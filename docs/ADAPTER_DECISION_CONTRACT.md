@@ -7818,3 +7818,14 @@ success/failure control shock lifetime. Exact-history restore/fork/replay binds
 the direct status to accepted setup and completed hazard. No Battle-shock test
 or outcome trigger is fabricated and no prior-runtime migration is inferred.
 See [the migration](../contracts/migrations/44.3.25-to-44.3.26.md).
+
+
+### D06 actual Embark distance
+
+Contract44.3.28 retains witnessed movement proposals and the finite canonical
+Embark option family. Shared discovery and accepted selection require each
+living rules-unit model within an inclusive actual three inches. Runtime/examples
+refresh without schema, proposal, event envelope or viewer changes. Existing
+atomic typed rejection/retry, exact-runtime restore/fork and replay apply.
+Analytical FRAME geometry does not certify native faction applicability.
+See [D06 scope](D06_EMBARK_DISTANCE_SCOPE.md) and the contract migration.

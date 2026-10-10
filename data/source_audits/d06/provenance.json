@@ -1,0 +1,235 @@
+{
+  "schema": "d06-embark-distance-provenance-v1",
+  "BASE": "b3e411bc415f98dae182fd96703d866f18a22ee2",
+  "BASE_TREE": "0d3c613b227a42e356d7fa6756b15832346fe5b8",
+  "selected_refs": [
+    "01.04",
+    "01.04.01",
+    "17.02",
+    "18.02",
+    "18.02.01"
+  ],
+  "retained_source_sha256": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+  "archives": {
+    "baseline-embark-validation.py.txt": "1b9b19bdd81e8b1254008e3b6a124b7c801ad3e0414ca8cbdc5b75dfe76c0cdb"
+  },
+  "original_five_file_checkpoint": {
+    "kind": "D06_WINDOWS_RESTORED_CHECKPOINT_BASELINE_BLOCKER_PARENT_DECISION",
+    "utc": "2026-10-10T15:12:55.911853+00:00",
+    "checkout": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-10\\task-2\\d06-windows-20261010",
+    "head": "7debdbd4182c1ee2703a367f2966dbdac685f18e",
+    "head_tree": "e964044f5fde51ea7e843e7d39a9a12c82e8e74f",
+    "working_files": [
+      {
+        "path": "src/warhammer40k_core/_engine_build_manifest.json",
+        "bytes": 708991,
+        "git_blob": "4a57963272f744e0a1083598305a53ae8088bf33",
+        "sha256": "632b9d1823d541508ecffc343af31170275b242727075b1725bcafc2dde059c7"
+      },
+      {
+        "path": "src/warhammer40k_core/engine/transport_embark_validation.py",
+        "bytes": 12099,
+        "git_blob": "5f69f941330becdefc52dea926942c70f117ab65",
+        "sha256": "84b620d0c2e858b7701eea093cf12dff9b002d0324d7e23d58143abdaa282dc7"
+      },
+      {
+        "path": "tests/d06_embark_helpers.py",
+        "bytes": 11835,
+        "git_blob": "5a340d10146e2a5e97582b90bfda9881d5b8c3e3",
+        "sha256": "a5eb476d823f5c6217524e891bc9c7111d74528b34cf261bfb48d16ae6d2b058"
+      },
+      {
+        "path": "tests/integration/test_d06_native_embark_distance.py",
+        "bytes": 6601,
+        "git_blob": "a14e0e6d7d77cc336571b5fc1552925ba49529a3",
+        "sha256": "496b3f31d79c105e025a2260e456940ed88dbeba57727b407bc3ccca8f51f5c4"
+      },
+      {
+        "path": "tests/unit/test_d06_embark_distance.py",
+        "bytes": 3862,
+        "git_blob": "82aa64e3a20f5e547c89cfaef01ea87b0e5078c2",
+        "sha256": "048391ca4459d2753d101e2509a9c978178071ae3ef0be5c13709a3e5c6c411c"
+      }
+    ],
+    "status": " M src/warhammer40k_core/_engine_build_manifest.json\n M src/warhammer40k_core/engine/transport_embark_validation.py\n?? tests/d06_embark_helpers.py\n?? tests/integration/test_d06_native_embark_distance.py\n?? tests/unit/test_d06_embark_distance.py\n",
+    "source_unchanged_during_ground_rerun": true,
+    "source_original_transfer_equivalence_receipt": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-10\\task-2\\D06_RESTORED_20261010T150149636029Z\\source-equivalence-receipt.json",
+    "only_post_transfer_edit": "New untracked integration draft corrected to expect GameLifecycleError for wrong submission kind on finite Embark request; original draft and failure preserved. No additional engine edit.",
+    "current_production_delta": "Transferred bounded Embark3D predicate plus its generated runtime manifest only.",
+    "baseline_restore": "FAIL on unchanged baseline7debdbd4;1353 loaded engine paths verified baseline-local;10.979308900015894seconds",
+    "candidate_restore": "FAIL on exact restored checkpoint;1353 loaded engine paths verified candidate-local;11.014602799987188seconds",
+    "identical_engine_generated_persistence_sha256": "2208b190df5659f2c634f8e1343a7659124f079658b72c6f3ee4727ebef40b0b",
+    "scope_assessment": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-10\\task-2\\D06_WINDOWS_CHECKS\\008-scope-assessment\\scope-assessment.json",
+    "focused_test_records": {
+      "geometry": {
+        "path": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-10\\task-2\\D06_WINDOWS_CHECKS\\005-current-geometry\\junit.xml",
+        "sha256": "53ee780302650161aa320c8b9f707546c7190377f68ba8cb42ca434cced2e7b3",
+        "cases": [
+          {
+            "id": "test_embark_actual_base_distance_boundary[horizontal-translation0-2.999-True]",
+            "seconds": "0.002",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_actual_base_distance_boundary[horizontal-translation0-3.0-True]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_actual_base_distance_boundary[horizontal-translation0-3.001-False]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_actual_base_distance_boundary[horizontal-translation1-2.999-True]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_actual_base_distance_boundary[horizontal-translation1-3.0-True]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_actual_base_distance_boundary[horizontal-translation1-3.001-False]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_actual_base_distance_boundary[vertical-translation0-2.999-True]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_actual_base_distance_boundary[vertical-translation0-3.0-True]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_actual_base_distance_boundary[vertical-translation0-3.001-False]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_actual_base_distance_boundary[vertical-translation1-2.999-True]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_actual_base_distance_boundary[vertical-translation1-3.0-True]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_actual_base_distance_boundary[vertical-translation1-3.001-False]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_diagonal_distance_is_not_separate_axis_limits[2.399]",
+            "seconds": "0.000",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_diagonal_distance_is_not_separate_axis_limits[2.4]",
+            "seconds": "0.000",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_diagonal_distance_is_not_separate_axis_limits[2.401]",
+            "seconds": "0.000",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_frame_closest_part_preserves_ordinary_base_plane[passenger]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_frame_closest_part_preserves_ordinary_base_plane[carrier]",
+            "seconds": "0.001",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_embark_any_carrier_model_can_be_closest",
+            "seconds": "0.000",
+            "outcome": "PASS"
+          }
+        ]
+      },
+      "first_player_original_draft": {
+        "path": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-10\\task-2\\D06_WINDOWS_CHECKS\\006-first-player-native\\junit.xml",
+        "sha256": "9bcdb30a2f87b0f038451ca95fe84744f409a3b3a5b1c201ff934107bc5964e2",
+        "cases": [
+          {
+            "id": "test_native_distance_offer_atomic_rejection_retry_forks_and_continuation[True-player-a]",
+            "seconds": "137.015",
+            "outcome": "PASS"
+          },
+          {
+            "id": "test_native_distance_offer_atomic_rejection_retry_forks_and_continuation[False-player-a]",
+            "seconds": "38.708",
+            "outcome": "FAIL"
+          }
+        ]
+      },
+      "first_player_ground_corrected": {
+        "path": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-10\\task-2\\D06_WINDOWS_CHECKS\\007-first-player-ground-corrected\\junit.xml",
+        "sha256": "d0f206e8c23c273b91ac1b3a71bc6fb9ef927e619961e607ed6ca50372bfb6cb",
+        "cases": [
+          {
+            "id": "test_native_distance_offer_atomic_rejection_retry_forks_and_continuation[False-player-a]",
+            "seconds": "138.261",
+            "outcome": "PASS"
+          }
+        ]
+      }
+    },
+    "timing_qualification": "Diagnostic focused runs only. Original mixed native cohort remains failed; its durations cannot feed passing final shard profile. No full behavioral/current final passing cohort exists.",
+    "first_player_elevated_qualification": "Passed under original transferred integration draft before finite-kind expectation correction; historical Windows focused evidence, not final-source gate credit.",
+    "second_player_normal_reachability": "Engine-generated player-b round2 pending Normal Move before passenger mutation; no live state/history/controller/dice edits.",
+    "needed_decision": "Authorize narrow baseline physical-history prerequisite within D06, or select a separately scoped prerequisite repair. Shared history source is unchanged pending this decision.",
+    "frame_native_applicability": "UNPROVEN",
+    "gates_pending": [
+      "attached living-model ownership/aggregation regression",
+      "static source audit",
+      "scope/roadmap and assertion inventory/pin updates",
+      "contract/client/runtime generation",
+      "exact-base performance assessment and quiet serial smoke",
+      "types/imports/contracts/wheel/source checks",
+      "whole quality",
+      "original16 isolated branch coverage",
+      "canonical final full-source/acceptance/policy/HEAD/TREE/BASE/Gitblob/archive freeze",
+      "parent independent coding/rules reviews",
+      "explicit RELEASE before remaining32-worker behavior/reviewer probes",
+      "complete passing current-cohort timing profile/twelve shards and post-profile whole quality",
+      "same-reviewer exact-final equivalence/renewal",
+      "parent authorization before draft publication/native CI/protected human merge"
+    ],
+    "aggregate_or_final_review_claims": false,
+    "publication_performed": false,
+    "active_owned_runtime_validation": false,
+    "no_mac_or_predecessor_edits": true
+  },
+  "original_tests_assertions_archives_or_budgets_changed": false,
+  "approved_scope": "Separately approved actual three-dimensional Embark distance, inclusive three-inch boundary and existing physical ownership/living model aggregation.",
+  "user_authorization": [
+    {
+      "sentinel": "Sentinel_859b395acafc8191b4859144b5eb74cd",
+      "text": "approved for all of them",
+      "context": "five named separate repairs including Embark beyond3inches"
+    },
+    {
+      "sentinel": "Sentinel_e4ab740989808191bac517724d80c69b",
+      "text": "I merged PR 577 manually - proceed to next PR"
+    },
+    {
+      "sentinel": "Sentinel_54a0428319648191882893ea81fea9aa",
+      "text": "move it to Windows since it never goes offline and thus we won't have the disconnect issues"
+    }
+  ],
+  "transfer": "Authenticated restored checkpoint; original five files and all earlier failures immutable. Successor starts from actual merged prerequisite main; old manifest retained separately and regenerated against current source.",
+  "sole_owner": "Windows task-2 D06 successor; parent arranges independent coding and rules reviews.",
+  "FRAME_native_applicability": "UNPROVEN; pure analytical part geometry is separate from admitted native gameplay.",
+  "delivery": "STATIC HOLD: no original16 until explicit16RELEASE; no remaining32 or reviewer runtime probes until subsequent explicitRELEASE. All current prerequisites, quiet smoke, whole quality, complete covered cohort, current-only timings/shards, post-profile quality, SAME exact-final reviews and parent readiness required. Publication held."
+}

@@ -1,0 +1,275 @@
+{
+  "retained_path": "data/source_audits/order135/retained-current-sources.json",
+  "source_authority": "Game Datamissions maintained mirror, non-affiliated; existing accepted hostname; live-body actual timestamp, not asserted App-data963",
+  "observed_at": "2026-10-01T12:04:31.127429+00:00",
+  "qualification": "Retained timestamped maintained-mirror body; no independent Games Workshop publication or App export certification; no new provider observation. D06 reuses these selected retained observations; no new live observation, official publication certification or faction admission is claimed.",
+  "source_inventory": [
+    {
+      "row_id": "rule:01:01.04:1",
+      "category": "01",
+      "locator": "01.04",
+      "title": "Measuring Distances",
+      "occurrence": 1,
+      "source_sha256": "4b621847515aae075777aa48d22a1c71da72ed738b3059f3c6fa2aab2a5accc8",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "c4af07e924c35efa39a39075b1af452ff5b5431037f4f736281a2d7110d017ef"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "63950d8a6a9a89a116a5ab67343f1c705ee6a6941101cdddeacb8e0d202cf30d"
+        }
+      ]
+    },
+    {
+      "row_id": "rule:01:01.04.01:1",
+      "category": "01",
+      "locator": "01.04.01",
+      "title": "Within / Wholly Within",
+      "occurrence": 1,
+      "source_sha256": "ffff59c3904c7a7de1e0883097826096caed61e66b5c68e24d3a911391b4114f",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "8150e840895740706e099029127f4c88d27a43ba52b29c71dc6d02d419d8b749"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "555f37963792f377f310cc6bda55faeaac294973d59eb5b499319e088534d487"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "9762a8db79ca66b513314e589b088fc47b6a7f21bc9ec8c81b41fea95d473a7b"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "dcd27e35283ef196362d813012bc23eb7f5dbff328a55835e378fc6506d4384a"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "16a51339b0c0bfe0a3f6050561819117a56b773bd891f9549760571e26eba32c"
+        }
+      ]
+    },
+    {
+      "row_id": "rule:17:17.02:1",
+      "category": "17",
+      "locator": "17.02",
+      "title": "Frame",
+      "occurrence": 1,
+      "source_sha256": "2e122ac8b1faf0a5497786125ee088c85820bf2b70f53a89ee65b99d2c3a7d5a",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "2a4942ad85d5acd97f8d310a67c07c46ff56fe555773608d360a470922b69c0a"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "2948b2b226b8ea545c37a665fcfbee6f37f7367638868323096b05f74718e1a8"
+        }
+      ]
+    },
+    {
+      "row_id": "rule:18:18.02:1",
+      "category": "18",
+      "locator": "18.02",
+      "title": "Embarking",
+      "occurrence": 1,
+      "source_sha256": "cede2b36ed7ba42da68829ea33baf5832d430cee25597c1824fa61a15a633cde",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "c9716e6b618df9695b8dd9fa097c24e2405e56f9572d9ab70a344fe7d328fd20"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "fac618c38cc3a5e0dafe55bc1a659748f141dca7f0cf566f6a3ca18940f95c45"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "4925d92519279b18daace03eeb976bdc22a2914b767420f1d88fd241c94c5351"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "179924150f0d37e2bf05f0fc91c19d8fd79f152668c1a3a9c42ca87f894ea0ef"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "d576ffb8a52d1d01a03f071452e69d2a5f71f07e6d003326e80f5cabf03eefb0"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "fd5e9f11f242ac691bf6e9abb6e667472cdf7d55b0804c376ab2e7ddbbe3f854"
+        }
+      ]
+    },
+    {
+      "row_id": "rule:18:18.02.01:1",
+      "category": "18",
+      "locator": "18.02.01",
+      "title": "Able To Embark",
+      "occurrence": 1,
+      "source_sha256": "26a755dfe36cce0c3cdebacd754fc0ca96c9fc125ab0886c919eb30b69a45b39",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "5bef2c9e7b335cb7c18ccc9742c06185cf2e87ae8203dd016422e72ebcb80521"
+        }
+      ]
+    }
+  ],
+  "complete_source_clauses": [
+    {
+      "ref": "01.04",
+      "title": "Measuring Distances",
+      "text": [
+        "Distances in Warhammer 40,000 are measured in inches (\"). You can measure distances whenever you want to.",
+        "When a rule refers to a model’s position in relation to anything else on the battlefield, unless otherwise stated, measure to or from the closest part of that model’s base."
+      ],
+      "accordions": [
+        {
+          "ref": "01.04.01",
+          "title": "Within / Wholly Within",
+          "text": [
+            "Rules in Warhammer 40,000 will often apply to models or units that are within or wholly within a certain distance. The following definitions explain what these terms mean:",
+            "• \u0005Within:\u0006 If a rule says it applies ‘within’ a specified distance, it applies at any distance that is not more than that distance. For example, within 1\" means any distance that is not more than 1\" away",
+            "• \u0005Model/Unit Within:\u0006 A model is within a specified distance if any part of its base is within that distance. A unit is within a specified distance if one or more of its models are within that distance.",
+            "• \u0005Model/Unit Wholly Within:\u0006 A model is wholly within a specified distance if every part of its base is within that distance. A unit is wholly within if every model in that unit is wholly within the specified distance. A model with the \u0003frame\u0004 keyword is wholly within a specified distance if all parts of that model are within the specified distance.",
+            "\u0005Example\u0006: \u0007A model is wholly within a \u0005terrain area\u0006 if no part of its base extends beyond the footprint of that \u0005terrain area\u0006. A unit is wholly within a specified distance if every model in that unit is wholly within that distance.\b"
+          ]
+        },
+        {
+          "ref": "01.04.02",
+          "title": "Closest Or Nearest Model/Unit",
+          "text": [
+            "When a rule refers to the closest or nearest model or unit, this is the closest model or unit to the model or unit using that rule.",
+            "If two or more are equally close, the controlling player of the model or unit using that rule selects which is the closest for the purposes of that rule."
+          ]
+        },
+        {
+          "ref": "01.04.03",
+          "title": "As Close As Possible",
+          "text": [
+            "If a rule instructs you to move a model as close as possible to a unit or model you must end that model’s move in base contact with that unit or model if its move is sufficient to do so without breaking any other restrictions (such as \u0005coherency\u0006), or as close as you can achieve if its move is not sufficient.",
+            "• If a model is already as close as possible to a unit or model when it is instructed to make a move as close as possible towards a unit or model, that model cannot be moved, but still counts as having made the move in question.",
+            "If a rule instructs you to move a model as close as possible to an \u0005objective\u0006 you must end that model’s move within range of an \u0005objective\u0006 if its move is sufficient to do so without breaking any other restrictions (such as \u0005coherency\u0006), or as close as you can achieve if its move is not sufficient.",
+            "• If that model is already within range of an \u0005objective\u0006 it can move up to the \u0005maximum distance\u0006 of that move but must end its move still within range of that \u0005objective\u0006."
+          ]
+        },
+        {
+          "ref": "01.04.04",
+          "title": "Base Contact or Base to Base Contact",
+          "text": [
+            "When two models’ bases are touching, they are in base contact – also known as base-to-base contact – and are as close as possible (01.04.03).",
+            "When moving a model from your army into base contact with an enemy model during a move, if that enemy model overhangs its base such that it is not physically possible to be in base contact with that model, until the end of the turn, those models are considered to be in base contact with each other while all of the following are true:",
+            "• The distance your model could move was sufficient to move it into base contact with the enemy model if there was no overhang.",
+            "• The models are as close as possible together.",
+            "• Any part of one model is within 1\" of any part of the other model."
+          ]
+        },
+        {
+          "ref": "01.04.05",
+          "title": "Table Quarters",
+          "text": [
+            "When a rule refers to a table quarter, or table quarters, divide the battlefield with imaginary lines 1mm thick drawn lengthwise and widthwise through the centre of the battlefield to create four equal rectangles. These rectangles are the table quarters."
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "01.04.01",
+      "title": "Within / Wholly Within",
+      "text": [
+        "Rules in Warhammer 40,000 will often apply to models or units that are within or wholly within a certain distance. The following definitions explain what these terms mean:",
+        "• \u0005Within:\u0006 If a rule says it applies ‘within’ a specified distance, it applies at any distance that is not more than that distance. For example, within 1\" means any distance that is not more than 1\" away",
+        "• \u0005Model/Unit Within:\u0006 A model is within a specified distance if any part of its base is within that distance. A unit is within a specified distance if one or more of its models are within that distance.",
+        "• \u0005Model/Unit Wholly Within:\u0006 A model is wholly within a specified distance if every part of its base is within that distance. A unit is wholly within if every model in that unit is wholly within the specified distance. A model with the \u0003frame\u0004 keyword is wholly within a specified distance if all parts of that model are within the specified distance.",
+        "\u0005Example\u0006: \u0007A model is wholly within a \u0005terrain area\u0006 if no part of its base extends beyond the footprint of that \u0005terrain area\u0006. A unit is wholly within a specified distance if every model in that unit is wholly within that distance.\b"
+      ]
+    },
+    {
+      "ref": "17.02",
+      "title": "Frame",
+      "text": [
+        "Some models do not have a base; many of these are \u0003MONSTER/VEHICLE\u0004 models. Such models have the \u0003FRAME\u0004 keyword, as do some other large models. Whenever a rule refers to a model’s position in relation to anything else on the battlefield (e.g. when measuring distances), if that model has the \u0003FRAME\u0004 keyword, unless otherwise stated, measure to and from the closest point on that model (so not necessarily from its base, if it has one).",
+        "When rotating a \u0003FRAME\u0004 model as part of a move, if that model does not have a base, turn it any amount around its central axis, while keeping it upright."
+      ]
+    },
+    {
+      "ref": "18.02",
+      "title": "Embarking",
+      "text": [
+        "Once the first battle round has started, a friendly unit can embark within a friendly \u0003TRANSPORT\u0004 model after making a \u0005normal\u0006, \u0005advance\u0006 or \u0005fall-back move\u0006, if \u0001all\u0002 of the following conditions apply:",
+        "• Each model in that unit is within 3\" of that \u0003TRANSPORT\u0004.",
+        "• That unit was not set up on the battlefield this turn.",
+        "• That unit is \u0005eligible to embark\u0006 within that \u0003TRANSPORT\u0004, as described on that \u0003TRANSPORT\u0004’s datasheet.",
+        "• That \u0003TRANSPORT\u0004 has sufficient remaining \u0005transport capacity\u0006 for each model in that unit.",
+        "When a unit embarks, the active player removes that unit from the battlefield and places it to one side – it is now embarked within that \u0003TRANSPORT\u0004 and is not on the battlefield."
+      ],
+      "accordions": [
+        {
+          "ref": "18.02.01",
+          "title": "Able To Embark",
+          "text": [
+            "A unit is able to embark if it meets all of the conditions in Embarking (18.02). Note that one or more of these conditions may be modified by other rules, in which case a unit must satisfy those modified conditions in addition to any unmodified conditions to be able to embark."
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "18.02.01",
+      "title": "Able To Embark",
+      "text": [
+        "A unit is able to embark if it meets all of the conditions in Embarking (18.02). Note that one or more of these conditions may be modified by other rules, in which case a unit must satisfy those modified conditions in addition to any unmodified conditions to be able to embark."
+      ]
+    }
+  ],
+  "raw_capture_checks": [
+    {
+      "path": "data/source_audits/v963_shock/captures/changelog.html",
+      "sha256": "64ecd26644424f89e7a4760a037680d380a295b20ec24fa3a017066e255cc9fa",
+      "bytes": 85282
+    },
+    {
+      "path": "data/source_audits/v963_shock/captures/core-rules.html",
+      "sha256": "e3a570737daa7dad215efce14d606e95e7cd194df2d7d61bed9a2353caeb8744",
+      "bytes": 61599
+    },
+    {
+      "path": "data/source_audits/v963_shock/captures/core-page.js",
+      "sha256": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
+      "bytes": 216294
+    }
+  ],
+  "historical_d06_audit": {
+    "id": "D06-EMBARK-FRAME",
+    "disposition": "STATIC_DISCREPANCY_NORMAL_NATIVE_ENTRY_UNRESOLVED",
+    "rationale": "Horizontalbase-only embark distance concern distinctfrom approvedDisembarkrepair. Need legalstableupperFRAME/3D publicMove-embark; no arbitrarybodycert.",
+    "controlling_source": "18.02everymodelwithin3;01.04default3D;17.02FRAMEparts",
+    "actual_owner": "engine/transport_embark_validation.py:_model_within_any_transport_model",
+    "complete_static_evidence": "candidate-reconciliation-001.json STATIC-EMBARK-DISTANCE-01; traces003/006",
+    "next_minimal_boundary": "PubliclegalNormal/Advanceend onstableelevatedfloor nearcarrierhorizontal but>3vertical; separatelyFRAMEbodynearcarrier supportbase>3, physicallylegal/nooverlap.",
+    "pr576_cutoff_disposition": "FOLLOW_UP_NO_IMPLEMENTATION_ORDER_OR_REPAIR_AUTHORIZATION",
+    "next_action": "Use the retained next_minimal_boundary and controlling source to assess this item in separately selected follow-up work. No broad probe or fix in PR576.",
+    "current_runtime_pass_or_full_compliance_claimed": false
+  },
+  "later_authorization": "Delegation supplies explicit later user approval and Windows relocation; historical cutoff disposition is preserved unchanged.",
+  "retained_sha256": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f"
+}
