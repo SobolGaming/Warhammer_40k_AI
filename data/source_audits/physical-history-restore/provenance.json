@@ -1,0 +1,20 @@
+{
+  "base": "7debdbd4182c1ee2703a367f2966dbdac685f18e",
+  "scope": "Separate valid-state physical-history save/load prerequisite before D06",
+  "authority": "User approved the separate prerequisite PR followed by D06 at 2026-10-10T15:22 UTC.",
+  "baseline_tree": "e964044f5fde51ea7e843e7d39a9a12c82e8e74f",
+  "owner": "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py",
+  "owner_baseline_git_blob": "a35a984f51013ceff714b1342b9cb6346addef31",
+  "archives": {
+    "baseline-off-battlefield-command-tests.py.txt": "877f50031cc5fc93a3a8adb2f12efdd08bfca48259d8161ee306aae6e5c53cc6",
+    "baseline-physical-authority.py.txt": "7df434b15f175cc8486dbc765a7badc3f6c2ff7b6d1fab54bf72419c9269ff57"
+  },
+  "reproduced_payload_sha256": "2208b190df5659f2c634f8e1343a7659124f079658b72c6f3ee4727ebef40b0b",
+  "failure": "Physical event-bound history lacks an exact pre-mutation anchor.",
+  "original_assertion_changes": [],
+  "original_budgets_changed": false,
+  "new_gameplay_rule": false,
+  "new_source_observation": false,
+  "compatibility_shim": false,
+  "supported_boundary": "Engine-generated earlier embarked passenger state followed by legal Disembark/Move; retained scoring/checkpoint authentication and terminal-state binding."
+}

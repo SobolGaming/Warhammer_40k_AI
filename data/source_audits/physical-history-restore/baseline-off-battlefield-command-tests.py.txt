@@ -5,7 +5,6 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.order135_transport_helpers import CARRIER, PASSENGER
 from tests.phase11c_command_phase_helpers import (
     complete_setup_through_gate,
     default_unit_selection,
@@ -15,20 +14,7 @@ from tests.phase11c_command_phase_helpers import (
     unit_by_id,
     unit_selection,
 )
-from tests.physical_history_transport_helpers import (
-    default_choice,
-    move_payload,
-    propose,
-    round2_movement_scene,
-    state_of,
-)
-from tests.psychic_modifier_helpers import pending_request
 
-from warhammer40k_core.adapters.access_control import (
-    ROLE_POLICY_BY_ROLE,
-    PrincipalRole,
-    ViewerContext,
-)
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
@@ -60,9 +46,6 @@ from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePaylo
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
-    PrimaryMissionBoundaryCheckpoint,
-)
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.reserve_arrival_requirements import reposition_destruction_policy
@@ -589,116 +572,3 @@ def test_mixed_battlefield_and_off_battlefield_candidates_share_finite_sequencin
         .status
         is ReplayRunStatus.REPRODUCED
     )
-
-
-def assert_session_equivalent(source: LocalGameSession, other: LocalGameSession) -> None:
-    assert other.to_persistence_payload() == source.to_persistence_payload()
-    assert other.lifecycle.to_payload() == source.lifecycle.to_payload()
-    assert other.lifecycle.state is not source.lifecycle.state
-    for role in PrincipalRole:
-        players = (
-            ("player-a", "player-b")
-            if role in (PrincipalRole.PLAYER, PrincipalRole.COACH)
-            else (None,)
-        )
-        for player in players:
-            viewer = ViewerContext(
-                principal_id=f"physical-history:{role}:{player}",
-                role=role,
-                viewer_player_id=player,
-                policy=ROLE_POLICY_BY_ROLE[role],
-            )
-            assert other.view_for_context(viewer=viewer) == source.view_for_context(viewer=viewer)
-            assert other.events_since_for_context(
-                EventStreamCursor(), viewer=viewer
-            ) == source.events_since_for_context(EventStreamCursor(), viewer=viewer)
-
-
-def assert_replayed(session: LocalGameSession) -> None:
-    result = ReplayRunner.from_payload(
-        json.loads(json.dumps(session.replay_artifact(artifact_id="physical-history:exact")))
-    ).run()
-    assert result.status is ReplayRunStatus.REPRODUCED, result
-
-
-def complete_movement(session: LocalGameSession) -> None:
-    for _ in range(30):
-        request = pending_request(session)
-        if request.decision_type == "select_shooting_unit":
-            return
-        default_choice(session, request)
-    raise AssertionError("Native movement continuation did not reach shooting")
-
-
-@pytest.mark.parametrize("player", ["player-a", "player-b"])
-@pytest.mark.parametrize("elevated", [False, True])
-@pytest.mark.integration
-@pytest.mark.replay
-def test_prior_embarked_checkpoint_restores_pending_and_completed_native_movement(
-    player: str, elevated: bool
-) -> None:
-    scene = round2_movement_scene(player=player, elevated=elevated)
-    session = scene.session
-    request = pending_request(session)
-    assert request.decision_type == "submit_movement_proposal"
-    assert request.actor_id == player
-    assert state_of(session).battle_round == 2
-    events = session.lifecycle.decision_controller.event_log.records
-    prior_checkpoints = tuple(
-        event
-        for event in events
-        if event.event_type == "primary_scoring_commit_checkpoint_recorded"
-    )
-    assert prior_checkpoints
-    assert any(event.event_type == "unit_disembarked" for event in events)
-    checkpoints: list[PrimaryMissionBoundaryCheckpoint] = []
-    for event in prior_checkpoints:
-        assert isinstance(event.payload, dict)
-        checkpoints.append(
-            PrimaryMissionBoundaryCheckpoint.from_payload(event.payload["checkpoint"])
-        )
-    assert any(
-        row.component_unit_instance_id == PASSENGER
-        and row.owner_player_id == player
-        and row.presence == "embarked"
-        for checkpoint in checkpoints
-        for row in checkpoint.model_states
-    )
-
-    payload = session.to_persistence_payload()
-    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(payload)))
-    fork = session.fork()
-    assert_session_equivalent(session, restored)
-    assert_session_equivalent(session, fork)
-    assert_replayed(session)
-
-    proposal = move_payload(session, request, dy=-0.5)
-    assert isinstance(proposal, dict)
-    invalid = session.submit_parameterized_payload(
-        request_id=request.request_id,
-        result_id="physical-history:invalid-echo",
-        payload={**proposal, "unit_instance_id": CARRIER},
-    )
-    assert invalid.status_kind is LifecycleStatusKind.INVALID
-    assert session.to_persistence_payload() == payload
-    assert pending_request(session) == request
-
-    propose(fork, pending_request(fork), proposal)
-    assert fork.to_persistence_payload() != payload
-    assert session.to_persistence_payload() == restored.to_persistence_payload() == payload
-    for active in (session, restored):
-        propose(
-            active, pending_request(active), move_payload(active, pending_request(active), dy=-0.5)
-        )
-    for active in (session, restored, fork):
-        # The prerequisite does not alter or assert Embark distance semantics.
-        # Decline any optional transport selection through the ordinary facade.
-        complete_movement(active)
-    assert_session_equivalent(session, restored)
-    assert_session_equivalent(session, fork)
-    completed = LocalGameSession.from_persistence_payload(
-        json.loads(json.dumps(session.to_persistence_payload()))
-    )
-    assert_session_equivalent(session, completed)
-    assert_session_equivalent(session, session.fork())
-    assert_replayed(session)

@@ -43717,8 +43717,8 @@
       "sha256": "64092d65b4849ceabebe2575ba927cc4be092dff0ded5b50cc00da121c5bf190"
     },
     "tests/integration/test_off_battlefield_command_battle_shock.py": {
-      "bytes": 23703,
-      "sha256": "877f50031cc5fc93a3a8adb2f12efdd08bfca48259d8161ee306aae6e5c53cc6"
+      "bytes": 28972,
+      "sha256": "d58f788f6f9a80403ff494750ff22572f9d20b091e7d2ce05e66c9c13b9bf0aa"
     },
     "tests/integration/test_order127_infiltrators_redeploy.py": {
       "bytes": 8299,
@@ -104283,7 +104283,7 @@
         "assert requests[0].below_half_strength_context.current_model_count == remaining"
       ],
       "complete_current_body": "@pytest.mark.parametrize('location', ['embarked', 'reserves'])\n@pytest.mark.parametrize(('remaining', 'shocked', 'required'), [(5, False, False), (5, True, True), (2, False, True), (2, True, True), (0, False, False)])\ndef test_command_collection_counts_living_off_battlefield_units_once(location: str, remaining: int, shocked: bool, required: bool) -> None:\n    _, state, _, unit_id = _command_fixture(location=location, remaining=remaining, shocked=shocked)\n    army = state.army_definition_for_player('player-a')\n    assert army is not None\n    assert state.battlefield_state is not None\n    requests = collect_battle_shock_test_requests(game_id=state.game_id, battle_round=state.battle_round, player_id='player-a', army=army, battlefield_state=state.battlefield_state, starting_strength_records=tuple(state.starting_strength_records), battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids), state=state)\n    assert tuple((request.unit_instance_id for request in requests)) == ((unit_id,) if required else ())\n    if required:\n        assert requests[0].reason is BattleShockTestReason.COMMAND_PHASE_REQUIRED\n        assert requests[0].below_half_strength_context.current_model_count == remaining",
-      "file_sha256": "877f50031cc5fc93a3a8adb2f12efdd08bfca48259d8161ee306aae6e5c53cc6",
+      "file_sha256": "d58f788f6f9a80403ff494750ff22572f9d20b091e7d2ce05e66c9c13b9bf0aa",
       "resolved_path": "tests/integration/test_off_battlefield_command_battle_shock.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "0ef013ab5639c17ce7f1efadf5930ff64eae7f830b542f1e95ee31a1e7b9b244"
