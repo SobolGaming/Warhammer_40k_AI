@@ -20,6 +20,7 @@ from warhammer40k_core.engine import (
 )
 from warhammer40k_core.engine import charge_declaration_hooks as _cd
 from warhammer40k_core.engine import charge_roll_dispatch as _charge_rerolls
+from warhammer40k_core.engine import combat_disembark_battle_shock as _combat_disembark_bs
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import core_stratagem_mortal_wound_continuation as _stratagem_mw
 from warhammer40k_core.engine import fight_activation_abilities as _fa
@@ -329,6 +330,7 @@ from warhammer40k_core.engine.tracked_targets import (
 from warhammer40k_core.engine.transport_source_embark import source_embark_dispatch_handler
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+    DisembarkModeKind,
     apply_transport_hazard_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.triggered_movement import (
@@ -1992,6 +1994,10 @@ class GameLifecycle:
                         if handled_status is not None:
                             return handled_status
                 return transport_hazard_status
+            if source_context.get("disembark_mode") == DisembarkModeKind.COMBAT_DISEMBARK.value:
+                _combat_disembark_bs.complete_combat_disembark_battle_shock(
+                    state=state, decisions=self.decision_controller
+                )
             advanced_status = self.advance_until_decision_or_terminal()
             if resolves_reaction_frame:
                 if _fight_decision_owns_request(state=state, request=record.request):

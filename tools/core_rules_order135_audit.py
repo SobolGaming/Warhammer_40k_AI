@@ -31,6 +31,56 @@ class CurrentAuditError(ValueError):
     """A required current source/owner/assertion input is incomplete or drifted."""
 
 
+def _d04_assertion_exception(root: Path, changed_links: list[dict[str, Any]]) -> int:
+    """Preserve the fourteen historical changes, inventory one selected correction."""
+    record = _read(root, Path("data/source_audits/d04/assertion-exceptions.json"))
+    archive = (root / record["baseline_file"]).read_bytes()
+    if _sha(archive) != record["baseline_file_sha256"]:
+        raise CurrentAuditError("D04 original assertion archive drifted.")
+    original = ast.parse(archive)
+    current = ast.parse((root / "tests/unit/test_phase10q_transports.py").read_bytes())
+    for row in record["assertion_exceptions"]:
+        name = row["nodeid"].split("::")[1]
+        before = next(n for n in original.body if isinstance(n, ast.FunctionDef) and n.name == name)
+        after = next(n for n in current.body if isinstance(n, ast.FunctionDef) and n.name == name)
+        before_assertions = [ast.unparse(n) for n in ast.walk(before) if isinstance(n, ast.Assert)]
+        after_assertions = [ast.unparse(n) for n in ast.walk(after) if isinstance(n, ast.Assert)]
+        restored_after = ast.parse(
+            ast.unparse(after).replace(row["current_assertion"], row["changed_assertion"])
+        ).body[0]
+        if (
+            before_assertions != row["original_assertions"]
+            or _sha(ast.dump(before, include_attributes=False).encode())
+            != row["original_function_ast_sha256"]
+            or _sha(ast.dump(restored_after, include_attributes=False).encode())
+            != row["original_function_ast_sha256"]
+            or before_assertions.count(row["changed_assertion"]) != 1
+            or after_assertions
+            != [
+                row["current_assertion"] if a == row["changed_assertion"] else a
+                for a in before_assertions
+            ]
+            or row["current_assertion"]
+            != row["changed_assertion"].replace("'end_of_turn'", "'until_cleared'")
+        ):
+            raise CurrentAuditError("D04 marker exception changed another original assertion.")
+    expected_node = (
+        "tests/unit/test_phase10q_transports.py::"
+        "test_combat_disembark_rolls_hazard_for_each_model_and_round_trips"
+    )
+    selected = [
+        row
+        for row in changed_links
+        if row["requirement_id"] == "18.04-combat-battle-shock"
+        and row["original"]["nodeid"] == expected_node
+        and row["original"]["assertion"]
+        == "assert result.disembarked_unit_state.battle_shocked_until == 'end_of_turn'"
+    ]
+    if len(selected) != 1:
+        raise CurrentAuditError("D04 selected assertion exception is not uniquely used.")
+    return len(selected)
+
+
 def _sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
@@ -379,7 +429,8 @@ def build(root: Path = ROOT) -> dict[str, Any]:
                         "runtime_pass_claimed": False,
                     }
                 )
-    if len(rows) != 1078 or len(no_original) != 34 or len(changed_links) != 14:
+    d04_exceptions = _d04_assertion_exception(root, changed_links)
+    if len(rows) != 1078 or len(no_original) != 34 or len(changed_links) - d04_exceptions != 14:
         raise CurrentAuditError("Complete original obligation/link inventory drifted.")
     additions = []
     for faq_id, binding in bindings["current_new_faqs"].items():

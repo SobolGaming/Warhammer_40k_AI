@@ -347,7 +347,7 @@ class DisembarkedUnitState:
                 can_move_further=False,
                 can_choose_remain_stationary=False,
                 can_declare_charge=False,
-                battle_shocked_until="end_of_turn",
+                battle_shocked_until="until_cleared",
                 source_rule_id=_COMBAT_DISEMBARK_RULE_ID,
             )
         if mode is not DisembarkModeKind.TACTICAL_DISEMBARK:

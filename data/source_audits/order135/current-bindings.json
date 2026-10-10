@@ -1136,6 +1136,31 @@
       "disposition": "Approved D03: verified whole-unit Tactical witness blocks Combat; a sound necessary-domain exclusion can authorize Combat, while unresolved proof rejects atomically. Current grouped hazard producer and shared strict decoder preserve valid state.",
       "authority": "data/source_audits/order135/d02-d03-explicit-repair-and-assertion-approval.json",
       "qualification": "Analytical public tall-FRAME and ordinary supported-platform scenes plus original attached hazard/FNP regressions. Continuous joint pose proof is relaxed; finite witness failure is not impossibility, and these controls do not establish complete admission for every scene. Exact five-test exception retains all 63 original assertions and adds five atomicity assertions."
+    },
+    "18.04-combat-battle-shock": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/combat_disembark_battle_shock.py:complete_combat_disembark_battle_shock",
+        "src/warhammer40k_core/engine/combat_disembark_battle_shock.py:replay_combat_disembark_battle_shock",
+        "src/warhammer40k_core/engine/battle_shock_state.py:apply_direct_battle_shock_state",
+        "src/warhammer40k_core/engine/phases/movement_placement_proposals.py:_apply_valid_combat_disembark",
+        "src/warhammer40k_core/engine/lifecycle.py:GameLifecycle._apply_mortal_wound_resolution_decision",
+        "src/warhammer40k_core/engine/phases/movement_rules_unit_disembark.py:_emit_rules_unit_combat_hazard_resolved"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d04_combat_battle_shock.py::test_native_combat_survivor_enters_shared_shock_without_test_and_restores",
+        "tests/unit/test_d04_combat_battle_shock.py::test_native_ground_tactical_remains_unshocked_positive",
+        "tests/unit/test_d04_combat_battle_shock.py::test_native_combat_persists_until_one_required_own_command_test",
+        "tests/unit/test_d04_combat_battle_shock.py::test_native_combat_malformed_source_is_atomic_and_retry_applies_once",
+        "tests/unit/test_order135_combat_tactical_feasibility.py::test_native_grouped_combat_pending_hazard_preserves_strict_context_and_replay",
+        "tests/unit/test_d04_combat_battle_shock.py::test_native_combat_member_oc_and_normal_objective_resolver_use_shared_status",
+        "tests/unit/test_d04_combat_battle_shock.py::test_native_combat_restore_requires_the_exact_direct_status_occurrence",
+        "tests/unit/test_d04_combat_battle_shock.py::test_native_combat_all_killed_cargo_records_no_surviving_shock",
+        "tests/unit/test_d04_combat_battle_shock.py::test_native_attached_combat_uses_one_identity_and_shared_status_is_idempotent"
+      ],
+      "disposition": "Selected D04 correction applies direct shared Battle-shock after accepted Combat setup and completed hazard; source/result/event-linked reconstruction. Charge expiry remains end of turn; shock clears only through source-authorized ordinary Command success.",
+      "authority": "data/source_audits/d04/assertion-exceptions.json",
+      "qualification_reference": "docs/D04_COMBAT_BATTLE_SHOCK_SCOPE.md",
+      "qualification": "Analytical predeclared cargo/HILLS recipe, no faction grant or provider certification. Native standalone survivor through current grouped dispatch, canonical attached survivor, canonical ten-model all-killed hazard, pending FNP and Command pass/fail controls; current OC/Action/target queries and normal objective resolver. Shared direct-owner idempotence on native attached status does not claim a second native Combat decision. Actual native CP spend, mission Action execution and scoring delta remain unavailable in this recipe; existing legitimate shared consumer regressions are required separately. Valid-state restore/fork/all roles/events/exact replay are tested with current receipts; static bindings do not certify runtime. Emergency remains unselected. Current public scalar-shaped wrapper delegates to the whole-unit resolver. Retained scalar native owner and lifecycle continuation wiring are separate owner obligations; native standalone scenes do not certify scalar-owner execution."
     }
   },
   "source_supersessions": {

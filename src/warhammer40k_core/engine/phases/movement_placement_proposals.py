@@ -583,4 +583,9 @@ def _apply_valid_combat_disembark(
                 "phase_body_status": "transport_hazard_feel_no_pain_required",
             },
         )
+    from warhammer40k_core.engine.combat_disembark_battle_shock import (
+        complete_combat_disembark_battle_shock,
+    )
+
+    complete_combat_disembark_battle_shock(state=state, decisions=decisions)
     return None

@@ -810,6 +810,7 @@ def apply_rules_unit_combat_disembark_to_state(
     combat_payload = validate_json_value(combat_disembark.to_payload())
     if mortal_wounds == 0:
         _emit_rules_unit_combat_hazard_resolved(
+            state=state,
             decisions=decisions,
             combat_payload=combat_payload,
             mortal_wounds=0,
@@ -859,6 +860,7 @@ def apply_rules_unit_combat_disembark_to_state(
             "Rules-unit Combat Disembark hazard did not produce an application."
         )
     _emit_rules_unit_combat_hazard_resolved(
+        state=state,
         decisions=decisions,
         combat_payload=combat_payload,
         mortal_wounds=mortal_wounds,
@@ -906,6 +908,7 @@ def apply_rules_unit_combat_disembark_feel_no_pain_decision(
     if routed.application is None:
         raise GameLifecycleError("Rules-unit Combat Disembark FNP did not finish hazard routing.")
     _emit_rules_unit_combat_hazard_resolved(
+        state=state,
         decisions=decisions,
         combat_payload=combat_payload,
         mortal_wounds=mortal_wounds,
@@ -955,6 +958,7 @@ def _rules_unit_combat_hazard_context(
 
 def _emit_rules_unit_combat_hazard_resolved(
     *,
+    state: GameState,
     decisions: DecisionController,
     combat_payload: JsonValue,
     mortal_wounds: int,
@@ -976,6 +980,11 @@ def _emit_rules_unit_combat_hazard_resolved(
             "pending_mortal_wound_request_id": None,
         },
     )
+    from warhammer40k_core.engine.combat_disembark_battle_shock import (
+        complete_combat_disembark_battle_shock,
+    )
+
+    complete_combat_disembark_battle_shock(state=state, decisions=decisions)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

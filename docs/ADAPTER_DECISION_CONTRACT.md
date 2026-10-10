@@ -7801,3 +7801,20 @@ context comparison; Boolean/number aliases and extra unowned fields are rejected
 The existing standalone and Emergency variants retain their routes. No old draft
 payload is silently converted. Exact-runtime save/load/fork, public event views
 and replay remain required. See the contract migration for feasibility limits.
+
+### D04 Combat Disembark direct Battle-shock
+
+Contract44.3.26 uses the existing Combat placement proposal and hazard/FNP
+continuation. Completed Combat hazard emits
+`combat_disembark_battle_shock_applied` with accepted setup/result and exact
+hazard occurrence identities, and applies canonical surviving-unit status through
+the shared direct-state owner. Pending hazard applies no status; all-killed cargo
+records no required survivor status; already-shocked identity is not duplicated.
+The generic event envelope and viewer scoping cover the additional event.
+
+Combat's `battle_shocked_until` marker is `until_cleared`, while the charge
+restriction expires at current turn end. Ordinary own Command selection and
+success/failure control shock lifetime. Exact-history restore/fork/replay binds
+the direct status to accepted setup and completed hazard. No Battle-shock test
+or outcome trigger is fabricated and no prior-runtime migration is inferred.
+See [the migration](../contracts/migrations/44.3.25-to-44.3.26.md).
