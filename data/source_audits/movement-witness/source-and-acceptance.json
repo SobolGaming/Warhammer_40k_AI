@@ -1,0 +1,69 @@
+{
+  "base": "72475b63fa70f64a57264bc7a37e1c6fe7c7cca3",
+  "base_tree": "dfc57f6f5accf2d948c9ef7540a7272b167b6b80",
+  "sole_parent": "b3e411bc415f98dae182fd96703d866f18a22ee2",
+  "selected_complete_source_pins": [
+    {
+      "path": "AGENTS.md",
+      "blob": "e58b67eb6a602fbab86d9036a687d4cb3d8c6f0c",
+      "bytes": 23981,
+      "sha256": "76801ae91602ab66a164e7d4500294977bd92725ca78026472ddfcd23f20e309"
+    },
+    {
+      "path": "docs/ADAPTER_DECISION_CONTRACT.md",
+      "blob": "85dcb800e4dccb048540bb775eb29abec9fbc18f",
+      "bytes": 679085,
+      "sha256": "f5f2f2d17d85d775d08adea7f1bcd46160602257ddcb336842966f9dd36eab18"
+    },
+    {
+      "path": "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md",
+      "blob": "15d14ed8ee947fb8fc8e6b3a4bad1c2c2bdc2eb0",
+      "bytes": 6709,
+      "sha256": "130c91bcc173640eae41ae3ea0e6b63ac70a49a059071f6ecbc930c0a7ea2297"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/physical_proposal_validation.py",
+      "blob": "0d0c1b6916954eb86745b3172a4d8b7ac84219c4",
+      "bytes": 4650,
+      "sha256": "5dfd897c09bf99bac39e2e4bd1555a4acdfc14509d1634aa8338a2c67a58f800"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/rules_unit_placement.py",
+      "blob": "f4801c977d7c876fc7e26ac6041706b877fb6a06",
+      "bytes": 9332,
+      "sha256": "b61fdaafc003aea993b5608145f3e8b108172b6cafc79f39b2590dca81e40cac"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/phases/movement_handler.py",
+      "blob": "703140585643aea596ce645531323806d3aac565",
+      "bytes": 45885,
+      "sha256": "addb7675a9b6efc52fb4c336f3c82bcc39ae928988bdd3f4bdcbd7cf6d80e6f3"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/phases/movement_rules_units.py",
+      "blob": "465551f2dda47dd61ae91b3fcbcebea956c6754b",
+      "bytes": 19604,
+      "sha256": "0e8bae1578bf0b77fe736bcbc7af389584d2f792b66287d5f2cbc7de9eff4186"
+    },
+    {
+      "path": "src/warhammer40k_core/engine/lifecycle.py",
+      "blob": "333a788d26ad59f90104e01e058c8526edbf9898",
+      "bytes": 147720,
+      "sha256": "6bb0b8ab95e0f7b83e40f2d5db66f81e542fba7f20671c6be30c87617e06cd02"
+    },
+    {
+      "path": "src/warhammer40k_core/adapters/local_session.py",
+      "blob": "a57ba5c90fb714fa54f01489b5bf4590aeab71e9",
+      "bytes": 29494,
+      "sha256": "c6e7abc7bd63c33a47ef6c42b61e51eac8dc158e5392014f606c6bcfdc347508"
+    }
+  ],
+  "source_obligation": "Existing complete engine physical ownership and precommit adapter wrong-context rejection contracts; no new gameplay permission.",
+  "acceptance_document": "docs/MOVEMENT_WITNESS_MEMBERSHIP_SCOPE.md",
+  "approval_sha256": "fd17a4914b4ce1eb001c25e98bc6012bcdd2fc816b67cf53d14e2627a064d599",
+  "baseline_reproduction": "Fresh ordinary LocalGameSession.start plus native decisions. Correct pending wrapper, one actual foreign physical model ID. Valid before checkpoint restored; after queue/decision mutation and strict resolver error, generated checkpoint failed replay restore.",
+  "normal_legal_play_failure_claimed": false,
+  "D07_in_this_PR": false,
+  "original_tests_assertions_archives_branches_ceilings_changed": false,
+  "full_local_remote_gates_and_two_exact_final_reviews": "PENDING"
+}

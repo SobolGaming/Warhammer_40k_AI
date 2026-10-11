@@ -5857,6 +5857,38 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "movement-witness-membership-validation": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py",
+        "src/warhammer40k_core/engine/phases/movement_rules_units.py",
+        "src/warhammer40k_core/engine/rules_unit_placement.py"
+      ],
+      "owners": [
+        "@module",
+        "MovementPhaseHandler.invalid_proposal_submission_status",
+        "RulesUnitPlacement.matches_witness_models",
+        "_resolve_rules_unit_move"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "movement-witness-membership-evidence": {
+      "paths": [
+        "tests/movement_witness_membership_helpers.py",
+        "tests/movement_witness_fall_back_helpers.py",
+        "tests/unit/test_rules_unit_witness_membership.py",
+        "tests/integration/test_movement_witness_membership.py",
+        "data/source_audits/movement-witness/*",
+        "contracts/migrations/44.3.28-to-44.3.29.md"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

@@ -14,6 +14,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.volume import Model
 
 
@@ -119,6 +120,13 @@ class RulesUnitPlacement:
             for component in self.component_unit_placements
             for model_placement in component.model_placements
         )
+
+    def matches_witness_models(self, witness: PathWitness) -> bool:
+        """Require precisely the placed physical inventory, including attached components."""
+        if type(witness) is not PathWitness:
+            raise GameLifecycleError("Rules-unit witness membership requires PathWitness.")
+        expected = tuple(sorted(model.model_instance_id for model in self.model_placements))
+        return tuple(sorted(witness.model_ids())) == expected
 
     def validate_for_view(self, view: RulesUnitView) -> None:
         if type(view) is not RulesUnitView:
