@@ -5830,6 +5830,33 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "d06-embark-distance-rule": {
+      "paths": [
+        "src/warhammer40k_core/engine/transport_embark_validation.py"
+      ],
+      "owners": [
+        "@module",
+        "_model_within_any_transport_model"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d06-embark-regression-evidence": {
+      "paths": [
+        "tests/d06_embark_helpers.py",
+        "tests/unit/test_d06_embark_distance.py",
+        "tests/integration/test_d06_native_embark_distance.py",
+        "data/source_audits/d06/*",
+        "contracts/migrations/44.3.27-to-44.3.28.md"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

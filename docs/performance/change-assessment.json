@@ -1,488 +1,432 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "7debdbd4182c1ee2703a367f2966dbdac685f18e",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0b87ae159198b4850c8eab38d67187e0e4f4c8032583a0b09ab53e9225922901",
-  "operation_map_sha256": "01df22c2fee58612eee06a7bc41867e65b432d1bef4585f69d1e5321262c8d38",
+  "base": "b3e411bc415f98dae182fd96703d866f18a22ee2",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6baf611e27483bc259dd6fda6a820490524684d8b9e81cef738d1bdaf6b71b5d",
+  "operation_map_sha256": "b878fca5b2881977a53c76040bfef610ec8b21f2323e3ef10b85cc18e09798db",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "cdba21f86b2e64aeba1214217e4e167d128428e7d9fd5fa28e4af662ddb4c066",
-      "after_sha256": "03cc19bf5b693e7cabad6952efc4ffa65355a088ea55a3bc3b9927d5688630ea",
+      "before_sha256": "03cc19bf5b693e7cabad6952efc4ffa65355a088ea55a3bc3b9927d5688630ea",
+      "after_sha256": "bf5610c98d7b5f21febde28b2a0a1f38f488e9a858785c3cbe5dcca3bc312bb1",
       "owners": {
         "@document": {
-          "before": "cdba21f86b2e64aeba1214217e4e167d128428e7d9fd5fa28e4af662ddb4c066",
-          "after": "03cc19bf5b693e7cabad6952efc4ffa65355a088ea55a3bc3b9927d5688630ea"
+          "before": "03cc19bf5b693e7cabad6952efc4ffa65355a088ea55a3bc3b9927d5688630ea",
+          "after": "bf5610c98d7b5f21febde28b2a0a1f38f488e9a858785c3cbe5dcca3bc312bb1"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "62c1f3b602b820578046584304e0c35bbf904f8dd32b2c95f11bb37950745145",
-      "after_sha256": "72b0735e0d317a9568fa6518cb0f8c8d5f382c6bd36c4b3df26dabfda708e96f",
+      "before_sha256": "72b0735e0d317a9568fa6518cb0f8c8d5f382c6bd36c4b3df26dabfda708e96f",
+      "after_sha256": "f48d348d078975cd1b22664d4ea7b177d3e098575b61cf58fb8a264c4a602d59",
       "owners": {
         "@document": {
-          "before": "62c1f3b602b820578046584304e0c35bbf904f8dd32b2c95f11bb37950745145",
-          "after": "72b0735e0d317a9568fa6518cb0f8c8d5f382c6bd36c4b3df26dabfda708e96f"
+          "before": "72b0735e0d317a9568fa6518cb0f8c8d5f382c6bd36c4b3df26dabfda708e96f",
+          "after": "f48d348d078975cd1b22664d4ea7b177d3e098575b61cf58fb8a264c4a602d59"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "8828891d3847d1d17fc7a3718990dec9913b7d87870d346fe3214fc2602f7ed3",
-      "after_sha256": "52a4da90a015c17e7773bba01a2f5cb18218a993a17818adce6a4cd9f5cd90ac",
+      "before_sha256": "52a4da90a015c17e7773bba01a2f5cb18218a993a17818adce6a4cd9f5cd90ac",
+      "after_sha256": "c6da95119cd1f25b298e949c66aaea0b0d3ab4f4280fbbb46fab771aecbdd893",
       "owners": {
         "@document": {
-          "before": "8828891d3847d1d17fc7a3718990dec9913b7d87870d346fe3214fc2602f7ed3",
-          "after": "52a4da90a015c17e7773bba01a2f5cb18218a993a17818adce6a4cd9f5cd90ac"
+          "before": "52a4da90a015c17e7773bba01a2f5cb18218a993a17818adce6a4cd9f5cd90ac",
+          "after": "c6da95119cd1f25b298e949c66aaea0b0d3ab4f4280fbbb46fab771aecbdd893"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "53cd52d6609c9ba57ea69a715fc09199abd4776836a050ae981bbd144ad4b965",
-      "after_sha256": "438cf85e5895d1fffe5c78c53488273781280c130345a0c9bf193fc2632bc867",
+      "before_sha256": "438cf85e5895d1fffe5c78c53488273781280c130345a0c9bf193fc2632bc867",
+      "after_sha256": "c7264f9c64f9132a23c10dbd9d8a3719f6aca813d5d4909b8783f6ef2f1c4ac2",
       "owners": {
         "@document": {
-          "before": "53cd52d6609c9ba57ea69a715fc09199abd4776836a050ae981bbd144ad4b965",
-          "after": "438cf85e5895d1fffe5c78c53488273781280c130345a0c9bf193fc2632bc867"
+          "before": "438cf85e5895d1fffe5c78c53488273781280c130345a0c9bf193fc2632bc867",
+          "after": "c7264f9c64f9132a23c10dbd9d8a3719f6aca813d5d4909b8783f6ef2f1c4ac2"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "a277dc655ebcf809e5bf8e020780ac04c3b3973f42b140726d173d77a608a843",
-      "after_sha256": "403925ff0672617ba682f867b88c8609ecb7b44edf0321380a7331c3fe80c94c",
+      "before_sha256": "403925ff0672617ba682f867b88c8609ecb7b44edf0321380a7331c3fe80c94c",
+      "after_sha256": "8776ff3073852d82898d88b2ef783f05da427957312bbca93f009dee5aa502b5",
       "owners": {
         "@document": {
-          "before": "a277dc655ebcf809e5bf8e020780ac04c3b3973f42b140726d173d77a608a843",
-          "after": "403925ff0672617ba682f867b88c8609ecb7b44edf0321380a7331c3fe80c94c"
+          "before": "403925ff0672617ba682f867b88c8609ecb7b44edf0321380a7331c3fe80c94c",
+          "after": "8776ff3073852d82898d88b2ef783f05da427957312bbca93f009dee5aa502b5"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "1afaf91dabdb576edc96dee6af02e1c3b6c41c72989f41ac8a7cc09b12b693bb",
-      "after_sha256": "c1938206c855d58aa4464a8099abdadc7720c914ddcfb24d349d951412ea4eab",
+      "before_sha256": "c1938206c855d58aa4464a8099abdadc7720c914ddcfb24d349d951412ea4eab",
+      "after_sha256": "07cd5ab620ffba363d056f35cd98146cfdfd10a09ba927bf4429ccbdec5e5a11",
       "owners": {
         "@document": {
-          "before": "1afaf91dabdb576edc96dee6af02e1c3b6c41c72989f41ac8a7cc09b12b693bb",
-          "after": "c1938206c855d58aa4464a8099abdadc7720c914ddcfb24d349d951412ea4eab"
+          "before": "c1938206c855d58aa4464a8099abdadc7720c914ddcfb24d349d951412ea4eab",
+          "after": "07cd5ab620ffba363d056f35cd98146cfdfd10a09ba927bf4429ccbdec5e5a11"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "ab1010411a7badb322cbd8e2601d5ac43b2d420987f38d259a588b4bffd0ec9d",
-      "after_sha256": "ded468aba08de5becf300803e1735c53a64a7d3925ca6b903986d6c4cabaf674",
+      "before_sha256": "ded468aba08de5becf300803e1735c53a64a7d3925ca6b903986d6c4cabaf674",
+      "after_sha256": "8285dbe0976e81b3dd5abc00be4f3407f320fc679bf51f35b949b1f4b20c0aa7",
       "owners": {
         "@document": {
-          "before": "ab1010411a7badb322cbd8e2601d5ac43b2d420987f38d259a588b4bffd0ec9d",
-          "after": "ded468aba08de5becf300803e1735c53a64a7d3925ca6b903986d6c4cabaf674"
+          "before": "ded468aba08de5becf300803e1735c53a64a7d3925ca6b903986d6c4cabaf674",
+          "after": "8285dbe0976e81b3dd5abc00be4f3407f320fc679bf51f35b949b1f4b20c0aa7"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "9b2e77ca248196485ffcb4a900a7be498d29bbd1498b644a31b0df85e2e3d3a1",
-      "after_sha256": "3351eddbe6939fda882364efc340400745edfc7b171ac5f6fcec0ba33e909429",
+      "before_sha256": "3351eddbe6939fda882364efc340400745edfc7b171ac5f6fcec0ba33e909429",
+      "after_sha256": "f80dfda9e512f3b662ef4b54a3b23d01a28e3e997b937cc955e37ae849bb7429",
       "owners": {
         "@document": {
-          "before": "9b2e77ca248196485ffcb4a900a7be498d29bbd1498b644a31b0df85e2e3d3a1",
-          "after": "3351eddbe6939fda882364efc340400745edfc7b171ac5f6fcec0ba33e909429"
+          "before": "3351eddbe6939fda882364efc340400745edfc7b171ac5f6fcec0ba33e909429",
+          "after": "f80dfda9e512f3b662ef4b54a3b23d01a28e3e997b937cc955e37ae849bb7429"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "8b974becf631b5a69139f4a527ff0b9b4f83eed9d083bb9c28b4ebd6010f4a4e",
-      "after_sha256": "16a2931a24f4bebaa5c5fa086306eb117fcfa4ba240eff3e0aef7d9550ec070e",
+      "before_sha256": "16a2931a24f4bebaa5c5fa086306eb117fcfa4ba240eff3e0aef7d9550ec070e",
+      "after_sha256": "061a106218dddb031958a1c21cac8baaaf6af28d0cbf07c64a04febabe89590c",
       "owners": {
         "@document": {
-          "before": "8b974becf631b5a69139f4a527ff0b9b4f83eed9d083bb9c28b4ebd6010f4a4e",
-          "after": "16a2931a24f4bebaa5c5fa086306eb117fcfa4ba240eff3e0aef7d9550ec070e"
+          "before": "16a2931a24f4bebaa5c5fa086306eb117fcfa4ba240eff3e0aef7d9550ec070e",
+          "after": "061a106218dddb031958a1c21cac8baaaf6af28d0cbf07c64a04febabe89590c"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "b099b284598393e32369d892ff0c8623a641d455d56ea9e8be7e68a5cd9a845d",
-      "after_sha256": "6e95ceea9a3b8ae7d493303163287983d4e76c8346add24762c094dfe5ece45f",
+      "before_sha256": "6e95ceea9a3b8ae7d493303163287983d4e76c8346add24762c094dfe5ece45f",
+      "after_sha256": "28175bedaf400abc07c2578ceaf05ec95bba481c79a93ff4cec467274de4a329",
       "owners": {
         "@document": {
-          "before": "b099b284598393e32369d892ff0c8623a641d455d56ea9e8be7e68a5cd9a845d",
-          "after": "6e95ceea9a3b8ae7d493303163287983d4e76c8346add24762c094dfe5ece45f"
+          "before": "6e95ceea9a3b8ae7d493303163287983d4e76c8346add24762c094dfe5ece45f",
+          "after": "28175bedaf400abc07c2578ceaf05ec95bba481c79a93ff4cec467274de4a329"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "d10b4baac151b52c2beb2cc07ee129f6b54df6d43fe20fdf1705a2affaa703cc",
-      "after_sha256": "c47f23612260d78a812f5f0f37107d227db9081f00e664d68988bfa97a20ac25",
+      "before_sha256": "c47f23612260d78a812f5f0f37107d227db9081f00e664d68988bfa97a20ac25",
+      "after_sha256": "b5a62d99f0e660e095581ac3bbf97c6812a84076b6bb27d9a0e9a98b706b00da",
       "owners": {
         "@document": {
-          "before": "d10b4baac151b52c2beb2cc07ee129f6b54df6d43fe20fdf1705a2affaa703cc",
-          "after": "c47f23612260d78a812f5f0f37107d227db9081f00e664d68988bfa97a20ac25"
+          "before": "c47f23612260d78a812f5f0f37107d227db9081f00e664d68988bfa97a20ac25",
+          "after": "b5a62d99f0e660e095581ac3bbf97c6812a84076b6bb27d9a0e9a98b706b00da"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "f49b1c03610a035b600e00e5e5f2e7ba9b97f2d39a2e4e33948c3a59eb582acc",
-      "after_sha256": "e3a235c119674558c5738f566a08a8f767cb4609247a645a08944186beb09415",
+      "before_sha256": "e3a235c119674558c5738f566a08a8f767cb4609247a645a08944186beb09415",
+      "after_sha256": "af69e6131c44cc7f5d72c41e6e9d64450f21d24086db74d38f576a587882682b",
       "owners": {
         "@document": {
-          "before": "f49b1c03610a035b600e00e5e5f2e7ba9b97f2d39a2e4e33948c3a59eb582acc",
-          "after": "e3a235c119674558c5738f566a08a8f767cb4609247a645a08944186beb09415"
+          "before": "e3a235c119674558c5738f566a08a8f767cb4609247a645a08944186beb09415",
+          "after": "af69e6131c44cc7f5d72c41e6e9d64450f21d24086db74d38f576a587882682b"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "e32b5ee34e6b1f97dadcc512e2ec90d250d9c68028f1ea7af0c828ea26572f3c",
-      "after_sha256": "94ede2761acd62511e32f41946fca38e480b2becc3defa71c8da54bb2aaa5cb4",
+      "before_sha256": "94ede2761acd62511e32f41946fca38e480b2becc3defa71c8da54bb2aaa5cb4",
+      "after_sha256": "6769847caef4f6976f08e30bb78480b1d0149c80a4ef8416fd53d32870060569",
       "owners": {
         "@document": {
-          "before": "e32b5ee34e6b1f97dadcc512e2ec90d250d9c68028f1ea7af0c828ea26572f3c",
-          "after": "94ede2761acd62511e32f41946fca38e480b2becc3defa71c8da54bb2aaa5cb4"
+          "before": "94ede2761acd62511e32f41946fca38e480b2becc3defa71c8da54bb2aaa5cb4",
+          "after": "6769847caef4f6976f08e30bb78480b1d0149c80a4ef8416fd53d32870060569"
         }
       }
     },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "d91cb60c7344320e747807407c469957f7890e04e56c09d8d626d22ddd4980d1",
-      "after_sha256": "8930a53cb8316470af08e2d6d057f651c53f7829222fe6f9a5a4d211ecd70dbb",
+      "before_sha256": "8930a53cb8316470af08e2d6d057f651c53f7829222fe6f9a5a4d211ecd70dbb",
+      "after_sha256": "c54c49f2c74d7b79a1e78e5571786602c324c7f5d1bc28f5b30f73669c7296cd",
       "owners": {
         "@document": {
-          "before": "d91cb60c7344320e747807407c469957f7890e04e56c09d8d626d22ddd4980d1",
-          "after": "8930a53cb8316470af08e2d6d057f651c53f7829222fe6f9a5a4d211ecd70dbb"
+          "before": "8930a53cb8316470af08e2d6d057f651c53f7829222fe6f9a5a4d211ecd70dbb",
+          "after": "c54c49f2c74d7b79a1e78e5571786602c324c7f5d1bc28f5b30f73669c7296cd"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "cc78eacbc80fcbfbc91abe8f607d9952e0a3a92444f105e2a3904268825019c1",
-      "after_sha256": "d136a1d9dc9d65e0c3c67b76b9a126c0b18a02cea151319e5dc3303abb32e15e",
+      "before_sha256": "d136a1d9dc9d65e0c3c67b76b9a126c0b18a02cea151319e5dc3303abb32e15e",
+      "after_sha256": "80bd3fb6e6314cf03333234fe4f72aa88f70d95703669e6106eb9defe728a20d",
       "owners": {
         "@document": {
-          "before": "cc78eacbc80fcbfbc91abe8f607d9952e0a3a92444f105e2a3904268825019c1",
-          "after": "d136a1d9dc9d65e0c3c67b76b9a126c0b18a02cea151319e5dc3303abb32e15e"
+          "before": "d136a1d9dc9d65e0c3c67b76b9a126c0b18a02cea151319e5dc3303abb32e15e",
+          "after": "80bd3fb6e6314cf03333234fe4f72aa88f70d95703669e6106eb9defe728a20d"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "d633bc73abbee411ce354b225fd57b4339225e0e2d5bcd1484a5d9689bb36d86",
-      "after_sha256": "0ed22c583963f1cf2b5f1c609aa24c9461f1e466c52a8379f4d511a1a98d59d7",
+      "before_sha256": "0ed22c583963f1cf2b5f1c609aa24c9461f1e466c52a8379f4d511a1a98d59d7",
+      "after_sha256": "439fc0a7f6df487abf283ab869fc2bf96db1c63b5fdd898ea93a207c60594a27",
       "owners": {
         "@document": {
-          "before": "d633bc73abbee411ce354b225fd57b4339225e0e2d5bcd1484a5d9689bb36d86",
-          "after": "0ed22c583963f1cf2b5f1c609aa24c9461f1e466c52a8379f4d511a1a98d59d7"
+          "before": "0ed22c583963f1cf2b5f1c609aa24c9461f1e466c52a8379f4d511a1a98d59d7",
+          "after": "439fc0a7f6df487abf283ab869fc2bf96db1c63b5fdd898ea93a207c60594a27"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "a0744d220c40b869c9f86afd11c50ae094fabea0013cd4b63c2a450f020ad120",
-      "after_sha256": "c118b0c1125dd98629c0050fc8dd4da19b51c3d47a465da32d5ea235db67c528",
+      "before_sha256": "c118b0c1125dd98629c0050fc8dd4da19b51c3d47a465da32d5ea235db67c528",
+      "after_sha256": "c583303844794fa03f51f067fe29222533e6f1d13cae114eafc7316ebb6eaaed",
       "owners": {
         "@document": {
-          "before": "a0744d220c40b869c9f86afd11c50ae094fabea0013cd4b63c2a450f020ad120",
-          "after": "c118b0c1125dd98629c0050fc8dd4da19b51c3d47a465da32d5ea235db67c528"
+          "before": "c118b0c1125dd98629c0050fc8dd4da19b51c3d47a465da32d5ea235db67c528",
+          "after": "c583303844794fa03f51f067fe29222533e6f1d13cae114eafc7316ebb6eaaed"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "3a77ee4b1760ed06c79395c3f70376ce7db83138d796f0effbac3aa25cc7d426",
-      "after_sha256": "ae45bfaa3fe285983ca5fbffabb0ecdb1141c1508aaf9cdd4b1c6199a513d51d",
+      "before_sha256": "ae45bfaa3fe285983ca5fbffabb0ecdb1141c1508aaf9cdd4b1c6199a513d51d",
+      "after_sha256": "27bc722ec6bb776a813dd529727609953d012fc03175ef73a20c184f1cebf656",
       "owners": {
         "@document": {
-          "before": "3a77ee4b1760ed06c79395c3f70376ce7db83138d796f0effbac3aa25cc7d426",
-          "after": "ae45bfaa3fe285983ca5fbffabb0ecdb1141c1508aaf9cdd4b1c6199a513d51d"
+          "before": "ae45bfaa3fe285983ca5fbffabb0ecdb1141c1508aaf9cdd4b1c6199a513d51d",
+          "after": "27bc722ec6bb776a813dd529727609953d012fc03175ef73a20c184f1cebf656"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "41f5d31a9fe54b989438fd103839da058911ce50709c4c939447de19a1bd05f4",
-      "after_sha256": "ad5ec2e9b6483ee35509744cb425cdf7ed0286b018a0d66fcc9b41afe54b871a",
+      "before_sha256": "ad5ec2e9b6483ee35509744cb425cdf7ed0286b018a0d66fcc9b41afe54b871a",
+      "after_sha256": "451a3a8550a6ad1af9df6ff3cc00298a989f80cece21f4499a6826d44ca1a85e",
       "owners": {
         "@document": {
-          "before": "41f5d31a9fe54b989438fd103839da058911ce50709c4c939447de19a1bd05f4",
-          "after": "ad5ec2e9b6483ee35509744cb425cdf7ed0286b018a0d66fcc9b41afe54b871a"
+          "before": "ad5ec2e9b6483ee35509744cb425cdf7ed0286b018a0d66fcc9b41afe54b871a",
+          "after": "451a3a8550a6ad1af9df6ff3cc00298a989f80cece21f4499a6826d44ca1a85e"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "52ee7dbce2677265e2a40c6c511fe97a4551bb16aa3574c1e00d991db17b4754",
-      "after_sha256": "17fd08a51d65421402c446550a52b3a12dd601304bd30b469927e44c1920afc3",
+      "before_sha256": "17fd08a51d65421402c446550a52b3a12dd601304bd30b469927e44c1920afc3",
+      "after_sha256": "ae451aaa57e0a8bd4db745951f8d2eb3c4ae528d87bce6cd0466df11d12073ed",
       "owners": {
         "@document": {
-          "before": "52ee7dbce2677265e2a40c6c511fe97a4551bb16aa3574c1e00d991db17b4754",
-          "after": "17fd08a51d65421402c446550a52b3a12dd601304bd30b469927e44c1920afc3"
+          "before": "17fd08a51d65421402c446550a52b3a12dd601304bd30b469927e44c1920afc3",
+          "after": "ae451aaa57e0a8bd4db745951f8d2eb3c4ae528d87bce6cd0466df11d12073ed"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "00197e93574a89d1417b0c933ebe53688dac9a370bf0c79c9799416505a62c73",
-      "after_sha256": "f7b96359dc1027660af653673222bd9281d3c12256f18c1ffada1034f9255117",
+      "before_sha256": "f7b96359dc1027660af653673222bd9281d3c12256f18c1ffada1034f9255117",
+      "after_sha256": "1d4a8023bae0abf72a98dd928e2be05afb83fa7dbaab992c9b0f7b0f7d592cd0",
       "owners": {
         "@document": {
-          "before": "00197e93574a89d1417b0c933ebe53688dac9a370bf0c79c9799416505a62c73",
-          "after": "f7b96359dc1027660af653673222bd9281d3c12256f18c1ffada1034f9255117"
+          "before": "f7b96359dc1027660af653673222bd9281d3c12256f18c1ffada1034f9255117",
+          "after": "1d4a8023bae0abf72a98dd928e2be05afb83fa7dbaab992c9b0f7b0f7d592cd0"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "adcbb328477e7ccab90e47ffce04691bfe9b8ff4fc1cc76eb18870f7aa76c8f9",
-      "after_sha256": "ecf8af1c10fb7a11ae8059bfe09198ea57dd8ffddeb4a86dde4329f29c03eb38",
+      "before_sha256": "ecf8af1c10fb7a11ae8059bfe09198ea57dd8ffddeb4a86dde4329f29c03eb38",
+      "after_sha256": "a1392a3a4e8172280696f38f6bc31f6e5a554f94c06e1854908e1ca034cd66cc",
       "owners": {
         "@document": {
-          "before": "adcbb328477e7ccab90e47ffce04691bfe9b8ff4fc1cc76eb18870f7aa76c8f9",
-          "after": "ecf8af1c10fb7a11ae8059bfe09198ea57dd8ffddeb4a86dde4329f29c03eb38"
+          "before": "ecf8af1c10fb7a11ae8059bfe09198ea57dd8ffddeb4a86dde4329f29c03eb38",
+          "after": "a1392a3a4e8172280696f38f6bc31f6e5a554f94c06e1854908e1ca034cd66cc"
         }
       }
     },
-    "contracts/migrations/44.3.26-to-44.3.27.md": {
+    "contracts/migrations/44.3.27-to-44.3.28.md": {
       "before_sha256": null,
-      "after_sha256": "5fe1233d1a54f586a6c08203a271545a3964be3779a935a890f960b6409f478c",
+      "after_sha256": "71d16193ba0d24be114a06f755003cf074838b89547e59e0f18e3e57c52c0c48",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5fe1233d1a54f586a6c08203a271545a3964be3779a935a890f960b6409f478c"
+          "after": "71d16193ba0d24be114a06f755003cf074838b89547e59e0f18e3e57c52c0c48"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "08f6eb614ddfaf4757a5d0274648998d78c55970a017e9d55011ed4bf66b39f9",
-      "after_sha256": "0354e04b9bb9c27eddd2f9c88ead266da4951a614388dc265409ee69d525a81b",
+      "before_sha256": "0354e04b9bb9c27eddd2f9c88ead266da4951a614388dc265409ee69d525a81b",
+      "after_sha256": "49097bb46c7086d6719644757f601fef7dc1c30551b0d0cd144e650f2315ba55",
       "owners": {
         "@document": {
-          "before": "08f6eb614ddfaf4757a5d0274648998d78c55970a017e9d55011ed4bf66b39f9",
-          "after": "0354e04b9bb9c27eddd2f9c88ead266da4951a614388dc265409ee69d525a81b"
+          "before": "0354e04b9bb9c27eddd2f9c88ead266da4951a614388dc265409ee69d525a81b",
+          "after": "49097bb46c7086d6719644757f601fef7dc1c30551b0d0cd144e650f2315ba55"
+        }
+      }
+    },
+    "data/source_audits/d06/baseline-embark-validation.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "1b9b19bdd81e8b1254008e3b6a124b7c801ad3e0414ca8cbdc5b75dfe76c0cdb",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1b9b19bdd81e8b1254008e3b6a124b7c801ad3e0414ca8cbdc5b75dfe76c0cdb"
+        }
+      }
+    },
+    "data/source_audits/d06/provenance.json": {
+      "before_sha256": null,
+      "after_sha256": "c49d76550020233c0b236f15823af49f5ca68e13c1690cbbd5ff9e6e5e3b15b2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c49d76550020233c0b236f15823af49f5ca68e13c1690cbbd5ff9e6e5e3b15b2"
+        }
+      }
+    },
+    "data/source_audits/d06/selected-source.json": {
+      "before_sha256": null,
+      "after_sha256": "689c82d288977064791dcbbdebb81269ed80c9a804171c855534f2ca23b6eb26",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "689c82d288977064791dcbbdebb81269ed80c9a804171c855534f2ca23b6eb26"
         }
       }
     },
     "data/source_audits/order135/current-inventory.json": {
-      "before_sha256": "fa6e408ec1e4a493bf1c67b7e573f3f12b94538f5290586c0b9b5deeaff25df7",
-      "after_sha256": "92c92af1129c3cf52dfd2a5c0be8769f8e88e8cbc180dad3b1cd0ce3c4a186c8",
+      "before_sha256": "92c92af1129c3cf52dfd2a5c0be8769f8e88e8cbc180dad3b1cd0ce3c4a186c8",
+      "after_sha256": "00fcbaaa0f2d1fdd19d6fe618a5eb56b5983fec052d44c18e985e3311a138dc6",
       "owners": {
         "@document": {
-          "before": "fa6e408ec1e4a493bf1c67b7e573f3f12b94538f5290586c0b9b5deeaff25df7",
-          "after": "92c92af1129c3cf52dfd2a5c0be8769f8e88e8cbc180dad3b1cd0ce3c4a186c8"
+          "before": "92c92af1129c3cf52dfd2a5c0be8769f8e88e8cbc180dad3b1cd0ce3c4a186c8",
+          "after": "00fcbaaa0f2d1fdd19d6fe618a5eb56b5983fec052d44c18e985e3311a138dc6"
         }
       }
     },
-    "data/source_audits/physical-history-restore/baseline-off-battlefield-command-tests.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "877f50031cc5fc93a3a8adb2f12efdd08bfca48259d8161ee306aae6e5c53cc6",
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "cf45472dbf6c4e4c98ed5f44d06e22cd685e55afb63bb19c5d5df01dd5dccd57",
+      "after_sha256": "f5f2f2d17d85d775d08adea7f1bcd46160602257ddcb336842966f9dd36eab18",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "877f50031cc5fc93a3a8adb2f12efdd08bfca48259d8161ee306aae6e5c53cc6"
-        }
-      }
-    },
-    "data/source_audits/physical-history-restore/baseline-physical-authority.py.txt": {
-      "before_sha256": null,
-      "after_sha256": "7df434b15f175cc8486dbc765a7badc3f6c2ff7b6d1fab54bf72419c9269ff57",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "7df434b15f175cc8486dbc765a7badc3f6c2ff7b6d1fab54bf72419c9269ff57"
-        }
-      }
-    },
-    "data/source_audits/physical-history-restore/historical-inputs.json": {
-      "before_sha256": null,
-      "after_sha256": "c9c4030a4b06bf684600ddb1741ca769da40cf29bc90196ee40e3d0fe09f60f2",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "c9c4030a4b06bf684600ddb1741ca769da40cf29bc90196ee40e3d0fe09f60f2"
-        }
-      }
-    },
-    "data/source_audits/physical-history-restore/provenance.json": {
-      "before_sha256": null,
-      "after_sha256": "b7956aebeb21ea6e2888508fe2c63e8f294f8eb20ad07a8500189371aa2e8cb9",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "b7956aebeb21ea6e2888508fe2c63e8f294f8eb20ad07a8500189371aa2e8cb9"
+          "before": "cf45472dbf6c4e4c98ed5f44d06e22cd685e55afb63bb19c5d5df01dd5dccd57",
+          "after": "f5f2f2d17d85d775d08adea7f1bcd46160602257ddcb336842966f9dd36eab18"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "1ff6b72250fdd76aa72840df8cf50b04c1ef1490e7dca900391e2948daefb035",
-      "after_sha256": "55bb7d6cfd40da4366feab8eaaf145374ab81dec2dd535847c4b69800c9699b1",
+      "before_sha256": "55bb7d6cfd40da4366feab8eaaf145374ab81dec2dd535847c4b69800c9699b1",
+      "after_sha256": "da2410a26f690a25b77b42b6f757cb65de57fd1a7511b2817ea7cea366517be4",
       "owners": {
         "@document": {
-          "before": "1ff6b72250fdd76aa72840df8cf50b04c1ef1490e7dca900391e2948daefb035",
-          "after": "55bb7d6cfd40da4366feab8eaaf145374ab81dec2dd535847c4b69800c9699b1"
+          "before": "55bb7d6cfd40da4366feab8eaaf145374ab81dec2dd535847c4b69800c9699b1",
+          "after": "da2410a26f690a25b77b42b6f757cb65de57fd1a7511b2817ea7cea366517be4"
         }
       }
     },
-    "docs/PHYSICAL_HISTORY_SAVE_RESTORE_SCOPE.md": {
+    "docs/D06_EMBARK_DISTANCE_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "a6eb0a27b59d5c1a9610246b823d184f9c429ee0d47c4f22979b7d3a4f3ec931",
+      "after_sha256": "c0e06a79530d7764c372ab1f8d88476563eab73ed15e6fe7ccefc521eb32a3fe",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a6eb0a27b59d5c1a9610246b823d184f9c429ee0d47c4f22979b7d3a4f3ec931"
+          "after": "c0e06a79530d7764c372ab1f8d88476563eab73ed15e6fe7ccefc521eb32a3fe"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "78ca6111ef2e5f3fdbff9f34dee43df1519ea0ecd246b3d9871fe8d522b9bf2b",
-      "after_sha256": "0c4fa7422eea6dbf1b793b52f83f2b135b1452bc9101f3f0823c78b0967ac06b",
+      "before_sha256": "0c4fa7422eea6dbf1b793b52f83f2b135b1452bc9101f3f0823c78b0967ac06b",
+      "after_sha256": "db69fa3f8094ad1fc5a163521bf81c26f773f0d0eb0d3dba43eb7f833d565e62",
       "owners": {
         "@document": {
-          "before": "78ca6111ef2e5f3fdbff9f34dee43df1519ea0ecd246b3d9871fe8d522b9bf2b",
-          "after": "0c4fa7422eea6dbf1b793b52f83f2b135b1452bc9101f3f0823c78b0967ac06b"
+          "before": "0c4fa7422eea6dbf1b793b52f83f2b135b1452bc9101f3f0823c78b0967ac06b",
+          "after": "db69fa3f8094ad1fc5a163521bf81c26f773f0d0eb0d3dba43eb7f833d565e62"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "73e44a96d604e1e5e7aebfb1cfef9c450cd58441d7d82e129b8f97538e042192",
-      "after_sha256": "15c4a53279fcae9d2a9feedde48a0a600ab0bd7634a9dbc8c66ae5273309f86c",
+      "before_sha256": "15c4a53279fcae9d2a9feedde48a0a600ab0bd7634a9dbc8c66ae5273309f86c",
+      "after_sha256": "4a86c0d0c5ca74d0cc0de8dd771f7de3ae3ad354d475fceb66f8fe18995cf7f9",
       "owners": {
         "@document": {
-          "before": "73e44a96d604e1e5e7aebfb1cfef9c450cd58441d7d82e129b8f97538e042192",
-          "after": "15c4a53279fcae9d2a9feedde48a0a600ab0bd7634a9dbc8c66ae5273309f86c"
+          "before": "15c4a53279fcae9d2a9feedde48a0a600ab0bd7634a9dbc8c66ae5273309f86c",
+          "after": "4a86c0d0c5ca74d0cc0de8dd771f7de3ae3ad354d475fceb66f8fe18995cf7f9"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "7f0a8c746da24870fec056754a693c39fd5d0ccb7aeedc68a90d76162c5d9a5d",
-      "after_sha256": "1b09773e7952d27f348c0c42deba7235c387b15042582e958d54e42e8d36c8a0",
+      "before_sha256": "1b09773e7952d27f348c0c42deba7235c387b15042582e958d54e42e8d36c8a0",
+      "after_sha256": "6d0ad7742263d0d92da84baa731eb8697840e35fdc8291aad9a2ce59d2505e9d",
       "owners": {
         "@module": {
-          "before": "cb011ce631bc2b646a5bcb24f1fc68c105544dd87f25003a1a1b064cfa4d6155",
-          "after": "432a664e3732b3d812bf595a9b1555b70037424f1bf0d0d7bd2a0f4de7442618"
+          "before": "432a664e3732b3d812bf595a9b1555b70037424f1bf0d0d7bd2a0f4de7442618",
+          "after": "5d348f12efbf8b3f0b51ac0255f3124a022ae6c90b4334dedf9f00de154dd034"
         }
       }
     },
-    "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
-      "before_sha256": "7df434b15f175cc8486dbc765a7badc3f6c2ff7b6d1fab54bf72419c9269ff57",
-      "after_sha256": "f286f1f5b07aaa92a10d7437af88626af3656a4373797384baba106379c20bcd",
+    "src/warhammer40k_core/engine/transport_embark_validation.py": {
+      "before_sha256": "1b9b19bdd81e8b1254008e3b6a124b7c801ad3e0414ca8cbdc5b75dfe76c0cdb",
+      "after_sha256": "7ad4d98e7bed11803f0ff20458a52bb08b0bb3383514b9977747ab98baa64d34",
       "owners": {
         "@module": {
-          "before": "ec9194526ef4920cb9a9316531ae0dccf1ec74bb8a05e97b76dce3502dcd6bdd",
-          "after": "7359499405a8b635885c4b4167a158d2babd6726fc519adaa7db498b26aa9698"
+          "before": "8f4df672b97fc29394bc370757865d6fe6600004d188fc11713fccd4dc765d3e",
+          "after": "14f6ea28b005ed7b6f5b5602a8cd6bf4cd97ec584ba4694327d200173edb60ae"
         },
-        "_authenticated_scoring_commit_checkpoint": {
-          "before": "d33c543e5f37eb6145482012686a741234ba3f285dfb99e8b487e4c90c9428a5",
-          "after": null
-        },
-        "_forward_scoring_commit_anchor_or_none": {
-          "before": "96939dd45cd3e4daf6bed9a7605bc6f95dd745d5eb35b937d60ac901dbaeaed6",
-          "after": "5b3f781d3ea85d64316b642bad02dba6e8b8ec494e2e85f491c3923f98ef14d5"
-        },
-        "_physical_authority_before_checkpoint": {
-          "before": "7aff7a476a2439f4ec70da3f7ba86ebb0ca2f6ecf93fea6289b4689708eb195a",
-          "after": "03f1e43e7541133f779d1d3a1aea7a78a5b73520f9e39f7872a343a481f7e941"
-        },
-        "_physical_authority_before_event": {
-          "before": "05e18ae7f87503c216b959eb586f543bc5fe5321c15cf3ea5e009dd5563b5ce2",
-          "after": "522c44eb2b2a52876697fecdae829d1e58758780e737ebae4d00445ce5977e40"
-        },
-        "physical_model_authority_before_event": {
-          "before": "ca4e478462cd27facb6a13d7577ef4bfebe56d90a4ff0b803f3bfa96244e8512",
-          "after": "6a4aa7f32f6dd6a986384d633df1a0b5bfcbddab9038bec25e8f552dcf1c1549"
-        },
-        "validate_primary_mission_boundary_physical_authority": {
-          "before": "088f4108c23104682fdf26400b7a91704bc5711600c6eb948ed02ddb8a097078",
-          "after": "63cb1568b173bc1ba85d084b1af678aa6ab3c7ca07408f45554a55690753d65e"
+        "_model_within_any_transport_model": {
+          "before": "8c8acdc2f026bbe356c082a1088487ca4f28825a1ba2377c4f3290784737b2ea",
+          "after": "05d2b69512979e2d53d11849ff200d387813e31a8bc00adf05d538e361e3f51e"
         }
       }
     },
-    "src/warhammer40k_core/engine/primary_scoring_physical_anchor.py": {
+    "tests/code_quality/test_d06_embark_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "6e94331072f3a6d5fe41d4105255888e2e32f429c14f3488f85d598001f4f875",
+      "after_sha256": "716ead49dc603694945b6ea5f49a08b30c38ebd76c52be5f0940db441383727f",
       "owners": {
         "@module": {
           "before": null,
-          "after": "caf065e410d0ec938e0a45d3fbc497e6ba1bf0bbe6724f2507f3dd7cce964a0e"
-        },
-        "authenticated_scoring_commit_checkpoint": {
-          "before": null,
-          "after": "ce9afffb9b9637716a0566a0778804af3a23abc34eafe62f20250b3b9cf05d5f"
-        }
-      }
-    },
-    "tests/code_quality/test_physical_history_anchor_provenance.py": {
-      "before_sha256": null,
-      "after_sha256": "6127acc269ac2d374256e89950f21a0e48e00ab08082302734997e076555f963",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "71b3d6c384f8f23c181e314e7f1ce5c2cfe69365dac10e476eec99948ed3dfb7"
+          "after": "b9bcbc165421cca79581002593eeb02093366a7e6812bae80b6c1819101a1680"
         },
         "_functions": {
           "before": null,
           "after": "692d5130b555282b2d560b9652dfae15eac7154cb37bdeecb1813ee6c1066c48"
         },
-        "test_prior_command_history_regression_bodies_are_preserved": {
+        "test_d06_offer_selection_and_source_continuation_retain_one_resolver": {
           "before": null,
-          "after": "d4e5457da672385028c1eb50b6091c3d561395ed5b94b65dc99fa18369f2b06c"
+          "after": "c54c52feba5409bebdca01e69bdca3de597d77a5063a94b6f424a5af9359fc63"
         },
-        "test_scoring_anchor_extraction_preserves_authentication_body_and_archive_hashes": {
+        "test_d06_preserves_original_ownership_setup_capacity_and_atomic_resolution": {
           "before": null,
-          "after": "ec55a51a5a430b47bf1c287ecd658d6e272cacdded5559f4ad023375c571dedb"
+          "after": "ac7758a1d9903b28ef1df0ea3873789f654175c8ae228d00d251a4955e3ed4c8"
         }
       }
     },
-    "tests/integration/test_off_battlefield_command_battle_shock.py": {
-      "before_sha256": "877f50031cc5fc93a3a8adb2f12efdd08bfca48259d8161ee306aae6e5c53cc6",
-      "after_sha256": "d58f788f6f9a80403ff494750ff22572f9d20b091e7d2ce05e66c9c13b9bf0aa",
-      "owners": {
-        "@module": {
-          "before": "6a202f6cd17be214d3531ec580eaa5facaba0a9b8afae5676c3956ab8246e32c",
-          "after": "b312cc85fde0d0a952e53f25793c3fbcacbb92b4d86af1ac2f21d842f8daea88"
-        },
-        "assert_replayed": {
-          "before": null,
-          "after": "2222aef196f10dee82968e4eed558a833c9ddca5a3b4ace9450f70a05b644e15"
-        },
-        "assert_session_equivalent": {
-          "before": null,
-          "after": "fc866d694ac36f637adb910a829fe1560de5a8931bc02e8f3755364021edf4fb"
-        },
-        "complete_movement": {
-          "before": null,
-          "after": "d2c787716f177c014b87bad50c7ddd777f595e86fdc34a5e87a606987869f405"
-        },
-        "test_prior_embarked_checkpoint_restores_pending_and_completed_native_movement": {
-          "before": null,
-          "after": "5479c59232732763e7c02da21820d832565bf53cc786b6b7a017ed3b109215dd"
-        }
-      }
-    },
-    "tests/physical_history_transport_helpers.py": {
+    "tests/d06_embark_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "01a65c0d049e48994c9593d854209602fdbe76e00dcfe59ae7cbf66c722b3fc7",
+      "after_sha256": "a8888b3a020b38539bd10edd0d454a8d017531acea692b752efe582324b5beed",
       "owners": {
         "@module": {
           "before": null,
-          "after": "87120bcd1d1ebc86ac2c2d3568f252828bb52947bc01ead1b71c6b40d3ae2fc2"
+          "after": "8126bf4c3430d8b284d13ca3ab0146c2c600cdc241813edcbfa2fe07b9983acf"
         },
-        "PhysicalHistoryScene": {
+        "EmbarkScene": {
           "before": null,
-          "after": "bcb3b763ef9a930b91eee60b941471205d3c399310ed44e03d146139a4fc200b"
+          "after": "92901112823b6a34c683f5ef7cb6970668136099d42298cbf837045798a47e97"
         },
-        "PhysicalHistoryScene.handle": {
+        "EmbarkScene.handle": {
           "before": null,
-          "after": "2b7e5820c2656bdd40dd6b3165676f03fd3ddb1ec12917bf122d0cbc4295b8fd"
+          "after": "3271960d072c7ef1d58ffa91ac6b573d0c0619f9b264c22ed9ac1397b8f034b4"
         },
-        "PhysicalHistoryScene.reach_later_move": {
+        "EmbarkScene.reach_later_move": {
           "before": null,
-          "after": "1b68c6ed161e6b4cb916abd3de90beb4f9f07e6f6982a9145e68576074e67a2c"
+          "after": "b4f7cef55ba65002ec27b1f845c10ebc2cea9cb2a20c2495eeb991d36103215d"
         },
         "choose": {
           "before": null,
-          "after": "9e27ea1588f43a384d0c10583821314ddd08300843d262ad98a07f32ec455751"
+          "after": "4de13ee0fab0eb08cf7d561b83ed5e908a979b3e5c35bde9415eeb9929689762"
         },
         "default_choice": {
           "before": null,
           "after": "295fb137c6afe4af3ef24883d9abc6e08b47a55ed44b1afe747140303fc43564"
         },
+        "embark_config": {
+          "before": null,
+          "after": "e113fef122b08344bd6a823f63e585d4c66778c9cb5e6852ff4a28a5ac68709c"
+        },
+        "later_diagonal_embark_scene": {
+          "before": null,
+          "after": "4c537e7ec048e561d77b3a4280caad23206ec4c66837d33b808a5d6ab40eb4c4"
+        },
+        "later_embark_scene": {
+          "before": null,
+          "after": "397b98d8dbf09a68d3dd0d74e646fb5ff801a73dfbfbc6310babe1e092f6ec15"
+        },
         "move_payload": {
           "before": null,
-          "after": "81976a1a7f99b8160422ae8d2cc11316897c3ce62d3758be7b4149bc27058de3"
-        },
-        "physical_history_config": {
-          "before": null,
-          "after": "f498b3428277be61fd5c094930ab4dcab6be5869c184ff520afdf22a81dab3a8"
+          "after": "8e7226a3d075b041a4fba19ba465bd1c5485833a371a534a6bca2d350f2811e6"
         },
         "propose": {
           "before": null,
-          "after": "bc9f1df39fb2470173f29fe08758406ba8ce5836c8daecbf7f193da9b5ef0e38"
-        },
-        "round2_movement_scene": {
-          "before": null,
-          "after": "af7a5d917c70afb152a18a9d041174d064550c450504377f943bd83e62037cec"
+          "after": "60a84676239d5b0dc46400019fe21c9a403c1866c594dd41fc108a38bbbc54d0"
         },
         "state_of": {
           "before": null,
@@ -490,17 +434,55 @@
         }
       }
     },
-    "tools/core_rules_order97_history.py": {
-      "before_sha256": "07e35808d6ed43bd46a4a481c6557dbfb3c5ad2e3bf0badff10257633d698496",
-      "after_sha256": "a45267d5cd7565989d8f79c105b58f5ae2838637eaa97ff924dbb32a8ce0b8b2",
+    "tests/integration/test_d06_native_embark_distance.py": {
+      "before_sha256": null,
+      "after_sha256": "82a7fea03be8e09e83ae94a2030f2cbcd870964ec43ae009639c4d888242f0c4",
       "owners": {
         "@module": {
-          "before": "70784b2e2fc1cff99128704ad43787772f209cc4c74b55367f5b9da917591a14",
-          "after": "9f2d3ad4aefd9029e2fe7e4fa947b4bdd55ed8c692e769de669393b55ec7f62a"
+          "before": null,
+          "after": "c548057cb48f3577fa5c80db8b34881007914925acca58a69b86e2ca7ed5cec8"
         },
-        "historical_evidence_path": {
-          "before": "0b90340a81b7abe1fc4258091108fabb8c786fdd861035d0b8407eeb57919216",
-          "after": "d51493eff2ce6fec77a6a283ea644a02d1f8e2d91b23b7ff24096de332d92b19"
+        "assert_preserved": {
+          "before": null,
+          "after": "b662f4915e316689a5630e5a304e62324928011f9af2371bf7d97aba51112e7f"
+        },
+        "test_native_distance_offer_atomic_rejection_retry_forks_and_continuation": {
+          "before": null,
+          "after": "d9d4a19600723134ed074810b4c63807f6dae788bae1f7a304138323512947a1"
+        },
+        "test_native_translated_diagonal_inclusive_boundary": {
+          "before": null,
+          "after": "fb096de9bda07f49c5670094876747bbd1dc3637fd8e98bcb1d29c314fc319a4"
+        }
+      }
+    },
+    "tests/unit/test_d06_embark_distance.py": {
+      "before_sha256": null,
+      "after_sha256": "d8e46f745bcb446cbdded41ba68776e09cd0a08bb3269be75937777ff59ad583",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a1d2f200f01b75d4324317100c9509e8a48fd8fcddeea9a4743c619e3ac2d94e"
+        },
+        "test_embark_actual_base_distance_boundary": {
+          "before": null,
+          "after": "5e58c1a2c66d65d70264294c5aabfe626af9e056d14f0da0ac1cb5f38a6a4463"
+        },
+        "test_embark_any_carrier_model_can_be_closest": {
+          "before": null,
+          "after": "030950562a03417eadf99673df5fe118af4d73d205d40038e288948d2ebac8b7"
+        },
+        "test_embark_comparison_allowance_does_not_admit_distance_beyond_envelope": {
+          "before": null,
+          "after": "1ff1fbfc1933450cc8996ee435dfa78cefa1ae8eb21df6bf4e04bdc72023aa26"
+        },
+        "test_embark_diagonal_distance_is_not_separate_axis_limits": {
+          "before": null,
+          "after": "291c1f1323b3d6a7db53ce59d62d5f43e73050599d0b71187d16e2d2b05807f2"
+        },
+        "test_embark_frame_closest_part_preserves_ordinary_base_plane": {
+          "before": null,
+          "after": "acfa8ba4f724b448d6a44fcbd30257a49eaad22c97158940c54ecdab2ceb6d14"
         }
       }
     }
@@ -512,9 +494,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "measured_workload",
@@ -522,9 +504,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "measured_workload",
@@ -532,9 +514,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "measured_workload",
@@ -542,9 +524,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "measured_workload",
@@ -552,9 +534,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "measured_workload",
@@ -562,9 +544,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "measured_workload",
@@ -572,9 +554,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "measured_workload",
@@ -582,9 +564,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "measured_workload",
@@ -592,9 +574,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "measured_workload",
@@ -602,9 +584,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "measured_workload",
@@ -612,9 +594,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "measured_workload",
@@ -622,9 +604,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "measured_workload",
@@ -632,9 +614,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve behavioral shard manifests and duration metadata solely from the authenticated complete current Windows passing cohort; preserve test membership, original selection, gates and thresholds.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Only measured current-cohort timings and distribution manifests change; all executable, test, helper, source, runtime, contract, dependency and tooling blobs remain identical to scoped-reviewed f1a4a4dec4dc45127f05d0b22b99ed275b87291d."
+      "rationale": "Complete passing corrected-current cohort only: 11273 covered n32 worksteal remainder plus 16 original isolated branch cases, 11289 unique passing cases on Windows. No failed, partial, prior-source or prior-host timing credit. Aggregate seal SHA256 30be9e4b929b4877050f505512e3dc4c634ad124df4b8ec3b6d0579e66205af5 supplies all exact current JUnit hashes and phase evidence.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
@@ -642,9 +624,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -652,9 +634,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -662,9 +644,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -672,9 +654,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -682,9 +664,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -692,9 +674,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -702,9 +684,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -712,9 +694,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -722,19 +704,19 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
-    "contracts/migrations/44.3.26-to-44.3.27.md": {
+    "contracts/migrations/44.3.27-to-44.3.28.md": {
       "category": "rule_semantics",
       "operations": [
-        "physical-history-restore-regression-evidence"
+        "d06-embark-regression-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
@@ -742,9 +724,39 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
+    },
+    "data/source_audits/d06/baseline-embark-validation.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "d06-embark-regression-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
+    },
+    "data/source_audits/d06/provenance.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "d06-embark-regression-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
+    },
+    "data/source_audits/d06/selected-source.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "d06-embark-regression-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "data/source_audits/order135/current-inventory.json": {
       "category": "rule_semantics",
@@ -752,73 +764,41 @@
         "order135-current-source-audit"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
-    "data/source_audits/physical-history-restore/baseline-off-battlefield-command-tests.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "physical-history-restore-regression-evidence"
-      ],
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
-    },
-    "data/source_audits/physical-history-restore/baseline-physical-authority.py.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "physical-history-restore-regression-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
-    },
-    "data/source_audits/physical-history-restore/historical-inputs.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "physical-history-restore-regression-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
-    },
-    "data/source_audits/physical-history-restore/provenance.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "physical-history-restore-regression-evidence"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Preserved bounded D06 source, scope and acceptance declarations.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserved source/policy/test evidence for the separate physical-history prerequisite.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Preserved bounded D06 source, scope and acceptance declarations.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
-    "docs/PHYSICAL_HISTORY_SAVE_RESTORE_SCOPE.md": {
+    "docs/D06_EMBARK_DISTANCE_SCOPE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserved source/policy/test evidence for the separate physical-history prerequisite.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Preserved bounded D06 source, scope and acceptance declarations.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserved source/policy/test evidence for the separate physical-history prerequisite.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Preserved bounded D06 source, scope and acceptance declarations.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -826,9 +806,9 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
@@ -836,67 +816,57 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
-    "src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py": {
+    "src/warhammer40k_core/engine/transport_embark_validation.py": {
       "category": "rule_semantics",
       "operations": [
-        "physical-history-preceding-scoring-anchor"
+        "d06-embark-distance-rule"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
-    "src/warhammer40k_core/engine/primary_scoring_physical_anchor.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "physical-history-preceding-scoring-anchor"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
-    },
-    "tests/code_quality/test_physical_history_anchor_provenance.py": {
+    "tests/code_quality/test_d06_embark_preservation.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserved source/policy/test evidence for the separate physical-history prerequisite.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Preserved bounded D06 source, scope and acceptance declarations.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
-    "tests/integration/test_off_battlefield_command_battle_shock.py": {
+    "tests/d06_embark_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "physical-history-restore-regression-evidence"
+        "d06-embark-regression-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
-    "tests/physical_history_transport_helpers.py": {
+    "tests/integration/test_d06_native_embark_distance.py": {
       "category": "rule_semantics",
       "operations": [
-        "physical-history-restore-regression-evidence"
+        "d06-embark-regression-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     },
-    "tools/core_rules_order97_history.py": {
+    "tests/unit/test_d06_embark_distance.py": {
       "category": "rule_semantics",
       "operations": [
-        "shock-source-generation-and-audit"
+        "d06-embark-regression-evidence"
       ],
       "selected_families": [],
-      "rationale": "Bounded supported prior-state authority correction or corresponding required runtime/contract/regression artifact; no intended performance optimization.",
-      "source_obligation": "User-approved valid-state save/load invariant: authenticated prior physical presence, ordered legal transitions, complete inventory and exact source-bound replay.",
-      "unchanged_work": "Existing checkpoint authentication body, physical transition algorithms, serializers, caches and original regression assertions remain unchanged; the preceding scoring checkpoint branch supplies already retained missing authority."
+      "rationale": "Bounded actual Embark distance rule branch or its required identity, source and regression artifacts; existing analytical geometry algorithms are reused unchanged.",
+      "source_obligation": "Selected retained18.02 requires every living model within inclusive actual3inches, applying01.04 base subjects and17.02 FRAME parts; do not substitute horizontal distance.",
+      "unchanged_work": "Shared distance algorithms, serializers, caches, physical transport ownership, attached/living aggregation, original assertion bodies, source archives and budgets remain unchanged. No performance optimization or complete-game certification claimed."
     }
   },
   "milestone": "ordinary",

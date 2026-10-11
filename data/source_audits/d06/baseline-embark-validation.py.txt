@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, UnitPlacement
@@ -19,11 +18,6 @@ from warhammer40k_core.engine.transport_embark_groups import (
     embarking_rules_unit_placement,
 )
 from warhammer40k_core.engine.unit_rule_effects import embark_transport_forbidden_effect_source_ids
-from warhammer40k_core.geometry.measurement import (
-    DistanceMeasurementContext,
-    DistancePredicateEvaluator,
-    WithinPredicate,
-)
 from warhammer40k_core.geometry.volume import Model
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_embark_setup_turn_2026_09 as source,
@@ -35,11 +29,6 @@ if TYPE_CHECKING:
         EmbarkSelection,
         TransportCargoState,
     )
-
-
-# Same absolute inch scale as geometry.pose.contact_planes_coincide. This
-# comparison allowance is local to inclusive Embark, independent of board scale.
-_EMBARK_DISTANCE_COMPARISON_ALLOWANCE_INCHES = 1e-9
 
 
 def resolve_embark(
@@ -276,28 +265,7 @@ def _model_within_any_transport_model(
     transport_models: tuple[Model, ...],
     distance_inches: float,
 ) -> bool:
-    """18.02 uses actual distance; 01.04 bases and 17.02 FRAME parts apply.
-
-    Ordinary bases contribute their support planes, not their model heights.
-    FRAME subjects retain their complete recorded prisms on either side.
-    Disembark's wholly-within setup predicate is a separate rule.
-    The absolute comparison allowance preserves equality after translated
-    floating-point subtraction; it does not repair footprint approximation.
-    """
-    # Validate the nominal distance before applying the numerical allowance.
-    predicate = WithinPredicate(distance_inches)
-    predicate = WithinPredicate(
-        predicate.distance_inches + _EMBARK_DISTANCE_COMPARISON_ALLOWANCE_INCHES
-    )
     return any(
-        DistancePredicateEvaluator(
-            replace(
-                DistanceMeasurementContext.from_models(model, transport_model),
-                source_height_inches=model.volume.height if model.measures_every_part else 0.0,
-                target_height_inches=(
-                    transport_model.volume.height if transport_model.measures_every_part else 0.0
-                ),
-            )
-        ).evaluate(predicate)
+        model.base_distance_to(transport_model) <= distance_inches
         for transport_model in transport_models
     )

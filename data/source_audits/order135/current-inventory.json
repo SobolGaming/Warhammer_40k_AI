@@ -43561,8 +43561,8 @@
       "sha256": "2d7d3e582b6e7ac90c98a331a402d5287496cca67a5e7875fe1aa5ecc30744e1"
     },
     "src/warhammer40k_core/engine/transport_embark_validation.py": {
-      "bytes": 11201,
-      "sha256": "1b9b19bdd81e8b1254008e3b6a124b7c801ad3e0414ca8cbdc5b75dfe76c0cdb"
+      "bytes": 12645,
+      "sha256": "7ad4d98e7bed11803f0ff20458a52bb08b0bb3383514b9977747ab98baa64d34"
     },
     "src/warhammer40k_core/engine/transport_firing_deck.py": {
       "bytes": 13124,
@@ -47080,12 +47080,12 @@
       "symbol_ast_sha256": "06af5659b842fbf966afaa77b579aa680acf78bda62b2202e7901e053956dd90"
     },
     "src/warhammer40k_core/engine/transport_embark_validation.py:embark_after_setup_forbidden": {
-      "file_sha256": "1b9b19bdd81e8b1254008e3b6a124b7c801ad3e0414ca8cbdc5b75dfe76c0cdb",
+      "file_sha256": "7ad4d98e7bed11803f0ff20458a52bb08b0bb3383514b9977747ab98baa64d34",
       "resolved_path": "src/warhammer40k_core/engine/transport_embark_validation.py",
       "symbol_ast_sha256": "4fde9f03235600500a602553712e75d3f599f0d6c2afdef86d0d8a56b228e57d"
     },
     "src/warhammer40k_core/engine/transport_embark_validation.py:resolve_embark": {
-      "file_sha256": "1b9b19bdd81e8b1254008e3b6a124b7c801ad3e0414ca8cbdc5b75dfe76c0cdb",
+      "file_sha256": "7ad4d98e7bed11803f0ff20458a52bb08b0bb3383514b9977747ab98baa64d34",
       "resolved_path": "src/warhammer40k_core/engine/transport_embark_validation.py",
       "symbol_ast_sha256": "485564e25860436eccb952825de38b649eb78ac858c69f3d3b886a338b66a445"
     },
