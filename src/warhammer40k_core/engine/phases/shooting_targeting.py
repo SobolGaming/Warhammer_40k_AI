@@ -208,8 +208,11 @@ def _rules_unit_within_heavy_movement_allowance(
     rules_unit: RulesUnitView,
     player_id: str | None = None,
 ) -> bool:
-    if not _rules_unit_has_no_advance_fall_back_or_setup(
-        state=state, rules_unit=rules_unit, player_id=player_id
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    # 24.16 tests accepted turn distance, not the selected movement action.
+    # Shooting admission separately determines which weapons may attack.
+    if _rules_unit_set_up_this_turn(
+        state=state, unit_ids=_rules_unit_state_unit_ids(rules_unit), player_id=actor_id
     ):
         return False
     from warhammer40k_core.engine.model_movement_history import models_within_turn_distance

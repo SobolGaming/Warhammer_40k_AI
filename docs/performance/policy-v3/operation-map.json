@@ -6031,6 +6031,64 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "d09-heavy-source-predicate": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/shooting_targeting.py"
+      ],
+      "owners": [
+        "_rules_unit_within_heavy_movement_allowance"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d09-native-regression-fixtures": {
+      "paths": [
+        "tests/d09_heavy_helpers.py",
+      "tests/d09_test_preservation_helpers.py",
+        "tests/unit/test_order97_facade_evidence.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d09-retained-source-publication": {
+      "paths": [
+        "data/source_audits/d09/*",
+        "contracts/migrations/44.3.30-to-44.3.31.md"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d09-original-negative-fixture": {
+      "paths": [
+        "tests/unit/test_phase13b_shooting_declarations.py"
+      ],
+      "owners": [
+        "test_phase13d_advanced_unit_allowed_to_shoot_does_not_gain_heavy_modifier"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d09-authenticated-source-bytes": {
+      "paths": [
+        ".gitattributes"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
