@@ -163,8 +163,11 @@ def starting_cargo_session(
     return session
 
 
-def submit_transport_choice(session: LocalGameSession, request: DecisionRequest) -> None:
-    result_id = f"{request.request_id}:order135-cargo"
+def submit_transport_choice(
+    session: LocalGameSession, request: DecisionRequest, *, result_id: str | None = None
+) -> None:
+    if result_id is None:
+        result_id = f"{request.request_id}:order135-cargo"
     if request.decision_type == "submit_deployment_placement":
         status = session.submit_parameterized_payload(
             request_id=request.request_id,
@@ -191,12 +194,20 @@ def submit_transport_choice(session: LocalGameSession, request: DecisionRequest)
     assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
 
 
-def reach_disembark(session: LocalGameSession) -> DecisionRequest:
+def reach_disembark(
+    session: LocalGameSession, *, action_result_id: str | None = None
+) -> DecisionRequest:
     for _ in range(30):
         request = pending_request(session)
         if request.decision_type == "submit_placement_proposal":
             return request
-        submit_transport_choice(session, request)
+        submit_transport_choice(
+            session,
+            request,
+            result_id=action_result_id
+            if request.decision_type == "select_movement_action"
+            else None,
+        )
     raise AssertionError("Native starting-cargo disembark request was not reached.")
 
 

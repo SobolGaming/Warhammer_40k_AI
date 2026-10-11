@@ -2,7 +2,10 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
-from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
+from warhammer40k_core.engine.model_movement_permission import (
+    model_movement_path_context,
+    model_movement_terrain_context,
+)
 
 from warhammer40k_core.core.attributes import CharacteristicValue
 from warhammer40k_core.engine.aircraft import AircraftMovementViolationCode
@@ -524,11 +527,15 @@ def _resolve_unit_move(
                 path_result=path_result,
                 aircraft_violations=aircraft_violations,
             )
-        terrain_context = legality_context.to_terrain_path_legality_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            terrain=terrain,
-            terrain_features=terrain_features,
+        terrain_context = model_movement_terrain_context(
+            model=model,
+            context=legality_context.to_terrain_path_legality_context(
+                moving_model=moving_model,
+                witness=model_witness,
+                terrain=terrain,
+                terrain_features=terrain_features,
+            ),
+            granted_keywords=validated_temporary_keywords,
         )
         terrain_result = terrain_context.validate()
         if path_context.enemy_models:

@@ -18,7 +18,10 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.consolidation_objectives import consolidation_objective_by_id
 from warhammer40k_core.engine.fight_geometry import geometry_models_for_fight_unit
-from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
+from warhammer40k_core.engine.model_movement_permission import (
+    model_movement_path_context,
+    model_movement_terrain_context,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest, ProposalKind
 from warhammer40k_core.engine.objective_geometry import (
@@ -264,11 +267,14 @@ def _query(
                 ),
             ),
         ),
-        terrain_context=legality.to_terrain_path_legality_context(
-            moving_model=start,
-            witness=witness,
-            terrain=fight_terrain_volumes_for_features(battlefield.terrain_features),
-            terrain_features=battlefield.terrain_features,
+        terrain_context=model_movement_terrain_context(
+            model=scenario.model_instance_for_placement(placement),
+            context=legality.to_terrain_path_legality_context(
+                moving_model=start,
+                witness=witness,
+                terrain=fight_terrain_volumes_for_features(battlefield.terrain_features),
+                terrain_features=battlefield.terrain_features,
+            ),
         ),
         goal=goal,
         maximum_target_range_inches=(

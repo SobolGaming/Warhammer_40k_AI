@@ -23,6 +23,7 @@ def save_damage_session(
     model_scoped_save: bool = False,
     modified_ap: bool = False,
     damage_zero_replacement: bool = False,
+    game_id: str = "order93-save-damage",
 ) -> LocalGameSession:
     catalog = _canonical_catalog()
     if damage_zero_replacement:
@@ -89,7 +90,7 @@ def save_damage_session(
     )
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=catalog,
-        game_id="order93-save-damage",
+        game_id=game_id,
         enemy_model_count=2,
     )
     state = lifecycle.state

@@ -53,13 +53,17 @@ def reroll_catalog() -> ArmyCatalog:
 
 
 def heroic_session(
-    *, natural: bool, attached: bool = False, catalog: ArmyCatalog | None = None
+    *,
+    natural: bool,
+    attached: bool = False,
+    catalog: ArmyCatalog | None = None,
+    game_id: str = "order49-heroic",
 ) -> tuple[LocalGameSession, str]:
     lifecycle, units = charge_lifecycle(
         alpha_unit_ids=("charger", "leader") if attached else ("charger",),
         alpha_attached_unit_ids=("charger", "leader") if attached else None,
         alpha_origins={"charger": Pose.at(10, 20), "leader": Pose.at(10, 18)},
-        game_id="order49-heroic",
+        game_id=game_id,
         enemy_model_poses=compact_test_unit_poses(origin=Pose.at(10, 26), model_count=5),
         catalog=reroll_catalog() if natural else catalog,
     )

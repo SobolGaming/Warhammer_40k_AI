@@ -724,7 +724,9 @@ def test_ecstatic_death_registers_idempotent_serializable_two_plus_model_source(
 
 
 def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() -> None:
-    session, attacker, target = _ecstatic_death_fight_session(game_id=ECSTATIC_DEATH_GAME_ID)
+    session, attacker, target = _ecstatic_death_fight_session(
+        game_id="order102-ecstatic-chain-07:d07:38010"
+    )
     state = session.lifecycle.state
     assert state is not None
     target_model_id = target.own_models[0].model_instance_id
@@ -906,7 +908,9 @@ def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() 
 def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
     corruption: str,
 ) -> None:
-    session, attacker, _target = _ecstatic_death_fight_session(game_id=ECSTATIC_DEATH_GAME_ID)
+    session, attacker, _target = _ecstatic_death_fight_session(
+        game_id="order102-ecstatic-chain-07:d07:38010"
+    )
     status = _advance_ecstatic_death_session(
         session=session,
         status=session.advance_until_decision_or_terminal(),
@@ -968,7 +972,9 @@ def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
 
 
 def test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting() -> None:
-    session, attacker, retained, child = _ecstatic_death_chain_session()
+    session, attacker, retained, child = _ecstatic_death_chain_session(
+        game_id="order102-ecstatic-chain-07:d07:38010"
+    )
     state = session.lifecycle.state
     assert state is not None
 
@@ -995,6 +1001,7 @@ def test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting() 
         status=status,
         stop_at_decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
         result_id_prefix="ecstatic-death-chain:attacker",
+        melee_result_id="ecstatic-death-chain:attacker:melee-001:d07-late:5",
         melee_profile_suffix=":strike",
         melee_target_unit_instance_id=retained.unit_instance_id,
     )
@@ -1126,7 +1133,9 @@ def _ecstatic_death_fight_session(
     return LocalGameSession(lifecycle=lifecycle), attacker, target
 
 
-def _ecstatic_death_chain_session() -> tuple[
+def _ecstatic_death_chain_session(
+    *, game_id: str = ECSTATIC_CHAIN_GAME_ID
+) -> tuple[
     LocalGameSession,
     UnitInstance,
     UnitInstance,
@@ -1142,7 +1151,7 @@ def _ecstatic_death_chain_session() -> tuple[
         },
         # Disjoint 60 mm bases remain engaged across each 3-inch centre gap.
         # Real deterministic rolls exercise both casualty/retention branches.
-        game_id=ECSTATIC_CHAIN_GAME_ID,
+        game_id=game_id,
         datasheet_id=DAEMON_PRINCE_ID,
         model_profile_id=f"{DAEMON_PRINCE_ID}:daemon-prince-of-slaanesh",
         model_count=1,
@@ -1199,6 +1208,7 @@ def _advance_ecstatic_death_session(
     result_id_prefix: str,
     melee_profile_suffix: str = ":sweep",
     melee_target_unit_instance_id: str | None = None,
+    melee_result_id: str | None = None,
 ) -> LifecycleStatus:
     current = status
     for result_index in range(1, 129):
@@ -1225,7 +1235,9 @@ def _advance_ecstatic_death_session(
                 status=current,
                 profile_suffix=melee_profile_suffix,
                 target_unit_instance_id=melee_target_unit_instance_id,
-                result_id=f"{result_id_prefix}:melee-{result_index:03d}",
+                result_id=f"{result_id_prefix}:melee-{result_index:03d}"
+                if melee_result_id is None
+                else melee_result_id,
             )
             continue
         if request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:

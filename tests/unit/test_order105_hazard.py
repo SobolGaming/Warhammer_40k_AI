@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.d07_fixture_identity_helpers import submit_fixed_fixture_request
 from tests.hazard_all_models_helpers import hazard_scene
 from tests.order97_gap_probes_04_06 import mixed_hazard_unit
 from tests.phase13b_shooting_declaration_helpers import (
@@ -254,7 +255,7 @@ def test_mixed_hazardous_facade_restore_and_replay(
         keyword,
         attached=attached,
         fragile=fragile,
-        game_id="order105-hazard-name-12"
+        game_id="order105-hazard-name-12:d07:0"
         if attached and fragile and keyword == "MOUNTED"
         else "order105-hazard-1"
         if attached
@@ -304,7 +305,16 @@ def test_mixed_hazardous_facade_restore_and_replay(
             )
             assert status.status_kind is not LifecycleStatusKind.INVALID, status
         else:
-            submit_fixture_request(session, request)
+            submit_fixed_fixture_request(
+                session,
+                request,
+                result_id="decision-request-000006:fixture-choice:d07-late:544619"
+                if attached
+                and fragile
+                and keyword == "MOUNTED"
+                and request.request_id == "decision-request-000006"
+                else None,
+            )
     else:
         raise AssertionError("Hazardous completion was not reached.")
     event = next(

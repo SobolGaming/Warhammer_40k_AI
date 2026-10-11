@@ -1,0 +1,28 @@
+{
+  "schema": "d07-upper-floor-provenance-v2",
+  "BASE": "6fbd2a9fa14f8bab1e1f4655235dbbe276bf2f88",
+  "BASE_TREE": "a1e26f63c5ffedbae22fd8ea2c81aa1c76179bd5",
+  "sole_parent": "72475b63fa70f64a57264bc7a37e1c6fe7c7cca3",
+  "archives": {
+    "baseline/src/warhammer40k_core/core/ruleset_descriptor.py.txt": {
+      "sha256": "47a2930f5e4c29dab96b100cce63b639d1f87ee30b6c4664621643b0972d126e",
+      "blob": "cf8396f43097a7f4bb7fd2961442cdc67b50cdc5"
+    },
+    "baseline/src/warhammer40k_core/engine/phases/movement_resolution_flow.py.txt": {
+      "sha256": "0c3df639487fc7eeef3a5be961107fcf65b49476704ed0541a754257cbfb067a",
+      "blob": "c07d5c40b7344bea6de7d185548229c282111f8d"
+    }
+  },
+  "selected_source_sha256": "f65bd6ac651d80e11bc3bf6240d4b7fbed008cc7bd542a4b3f5c3343928f4d0e",
+  "scope_approval_sha256": "a79df50aa64f4cd72e20c9cb548280fc39b4920e40e1e69ad0b7b6db6d64bf14",
+  "identity_maintenance_approval_sha256": "42100279c5906f722e04cdc800ef8ba25070ccf37e9af4ac5453a635caa512e3",
+  "original_report_218_sha256": "135b2399d1e5a4819e53e1763e5fad02c9222fdace1f7805e139daefbda9b8ee",
+  "historical_limit": "Detailed report199 and supportindex217 were not recovered on Windows. Complete retained source/acceptance and independent actual-baseline facade reproductions control this repair; no missing historical receipt fabricated.",
+  "baseline_reproduction": "Actual post-580 main rejects canonical MONSTER120 wholly supported upper-floor setup; an INFANTRY upper-floor genuine witnessed movement control passes. Predeclared admitted analytical mixed/attached Core fixtures reproduce unit-keyword borrowing.",
+  "mixed_fixture_qualification": "Existing legacy non-strict analytical Core fixtures; no official named mixed roster/provider/faction/SWARM certification.",
+  "original_assertions_archives_branches_ceilings_preserved": true,
+  "original_test_bytes_changed_under_explicit_identity_exception": true,
+  "full_current_cohort_final_reviews_and_performance": "PENDING; focused fixture proofs are not aggregate, timing or final gate credit.",
+  "original_tests_sha256": "2a760cafee062ea14b57a029035e2fd175403752279c1e2d842f43ccfb1e6451",
+  "fixture_maintenance_sha256": "906afef1aa8b53dafd1ae714869ce4cf39b6af961a6a6f20583f62958dcac325"
+}

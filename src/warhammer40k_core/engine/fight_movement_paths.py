@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
+from warhammer40k_core.engine.model_movement_permission import (
+    model_movement_path_context,
+    model_movement_terrain_context,
+)
 from warhammer40k_core.engine.sequential_movement import sequential_friendly_models
 
 if TYPE_CHECKING:
@@ -115,11 +118,14 @@ def validate_fight_paths(
                 movement_distance_budget_inches=distance_budget_inches,
             ),
         )
-        terrain_context = legality_context.to_terrain_path_legality_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            terrain=terrain_volumes,
-            terrain_features=terrain_features,
+        terrain_context = model_movement_terrain_context(
+            model=scenario.model_instance_for_placement(placement),
+            context=legality_context.to_terrain_path_legality_context(
+                moving_model=moving_model,
+                witness=model_witness,
+                terrain=terrain_volumes,
+                terrain_features=terrain_features,
+            ),
         )
         terrain_result = terrain_context.validate()
         path_results.append(

@@ -813,7 +813,7 @@ def test_order97_hazardous_casualty_may_be_a_non_weapon_bearer() -> None:
     from tests.optional_shooting_helpers import optional_payload
     from tests.order97_gap_probes_09_17 import hazardous_nonbearer_session
 
-    session, nonbearer = hazardous_nonbearer_session()
+    session, nonbearer = hazardous_nonbearer_session(game_id="order97-nonbearer-1:d07:74")
     state = session.lifecycle.state
     assert state is not None
     request = select_optional_shooting(session)

@@ -33,7 +33,13 @@ def test_choices_devastating_sustained_restore_and_replay(phase: BattlePhase, ch
     from warhammer40k_core.engine.event_log import JsonValue, canonical_json
     from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
 
-    session = lethal_session(phase, devastating=True)
+    session = lethal_session(
+        phase,
+        devastating=True,
+        game_id="order44-shooting:d07:36"
+        if phase is BattlePhase.SHOOTING and choice == "roll-to-wound"
+        else None,
+    )
     pending_request(session)
     initial = session.lifecycle.to_payload()
     request = reach_lethal_choice(session)
@@ -56,8 +62,19 @@ def test_choices_devastating_sustained_restore_and_replay(phase: BattlePhase, ch
         current.submit_option(
             request_id=request.request_id, result_id=first_result_id, option_id=choice
         )
-    complete_attack(session, choice=choice)
-    complete_attack(restored, choice=choice)
+    result_identities = (
+        {
+            "attack-sequence:decision-request-000003:fixture-choice:pool-001:"
+            "attack-014:lethal-hit-wound": (
+                "attack-sequence:decision-request-000003:fixture-choice:pool-001:"
+                "attack-014:lethal-hit-wound:fixture-choice:d07-late:988073"
+            )
+        }
+        if phase is BattlePhase.SHOOTING and choice == "roll-to-wound"
+        else None
+    )
+    complete_attack(session, choice=choice, result_identities=result_identities)
+    complete_attack(restored, choice=choice, result_identities=result_identities)
     assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
     choices = [
         record

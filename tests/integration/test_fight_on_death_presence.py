@@ -53,7 +53,7 @@ def test_r32_retained_only_observer_eligibility_restores_replays_and_cleans_up(
         attached=attached,
         game_id="order123-retained-observer-attached-keyword-identity-0"
         if attached
-        else "order123-retained-observer-unattached-keyword-identity-0",
+        else "order123-retained-observer-unattached-keyword-identity-0:d07:5",
     )
     pending_request(session)
     initial = session.lifecycle.to_payload()

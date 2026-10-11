@@ -4159,7 +4159,7 @@ def test_infractors_excessive_assault_does_not_enter_ranged_reroll_path() -> Non
         source_datasheet_id="000004080",
         phase=BattlePhase.SHOOTING,
         with_icon=False,
-        game_id="order32-infractors-ranged-0",
+        game_id="order32-infractors-ranged-0:d07:3",
     )
     state = session.lifecycle.state
     assert state is not None
@@ -4280,6 +4280,8 @@ def test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays(
     expected_passed: bool,
     expected_gain_status: str | None,
 ) -> None:
+    if game_id == "order43-icon-0":
+        game_id = "order43-icon-0:d07:24"
     session, tormentors, target = _battleline_lifecycle_session(
         source_datasheet_id="000004079",
         phase=BattlePhase.SHOOTING,
@@ -4313,7 +4315,9 @@ def test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays(
     submitted = session.submit_option(
         request_id=request.request_id,
         option_id=request.options[0].option_id,
-        result_id="icon-of-excess-damage-allocation",
+        result_id="icon-of-excess-damage-allocation:d07-late:36"
+        if game_id == "order43-icon-0:d07:24"
+        else "icon-of-excess-damage-allocation",
     )
     assert submitted.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert state.current_battle_phase is not BattlePhase.SHOOTING
@@ -5159,7 +5163,7 @@ def test_fulgrim_daemonic_poisons_routes_shooting_and_fight_hits_then_ticks_once
     armies, state, indexes, fulgrim, enemy = _fulgrim_runtime_fixture(
         phase=BattlePhase.SHOOTING,
         active_player_id="player-a",
-        game_id="order65-fulgrim-poison-0",
+        game_id="order65-fulgrim-poison-0:d07:34",
     )
     decisions = DecisionController()
     runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)

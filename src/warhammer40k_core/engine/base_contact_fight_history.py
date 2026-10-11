@@ -7,7 +7,10 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
 from warhammer40k_core.engine.charge_endpoint_history import charge_component_at_physical_boundary
-from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
+from warhammer40k_core.engine.model_movement_permission import (
+    model_movement_path_context,
+    model_movement_terrain_context,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phase import GameLifecycleError
 
@@ -74,11 +77,14 @@ def validate_fight_contact_permissions(
             movement_distance_budget_inches=context.movement_distance_budget_inches,
         ),
     )
-    expected_terrain = legality.to_terrain_path_legality_context(
-        moving_model=context.moving_model,
-        witness=context.witness,
-        terrain=query.terrain_context.terrain,
-        terrain_features=query.terrain_context.terrain_features,
+    expected_terrain = model_movement_terrain_context(
+        model=unit.own_model_by_id(context.moving_model.model_id),
+        context=legality.to_terrain_path_legality_context(
+            moving_model=context.moving_model,
+            witness=context.witness,
+            terrain=query.terrain_context.terrain,
+            terrain_features=query.terrain_context.terrain_features,
+        ),
     )
     if context != expected_path or query.terrain_context != expected_terrain:
         raise GameLifecycleError("Deemed contact Fight movement capabilities drifted.")
@@ -234,11 +240,15 @@ def validate_triggered_contact_permissions(
             movement_distance_budget_inches=context.movement_distance_budget_inches,
         ),
     )
-    terrain = legality.to_terrain_path_legality_context(
-        moving_model=context.moving_model,
-        witness=context.witness,
-        terrain=query.terrain_context.terrain,
-        terrain_features=query.terrain_context.terrain_features,
+    terrain = model_movement_terrain_context(
+        model=unit.own_model_by_id(context.moving_model.model_id),
+        context=legality.to_terrain_path_legality_context(
+            moving_model=context.moving_model,
+            witness=context.witness,
+            terrain=query.terrain_context.terrain,
+            terrain_features=query.terrain_context.terrain_features,
+        ),
+        granted_keywords=chosen_move_keywords(payload),
     )
     if expected != context or terrain != query.terrain_context:
         raise GameLifecycleError("Deemed contact reactive movement capabilities drifted.")

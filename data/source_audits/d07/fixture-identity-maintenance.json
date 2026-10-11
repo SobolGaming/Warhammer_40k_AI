@@ -1,0 +1,343 @@
+{
+  "schema": "d07-approved-fixed-fixture-identity-v2",
+  "base": "6fbd2a9fa14f8bab1e1f4655235dbbe276bf2f88",
+  "approval": "approved-identity-maintenance.json",
+  "original_fingerprint": "f1862a7da1e38e7cf5c68505b69d4ccd990a52cbd4b17145d0913730994fe83f",
+  "truthful_fingerprint": "358ded485e5c9aab3619b2ac06048820dbc60ad96443737f0a4d1a2e21a31536",
+  "runtime_candidate_search_or_rng_history_shim": false,
+  "files": [
+    {
+      "path": "tests/charge_reroll_helpers.py",
+      "before_sha256": "1e3d661fc9b1c86efc89032b2fbc6c1bc4172301d3cde4315371799353da24da",
+      "original_git_blob": "69fc516389549741773124dfca3d58ec194633f3",
+      "after_sha256": "2eb1d994716bef5455d7f77e256acac587b30afd7290cacf2a29036a376018be",
+      "original_assertions_sha256": "a849fe318b06e20a70d3b3fd800ab41b5567173dab402aa5afe5ad5c6dd91116",
+      "original_assertion_count": 2,
+      "original_decorators_sha256": "a171aa333b8c7895304529cdd5ec45940d12e35c8f2e388398bceeaf36a21bce",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/integration/test_fight_on_death_presence.py",
+      "before_sha256": "64092d65b4849ceabebe2575ba927cc4be092dff0ded5b50cc00da121c5bf190",
+      "original_git_blob": "82aef08fcbf5d2a6f679c023a8b49bcbdcf53a8c",
+      "after_sha256": "30104bd3e02a18b7ec23dcccad9d1a52836aef1d83c3df1312a5701fbeed0b56",
+      "original_assertions_sha256": "6fa534d0a236b35585d62fe2023cbe71d4ea74237e6deca7d0ef344648794b99",
+      "original_assertion_count": 135,
+      "original_decorators_sha256": "ff06771d309e1131ba9d83959667bc3a974b5e73684e51864719a02ec93f9252",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/integration/test_retained_shooting.py",
+      "before_sha256": "b8769a3c63305b07beb9493d1e33ed0deb3678b9cf01bfd414eab9567f548f87",
+      "original_git_blob": "1794b106fec3925992a421086a334b323650e4ed",
+      "after_sha256": "766a18d87c0e93eefd247133cf7ff47aadfec78752bc5b676fa82c281d363037",
+      "original_assertions_sha256": "bf04cb96b2c525612e3abffe44aaf8a37f7e11582f6666376f4bb5c2323c068a",
+      "original_assertion_count": 201,
+      "original_decorators_sha256": "a2eac77afd6ef6d0de099a7566e43e3145727f9d0432c8805c42bfba8229a165",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/integration/test_ws13_adapter_phase_families.py",
+      "before_sha256": "221db5bd51aae14b71667f8b3fe1d3b53d088e9f9ae0be206953550b13deaca9",
+      "original_git_blob": "0c94b74dd371a9cd1c7567c53df2018cd4fcd0d9",
+      "after_sha256": "ab3222d931f2c947b27993686dba22946687a25300dc804be329b15ee848e2b0",
+      "original_assertions_sha256": "8a50606f49e19f82d62d2ed32e56542cdebabed47ae60ce12c4e8cc0fda13d6d",
+      "original_assertion_count": 200,
+      "original_decorators_sha256": "fe7d4a240ef60e87dd81c089da261bad27c41e9f0cc93664243385d30c82490d",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/lethal_hits_helpers.py",
+      "before_sha256": "5db60d818c07f1e12fb61fabead07722da73baebda47ce8a58af7da9e629d6eb",
+      "original_git_blob": "d6e0e363a78b04164253168201d51da3d43a78db",
+      "after_sha256": "02439b58e6e45e046703c828ff7d092dc123f860bbe1c72facd85f8f5606c18b",
+      "original_assertions_sha256": "bef2e5262c69b1ee9258f9af8469f5e0f687c4fff7b92c6402d0e3c4aadff3c0",
+      "original_assertion_count": 9,
+      "original_decorators_sha256": "c4dc3415adc59cceff55057caf7d2444ffd3c7b7173442d3aa00588254c3f479",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/order116_mortal_helpers.py",
+      "before_sha256": "643314c9c577ffb5cfe5fb6b1596fa203755daa6d679fda90860ea66662dce72",
+      "original_git_blob": "928dc24facae8fa304c639af21000252075f2752",
+      "after_sha256": "991cef82695e7e1dbd1ffb7deced4e9917f6d64ba1e8699c23faf486e82ca71b",
+      "original_assertions_sha256": "86de2bf05e9570339a6e8c6b20dc8c2b14cccfdf01ac088fa66076eae43668d1",
+      "original_assertion_count": 6,
+      "original_decorators_sha256": "344d00c257916936eda318f40190e2d7cae3d94a7122bd5b993da3de2f6f9831",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/order117_allocation_helpers.py",
+      "before_sha256": "6b1c88f91e537750dfb1a05b4d451b904ec4f9948c0a777b07cfd1ab365297ce",
+      "original_git_blob": "91dcddefac36e14c5a76f9a5f3f0a8057bf8224a",
+      "after_sha256": "6d6c9833c0f8bea283a55322635891309ee07eb90f9538e58c2171f60ea85739",
+      "original_assertions_sha256": "a78b9e3b534d4618a279f424b89a6aff6443ed411bdee239d28f54a897aaf72b",
+      "original_assertion_count": 2,
+      "original_decorators_sha256": "2851fd4bcd6e3b86dd81db3b806d404991cdfdc0b622ec66f5919fe9a97aba1e",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/order124_helpers.py",
+      "before_sha256": "4710be5a040fa6819c3fa6e032877aa6620721eeafaf2d279d1a8f1512279880",
+      "original_git_blob": "965715235de2e120b9e914db7f76e47607d42432",
+      "after_sha256": "d47477ee5d7d2971745d06fa20c8d2dbe69e2fb3075e370cde686c81895968d6",
+      "original_assertions_sha256": "b281f3e93bea8e2ad1d863d915ddbb08e592c26c6a2b2a8d2e0095781e9023cb",
+      "original_assertion_count": 20,
+      "original_decorators_sha256": "8cdda0e2e30e3abc214a9140a5a1e9d1ebd3cf7bba921c2ed73f5b0713f8f623",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/order135_rng_helpers.py",
+      "before_sha256": "9f1b7af8d9e8f12e6a1bbad0e0a61a6ab36b4d8ac0ff190f9eab669a2fb11857",
+      "original_git_blob": "a3251d57f60bf25d9c3465a33f6292e41f29f091",
+      "after_sha256": "8e87c2dc245f30639b36c466d1fbac5f7165acbef2b6c5415598a31ed4ee8d29",
+      "original_assertions_sha256": "22cc731850bb16204390d2a7f6457b51e87b80a8b68d0c648ae71c0e3017e3a2",
+      "original_assertion_count": 5,
+      "original_decorators_sha256": "726b0ded82608f3a1b36faba7e38440d894b85daf613d4fae7e38913687bdcc1",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/order135_transport_helpers.py",
+      "before_sha256": "9df33b7b27a35b2df3df623d8d662b7dbfc51d0a8c8e79e52de8ee662479ebf7",
+      "original_git_blob": "2c2d5046a7af9f347554dca66a351c45bce077c3",
+      "after_sha256": "a6b1f5394808e4fba1d31dbbd69baab017e2ae8999d925ad4954e656d7a276db",
+      "original_assertions_sha256": "ac31dc13a4864eb00a8d3775b40f68d3a178854d5ffb2b88d42fb0fca6ca1f2a",
+      "original_assertion_count": 6,
+      "original_decorators_sha256": "11fb1d100847ee34d598470305f92a2f2af5ea10094355d32866481e169b3005",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/order93_save_damage_helpers.py",
+      "before_sha256": "f9808b06e0b9048ac1497536d86c9cf1c4e9388219376f81fb3f0edf9569cda5",
+      "original_git_blob": "ecbb6953cdc1915192b457b6d227f29ca1332a5b",
+      "after_sha256": "2d717557907d91cf02deeaec97958d861ceea7e2f82677f631ff95b7ed34ad8e",
+      "original_assertions_sha256": "b44f6bd54a4522a4cc3b4d247bc60ef8082170e19c6c61c1c00bbcfa7e52fe53",
+      "original_assertion_count": 7,
+      "original_decorators_sha256": "d92eae3b9d0253de7a4350a1fe1587b05c2f544b8f99a23010e5d98641b06d38",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/order97_gap_probes_09_17.py",
+      "before_sha256": "5d3518132c0939f625e8751d93cadb5c955decd6da9decda86ed100fb7589f08",
+      "original_git_blob": "4e2aa2ebc48955ddfdd7a17a511d65274df51d8e",
+      "after_sha256": "1188c8c4525b2cc04a12d644e93a000f5d5b3b359cf743ba1af0f6a3def8e91e",
+      "original_assertions_sha256": "55235a10b877b71ccf07cd8fb7bc77baa374218ee4bffaef69be1656028927c7",
+      "original_assertion_count": 16,
+      "original_decorators_sha256": "7fdcf3bfa90479e6532069c43aa9d1373d48d6416608faae8a29081a2bba37c5",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_action_movement_interruption.py",
+      "before_sha256": "559e3850487e6aaf7b17d3ca74ae31ac73e5b12d6444d3b379a37dd49f28594a",
+      "original_git_blob": "784323db1031ca8a439db3f826571076f8440384",
+      "after_sha256": "b638f1f66117b1f9829223572dc77578f1f22e2de469da9894b63d9c3c13e06f",
+      "original_assertions_sha256": "4403a56895098be1f1552aa03e40b9cc21bbf5d890d93130058e5b6ed169182d",
+      "original_assertion_count": 79,
+      "original_decorators_sha256": "bc01c736876c29a3df6b2e5d4571c502865ea014aa8bb2e1bdc6900587dcc510",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_d04_combat_battle_shock.py",
+      "before_sha256": "a7aaa6b03f56818134ed7b78bf157d794ab404b57061c960014ce52757755180",
+      "original_git_blob": "63eb8dcf6bd47620dd8b10e20d812c57b3819d19",
+      "after_sha256": "8234c19b7b1dbf98f97c77219ea35868b938f5dfe0b9acc130b73e139171f9f6",
+      "original_assertions_sha256": "1f4b09b353fcce63cd37cfb20b1864334401099e56d2c46b9d7fa5d2403faeaa",
+      "original_assertion_count": 74,
+      "original_decorators_sha256": "0f8029e02b7988d023790fa66be208037bec2112885c97662ecb4c2cf9b1dc29",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_heroic_intervention.py",
+      "before_sha256": "5f65cb14a014d23a0321efb47b212b1666a66fee55aa1133f3ca21b351713160",
+      "original_git_blob": "cd9ac281c379d33b5d9e691a804e8c375d18befa",
+      "after_sha256": "107e4803f147bd6a60842fd655757e4ee981c66d93eb1ddc9ca051d783c5da9a",
+      "original_assertions_sha256": "662280e04dea4a464e0bd3152db79b4aa1e5744cffc10541025e49b2a07d1d18",
+      "original_assertion_count": 97,
+      "original_decorators_sha256": "e58b342f1265e989546c58a94812030946ee09c6969f579ac00662947f4a543a",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_lethal_hits.py",
+      "before_sha256": "ca456c90c526d48b6b09c2afb9794ee4e211108e1d11f5ceba803639e555d9f1",
+      "original_git_blob": "32a58ee0d3c5026b4da7f6dc2aa6c60404a4847a",
+      "after_sha256": "3137a32356eec44f617ea4cc5f5a50cf53f400ee36860d01deea053ace572f44",
+      "original_assertions_sha256": "dc9f371aa656faf4d2a6c3fb44296a39b20c2cba8681be581574f3ecd779d814",
+      "original_assertion_count": 46,
+      "original_decorators_sha256": "f220769cb3d89ebab1f85ad38fe034a3bde9a832c3c773dad91f31e27b7822cf",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_order105_hazard.py",
+      "before_sha256": "8d58a31f06d27e095fb80859c96944cad9c48b81f6b0b3724a8991078099d512",
+      "original_git_blob": "dfd3280b286b78121ebdf35644de7215ae880932",
+      "after_sha256": "e6397dc57b1734f716087d1beb31cb5495a1b06f655c949a5d77d51cdd14a6b7",
+      "original_assertions_sha256": "c144dc96931adff026bd359841dc4e2049cfd805232a6a56661b1afd4711425e",
+      "original_assertion_count": 35,
+      "original_decorators_sha256": "829d332804b897019e5d2255fa0246bd6df4a8e30b2726b0aca15929e680d5e7",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_order116_additional_mortals.py",
+      "before_sha256": "16be57fd7934ade900e7e8febd9ca008d87c26e1e13fd17c17a396aa81982ad2",
+      "original_git_blob": "2b11d600fa239065b1e38b8170d3a397dacfde0a",
+      "after_sha256": "a7403545413122246b89e543dc5c3c26a0aa446531df6b793d04433649d112aa",
+      "original_assertions_sha256": "394ce05dd35b3a0c7d9f584148af6ad20ccbb498c6da0b069f45e540003b835f",
+      "original_assertion_count": 62,
+      "original_decorators_sha256": "1f1a6788a24a29381853b948b8b9c2c9f53d605973311f5f9a0b8bc7818d45d1",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_order117_mortal_allocation.py",
+      "before_sha256": "8d195dc0617dddf680e8924c5b4ccadd25346e35225d80978592c5c1f6ea3e17",
+      "original_git_blob": "cbed4ff8fe45697bb3dbceef8153a750cd6821ff",
+      "after_sha256": "5cf0e59b3c22d0167630a6971bb236dd8cccf5a3404f5c21f48caf97d7805f9b",
+      "original_assertions_sha256": "468aea4ab3b49968532a10217496ecd9bd8a156b157160fdeee0ff14b3e61b1b",
+      "original_assertion_count": 88,
+      "original_decorators_sha256": "10ac3f042135a55f3300f16091497b6f85e49fa5594821fcea76ae0a611287e0",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_order124_nested_conditions.py",
+      "before_sha256": "59fe3790f835881b987acb197f4d8c802dbcbfb315ca494dbeba0d1c722b88d8",
+      "original_git_blob": "c8a59444c1428001597275f47c6292a640f52fb7",
+      "after_sha256": "994f193d2526d6b8dc64771a994bd2d90adfb4990ced6c08c5803e1084fa5ecf",
+      "original_assertions_sha256": "5c527d2811ee2fd7a21cd85b09a063d9d900be6d3e765dc521d4c1d1e63f4e26",
+      "original_assertion_count": 59,
+      "original_decorators_sha256": "9bb095569d529788d1c8c655dd4ac84693ea32f194bc0eae64b5527dba6c2d9d",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_order135_combat_tactical_feasibility.py",
+      "before_sha256": "75657e9a1fcf141259f8ba3a62e0f74b01ed848df026c400f3d07202b4cc969e",
+      "original_git_blob": "217cfe7c25a873c1057f0fb8380f00414d2d6362",
+      "after_sha256": "32e95357c41045d6d7adc89f49c34d330713c35315a1e8417f6c7c80a9a9e03b",
+      "original_assertions_sha256": "c5db81f1bb710bc251b776f70529fb892418526fd9e848ad9a6e0bf0d1c33a2e",
+      "original_assertion_count": 47,
+      "original_decorators_sha256": "32cdc8be6880be9d5646fa0d6c570fc4a1d6d939bb54ca2ca76f33cca290b95f",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_order135_shooting_boundary.py",
+      "before_sha256": "d011631dec22c1b075c69b60d1a692d600994bd2aa3da7fa4b608841f797dd6d",
+      "original_git_blob": "bba8d83e7b0e071e22067c77879b565c84e71fc2",
+      "after_sha256": "0faac8c5de98389a76234b26ef4ab2ffb8270782f94224eb6b0bda1fecd1773d",
+      "original_assertions_sha256": "3a7980c448c9329b225c744234c070c689bf9a98139668a2ce41797e9a2d9a49",
+      "original_assertion_count": 30,
+      "original_decorators_sha256": "9393d18c1bf00e4880470c2c0fcd96335c45d6d99c5e73b6562a5f2aeaafa016",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_order97_secondary_clause_evidence.py",
+      "before_sha256": "6fe0b7d41c8fa1748618c0da4194a7cf327a84fa0ef4e43714f5f42a55971009",
+      "original_git_blob": "756b00b7d8d8c47af73263e09de9603bc7c2c544",
+      "after_sha256": "be5cac7f53b9f18ca337ce4baba4a82f524dbf4b7936c91bc913bf1a011f69c3",
+      "original_assertions_sha256": "efde638386da096ee2b4b7d419309b88c9aea321eb6d5dde28d79f2eb168ef2b",
+      "original_assertion_count": 110,
+      "original_decorators_sha256": "94347d83daa4b2a5da452c5b95d99e6fd52064c0c63d2ed731228d1db1cd463c",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_phase10o_fall_back.py",
+      "before_sha256": "689c18ed21f224db11b8115be0fedee9f501488a37b439cf6510a382eef7e4bf",
+      "original_git_blob": "d0c2a0c552974f476d02b35b84cf256430662194",
+      "after_sha256": "6c93e43b590ee493c13dea88cb1165ace8bf316287ea2b5c1ec197c0eebf2039",
+      "original_assertions_sha256": "c3c17b3cc06723cec24c4ee67f2be70695f937732e9faab602fc4f0a9a617b9b",
+      "original_assertion_count": 244,
+      "original_decorators_sha256": "e9041f892790d06bfc7455f35c6d36f532abc7f0a202cea0a18ac9c87c243b3e",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_phase13b_shooting_declarations.py",
+      "before_sha256": "0fc1568292ed5c8ba499ee8fe6f454e128f8d8d5bb8a9dff5c672e4095f803f0",
+      "original_git_blob": "e9dc79338289d51b2306b4321bf4cad208754cb4",
+      "after_sha256": "03e0fe35297d74bdfa3e27b341e19c239a4ab945c277564b2b12583cfda6a6d6",
+      "original_assertions_sha256": "e3af3401e76c19696c69115e225846805b5e4bde252200ad09091278090d4dce",
+      "original_assertion_count": 1456,
+      "original_decorators_sha256": "117d407b05157262c02e6840d527dab8d2b3f7ee655d5fde8feae0c733c12ea1",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_phase17_emperors_children_daemon_prince.py",
+      "before_sha256": "1593c556c3a26ccda081a733499364805df6efc9e64d0e0f5e010c2e0bfd0017",
+      "original_git_blob": "2954ac2e3c213ab95a4320cb8c3c399d1559925c",
+      "after_sha256": "e8afe1692d7dbf3dcaa02d761084ac095b2739fd7af9b040a8b7e391e67b83f6",
+      "original_assertions_sha256": "53f880ac85ab26aac3d11fac8bd351502c5b39851c2ef641f7460787be27d78d",
+      "original_assertion_count": 186,
+      "original_decorators_sha256": "274b5670f3a20f76fb684c3f6ebcf0ae8a51c0e7b6d5c19b6c2d2b923e1fe477",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_phase17_emperors_children_datasheet_overlay.py",
+      "before_sha256": "2def434b7588269d94dc1f313cabda9b1343660ae4f99eae421b0bf4c28c660e",
+      "original_git_blob": "7adbc61761aa34adfd133ccc636d216cb5cb5e2b",
+      "after_sha256": "cefaecc53d533dbb246fb7b4c5c7dc21ab47f3c6eb538cc89101843a029d231b",
+      "original_assertions_sha256": "291b6b30fe92d9e6e80e191c50c1af143c6b39f09ebc42ac7b8248a80e93d8f4",
+      "original_assertion_count": 631,
+      "original_decorators_sha256": "fb878c135dcb1bb8fa814ef7f92220462eb9f21fe21832fc6c6ea7377b9036cd",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_phase17g_chaos_space_marines_army_rule.py",
+      "before_sha256": "d66405605856342faa8983a10d658da097af60290b01bf74bc590e5f4234144c",
+      "original_git_blob": "f34cf18f9020791cf41d5a93d377a4c5a33a0349",
+      "after_sha256": "132ad158de58951446b311204ccc83af37e1d7596ac20ff9142feef3c26a6dac",
+      "original_assertions_sha256": "94709e434d0e0b22dfcea16f182ea5fd0a5603bc2d3b45ecbd693554be65ef14",
+      "original_assertion_count": 125,
+      "original_decorators_sha256": "054d46cb4a5a9c424314ba6b6a37a23482af1b1d8ebc7d1ed223201c50bd9d51",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_phase17g_thousand_sons_army_rule.py",
+      "before_sha256": "2e15529cdf49bdc960193e1c3f74da6693b4c3c7cf394a3e27731eb9225b29ee",
+      "original_git_blob": "a17d59d801383cebb0594e2ab3e15e3940a3ab3c",
+      "after_sha256": "164b74babdb28ec0b67c821951c32821402e7caf9181e55669fcbccde44d9373",
+      "original_assertions_sha256": "78eb337e9e7b833b21f8e72a5e4b34258112e44d8566cded442b8782ead748de",
+      "original_assertion_count": 50,
+      "original_decorators_sha256": "5fe624e399e30d5fdf71bba7a1a95e757b133c7ed654d0e48fac4f024067045a",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_phase17g_tyranids_army_rule.py",
+      "before_sha256": "8f0188baa44f3c9c3d9c53fdb4786a37c064099fbb9d60b18a4e4c8ef04f0581",
+      "original_git_blob": "5233bbec17aa04ac46ef27bfaefc155de2bafcb1",
+      "after_sha256": "9b8d85efcd140e524fd66a1a550577fb9249dbe9cb76a580625565c29f03cbb0",
+      "original_assertions_sha256": "b4e2913581c901cc7ab470fd490670f49cb00f6fb3cb8e93fdf4d80b16120ce9",
+      "original_assertion_count": 146,
+      "original_decorators_sha256": "f127331875fca3cc7f4b302b448d1512923e4b322682c7b92556c5878845247c",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_ruleset_descriptor.py",
+      "before_sha256": "47179c9f06b7e63106fc0f44391c13a0510e8a3b16c1c7ea879182315f99fc12",
+      "original_git_blob": "f0073bf89f3cb28ceb1001c646f62abce74fc8d7",
+      "after_sha256": "d9260ad72a89706009735cab7460038c669dc252e37e396d2cb2cafa878a5bb4",
+      "original_assertions_sha256": "3482ccfc93cba59a3ee80223c978898a3ae01819d23679d1795733535805bc75",
+      "original_assertion_count": 65,
+      "original_decorators_sha256": "ad119440a9a8ac4b01ee0fdfe767bac25a3f0b3d0520a505918b0d078759ba6c",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_unit_abilities.py",
+      "before_sha256": "d6b6dd3cf8da8f5e788a15c2cf73a9c8be27a69df045d6125d19d7a821ee9348",
+      "original_git_blob": "61395a98408b9e06f7e12fecdcb0667909432e47",
+      "after_sha256": "1f669994bca96fdb210b39702c28a48d42a24133afbd3e16c0ed81dfe234461d",
+      "original_assertions_sha256": "839370c49940dffc01a62eed700588fb02b9e0de97b954d25ed7d628b526bac6",
+      "original_assertion_count": 132,
+      "original_decorators_sha256": "c0ab9f40f294ea0dda65e8fcf5d6faef53d85a531795fdd62c8c71427792a71f",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    },
+    {
+      "path": "tests/unit/test_ws14_attack_sequence_runtime_hooks.py",
+      "before_sha256": "792d99e23ab8717c3302731c4203b99e7902ea3582a3b3510ea1286f96da423d",
+      "original_git_blob": "4d67cb750e93d2b246ae4301591e09e666ff2871",
+      "after_sha256": "2b3d4f2a441fda2755d84fba9d4f1bb471c8b938355e44a92c6d33f28cc2b42f",
+      "original_assertions_sha256": "d45039191c9b34ea43d1b65c176fa399883f581e9885fac9cd91e78e9f0a4743",
+      "original_assertion_count": 177,
+      "original_decorators_sha256": "5d4d103e11cf2a73e683ada1cbcdb81507791417edcbcb69cf54e977eee46bf0",
+      "qualification": "Explicitly approved descriptor golden or fixed fixture client/game identities; every original gameplay assertion and parameter decorator retained. Complete raw before/after sources are in the exact canonical packet; focused receipts confer no aggregate/performance credit."
+    }
+  ],
+  "original_assertions_preserved": 4548,
+  "all_parameter_decorators_preserved": true,
+  "current_complete_cohort": "PENDING"
+}

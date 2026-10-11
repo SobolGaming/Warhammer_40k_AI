@@ -222,8 +222,10 @@ def test_native_grouped_combat_pending_hazard_preserves_strict_context_and_repla
         ),
     )
     session = LocalGameSession()
-    session.start(replace(config, game_id="order135-combat-pending-03", army_catalog=catalog))
-    request = reach_disembark(session)
+    session.start(replace(config, game_id="order135-combat-pending-03:d07:9", army_catalog=catalog))
+    request = reach_disembark(
+        session, action_result_id="decision-request-000008:order135-cargo:d07:8"
+    )
     proposal = cargo_proposal(session)
     assert proposal.attempted_placement is not None
     state = session.lifecycle.state

@@ -7844,3 +7844,19 @@ events, persistence and exact replay use the shared engine path. No new decision
 proposal kind, wire shape, terrain permission or compatibility shim is introduced.
 See [scope and acceptance](MOVEMENT_WITNESS_MEMBERSHIP_SCOPE.md) and
 [Contract migration](../contracts/migrations/44.3.28-to-44.3.29.md).
+
+
+## D07 model-owned upper Ruins floors
+
+Legal stable MONSTER upper Ruins floor endpoints are now admitted. Setup and native
+movement/contact reconstruction use the physical model's eligible keywords, with
+existing authenticated movement grants retained. Support/no-overhang, traversal,
+witness budgets, coherency, native rejection ledgers and legal retry remain required.
+
+The declared terrain descriptor fingerprint changes. Strict old fingerprint pins
+are rejected. Existing request, proposal, event, persistence and viewer schemas stay
+intact; runtime identity and generated examples change. Save/load and replay require
+the matching runtime. No old-runtime compatibility converter or new provider,
+faction, SWARM or full Core certification is supplied.
+
+[Contract migration](../contracts/migrations/44.3.29-to-44.3.30.md).

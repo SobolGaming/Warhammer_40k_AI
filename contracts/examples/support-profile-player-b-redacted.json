@@ -797,20 +797,20 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "44.3.29",
+        "contract_version": "44.3.30",
         "identity_hash": "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d",
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "e1a171cccdabdd4210fcf019b01cbc8e82200815932091b4a4a79a7bf3eb395b",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:39e67db3386d58abb98cbc2fccddd4a9484553a6cb65e40e2346d1fe112c6963"
+        "identity_hash": "0280a6c672bda0278586dc22a9c77d4e6668dbf1f29a3f0952dcffc86e746de2",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a58246ae4350d42c569d48d130ed72a45e3da2656456962ba378bcfe30aeca2b"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",
         "identity_id": "11e-warhammer-event-companion-2026-07"
       },
       "ruleset": {
-        "identity_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
+        "identity_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
         "identity_id": "warhammer_40000:11e:core-v2-setup-prebattle-ui-smoke"
       },
       "source_packages": [
@@ -2706,7 +2706,7 @@
     }
   ],
   "overall_status": "playable",
-  "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
+  "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
   "schema_version": "support-profile-v4-directed-primary",
   "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
   "status_counts": {

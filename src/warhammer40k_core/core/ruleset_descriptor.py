@@ -2370,6 +2370,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
         "FLY",
         "IMPERIUM_PRIMARCH",
         "INFANTRY",
+        "MONSTER",
     )
     freely_moved_over_height_inches = 2.0
     return (

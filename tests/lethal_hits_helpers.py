@@ -28,6 +28,7 @@ def lethal_session(
     sustained: int = 1,
     target_keywords: tuple[str, ...] = (),
     torrent: bool = False,
+    game_id: str | None = None,
 ) -> LocalGameSession:
     catalog = _compact_intercessor_catalog(_canonical_catalog())
     keywords = [WeaponKeyword.LETHAL_HITS]
@@ -60,13 +61,15 @@ def lethal_session(
         ),
     )
     if phase is BattlePhase.SHOOTING:
-        lifecycle, _ = _compact_shooting_lifecycle(catalog=catalog, game_id="order44-shooting")
+        lifecycle, _ = _compact_shooting_lifecycle(
+            catalog=catalog, game_id="order44-shooting" if game_id is None else game_id
+        )
     else:
         lifecycle, _ = fight_lifecycle(
             alpha_unit_ids=("intercessor-1",),
             enemy_unit_ids=("enemy",),
             origins={"intercessor-1": Pose.at(10, 10), "enemy": Pose.at(12, 10)},
-            game_id="order44-fight",
+            game_id="order44-fight" if game_id is None else game_id,
             model_count=1,
             catalog=catalog,
             datasheet_id="core-character-leader",
@@ -103,7 +106,12 @@ def reach_lethal_choice(session: LocalGameSession) -> DecisionRequest:
     raise AssertionError("Did not reach a Lethal Hits choice.")
 
 
-def complete_attack(session: LocalGameSession, *, choice: str = "auto-wound") -> None:
+def complete_attack(
+    session: LocalGameSession,
+    *,
+    choice: str = "auto-wound",
+    result_identities: dict[str, str] | None = None,
+) -> None:
     for _ in range(150):
         if attack_completed(session):
             return
@@ -111,7 +119,13 @@ def complete_attack(session: LocalGameSession, *, choice: str = "auto-wound") ->
         if request.decision_type == "select_lethal_hit_wound":
             status = session.submit_option(
                 request_id=request.request_id,
-                result_id=f"{request.request_id}:fixture-choice",
+                result_id=(
+                    result_identities.get(
+                        request.request_id, f"{request.request_id}:fixture-choice"
+                    )
+                    if result_identities is not None
+                    else f"{request.request_id}:fixture-choice"
+                ),
                 option_id=choice,
             )
             assert status.status_kind is not LifecycleStatusKind.INVALID, status

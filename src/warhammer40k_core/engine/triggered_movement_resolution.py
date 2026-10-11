@@ -28,7 +28,10 @@ from warhammer40k_core.engine.charge_movement_source import (
     charge_placement_id,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
+from warhammer40k_core.engine.model_movement_permission import (
+    model_movement_path_context,
+    model_movement_terrain_context,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.normal_move_history import NormalMoveState
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -301,11 +304,15 @@ def resolve_triggered_movement(
             ),
         )
         path_result = path_context.validate()
-        terrain_context = legality_context.to_terrain_path_legality_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            terrain=terrain,
-            terrain_features=scenario.battlefield_state.terrain_features,
+        terrain_context = model_movement_terrain_context(
+            model=model,
+            context=legality_context.to_terrain_path_legality_context(
+                moving_model=moving_model,
+                witness=model_witness,
+                terrain=terrain,
+                terrain_features=scenario.battlefield_state.terrain_features,
+            ),
+            granted_keywords=temporary_keywords,
         )
         terrain_result = terrain_context.validate()
         model_contexts.append((placement, path_context, terrain_context))

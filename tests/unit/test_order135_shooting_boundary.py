@@ -98,7 +98,11 @@ def test_last_shooter_without_attacks_preserves_boundary_save_fork_views_and_rep
 def test_nonempty_native_attack_remains_shot_at_boundary(
     weapon_index: int, no_damage: bool
 ) -> None:
-    session, request = native_scalar_shooting_request()
+    session, request = native_scalar_shooting_request(
+        game_id="order135-native-scalar-rng:d07:91"
+        if weapon_index == 0
+        else "order135-native-scalar-rng"
+    )
     payload = json.loads(
         json.dumps(
             proposal_from_request(request=request, target_unit_id="army-beta:scalar").to_payload()

@@ -122,6 +122,8 @@ def test_native_combat_persists_until_one_required_own_command_test(
     game_id: str,
     passed: bool,
 ) -> None:
+    if game_id == "order135-combat-platform":
+        game_id = "order135-combat-platform:d07:1"
     from tests.d04_combat_helpers import finish_to_next_own_movement
 
     session = combat_session(game_id=game_id)
@@ -309,7 +311,7 @@ def test_native_combat_all_killed_cargo_records_no_surviving_shock() -> None:
     # The actual public engine rolls below, never injected dice, establish this control.
     status = session.submit_parameterized_payload(
         request_id=request.request_id,
-        result_id="d04:all-killed-result:45999",
+        result_id="d04:all-killed-result:d07:245668252",
         payload=validate_json_value(canonical_cargo_proposal(session).to_payload()),
     )
     assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
@@ -373,7 +375,7 @@ def test_native_attached_combat_uses_one_identity_and_shared_status_is_idempoten
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
     session = combat_session(
-        game_id="d04-canonical-attached", cargo_config=canonical_attached_cargo_config()
+        game_id="d04-canonical-attached:d07:20", cargo_config=canonical_attached_cargo_config()
     )
     request = pending_request(session)
     proposal = canonical_cargo_proposal(session)

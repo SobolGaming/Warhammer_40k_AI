@@ -1,0 +1,52 @@
+{
+  "schema": "order135-d07-historical-inputs-v1",
+  "purpose": "Exact original Order97 assertion/file/helper evidence only, retained from immutable BASE. Current approved fixture IDs still execute current gameplay tests. No original reviewed inventory, assertion, file pin, rule source or budget is replaced or repinned.",
+  "source_commit": "6fbd2a9fa14f8bab1e1f4655235dbbe276bf2f88",
+  "files": [
+    {
+      "path": "tests/charge_reroll_helpers.py",
+      "historical_path": "data/source_audits/order135/d07-baseline-charge-reroll-helpers.py.txt",
+      "bytes": 5657,
+      "sha256": "1e3d661fc9b1c86efc89032b2fbc6c1bc4172301d3cde4315371799353da24da",
+      "order97_file_pin": "1e3d661fc9b1c86efc89032b2fbc6c1bc4172301d3cde4315371799353da24da",
+      "git_path": "tests/charge_reroll_helpers.py",
+      "git_revision": "6fbd2a9fa14f8bab1e1f4655235dbbe276bf2f88"
+    },
+    {
+      "path": "tests/order93_save_damage_helpers.py",
+      "historical_path": "data/source_audits/order135/d07-baseline-order93-save-damage-helpers.py.txt",
+      "bytes": 14748,
+      "sha256": "f9808b06e0b9048ac1497536d86c9cf1c4e9388219376f81fb3f0edf9569cda5",
+      "order97_file_pin": "f9808b06e0b9048ac1497536d86c9cf1c4e9388219376f81fb3f0edf9569cda5",
+      "git_path": "tests/order93_save_damage_helpers.py",
+      "git_revision": "6fbd2a9fa14f8bab1e1f4655235dbbe276bf2f88"
+    },
+    {
+      "path": "tests/order97_gap_probes_09_17.py",
+      "historical_path": "data/source_audits/order135/d07-baseline-order97-gap-probes-09-17.py.txt",
+      "bytes": 28892,
+      "sha256": "5d3518132c0939f625e8751d93cadb5c955decd6da9decda86ed100fb7589f08",
+      "order97_file_pin": "5d3518132c0939f625e8751d93cadb5c955decd6da9decda86ed100fb7589f08",
+      "git_path": "tests/order97_gap_probes_09_17.py",
+      "git_revision": "6fbd2a9fa14f8bab1e1f4655235dbbe276bf2f88"
+    },
+    {
+      "path": "tests/unit/test_heroic_intervention.py",
+      "historical_path": "data/source_audits/order135/d07-baseline-heroic-intervention.py.txt",
+      "bytes": 30060,
+      "sha256": "5f65cb14a014d23a0321efb47b212b1666a66fee55aa1133f3ca21b351713160",
+      "order97_file_pin": "5f65cb14a014d23a0321efb47b212b1666a66fee55aa1133f3ca21b351713160",
+      "git_path": "tests/unit/test_heroic_intervention.py",
+      "git_revision": "6fbd2a9fa14f8bab1e1f4655235dbbe276bf2f88"
+    },
+    {
+      "path": "tests/unit/test_ws14_attack_sequence_runtime_hooks.py",
+      "historical_path": "data/source_audits/order135/d07-baseline-ws14-attack-sequence-runtime-hooks.py.txt",
+      "bytes": 99542,
+      "sha256": "792d99e23ab8717c3302731c4203b99e7902ea3582a3b3510ea1286f96da423d",
+      "order97_file_pin": "792d99e23ab8717c3302731c4203b99e7902ea3582a3b3510ea1286f96da423d",
+      "git_path": "tests/unit/test_ws14_attack_sequence_runtime_hooks.py",
+      "git_revision": "6fbd2a9fa14f8bab1e1f4655235dbbe276bf2f88"
+    }
+  ]
+}

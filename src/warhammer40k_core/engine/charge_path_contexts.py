@@ -12,7 +12,10 @@ from warhammer40k_core.engine.charge_rule_effects import (
     charge_path_context_with_rule_effect_permissions,
 )
 from warhammer40k_core.engine.effects import PersistingEffect
-from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
+from warhammer40k_core.engine.model_movement_permission import (
+    model_movement_path_context,
+    model_movement_terrain_context,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import (
@@ -124,9 +127,12 @@ def charge_model_path_contexts(
         owner_player_id=owner_player_id,
         enemy_vehicle_monster_model_ids=enemies_vm,
     )
-    return path, legality.to_terrain_path_legality_context(
-        moving_model=moving_model,
-        witness=witness,
-        terrain=terrain,
-        terrain_features=terrain_features,
+    return path, model_movement_terrain_context(
+        model=unit.own_model_by_id(moving_model.model_id),
+        context=legality.to_terrain_path_legality_context(
+            moving_model=moving_model,
+            witness=witness,
+            terrain=terrain,
+            terrain_features=terrain_features,
+        ),
     )

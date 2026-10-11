@@ -137,7 +137,7 @@ def test_shocked_start_uses_explicit_catalog_permission_through_facade(permissio
     from tests.action_battle_shock_helpers import shocked_action_opportunity_session
 
     session, _unit_id = shocked_action_opportunity_session(
-        permission=permission, game_id="order110-walker-keyword-identity"
+        permission=permission, game_id="order110-walker-keyword-identity:d07:0"
     )
     state = session.lifecycle.state
     assert state is not None
