@@ -1,3 +1,7 @@
+The separately approved movement-witness prerequisite rejects wrong physical model
+inventories before decision commit, preserving native legal retry and the existing
+recorded rule-invalid geometry contract. See [scope and acceptance](docs/MOVEMENT_WITNESS_MEMBERSHIP_SCOPE.md).
+
 Order132 / P18K restores inclusive circular Rapid/Tactical disembark distance
 through shared geometry, preserving setup, continuation, persistence and replay.
 See [source and scope](docs/ORDER_132_SCOPE_PLAN.md).

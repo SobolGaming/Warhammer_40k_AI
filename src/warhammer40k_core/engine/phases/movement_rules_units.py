@@ -335,10 +335,7 @@ def _resolve_rules_unit_move(
     ignores_vertical_distance: bool = False,
 ) -> _ResolvedRulesUnitMove:
     before.validate_for_view(rules_unit)
-    expected_model_ids = tuple(
-        sorted(placement.model_instance_id for placement in before.model_placements)
-    )
-    if tuple(sorted(witness.model_ids())) != expected_model_ids:
+    if not before.matches_witness_models(witness):
         raise GameLifecycleError(f"{action_label} witness must match every rules-unit model.")
     attempted = RulesUnitPlacement(
         rules_unit_instance_id=before.rules_unit_instance_id,

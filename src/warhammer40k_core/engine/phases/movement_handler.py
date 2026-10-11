@@ -487,6 +487,28 @@ class MovementPhaseHandler:
                     ),
                     message="Unit has already made a Normal move this phase.",
                 )
+            from warhammer40k_core.engine.phases.movement_rules_units import (
+                rules_unit_placement_for_movement,
+            )
+
+            _rules_unit, placement = rules_unit_placement_for_movement(
+                state=state,
+                scenario=_battlefield_scenario(state),
+                unit_instance_id=proposal_request.unit_instance_id,
+            )
+            if not placement.matches_witness_models(movement_submission.witness):
+                return _reject_invalid_proposal(
+                    state=state,
+                    result=result,
+                    proposal_validation=ProposalValidationResult.invalid(
+                        proposal_request_id=proposal_request.request_id,
+                        proposal_kind=proposal_request.proposal_kind,
+                        violation_code="movement_witness_model_inventory_mismatch",
+                        message="Movement witness must match every placed rules-unit model.",
+                        field="witness",
+                    ),
+                    message="Movement witness does not match the pending rules unit.",
+                )
             return None
         if request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE:
             from warhammer40k_core.engine.phases.movement_placement_proposals import (

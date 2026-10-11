@@ -7829,3 +7829,18 @@ refresh without schema, proposal, event envelope or viewer changes. Existing
 atomic typed rejection/retry, exact-runtime restore/fork and replay apply.
 Analytical FRAME geometry does not certify native faction applicability.
 See [D06 scope](D06_EMBARK_DISTANCE_SCOPE.md) and the contract migration.
+
+## Movement-witness membership prerequisite
+
+Contract44.3.29 preserves the existing movement proposal envelope. Normal Move,
+Advance and Fall Back ingress requires the exact placed physical inventory of
+the pending canonical rules unit. Foreign, unknown, missing and extra witness
+model IDs return typed `movement_witness_model_inventory_mismatch` on `witness`
+before queue pop or decision/event/RNG mutation. Attached components are one
+canonical actor and contribute their current living models. Corrected legal input
+uses the same pending request. Well-formed rule-invalid geometry retains its
+recorded-attempt and fresh-request retry behavior. Existing all-role projections,
+events, persistence and exact replay use the shared engine path. No new decision,
+proposal kind, wire shape, terrain permission or compatibility shim is introduced.
+See [scope and acceptance](MOVEMENT_WITNESS_MEMBERSHIP_SCOPE.md) and
+[Contract migration](../contracts/migrations/44.3.28-to-44.3.29.md).

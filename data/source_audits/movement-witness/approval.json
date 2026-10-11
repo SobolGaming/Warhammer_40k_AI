@@ -1,0 +1,37 @@
+{
+  "source_thread_id": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+  "scope": "Separate small authoritative movement-witness model-membership prevalidation and typed atomic rejection prerequisite; no D07 terrain changes",
+  "transcript_evidence": [
+    {
+      "speaker": "Assistant",
+      "sentinel": "Sentinel_1edc9a8b404081919de5708548c19015",
+      "text": "The upper-floor gameplay checks passed, but review found a separate existing input-validation bug: submitting a movement witness for the wrong model consumes the pending action, then throws an error and leaves a save that won’t reload. May I fix that in a separate small prerequisite PR, then finish D07? That keeps it out of the upper-floor PR while satisfying the required rejection checks"
+    },
+    {
+      "speaker": "User",
+      "sentinel": "Sentinel_428c783a7ad08191a7914fd45e0fb14e",
+      "utc": "2026-10-11T03:57:21Z",
+      "text": "Yes"
+    },
+    {
+      "speaker": "User",
+      "sentinel": "Sentinel_bb34039705dc8191bf735edbf631fe1c",
+      "utc": "2026-10-11T03:57:35Z",
+      "text": "You have my approval to fix all rule bugs you find"
+    }
+  ],
+  "parent_directions": {
+    "finish_current_diagnosis_before_new_work": true,
+    "confirm_owned_validation_idle_before_new_work": true,
+    "fresh_isolated_checkout_from_actual_merged_main": "72475b63fa70f64a57264bc7a37e1c6fe7c7cca3",
+    "preserve_frozen_D07_HEAD": "96b5d5bd72c871dce4d73d082bc725071087dcba",
+    "prerequisite_only": "Authoritative movement-witness model-membership prevalidation/typed atomic rejection",
+    "D07_terrain_changes_in_prerequisite": false,
+    "parent_arranges_reviewers_after_canonical_freeze": true,
+    "nested_reviewers_or_coordinators": false,
+    "compatibility_shim_approval": false,
+    "tests_source_truth_assertions_ceilings_protection_waived": false,
+    "distinct_bugs_in_small_sequential_PRs": true,
+    "unverified_hypotheses_or_provider_grants_are_confirmed_bugs": false
+  }
+}
