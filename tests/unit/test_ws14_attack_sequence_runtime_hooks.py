@@ -2226,7 +2226,9 @@ def test_order93_failed_save_zero_replacement_is_selectable_after_save_and_consu
     from warhammer40k_core.engine.phase import LifecycleStatusKind
     from warhammer40k_core.engine.replay import ReplayRunner
 
-    session = save_damage_session(damage_zero_replacement=True)
+    session = save_damage_session(
+        damage_zero_replacement=True, game_id="order93-save-damage:d07:120"
+    )
     request = reach_save_damage_request(
         session,
         kind="damage_characteristic",

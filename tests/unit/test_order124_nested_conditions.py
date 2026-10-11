@@ -123,7 +123,10 @@ def test_real_nested_upgrade_survives_pending_and_completed_continuations(
     assert records[-1].phase == "movement"
     assert records[-1].results[0].controlled_by_player_id == "player-b"
     _assert_roundtrips(session)
-    request = declare_nested_shot(session)
+    request = declare_nested_shot(
+        session,
+        result_id="order124:declaration:d07:2" if attached else "order124:declaration:d07:1",
+    )
     assert request.decision_type == "select_dice_reroll"
     assert cast(dict[str, object], request.payload)["current_values"] == [4]
     source = _source_context(request)

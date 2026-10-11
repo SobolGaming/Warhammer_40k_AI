@@ -366,7 +366,9 @@ def test_order120_invalid_descriptor_rejects_before_zero_prevention_mutation() -
 def test_allocation_trigger_executes_source_backed_prevention_before_wound_loss(
     phase: BattlePhase,
 ) -> None:
-    session = allocation_permission_session(phase)
+    session = allocation_permission_session(
+        phase, game_id="order116-shooting:d07:63921" if phase is BattlePhase.SHOOTING else None
+    )
     complete_allocation_attack(session)
     events = session.lifecycle.decision_controller.event_log.records
     allocated = [e for e in events if e.event_type == "mortal_wound_model_allocated"]

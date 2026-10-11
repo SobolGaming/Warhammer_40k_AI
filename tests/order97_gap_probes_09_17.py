@@ -627,14 +627,16 @@ def probe_pile_in_closest_target() -> dict[str, JsonValue]:
     )
 
 
-def hazardous_nonbearer_session() -> tuple[LocalGameSession, ModelInstance]:
+def hazardous_nonbearer_session(
+    *, game_id: str = "order97-nonbearer-1"
+) -> tuple[LocalGameSession, ModelInstance]:
     """Canonical firing squad with a weaponless legal Hazardous recipient."""
     session = empty_shooting_session(
         reachable=True,
         spare=True,
         model_count=3,
         keywords=(WeaponKeyword.HAZARDOUS,),
-        game_id="order97-nonbearer-1",
+        game_id=game_id,
     )
     state = session.lifecycle.state
     assert state is not None

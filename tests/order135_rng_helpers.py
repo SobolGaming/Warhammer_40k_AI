@@ -15,7 +15,9 @@ from warhammer40k_core.engine.stratagems import stratagem_decline_payload
 from warhammer40k_core.geometry.pose import Pose
 
 
-def native_scalar_shooting_request() -> tuple[LocalGameSession, DecisionRequest]:
+def native_scalar_shooting_request(
+    *, game_id: str = "order135-native-scalar-rng"
+) -> tuple[LocalGameSession, DecisionRequest]:
     units = (
         unit_selection(
             unit_selection_id="scalar",
@@ -24,9 +26,7 @@ def native_scalar_shooting_request() -> tuple[LocalGameSession, DecisionRequest]
             model_count=5,
         ),
     )
-    config = phase11c_config(
-        game_id="order135-native-scalar-rng", player_a_units=units, player_b_units=units
-    )
+    config = phase11c_config(game_id=game_id, player_a_units=units, player_b_units=units)
     assert config.mission_setup is not None
     # Explicit synthetic single-shot/range fixture, declared before start; it
     # makes no provider weapon/body measurement claim and injects no dice/state.

@@ -447,7 +447,7 @@ def test_queued_source_destruction_survives_native_deferred_mortal_checkpoint(
         BattlePhase(phase_token),
         game_id="order123-source-checkpoint-keyword-identity-0"
         if phase_token == "shooting"
-        else None,
+        else "order118-fight:d07:106",
         source_role="leader",
         native_deferred_mortals=True,
         death_reaction=True,

@@ -82,8 +82,14 @@ def test_rules_overlay_identity_participates_in_descriptor_hash_and_serializatio
 
     assert base.rules_overlay_ids == ()
     assert (
-        base.descriptor_hash == "f1862a7da1e38e7cf5c68505b69d4ccd990a52cbd4b17145d0913730994fe83f"
+        base.descriptor_hash == "358ded485e5c9aab3619b2ac06048820dbc60ad96443737f0a4d1a2e21a31536"
     )
+    former_default_payload = base.to_payload()
+    former_default_payload["descriptor_hash"] = (
+        "f1862a7da1e38e7cf5c68505b69d4ccd990a52cbd4b17145d0913730994fe83f"
+    )
+    with pytest.raises(RulesetDescriptorError, match="descriptor_hash"):
+        RulesetDescriptor.from_payload(former_default_payload)
     assert tacoma.rules_overlay_ids == (tacoma_open_2026.RULES_OVERLAY_ID,)
     assert tacoma.descriptor_hash != base.descriptor_hash
     assert tacoma.to_payload()["rules_overlay_ids"] == [tacoma_open_2026.RULES_OVERLAY_ID]

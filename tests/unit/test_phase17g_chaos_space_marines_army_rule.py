@@ -383,7 +383,8 @@ def test_defiler_daemonforge_runs_through_catalog_lifecycle_and_replay(
     resolved_event_type: str,
 ) -> None:
     session, status = _daemonforge_shooting_status(
-        game_id="order56-daemonforge-12",
+        game_id="order56-daemonforge-12:d07:10",
+        declaration_result_id="order56-daemonforge-12:d07:10:declaration:d07-vector:43",
         attacker_datasheet_id=army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
         choose_dark_pact=True,
     )
@@ -429,7 +430,8 @@ def test_defiler_daemonforge_runs_through_catalog_lifecycle_and_replay(
 
 def test_defiler_daemonforge_runs_through_catalog_fight_lifecycle_and_replay() -> None:
     session, status = _daemonforge_fight_status(
-        game_id="order56-daemonforge-fight-26",
+        game_id="order56-daemonforge-fight-26:d07:4",
+        declaration_result_id="order56-daemonforge-fight-26:d07:4:melee-declaration:d07-vector:134",
     )
     request = _decision_request(status.decision_request)
 
@@ -495,10 +497,28 @@ def test_defiler_daemonforge_does_not_offer_ineligible_wound_rerolls(
     choose_dark_pact: bool,
     expected_wound_roll: int,
 ) -> None:
+    if game_id == "order56-daemonforge-no-pact-8-order64-3":
+        game_id = "order56-daemonforge-no-pact-8-order64-3:d07:31"
+    if game_id == "order56-daemonforge-other-roll-8-order64-2":
+        game_id = "order56-daemonforge-other-roll-8-order64-2:d07:19"
+    if game_id == "order56-daemonforge-other-unit-12-order64-20":
+        game_id = "order56-daemonforge-other-unit-12-order64-20:d07:14"
+    declaration_result_ids = {
+        "order56-daemonforge-no-pact-8-order64-3:d07:31": (
+            "order56-daemonforge-no-pact-8-order64-3:d07:31:declaration:d07-vector:48"
+        ),
+        "order56-daemonforge-other-roll-8-order64-2:d07:19": (
+            "order56-daemonforge-other-roll-8-order64-2:d07:19:declaration:d07-vector:72"
+        ),
+        "order56-daemonforge-other-unit-12-order64-20:d07:14": (
+            "order56-daemonforge-other-unit-12-order64-20:d07:14:declaration:d07-vector:13"
+        ),
+    }
     session, status = _daemonforge_shooting_status(
         game_id=game_id,
         attacker_datasheet_id=attacker_datasheet_id,
         choose_dark_pact=choose_dark_pact,
+        declaration_result_id=declaration_result_ids[game_id],
     )
 
     assert status.decision_request is None or (
@@ -1536,7 +1556,9 @@ def _dark_pact_completion_handler(
     return state, decisions, handler
 
 
-def _daemonforge_fight_status(*, game_id: str) -> tuple[LocalGameSession, LifecycleStatus]:
+def _daemonforge_fight_status(
+    *, game_id: str, declaration_result_id: str | None = None
+) -> tuple[LocalGameSession, LifecycleStatus]:
     catalog = _daemonforge_catalog()
     lifecycle, units = fight_lifecycle(
         alpha_unit_ids=("defiler-attacker",),
@@ -1601,7 +1623,9 @@ def _daemonforge_fight_status(*, game_id: str) -> tuple[LocalGameSession, Lifecy
             request=declaration_request,
             target_unit_instance_id=units["enemy"].unit_instance_id,
         ),
-        result_id=f"{game_id}:melee-declaration",
+        result_id=f"{game_id}:melee-declaration"
+        if declaration_result_id is None
+        else declaration_result_id,
     )
 
 
@@ -1677,6 +1701,7 @@ def _daemonforge_shooting_status(
     game_id: str,
     attacker_datasheet_id: str,
     choose_dark_pact: bool,
+    declaration_result_id: str | None = None,
 ) -> tuple[LocalGameSession, LifecycleStatus]:
     catalog = _daemonforge_catalog()
     attacker_is_csm = attacker_datasheet_id == army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID
@@ -1752,7 +1777,9 @@ def _daemonforge_shooting_status(
     return session, session.submit_parameterized_payload(
         request_id=declaration_request.request_id,
         payload=cast(JsonValue, proposal.to_payload()),
-        result_id=f"{game_id}:declaration",
+        result_id=f"{game_id}:declaration"
+        if declaration_result_id is None
+        else declaration_result_id,
     )
 
 

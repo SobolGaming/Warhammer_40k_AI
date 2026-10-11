@@ -546,7 +546,8 @@ def test_restore_rejects_coordinated_shadow_leadership_and_dice_semantic_tamper(
 
 def test_restore_rejects_omitted_mandatory_shadow_modifier_application() -> None:
     lifecycle = _resolved_shadow_lifecycle(
-        game_id="phase17g-tyranids-omitted-modifier-authority",
+        game_id="phase17g-tyranids-omitted-modifier-authority:d07:8",
+        result_id="phase17g-tyranids-omitted-modifier-authority:d07:8:unleash:d07-vector:16",
     )
     forged = _mutable_lifecycle_payload(lifecycle)
     events = _mutable_lifecycle_events(forged)
@@ -2456,7 +2457,7 @@ def _event_payload(decisions: DecisionController, event_type: str) -> dict[str, 
     raise AssertionError(f"missing event {event_type}")
 
 
-def _resolved_shadow_lifecycle(*, game_id: str) -> GameLifecycle:
+def _resolved_shadow_lifecycle(*, game_id: str, result_id: str | None = None) -> GameLifecycle:
     lifecycle = _battle_ready_lifecycle(
         game_id=game_id,
         active_player_id="player-b",
@@ -2465,7 +2466,7 @@ def _resolved_shadow_lifecycle(*, game_id: str) -> GameLifecycle:
     assert request is not None
     lifecycle.submit_decision(
         DecisionResult.for_request(
-            result_id=f"{game_id}:unleash",
+            result_id=f"{game_id}:unleash" if result_id is None else result_id,
             request=request,
             selected_option_id=army_rule.SHADOW_UNLEASH_OPTION_ID,
         )

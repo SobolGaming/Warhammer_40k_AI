@@ -5774,7 +5774,7 @@
           "required_neighbors_large_unit": null,
           "required_neighbors_small_unit": 1
         },
-        "descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
+        "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
         "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
         "engagement_policy": {
           "horizontal_inches": 2.0,
@@ -6049,7 +6049,8 @@
                 "BELISARIUS_CAWL",
                 "FLY",
                 "IMPERIUM_PRIMARCH",
-                "INFANTRY"
+                "INFANTRY",
+                "MONSTER"
               ]
             },
             {
@@ -6335,7 +6336,7 @@
               "fight"
             ],
             "game_id": "phase18d-contract-session",
-            "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
+            "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
             "setup_sequence": [
               "muster_armies",
               "select_mission",
@@ -12380,7 +12381,7 @@
             "required_neighbors_large_unit": null,
             "required_neighbors_small_unit": 1
           },
-          "descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
+          "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
           "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
           "engagement_policy": {
             "horizontal_inches": 2.0,
@@ -12655,7 +12656,8 @@
                   "BELISARIUS_CAWL",
                   "FLY",
                   "IMPERIUM_PRIMARCH",
-                  "INFANTRY"
+                  "INFANTRY",
+                  "MONSTER"
                 ]
               },
               {
@@ -12941,7 +12943,7 @@
                 "fight"
               ],
               "game_id": "phase18d-contract-session",
-              "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
+              "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
               "setup_sequence": [
                 "muster_armies",
                 "select_mission",
@@ -17230,7 +17232,7 @@
         "reserve_states": [],
         "return_on_death_consumed_keys": [],
         "rules_overlay_ids": [],
-        "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
+        "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
         "scoring_window_states": [],
         "secondary_mission_card_states": [],
         "secondary_mission_choices": [],
@@ -26557,7 +26559,7 @@
       "reserve_states": [],
       "return_on_death_consumed_keys": [],
       "rules_overlay_ids": [],
-      "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
+      "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
       "scoring_window_states": [],
       "secondary_mission_card_states": [],
       "secondary_mission_choices": [],
@@ -26642,7 +26644,7 @@
   "initial_rng_state": {
     "draw_count": 0,
     "history": [
-      "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18d-contract-session\",\"ruleset_descriptor_hash\":\"50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}",
+      "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18d-contract-session\",\"ruleset_descriptor_hash\":\"4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}",
       "{\"event_id\":\"event-000002\",\"event_type\":\"army_mustered\",\"payload\":{\"army_id\":\"army-alpha\",\"game_id\":\"phase18d-contract-session\",\"player_id\":\"player-a\",\"roster_legality_report\":{\"battle_size\":\"strike_force\",\"is_legal\":false,\"violations\":[{\"message\":\"Roster requires one selected Warlord.\",\"source_id\":\"gw-11e-core-roster-models:warlord\",\"unit_selection_id\":null,\"violation_code\":\"missing_warlord_selection\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"deep-strike-unit\",\"violation_code\":\"source_awaiting_unit_points\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"scout-redeploy-unit\",\"violation_code\":\"source_awaiting_unit_points\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"strategic-reserve-unit\",\"violation_code\":\"source_awaiting_unit_points\"}]},\"setup_step\":\"muster_armies\",\"starting_attached_unit_records\":[],\"unit_count\":3}}",
       "{\"event_id\":\"event-000003\",\"event_type\":\"army_mustered\",\"payload\":{\"army_id\":\"army-beta\",\"game_id\":\"phase18d-contract-session\",\"player_id\":\"player-b\",\"roster_legality_report\":{\"battle_size\":\"strike_force\",\"is_legal\":false,\"violations\":[{\"message\":\"Roster requires one selected Warlord.\",\"source_id\":\"gw-11e-core-roster-models:warlord\",\"unit_selection_id\":null,\"violation_code\":\"missing_warlord_selection\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"scout-redeploy-unit\",\"violation_code\":\"source_awaiting_unit_points\"}]},\"setup_step\":\"muster_armies\",\"starting_attached_unit_records\":[],\"unit_count\":1}}",
       "{\"event_id\":\"event-000004\",\"event_type\":\"setup_step_completed\",\"payload\":{\"active_player_id\":null,\"battle_phase\":null,\"battle_round\":0,\"game_id\":\"phase18d-contract-session\",\"next_setup_step\":\"select_mission\",\"stage\":\"setup\",\"step\":\"muster_armies\"}}",
@@ -26660,12 +26662,12 @@
   "source_identity": {
     "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
     "catalog_id": "phase9a-canonical",
-    "game_config_hash": "9b9d8e992e034604efa859ade69d31621295c66fea6c6f82c6328fed3bb638e5",
+    "game_config_hash": "d830edbd05c0431ee6940e8c5665ef85423acb4e1349b4437504da66bba3de44",
     "game_id": "phase18d-contract-session",
     "mission_pack_id": "11e-warhammer-event-companion-2026-07",
     "mission_source_package_hash": "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5",
     "rules_overlay_ids": [],
-    "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
+    "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
     "source_ids": [
       "catalog:phase9a-canonical"
     ],

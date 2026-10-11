@@ -121,7 +121,10 @@ class _PlacementContext:
             blockers=(*self.blockers, *partners),
             enemies=self.enemies,
             partners=partners,
-            terrain=tuple(_setup_terrain(feature, unit, self.ruleset) for feature in self.terrain),
+            terrain=tuple(
+                _setup_terrain(feature, unit.own_model_by_id(passenger.model_id), self.ruleset)
+                for feature in self.terrain
+            ),
             objective_disks=tuple(
                 (
                     marker.x_inches,
@@ -153,7 +156,7 @@ class _PlacementContext:
 
 def _setup_terrain(
     feature: TerrainFeatureDefinition,
-    unit: UnitInstance,
+    model: ModelInstance,
     ruleset: RulesetDescriptor,
 ) -> SetupTerrain:
     policy = ruleset.terrain_movement_policy.policy_for_feature_kind(feature.feature_kind)
@@ -166,7 +169,7 @@ def _setup_terrain(
         is not TerrainEndpointSupportPolicy.ALLOWED_ON_GROUND_FLOOR_ONLY
         and (
             not policy.ground_floor_only_unless_keyword
-            or bool(set(unit.keywords).intersection(policy.upper_floor_allowed_keywords))
+            or bool(set(model.keywords).intersection(policy.upper_floor_allowed_keywords))
         ),
         no_overhang=policy.no_overhang_required,
         ground_containment=policy.endpoint_support_policy

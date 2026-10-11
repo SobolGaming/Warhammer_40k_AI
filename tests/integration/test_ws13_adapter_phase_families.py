@@ -876,7 +876,7 @@ def test_local_session_drives_armour_of_contempt_fight_save_completion_and_repla
             "attacker": Pose.at(10.0, 20.0),
             "defender": Pose.at(12.0, 20.0),
         },
-        game_id="ws14-armour-of-contempt-fight-facade",
+        game_id="ws14-armour-of-contempt-fight-facade:d07:225",
         datasheet_id="core-character-leader",
         model_profile_id="core-character-leader",
         model_count=1,
@@ -935,7 +935,7 @@ def test_local_session_drives_armour_of_contempt_fight_save_completion_and_repla
     status = session.submit_option(
         request_id=stratagem_request.request_id,
         option_id=stratagem_option.option_id,
-        result_id="ws14-aoc-fight-use-stratagem",
+        result_id="ws14-aoc-fight-use-stratagem:d07-late:0",
     )
     assert state.command_point_total("player-b") == 0
 

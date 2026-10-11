@@ -14,7 +14,10 @@ from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.model_movement_permission import model_movement_path_context
+from warhammer40k_core.engine.model_movement_permission import (
+    model_movement_path_context,
+    model_movement_terrain_context,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
@@ -114,11 +117,14 @@ def append_scout_path_violations(
                     blocker_id=first_violation.blocker_id,
                 )
             )
-        terrain_result = legality_context.to_terrain_path_legality_context(
-            moving_model=moving_model,
-            witness=model_witness,
-            terrain=terrain_volumes,
-            terrain_features=battlefield_state.terrain_features,
+        terrain_result = model_movement_terrain_context(
+            model=model,
+            context=legality_context.to_terrain_path_legality_context(
+                moving_model=moving_model,
+                witness=model_witness,
+                terrain=terrain_volumes,
+                terrain_features=battlefield_state.terrain_features,
+            ),
         ).validate()
         if not terrain_result.is_valid:
             first_terrain_violation = terrain_result.violations[0]

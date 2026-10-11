@@ -168,7 +168,7 @@ def test_lifecycle_requests_cabal_and_destinys_ruin_records_hit_reroll() -> None
 
 
 def test_twist_of_fate_modifies_ap_and_rejects_drift_or_closed_window() -> None:
-    lifecycle = _battle_ready_lifecycle(game_id="phase17g-thousand-sons-twist-a")
+    lifecycle = _battle_ready_lifecycle(game_id="phase17g-thousand-sons-twist-a:d07:324")
     request = _next_cabal_request(lifecycle)
     option = _ritual_option(
         request,
@@ -179,7 +179,7 @@ def test_twist_of_fate_modifies_ap_and_rejects_drift_or_closed_window() -> None:
 
     status = lifecycle.submit_decision(
         DecisionResult.for_request(
-            result_id="phase17g-thousand-sons-twist-a-result",
+            result_id="phase17g-thousand-sons-twist-a-result:d07-vector:60",
             request=request,
             selected_option_id=option.option_id,
         )
@@ -343,7 +343,7 @@ def test_temporal_surge_requests_triggered_movement_and_forbids_charge() -> None
 
 
 def test_doombolt_excludes_lone_operatives_beyond_twelve_and_applies_wounds() -> None:
-    lifecycle = _battle_ready_lifecycle(game_id="phase17g-thousand-sons-doombolt")
+    lifecycle = _battle_ready_lifecycle(game_id="phase17g-thousand-sons-doombolt:d07:115")
     request = _next_cabal_request(lifecycle)
     assert (
         _ritual_option_or_none(

@@ -277,7 +277,9 @@ def test_additional_permission_id_cannot_alias_native_mortal_application() -> No
 
 
 def test_additional_mortals_coexist_with_native_devastating_wounds() -> None:
-    session = additional_mortal_session(BattlePhase.SHOOTING, devastating=True, attacks=12)
+    session = additional_mortal_session(
+        BattlePhase.SHOOTING, devastating=True, attacks=12, game_id="order116-shooting:d07:63921"
+    )
     complete_attack(session)
     events = session.lifecycle.decision_controller.event_log.records
     extra = [e for e in events if e.event_type == "additional_attack_mortal_wounds_deferred"]

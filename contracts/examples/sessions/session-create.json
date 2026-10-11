@@ -5770,7 +5770,7 @@
         "required_neighbors_large_unit": null,
         "required_neighbors_small_unit": 1
       },
-      "descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
+      "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
       "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
       "engagement_policy": {
         "horizontal_inches": 2.0,
@@ -6045,7 +6045,8 @@
               "BELISARIUS_CAWL",
               "FLY",
               "IMPERIUM_PRIMARCH",
-              "INFANTRY"
+              "INFANTRY",
+              "MONSTER"
             ]
           },
           {

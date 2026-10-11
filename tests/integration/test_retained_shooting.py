@@ -6,6 +6,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.d07_fixture_identity_helpers import submit_fixed_fixture_request
 from tests.phase13b_shooting_declaration_helpers import (
     _compact_shooting_lifecycle,
     _proposal_from_request,
@@ -137,9 +138,9 @@ def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_
         catalog=for_the_chapter_catalog(hazardous=True),
         # Additional native keyword facts participate in recorded RNG history.
         # Keep real own-Hazardous destruction, including the optional FNP branch.
-        game_id="order117-own-hazard-continuation-4"
+        game_id="order117-own-hazard-continuation-4:d07:123"
         if with_feel_no_pain
-        else "order123-own-hazard-keyword-identity-0",
+        else "order123-own-hazard-keyword-identity-0:d07:501",
         enemy_model_count=5,
     )
     state = lifecycle.state
@@ -183,11 +184,23 @@ def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_
             else:
                 session.submit_option(
                     request_id=request.request_id,
-                    result_id=f"decline-{index}",
+                    result_id="decline-4:d07-late:2"
+                    if with_feel_no_pain and index == 4
+                    else f"decline-{index}",
                     option_id=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
                 )
         else:
-            submit_fixture_request(session, request)
+            submit_fixed_fixture_request(
+                session,
+                request,
+                result_id=(
+                    "decision-request-000003:fixture-choice:d07-vector:1447"
+                    if with_feel_no_pain and request.request_id == "decision-request-000003"
+                    else "decision-request-000008:fixture-choice:d07-late:4"
+                    if with_feel_no_pain and request.request_id == "decision-request-000008"
+                    else None
+                ),
+            )
         state = session.lifecycle.state
         assert state is not None
         assert state.battlefield_state is not None
@@ -565,9 +578,9 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
         catalog=unending_fidelity_catalog(),
         # Contract 41 authenticates new SaveOption evidence in retention hashes;
         # this fixture ID preserves the required first-pool casualty branch.
-        game_id="order93-fidelity-retention-3"
+        game_id="order93-fidelity-retention-3:d07:68"
         if attached and action is RetainedAttackAction.FIGHT
-        else "order56-fidelity-1-order64-0",
+        else "order56-fidelity-1-order64-0:d07:785",
         alpha_unit_ids=("alpha",),
         enemy_unit_ids=("enemy", "leader") if attached else ("enemy",),
         enemy_unit_specs={"enemy": ("core-intercessor-like-infantry", "core-intercessor-like", 1)}
@@ -618,7 +631,15 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
         )
         if option is not None:
             status = session.submit_option(
-                request_id=request.request_id, result_id="use-fidelity", option_id=option.option_id
+                request_id=request.request_id,
+                result_id=(
+                    "use-fidelity:d07-vector:276"
+                    if attached and action is RetainedAttackAction.FIGHT
+                    else "use-fidelity:d07-vector:285"
+                    if not attached
+                    else "use-fidelity"
+                ),
+                option_id=option.option_id,
             )
             assert status.status_kind is not LifecycleStatusKind.INVALID
             used = True
@@ -643,7 +664,15 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
             continue
         if request.decision_type == "select_destruction_reaction":
             break
-        submit_fixture_request(session, request)
+        submit_fixed_fixture_request(
+            session,
+            request,
+            result_id="decision-request-000012:fixture-choice:d07-late:2"
+            if attached
+            and action is RetainedAttackAction.FIGHT
+            and request.request_id == "decision-request-000012"
+            else None,
+        )
     else:
         raise AssertionError("Unending Fidelity did not reach retention.")
     assert used
@@ -728,7 +757,15 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
             )
             assert status.status_kind is not LifecycleStatusKind.INVALID, status
         else:
-            submit_fixture_request(session, request)
+            submit_fixed_fixture_request(
+                session,
+                request,
+                result_id="decision-request-000012:fixture-choice:d07-late:2"
+                if attached
+                and action is RetainedAttackAction.FIGHT
+                and request.request_id == "decision-request-000012"
+                else None,
+            )
     else:
         raise AssertionError("Unending Fidelity attack did not complete.")
     if action is RetainedAttackAction.SHOOT:
@@ -1424,9 +1461,9 @@ def test_r34_001_action_blocks_nested_retained_shooting_before_acceptance(titani
         catalog=catalog,
         # Additional native keyword facts change RNG history; re-anchor only
         # the Titanic fixture to retain its nested casualty branch.
-        game_id="order123-nested-action-keyword-identity-0"
+        game_id="order123-nested-action-keyword-identity-0:d07:1"
         if titanic
-        else "order103-fixture-11-02",
+        else "order103-fixture-11-02:d07:3",
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         enemy_model_count=3,
     )
@@ -1567,11 +1604,19 @@ def test_r34_001_action_blocks_nested_retained_shooting_before_acceptance(titani
             proposal = _proposal_from_request(request=request, target_unit_id=target)
             session.submit_parameterized_payload(
                 request_id=request.request_id,
-                result_id=f"review-r34-shoot-{index}",
+                result_id="review-r34-shoot-2:d07-vector:6"
+                if titanic and index == 2
+                else f"review-r34-shoot-{index}",
                 payload=validate_json_value(proposal.to_payload()),
             )
         else:
-            submit_fixture_request(session, request)
+            submit_fixed_fixture_request(
+                session,
+                request,
+                result_id="decision-request-000013:fixture-choice:d07-late:1"
+                if titanic and request.request_id == "decision-request-000013"
+                else None,
+            )
         checkpoint = session.lifecycle.to_payload()
         assert (
             GameLifecycle.from_payload(json.loads(json.dumps(checkpoint))).to_payload()

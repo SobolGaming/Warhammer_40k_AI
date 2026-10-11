@@ -1,0 +1,845 @@
+{
+  "retained_path": "data/source_audits/order135/retained-current-sources.json",
+  "qualification": "Complete retained maintained-mirror observations and acceptance, no new official observation, provider or faction certification.",
+  "source_inventory": [
+    {
+      "row_id": "rule:02:02.05.01:1",
+      "category": "02",
+      "locator": "02.05.01",
+      "title": "Using Keywords & Mixed Keywords in Units",
+      "occurrence": 1,
+      "source_sha256": "48df8363e95ed138f1cf0af5f99b0cf159fc9a66d8141bae3c5e87ac2ad899ef",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "fbd269ac5e31c1a60ffb508a720bdc2a0fe34d93cb776f6eba9a6ef91d61aa6e",
+          "value": "When using keywords, the following points apply:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "cd5a551d353de0b4c29ed46c31929eef51de2cf3b4bac652e856404e39ccc6f2",
+          "value": "• A unit has all the keywords of all models in that unit. A model only has its own keywords."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "3d0d53efedbd7defb3ad7ba0797343e9b68e697ccca7a7c464175a48e80f2033",
+          "value": "• If a rule specifies that it applies to a unit with a keyword, it applies to a unit which includes one or more models with that keyword."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "083913006c59b36c093ac2dcbdeaba990045375651a813fa6a431058777bfb60",
+          "value": "• If a rule specifies that it applies to a model with a keyword, it only applies to a model with that keyword."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "7ab0b77ab1dc7ce10b8b9fd6aaa72b25ae76a0e651bc41d56e4bb447800aecb7",
+          "value": "• If a rule specifies that it applies to ‘non-\u0003Keyword\u0004’ models/units, it only applies to models/units that do not have that keyword. For example, if a rule applies to non-\u0003Vehicle\u0004 units, it only applies to units that do not have the \u0003Vehicle\u0004 keyword."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "e82cfed961d633cc06623e03c8a830dfc14d67f19d28c9885cf19a920e0fcca0",
+          "value": "• Some units can contain models that have different keywords. While this is the case, such a unit is considered to have all of the keywords of all of its models, and so is affected by any rule that applies to units with any of those keywords. Remember that attacks are made against units, not models."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "1443e3ef5f01968e29f55ef61df03f71e45b7347511db6e6bd8be5926e75ba67",
+          "value": "• If a rule only applies to models with a specific keyword, then it instead only applies to models in such a unit that have the correct keyword."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "3b890049f17247a3e8788fe4ad12362692c5bc85f021ecec9afdb8688e7f2262",
+          "value": "• A rule with a comma-separated list of keywords, or a series of keywords separated by slashes ('/'), or two keywords separated by the word ‘or’ (e.g. ‘an \u0003Immortals\u0004, \u0003Deathmarks\u0004 or \u0003Lychguard\u0004 unit’) refers to a model/unit that has any one of those keywords."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "42a72bf3c5ca60d0ebaa0ab0eb0527ebe0384687b8f190f15a0ecf196780c2b5",
+          "value": "• A rule with multiple adjacent keywords (e.g. ‘an \u0003Aeldari Guardians\u0004 unit’) only refers to a model/unit that has all of those keywords."
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "94f8ace125b168d39248817067356869ef2eba3eaaa108a27a5421c332c5a0df",
+          "value": "• Some older rules use keywords without specifying model or unit: for example, \u0003MONSTER/VEHICLE\u0004 or \u0003TRANSPORT\u0004. These rules refer to units with those keywords."
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "b9a8f1937d717a0e7e7d6b1e185d5efb0f64aa5918396d6fcf574956c4d8bc31",
+          "value": "• Singular and plural instances of the same keyword function in the same way."
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "b52aa983a704ed44503636e301f8125e828ce2701fb09ffa0d774d7cec98296b",
+      "review_category": "02"
+    },
+    {
+      "row_id": "rule:13:13.06:1",
+      "category": "13",
+      "locator": "13.06",
+      "title": "Terrain And Movement",
+      "occurrence": 1,
+      "source_sha256": "3dc8a7351ba5246eb1d88731dd743a87972d3a9aa85427564a778b4d6f34ea24",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "475afebaf44700ba895d86082155407d41f9f0f577d22400430cc6c5eba74f17",
+          "value": "Models can move through different categories of \u0005terrain feature\u0006 as follows:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "3a05d657473262c44cb4928487541377ccb99108ce87d8aaa078b0e67469ce82",
+          "value": "• \u0005Exposed/Light\u0006: All models can move horizontally and vertically through \u0005exposed\u0006 and \u0005light terrain features\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "7440db071742ffc77ef1c9ea6886c6cdf1c88078489c279538fec7a12d5c4e91",
+          "value": "• \u0005Dense\u0006:"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "853692df8e1517f141d91b32cd3e929d6b8310ecdb89f85871bc0f96029f3489",
+          "value": "◦ \u0003INFANTRY/BEASTS/SWARM/MOBILE\u0004 models can move horizontally through \u0005dense terrain features\u0006."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "42f516c9ca50471eccac322b27321d7b9fe023a6e1288d374e003c621680d53d",
+          "value": "◦ \u0003INFANTRY/BEASTS/SWARM\u0004 models can move vertically through \u0005dense terrain features\u0006."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "a4f44fbb0d2883262ff4480ad602ace641c0d5218a91b1504dadc27b40f17fd7",
+          "value": "◦ Other models can move horizontally through \u0005dense terrain features\u0006 provided that all sections of that \u0005terrain feature\u0006 that the moving model’s base would move through are 2\" or less in height. Otherwise, the moving model must move vertically to ascend or descend such sections. They cannot move through ceilings and floors while doing so, and they cannot end that move on any surface of that \u0005terrain feature\u0006 that is not on ground level (see below)."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "a619417d0852d07369ea597aa842a6c621162531c3e6232a92039a62fd5c1abe",
+          "value": "\u0005MOVING VERTICALLY\u0006"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "ab36dec3983ed08b9eb5e6d5e029dd7c06c7bda1ca88f9463211cd3b20756560",
+          "value": "Models can move vertically to ascend or descend \u0005terrain features\u0006. While doing so:"
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "1e582bb65828bbdc9069bab8404aa12eeba39755341bbcd295a967b20642fb7d",
+          "value": "• That model must remain within ½\" horizontally of that \u0005terrain feature\u0006."
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "327d7c038bf9c06eb9d577f8773299408f96508df82b8220efcc8dde262a08db",
+          "value": "• Add the distance moved vertically up, and the distance moved vertically down, to any other distance that model has moved since its unit began that move."
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "fda47469f3cef443a5be4d955e292e1aa3f602b1c99a2d98bd8f2263372d5423",
+          "value": "\u0005SETTING UP OR ENDING A MOVE\u0006"
+        },
+        {
+          "ordinal": 12,
+          "kind": "text",
+          "sha256": "fc0055b2303b1cdd5f93b986012118f8bf4f6d6c8b1d9af24f811d0a8a29fd2b",
+          "value": "Models can be set up or end a move on the ground level of \u0005terrain features\u0006. Models can also be set up or end a move on any surface of a \u0005terrain feature\u0006that is not on ground level, if all of the following apply:"
+        },
+        {
+          "ordinal": 13,
+          "kind": "text",
+          "sha256": "b450cfba1bfd206e034f24b04dfe08a9f602d7728278927917b17b8e5e9211bf",
+          "value": "• That model has one or more of the following keywords: \u0003INFANTRY/BEASTS/SWARM/FLY/MONSTER\u0004."
+        },
+        {
+          "ordinal": 14,
+          "kind": "text",
+          "sha256": "b42331d3bce969e5e888085d84868e801fef9fd07014e8ffc2e73366a68b0bed",
+          "value": "• After ending that move, that model is stable and no part of its base overhangs the outer edge of that surface."
+        },
+        {
+          "ordinal": 15,
+          "kind": "text",
+          "sha256": "0af31cc5da504faffc6160e2d5abffe0c7ee8d001c32293daa0cf838ec532f59",
+          "value": "\u000eTerrain and Movement"
+        },
+        {
+          "ordinal": 16,
+          "kind": "text",
+          "sha256": "a3f8cf122a3044ceb67573557a82a3392734253e322d1d642af3fa55bf507e89",
+          "value": "All sections of the \u0005\u0007dense\b\u0006 \u0005\u0007terrain feature (A)\b\u0006 are more than 2\" in height, so the \u0003Monster\u0004 model \u0005\u0007(B)\b\u0006 cannot move through it and must move around it instead."
+        },
+        {
+          "ordinal": 17,
+          "kind": "text",
+          "sha256": "48d741a3638a34b2cb4fed650bef5a81e125d86c9723e95ba75262e6d0b72e02",
+          "value": "The \u0003Infantry\u0004 models \u0005\u0007(C)\b\u0006 can move through \u0005\u0007dense terrain features\b\u0006, such as the walls of this ruin."
+        },
+        {
+          "ordinal": 18,
+          "kind": "text",
+          "sha256": "36a5fc66b8d9d6395f3e3d742c9ab572e95954c65affdb4230a7886c200873d6",
+          "value": "1. This \u0003Infantry\u0004 model can move vertically and end its move on the top surface of the \u0005\u0007terrain feature (D)\b\u0006, as it is stable and no part of its base overhangs the outer edge of that surface."
+        },
+        {
+          "ordinal": 19,
+          "kind": "text",
+          "sha256": "470dfc54651945389c639c1976355f9e4fd21f12f07cd4816c0ae5ec03ab0294",
+          "value": "2. This \u0003Vehicle\u0004 model cannot move through the \u0005\u0007dense\b\u0006 \u0005\u0007terrain feature (E)\b\u0006, but It can move vertically to ascend and descend sections that are more than 2\" in height (provided it does not end that move on top of such sections)."
+        },
+        {
+          "ordinal": 20,
+          "kind": "text",
+          "sha256": "8e4df7de73d08370df1b33ae4e7072d6180d568f23bbae5488ac42fd026d2ba7",
+          "value": "3. This \u0003INFANTRY\u0004 model is not being moved over or through any \u0005\u0007terrain features\b\u0006. Its move through the \u0005\u0007terrain area\b\u0006 shown is therefore unimpeded."
+        },
+        {
+          "ordinal": 21,
+          "kind": "callout",
+          "sha256": "7cbcc548494e1e5ef0d7fcc40581959e6db12dc2d620dd68803b0da03bffb88d",
+          "value": {
+            "title": "Plunging Fire",
+            "body": "As well as gaining superior lines of sight, models that ascend tall terrain features can benefit from the Plunging Fire rule (22.05)."
+          }
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "5f8c211044c50ce7b3b2eaee1e1232b3badbc85eaa0bcdd8627c0cec0ca18ce0",
+      "review_category": "13"
+    },
+    {
+      "row_id": "rule:19:19.03:1",
+      "category": "19",
+      "locator": "19.03",
+      "title": "Keywords In Attached Units",
+      "occurrence": 1,
+      "source_sha256": "c201e92790ee6f6c67d64b1cce8559d1e07f62641c68d0df15d7aaefd6e51b79",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "d89c3900547a3439bda1d6489ccde0e1edd1b1f71ad68e2987114d2273be2c0a",
+          "value": "An \u0005attached\u0006 unit has all of the keywords of all of its component units. As such, an \u0005attached\u0006 unit is affected by any rule that applies to units with any of those keywords. Note that models in an \u0005attached\u0006 unit do not gain the keywords of other models in that unit that they do not already have. Remember that attacks target units, not models."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "823e912116393198218d43b87719d10998f350a8af2cb7478acb34ed82870c41",
+          "value": "\u0005Example\u0006: \u0007An \u0005attached\u0006 unit contains a \u0005leader\u0006 model with the \u0003PSYKER\u0004 keyword. While that model is part of that unit, that unit has the \u0003PSYKER\u0004 keyword, even if the \u0005bodyguard\u0006 models do not have that keyword. If that unit is attacked by a weapon with the \u0003[ANTI‑PSYKER 4+]\u0004 ability, any unmodified \u0005wound roll\u0006 of 4+ made against that unit is a \u0005critical wound\u0006, even if the attack itself is not allocated to that \u0005leader\u0006 model.\b"
+        }
+      ],
+      "selected_provider": "Game Datamissions",
+      "historical_source_row_sha256": "0ff0081bed015d7744ed6aed4572cb5cb3329ed208c5d35d69b94223ed8cdb60",
+      "review_category": "19"
+    }
+  ],
+  "complete_historical_acceptance": [
+    {
+      "row_id": "rule:02:02.05.01:1",
+      "requirements": [
+        {
+          "requirement_id": "02.05.01-obligation-01",
+          "source_blocks": [
+            2
+          ],
+          "summary": "A rules unit possesses the union of its members' keywords.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_attached_melee_cleave_uses_rules_unit_count_and_keywords",
+              "role": "semantic",
+              "assertion": "assert 'CHARACTER' in target_rules_unit.keywords",
+              "proves": "The attached unit includes its leader CHARACTER keyword while the bodyguard itself does not."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "02.05.01-obligation-02",
+          "source_blocks": [
+            2
+          ],
+          "summary": "A model possesses only its own keywords.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_keywords",
+              "role": "semantic",
+              "assertion": "assert vehicle_leader.own_models[0].model_instance_id not in hidden_model_ids",
+              "proves": "The attached vehicle leader does not inherit the infantry members' Hidden condition."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "02.05.01-obligation-03",
+          "source_blocks": [
+            3
+          ],
+          "summary": "A keyword-qualified unit rule matches if any member has the keyword.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_mixed_unit_keyword_does_not_promote_member_keywords",
+              "role": "semantic",
+              "assertion": "assert unit_has_keyword(unit, 'PSYKER')",
+              "proves": "The one PSYKER member causes a unit-keyword match."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "02.05.01-obligation-04",
+          "source_blocks": [
+            4
+          ],
+          "summary": "A keyword-qualified model rule matches only that model's own keywords.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_mixed_unit_keyword_does_not_promote_member_keywords",
+              "role": "semantic",
+              "assertion": "assert tuple(('PSYKER' in model.keywords for model in unit.own_models)) == (False, False, True)",
+              "proves": "Only the physical PSYKER member carries that keyword; siblings do not."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "02.05.01-obligation-05",
+          "source_blocks": [
+            5
+          ],
+          "summary": "A non-keyword rule matches only if the specified model or unit lacks that keyword.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_non_keyword_gated_weapon_abilities_match_missing_target_keywords",
+              "role": "semantic",
+              "assertion": "assert not lethal_hits_applies(profile, target_keywords=('VEHICLE',))",
+              "proves": "A prohibited keyword prevents the ability from applying."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "02.05.01-obligation-06",
+          "source_blocks": [
+            6
+          ],
+          "summary": "A mixed-keyword unit is affected by unit rules matching any member keyword.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_foundation_evidence.py::test_mixed_unit_keyword_does_not_promote_member_keywords",
+              "role": "semantic",
+              "assertion": "assert unit_has_keyword(unit, 'PSYKER')",
+              "proves": "The one PSYKER member causes a unit-keyword match."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "02.05.01-obligation-07",
+          "source_blocks": [
+            6
+          ],
+          "summary": "Attacks target a rules unit, not a keyword-selected member.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_mustered_attached_unit_targets_and_allocates_as_rules_unit",
+              "role": "semantic",
+              "assertion": "assert target_candidates[0].target_unit_instance_id == attached_id",
+              "proves": "Enumerating separate bodyguard and leader identities produces one attached rules-unit target; allocation chooses models only after the unit is targeted."
+            }
+          ],
+          "qualifications": [
+            "This proves target identity, with the adjacent keyword-union assertions covering keyword eligibility. It does not promote a keyword to every model."
+          ]
+        },
+        {
+          "requirement_id": "02.05.01-obligation-08",
+          "source_blocks": [
+            7
+          ],
+          "summary": "Model-keyword effects do not spill over to other models in a mixed unit.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_keywords",
+              "role": "semantic",
+              "assertion": "assert vehicle_leader.own_models[0].model_instance_id not in hidden_model_ids",
+              "proves": "The model-scoped infantry condition does not grant Hidden to an attached vehicle."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "02.05.01-obligation-09",
+          "source_blocks": [
+            8
+          ],
+          "summary": "Comma, slash, and or keyword alternatives mean any listed keyword.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_anti_keyword_supports_slash_keywords_and_non_matching_targets",
+              "role": "semantic",
+              "assertion": "assert anti_keyword_critical_threshold(profile=slash_profile, target_keywords=('MONSTER',)) == 4",
+              "proves": "Either MONSTER or VEHICLE in the slash-keyword list matches the same ability threshold."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "02.05.01-obligation-10",
+          "source_blocks": [
+            9
+          ],
+          "summary": "Adjacent required keywords form a conjunction.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase17d_rule_execution.py::test_phase17d_aura_keyword_gates_match_target_faction_keywords",
+              "role": "semantic",
+              "assertion": "assert result.effect_payloads[0]['target_unit_instance_ids'] == [source_unit_id, target_unit_id]",
+              "proves": "The Khorne Legiones Daemonica conjunction accepts the unit with both faction keywords and excludes the one missing Khorne."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "02.05.01-obligation-11",
+          "source_blocks": [
+            10
+          ],
+          "summary": "Legacy unspecified model/unit keyword subjects refer to units.",
+          "owners": [
+            "src/warhammer40k_core/rules/rule_parser.py:parse_rule_ir"
+          ],
+          "evidence": [],
+          "qualifications": [
+            "Evidence gap: The typed keyword target is not inferred when model/unit is omitted; PSYKER is retained as unsupported residual language. The otherwise-identical explicit PSYKER unit form is parsed separately as a positive control. See tests/order97_gap_probes_01_08.py and observed_gaps_01_08.json, finding implicit-unit-keyword-consumer-boundary."
+          ]
+        },
+        {
+          "requirement_id": "02.05.01-obligation-12",
+          "source_blocks": [
+            11
+          ],
+          "summary": "Singular and plural spellings identify the same canonical keyword.",
+          "owners": [
+            "src/warhammer40k_core/rules/rule_keyword_sequences.py:keyword_sequence_tokens",
+            "src/warhammer40k_core/engine/rule_target_resolution.py:unit_has_required_keywords"
+          ],
+          "evidence": [],
+          "qualifications": [
+            "Gameplay gap: keyword-sequence normalization preserves distinct CHARACTER and CHARACTERS tokens, and the real unit target gate rejects the plural while accepting the singular on the same CHARACTER model. The pinned keyword probe exercises the keyword itself, not pluralized model-owner labels. Resolve singular/plural aliases at the source boundary and retain canonical runtime identity."
+          ]
+        }
+      ],
+      "nonoperative_blocks": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "context",
+          "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+        }
+      ]
+    },
+    {
+      "row_id": "rule:13:13.06:1",
+      "requirements": [
+        {
+          "requirement_id": "13.06-light-traversal",
+          "source_blocks": [
+            1,
+            2
+          ],
+          "summary": "All models may traverse Light terrain horizontally and vertically.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_light_classification_allows_mounted_through_three_inch_feature",
+              "role": "semantic",
+              "assertion": "assert result.is_valid",
+              "proves": "A Mounted model passes through a Light feature above the generic two-inch threshold."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_terrain_permitted_vertical_transit",
+              "role": "semantic",
+              "assertion": "assert result.is_valid",
+              "proves": "The Light Vehicle case passes through a four-inch feature along a vertical witness."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "13.06-exposed-traversal",
+          "source_blocks": [
+            1,
+            2
+          ],
+          "summary": "All models may traverse Exposed terrain horizontally and vertically.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [],
+          "qualifications": [
+            "Gameplay gap: selected-source Exposed lacks an explicit typed category or verified source alias; the exact exposed token fails closed. See probe_exposed_category."
+          ]
+        },
+        {
+          "requirement_id": "13.06-dense-horizontal",
+          "source_blocks": [
+            4
+          ],
+          "summary": "Infantry, Beasts, Swarm and Mobile may pass horizontally through Dense features.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_order53_movement_abilities.py::test_horizontal_terrain_sections_mobile_and_endpoints",
+              "role": "semantic",
+              "assertion": "assert context.validate().is_valid is accepted",
+              "proves": "The model-keyword terrain matrix exercises horizontal permissions."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "13.06-dense-vertical",
+          "source_blocks": [
+            5
+          ],
+          "summary": "Infantry, Beasts and Swarm may pass vertically through Dense features.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_terrain_permitted_vertical_transit",
+              "role": "semantic",
+              "assertion": "assert result.is_valid",
+              "proves": "Infantry, Beasts and Swarm each pass vertically through a four-inch Dense wall."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_terrain_permitted_vertical_transit",
+              "role": "semantic",
+              "assertion": "assert any((s.vertical_distance_inches > 0 for s in result.segments))",
+              "proves": "The witnessed accepted transit contains actual vertical movement."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "13.06-other-dense-low",
+          "source_blocks": [
+            6
+          ],
+          "summary": "Otherwise Dense horizontal traversal is allowed only through sections at most two inches high.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_low_wall_can_be_moved_over_as_if_not_there",
+              "role": "semantic",
+              "assertion": "assert result.segments[0].traversal_mode.value == 'freely_traversable'",
+              "proves": "The two-inch wall is traversable without added height."
+            },
+            {
+              "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_model_cannot_pass_through_wall_without_traversal_permission",
+              "role": "semantic",
+              "assertion": "assert not result.is_valid",
+              "proves": "An ineligible Vehicle cannot pass through the tall wall."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "13.06-other-dense-climb",
+          "source_blocks": [
+            6
+          ],
+          "summary": "Other models must ascend and descend taller Dense sections.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_through",
+              "role": "semantic",
+              "assertion": "assert any((segment.traversal_mode.value == 'climb' for segment in matching_segments))",
+              "proves": "The permitted route climbs the actual tall Dense volume."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "13.06-dense-floor-crossing",
+          "source_blocks": [
+            6
+          ],
+          "summary": "Models without vertical Dense transit permission cannot pass through ceilings or floors while climbing.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [],
+          "qualifications": [
+            "Gameplay gap: a Vehicle passes vertically through a thin Dense floor at three inches; see probe_dense_floor_crossing."
+          ]
+        },
+        {
+          "requirement_id": "13.06-other-dense-upper",
+          "source_blocks": [
+            6
+          ],
+          "summary": "An unqualified model cannot end its move on an elevated terrain surface.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_non_eligible_model_cannot_end_on_upper_ruins_floor",
+              "role": "semantic",
+              "assertion": "assert result.violations[0].violation_code == TerrainEndpointViolationCode.UPPER_FLOOR_KEYWORD_FORBIDDEN.value",
+              "proves": "The Vehicle upper-floor endpoint is explicitly rejected."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "13.06-vertical-contact",
+          "source_blocks": [
+            8,
+            9
+          ],
+          "summary": "Ascending or descending models remain within half an inch horizontally of the feature.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [],
+          "qualifications": [
+            "Gameplay gap: a real vertical path more than half an inch from all terrain is accepted by TerrainPathLegalityContext; no ascending/descending contact gate is applied."
+          ]
+        },
+        {
+          "requirement_id": "13.06-vertical-distance",
+          "source_blocks": [
+            10
+          ],
+          "summary": "Count both upward and downward travel in the total distance budget.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_climbing_counts_both_ascent_and_descent",
+              "role": "semantic",
+              "assertion": "assert result.segments[0].vertical_distance_inches == 6",
+              "proves": "Ascending three inches and descending three inches adds six vertical inches."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_climbing_counts_both_ascent_and_descent",
+              "role": "semantic",
+              "assertion": "assert result.segments[0].counted_distance_inches == result.segments[0].horizontal_distance_inches + 6",
+              "proves": "The vertical total is added to horizontal travel."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "13.06-upper-keywords",
+          "source_blocks": [
+            12,
+            13
+          ],
+          "summary": "Ground-level endpoints are allowed; elevated surfaces require Infantry, Beasts, Swarm, Fly or Monster.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_eligible_keywords_can_end_on_upper_ruins_floor_without_overhang",
+              "role": "semantic",
+              "assertion": "assert result.is_valid",
+              "proves": "Permitted model keywords can use supported upper endpoints."
+            },
+            {
+              "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_non_eligible_model_cannot_end_on_upper_ruins_floor",
+              "role": "semantic",
+              "assertion": "assert result.violations[0].violation_code == TerrainEndpointViolationCode.UPPER_FLOOR_KEYWORD_FORBIDDEN.value",
+              "proves": "Other keywords cannot use upper endpoints."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "13.06-support",
+          "source_blocks": [
+            14
+          ],
+          "summary": "An elevated endpoint must be stable and its base must not overhang.",
+          "owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_upper_ruins_floor_endpoint_fails_when_base_overhangs",
+              "role": "semantic",
+              "assertion": "assert result.violations[0].violation_code == TerrainEndpointViolationCode.BASE_OVERHANGS_SUPPORT_SURFACE.value",
+              "proves": "Overhanging upper-floor endpoint is rejected."
+            },
+            {
+              "nodeid": "tests/unit/test_phase10i_terrain_movement.py::test_shared_endpoint_placement_rejects_rotated_floor_aabb_overhang",
+              "role": "semantic",
+              "assertion": "assert violation.violation_code == 'rotated_floor_overhang'",
+              "proves": "The shared endpoint owner rejects overhang beyond a rotated floor."
+            }
+          ],
+          "qualifications": []
+        }
+      ],
+      "nonoperative_blocks": [
+        {
+          "source_blocks": [
+            3,
+            7,
+            11,
+            15
+          ],
+          "classification": "metadata",
+          "reason": "Traversal group labels and illustration title."
+        },
+        {
+          "source_blocks": [
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "classification": "example",
+          "reason": "Examples illustrate the category, climbing and endpoint rules."
+        },
+        {
+          "source_blocks": [
+            21
+          ],
+          "classification": "cross_reference",
+          "reason": "Plunging Fire callout points to 22.05 without modifying these movement rules."
+        }
+      ]
+    },
+    {
+      "row_id": "rule:19:19.03:1",
+      "requirements": [
+        {
+          "requirement_id": "19.03-unit-keyword-union",
+          "source_blocks": [
+            1
+          ],
+          "summary": "The attached unit has the keywords of all current component models for unit-targeting rules.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:rules_unit_view_by_id"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_attached_melee_cleave_uses_rules_unit_count_and_keywords",
+              "role": "semantic",
+              "assertion": "assert 'CHARACTER' in target_rules_unit.keywords",
+              "proves": "The attached target has CHARACTER despite a non-Character Bodyguard."
+            }
+          ],
+          "qualifications": []
+        },
+        {
+          "requirement_id": "19.03-model-keywords-not-inherited",
+          "source_blocks": [
+            1
+          ],
+          "summary": "An individual model does not inherit another component model’s keywords.",
+          "owners": [
+            "src/warhammer40k_core/engine/rules_units.py:rules_unit_view_by_id"
+          ],
+          "evidence": [
+            {
+              "nodeid": "tests/unit/test_model_keyword_authority.py::test_model_scoped_rolls_and_visibility_use_the_exact_model_owner",
+              "role": "semantic",
+              "assertion": "assert scoped_roll_model_ids_for_effect(source_rules_unit=view, current_roll_model_instance_ids=unit.own_model_ids(), effect_parameters={'required_model_keyword': 'PSYKER'}) == (specialist.model_instance_id,)",
+              "proves": "Only the actual Psyker specialist contributes to a model-keyword-gated roll."
+            },
+            {
+              "nodeid": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_attached_melee_cleave_uses_rules_unit_count_and_keywords",
+              "role": "semantic",
+              "assertion": "assert 'CHARACTER' not in target_bodyguard.keywords",
+              "proves": "The Bodyguard component does not acquire CHARACTER from its attached Leader."
+            }
+          ],
+          "qualifications": []
+        }
+      ],
+      "nonoperative_blocks": [
+        {
+          "source_blocks": [
+            2
+          ],
+          "classification": "example",
+          "reason": "Illustrative instance of the separately enumerated operative rule; no additional permission or restriction."
+        }
+      ]
+    }
+  ]
+}

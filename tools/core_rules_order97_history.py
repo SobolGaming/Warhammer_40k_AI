@@ -110,6 +110,10 @@ PHYSICAL_HISTORY_RESTORE_MAPPING_SHA256 = (
 )
 
 
+ORDER135_D07_MAPPING = "data/source_audits/order135/d07-historical-inputs.json"
+ORDER135_D07_MAPPING_SHA256 = "347097fb7a159d7e640014e00e309621c56b013a74028df2cdf02b2068469c7e"
+
+
 def historical_evidence_path(reference: str, *, root: Path) -> Path | None:
     """Resolve only the reviewed mapping; missing or corrupt history never falls back."""
     for mapping_name, expected_sha256 in (
@@ -138,6 +142,7 @@ def historical_evidence_path(reference: str, *, root: Path) -> Path | None:
         (ORDER135_FINAL_FIXTURE_MAPPING, ORDER135_FINAL_FIXTURE_MAPPING_SHA256),
         (ORDER135_FINAL_QUALITY_MAPPING, ORDER135_FINAL_QUALITY_MAPPING_SHA256),
         (PHYSICAL_HISTORY_RESTORE_MAPPING, PHYSICAL_HISTORY_RESTORE_MAPPING_SHA256),
+        (ORDER135_D07_MAPPING, ORDER135_D07_MAPPING_SHA256),
     ):
         raw = (root / mapping_name).read_bytes()
         if hashlib.sha256(raw).hexdigest() != expected_sha256:

@@ -1,0 +1,8 @@
+{
+  "assistant_sentinel": "Sentinel_eadfd9af445c8191bb3e04354ce6f271",
+  "question": "D07’s baseline test confirmed the MONSTER rejection and exposed a related permission bug: a VEHICLE-only model can inherit upper-floor access from INFANTRY models in its unit. May I include the per-model eligibility correction in this same small upper-floor PR? Both use the same permission check",
+  "user_sentinel": "Sentinel_e61bb852e9b081918ac81d20c166f5d6",
+  "answer": "Yes",
+  "answered_at": "2026-10-11T00:42:39Z",
+  "scope": "Legal MONSTER upper-floor eligibility and per-model qualifying keyword ownership in one D07 PR; no SWARM or other finding expansion."
+}

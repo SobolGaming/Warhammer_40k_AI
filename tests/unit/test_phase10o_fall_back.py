@@ -976,6 +976,7 @@ def _advance_voluntary_desperate_escape_to_delirium_fnp(
     game_id: str,
     with_reroll: bool,
     target_wounds_remaining: int,
+    proposal_result_id: str | None = None,
 ) -> tuple[GameLifecycle, LifecycleStatus, str]:
     lifecycle, movement_status = _movement_lifecycle_with_overflight_engagement(
         _config(
@@ -1003,7 +1004,9 @@ def _advance_voluntary_desperate_escape_to_delirium_fnp(
         request=_decision_request(action_status),
         option_id=_DESPERATE_FALL_BACK_OPTION_ID,
         action_result_id=f"{game_id}:select-desperate",
-        proposal_result_id=f"{game_id}:proposal",
+        proposal_result_id=f"{game_id}:proposal"
+        if proposal_result_id is None
+        else proposal_result_id,
         unit_instance_id=target_unit_id,
         movement_phase_action=MovementPhaseActionKind.FALL_BACK,
         movement_mode=MovementMode.FALL_BACK,
@@ -1058,11 +1061,14 @@ def test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark(
     with_reroll: bool,
 ) -> None:
     # Retain the failed Battle-shock branch with the complete allocation audit history.
-    game_id = "order121-escape-reroll-0" if with_reroll else "order121-escape-fnp-4"
+    game_id = "order121-escape-reroll-0" if with_reroll else "order121-escape-fnp-4:d07:390"
     lifecycle, status, target_unit_id = _advance_voluntary_desperate_escape_to_delirium_fnp(
         game_id=game_id,
         with_reroll=with_reroll,
         target_wounds_remaining=4,
+        proposal_result_id="order121-escape-fnp-4:d07:390:proposal:d07-late:63"
+        if not with_reroll
+        else None,
     )
     state = _state(lifecycle)
     fnp_request = _decision_request(status)

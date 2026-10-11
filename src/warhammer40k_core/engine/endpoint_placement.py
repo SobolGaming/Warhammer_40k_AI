@@ -167,7 +167,22 @@ def terrain_endpoint_placement_violation(
     features = _validate_terrain_feature_tuple("terrain_features", terrain_features)
     code = _validate_identifier("violation_code", violation_code)
     label = _validate_identifier("placement_label", placement_label)
-    movement_keywords = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    owning_model = next(
+        (
+            candidate
+            for candidate in unit.own_models
+            if candidate.model_instance_id == model.model_id
+        ),
+        None,
+    )
+    if owning_model is None:
+        return TerrainEndpointPlacementViolation(
+            violation_code=code,
+            message=f"{label} model does not belong to the physical unit.",
+            model_instance_id=model.model_id,
+            blocker_id=unit.unit_instance_id,
+        )
+    movement_keywords = set(owning_model.keywords)
     for feature in features:
         solid_blocker = solid_endpoint_intersection(model, feature)
         if solid_blocker is not None:
@@ -344,10 +359,6 @@ def _validate_objective_marker_tuple(
         seen.add(value.objective_marker_id)
         markers.append(value)
     return tuple(sorted(markers, key=lambda marker: marker.objective_marker_id))
-
-
-def _canonical_keyword(value: str) -> str:
-    return _validate_identifier("keyword", value).upper().replace(" ", "_").replace("-", "_")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

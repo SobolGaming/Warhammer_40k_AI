@@ -28,6 +28,7 @@ def allocation_permission_session(
     permission_target_is_attacker: bool = False,
     command_reroll_player_id: str | None = None,
     threshold: int = 4,
+    game_id: str | None = None,
 ) -> LocalGameSession:
     session = additional_mortal_session(
         phase,
@@ -37,6 +38,7 @@ def allocation_permission_session(
         enemy_models=enemy_models,
         optional_fnp=existing_optional_fnp,
         command_reroll_player_id=command_reroll_player_id,
+        game_id=game_id,
     )
     state = session.lifecycle.state
     assert state is not None

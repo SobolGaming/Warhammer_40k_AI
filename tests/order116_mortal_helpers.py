@@ -50,6 +50,7 @@ def additional_mortal_session(
     command_reroll_player_id: str | None = None,
     second_permission: bool = False,
     permission_effect_id: str = "order116:source-permission",
+    game_id: str | None = None,
 ) -> LocalGameSession:
     catalog = _compact_intercessor_catalog(_canonical_catalog())
     catalog = replace(
@@ -89,14 +90,16 @@ def additional_mortal_session(
     )
     if phase is BattlePhase.SHOOTING:
         lifecycle, units = _compact_shooting_lifecycle(
-            catalog=catalog, game_id="order116-shooting", enemy_model_count=enemy_models
+            catalog=catalog,
+            game_id="order116-shooting" if game_id is None else game_id,
+            enemy_model_count=enemy_models,
         )
     else:
         lifecycle, units = fight_lifecycle(
             alpha_unit_ids=("intercessor-1",),
             enemy_unit_ids=("enemy",),
             origins={"intercessor-1": Pose.at(10, 10), "enemy": Pose.at(12, 10)},
-            game_id="order116-fight-2",
+            game_id="order116-fight-2" if game_id is None else game_id,
             model_count=1,
             catalog=catalog,
             datasheet_id="core-character-leader",

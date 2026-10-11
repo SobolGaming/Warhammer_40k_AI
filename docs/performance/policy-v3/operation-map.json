@@ -5889,6 +5889,148 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "d07-model-owned-upper-floor-rule": {
+      "paths": [
+        "src/warhammer40k_core/core/ruleset_descriptor.py",
+        "src/warhammer40k_core/engine/base_contact_fight_history.py",
+        "src/warhammer40k_core/engine/base_contact_history.py",
+        "src/warhammer40k_core/engine/charge_path_contexts.py",
+        "src/warhammer40k_core/engine/consolidation_model_constraints.py",
+        "src/warhammer40k_core/engine/emergency_disembark_placement.py",
+        "src/warhammer40k_core/engine/endpoint_placement.py",
+        "src/warhammer40k_core/engine/fight_movement_paths.py",
+        "src/warhammer40k_core/engine/model_movement_permission.py",
+        "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+        "src/warhammer40k_core/engine/scout_movement_paths.py",
+        "src/warhammer40k_core/engine/triggered_movement_resolution.py"
+      ],
+      "owners": [
+        "@module",
+        "_PlacementContext.query",
+        "_canonical_keyword",
+        "_query",
+        "_resolve_unit_move",
+        "_setup_terrain",
+        "_terrain_feature_movement_policies_for_eleventh",
+        "append_scout_path_violations",
+        "charge_model_path_contexts",
+        "model_movement_terrain_context",
+        "resolve_triggered_movement",
+        "terrain_endpoint_placement_violation",
+        "validate_base_contact_history",
+        "validate_fight_contact_permissions",
+        "validate_fight_paths",
+        "validate_triggered_contact_permissions"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d07-fixed-fixture-and-native-regressions": {
+      "paths": [
+        "tests/charge_reroll_helpers.py",
+        "tests/d07_fixture_identity_helpers.py",
+        "tests/d07_upper_floor_helpers.py",
+        "tests/integration/test_d07_native_upper_floor.py",
+        "tests/integration/test_fight_on_death_presence.py",
+        "tests/integration/test_retained_shooting.py",
+        "tests/integration/test_ws13_adapter_phase_families.py",
+        "tests/lethal_hits_helpers.py",
+        "tests/order116_mortal_helpers.py",
+        "tests/order117_allocation_helpers.py",
+        "tests/order124_helpers.py",
+        "tests/order135_rng_helpers.py",
+        "tests/order135_transport_helpers.py",
+        "tests/order93_save_damage_helpers.py",
+        "tests/order97_gap_probes_09_17.py",
+        "tests/unit/test_action_movement_interruption.py",
+        "tests/unit/test_d04_combat_battle_shock.py",
+        "tests/unit/test_d07_upper_floor_permission.py",
+        "tests/unit/test_heroic_intervention.py",
+        "tests/unit/test_lethal_hits.py",
+        "tests/unit/test_order105_hazard.py",
+        "tests/unit/test_order116_additional_mortals.py",
+        "tests/unit/test_order117_mortal_allocation.py",
+        "tests/unit/test_order124_nested_conditions.py",
+        "tests/unit/test_order135_combat_tactical_feasibility.py",
+        "tests/unit/test_order135_shooting_boundary.py",
+        "tests/unit/test_order97_secondary_clause_evidence.py",
+        "tests/unit/test_phase10o_fall_back.py",
+        "tests/unit/test_phase13b_shooting_declarations.py",
+        "tests/unit/test_phase17_emperors_children_daemon_prince.py",
+        "tests/unit/test_phase17_emperors_children_datasheet_overlay.py",
+        "tests/unit/test_phase17g_chaos_space_marines_army_rule.py",
+        "tests/unit/test_phase17g_thousand_sons_army_rule.py",
+        "tests/unit/test_phase17g_tyranids_army_rule.py",
+        "tests/unit/test_ruleset_descriptor.py",
+        "tests/unit/test_unit_abilities.py",
+        "tests/unit/test_ws14_attack_sequence_runtime_hooks.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "d07-retained-source-and-contract-publication": {
+      "paths": [
+        "data/source_audits/d07/*",
+        "contracts/migrations/44.3.29-to-44.3.30.md"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "d07-generated-current-contract-inventory": {
+      "paths": [
+        "contracts/examples/decisions/interaction-conformance.json",
+        "contracts/examples/decisions/parameterized/deployment_placement.json",
+        "contracts/examples/decisions/proposals/deployment_placement.json",
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/replay-metadata.json",
+        "contracts/examples/sessions/create-session.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-create.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+        "contracts/migrations/44.3.29-to-44.3.30.md",
+        "contracts/openapi.yaml",
+        "data/source_audits/order135/current-inventory.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "d07-order97-exact-historical-evidence": {
+      "paths": [
+        "tools/core_rules_order97_history.py",
+        "data/source_audits/order135/d07-historical-inputs.json",
+        "data/source_audits/order135/d07-baseline-charge-reroll-helpers.py.txt",
+        "data/source_audits/order135/d07-baseline-order93-save-damage-helpers.py.txt",
+        "data/source_audits/order135/d07-baseline-order97-gap-probes-09-17.py.txt",
+        "data/source_audits/order135/d07-baseline-heroic-intervention.py.txt",
+        "data/source_audits/order135/d07-baseline-ws14-attack-sequence-runtime-hooks.py.txt"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "historical_evidence_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

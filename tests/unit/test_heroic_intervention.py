@@ -571,7 +571,9 @@ def test_heroic_completion_decisions_restore_continue_and_replay(ability_count: 
     from warhammer40k_core.geometry.pose import Pose
 
     session, unit_id = heroic_session(
-        natural=False, catalog=heroic_completion_catalog(ability_count=ability_count)
+        natural=False,
+        catalog=heroic_completion_catalog(ability_count=ability_count),
+        game_id="order49-heroic:d07:81" if ability_count == 1 else "order49-heroic",
     )
     state = session.lifecycle.state
     assert state is not None

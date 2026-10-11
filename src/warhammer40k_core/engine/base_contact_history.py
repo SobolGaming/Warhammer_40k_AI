@@ -15,6 +15,9 @@ from warhammer40k_core.engine.charge_model_endpoints import charge_endpoint_quer
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.fight_model_authority_history import historical_rules_unit_model_ids
+from warhammer40k_core.engine.model_movement_permission import model_movement_terrain_context
+from warhammer40k_core.engine.move_ability_choices import CHOICE_KEY, chosen_move_keywords
+from warhammer40k_core.engine.move_keyword_completion import completion_choice
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_mission_boundary_physical_authority import (
     physical_model_authority_before_event,
@@ -131,7 +134,7 @@ def validate_base_contact_history(
                 cast(MovementDistanceWitnessPayload, raw["movement_distance_witness"])
             )
             source = geometry[distance.model_id]
-            owner, unit, _ = identities[source.model_id]
+            owner, unit, physical_model = identities[source.model_id]
             enemy_models = tuple(
                 m
                 for mid, m in sorted(geometry.items())
@@ -186,6 +189,26 @@ def validate_base_contact_history(
                 raise GameLifecycleError("Deemed contact movement query is absent.")
             query = query_from_payload(cast(MovementQueryPayload, raw_query))
             context = query.path_context
+            choice = completion_choice(state=state, event=event, decision_records=decisions)
+            if choice is not None and source.model_id not in cast(
+                list[str], choice["model_instance_ids"]
+            ):
+                raise GameLifecycleError("Deemed contact move keyword model authority drifted.")
+            granted_keywords = () if choice is None else chosen_move_keywords({CHOICE_KEY: choice})
+            expected_terrain_policy = model_movement_terrain_context(
+                model=physical_model,
+                context=replace(
+                    query.terrain_context,
+                    terrain_movement_policy=state.runtime_ruleset_descriptor().terrain_movement_policy,
+                ),
+                granted_keywords=granted_keywords,
+            ).terrain_movement_policy
+            expected_raw_terrain = (
+                ()
+                if event.event_type
+                in {"movement_activation_completed", "triggered_movement_resolved"}
+                else tuple(v for f in battlefield.terrain_features for v in f.terrain_volumes())
+            )
             if (
                 any(
                     c.source_rule_id != DEEMED_BASE_CONTACT_SOURCE_ID
@@ -201,12 +224,10 @@ def validate_base_contact_history(
                 or context.battlefield_width_inches != battlefield.battlefield_width_inches
                 or context.battlefield_depth_inches != battlefield.battlefield_depth_inches
                 or query.terrain_context.terrain_features != battlefield.terrain_features
-                or query.terrain_context.terrain
-                != tuple(v for f in battlefield.terrain_features for v in f.terrain_volumes())
+                or query.terrain_context.terrain != expected_raw_terrain
                 or context.terrain
                 or query.terrain_context.witness != model_path
-                or query.terrain_context.terrain_movement_policy
-                != state.runtime_ruleset_descriptor().terrain_movement_policy
+                or query.terrain_context.terrain_movement_policy != expected_terrain_policy
                 or context.validate().movement_distance_witness != distance
             ):
                 raise GameLifecycleError("Deemed contact physical movement authority drifted.")

@@ -292,7 +292,10 @@ def nested_session(
 
 
 def declare_nested_shot(
-    session: LocalGameSession, *, shooting_type: str = "normal"
+    session: LocalGameSession,
+    *,
+    shooting_type: str = "normal",
+    result_id: str = "order124:declaration",
 ) -> DecisionRequest:
     state = session.lifecycle.state
     assert state is not None
@@ -309,7 +312,7 @@ def declare_nested_shot(
     proposal = _proposal_from_request(request=request, target_unit_id=TARGET)
     status = session.submit_parameterized_payload(
         request_id=request.request_id,
-        result_id="order124:declaration",
+        result_id=result_id,
         payload=validate_json_value(proposal.to_payload()),
     )
     assert status.status_kind is not LifecycleStatusKind.INVALID, status.payload

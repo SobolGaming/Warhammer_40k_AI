@@ -2058,7 +2058,9 @@ def test_phase18b_command_reroll_window_opens_after_shooting_save_roll() -> None
 
 
 def test_phase18b_command_reroll_window_opens_after_shooting_damage_roll() -> None:
-    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",), game_id="phase13b-game:d07:10"
+    )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
