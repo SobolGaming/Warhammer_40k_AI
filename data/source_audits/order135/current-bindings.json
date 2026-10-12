@@ -895,7 +895,7 @@
         "approval_reference": "data/source_audits/order135/b03-explicit-repair-approval.json",
         "documented_acceptance": "docs/ADAPTER_DECISION_CONTRACT.md:1904,1908",
         "scope": "Exact typed request context equality before queue/history/events for supported live submissions; valid target/effect choices and earlier authoritative checks preserved.",
-        "reproduced_original_impact": "records99\u2192100/queue1\u21920/two acceptance-history events/exception, every game-state and CP/use/effect ledger unchanged CP5\u21925; malformed live-client input, no ordinary legal-play or edited-history claim, no executed BASE introduction claim.",
+        "reproduced_original_impact": "records99→100/queue1→0/two acceptance-history events/exception, every game-state and CP/use/effect ledger unchanged CP5→5; malformed live-client input, no ordinary legal-play or edited-history claim, no executed BASE introduction claim.",
         "current_controls": "Both-direction native context invalid leaves complete lifecycle unchanged, followed by exact legal retry,2CP/FightsFirst/interrupt/actual-melee continuation, save/load/fork/allprincipalviews/events/exact replay. Constructed domain context/metadata/Carnival controls qualified; no whole-provider certification."
       },
       "approved_b03_json_kind_qualification": {
@@ -957,12 +957,16 @@
         "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available",
         "src/warhammer40k_core/engine/stratagems_geometry.py:_counteroffensive_target_context_error",
         "src/warhammer40k_core/engine/stratagems_eligibility.py:_handler_unavailable_reason",
-        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler"
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py:_apply_counteroffensive_handler",
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
       ],
       "current_test_nodes": [
         "tests/unit/test_order135_counteroffensive_band.py::test_native_counter_targets_non_first_unit_before_grant",
         "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_own_turn_is_not_offered",
-        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists"
+        "tests/unit/test_order135_counteroffensive_timing.py::test_native_core_counteroffensive_opponent_turn_acceptance_persists",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
       ],
       "disposition": "Original source and assertions retained; approved Core pre-grant target eligibility correction.",
       "approved_counter_band_qualification": {
@@ -1042,10 +1046,14 @@
     "12.04-empty-first": {
       "current_additional_owners": [
         "src/warhammer40k_core/engine/fight_order.py:FightPhaseState.with_next_band",
-        "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request"
+        "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request",
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
       ],
       "current_test_nodes": [
-        "tests/unit/test_order135_fight_transition.py::test_native_fights_first_exhaustion_keeps_owed_player"
+        "tests/unit/test_order135_fight_transition.py::test_native_fights_first_exhaustion_keeps_owed_player",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
       ],
       "disposition": "Approved preservation of originally owed player across exhausted Fights First band, before speculative availability scanning. Original assertions retained.",
       "authority": "data/source_audits/order135/fight-transition-explicit-repair-approval.json",
@@ -1054,10 +1062,14 @@
     "12.04-remaining": {
       "current_additional_owners": [
         "src/warhammer40k_core/engine/fight_order.py:FightPhaseState.with_next_band",
-        "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request"
+        "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request",
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
       ],
       "current_test_nodes": [
-        "tests/unit/test_order135_fight_transition.py::test_native_fights_first_exhaustion_keeps_owed_player"
+        "tests/unit/test_order135_fight_transition.py::test_native_fights_first_exhaustion_keeps_owed_player",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
       ],
       "disposition": "Approved preservation of originally owed player across exhausted Fights First band, before speculative availability scanning. Original assertions retained.",
       "authority": "data/source_audits/order135/fight-transition-explicit-repair-approval.json",
@@ -1067,7 +1079,9 @@
       "current_additional_owners": [
         "src/warhammer40k_core/engine/fight_order.py:eligible_pass_is_available",
         "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request",
-        "src/warhammer40k_core/engine/phases/fight.py:_invalid_fight_pass_status"
+        "src/warhammer40k_core/engine/phases/fight.py:_invalid_fight_pass_status",
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
       ],
       "current_test_nodes": [
         "tests/unit/test_order135_fight_pass.py::test_nearby_remaining_unit_prevents_fights_first_pass",
@@ -1075,7 +1089,9 @@
         "tests/unit/test_order135_fight_pass.py::test_newly_nearby_lower_band_unit_invalidates_offered_pass_atomically",
         "tests/unit/test_order135_fight_pass.py::test_pass_distance_boundary_is_strict",
         "tests/unit/test_order135_fight_pass.py::test_native_pass_after_shared_charge_target_dies",
-        "tests/unit/test_phase15c_fight_order.py::test_fights_first_pass_does_not_reoffer_same_unit_before_remaining_activation"
+        "tests/unit/test_phase15c_fight_order.py::test_fights_first_pass_does_not_reoffer_same_unit_before_remaining_activation",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
       ],
       "disposition": "All otherwise-eligible friendly units constrain the strict greater-than-five pass test. The current ordering band still constrains selectable units and the finite request snapshot.",
       "authority": "data/source_audits/order135/pass-explicit-repair-and-assertion-approval.json",
@@ -1185,6 +1201,426 @@
       ],
       "disposition": "D10 native physical-copy selection and legal separate-copy/model controls; original acceptance assertions retained unchanged. No static runtime pass claim.",
       "qualification_reference": "docs/D10_PHYSICAL_WEAPON_PROFILE_SCOPE.md"
+    },
+    "15.03-model": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_epic_challenge_context_error",
+        "src/warhammer40k_core/engine/attack_weapon_inventory.py:melee_weapon_selection_context",
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_epic_attached_leader",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_split_epic_keeps_physical_model_ownership",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "D12 logical selected rules-unit membership and physical CHARACTER keyword repair; original source and acceptance retained. Native runtime pass is not inferred from static inventory.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "15.03-target": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_epic_challenge_context_error",
+        "src/warhammer40k_core/engine/attack_weapon_inventory.py:melee_weapon_selection_context",
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_epic_attached_leader",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_split_epic_keeps_physical_model_ownership",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "D12 logical selected rules-unit membership and physical CHARACTER keyword repair; original source and acceptance retained. Native runtime pass is not inferred from static inventory.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "15.03-precision": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_epic_challenge_context_error",
+        "src/warhammer40k_core/engine/attack_weapon_inventory.py:melee_weapon_selection_context",
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_epic_attached_leader",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_split_epic_keeps_physical_model_ownership",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "D12 logical selected rules-unit membership and physical CHARACTER keyword repair; original source and acceptance retained. Native runtime pass is not inferred from static inventory.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "15.03-expiry": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_epic_challenge_context_error",
+        "src/warhammer40k_core/engine/attack_weapon_inventory.py:melee_weapon_selection_context",
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_epic_attached_leader",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_split_epic_keeps_physical_model_ownership",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "D12 logical selected rules-unit membership and physical CHARACTER keyword repair; original source and acceptance retained. Native runtime pass is not inferred from static inventory.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "05.04.05-obligation-01": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "05.04.05-obligation-02": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "05.04.05-obligation-03": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "05.04.05-obligation-04": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "05.04.05-obligation-05": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.04-fight-type": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.04-first-band": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.04-mandatory": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.04-once": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.04-return-first": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.05-eligibility": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.05-melee": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.07-sequence": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-distance": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-eligibility": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-engaging-all-targets": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-engaging-closer": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-engaging-forced-fights": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-engaging-mode": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-objective-approach": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-objective-attainable": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-objective-end": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-objective-mode": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-ongoing-attainable": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-ongoing-base-contact": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-ongoing-closest": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-ongoing-maintains": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-ongoing-mode": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "12.08-witness": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision",
+        "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_dead_leader_support_no_usable_melee_completes_and_replays",
+        "tests/unit/test_d12_no_melee_continuation.py::test_d12_armed_attached_melee_empty_rejects_atomically_and_retries"
+      ],
+      "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
+      "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
     }
   },
   "source_supersessions": {

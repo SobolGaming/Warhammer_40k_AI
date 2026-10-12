@@ -1,0 +1,62 @@
+{
+  "base": "35768d18d398ee1a40061e63d134cb63f8c2b086",
+  "changes": {
+    "src/warhammer40k_core/engine/fight_model_authority_history.py": {
+      "before_sha256": "b5c548580b003d9df56e943ed698166a2b0ddb516613e8b2f20d25be10ba5d1f",
+      "after_sha256": "3d6c8a7bed5175f5245480190c094751fbf2eaa1b74dfdfb153e2f0b1945337c",
+      "owners": {
+        "_historical_model_inventory": {
+          "before": "5a225195a78338b9c8c82fe1f3947ce12f34e46df6c40064de74eddd3821ecce",
+          "after": "af2497c6e8a1b7be97bb89a59b2abf2b8a7db4f01b1b08306c94802e73e263cc"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_geometry.py": {
+      "before_sha256": "61c574f5e29c8999a56f1702d5a00f5e232135de133b3c930b654c96794ee0e0",
+      "after_sha256": "9fed9a266621603085f8cbc3c002314d9966dfd899abd4b99513bf2609ccd9cc",
+      "owners": {
+        "_epic_challenge_context_error": {
+          "before": "8ffb358251968c616c13f569345fd49ab951f252a8b81893373b9383245986ea",
+          "after": "b5950b52faf03ea66b09391b0af5f5bd3035fbc270af0d96ae21b0baa7c32e3c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/fight_melee.py": {
+      "before_sha256": "a89abfd22eaf0de2dddb5208c458f4f1f55e51d1dc0ccd6c88dc22b9dee3d819",
+      "after_sha256": "00f42e80318a3d0cadad534535c3a642b723cf969e001a06166aa3aa281cbaba",
+      "owners": {
+        "_apply_melee_declaration_decision": {
+          "before": "82cf2843ba49874be79fdc28820d73285a8c80f654f0748a944b787fe3fe39f9",
+          "after": "42ddeacdd31a4c3ab4fd416cda8e9d84d7af86f277b1fe029c0612815dc32fbe"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/fight.py": {
+      "before_sha256": "6aaa6b6a9cc65d512a247baa9b0dcd133da65068a52a216c98bbd0df58264b95",
+      "after_sha256": "cc83944e0c9c2839bc24d7bac138c6187853ddcfebd9a4f39791f91b84975909",
+      "owners": {
+        "FightPhaseHandler.apply_decision": {
+          "before": "871d2b673b63e916c7a0b5ea94f2a74ecd52281714e9930276e5477736c346db",
+          "after": "bb53c7e629853f24f859a5df8eb92b3ac8ac533945b70a099c451aba019f38fb"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/engine/fight_model_authority_history.py": [
+      "order135-grouped-combat-decoding"
+    ],
+    "src/warhammer40k_core/engine/stratagems_geometry.py": [
+      "order135-visibility-hot-consumers"
+    ],
+    "src/warhammer40k_core/engine/phases/fight_melee.py": [
+      "d12-validated-no-melee-completion"
+    ],
+    "src/warhammer40k_core/engine/phases/fight.py": [
+      "d12-melee-completion-reaction-forwarding"
+    ]
+  },
+  "authority": "Bounded confirmed necessary D12 rules/persistence repair under the approved sequential remediation default: quiet serial current-runtime smoke and exact-base assessment. Detailed comparison remains mandatory for deliberate performance work or demonstrated serious regression. BOTH independent reviewers must assess this exact source classification; no original mapping, numeric ceiling, historical measurement, live work/cache check or gate is weakened.",
+  "source_obligation": "Complete15.03/02.05.01 select the physical CHARACTER of the chosen rules unit; complete01.02.06 and category19 govern physical ownership after native split. D12 explicitly requires split identity with genuine engine-generated persistence/replay/continuation. Base-native setup/split/Charge snapshot fails original historical ownership validation before Epic. Existing complete12.04/12.04.01/12.05 and12.07/12.08 require ordinary no-usable-melee completion/consolidation;05.04.05 retains actual-fight boundary. Native dead-Leader/living-Support legal Epic continuation independently fails in BASE-identical melee owner after consuming validated empty response, preventing retry/save replay.",
+  "unchanged_work": "Epic's identity/model-keyword branch uses existing authoritative RulesUnitView without changing any visibility query, geometry or targeting algorithm. Only historical inventory's existing linear current-unit/frozen-component scan changes: exact physical model plus validated source component resolves its current successor. Existing decoding, history traversal, serializer fields, event/replay schema, search, caches and all unrelated ownership rejections remain unchanged. One small dictionary supports the required identity lookup; no intended optimization, altered measurement workload or serious measured regression. Original acceptance and regression bodies remain exact. Real both-player split save/fork/role/replay/continuation controls and all unchanged quiet smoke/live work checks remain required; no universal integrity or performance certification. Required completion adds only an already validated empty-proposal branch to the existing no-melee activation helper, forwarding ReactionQueue. Producer/validator/nonempty builder/pool count invariant/global lifecycle/mandatory physical budgets/one-shot uses remain exact. No empty AttackSequence or actual-fought/Counteroffensive grant is fabricated. No new loop, query, serialized field, cache, RNG draw, dependency or changed numeric ceiling. Retained native old entry completion/replay is independently reproduced before and after repair; exact successor smoke/live work and both independent source assessments remain required."
+}

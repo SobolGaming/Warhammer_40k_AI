@@ -323,6 +323,7 @@ def _apply_melee_declaration_decision(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    reaction_queue: ReactionQueue | None,
 ) -> LifecycleStatus | None:
 
     from warhammer40k_core.engine.dice import DiceRollManager
@@ -335,12 +336,14 @@ def _apply_melee_declaration_decision(
         record_rules_unit_one_shot_melee_weapon_uses,
         rules_unit_melee_attack_sequence_from_proposal,
     )
-    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
     from warhammer40k_core.engine.phases.fight import (
         _MELEE_DECLARATION_ACCEPTED_STATUS,
         _army_catalog_for_handler,
         _battlefield_scenario,
+        _complete_active_fight_activation_without_melee_declaration,
         _ruleset_descriptor_for_handler,
+        fight_policy_for_handler,
         require_fight_state,
     )
     from warhammer40k_core.engine.random_weapon_profiles import random_melee_pool_evidence
@@ -348,6 +351,22 @@ def _apply_melee_declaration_decision(
     record = decisions.record_for_result(result)
     proposal_request = MeleeDeclarationProposalRequest.from_decision_request(record.request)
     proposal = melee_declaration_proposal_from_payload(result.payload)
+    if not proposal.declarations:
+        activation = require_fight_state(state).active_activation
+        if activation is None:
+            raise GameLifecycleError(
+                "Accepted melee declaration requires an active fight activation."
+            )
+        return _complete_active_fight_activation_without_melee_declaration(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            policy=fight_policy_for_handler(handler),
+            activation=activation,
+            target_unit_instance_ids=proposal_request.target_unit_instance_ids,
+            available_weapon_count=len(proposal_request.available_weapons),
+        )
     sequence_id = (
         f"melee-sequence:{state.game_id}:round-{state.battle_round:02d}:"
         f"{proposal.unit_instance_id}:{result.result_id}"
