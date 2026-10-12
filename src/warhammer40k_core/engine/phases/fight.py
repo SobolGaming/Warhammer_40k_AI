@@ -499,6 +499,7 @@ class FightPhaseHandler:
                 state=state,
                 result=result,
                 decisions=decisions,
+                reaction_queue=reaction_queue,
             )
         if result.decision_type in ATTACK_RESOLUTION_SELECTION_DECISION_TYPES:
             apply_fight_attack_sequence_selection_decision(

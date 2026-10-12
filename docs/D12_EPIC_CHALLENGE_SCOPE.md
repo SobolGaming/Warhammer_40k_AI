@@ -154,3 +154,41 @@ reviewer probes. The full packet retains the exact parent authorization, origina
 README rule verbatim, bootstrap command/input/JUnit/phase/closure proof, failed
 quality receipt and abandoned bridge. No final gate or original assertion is
 waived. Both complete gates remain mandatory.
+
+The SAME independent rules auditor also reproduced a normally reachable required
+continuation failure on the first frozen source: after real native Leader death,
+a living Support keeps Epic Challenge legal, but its sole advertised melee
+weapon has no engaged target. A forced attack rejects atomically. An empty legal
+proposal passed validation, then the unchanged BASE melee builder raised after
+the request and decision had been consumed; no retry remained and the resulting
+save could not replay. The author independently restored and reproduced that
+exact retained native entry before repair. The original blocked report, five
+completed scene controls, failed attempts and stopped covered run are historical
+and confer no successor passing credit.
+
+The necessary repair routes only an already validated empty melee proposal to
+the existing no-melee activation completion helper, forwarding the caller's
+ReactionQueue. Producer, validator, mandatory attacks, nonempty pool builder,
+one-shot consumption, physical budgets and global lifecycle remain unchanged.
+No empty AttackSequence, converter or compatibility shim is introduced. This
+completion does not mark an actual fight or open Counteroffensive; it retains
+the existing consolidation and phase-expiry behavior. Full retained Fight-step,
+unable-to-fight, Normal Fight, consolidation and Fight-on-Death source clauses
+already belong to the selected source packet; no new provider observation is
+claimed. The exact old native entry restores on the repair and completes the
+atomic invalid/legal retry with JSON, forks, role views and exact replay.
+
+A separate four-case module preserves every byte of the previous 343 behavioral
+files and the exact eight-function D12 guard. Both players exercise the native
+dead-Leader/living-Support completion and the armed mandatory-attack rejection
+with a legal same-request retry. The final typed module passed four cases in
+233.27 seconds with two workers; its actual summed JUnit file duration is
+290.152 seconds. This is a focused no-coverage measurement, not complete-current
+or final timing credit. The parent expressly approved the concrete 344-file
+provisional registration, preserving the previous 343 qualified records and
+adding this measured file. ALL final 344 durations and profile records must be
+replaced exclusively from the later complete current passing covered cohort,
+independently verified by both SAME reviewers. Every original source, test guard,
+numeric ceiling, operation mapping and complete-profile checker remains intact;
+new exact owner mappings identify the two additional completion owners. The
+old runtime RELEASE does not authorize this executable successor.

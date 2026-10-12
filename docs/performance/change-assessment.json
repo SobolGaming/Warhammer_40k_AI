@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "35768d18d398ee1a40061e63d134cb63f8c2b086",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aff17af1ce067048b8fc1a396b2287ad19c8b30609a6eceae47e6b4ea8a07f87",
-  "operation_map_sha256": "638eef2af2607b0eb4ecf42ec33e96f703c3b82c3cd859f5707930e718f74f7e",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bfd9257af731cca48429f7ec294d22712173fefce784c28315cff672d2e4c51e",
+  "operation_map_sha256": "f7f83b2bc0a09fad5693c1c351e2666fe0ad2f9f98c4c594cde22558e53149c0",
   "changes": {
     ".gitattributes": {
       "before_sha256": "5d9281cfae84ddc5d61053886e5f9e6a5ff803bc6753d863cae96530fcf96d17",
@@ -26,131 +26,131 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "35a7dd0e57c0e0a2c812b71701d4037abca2ba7b768c792730e788f73de2a204",
-      "after_sha256": "80a1280564fe2e47ee9dcf1fb1f05b010a13d4f911e46e241df7ec4c3672aa0e",
+      "after_sha256": "9fe8b2b7dcc239adf66e57a76e946d12e88229b3c17c5fe20ac3d51798267460",
       "owners": {
         "@document": {
           "before": "35a7dd0e57c0e0a2c812b71701d4037abca2ba7b768c792730e788f73de2a204",
-          "after": "80a1280564fe2e47ee9dcf1fb1f05b010a13d4f911e46e241df7ec4c3672aa0e"
+          "after": "9fe8b2b7dcc239adf66e57a76e946d12e88229b3c17c5fe20ac3d51798267460"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "1333efb881dca4f9604eebd0333b66d35ee75a77ea1d4ace34288a39fae0682d",
-      "after_sha256": "080fb7befb5334b9e9682105fb7b08595eb95cae1d3dd21da11892ccf3f6a861",
+      "after_sha256": "20f5333c9fd17cc117353a6c074e6d64cbc64863b26102b61b2bd85555fa1a72",
       "owners": {
         "@document": {
           "before": "1333efb881dca4f9604eebd0333b66d35ee75a77ea1d4ace34288a39fae0682d",
-          "after": "080fb7befb5334b9e9682105fb7b08595eb95cae1d3dd21da11892ccf3f6a861"
+          "after": "20f5333c9fd17cc117353a6c074e6d64cbc64863b26102b61b2bd85555fa1a72"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "a5ee1b713ba6ffb6ce9e938d51a2289306da27b6d68443cbd97585e81bebeeb2",
-      "after_sha256": "8667dafd1e0e2f803cb0a6cb391d1c4e5dd365639ffc22abfcec6898be43a62f",
+      "after_sha256": "94edccd84e780b7a9e15edf67fe36959d1062a1feb93bbf984c34d4fc27f1dfa",
       "owners": {
         "@document": {
           "before": "a5ee1b713ba6ffb6ce9e938d51a2289306da27b6d68443cbd97585e81bebeeb2",
-          "after": "8667dafd1e0e2f803cb0a6cb391d1c4e5dd365639ffc22abfcec6898be43a62f"
+          "after": "94edccd84e780b7a9e15edf67fe36959d1062a1feb93bbf984c34d4fc27f1dfa"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "bc313b0d2ca717525cfbf7b7d70f0456bad7b951c9b06a6877953e29242ec888",
-      "after_sha256": "1cdc5e1942b3f87c607f548583480aef0f4caeaa37c4aef16349f086c4a82460",
+      "after_sha256": "6fadda221ff89982aacde1809722d5b5db63f00daed22ff257c374eea39f063e",
       "owners": {
         "@document": {
           "before": "bc313b0d2ca717525cfbf7b7d70f0456bad7b951c9b06a6877953e29242ec888",
-          "after": "1cdc5e1942b3f87c607f548583480aef0f4caeaa37c4aef16349f086c4a82460"
+          "after": "6fadda221ff89982aacde1809722d5b5db63f00daed22ff257c374eea39f063e"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "f6d26a230c834a721c60916c54fcc12a8ee8f54946e7b80f2461dd61acb60546",
-      "after_sha256": "d97f55a2ed4b96981ff3eb37f05feec18b6e3358898a832da48f147b74a901d2",
+      "after_sha256": "15440c47c2975c50703b91f5a0738a693c67b86a368025367b9d12b036a4afb5",
       "owners": {
         "@document": {
           "before": "f6d26a230c834a721c60916c54fcc12a8ee8f54946e7b80f2461dd61acb60546",
-          "after": "d97f55a2ed4b96981ff3eb37f05feec18b6e3358898a832da48f147b74a901d2"
+          "after": "15440c47c2975c50703b91f5a0738a693c67b86a368025367b9d12b036a4afb5"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "77a32685228b7e0d70fe53cd45c839b24658e3bf825f9fd1463dab00315a8a62",
-      "after_sha256": "d6c4a665e52a27ec3df58c1ece9782d67acda2f2116d4fde51a97cee2be9a373",
+      "after_sha256": "07d41e57dc09b7bd8a706fa18dbfa6869c0c3eaf6f24deadd86a96741889593e",
       "owners": {
         "@document": {
           "before": "77a32685228b7e0d70fe53cd45c839b24658e3bf825f9fd1463dab00315a8a62",
-          "after": "d6c4a665e52a27ec3df58c1ece9782d67acda2f2116d4fde51a97cee2be9a373"
+          "after": "07d41e57dc09b7bd8a706fa18dbfa6869c0c3eaf6f24deadd86a96741889593e"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "6563972114290261829576c10e58fd4d838d39d025673a4c431965d41a19dc5d",
-      "after_sha256": "8fce59a42f57a505eb308d415ec038665a5683d2aab702e930f9a79178fc8a08",
+      "after_sha256": "be3c1ceb812c111c9306262992be227c229f014af7a678f3ca6b3a23133d0c80",
       "owners": {
         "@document": {
           "before": "6563972114290261829576c10e58fd4d838d39d025673a4c431965d41a19dc5d",
-          "after": "8fce59a42f57a505eb308d415ec038665a5683d2aab702e930f9a79178fc8a08"
+          "after": "be3c1ceb812c111c9306262992be227c229f014af7a678f3ca6b3a23133d0c80"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "45544c598b387ad80f1e4bcea3ceac382f31fe19657c23f5cbeea376963f308e",
-      "after_sha256": "c3f512109397ec45a221a27571fd6942600ca8c3531778989ea75bb8f38f2f01",
+      "after_sha256": "6ab7358968922ff9a545bef6e8859164de4ea15e00676954097ce763b36e4813",
       "owners": {
         "@document": {
           "before": "45544c598b387ad80f1e4bcea3ceac382f31fe19657c23f5cbeea376963f308e",
-          "after": "c3f512109397ec45a221a27571fd6942600ca8c3531778989ea75bb8f38f2f01"
+          "after": "6ab7358968922ff9a545bef6e8859164de4ea15e00676954097ce763b36e4813"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "f4ec58d73521fac1621899f50e2156d8ad301777bbab1d3bdcdb10070c107461",
-      "after_sha256": "94e23aa03818140060c145ff02fe61d7b929fea434d9132d68e7828da9b98383",
+      "after_sha256": "5eb2e1132a3868cb67fd54c7888b66d764e1e924767231c990d18d7627e77d8d",
       "owners": {
         "@document": {
           "before": "f4ec58d73521fac1621899f50e2156d8ad301777bbab1d3bdcdb10070c107461",
-          "after": "94e23aa03818140060c145ff02fe61d7b929fea434d9132d68e7828da9b98383"
+          "after": "5eb2e1132a3868cb67fd54c7888b66d764e1e924767231c990d18d7627e77d8d"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "872225902ed46ade47899e45c809468a136530e4d41749630aafdd70a5f1540e",
-      "after_sha256": "6075815c11a477f808ac1c659fd064f8e72d77b7323c53798251f8f4f6085b33",
+      "after_sha256": "10de846ca95f0c774b00f51f90bd303324a05b158bdd62dc52d99cfa81f1d349",
       "owners": {
         "@document": {
           "before": "872225902ed46ade47899e45c809468a136530e4d41749630aafdd70a5f1540e",
-          "after": "6075815c11a477f808ac1c659fd064f8e72d77b7323c53798251f8f4f6085b33"
+          "after": "10de846ca95f0c774b00f51f90bd303324a05b158bdd62dc52d99cfa81f1d349"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "35993b59110405a95fd8e24867fbb8bc9e616acf52d2467936c63634b6b257f3",
-      "after_sha256": "93e28ea29e128046d4df66322ba30b8a4d040a28035a6bf197bd1451aebd1d1f",
+      "after_sha256": "4defebea8c1f513a69efbc9c40574c2588960ba072a73bdbc2ef3c2dd9117b33",
       "owners": {
         "@document": {
           "before": "35993b59110405a95fd8e24867fbb8bc9e616acf52d2467936c63634b6b257f3",
-          "after": "93e28ea29e128046d4df66322ba30b8a4d040a28035a6bf197bd1451aebd1d1f"
+          "after": "4defebea8c1f513a69efbc9c40574c2588960ba072a73bdbc2ef3c2dd9117b33"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "38254d5a181a088162116b72f0a4cc65bb49b76e8b69058bf799e5d67de71431",
-      "after_sha256": "971b146594fe0a9a733b68767595751cd8c3d22d465bf5c8b64b3a8e4e4a86ed",
+      "after_sha256": "a76d6390bb47b2b9064a1d2069ebbb6d0cda9bc761862fdaf5ded5c2e2683bad",
       "owners": {
         "@document": {
           "before": "38254d5a181a088162116b72f0a4cc65bb49b76e8b69058bf799e5d67de71431",
-          "after": "971b146594fe0a9a733b68767595751cd8c3d22d465bf5c8b64b3a8e4e4a86ed"
+          "after": "a76d6390bb47b2b9064a1d2069ebbb6d0cda9bc761862fdaf5ded5c2e2683bad"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "33ea5fdbc9238d643ab03bd56c9cb3717ca9b4a2b18356340e22d5772129f862",
-      "after_sha256": "585552341ed9dd1862a58d30499ddc613dc54347a120607af362214061d8a31b",
+      "after_sha256": "b4cf2e5bcaed74bbf3cdf01b9682e033f13149abb8769b4fa8b48342c2dc2f9c",
       "owners": {
         "@document": {
           "before": "33ea5fdbc9238d643ab03bd56c9cb3717ca9b4a2b18356340e22d5772129f862",
-          "after": "585552341ed9dd1862a58d30499ddc613dc54347a120607af362214061d8a31b"
+          "after": "b4cf2e5bcaed74bbf3cdf01b9682e033f13149abb8769b4fa8b48342c2dc2f9c"
         }
       }
     },
@@ -166,91 +166,91 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "33156121a82da67246cc679dc4fa56080971d8713c5a93e2252fb76e395c5d43",
-      "after_sha256": "12646a9682bb7501c34d94d475431b842795266559ce0eeeef2a5fa79068024a",
+      "after_sha256": "000346c6cdd8a17272117ccbafc9f3b83cde8bcf2a084ff493d10bdae70e07aa",
       "owners": {
         "@document": {
           "before": "33156121a82da67246cc679dc4fa56080971d8713c5a93e2252fb76e395c5d43",
-          "after": "12646a9682bb7501c34d94d475431b842795266559ce0eeeef2a5fa79068024a"
+          "after": "000346c6cdd8a17272117ccbafc9f3b83cde8bcf2a084ff493d10bdae70e07aa"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "b8f9d12cb3700949a2ba8fd7c0425541c16da1119d0e6d2aa6686e0dee7fdaed",
-      "after_sha256": "b1cf827c4250687d3274634ca55d53f9a8c17f4c988d9356e0378379bd6f14ac",
+      "after_sha256": "bd8585875ae4bf911a853a83c474d5a9757535d35fdefa7a19b18e20d02a82be",
       "owners": {
         "@document": {
           "before": "b8f9d12cb3700949a2ba8fd7c0425541c16da1119d0e6d2aa6686e0dee7fdaed",
-          "after": "b1cf827c4250687d3274634ca55d53f9a8c17f4c988d9356e0378379bd6f14ac"
+          "after": "bd8585875ae4bf911a853a83c474d5a9757535d35fdefa7a19b18e20d02a82be"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "1563b41a19d699675174dcf193ff6b13e59f8a34a94b832f23a63997a0cb0cac",
-      "after_sha256": "db35a698077a9c24e87b734c33d06663d55431d5d51ed31ba3e82c4664dbb860",
+      "after_sha256": "f8f4063746c9209b833bfdece1f9ac1c90d32b16053a998934c5ccc061841c44",
       "owners": {
         "@document": {
           "before": "1563b41a19d699675174dcf193ff6b13e59f8a34a94b832f23a63997a0cb0cac",
-          "after": "db35a698077a9c24e87b734c33d06663d55431d5d51ed31ba3e82c4664dbb860"
+          "after": "f8f4063746c9209b833bfdece1f9ac1c90d32b16053a998934c5ccc061841c44"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "37ea55d196289767cf02ac358f9af44f808e0be5a9469dbbdb7d2ea8854a6680",
-      "after_sha256": "c1c1ee9bc503b70afc6b789071d04f77cc2f850a576908c8753f5898b4293d64",
+      "after_sha256": "7b41c8ba51b1507b641aecd255e1e50094efaf657f7fa7c1e5a1a5e2c3e0f11b",
       "owners": {
         "@document": {
           "before": "37ea55d196289767cf02ac358f9af44f808e0be5a9469dbbdb7d2ea8854a6680",
-          "after": "c1c1ee9bc503b70afc6b789071d04f77cc2f850a576908c8753f5898b4293d64"
+          "after": "7b41c8ba51b1507b641aecd255e1e50094efaf657f7fa7c1e5a1a5e2c3e0f11b"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "9266a2da2d596748e67e15f66c0da0654e2c3892a9a8d03700e4b57811aec5f1",
-      "after_sha256": "d9053968bcceb4b798435e5cce9e552f5eb504b85ab801ec04a750933c9c4f35",
+      "after_sha256": "c4f65af151b11ebac1d04975389c75b758efc728a4d842b046a848b9f29cc3df",
       "owners": {
         "@document": {
           "before": "9266a2da2d596748e67e15f66c0da0654e2c3892a9a8d03700e4b57811aec5f1",
-          "after": "d9053968bcceb4b798435e5cce9e552f5eb504b85ab801ec04a750933c9c4f35"
+          "after": "c4f65af151b11ebac1d04975389c75b758efc728a4d842b046a848b9f29cc3df"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "481baafb0ba35828abda99249cdda2acfc569d0b17351d2927a71ad71951e9f8",
-      "after_sha256": "50b039a3a6ee2756b21d553f305c6075831a17a56aa95af6afb906a62f1f9fd9",
+      "after_sha256": "4487dd2174b4a08f4b9560d37716484c1205db33c423cf017e655e2dfdde7b32",
       "owners": {
         "@document": {
           "before": "481baafb0ba35828abda99249cdda2acfc569d0b17351d2927a71ad71951e9f8",
-          "after": "50b039a3a6ee2756b21d553f305c6075831a17a56aa95af6afb906a62f1f9fd9"
+          "after": "4487dd2174b4a08f4b9560d37716484c1205db33c423cf017e655e2dfdde7b32"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "50985893f66c9bbb4230156c0deefcca9641ac25fbc89a163cb2de07faf0413a",
-      "after_sha256": "a9978c0c104c2f9b59554ecaa02da62f3e5264108ce8652f5aefd62d7c82eae1",
+      "after_sha256": "e395c6dfc0e57803421b92d82467a9c45d6a3a0401baac08231e142f7a890b6b",
       "owners": {
         "@document": {
           "before": "50985893f66c9bbb4230156c0deefcca9641ac25fbc89a163cb2de07faf0413a",
-          "after": "a9978c0c104c2f9b59554ecaa02da62f3e5264108ce8652f5aefd62d7c82eae1"
+          "after": "e395c6dfc0e57803421b92d82467a9c45d6a3a0401baac08231e142f7a890b6b"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "10f6adc99127472f08ddac1deea8b216329d7052006db1a61e98d15fba6d7616",
-      "after_sha256": "a051e5edf42c5e70769444ea7e3d46bcd07710bd9dd5a2a49f0a13071d869327",
+      "after_sha256": "454e46a7d784e0f6b34f71c8dabf5a2637a9639365a3c19521b8d8d853471078",
       "owners": {
         "@document": {
           "before": "10f6adc99127472f08ddac1deea8b216329d7052006db1a61e98d15fba6d7616",
-          "after": "a051e5edf42c5e70769444ea7e3d46bcd07710bd9dd5a2a49f0a13071d869327"
+          "after": "454e46a7d784e0f6b34f71c8dabf5a2637a9639365a3c19521b8d8d853471078"
         }
       }
     },
     "contracts/migrations/44.3.32-to-44.3.33.md": {
       "before_sha256": null,
-      "after_sha256": "b63d73036706c1abd35319f66b1cee10df4e60efcb06205ef58ef696a0216ae0",
+      "after_sha256": "046c48685cb28525cbe14e00be1947d81998005dff1ec1045f447e0df44dae6e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b63d73036706c1abd35319f66b1cee10df4e60efcb06205ef58ef696a0216ae0"
+          "after": "046c48685cb28525cbe14e00be1947d81998005dff1ec1045f447e0df44dae6e"
         }
       }
     },
@@ -316,21 +316,21 @@
     },
     "data/source_audits/order135/current-bindings.json": {
       "before_sha256": "476c1f60543a408de873471fc1c6a8b7513d271b86ae218a1f3f83f19639acbf",
-      "after_sha256": "faec68ab9cf422a0df8d742d621c6a39d05ab7283356fd944db844d04b5a6b1d",
+      "after_sha256": "ec45efd6d69942d73997c7f14b7045b708b8e6732dac65e47e0f6f892102d861",
       "owners": {
         "@document": {
           "before": "476c1f60543a408de873471fc1c6a8b7513d271b86ae218a1f3f83f19639acbf",
-          "after": "faec68ab9cf422a0df8d742d621c6a39d05ab7283356fd944db844d04b5a6b1d"
+          "after": "ec45efd6d69942d73997c7f14b7045b708b8e6732dac65e47e0f6f892102d861"
         }
       }
     },
     "data/source_audits/order135/current-inventory.json": {
       "before_sha256": "0552199f0fcb9e88c000cf2575f3dff3750709237e540f94d4ad1c0ef14d6ac2",
-      "after_sha256": "6e9deb6eefce75862507ead39f0c88c079dfc301d4131bbaff9cd5d9cca4ec37",
+      "after_sha256": "3b36802afd22ec5931c7f7161ed97bff6a6f8335f27db04896ff93a49f74c09f",
       "owners": {
         "@document": {
           "before": "0552199f0fcb9e88c000cf2575f3dff3750709237e540f94d4ad1c0ef14d6ac2",
-          "after": "6e9deb6eefce75862507ead39f0c88c079dfc301d4131bbaff9cd5d9cca4ec37"
+          "after": "3b36802afd22ec5931c7f7161ed97bff6a6f8335f27db04896ff93a49f74c09f"
         }
       }
     },
@@ -356,41 +356,41 @@
     },
     "docs/D12_EPIC_CHALLENGE_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "b47e7db47e077a10e319f3a95f7ad874457a7b9985ae448ea7fec3b9d0a36394",
+      "after_sha256": "1274033d6bc07b24e1d7d9095222f0e56a85284b2ff9c0db4b0975cc4909dd2c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b47e7db47e077a10e319f3a95f7ad874457a7b9985ae448ea7fec3b9d0a36394"
+          "after": "1274033d6bc07b24e1d7d9095222f0e56a85284b2ff9c0db4b0975cc4909dd2c"
         }
       }
     },
     "docs/performance/policy-v3/d12-rule-semantics.json": {
       "before_sha256": null,
-      "after_sha256": "13d675d6fc775e099fef8d069e9afcbdb968f00c24aebd85ed18f2a76f2228e0",
+      "after_sha256": "ea58b370b8f8eda1407a713fc35e893297d3f2dc0eedc5fd8635e79048aec234",
       "owners": {
         "@document": {
           "before": null,
-          "after": "13d675d6fc775e099fef8d069e9afcbdb968f00c24aebd85ed18f2a76f2228e0"
+          "after": "ea58b370b8f8eda1407a713fc35e893297d3f2dc0eedc5fd8635e79048aec234"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "f8feb624156fecd1a32383f84386045d8631e9eb489367ce977c06430d7d6f7c",
-      "after_sha256": "369ef072922b591623723b3d5f6d31d195c9b52d3b70eb8b3c7f2be760a630ce",
+      "after_sha256": "970238cfebd28600092c5c43c36a1a474ef29d99b9b51cd5a1f25b48b336f9e2",
       "owners": {
         "@document": {
           "before": "f8feb624156fecd1a32383f84386045d8631e9eb489367ce977c06430d7d6f7c",
-          "after": "369ef072922b591623723b3d5f6d31d195c9b52d3b70eb8b3c7f2be760a630ce"
+          "after": "970238cfebd28600092c5c43c36a1a474ef29d99b9b51cd5a1f25b48b336f9e2"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "82a17a7166d78d4aeab112c7dad6271218d3d226eb1d47a6e83c1cda8b076399",
-      "after_sha256": "884ae330d0202ab3c97f38c2edd383856d2e0fdabae94b09af9ee266ca6f5136",
+      "after_sha256": "ac35eb0501d9ad0ea95f4d21a7c71e9a42222d97e1f17d334579eabd691caa8c",
       "owners": {
         "@document": {
           "before": "82a17a7166d78d4aeab112c7dad6271218d3d226eb1d47a6e83c1cda8b076399",
-          "after": "884ae330d0202ab3c97f38c2edd383856d2e0fdabae94b09af9ee266ca6f5136"
+          "after": "ac35eb0501d9ad0ea95f4d21a7c71e9a42222d97e1f17d334579eabd691caa8c"
         }
       }
     },
@@ -414,6 +414,26 @@
         }
       }
     },
+    "src/warhammer40k_core/engine/phases/fight.py": {
+      "before_sha256": "6aaa6b6a9cc65d512a247baa9b0dcd133da65068a52a216c98bbd0df58264b95",
+      "after_sha256": "cc83944e0c9c2839bc24d7bac138c6187853ddcfebd9a4f39791f91b84975909",
+      "owners": {
+        "FightPhaseHandler.apply_decision": {
+          "before": "871d2b673b63e916c7a0b5ea94f2a74ecd52281714e9930276e5477736c346db",
+          "after": "bb53c7e629853f24f859a5df8eb92b3ac8ac533945b70a099c451aba019f38fb"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/fight_melee.py": {
+      "before_sha256": "a89abfd22eaf0de2dddb5208c458f4f1f55e51d1dc0ccd6c88dc22b9dee3d819",
+      "after_sha256": "7a219db6d69a9f4ece4fc6fa971d837423e1fcde3143c2cc9e002f7164dcdd87",
+      "owners": {
+        "_apply_melee_declaration_decision": {
+          "before": "82cf2843ba49874be79fdc28820d73285a8c80f654f0748a944b787fe3fe39f9",
+          "after": "42ddeacdd31a4c3ab4fd416cda8e9d84d7af86f277b1fe029c0612815dc32fbe"
+        }
+      }
+    },
     "src/warhammer40k_core/engine/stratagems_geometry.py": {
       "before_sha256": "61c574f5e29c8999a56f1702d5a00f5e232135de133b3c930b654c96794ee0e0",
       "after_sha256": "9fed9a266621603085f8cbc3c002314d9966dfd899abd4b99513bf2609ccd9cc",
@@ -426,7 +446,7 @@
     },
     "tests/code_quality/test_d12_epic_challenge.py": {
       "before_sha256": null,
-      "after_sha256": "c2488e49de87490760dcd103162b6eba20fbedb824e804d1ec5a43c4cc371b7d",
+      "after_sha256": "9a6f3bb343c8f005d4cb03d6b51bfe9b33d20c27d98b8d827f22719830e6ebd4",
       "owners": {
         "@module": {
           "before": null,
@@ -438,7 +458,7 @@
         },
         "test_d12_performance_rule_scope_requires_exact_base_category_and_owner_bytes": {
           "before": null,
-          "after": "0f1f02b1703d60a55f1c2c7261c347598c35e68a1ce8b6b935d57232d1931284"
+          "after": "91826d149578cb67618a505cfa335dcbd3ea4a3566a222aef5c6e77039f24449"
         },
         "test_d12_retained_complete_source_and_original_acceptance_are_exact": {
           "before": null,
@@ -544,9 +564,35 @@
         }
       }
     },
+    "tests/unit/test_d12_no_melee_continuation.py": {
+      "before_sha256": null,
+      "after_sha256": "65fed4de6fd4cb0b3455934a9419c7f5b5d607387d15fa1369cde3657f208764",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "aed30160956da2a3602229a20a3440d89c76e630e6fab6adcd577c5b5cf8b3e8"
+        },
+        "_empty_melee_payload": {
+          "before": null,
+          "after": "a5a442b614505d641c8d9b50277b273360db356efd7a3923a0a9fbd3cdaadc40"
+        },
+        "_melee_rows": {
+          "before": null,
+          "after": "db9f75aa3ea412aadf5bc315b67264b861dbb2589eee571c26eda2d8cba335b9"
+        },
+        "test_d12_armed_attached_melee_empty_rejects_atomically_and_retries": {
+          "before": null,
+          "after": "874f36d227298f39d4cdd8ead325378625e7f3840b9f94736e9dfead0954ff6c"
+        },
+        "test_d12_dead_leader_support_no_usable_melee_completes_and_replays": {
+          "before": null,
+          "after": "49a20598c3691bca4e39fc05e5e2d004550455fbd6de1fa4f8d36fcf4e34570b"
+        }
+      }
+    },
     "tools/performance_policy.py": {
       "before_sha256": "c2f9cddcfa9bebc2117ec6fdd74a0ff5453515d89910808dca113a534e5099d5",
-      "after_sha256": "447892a1b2a95a6b2e3493bc38a6b7ab53a181ffabef4b275e77760b01f728d1",
+      "after_sha256": "b8bc2562d7d8397a087ce8ee3e7574df9ac69f287433b7a48913164dcdc38edc",
       "owners": {
         "@module": {
           "before": "3a85392259ccbde45e59acccf3c759c75b4627158c08bb357a130fb792e6a867",
@@ -554,7 +600,7 @@
         },
         "d12_rule_semantics_smoke_operations": {
           "before": null,
-          "after": "5963918a11ae8635991b6971d00daf21106cac11bf1eeeb84c42ce2b58d7adbf"
+          "after": "06c3b4907bd986075443b54a0424c830c0dad5e35ae059294189d03ddf7ef7c9"
         },
         "validate_assessment": {
           "before": "3ac72bfd9d7cc3c4d66f89b5f9571487c826a35bf47f1d0542d1846700cb608e",
@@ -570,17 +616,17 @@
         "d09-authenticated-source-bytes"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -588,9 +634,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -598,9 +644,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -608,9 +654,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -618,9 +664,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -628,9 +674,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -638,9 +684,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -648,9 +694,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -658,9 +704,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -668,9 +714,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -678,9 +724,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -688,9 +734,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -698,9 +744,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -708,9 +754,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
@@ -718,9 +764,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -728,9 +774,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -738,9 +784,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -748,9 +794,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -758,9 +804,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -768,9 +814,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -778,9 +824,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -788,9 +834,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -798,9 +844,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "contracts/migrations/44.3.32-to-44.3.33.md": {
       "category": "rule_semantics",
@@ -808,9 +854,9 @@
         "d12-retained-source-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
@@ -818,9 +864,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "data/source_audits/d12/baseline/tests/d12_regressions_before_extraction.py.txt": {
       "category": "rule_semantics",
@@ -828,9 +874,9 @@
         "d12-retained-source-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "data/source_audits/d12/baseline/tests/unit/test_phase12c_core_stratagems.py.txt": {
       "category": "rule_semantics",
@@ -838,9 +884,9 @@
         "d12-retained-source-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "data/source_audits/d12/selected-source-and-acceptance.json": {
       "category": "rule_semantics",
@@ -848,9 +894,9 @@
         "d12-retained-source-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "data/source_audits/d12/supplemental-identity-source-and-acceptance.json": {
       "category": "rule_semantics",
@@ -858,9 +904,9 @@
         "d12-retained-source-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "data/source_audits/d12/test-preservation.json": {
       "category": "rule_semantics",
@@ -868,9 +914,9 @@
         "d12-retained-source-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "data/source_audits/order135/current-bindings.json": {
       "category": "rule_semantics",
@@ -878,9 +924,9 @@
         "order135-current-source-audit"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "data/source_audits/order135/current-inventory.json": {
       "category": "rule_semantics",
@@ -888,49 +934,49 @@
         "order135-current-source-audit"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "docs/D12_EPIC_CHALLENGE_SCOPE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "docs/performance/policy-v3/d12-rule-semantics.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -938,9 +984,9 @@
         "order108-terrain-semantics"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
@@ -948,9 +994,9 @@
         "order129-flight-history"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "src/warhammer40k_core/engine/fight_model_authority_history.py": {
       "category": "rule_semantics",
@@ -959,9 +1005,29 @@
         "order135-grouped-combat-decoding"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+    },
+    "src/warhammer40k_core/engine/phases/fight.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "d12-melee-completion-reaction-forwarding"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+    },
+    "src/warhammer40k_core/engine/phases/fight_melee.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "d12-validated-no-melee-completion"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "src/warhammer40k_core/engine/stratagems_geometry.py": {
       "category": "rule_semantics",
@@ -970,17 +1036,17 @@
         "order135-visibility-hot-consumers"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "tests/code_quality/test_d12_epic_challenge.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "tests/epic_challenge_helpers.py": {
       "category": "rule_semantics",
@@ -988,9 +1054,9 @@
         "d12-native-ownership-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "tests/epic_challenge_split_helpers.py": {
       "category": "rule_semantics",
@@ -998,9 +1064,9 @@
         "d12-native-ownership-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "tests/unit/test_d12_epic_challenge.py": {
       "category": "rule_semantics",
@@ -1008,17 +1074,27 @@
         "d12-native-ownership-regressions"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+    },
+    "tests/unit/test_d12_no_melee_continuation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "d12-native-no-melee-continuation-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     },
     "tools/performance_policy.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
     }
   },
   "milestone": "ordinary",

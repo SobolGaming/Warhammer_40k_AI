@@ -1,4 +1,34 @@
 {
+  "strategy": "largest-processing-time-by-median-file-duration",
+  "profiles": [
+    {
+      "junit_sha256": [
+        "8bd2debc10434e4b4818d43852a682b219c1ddc5139943a77a7f252a5e4cbdce",
+        "dc0c8bcdec60c5433a62973552664c5639d9c9c2380606593135203f6986a3e4"
+      ],
+      "source": "D10 authenticated complete PASS cohort at bf049c4a4b8cefc9b25e22d39a6b3e5545c5725d; Windows11 Python3.14.5; observer-free A3: fresh16 original50492 serial + single11330 original79665 remainder32workers;11346 cases34038 phases; no failed/historical/focused/reviewer/benchmark timing",
+      "test_cases": 11346,
+      "test_files": 342
+    },
+    {
+      "junit_sha256": [
+        "ebeee71e5e7700377b4cf32a4ba2df83d52f718d551863b0c9bd52143632a5bb"
+      ],
+      "source": "PROVISIONAL BOOTSTRAP ONLY, NOT a complete/representative/current-full/final profile: parent-authorized isolated D12 34-case module on uncommitted Git TREE7e59b444aad3b80ed3d7aceea15eb52d1b6a354a; Windows11 Python3.14.5,4workers,no coverage. One real measured file registers inventory with historical D10 unchanged342 files retained separately. All343 durations MUST be replaced by the successful complete current covered cohort before final publication.",
+      "test_cases": 34,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "d872f5e62ed1a77a97ccbc2d6d54a76c00679bedfd9de52f6622ab30a4a99b26"
+      ],
+      "test_cases": 4,
+      "test_files": 1,
+      "source": "PROVISIONAL NEW-FILE REGISTRATION ONLY, NOT COMPLETE CURRENT OR FINAL PROFILE: actual four passing no-melee continuation cases on uncommitted minimal repair, Windows Python3.14.5, two workers, no coverage. All previous343 values retain their earlier explicitly provisional source qualifications. Requires explicit parent sequencing authority before application. ALL344 final values/profiles must be exclusively replaced from successful new current complete covered cohort."
+    }
+  ],
+  "shard_count": 12,
+  "total_test_duration_seconds": 77899.111,
   "files": {
     "tests/integration/test_aeldari_rangers_facade.py": 99.891,
     "tests/integration/test_catalog_movement_completion_runtime.py": 3.037,
@@ -72,6 +102,7 @@
     "tests/unit/test_d06_embark_distance.py": 0.241,
     "tests/unit/test_d07_upper_floor_permission.py": 0.529,
     "tests/unit/test_d12_epic_challenge.py": 1536.164,
+    "tests/unit/test_d12_no_melee_continuation.py": 290.152,
     "tests/unit/test_damaged_effects.py": 1.11,
     "tests/unit/test_decision_system.py": 0.396,
     "tests/unit/test_dice.py": 0.345,
@@ -344,88 +375,66 @@
     "tests/unit/test_ws14_attack_sequence_runtime_hooks.py": 524.818,
     "tests/unit/test_ws14_stratagem_activation_support.py": 1.139
   },
-  "profiles": [
-    {
-      "junit_sha256": [
-        "8bd2debc10434e4b4818d43852a682b219c1ddc5139943a77a7f252a5e4cbdce",
-        "dc0c8bcdec60c5433a62973552664c5639d9c9c2380606593135203f6986a3e4"
-      ],
-      "source": "D10 authenticated complete PASS cohort at bf049c4a4b8cefc9b25e22d39a6b3e5545c5725d; Windows11 Python3.14.5; observer-free A3: fresh16 original50492 serial + single11330 original79665 remainder32workers;11346 cases34038 phases; no failed/historical/focused/reviewer/benchmark timing",
-      "test_cases": 11346,
-      "test_files": 342
-    },
-    {
-      "junit_sha256": [
-        "ebeee71e5e7700377b4cf32a4ba2df83d52f718d551863b0c9bd52143632a5bb"
-      ],
-      "source": "PROVISIONAL BOOTSTRAP ONLY, NOT a complete/representative/current-full/final profile: parent-authorized isolated D12 34-case module on uncommitted Git TREE7e59b444aad3b80ed3d7aceea15eb52d1b6a354a; Windows11 Python3.14.5,4workers,no coverage. One real measured file registers inventory with historical D10 unchanged342 files retained separately. All343 durations MUST be replaced by the successful complete current covered cohort before final publication.",
-      "test_cases": 34,
-      "test_files": 1
-    }
-  ],
-  "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 6467.415,
       "shard_id": 1,
+      "duration_seconds": 6491.588,
+      "test_file_count": 29
+    },
+    {
+      "shard_id": 2,
+      "duration_seconds": 6491.606,
       "test_file_count": 27
     },
     {
-      "duration_seconds": 6467.408,
-      "shard_id": 2,
-      "test_file_count": 28
-    },
-    {
-      "duration_seconds": 6467.406,
       "shard_id": 3,
+      "duration_seconds": 6491.581,
       "test_file_count": 29
     },
     {
-      "duration_seconds": 6467.407,
       "shard_id": 4,
-      "test_file_count": 28
+      "duration_seconds": 6491.586,
+      "test_file_count": 29
     },
     {
-      "duration_seconds": 6467.406,
       "shard_id": 5,
+      "duration_seconds": 6491.591,
       "test_file_count": 29
     },
     {
-      "duration_seconds": 6467.435,
       "shard_id": 6,
+      "duration_seconds": 6491.611,
       "test_file_count": 28
     },
     {
-      "duration_seconds": 6467.416,
       "shard_id": 7,
-      "test_file_count": 29
-    },
-    {
-      "duration_seconds": 6467.416,
-      "shard_id": 8,
+      "duration_seconds": 6491.61,
       "test_file_count": 28
     },
     {
-      "duration_seconds": 6467.415,
-      "shard_id": 9,
+      "shard_id": 8,
+      "duration_seconds": 6491.584,
       "test_file_count": 29
     },
     {
-      "duration_seconds": 6467.413,
+      "shard_id": 9,
+      "duration_seconds": 6491.589,
+      "test_file_count": 29
+    },
+    {
       "shard_id": 10,
+      "duration_seconds": 6491.58,
       "test_file_count": 30
     },
     {
-      "duration_seconds": 6467.411,
       "shard_id": 11,
-      "test_file_count": 29
+      "duration_seconds": 6491.601,
+      "test_file_count": 28
     },
     {
-      "duration_seconds": 6467.411,
       "shard_id": 12,
+      "duration_seconds": 6491.584,
       "test_file_count": 29
     }
-  ],
-  "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 77608.959
+  ]
 }

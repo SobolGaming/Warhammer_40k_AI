@@ -291,7 +291,7 @@ def _d04_smoke_operations(*, base: str, path: str, category: str, change: object
 def d12_rule_semantics_smoke_operations(
     *, base: str, path: str, category: str, change: object
 ) -> frozenset[str]:
-    """Bind the two selected D12 identity rule repairs to exact owner bytes."""
+    """Bind D12 identity and required continuation repairs to exact owner bytes."""
     if base != "35768d18d398ee1a40061e63d134cb63f8c2b086" or category != "rule_semantics":
         return frozenset()
     scope = read_object(Path(__file__).resolve().parents[1] / D12_SCOPE)

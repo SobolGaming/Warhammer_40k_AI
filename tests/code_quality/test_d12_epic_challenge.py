@@ -82,6 +82,8 @@ def test_d12_performance_rule_scope_requires_exact_base_category_and_owner_bytes
             "order135-grouped-combat-decoding"
         ),
         "src/warhammer40k_core/engine/stratagems_geometry.py": "order135-visibility-hot-consumers",
+        "src/warhammer40k_core/engine/phases/fight_melee.py": "d12-validated-no-melee-completion",
+        "src/warhammer40k_core/engine/phases/fight.py": "d12-melee-completion-reaction-forwarding",
     }
     assert scope["smoke_operations"] == {path: [name] for path, name in operations.items()}
     assert set(scope["changes"]) == set(operations)
