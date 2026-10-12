@@ -3,7 +3,7 @@
   "base": "53256c54bf9b34596ac2247ca27622d9b8480af6",
   "source_row_id": "rule:04:04.01.03:1",
   "source_sha256": "1f3b7c40f92853144b9b6b2d221f2eb5fd43b9e0989015f5d63dd783d6aab92e",
-  "reason": "One selected physical weapon selects one profile. The analytical Ctan group represents three independently named Powers weapons; equip separate items rather than three alternatives of a single rifle. Preserve baseline2/damaged1 caps and all assertions. Append native D10 cases to an existing behavioral file, retaining original complete byte archives and AST/assert/decorator proof.",
+  "reason": "One selected physical weapon selects one profile. Analytical Ctan Powers equip separate items while preserving baseline2/damaged1 caps. The mixed Close Quarters control equips a separate admitted Pistol on the same model, retaining its original profile fields and all four rejection/queue/history assertions; only its catalog factory name changes. Preserve every original assertion/decorator, complete original byte archive and unrelated AST. Native D10 cases append to an existing behavioral file.",
   "source_condition": "Different physical models/copies select profiles independently; Hunter target restrictions remain.",
   "runtime_compatibility_shim": false,
   "files": [
@@ -11,7 +11,7 @@
       "path": "tests/unit/test_phase13b_shooting_phase_declarations.py",
       "baseline_archive": "data/source_audits/d10/baseline/tests/unit/test_phase13b_shooting_phase_declarations.py.txt",
       "before_sha256": "fccb77a79c0cc9d8413f4a87dcc32065fbb92a2e1fe376bf801fca5640b97b9e",
-      "after_sha256": "f3f2a26845a2dbdf91dacb3a61adc238aceaf6e7c147e76f13243d5ac9355b48",
+      "after_sha256": "aea8f8dee74128202460a31ac9ade8b707f938d2570b272fef1fe4e27353705b",
       "original_functions": [
         "test_invalid_shooting_declaration_submissions_do_not_consume_pending_request",
         "test_ctan_power_selection_limits_are_exposed_and_validated_before_queue_pop",
@@ -86,8 +86,17 @@
         "test_order71_attached_target_alias_uses_rules_unit_engagement_for_exemption",
         "test_order71_mixed_physical_unit_exclusivity_uses_declaring_model"
       ],
-      "added_functions": [],
-      "maintained_fixture_function": "_catalog_with_ctan_power_selection_limit"
+      "added_functions": [
+        "_catalog_with_separate_bolt_weapon"
+      ],
+      "maintained_fixture_function": "_catalog_with_ctan_power_selection_limit",
+      "setup_catalog_rebindings": {
+        "test_mixed_close_quarters_and_non_close_quarters_declarations_reject_before_pop": {
+          "before_factory": "_catalog_with_extra_bolt_profile",
+          "after_factory": "_catalog_with_separate_bolt_weapon",
+          "reason": "Equip a separate admitted Pistol instead of selecting two alternative profiles of one physical rifle; preserve all original assertions and the entire body after catalog creation."
+        }
+      }
     },
     {
       "path": "tests/unit/test_order97_attack_evidence.py",
@@ -108,7 +117,8 @@
         "test_one_copy_cannot_select_two_profiles_and_exact_request_retries",
         "test_profile_selection_rejects_stale_wrong_player_and_unadvertised_copy_atomically"
       ],
-      "maintained_fixture_function": null
+      "maintained_fixture_function": null,
+      "setup_catalog_rebindings": {}
     }
   ]
 }

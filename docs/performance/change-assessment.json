@@ -156,11 +156,11 @@
     },
     "data/source_audits/d10/test-preservation.json": {
       "before_sha256": null,
-      "after_sha256": "72438dd5d19606ce123595fb60df662e8e6a98cc7cdf85b8dae36ae70dd51fbf",
+      "after_sha256": "c06f024250834310afaa16871f5d6be826e62aed100e06d40d05acf3d55f26ec",
       "owners": {
         "@document": {
           "before": null,
-          "after": "72438dd5d19606ce123595fb60df662e8e6a98cc7cdf85b8dae36ae70dd51fbf"
+          "after": "c06f024250834310afaa16871f5d6be826e62aed100e06d40d05acf3d55f26ec"
         }
       }
     },
@@ -176,11 +176,11 @@
     },
     "data/source_audits/order135/current-inventory.json": {
       "before_sha256": "ff842a79fe64875bb4bdcb40adcd957bd1b21eeb5c5cbbf5636daeaa6d914fb3",
-      "after_sha256": "a388399be055674b6f002a67493422af00f4eed8b399956d3c1a3ba61f803608",
+      "after_sha256": "0552199f0fcb9e88c000cf2575f3dff3750709237e540f94d4ad1c0ef14d6ac2",
       "owners": {
         "@document": {
           "before": "ff842a79fe64875bb4bdcb40adcd957bd1b21eeb5c5cbbf5636daeaa6d914fb3",
-          "after": "a388399be055674b6f002a67493422af00f4eed8b399956d3c1a3ba61f803608"
+          "after": "0552199f0fcb9e88c000cf2575f3dff3750709237e540f94d4ad1c0ef14d6ac2"
         }
       }
     },
@@ -206,11 +206,11 @@
     },
     "docs/D10_PHYSICAL_WEAPON_PROFILE_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "7771e197c331a32eff147f15a084d733e86116fbfd9996310bf06fcbcdb2d1d1",
+      "after_sha256": "c125c0339047243fbdafdb34d7ed0b86073e6ace4731581f22b9177b371001b8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "7771e197c331a32eff147f15a084d733e86116fbfd9996310bf06fcbcdb2d1d1"
+          "after": "c125c0339047243fbdafdb34d7ed0b86073e6ace4731581f22b9177b371001b8"
         }
       }
     },
@@ -239,8 +239,8 @@
       "after_sha256": "0e87686ef805874c28112033a1a997f234bdb2c8a7bdbea77ff96bb342c772cb",
       "owners": {
         "@module": {
-          "before": "0e91aff5414c57d358a3ac9d186655736e330ab7e45113b5f2b74bd33ad5e46b",
-          "after": "012b724663cf3486cd6b7277ade7135ad7d8b326a56c297f1e33e04e34d40036"
+          "before": "59b0374c87fac49fecfcf1c29a347060dcb1db864bdd4cc2efafa81093faaf0e",
+          "after": "e0ac2ca99d2076f0f274971965af662dadce3ef930b67d0f6cd6b588cf08d8a7"
         }
       }
     },
@@ -249,8 +249,8 @@
       "after_sha256": "2e604814a27ec5340ab7cc913d0284fc260aec5ea5b4dad1b96b476f2c8c8bb9",
       "owners": {
         "_attack_pools_or_validation": {
-          "before": "d3189605b7edbdcd51cce15896e7678dd50670f8ba01c662d6d8d1bf147a3bf0",
-          "after": "db54767dea297ed0562ff72614fd04be34cad9b34f55f964fdb3ce651df331e6"
+          "before": "7b289c7bc4e74a6d0ae8d6bcb2f44be21f61e77d52bd176b68b216c7d6463248",
+          "after": "8d898f7c26e6853e5537f59ce0f670a98b777e5632d9d1b113625e9df2b427d9"
         }
       }
     },
@@ -260,15 +260,15 @@
       "owners": {
         "@module": {
           "before": null,
-          "after": "b9ae0f978092d7c8cffc5cb6edec78f550bf8bc45b703cf1202455ea1ded6e6c"
+          "after": "50914086ea5650c9c65805243d82e48065ff1dd7699c50786ffd39c3881588d9"
         },
         "test_complete_original_tests_keep_assertions_decorators_and_unrelated_ast": {
           "before": null,
-          "after": "f764bcca5ff9eb5353fe12776184a0bd74a94028bbdc39e3feee4490f4a24e46"
+          "after": "38454f7404c10432dc1b4a5fac43f9e2efe8c1b92c3110b345329e0e77333fd6"
         },
         "test_duplicate_guard_uses_authenticated_physical_copy_before_profile_consumers": {
           "before": null,
-          "after": "c2c99429c8b1ab1ecda125b0c2f3f5d947056fc808806ad21a3e32049800f90b"
+          "after": "cacb16900e6509da134d5f3f3d0b19086dd7dfb73f5ba583ad61ac8b1996aac9"
         }
       }
     },
@@ -277,12 +277,12 @@
       "after_sha256": "96684cdfcb12400d9ba35b3a7e7a1298f6e62563842f28adfca506ed1a22af93",
       "owners": {
         "@module": {
-          "before": "76ce095a13d4e7649395e0bbbf19c59dcba32f65c2b87a15c8b7fa0e86057197",
-          "after": "9a89caa9e927e9430edfc6cbd2ef2021cd459842dda437fd26cdccec22cecf98"
+          "before": "aa9750b201def565b7a49fc4872758332b007be0f4d3050e3453708f888fd300",
+          "after": "cad382551d51c241ee19834e4e587d4132074f6c89af5270199f55d7985420b9"
         },
         "preserved_d09_predecessor_test_bytes": {
-          "before": "2f850bf572772653f66e56494ddbb4f2b905ba3a17cf8ea69602dcd7dfc8ad0f",
-          "after": "59c9670c63e98b69759e4ec20ff4759cdeebb4c4414ddfcea2fce76ac3632265"
+          "before": "e0206758fc7ceef7d4054243ae1166c7eb23429995c75bcff28641c9de269d61",
+          "after": "55e1f808dac37cd349edae19ae39c2f552e8a1e371279d48628463aab5539d59"
         }
       }
     },
@@ -292,53 +292,53 @@
       "owners": {
         "@module": {
           "before": null,
-          "after": "99c4843e2f3cfe788fa29ce21318aabf4106e5f9915a94670f5fa9475b3c6e53"
+          "after": "76b4c0e015e52e1ce263f61154ce5b211219cfcce1c67009f9236faa4910d535"
         },
         "advertised_weapons": {
           "before": null,
-          "after": "14e83bcb653ce31730e146fc9b86d3ef38b8c12358b85159ccde9dc71938e48b"
+          "after": "5e41271bffa3f199ce7768f8a8955fac00e561cd29d7d7132b235143cd38550f"
         },
         "declaration_request": {
           "before": null,
-          "after": "ab293f3369f27760b6d13996d31935f671495109c2e74487fbb8187cda8f14a2"
+          "after": "afa8e41e8f9572787a8c4c7b87352bdf9466153c26ca6bc65a49ed96c51aa355"
         },
         "finish_profile_attack": {
           "before": null,
-          "after": "3824288ab7656eaf5396ce2966da753453ce5c440265cdfba2949dbf0a5ed3b0"
+          "after": "978350c2d675e696dc15f89166faa81f3aaa34f6e09e0c97b445164f0384bd01"
         },
         "profile_catalog": {
           "before": null,
-          "after": "31c59fcac707f1263d7a420d804f246d756e152eef79318664aa9f92a9df384e"
+          "after": "cc15593498f49dcf1e0bb4dce4e349db6e516b12fcde271686f23ff141ca6e91"
         },
         "profile_checkpoint": {
           "before": null,
-          "after": "b6893e456e0f510e23e1bc82253f27d1b6b72e1a2cd4237f27652fbb996c279f"
+          "after": "30c68e2601ce369841c99fca4957244c8f90b9468f405deaca60c088d8cb7eae"
         },
         "profile_proposal": {
           "before": null,
-          "after": "1e757d903c5229e481140bc2e3544c257b5375a268a2812ea40216ba0115fd72"
+          "after": "8975b1500c24a2d622e99dc9495a5e093291e68e4425af9b3eb951ea59b353b7"
         },
         "profile_session": {
           "before": null,
-          "after": "4360dbb849c650d6d290640712eba581c717689bacb85a476b94629ad346da68"
+          "after": "de22cd6713d733cf95f67e111ead2d4c3d5501fd5bd956042a62946e001af95f"
         },
         "submit_profile": {
           "before": null,
-          "after": "27ad6b35ac4ef8bf71a7fcd24c4d6b0ef91f5b744b4fde113e8450f654884929"
+          "after": "56878f81c1221653066c644daf82a0d6ab82497ebcdf70878a6b244377db3cd5"
         }
       }
     },
     "tests/d10_test_preservation_helpers.py": {
       "before_sha256": null,
-      "after_sha256": "afe34af272073ec89341d65d76c9ff3d47c1b5bffdf3658b8e8e11d707b0c84b",
+      "after_sha256": "696f39bb47156830d0d018639fe02cf6e3a0c683b6f85b45476e54703887a152",
       "owners": {
         "@module": {
           "before": null,
-          "after": "af11b28dbfce88e5864fbdb79ff4eabf2a54e42594d84218d3d8343082e0b798"
+          "after": "4106321e5efdaa82d49de2c7378a3c16ebd136734e8f873ff099dcfa78d6e4ed"
         },
         "preserved_d10_predecessor_test_bytes": {
           "before": null,
-          "after": "2b8cc9b74c59f0d73f23a5755c17e227deffb3be4619c7eb0d57e249267cf1e3"
+          "after": "eec0085f65aee21a78cb8fc642892b430baadc9efa5832e90d00907c06613b13"
         }
       }
     },
@@ -347,34 +347,42 @@
       "after_sha256": "0df66af7f283a8c6959c4eab29ac12d2b657f8dd33389297b9b891855ff96dd3",
       "owners": {
         "@module": {
-          "before": "d167e85ecc44603cdbfd81bb04c7c7f5893d73672ac470a8cf8423eae00529c1",
-          "after": "1cdbabb34410c84f78a8da7b62233b3009cc7195b6e13f89f96a83ef27235ae4"
+          "before": "be6a5392b143a358a3fde2ab62bbd6b108c91efff718dcb7488f9fba717dc7c5",
+          "after": "5170ebddfd2fddb2a2b9bf238719516359bf908296bb6b1a0316f9f9ef25cd63"
         },
         "test_independent_physical_weapons_can_choose_different_profiles": {
           "before": null,
-          "after": "b3007288f5595058be0c2b29d37fb3f70684d91b42934db3a79e0ad7e89ca370"
+          "after": "56e115de7d110da60f329ad04a7127b3be2023a1fe4c92c9596878d81d3bd7b3"
         },
         "test_one_copy_cannot_select_two_profiles_and_exact_request_retries": {
           "before": null,
-          "after": "6e04087f855e9c3aeca2106a1e3082ab72ef81b26b1fd72cc31453685ca3070b"
+          "after": "6f13daa612675bd5c50d6decff005fde0035386096a498669481d321a490f9de"
         },
         "test_profile_selection_rejects_stale_wrong_player_and_unadvertised_copy_atomically": {
           "before": null,
-          "after": "dd8c522532b6ee67881ac8a5c5f2791a0f01456c1b9756353eb4d8746278e2e5"
+          "after": "f739c6c587f253bd7ddc8ab164b753a575ccb678249b6a17909e7c85a8ffbfa4"
         }
       }
     },
     "tests/unit/test_phase13b_shooting_phase_declarations.py": {
       "before_sha256": "fccb77a79c0cc9d8413f4a87dcc32065fbb92a2e1fe376bf801fca5640b97b9e",
-      "after_sha256": "f3f2a26845a2dbdf91dacb3a61adc238aceaf6e7c147e76f13243d5ac9355b48",
+      "after_sha256": "aea8f8dee74128202460a31ac9ade8b707f938d2570b272fef1fe4e27353705b",
       "owners": {
         "@module": {
-          "before": "9d57be890cac273cb67df8ddd0a48ef56d4965eae5cc91875e8bf02a3f938e60",
-          "after": "7b26c595e57f81361753885d737e7646fbf12dd25fe50a22ef67c5387d90cb9b"
+          "before": "06088c4081baaf0ecf3babd6744663eaefda3dcced9503dea280767a061b223f",
+          "after": "106279b3bc97a63c646b441a2febaf9bf257c3ce6006fd626540163568be83f2"
         },
         "_catalog_with_ctan_power_selection_limit": {
-          "before": "5f0638d397bda24ff7952f00ecc5eb2f661b92a990ab89c7a363ae042e8b1e4d",
-          "after": "b5bc85e13c027431ce76d6aa1f54b3ff73b018a85020b2549bb76dd9bdc8e2b1"
+          "before": "99db70fdaf7b8ccd81f1d95c101b0bb9edd72d9a38d62f8726c6c52f18e27d64",
+          "after": "9584fc076b0d0dd139edf0bfa4ae08700b5dc16fa7b63fc6b0564d8bbf70b1f5"
+        },
+        "_catalog_with_separate_bolt_weapon": {
+          "before": null,
+          "after": "f69dfa42177c329f375dc149f7acd6ef85d4dc362e21f9a942e5b7a2eab82925"
+        },
+        "test_mixed_close_quarters_and_non_close_quarters_declarations_reject_before_pop": {
+          "before": "3be632f4cef64bd21a31d4330256a804ac56c9c55cc567ef9d3f239c813361b2",
+          "after": "69db5ea9cbea5fd3ec43fe1e7bce47d8e662e2797ecaea0f022bb9e78b36ed6b"
         }
       }
     }

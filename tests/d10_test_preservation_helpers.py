@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PRESERVATION_SHA256 = "72438dd5d19606ce123595fb60df662e8e6a98cc7cdf85b8dae36ae70dd51fbf"
+PRESERVATION_SHA256 = "c06f024250834310afaa16871f5d6be826e62aed100e06d40d05acf3d55f26ec"
 
 
 def preserved_d10_predecessor_test_bytes(path: str, current: bytes) -> bytes:
@@ -40,7 +40,16 @@ def preserved_d10_predecessor_test_bytes(path: str, current: bytes) -> bytes:
         assert [ast.dump(node) for node in ast.walk(before) if isinstance(node, ast.Assert)] == [
             ast.dump(node) for node in ast.walk(after) if isinstance(node, ast.Assert)
         ]
-        if name != pin["maintained_fixture_function"]:
+        binding = pin["setup_catalog_rebindings"].get(name)
+        if binding is not None:
+            first = before.body[0]
+            assert isinstance(first, ast.Assign)
+            assert isinstance(first.value, ast.Call)
+            assert isinstance(first.value.func, ast.Name)
+            assert first.value.func.id == binding["before_factory"]
+            first.value.func.id = binding["after_factory"]
+            assert ast.dump(before) == ast.dump(after)
+        elif name != pin["maintained_fixture_function"]:
             assert ast.dump(before) == ast.dump(after)
 
     # Formatting may coalesce imports; preserve every original module/name/alias

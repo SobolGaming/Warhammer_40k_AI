@@ -44,12 +44,35 @@ changes. Current Necrons source audit records Tesseract Vault as having no
 component evidence row; this analytical cap control does not certify its fieldability
 or supply new faction content.
 
+The first complete covered remainder retained 11,329 passes and one failure in
+the original mixed Close Quarters control. Its catalog attached the Pistol as
+an alternative profile of the same physical rifle; the new duplicate guard
+therefore correctly rejected that copy before checking the mixed shooting
+regime. A bounded native comparison confirmed the original case passes on the
+authenticated base and fails with `duplicate_weapon_declaration` on the first
+D10 freeze. Complete retained `04.01.03`, `24.07` and `24.27` require separate
+physical weapons to exercise the original mixed-regime restriction faithfully.
+The control now equips a separate admitted single-profile Pistol on the same
+Infantry model before muster. Its original profile fields, lifecycle and
+decision body, and all four rejection/queue/history assertions remain exact;
+only the catalog factory name changes. The shared extra-profile helper and
+production duplicate guard remain unchanged. The original failed cohort,
+source revision, complete test bytes and native comparison receipts remain in
+durable state and supply no aggregate pass or timing credit.
+The preserved analytical Pistol also retains the original rifle's Rapid Fire
+descriptor despite replacing its keywords with Pistol. An additional individual
+fire probe reached the existing descriptor/keyword invariant and is retained as
+a failed attempt. This invalid-mixture fixture supplies no Pistol fieldability
+or individual-fire certification; the separate D10 native legal controls use
+consistent profile descriptors. No original profile field is normalized here.
+
 The D10 cases extend the existing attack-evidence file so the behavioral file
 inventory is unchanged before the single covered cohort. Complete original
 files are retained under `data/source_audits/d10/baseline/`. The pinned
 test-preservation manifest authenticates complete current/original bytes and
-independently proves every original function AST unchanged except the one
-equipment fixture, every original assertion/decorator exact, and only the
+independently proves every original function AST unchanged except the C'tan
+equipment fixture and the single declared mixed-regime catalog callee, every
+original assertion/decorator exact, and only the
 declared added tests/imports. The D09 historical resolver first applies this
 D10 proof, then continues its unchanged D09/D07 archival pins. This is a
 test-only historical audit, with no runtime compatibility conversion.

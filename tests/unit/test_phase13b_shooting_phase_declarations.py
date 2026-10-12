@@ -2944,8 +2944,41 @@ def test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns() 
     assert blast_candidates[0].violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
 
 
+def _catalog_with_separate_bolt_weapon(extra_profile: WeaponProfile) -> ArmyCatalog:
+    """Admit an independent pistol for the mixed physical weapons control."""
+    catalog = _canonical_catalog()
+    extra_weapon = Wargear(
+        wargear_id=f"d10-separate-weapon:{extra_profile.profile_id}",
+        name=extra_profile.name,
+        weapon_profiles=(extra_profile,),
+    )
+    return replace(
+        catalog,
+        wargear=(*catalog.wargear, extra_weapon),
+        datasheets=tuple(
+            replace(
+                sheet,
+                wargear_options=(
+                    *sheet.wargear_options,
+                    DatasheetWargearOption(
+                        option_id="d10-independent-bolt-pistol",
+                        model_profile_id="core-intercessor-like",
+                        default_wargear_ids=(extra_weapon.wargear_id,),
+                        allowed_wargear_ids=(extra_weapon.wargear_id,),
+                        min_selections=1,
+                        max_selections=1,
+                    ),
+                ),
+            )
+            if sheet.datasheet_id == "core-intercessor-like-infantry"
+            else sheet
+            for sheet in catalog.datasheets
+        ),
+    )
+
+
 def test_mixed_close_quarters_and_non_close_quarters_declarations_reject_before_pop() -> None:
-    catalog = _catalog_with_extra_bolt_profile(
+    catalog = _catalog_with_separate_bolt_weapon(
         replace(
             _weapon_profile_by_wargear(
                 wargear_id="core-bolt-rifle",
