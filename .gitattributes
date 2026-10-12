@@ -7,3 +7,5 @@ data/source_audits/order135/source-reconciliation.json -text
 data/source_audits/d09/selected-source.json -text
 # D10 retains the complete sealed selected source/acceptance bytes.
 data/source_audits/d10/selected-source-and-acceptance.json -text whitespace=cr-at-eol
+# D12 retains the complete sealed selected source/acceptance bytes.
+data/source_audits/d12/selected-source-and-acceptance.json -text whitespace=cr-at-eol

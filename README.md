@@ -1,3 +1,7 @@
+D12 restores legal attached CHARACTER model selection for Epic Challenge through
+the shared rules-unit validator, retaining physical keywords and model-owned
+Precision. See [source, scope and controls](docs/D12_EPIC_CHALLENGE_SCOPE.md).
+
 The separately approved movement-witness prerequisite rejects wrong physical model
 inventories before decision commit, preserving native legal retry and the existing
 recorded rule-invalid geometry contract. See [scope and acceptance](docs/MOVEMENT_WITNESS_MEMBERSHIP_SCOPE.md).

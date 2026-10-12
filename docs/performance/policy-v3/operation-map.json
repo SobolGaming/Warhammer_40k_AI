@@ -6127,6 +6127,54 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "d12-epic-model-membership-validation": {
+      "paths": [
+        "src/warhammer40k_core/engine/stratagems_geometry.py"
+      ],
+      "owners": [
+        "_epic_challenge_context_error"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d12-fight-history-split-ownership-validation": {
+      "paths": [
+        "src/warhammer40k_core/engine/fight_model_authority_history.py"
+      ],
+      "owners": [
+        "_historical_model_inventory"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d12-native-ownership-regressions": {
+      "paths": [
+        "tests/epic_challenge_helpers.py",
+        "tests/epic_challenge_split_helpers.py",
+        "tests/unit/test_phase12c_core_stratagems.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d12-retained-source-publication": {
+      "paths": [
+        "data/source_audits/d12/*",
+        "data/source_audits/d12/baseline/*",
+        "contracts/migrations/44.3.32-to-44.3.33.md"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

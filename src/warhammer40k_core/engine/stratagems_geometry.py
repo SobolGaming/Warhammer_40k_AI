@@ -257,13 +257,15 @@ def _epic_challenge_context_error(
     model_id = _epic_challenge_character_model_id_or_none(effect_selection)
     if model_id is None:
         return "missing_epic_challenge_character_model"
-    unit = _unit_by_id(state=state, unit_instance_id=target_unit_id)
-    if model_id not in unit.own_model_ids():
+    unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
+    if model_id not in {model.model_instance_id for model in unit.own_models}:
         return "epic_challenge_model_not_in_unit"
     if not _target_unit_has_keyword(
         state=state, target_binding=target_binding, keyword="CHARACTER"
     ):
         return "epic_challenge_unit_not_character"
+    if "CHARACTER" not in unit.model_by_id(model_id).keywords:
+        return "epic_challenge_model_not_character"
     if not _model_is_alive_and_placed(state=state, model_instance_id=model_id):
         return "epic_challenge_model_not_alive_and_placed"
     return None

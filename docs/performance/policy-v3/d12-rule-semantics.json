@@ -1,0 +1,36 @@
+{
+  "base": "35768d18d398ee1a40061e63d134cb63f8c2b086",
+  "changes": {
+    "src/warhammer40k_core/engine/fight_model_authority_history.py": {
+      "before_sha256": "b5c548580b003d9df56e943ed698166a2b0ddb516613e8b2f20d25be10ba5d1f",
+      "after_sha256": "3d6c8a7bed5175f5245480190c094751fbf2eaa1b74dfdfb153e2f0b1945337c",
+      "owners": {
+        "_historical_model_inventory": {
+          "before": "5a225195a78338b9c8c82fe1f3947ce12f34e46df6c40064de74eddd3821ecce",
+          "after": "af2497c6e8a1b7be97bb89a59b2abf2b8a7db4f01b1b08306c94802e73e263cc"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_geometry.py": {
+      "before_sha256": "61c574f5e29c8999a56f1702d5a00f5e232135de133b3c930b654c96794ee0e0",
+      "after_sha256": "9fed9a266621603085f8cbc3c002314d9966dfd899abd4b99513bf2609ccd9cc",
+      "owners": {
+        "_epic_challenge_context_error": {
+          "before": "8ffb358251968c616c13f569345fd49ab951f252a8b81893373b9383245986ea",
+          "after": "b5950b52faf03ea66b09391b0af5f5bd3035fbc270af0d96ae21b0baa7c32e3c"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/engine/fight_model_authority_history.py": [
+      "order135-grouped-combat-decoding"
+    ],
+    "src/warhammer40k_core/engine/stratagems_geometry.py": [
+      "order135-visibility-hot-consumers"
+    ]
+  },
+  "authority": "Bounded confirmed necessary D12 rules/persistence repair under the approved sequential remediation default: quiet serial current-runtime smoke and exact-base assessment. Detailed comparison remains mandatory for deliberate performance work or demonstrated serious regression. BOTH independent reviewers must assess this exact source classification; no original mapping, numeric ceiling, historical measurement, live work/cache check or gate is weakened.",
+  "source_obligation": "Complete15.03/02.05.01 select the physical CHARACTER of the chosen rules unit; complete01.02.06 and category19 govern physical ownership after native split. D12 explicitly requires split identity with genuine engine-generated persistence/replay/continuation. Base-native setup/split/Charge snapshot fails original historical ownership validation before Epic.",
+  "unchanged_work": "Epic's identity/model-keyword branch uses existing authoritative RulesUnitView without changing any visibility query, geometry or targeting algorithm. Only historical inventory's existing linear current-unit/frozen-component scan changes: exact physical model plus validated source component resolves its current successor. Existing decoding, history traversal, serializer fields, event/replay schema, search, caches and all unrelated ownership rejections remain unchanged. One small dictionary supports the required identity lookup; no intended optimization, altered measurement workload or serious measured regression. Original acceptance and regression bodies remain exact. Real both-player split save/fork/role/replay/continuation controls and all unchanged quiet smoke/live work checks remain required; no universal integrity or performance certification."
+}

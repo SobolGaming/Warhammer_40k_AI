@@ -1130,6 +1130,7 @@ def _historical_model_inventory(
     catalog_history: _CatalogHistory,
 ) -> tuple[dict[str, str], frozenset[str], frozenset[str]]:
     model_unit_by_id: dict[str, str] = {}
+    split_owner_by_source_model: dict[tuple[str, str], str] = {}
     current_model_ids: set[str] = set()
     for army in state.army_definitions:
         for unit in army.units:
@@ -1140,12 +1141,19 @@ def _historical_model_inventory(
                     model_unit_by_id=model_unit_by_id,
                 )
                 current_model_ids.add(model.model_instance_id)
+                if unit.split_origin is not None:
+                    split_owner_by_source_model[
+                        (model.model_instance_id, unit.source_unit_instance_id)
+                    ] = unit.unit_instance_id
     for record in state.starting_attached_unit_records:
         for component_id, model_ids in record.starting_model_instance_ids_by_component:
             for model_id in model_ids:
+                physical_owner_id = component_id
+                if (model_id, component_id) in split_owner_by_source_model:
+                    physical_owner_id = split_owner_by_source_model[(model_id, component_id)]
                 _record_model_unit(
                     model_id,
-                    component_id,
+                    physical_owner_id,
                     model_unit_by_id=model_unit_by_id,
                 )
     catalog_model_ids: set[str] = set()
