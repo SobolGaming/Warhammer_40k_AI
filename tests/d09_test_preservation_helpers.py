@@ -5,12 +5,15 @@ import hashlib
 import json
 from pathlib import Path
 
+from tests.d10_test_preservation_helpers import preserved_d10_predecessor_test_bytes
+
 ROOT = Path(__file__).resolve().parents[1]
 PRESERVATION_SHA256 = "a7d6949a94a38a31d0779bb065840b4ba3c4f344c4893debcbadc4076619f575"
 
 
 def preserved_d09_predecessor_test_bytes(path: str, current: bytes) -> bytes:
     """Pin complete current bytes and independently prove original AST preservation."""
+    current = preserved_d10_predecessor_test_bytes(path, current)
     manifest_raw = (ROOT / "data/source_audits/d09/test-preservation.json").read_bytes()
     assert hashlib.sha256(manifest_raw).hexdigest() == PRESERVATION_SHA256
     manifest = json.loads(manifest_raw)

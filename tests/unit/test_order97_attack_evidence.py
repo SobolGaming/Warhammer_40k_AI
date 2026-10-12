@@ -7,6 +7,15 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.d10_profile_helpers import (
+    advertised_weapons,
+    declaration_request,
+    finish_profile_attack,
+    profile_checkpoint,
+    profile_proposal,
+    profile_session,
+    submit_profile,
+)
 from tests.lethal_hits_helpers import attack_completed, lethal_session
 from tests.order97_gap_probes_04_06 import mixed_hazard_unit, weaponless_fight_session
 from tests.phase13b_shooting_declaration_helpers import (
@@ -32,7 +41,7 @@ from warhammer40k_core.engine.attack_sequence import (
 )
 from warhammer40k_core.engine.attack_sequence_selection import target_has_character_for_attack_group
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.hazard import (
     failed_hazard_roll_indices,
     hazard_mortal_wounds_per_failed_roll,
@@ -329,3 +338,156 @@ def test_selected_rules_unit_target_inventory_includes_every_weapon_pool(
     )
     assert targets == expected
     assert (len(targets) == 1) is (not split_targets)
+
+
+@pytest.mark.parametrize("player", ["player-a", "player-b"])
+@pytest.mark.parametrize("targetless", [False, True])
+@pytest.mark.parametrize("alternate", [False, True])
+def test_one_copy_cannot_select_two_profiles_and_exact_request_retries(
+    player: str, targetless: bool, alternate: bool
+) -> None:
+    session = profile_session()
+    request = declaration_request(session, player=player)
+    weapons = advertised_weapons(request)
+    copy_id = weapons[0]["weapon_instance_id"]
+    profiles = [weapon for weapon in weapons if weapon["weapon_instance_id"] == copy_id]
+    assert len(profiles) == 2
+    assert len({weapon["weapon_profile_id"] for weapon in profiles}) == 2
+    proposal = profile_proposal(request, profiles, targetless=targetless)
+    if targetless:
+        # The physical selection rule applies even when just one alternative
+        # selects a target; targetless selection still commits that weapon.
+        proposal = replace(
+            proposal,
+            declarations=(
+                proposal.declarations[0],
+                replace(
+                    proposal.declarations[1],
+                    target_unit_instance_id="army-beta:enemy"
+                    if player == "player-a"
+                    else "army-alpha:shooter",
+                ),
+            ),
+        )
+    before = session.to_persistence_payload()
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="d10-invalid-both-profiles",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID, status
+    body = cast(dict[str, JsonValue], status.payload)
+    validation = cast(dict[str, JsonValue], body["proposal_validation"])
+    violations = cast(list[dict[str, JsonValue]], validation["violations"])
+    assert violations[0]["violation_code"] == "duplicate_weapon_declaration"
+    assert session.lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert session.to_persistence_payload() == before
+    restored, fork = profile_checkpoint(session)
+    legal = profile_proposal(request, [profiles[int(alternate)]])
+    submit_profile(session, request, legal)
+    assert restored.to_persistence_payload() == fork.to_persistence_payload() == before
+    pools = finish_profile_attack(session)
+    for clone in (restored, fork):
+        submit_profile(clone, request, legal)
+        assert finish_profile_attack(clone) == pools
+        assert clone.to_persistence_payload() == session.to_persistence_payload()
+    assert len(pools) == 1
+    assert pools[0]["weapon_instance_id"] == copy_id
+    assert pools[0]["weapon_profile_id"] == profiles[int(alternate)]["weapon_profile_id"]
+    assert pools[0]["attacks"] == 1 + int(alternate)
+    profile_checkpoint(session)
+
+
+@pytest.mark.parametrize("kind", ["copies", "models", "attached", "firing_deck"])
+def test_independent_physical_weapons_can_choose_different_profiles(kind: str) -> None:
+    session = profile_session(
+        copies=2 if kind == "copies" else 1,
+        models=2 if kind in {"models", "firing_deck"} else 1,
+        attached=kind == "attached",
+        firing_deck=kind == "firing_deck",
+    )
+    request = declaration_request(session, firing_deck=kind == "firing_deck")
+    weapons = advertised_weapons(request)
+    if kind == "firing_deck":
+        weapons = [weapon for weapon in weapons if "firing_deck_source_model_instance_id" in weapon]
+    by_copy = {weapon["weapon_instance_id"]: weapon for weapon in weapons}
+    copy_ids = list(by_copy)
+    assert len(copy_ids) >= 2
+    if kind == "attached":
+        leader_id = next(
+            copy_id
+            for copy_id, weapon in by_copy.items()
+            if ":leader:" in weapon["model_instance_id"]
+        )
+        bodyguard_id = next(
+            copy_id
+            for copy_id, weapon in by_copy.items()
+            if ":shooter:" in weapon["model_instance_id"]
+        )
+        copy_ids = [bodyguard_id, leader_id]
+    selected = [
+        next(
+            weapon
+            for weapon in weapons
+            if weapon["weapon_instance_id"] == copy_id
+            and weapon["weapon_profile_id"].endswith(":d10-alternate") is bool(index)
+        )
+        for index, copy_id in enumerate(copy_ids[:2])
+    ]
+    assert selected[0]["weapon_instance_id"] != selected[1]["weapon_instance_id"]
+    if kind == "copies":
+        assert selected[0]["model_instance_id"] == selected[1]["model_instance_id"]
+    elif kind == "firing_deck":
+        assert selected[0]["model_instance_id"] == selected[1]["model_instance_id"]
+        first_source_model = selected[0].get("firing_deck_source_model_instance_id")
+        second_source_model = selected[1].get("firing_deck_source_model_instance_id")
+        assert first_source_model is not None
+        assert second_source_model is not None
+        assert first_source_model != second_source_model
+    else:
+        assert selected[0]["model_instance_id"] != selected[1]["model_instance_id"]
+    proposal = profile_proposal(request, selected)
+    restored, fork = profile_checkpoint(session)
+    submit_profile(session, request, proposal)
+    pools = finish_profile_attack(session)
+    assert [pool["weapon_instance_id"] for pool in pools] == [
+        weapon["weapon_instance_id"] for weapon in selected
+    ]
+    assert [pool["weapon_profile_id"] for pool in pools] == [
+        weapon["weapon_profile_id"] for weapon in selected
+    ]
+    assert [pool["attacks"] for pool in pools] == [1, 2]
+    for clone in (restored, fork):
+        submit_profile(clone, request, proposal)
+        assert finish_profile_attack(clone) == pools
+        assert clone.to_persistence_payload() == session.to_persistence_payload()
+    profile_checkpoint(session)
+
+
+def test_profile_selection_rejects_stale_wrong_player_and_unadvertised_copy_atomically() -> None:
+    session = profile_session()
+    request = declaration_request(session)
+    proposal = profile_proposal(request, [advertised_weapons(request)[0]])
+    invalid_proposals = (
+        replace(proposal, proposal_request_id="d10-stale-request"),
+        replace(proposal, player_id="player-b"),
+        replace(
+            proposal,
+            declarations=(
+                replace(proposal.declarations[0], weapon_instance_id="d10-unadvertised-copy"),
+            ),
+        ),
+    )
+    before = session.to_persistence_payload()
+    for invalid in invalid_proposals:
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="d10-invalid-context",
+            payload=validate_json_value(invalid.to_payload()),
+        )
+        assert status.status_kind is LifecycleStatusKind.INVALID, status
+        assert session.lifecycle.decision_controller.queue.pending_requests == (request,)
+        assert session.to_persistence_payload() == before
+    submit_profile(session, request, proposal)
+    assert len(finish_profile_attack(session)) == 1
+    profile_checkpoint(session)
