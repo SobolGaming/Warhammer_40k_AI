@@ -6154,7 +6154,7 @@
       "paths": [
         "tests/epic_challenge_helpers.py",
         "tests/epic_challenge_split_helpers.py",
-        "tests/unit/test_phase12c_core_stratagems.py"
+        "tests/unit/test_d12_epic_challenge.py"
       ],
       "owners": [
         "*"

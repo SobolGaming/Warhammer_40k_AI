@@ -1192,10 +1192,10 @@
         "src/warhammer40k_core/engine/attack_weapon_inventory.py:melee_weapon_selection_context"
       ],
       "current_test_nodes": [
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_native_epic_attached_leader",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_native_split_epic_keeps_physical_model_ownership"
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_epic_attached_leader",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_split_epic_keeps_physical_model_ownership"
       ],
       "disposition": "D12 logical selected rules-unit membership and physical CHARACTER keyword repair; original source and acceptance retained. Native runtime pass is not inferred from static inventory.",
       "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
@@ -1206,10 +1206,10 @@
         "src/warhammer40k_core/engine/attack_weapon_inventory.py:melee_weapon_selection_context"
       ],
       "current_test_nodes": [
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_native_epic_attached_leader",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_native_split_epic_keeps_physical_model_ownership"
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_epic_attached_leader",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_split_epic_keeps_physical_model_ownership"
       ],
       "disposition": "D12 logical selected rules-unit membership and physical CHARACTER keyword repair; original source and acceptance retained. Native runtime pass is not inferred from static inventory.",
       "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
@@ -1220,10 +1220,10 @@
         "src/warhammer40k_core/engine/attack_weapon_inventory.py:melee_weapon_selection_context"
       ],
       "current_test_nodes": [
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_native_epic_attached_leader",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_native_split_epic_keeps_physical_model_ownership"
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_epic_attached_leader",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_split_epic_keeps_physical_model_ownership"
       ],
       "disposition": "D12 logical selected rules-unit membership and physical CHARACTER keyword repair; original source and acceptance retained. Native runtime pass is not inferred from static inventory.",
       "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
@@ -1234,10 +1234,10 @@
         "src/warhammer40k_core/engine/attack_weapon_inventory.py:melee_weapon_selection_context"
       ],
       "current_test_nodes": [
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_native_epic_attached_leader",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
-        "tests/unit/test_phase12c_core_stratagems.py::test_d12_native_split_epic_keeps_physical_model_ownership"
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_epic_attached_leader",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_epic_invalid_model_choice_is_atomic_and_exact_request_retries",
+        "tests/unit/test_d12_epic_challenge.py::test_d12_native_split_epic_keeps_physical_model_ownership"
       ],
       "disposition": "D12 logical selected rules-unit membership and physical CHARACTER keyword repair; original source and acceptance retained. Native runtime pass is not inferred from static inventory.",
       "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"

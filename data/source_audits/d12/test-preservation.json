@@ -1,9 +1,9 @@
 {
-  "schema": "d12-all-original-branches-assertions-decorators-exact-v1",
+  "schema": "d12-original-bytes-and-extracted-regression-AST-exact-v2",
   "base": "35768d18d398ee1a40061e63d134cb63f8c2b086",
   "path": "tests/unit/test_phase12c_core_stratagems.py",
   "before_sha256": "9625abdb3320e6f6698cc9a743ad418ca57d438c34be979e95df3d0b06a82369",
-  "after_sha256": "882b83d9ecc992f542e52aefc94afa6ac95b8ef4f7d9ce2cc707af6da3f853d9",
+  "after_sha256": "9625abdb3320e6f6698cc9a743ad418ca57d438c34be979e95df3d0b06a82369",
   "every_original_nonimport_module_statement_AST_exact": true,
   "every_original_fixture_function_assertion_decorator_branch_ceiling_exact": true,
   "original_assertions": 588,
@@ -20,5 +20,11 @@
   ],
   "maintained_original_fixtures": [],
   "runtime_compatibility_shim": false,
-  "reason": "Append D12 same-responsibility native Stratagem controls. Retain every original statement/body/assertion/decorator/branch; one declared helper import is added. New failed D12 fixture/control attempts remain in durable state with no passing/gate/profile credit."
+  "historical_guard_or_provenance_helper_changed": false,
+  "introduced_regression_archive": "data/source_audits/d12/baseline/tests/d12_regressions_before_extraction.py.txt",
+  "introduced_regression_archive_sha256": "8af82b7a1b719d3bd74177222a616648db2eee53dbe6c9203d77a3085c13029e",
+  "new_module": "tests/unit/test_d12_epic_challenge.py",
+  "new_module_sha256": "85ac9e44ee2c1ce449a6f8a0b4335da21663c0d075dca984b5d177c36d879314",
+  "every_introduced_function_AST_assertion_branch_decorator_exact": true,
+  "reason": "Parent-preferred dedicated D12 module preserves exact eight introduced regression ASTs and all34 parameterized cases. Original pinned Stratagem bytes, historical guards and all D07/D09/D10 provenance helpers/archives/pins unchanged. Proposed bridge abandoned and retained. New module timings await complete passing current cohort; no invented or renamed profile."
 }

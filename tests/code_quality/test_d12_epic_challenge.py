@@ -48,34 +48,31 @@ def test_d12_all_original_test_branches_assertions_and_decorators_remain_exact()
     assert hashlib.sha256(original_data).hexdigest() == (
         "9625abdb3320e6f6698cc9a743ad418ca57d438c34be979e95df3d0b06a82369"
     )
+    assert (ROOT / TEST_PATH).read_bytes() == original_data
     original = ast.parse(original_data)
-    current = ast.parse((ROOT / TEST_PATH).read_bytes())
-    added = [
-        node
-        for node in current.body
-        if isinstance(node, ast.FunctionDef) and node.name.startswith("test_d12_")
-    ]
-    assert added
-    imports = (ast.Import, ast.ImportFrom)
-    original_body = [ast.dump(node) for node in original.body if not isinstance(node, imports)]
-    retained_body = [
-        ast.dump(node)
-        for node in current.body
-        if not isinstance(node, imports) and node not in added
-    ]
-    assert retained_body == original_body
-    original_imports = {ast.dump(node) for node in original.body if isinstance(node, imports)}
-    current_imports = {ast.dump(node) for node in current.body if isinstance(node, imports)}
-    assert original_imports <= current_imports
-    assert len(current_imports - original_imports) == 1
+    assert sum(isinstance(node, ast.Assert) for node in ast.walk(original)) == 588
     assert (
-        next(
-            node.module
-            for node in current.body
-            if isinstance(node, ast.ImportFrom) and ast.dump(node) not in original_imports
+        sum(
+            len(node.decorator_list)
+            for node in ast.walk(original)
+            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef)
         )
-        == "tests.epic_challenge_helpers"
+        == 25
     )
+    introduced = (AUDIT / "baseline/tests/d12_regressions_before_extraction.py.txt").read_bytes()
+    assert hashlib.sha256(introduced).hexdigest() == (
+        "8af82b7a1b719d3bd74177222a616648db2eee53dbe6c9203d77a3085c13029e"
+    )
+    added = ast.parse(introduced).body
+    assert len(added) == 8
+    assert all(isinstance(node, ast.FunctionDef) for node in added)
+    current = ast.parse((ROOT / "tests/unit/test_d12_epic_challenge.py").read_bytes())
+    actual = [node for node in current.body if isinstance(node, ast.FunctionDef)]
+    assert [ast.dump(node) for node in actual] == [ast.dump(node) for node in added]
+    preservation = json.loads((AUDIT / "test-preservation.json").read_bytes())
+    assert preservation["before_sha256"] == preservation["after_sha256"]
+    assert preservation["runtime_compatibility_shim"] is False
+    assert preservation["historical_guard_or_provenance_helper_changed"] is False
 
 
 def test_d12_performance_rule_scope_requires_exact_base_category_and_owner_bytes() -> None:

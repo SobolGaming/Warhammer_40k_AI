@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "35768d18d398ee1a40061e63d134cb63f8c2b086",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aff17af1ce067048b8fc1a396b2287ad19c8b30609a6eceae47e6b4ea8a07f87",
-  "operation_map_sha256": "e55cbbe8266e29d12a4a5c8dc22681a816bae6db2682b7685d6f24bb97f0868c",
+  "operation_map_sha256": "638eef2af2607b0eb4ecf42ec33e96f703c3b82c3cd859f5707930e718f74f7e",
   "changes": {
     ".gitattributes": {
       "before_sha256": "5d9281cfae84ddc5d61053886e5f9e6a5ff803bc6753d863cae96530fcf96d17",
@@ -21,6 +21,136 @@
         "@document": {
           "before": "08cf4ea674e8bc320348767014e893551385d1d05a5ce112602e245c334b0315",
           "after": "28043dc5ad6a1a83f18a75b119af1fe8ff639f75b25259c81a5640457608fc32"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "35a7dd0e57c0e0a2c812b71701d4037abca2ba7b768c792730e788f73de2a204",
+      "after_sha256": "80a1280564fe2e47ee9dcf1fb1f05b010a13d4f911e46e241df7ec4c3672aa0e",
+      "owners": {
+        "@document": {
+          "before": "35a7dd0e57c0e0a2c812b71701d4037abca2ba7b768c792730e788f73de2a204",
+          "after": "80a1280564fe2e47ee9dcf1fb1f05b010a13d4f911e46e241df7ec4c3672aa0e"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "1333efb881dca4f9604eebd0333b66d35ee75a77ea1d4ace34288a39fae0682d",
+      "after_sha256": "080fb7befb5334b9e9682105fb7b08595eb95cae1d3dd21da11892ccf3f6a861",
+      "owners": {
+        "@document": {
+          "before": "1333efb881dca4f9604eebd0333b66d35ee75a77ea1d4ace34288a39fae0682d",
+          "after": "080fb7befb5334b9e9682105fb7b08595eb95cae1d3dd21da11892ccf3f6a861"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "a5ee1b713ba6ffb6ce9e938d51a2289306da27b6d68443cbd97585e81bebeeb2",
+      "after_sha256": "8667dafd1e0e2f803cb0a6cb391d1c4e5dd365639ffc22abfcec6898be43a62f",
+      "owners": {
+        "@document": {
+          "before": "a5ee1b713ba6ffb6ce9e938d51a2289306da27b6d68443cbd97585e81bebeeb2",
+          "after": "8667dafd1e0e2f803cb0a6cb391d1c4e5dd365639ffc22abfcec6898be43a62f"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "bc313b0d2ca717525cfbf7b7d70f0456bad7b951c9b06a6877953e29242ec888",
+      "after_sha256": "1cdc5e1942b3f87c607f548583480aef0f4caeaa37c4aef16349f086c4a82460",
+      "owners": {
+        "@document": {
+          "before": "bc313b0d2ca717525cfbf7b7d70f0456bad7b951c9b06a6877953e29242ec888",
+          "after": "1cdc5e1942b3f87c607f548583480aef0f4caeaa37c4aef16349f086c4a82460"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "f6d26a230c834a721c60916c54fcc12a8ee8f54946e7b80f2461dd61acb60546",
+      "after_sha256": "d97f55a2ed4b96981ff3eb37f05feec18b6e3358898a832da48f147b74a901d2",
+      "owners": {
+        "@document": {
+          "before": "f6d26a230c834a721c60916c54fcc12a8ee8f54946e7b80f2461dd61acb60546",
+          "after": "d97f55a2ed4b96981ff3eb37f05feec18b6e3358898a832da48f147b74a901d2"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "77a32685228b7e0d70fe53cd45c839b24658e3bf825f9fd1463dab00315a8a62",
+      "after_sha256": "d6c4a665e52a27ec3df58c1ece9782d67acda2f2116d4fde51a97cee2be9a373",
+      "owners": {
+        "@document": {
+          "before": "77a32685228b7e0d70fe53cd45c839b24658e3bf825f9fd1463dab00315a8a62",
+          "after": "d6c4a665e52a27ec3df58c1ece9782d67acda2f2116d4fde51a97cee2be9a373"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "6563972114290261829576c10e58fd4d838d39d025673a4c431965d41a19dc5d",
+      "after_sha256": "8fce59a42f57a505eb308d415ec038665a5683d2aab702e930f9a79178fc8a08",
+      "owners": {
+        "@document": {
+          "before": "6563972114290261829576c10e58fd4d838d39d025673a4c431965d41a19dc5d",
+          "after": "8fce59a42f57a505eb308d415ec038665a5683d2aab702e930f9a79178fc8a08"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "45544c598b387ad80f1e4bcea3ceac382f31fe19657c23f5cbeea376963f308e",
+      "after_sha256": "c3f512109397ec45a221a27571fd6942600ca8c3531778989ea75bb8f38f2f01",
+      "owners": {
+        "@document": {
+          "before": "45544c598b387ad80f1e4bcea3ceac382f31fe19657c23f5cbeea376963f308e",
+          "after": "c3f512109397ec45a221a27571fd6942600ca8c3531778989ea75bb8f38f2f01"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "f4ec58d73521fac1621899f50e2156d8ad301777bbab1d3bdcdb10070c107461",
+      "after_sha256": "94e23aa03818140060c145ff02fe61d7b929fea434d9132d68e7828da9b98383",
+      "owners": {
+        "@document": {
+          "before": "f4ec58d73521fac1621899f50e2156d8ad301777bbab1d3bdcdb10070c107461",
+          "after": "94e23aa03818140060c145ff02fe61d7b929fea434d9132d68e7828da9b98383"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "872225902ed46ade47899e45c809468a136530e4d41749630aafdd70a5f1540e",
+      "after_sha256": "6075815c11a477f808ac1c659fd064f8e72d77b7323c53798251f8f4f6085b33",
+      "owners": {
+        "@document": {
+          "before": "872225902ed46ade47899e45c809468a136530e4d41749630aafdd70a5f1540e",
+          "after": "6075815c11a477f808ac1c659fd064f8e72d77b7323c53798251f8f4f6085b33"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "35993b59110405a95fd8e24867fbb8bc9e616acf52d2467936c63634b6b257f3",
+      "after_sha256": "93e28ea29e128046d4df66322ba30b8a4d040a28035a6bf197bd1451aebd1d1f",
+      "owners": {
+        "@document": {
+          "before": "35993b59110405a95fd8e24867fbb8bc9e616acf52d2467936c63634b6b257f3",
+          "after": "93e28ea29e128046d4df66322ba30b8a4d040a28035a6bf197bd1451aebd1d1f"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "38254d5a181a088162116b72f0a4cc65bb49b76e8b69058bf799e5d67de71431",
+      "after_sha256": "971b146594fe0a9a733b68767595751cd8c3d22d465bf5c8b64b3a8e4e4a86ed",
+      "owners": {
+        "@document": {
+          "before": "38254d5a181a088162116b72f0a4cc65bb49b76e8b69058bf799e5d67de71431",
+          "after": "971b146594fe0a9a733b68767595751cd8c3d22d465bf5c8b64b3a8e4e4a86ed"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "33ea5fdbc9238d643ab03bd56c9cb3717ca9b4a2b18356340e22d5772129f862",
+      "after_sha256": "585552341ed9dd1862a58d30499ddc613dc54347a120607af362214061d8a31b",
+      "owners": {
+        "@document": {
+          "before": "33ea5fdbc9238d643ab03bd56c9cb3717ca9b4a2b18356340e22d5772129f862",
+          "after": "585552341ed9dd1862a58d30499ddc613dc54347a120607af362214061d8a31b"
         }
       }
     },
@@ -134,6 +264,16 @@
         }
       }
     },
+    "data/source_audits/d12/baseline/tests/d12_regressions_before_extraction.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "8af82b7a1b719d3bd74177222a616648db2eee53dbe6c9203d77a3085c13029e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8af82b7a1b719d3bd74177222a616648db2eee53dbe6c9203d77a3085c13029e"
+        }
+      }
+    },
     "data/source_audits/d12/baseline/tests/unit/test_phase12c_core_stratagems.py.txt": {
       "before_sha256": null,
       "after_sha256": "9625abdb3320e6f6698cc9a743ad418ca57d438c34be979e95df3d0b06a82369",
@@ -166,31 +306,31 @@
     },
     "data/source_audits/d12/test-preservation.json": {
       "before_sha256": null,
-      "after_sha256": "d98e0ef3500100441a8d31137be02633bbfcf1e2fbd5848e687cb14f35b4dead",
+      "after_sha256": "119a5eabc2f9cc5100fb4ff48348dff4c8dbaec8604da62687eef69e738b4466",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d98e0ef3500100441a8d31137be02633bbfcf1e2fbd5848e687cb14f35b4dead"
+          "after": "119a5eabc2f9cc5100fb4ff48348dff4c8dbaec8604da62687eef69e738b4466"
         }
       }
     },
     "data/source_audits/order135/current-bindings.json": {
       "before_sha256": "476c1f60543a408de873471fc1c6a8b7513d271b86ae218a1f3f83f19639acbf",
-      "after_sha256": "ade1acfd4cd481ea2786037827871cad9bfae594b36e3ffded1a7fa30ecb2773",
+      "after_sha256": "faec68ab9cf422a0df8d742d621c6a39d05ab7283356fd944db844d04b5a6b1d",
       "owners": {
         "@document": {
           "before": "476c1f60543a408de873471fc1c6a8b7513d271b86ae218a1f3f83f19639acbf",
-          "after": "ade1acfd4cd481ea2786037827871cad9bfae594b36e3ffded1a7fa30ecb2773"
+          "after": "faec68ab9cf422a0df8d742d621c6a39d05ab7283356fd944db844d04b5a6b1d"
         }
       }
     },
     "data/source_audits/order135/current-inventory.json": {
       "before_sha256": "0552199f0fcb9e88c000cf2575f3dff3750709237e540f94d4ad1c0ef14d6ac2",
-      "after_sha256": "259cbc00207892db86cdaadb8565cce1600f65b31937a38af55774ba4ef26a0c",
+      "after_sha256": "6e9deb6eefce75862507ead39f0c88c079dfc301d4131bbaff9cd5d9cca4ec37",
       "owners": {
         "@document": {
           "before": "0552199f0fcb9e88c000cf2575f3dff3750709237e540f94d4ad1c0ef14d6ac2",
-          "after": "259cbc00207892db86cdaadb8565cce1600f65b31937a38af55774ba4ef26a0c"
+          "after": "6e9deb6eefce75862507ead39f0c88c079dfc301d4131bbaff9cd5d9cca4ec37"
         }
       }
     },
@@ -216,11 +356,11 @@
     },
     "docs/D12_EPIC_CHALLENGE_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "18bdf12e6c5df3f62d7c22c3ca1af906e02e4818bc04bd43cad2be0db5087f57",
+      "after_sha256": "b47e7db47e077a10e319f3a95f7ad874457a7b9985ae448ea7fec3b9d0a36394",
       "owners": {
         "@document": {
           "before": null,
-          "after": "18bdf12e6c5df3f62d7c22c3ca1af906e02e4818bc04bd43cad2be0db5087f57"
+          "after": "b47e7db47e077a10e319f3a95f7ad874457a7b9985ae448ea7fec3b9d0a36394"
         }
       }
     },
@@ -236,11 +376,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "f8feb624156fecd1a32383f84386045d8631e9eb489367ce977c06430d7d6f7c",
-      "after_sha256": "7a2e7bfc21d63f8650e430b3f3a31cb8835607e274753c52c5f136d171d064b4",
+      "after_sha256": "369ef072922b591623723b3d5f6d31d195c9b52d3b70eb8b3c7f2be760a630ce",
       "owners": {
         "@document": {
           "before": "f8feb624156fecd1a32383f84386045d8631e9eb489367ce977c06430d7d6f7c",
-          "after": "7a2e7bfc21d63f8650e430b3f3a31cb8835607e274753c52c5f136d171d064b4"
+          "after": "369ef072922b591623723b3d5f6d31d195c9b52d3b70eb8b3c7f2be760a630ce"
         }
       }
     },
@@ -286,7 +426,7 @@
     },
     "tests/code_quality/test_d12_epic_challenge.py": {
       "before_sha256": null,
-      "after_sha256": "d7759f772edb40298404c02b60fcdab332a6be9fadb926d15ed42c6ffbbba51b",
+      "after_sha256": "c2488e49de87490760dcd103162b6eba20fbedb824e804d1ec5a43c4cc371b7d",
       "owners": {
         "@module": {
           "before": null,
@@ -294,7 +434,7 @@
         },
         "test_d12_all_original_test_branches_assertions_and_decorators_remain_exact": {
           "before": null,
-          "after": "efe06b7e01ba9e960ba568bcf020e8fb9443df2086bc4b696b3fdcb14b2c5a5a"
+          "after": "15c9260786396a0fb09b3b035e9958562c85d1eba912de68bf8957f5e8cd39db"
         },
         "test_d12_performance_rule_scope_requires_exact_base_category_and_owner_bytes": {
           "before": null,
@@ -362,13 +502,13 @@
         }
       }
     },
-    "tests/unit/test_phase12c_core_stratagems.py": {
-      "before_sha256": "9625abdb3320e6f6698cc9a743ad418ca57d438c34be979e95df3d0b06a82369",
-      "after_sha256": "882b83d9ecc992f542e52aefc94afa6ac95b8ef4f7d9ce2cc707af6da3f853d9",
+    "tests/unit/test_d12_epic_challenge.py": {
+      "before_sha256": null,
+      "after_sha256": "85ac9e44ee2c1ce449a6f8a0b4335da21663c0d075dca984b5d177c36d879314",
       "owners": {
         "@module": {
-          "before": "120e32306db17a445c6d0f7c73e73205de33164eef612748105f1e0f94019448",
-          "after": "3decd7a272525754ea42ef11e1687234690c7100315e2ad99e4e9ac8889c8367"
+          "before": null,
+          "after": "6c28fb3ec7f6f615d322fae6e5935e2fefde46e318a4d58e11d3a60851562aca"
         },
         "test_d12_epic_character_survives_bodyguard_component_loss": {
           "before": null,
@@ -437,6 +577,136 @@
     "README.md": {
       "category": "governance",
       "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
       "selected_families": [],
       "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
       "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
@@ -546,6 +816,16 @@
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
+      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
+    },
+    "data/source_audits/d12/baseline/tests/d12_regressions_before_extraction.py.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "d12-retained-source-publication"
       ],
       "selected_families": [],
       "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change.",
@@ -722,7 +1002,7 @@
       "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact.",
       "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification."
     },
-    "tests/unit/test_phase12c_core_stratagems.py": {
+    "tests/unit/test_d12_epic_challenge.py": {
       "category": "rule_semantics",
       "operations": [
         "d12-native-ownership-regressions"

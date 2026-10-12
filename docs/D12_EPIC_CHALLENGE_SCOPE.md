@@ -76,9 +76,10 @@ produces the destroyed Leader/living Support control. Twin-linked is declared
 before the consumer scene to pause native attack resolution for actual pool
 inspection. These finite Core fixtures do not
 certify a faction granting provider or full-game performance. The complete
-original test file is retained; the quality audit requires every original
-non-import module statement, fixture/test AST, assertion, branch and decorator
-to remain exact, with only declared D12 additions.
+original test file is restored byte for byte; the quality audit verifies its
+complete original bytes, all 588 assertions and 25 decorators. The dedicated
+new D12 module retains the exact AST of all eight introduced test functions,
+including every positive/negative branch, assertion and parameter decorator.
 
 All failed new-fixture and control attempts remain in durable state. Fixed
 melee acceptance events omit pool detail; the consumer test reads the actual
@@ -89,7 +90,8 @@ is retained without passing credit. Hand-routed pre-existing casualties were
 replaced by real public setup/attack history, preserving the intended full
 persistence/replay expectations. No original assertion or fixture is changed.
 
-The behavioral file inventory remains unchanged. Only the complete passing
+The dedicated D12 module adds one behavioral file. Its inventory requires a
+fresh complete passing current JUnit profile before final shard publication. Only the complete passing
 current covered cohort may supply final twelve-shard durations. Delivery still
 requires both independent exact-head reviews, full local source/type/contract/
 wheel/client/inventory gates, quiet serial current-runtime smoke, complete
@@ -116,3 +118,39 @@ historical measurements, ceilings and live semantic/work/cache gates remain
 unchanged; deliberate performance work or a demonstrated serious regression
 still requires detailed comparison. No benchmark result is inferred from the
 record.
+
+The first complete quality run had 1,074 passes and one D07 historical whole-file
+preservation failure from appending D12 tests to the pinned Stratagem module.
+Following the parent recommendation and independent coding review, all eight
+new D12 test functions move into `tests/unit/test_d12_epic_challenge.py` with
+their entire AST, assertions, branches and decorators unchanged. The original
+Stratagem file returns to its exact original SHA256. The historical D07/D09/D10
+checks, provenance helpers, pins and archives remain unchanged. The proposed
+strict bridge was abandoned and retained in durable state with its raw attempts;
+no bridge is delivered. The failed complete receipt receives no passing or
+timing credit. The parent-authorized isolated extracted module passed all 34
+cases once in 427.11 seconds on Windows with locked Python 3.14.5 and four
+workers. Its 102 native phases join to the raw JUnit durations; the file measured
+1,536.164 seconds. Eleven recorded native processes closed before raw evidence
+was copied and inspected. This bootstrap is not a covered complete cohort or
+final timing evidence and must not be repeated without a new necessary reason.
+
+The parent explicitly approved ONE temporary provisional composition to register
+the new module before exact-source validation: authentic historical duration and
+JUnit records for the 342 byte-identical original test files plus the actual
+isolated new measurement, with separately qualified profile records. This is a
+sequencing exception to the complete-profile expectation. The standard complete
+JUnit generator, every checker/assertion/budget/coverage gate and the original
+README requirement remain unchanged. No zero, forged complete run, relabeled
+JUnit or archived-byte guard substitution is introduced. The provisional profile
+does not satisfy the final complete-current-inventory timing requirement.
+
+Before publication, the successful complete current covered cohort must supply
+every final duration and all profile records; both SAME independent reviewers
+must prove that replacement. The required prerequisites, fresh BOTH-idle quiet
+smoke, complete quality and original 16 polygon branch cases alone still precede
+explicit parent RELEASE for the ONE 32-worker covered remainder and bounded
+reviewer probes. The full packet retains the exact parent authorization, original
+README rule verbatim, bootstrap command/input/JUnit/phase/closure proof, failed
+quality receipt and abandoned bridge. No final gate or original assertion is
+waived. Both complete gates remain mandatory.
