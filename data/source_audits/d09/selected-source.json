@@ -1,0 +1,1811 @@
+{
+  "authority": {
+    "schema": "order135-retained-current-source-v1",
+    "source_authority": "Game Datamissions maintained mirror, non-affiliated; existing accepted hostname; live-body actual timestamp, not asserted App-data963",
+    "observed_at": "2026-10-01T12:04:31.127429+00:00",
+    "qualification": "Retained timestamped maintained-mirror body; no independent Games Workshop publication or App export certification; no new provider observation.",
+    "current_capture_fingerprint": "9b9eabedb5245b31403a3d321cba7923938516ed8a999666165e3795ca5b9564"
+  },
+  "complete_selected_rows": [
+    {
+      "blocks": [
+        {
+          "kind": "text",
+          "ordinal": 1,
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "kind": "text",
+          "ordinal": 2,
+          "sha256": "73dd5e336ab412220a434b599e7e9e6949c0d98f34adc3c4d5aaaaa782dffa50",
+          "value": "Any unit."
+        },
+        {
+          "kind": "text",
+          "ordinal": 3,
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "kind": "text",
+          "ordinal": 4,
+          "sha256": "b2a60b57e1d989929d547eb5aaad88ebf2ad55b7381a355440f07385c090d3b9",
+          "value": "No models are moved (either in straight lines or rotated). Units that \u0005remain stationary\u0006 do \u0001not\u0002 trigger any rules that are triggered when a unit starts or ends a move."
+        },
+        {
+          "kind": "text",
+          "ordinal": 5,
+          "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4",
+          "value": "\u000eMaximum Distance"
+        },
+        {
+          "kind": "text",
+          "ordinal": 6,
+          "sha256": "3e2e37b820aa71e7eb6860cedd29598f868ad9f5073c7ad641be68fffd2a8537",
+          "value": "'-'"
+        }
+      ],
+      "category": "09",
+      "historical_source_row_sha256": "0c6fa0d3fc9166205752e4304ce874cb0afddd097fd3f368eeee49b6a7a09cb5",
+      "locator": "09.04",
+      "occurrence": 1,
+      "review_category": "09",
+      "row_id": "rule:09:09.04:1",
+      "selected_provider": "Game Datamissions",
+      "source_sha256": "2435148733854be607224bcecc897d01bd5f7d5377e56cce2db30e618db8c85a",
+      "title": "Remain Stationary"
+    },
+    {
+      "blocks": [
+        {
+          "kind": "text",
+          "ordinal": 1,
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "kind": "text",
+          "ordinal": 2,
+          "sha256": "51c8711cdf10b02197b143fc1b78f0d6383d79a4be75a8dd5a464a95d138a1b8",
+          "value": "Your unit is on the battlefield and \u0005unengaged\u0006."
+        },
+        {
+          "kind": "text",
+          "ordinal": 3,
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "kind": "text",
+          "ordinal": 4,
+          "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab",
+          "value": "Your unit moves as described in Moving (03)."
+        },
+        {
+          "kind": "text",
+          "ordinal": 5,
+          "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+          "value": "\u000eAfter Moving"
+        },
+        {
+          "kind": "text",
+          "ordinal": 6,
+          "sha256": "b71e9142bcd52ebb6b57bfcb4221093d3fcd1dd418f217d18565d9de583c236d",
+          "value": "Your unit must be \u0005unengaged\u0006."
+        },
+        {
+          "kind": "text",
+          "ordinal": 7,
+          "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4",
+          "value": "\u000eMaximum Distance"
+        },
+        {
+          "kind": "text",
+          "ordinal": 8,
+          "sha256": "275c4cb105da303b08d54b28d2f1ac19f037f195e5e5426f9bf646c66fb34699",
+          "value": "Your unit\u2019s \u0005M\u0006 characteristic."
+        }
+      ],
+      "category": "09",
+      "historical_source_row_sha256": "9be8d8798082cd9b001b6c9d6d91384a3ed8122f938334c402eb983ce314724d",
+      "locator": "09.05",
+      "occurrence": 1,
+      "review_category": "09",
+      "row_id": "rule:09:09.05:1",
+      "selected_provider": "Game Datamissions",
+      "source_sha256": "4b58b251b966abd83d1fba30f20eeccdca03536d70714bd39c55f34a14ca15d7",
+      "title": "Normal Move"
+    },
+    {
+      "blocks": [
+        {
+          "kind": "text",
+          "ordinal": 1,
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "kind": "text",
+          "ordinal": 2,
+          "sha256": "51c8711cdf10b02197b143fc1b78f0d6383d79a4be75a8dd5a464a95d138a1b8",
+          "value": "Your unit is on the battlefield and \u0005unengaged\u0006."
+        },
+        {
+          "kind": "text",
+          "ordinal": 3,
+          "sha256": "71b6143d5f310205f6d72379853a67a7f27f18983ba7f07ef42b7255d7fca1ee",
+          "value": "\u000eBefore Moving"
+        },
+        {
+          "kind": "text",
+          "ordinal": 4,
+          "sha256": "a63907a6feccf00dd8db11829c1405d9359defce68726ec69b0160eab6847289",
+          "value": "Make an \u0005advance roll\u0006 by rolling one D6."
+        },
+        {
+          "kind": "text",
+          "ordinal": 5,
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "kind": "text",
+          "ordinal": 6,
+          "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab",
+          "value": "Your unit moves as described in Moving (03)."
+        },
+        {
+          "kind": "text",
+          "ordinal": 7,
+          "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+          "value": "\u000eAfter Moving"
+        },
+        {
+          "kind": "text",
+          "ordinal": 8,
+          "sha256": "7ea44889c11182e5c1b5faa26f13f400d8ae6f5ea372a9efca05e54701bb363a",
+          "value": "\u2022 Your unit must be \u0005unengaged\u0006."
+        },
+        {
+          "kind": "text",
+          "ordinal": 9,
+          "sha256": "5bfe1020a7dcb4edcf0922df26cee7fec567379f3156d32da4235e481336b672",
+          "value": "\u2022 Until the end of the turn, unless otherwise stated, your unit is \u0001not\u0002 \u0005eligible to declare a charge\u0006 or \u0005start an action\u0006."
+        },
+        {
+          "kind": "text",
+          "ordinal": 10,
+          "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4",
+          "value": "\u000eMaximum Distance"
+        },
+        {
+          "kind": "text",
+          "ordinal": 11,
+          "sha256": "57fd50e215e6570855d0062b08033907d6482aa19f45219298d0e93fa1c765de",
+          "value": "Advance roll + your unit\u2019s \u0005M\u0006 characteristic."
+        }
+      ],
+      "category": "09",
+      "historical_source_row_sha256": "0ceabc78f151f447b5e024a64a8e7d4d7c1be7ed0b09b6590ea88a243cde1137",
+      "locator": "09.06",
+      "occurrence": 1,
+      "review_category": "09",
+      "row_id": "rule:09:09.06:1",
+      "selected_provider": "Game Datamissions",
+      "source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7",
+      "title": "Advance Move"
+    },
+    {
+      "blocks": [
+        {
+          "kind": "text",
+          "ordinal": 1,
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "kind": "text",
+          "ordinal": 2,
+          "sha256": "327e2c8b2bfbdfb34feb6f2233d9d06b559fadf8d15c96ff3147b8bd0adfa7f7",
+          "value": "\u0001All\u0002 of the following apply to your unit:"
+        },
+        {
+          "kind": "text",
+          "ordinal": 3,
+          "sha256": "b6c30f6a22a4b359912fd0741a0bfde345ec3329ac395d8594c05abe496d1c67",
+          "value": "\u2022 \u0005Unengaged\u0006 and made an \u0005advance move\u0006 this turn."
+        },
+        {
+          "kind": "text",
+          "ordinal": 4,
+          "sha256": "48446e6d5c3583e99a7232f1873eda96a87d4651ed336a42f91bbcf294b2a3ca",
+          "value": "\u2022 Has one or more \u0005[ASSAULT]\u0006 weapons."
+        },
+        {
+          "kind": "text",
+          "ordinal": 5,
+          "sha256": "437caf5f75cd706929968d1f7b450c536c3ca2dfeec0133957ccdf6fd1c10612",
+          "value": "\u000eWhile Shooting"
+        },
+        {
+          "kind": "text",
+          "ordinal": 6,
+          "sha256": "040c388972ba17502bd331f109a390471d18ce131477448acef2ee9534e829f5",
+          "value": "You can only select \u0005[ASSAULT]\u0006 weapons to make attacks with."
+        },
+        {
+          "kind": "text",
+          "ordinal": 7,
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "kind": "text",
+          "ordinal": 8,
+          "sha256": "38b41a7c109a1b8284d8e745e38e4126a9e29d9623214f11f1fb6e4a5e9abeb0",
+          "value": "Your unit shoots as described in Making Attacks (04)."
+        },
+        {
+          "kind": "text",
+          "ordinal": 9,
+          "sha256": "3b0a419e0638b6172804599e28804af4b97411ddb84b2d8841739bdcf771bef4",
+          "value": "\u000eAfter Shooting"
+        },
+        {
+          "kind": "text",
+          "ordinal": 10,
+          "sha256": "f4667158419ad2a3efc7c444c5c7d03bd092647ae1acda8c7500d39fcc92ad78",
+          "value": "Until the end of the phase, your unit is \u0001not\u0002 \u0005eligible to start an action\u0006."
+        }
+      ],
+      "category": "10",
+      "historical_source_row_sha256": "3fe5f229576cbe2babc669445215572c588472ecb088fb44bd97f6f9be7b4b75",
+      "locator": "10.05",
+      "occurrence": 1,
+      "review_category": "10",
+      "row_id": "rule:10:10.05:1",
+      "selected_provider": "Game Datamissions",
+      "source_sha256": "8307e2e12636507e6901601fb56782b1d233d42855ddd15508916ccb64605c62",
+      "title": "Assault Shooting"
+    },
+    {
+      "blocks": [
+        {
+          "kind": "text",
+          "ordinal": 1,
+          "sha256": "321cca3ab06e96fe470eb3a05fa55526bf8c9576d89ce048c906c688cbdffa51",
+          "value": "Models with the \u0003FLY\u0004 keyword, and units such models are part of, are said to be able to \u0003FLY\u0004. Some rules also refer to such models/units as \u0003FLYING\u0004 models/\u0003FLYING\u0004 units."
+        },
+        {
+          "kind": "text",
+          "ordinal": 2,
+          "sha256": "6454371758bbf53eea82202564867323f1e7129f8cd0b564f2e0abdb47296ddf",
+          "value": "Each time a \u0003FLYING\u0004 unit is selected to make a \u0005normal\u0006, \u0005advance\u0006, \u0005fall-back\u0006 or \u0005charge move\u0006, before moving any models in that unit, the active player can declare that it will \u0003take to the skies\u0004. If it does, while resolving that move:"
+        },
+        {
+          "kind": "text",
+          "ordinal": 3,
+          "sha256": "b3b43f889f0558189b1f55582e38fccc89c1874b65b430b691423cb437ad05f8",
+          "value": "\u2022 Subtract 2\" from the \u0005maximum distance\u0006."
+        },
+        {
+          "kind": "text",
+          "ordinal": 4,
+          "sha256": "1fb0726d4d2d5479568d381d243597b0b8de8a29cebe46fdad1d983a945b73e2",
+          "value": "\u2022 Each time a \u0003FLYING\u0004 model moves:"
+        },
+        {
+          "kind": "text",
+          "ordinal": 5,
+          "sha256": "4057db7bb4caf9da00cd54534e6eb7b83af8bb56838143c65ea66b20b7f88246",
+          "value": "\u25e6 Ignore all vertical distance for the purposes of how far it has moved."
+        },
+        {
+          "kind": "text",
+          "ordinal": 6,
+          "sha256": "d097789b550fed5aa40b2d42d7b46465a02ba33e6bc523f61502fcd070e304f3",
+          "value": "\u25e6 It can move through all types of model (including enemy models and \u0003MONSTER/VEHICLE\u0004 models)."
+        },
+        {
+          "kind": "text",
+          "ordinal": 7,
+          "sha256": "a0aa81a9ccf32928519f927e53a0dc3d6d4f90bd34061507abc988467c6887d8",
+          "value": "\u25e6 It can move horizontally and vertically through all categories of \u0005terrain feature\u0006."
+        },
+        {
+          "kind": "text",
+          "ordinal": 8,
+          "sha256": "1764b8ea4c1ce881ecd42b7517e6c9bd55ceb5264695b20e25310a332083dc69",
+          "value": "\u000eTaking to the Skies"
+        },
+        {
+          "kind": "text",
+          "ordinal": 9,
+          "sha256": "b82112cf241825541e1b6c692688af8eccf38d16af2dafed5a266d2688faac39",
+          "value": "\u2022 This Riptide Battlesuit can \u0003Fly\u0004. It makes an \u0005\u0007advance move\b\u0006 with a \u0005\u0007maximum distance\b\u0006 of 16\"."
+        },
+        {
+          "kind": "text",
+          "ordinal": 10,
+          "sha256": "f7263f95ca2dc65d6f9a3d33965f26524e8afc2f5c33b2bdc5674c1a374490f5",
+          "value": "\u2022 Before moving the unit, the active player declares that it will \u0005\u0007take to the skies\b\u0006. That move\u2019s \u0005\u0007maximum distance\b\u0006 is reduced to 14\", but while making that move, the Riptide Battlesuit can move through all enemy units (including \u0003Vehicles\u0004) and all \u0005\u0007terrain features\b\u0006, ignoring any vertical distance that would normally be counted to ascend and descend \u0005\u0007terrain features\b\u0006."
+        }
+      ],
+      "category": "21",
+      "historical_source_row_sha256": "b33dcf77a81f85e1825dc702e3232c313351fcc8772b3881a50747cab12f7006",
+      "locator": "21.03",
+      "occurrence": 1,
+      "review_category": "21",
+      "row_id": "rule:21:21.03:1",
+      "selected_provider": "Game Datamissions",
+      "source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514",
+      "title": "Flying Models"
+    },
+    {
+      "blocks": [
+        {
+          "kind": "text",
+          "ordinal": 1,
+          "sha256": "2bb4f5415f4a1ae4b78810508bc94fecbbe1282ffdc2ab60549e33a15469669a",
+          "value": "Units containing one or more models with an \u0003[ASSAULT]\u0004 weapon can shoot using \u0005assault shooting\u0006 (10.05)."
+        }
+      ],
+      "category": "24",
+      "historical_source_row_sha256": "b41dd332a6dc01f9d34464117ff9259c761f9368efb758fd53bc8f54d227160e",
+      "locator": "24.04",
+      "occurrence": 1,
+      "review_category": "24",
+      "row_id": "rule:24:24.04:1",
+      "selected_provider": "Game Datamissions",
+      "source_sha256": "c469c131459cd5978bf0c05ba60242e6f38c8b8510c695a75f2b10b17cd44253",
+      "title": "[ASSAULT]"
+    },
+    {
+      "blocks": [
+        {
+          "kind": "text",
+          "ordinal": 1,
+          "sha256": "ef722c2db3a9c7c173035dbe3023c74e6109d5b673420dba76d27e2660b86eea",
+          "value": "In your Shooting phase, each time an attack is made with a \u0003[HEAVY]\u0004 weapon, add 1 to the \u0005hit roll\u0006 if \u0001all\u0002 of the following apply to the attacking unit:"
+        },
+        {
+          "kind": "text",
+          "ordinal": 2,
+          "sha256": "f00339d88bce9959c8a4b666e0a63212c92d123abaaa086005cff92f3c2050e7",
+          "value": "\u2022 That unit is \u0005unengaged\u0006."
+        },
+        {
+          "kind": "text",
+          "ordinal": 3,
+          "sha256": "4925d92519279b18daace03eeb976bdc22a2914b767420f1d88fd241c94c5351",
+          "value": "\u2022 That unit was not set up on the battlefield this turn."
+        },
+        {
+          "kind": "text",
+          "ordinal": 4,
+          "sha256": "46be26a5f1d2c109b004b011f2e3ba9528bbf1b7f538496a30ec10558ebdc9ab",
+          "value": "\u2022 No model in that unit has moved moret han 3\" this turn."
+        }
+      ],
+      "category": "24",
+      "historical_source_row_sha256": "8040c145ce7c35599d52a295f0a484f4c3418396c8a6fdbec46b93e0e5c8c3b5",
+      "locator": "24.16",
+      "occurrence": 1,
+      "review_category": "24",
+      "row_id": "rule:24:24.16:1",
+      "selected_provider": "Game Datamissions",
+      "source_sha256": "7896508df49e0334d6fd938bf6bf4305897500d58a893bc8b68b84eed1febc82",
+      "title": "[HEAVY]"
+    }
+  ],
+  "complete_corresponding_original_acceptance_rows": [
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+        "tests/unit/test_phase10m_movement_actions.py::test_action_options_outside_engagement_are_remain_normal_and_advance"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}', f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}'}",
+          "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+          "original_assertion_present": true,
+          "proves": "Stationary remains available while engaged.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, MovementPhaseActionKind.NORMAL_MOVE.value, MovementPhaseActionKind.ADVANCE.value}",
+          "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_outside_engagement_are_remain_normal_and_advance",
+          "original_assertion_present": true,
+          "proves": "Stationary remains available while unengaged.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}', f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}'}",
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+            "proves": "Stationary remains available while engaged.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, MovementPhaseActionKind.NORMAL_MOVE.value, MovementPhaseActionKind.ADVANCE.value}",
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_outside_engagement_are_remain_normal_and_advance",
+            "proves": "Stationary remains available while unengaged.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.04-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Every unit can remain stationary."
+      },
+      "retained_current_source_sha256": "2435148733854be607224bcecc897d01bd5f7d5377e56cce2db30e618db8c85a",
+      "row_id": "rule:09:09.04:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "2435148733854be607224bcecc897d01bd5f7d5377e56cce2db30e618db8c85a"
+    },
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10b_movement.py::test_remain_stationary_marks_unit_complete_without_changing_poses",
+        "tests/unit/test_phase10d_battlefield_transitions.py::test_remain_stationary_emits_no_transition_records"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert lifecycle.state.battlefield_state.to_payload() == before_payload",
+          "nodeid": "tests/unit/test_phase10b_movement.py::test_remain_stationary_marks_unit_complete_without_changing_poses",
+          "original_assertion_present": true,
+          "proves": "Authoritative model poses are unchanged.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert batch.to_payload() == {'placements': [], 'removals': [], 'displacements': []}",
+          "nodeid": "tests/unit/test_phase10d_battlefield_transitions.py::test_remain_stationary_emits_no_transition_records",
+          "original_assertion_present": true,
+          "proves": "No placement, removal or displacement transition is emitted.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert lifecycle.state.battlefield_state.to_payload() == before_payload",
+            "nodeid": "tests/unit/test_phase10b_movement.py::test_remain_stationary_marks_unit_complete_without_changing_poses",
+            "proves": "Authoritative model poses are unchanged.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert batch.to_payload() == {'placements': [], 'removals': [], 'displacements': []}",
+            "nodeid": "tests/unit/test_phase10d_battlefield_transitions.py::test_remain_stationary_emits_no_transition_records",
+            "proves": "No placement, removal or displacement transition is emitted.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.04-no-movement",
+        "source_blocks": [
+          4,
+          6
+        ],
+        "summary": "Stationary makes no translation or rotation and triggers no move-start/end displacement."
+      },
+      "retained_current_source_sha256": "2435148733854be607224bcecc897d01bd5f7d5377e56cce2db30e618db8c85a",
+      "row_id": "rule:09:09.04:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "2435148733854be607224bcecc897d01bd5f7d5377e56cce2db30e618db8c85a"
+    },
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}', f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}'}",
+          "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+          "original_assertion_present": true,
+          "proves": "Engaged units cannot select Normal move.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}', f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}'}",
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+            "proves": "Engaged units cannot select Normal move.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.05-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A Normal move requires battlefield presence and an unengaged unit."
+      },
+      "retained_current_source_sha256": "4b58b251b966abd83d1fba30f20eeccdca03536d70714bd39c55f34a14ca15d7",
+      "row_id": "rule:09:09.05:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "4b58b251b966abd83d1fba30f20eeccdca03536d70714bd39c55f34a14ca15d7"
+    },
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10m_movement_actions.py::test_normal_move_rejects_path_through_enemy_model_base"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert resolution.path_validation_results[0].violations[0].violation_code == 'enemy_model_base_crossed'",
+          "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_normal_move_rejects_path_through_enemy_model_base",
+          "original_assertion_present": true,
+          "proves": "An invalid transit through an enemy model is rejected.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert resolution.path_validation_results[0].violations[0].violation_code == 'enemy_model_base_crossed'",
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_normal_move_rejects_path_through_enemy_model_base",
+            "proves": "An invalid transit through an enemy model is rejected.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.05-witnessed-movement",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Normal movement follows the shared witnessed movement rules."
+      },
+      "retained_current_source_sha256": "4b58b251b966abd83d1fba30f20eeccdca03536d70714bd39c55f34a14ca15d7",
+      "row_id": "rule:09:09.05:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "4b58b251b966abd83d1fba30f20eeccdca03536d70714bd39c55f34a14ca15d7"
+    },
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10r_aircraft.py::test_normal_and_advance_can_transit_enemy_aircraft_but_not_end_in_engagement"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert endpoint_result.path_validation_results[0].violations[0].violation_code == 'enemy_engagement_range_end_forbidden'",
+          "nodeid": "tests/unit/test_phase10r_aircraft.py::test_normal_and_advance_can_transit_enemy_aircraft_but_not_end_in_engagement",
+          "original_assertion_present": true,
+          "proves": "Transit permission does not permit an engaged endpoint.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert endpoint_result.path_validation_results[0].violations[0].violation_code == 'enemy_engagement_range_end_forbidden'",
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_normal_and_advance_can_transit_enemy_aircraft_but_not_end_in_engagement",
+            "proves": "Transit permission does not permit an engaged endpoint.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.05-endpoint",
+        "source_blocks": [
+          6
+        ],
+        "summary": "A Normal move must end unengaged."
+      },
+      "retained_current_source_sha256": "4b58b251b966abd83d1fba30f20eeccdca03536d70714bd39c55f34a14ca15d7",
+      "row_id": "rule:09:09.05:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "4b58b251b966abd83d1fba30f20eeccdca03536d70714bd39c55f34a14ca15d7"
+    },
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10b_movement.py::test_normal_move_consumes_movement_base_size_current_pose_and_updates_placement"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert terminal_event['movement_inches'] == 6",
+          "nodeid": "tests/unit/test_phase10b_movement.py::test_normal_move_consumes_movement_base_size_current_pose_and_updates_placement",
+          "original_assertion_present": true,
+          "proves": "Canonical M6 unit completes a six-inch witnessed Normal move.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert terminal_event['movement_inches'] == 6",
+            "nodeid": "tests/unit/test_phase10b_movement.py::test_normal_move_consumes_movement_base_size_current_pose_and_updates_placement",
+            "proves": "Canonical M6 unit completes a six-inch witnessed Normal move.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.05-budget",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Normal movement uses the unit Movement characteristic budget."
+      },
+      "retained_current_source_sha256": "4b58b251b966abd83d1fba30f20eeccdca03536d70714bd39c55f34a14ca15d7",
+      "row_id": "rule:09:09.05:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "4b58b251b966abd83d1fba30f20eeccdca03536d70714bd39c55f34a14ca15d7"
+    },
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}', f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}'}",
+          "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+          "original_assertion_present": true,
+          "proves": "An engaged unit cannot choose Advance.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert {option.option_id for option in action_request.options} == {MovementPhaseActionKind.REMAIN_STATIONARY.value, f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}', f'{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}'}",
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_action_options_inside_engagement_are_remain_and_fall_back",
+            "proves": "An engaged unit cannot choose Advance.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.06-eligibility",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Advance requires an unengaged battlefield unit."
+      },
+      "retained_current_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7",
+      "row_id": "rule:09:09.06:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7"
+    },
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10n_advance.py::test_lifecycle_advance_roll_is_deterministic_replay_facing_and_marks_restrictions"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert terminal_event['advance_roll'] == left_advanced.movement_dice_record.advance_roll.to_payload()",
+          "nodeid": "tests/unit/test_phase10n_advance.py::test_lifecycle_advance_roll_is_deterministic_replay_facing_and_marks_restrictions",
+          "original_assertion_present": true,
+          "proves": "The lifecycle retains the deterministic Advance roll.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert terminal_event['advance_roll'] == left_advanced.movement_dice_record.advance_roll.to_payload()",
+            "nodeid": "tests/unit/test_phase10n_advance.py::test_lifecycle_advance_roll_is_deterministic_replay_facing_and_marks_restrictions",
+            "proves": "The lifecycle retains the deterministic Advance roll.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.06-advance-die",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Roll one D6 before advancing."
+      },
+      "retained_current_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7",
+      "row_id": "rule:09:09.06:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7"
+    },
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10n_advance.py::test_advance_move_consumes_movement_plus_d6"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert first_distance.is_within_budget",
+          "nodeid": "tests/unit/test_phase10n_advance.py::test_advance_move_consumes_movement_plus_d6",
+          "original_assertion_present": true,
+          "proves": "The resulting path carries a validated distance witness.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert first_distance.is_within_budget",
+            "nodeid": "tests/unit/test_phase10n_advance.py::test_advance_move_consumes_movement_plus_d6",
+            "proves": "The resulting path carries a validated distance witness.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.06-witness",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Advance follows shared witnessed movement."
+      },
+      "retained_current_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7",
+      "row_id": "rule:09:09.06:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7"
+    },
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10r_aircraft.py::test_normal_and_advance_can_transit_enemy_aircraft_but_not_end_in_engagement"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert endpoint_result.path_validation_results[0].violations[0].violation_code == 'enemy_engagement_range_end_forbidden'",
+          "nodeid": "tests/unit/test_phase10r_aircraft.py::test_normal_and_advance_can_transit_enemy_aircraft_but_not_end_in_engagement",
+          "original_assertion_present": true,
+          "proves": "End-engagement remains forbidden despite transit exceptions.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert endpoint_result.path_validation_results[0].violations[0].violation_code == 'enemy_engagement_range_end_forbidden'",
+            "nodeid": "tests/unit/test_phase10r_aircraft.py::test_normal_and_advance_can_transit_enemy_aircraft_but_not_end_in_engagement",
+            "proves": "End-engagement remains forbidden despite transit exceptions.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.06-unengaged-end",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Advance must finish unengaged."
+      },
+      "retained_current_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7",
+      "row_id": "rule:09:09.06:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7"
+    },
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler",
+        "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase15a_charge_declarations.py::test_charge_phase_filters_ineligible_units",
+        "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_opportunity_enforces_each_core_action_restriction",
+        "tests/unit/test_phase10n_advance.py::test_advanced_state_clears_at_end_of_active_player_turn"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert {option.option_id for option in request.options} == {units['intercessor-5'].unit_instance_id, COMPLETE_CHARGE_PHASE_OPTION_ID}",
+          "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charge_phase_filters_ineligible_units",
+          "original_assertion_present": true,
+          "proves": "The engine charging-unit decision excludes both the advanced unit and the unit that Fell Back, while retaining the eligible control unit.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert mission_action_unit_ineligibility_reason(state=state, player_id='player-a', unit_instance_id=unit_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) == expected_reason",
+          "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_opportunity_enforces_each_core_action_restriction",
+          "original_assertion_present": true,
+          "proves": "The Advance parameter case returns the exact Core action-start prohibition from the mission action eligibility owner.",
+          "role": "invalid"
+        },
+        {
+          "assertion": "assert waiting.decision_request is None or waiting.decision_request.decision_type != START_MISSION_ACTION_DECISION_TYPE",
+          "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_opportunity_enforces_each_core_action_restriction",
+          "original_assertion_present": true,
+          "proves": "The Advance parameter case produces no action-start opportunity through LocalGameSession.",
+          "role": "facade"
+        },
+        {
+          "assertion": "assert updated_state.advanced_unit_states == []",
+          "nodeid": "tests/unit/test_phase10n_advance.py::test_advanced_state_clears_at_end_of_active_player_turn",
+          "original_assertion_present": true,
+          "proves": "The actual Advance restriction record clears when the active player turn ends.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert {option.option_id for option in request.options} == {units['intercessor-5'].unit_instance_id, COMPLETE_CHARGE_PHASE_OPTION_ID}",
+            "nodeid": "tests/unit/test_phase15a_charge_declarations.py::test_charge_phase_filters_ineligible_units",
+            "proves": "The engine charging-unit decision excludes both the advanced unit and the unit that Fell Back, while retaining the eligible control unit.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert mission_action_unit_ineligibility_reason(state=state, player_id='player-a', unit_instance_id=unit_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) == expected_reason",
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_opportunity_enforces_each_core_action_restriction",
+            "proves": "The Advance parameter case returns the exact Core action-start prohibition from the mission action eligibility owner.",
+            "role": "invalid"
+          },
+          {
+            "assertion": "assert waiting.decision_request is None or waiting.decision_request.decision_type != START_MISSION_ACTION_DECISION_TYPE",
+            "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_mission_action_opportunity_enforces_each_core_action_restriction",
+            "proves": "The Advance parameter case produces no action-start opportunity through LocalGameSession.",
+            "role": "facade"
+          },
+          {
+            "assertion": "assert updated_state.advanced_unit_states == []",
+            "nodeid": "tests/unit/test_phase10n_advance.py::test_advanced_state_clears_at_end_of_active_player_turn",
+            "proves": "The actual Advance restriction record clears when the active player turn ends.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler",
+          "src/warhammer40k_core/engine/mission_action_eligibility.py:mission_action_unit_ineligibility_reason"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.06-turn-locks",
+        "source_blocks": [
+          9
+        ],
+        "summary": "Advancing blocks charge and action start through turn end unless permitted by another rule."
+      },
+      "retained_current_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7",
+      "row_id": "rule:09:09.06:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7"
+    },
+    {
+      "category": "09",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10n_advance.py::test_advance_move_consumes_movement_plus_d6"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert resolution.movement_payload['movement_inches'] == 10.0",
+          "nodeid": "tests/unit/test_phase10n_advance.py::test_advance_move_consumes_movement_plus_d6",
+          "original_assertion_present": true,
+          "proves": "M=6 plus D6=4 yields a ten-inch move.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert resolution.movement_payload['movement_inches'] == 10.0",
+            "nodeid": "tests/unit/test_phase10n_advance.py::test_advance_move_consumes_movement_plus_d6",
+            "proves": "M=6 plus D6=4 yields a ten-inch move.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/movement_handler.py:MovementPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "09.06-budget",
+        "source_blocks": [
+          11
+        ],
+        "summary": "Advance maximum distance is M plus the Advance die."
+      },
+      "retained_current_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7",
+      "row_id": "rule:09:09.06:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7"
+    },
+    {
+      "category": "10",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase13b_shooting_phase_declarations.py::test_advanced_unit_is_eligible_to_shoot_only_when_state_permits"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert {option.option_id for option in request.options} == {COMPLETE_SHOOTING_PHASE_OPTION_ID, units['intercessor-1'].unit_instance_id, units['intercessor-2'].unit_instance_id}",
+          "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_advanced_unit_is_eligible_to_shoot_only_when_state_permits",
+          "original_assertion_present": true,
+          "proves": "Advance eligibility is checked against available permissions.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert {option.option_id for option in request.options} == {COMPLETE_SHOOTING_PHASE_OPTION_ID, units['intercessor-1'].unit_instance_id, units['intercessor-2'].unit_instance_id}",
+            "nodeid": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_advanced_unit_is_eligible_to_shoot_only_when_state_permits",
+            "proves": "Advance eligibility is checked against available permissions.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "10.05-eligibility",
+        "source_blocks": [
+          2,
+          3,
+          4
+        ],
+        "summary": "Assault shooting requires an unengaged advanced unit with an Assault weapon."
+      },
+      "retained_current_source_sha256": "8307e2e12636507e6901601fb56782b1d233d42855ddd15508916ccb64605c62",
+      "row_id": "rule:10:10.05:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "8307e2e12636507e6901601fb56782b1d233d42855ddd15508916ccb64605c62"
+    },
+    {
+      "category": "10",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_advanced_unit_exposes_only_assault_weapons"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert {weapon['weapon_profile_id'] for weapon in available_weapons} == {assault_profile.profile_id}",
+          "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_advanced_unit_exposes_only_assault_weapons",
+          "original_assertion_present": true,
+          "proves": "Advanced-unit weapon enumeration excludes non-Assault weapons.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert {weapon['weapon_profile_id'] for weapon in available_weapons} == {assault_profile.profile_id}",
+            "nodeid": "tests/unit/test_phase12c_core_stratagems.py::test_phase13d_fire_overwatch_advanced_unit_exposes_only_assault_weapons",
+            "proves": "Advanced-unit weapon enumeration excludes non-Assault weapons.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "10.05-weapons",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Only Assault weapons can be selected for Assault shooting."
+      },
+      "retained_current_source_sha256": "8307e2e12636507e6901601fb56782b1d233d42855ddd15508916ccb64605c62",
+      "row_id": "rule:10:10.05:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "8307e2e12636507e6901601fb56782b1d233d42855ddd15508916ccb64605c62"
+    },
+    {
+      "category": "10",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_assault_uses_attack_host_and_serial_unit_completion"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert any((e.event_type == 'attack_sequence_completed' for e in events))",
+          "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_assault_uses_attack_host_and_serial_unit_completion",
+          "original_assertion_present": true,
+          "proves": "A real Assault declaration reaches the shared attack completion event.",
+          "role": "facade"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert any((e.event_type == 'attack_sequence_completed' for e in events))",
+            "nodeid": "tests/unit/test_order97_secondary_clause_evidence.py::test_order97_assault_uses_attack_host_and_serial_unit_completion",
+            "proves": "A real Assault declaration reaches the shared attack completion event.",
+            "role": "facade"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "10.05-attacks",
+        "source_blocks": [
+          8
+        ],
+        "summary": "Resolve Assault attacks through the shared attack sequence."
+      },
+      "retained_current_source_sha256": "8307e2e12636507e6901601fb56782b1d233d42855ddd15508916ccb64605c62",
+      "row_id": "rule:10:10.05:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "8307e2e12636507e6901601fb56782b1d233d42855ddd15508916ccb64605c62"
+    },
+    {
+      "category": "10",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert has_activity_restriction(state=state, rules_unit=unit, activity='completed_shooting')",
+          "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+          "original_assertion_present": true,
+          "proves": "Parameterized completed-shooting coverage checks phase action restriction.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert has_activity_restriction(state=state, rules_unit=unit, activity='completed_shooting')",
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+            "proves": "Parameterized completed-shooting coverage checks phase action restriction.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+        ],
+        "qualifications": [],
+        "requirement_id": "10.05-action-lock",
+        "source_blocks": [
+          10
+        ],
+        "summary": "Assault shooting blocks action start until phase end."
+      },
+      "retained_current_source_sha256": "8307e2e12636507e6901601fb56782b1d233d42855ddd15508916ccb64605c62",
+      "row_id": "rule:10:10.05:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "8307e2e12636507e6901601fb56782b1d233d42855ddd15508916ccb64605c62"
+    },
+    {
+      "category": "21",
+      "current_owners": [
+        "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_order51_flight.py::test_mixed_unit_flight_benefits_belong_only_to_flying_models"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert capabilities.has_fly is (index == 0)",
+          "nodeid": "tests/unit/test_order51_flight.py::test_mixed_unit_flight_benefits_belong_only_to_flying_models",
+          "original_assertion_present": true,
+          "proves": "Only the actual Flying model receives the FLY capability within the mixed unit.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert capabilities.has_fly is (index == 0)",
+            "nodeid": "tests/unit/test_order51_flight.py::test_mixed_unit_flight_benefits_belong_only_to_flying_models",
+            "proves": "Only the actual Flying model receives the FLY capability within the mixed unit.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "qualifications": [],
+        "requirement_id": "21.03-flying-model-unit-definition",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A model with FLY is Flying and its containing unit is a Flying unit."
+      },
+      "retained_current_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514",
+      "row_id": "rule:21:21.03:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514"
+    },
+    {
+      "category": "21",
+      "current_owners": [
+        "src/warhammer40k_core/engine/flight_decision_authority.py:validate_charge_flight"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_order51_flight.py::test_charge_flight_is_committed_before_dice_and_survives_restore",
+        "tests/unit/test_order51_flight.py::test_movement_flight_choice_precedes_roll_and_history_survives_shooting",
+        "tests/unit/test_order51_flight.py::test_fall_back_commits_flight_in_its_finite_mode_choice"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert choice_index < roll_index",
+          "nodeid": "tests/unit/test_order51_flight.py::test_charge_flight_is_committed_before_dice_and_survives_restore",
+          "original_assertion_present": true,
+          "proves": "Charge flight choice is recorded before the Charge roll.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert len(choices) == 2",
+          "nodeid": "tests/unit/test_order51_flight.py::test_movement_flight_choice_precedes_roll_and_history_survives_shooting",
+          "original_assertion_present": true,
+          "proves": "Movement selection offers both flight choices.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert all((isclose(row.distance_inches, 2, abs_tol=1e-09) for row in state.model_movement_history))",
+          "nodeid": "tests/unit/test_order51_flight.py::test_fall_back_commits_flight_in_its_finite_mode_choice",
+          "original_assertion_present": true,
+          "proves": "Fall Back flight produces recorded accepted per-model movement.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert choice_index < roll_index",
+            "nodeid": "tests/unit/test_order51_flight.py::test_charge_flight_is_committed_before_dice_and_survives_restore",
+            "proves": "Charge flight choice is recorded before the Charge roll.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert len(choices) == 2",
+            "nodeid": "tests/unit/test_order51_flight.py::test_movement_flight_choice_precedes_roll_and_history_survives_shooting",
+            "proves": "Movement selection offers both flight choices.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert all((isclose(row.distance_inches, 2, abs_tol=1e-09) for row in state.model_movement_history))",
+            "nodeid": "tests/unit/test_order51_flight.py::test_fall_back_commits_flight_in_its_finite_mode_choice",
+            "proves": "Fall Back flight produces recorded accepted per-model movement.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/flight_decision_authority.py:validate_charge_flight"
+        ],
+        "qualifications": [],
+        "requirement_id": "21.03-declare-before-move",
+        "source_blocks": [
+          2
+        ],
+        "summary": "A Flying unit may declare take to the skies before Normal, Advance, Fall Back or Charge movement."
+      },
+      "retained_current_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514",
+      "row_id": "rule:21:21.03:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514"
+    },
+    {
+      "category": "21",
+      "current_owners": [
+        "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10m_movement_actions.py::test_fly_take_to_the_skies_applies_budget_modifier"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert model_payload['movement_distance_modifier_inches'] == -2.0",
+          "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_fly_take_to_the_skies_applies_budget_modifier",
+          "original_assertion_present": true,
+          "proves": "The movement payload records the negative two-inch modifier.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert budget['max_distance_inches'] == 10.0",
+          "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_fly_take_to_the_skies_applies_budget_modifier",
+          "original_assertion_present": true,
+          "proves": "The resulting twelve-inch move has a ten-inch budget.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert model_payload['movement_distance_modifier_inches'] == -2.0",
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_fly_take_to_the_skies_applies_budget_modifier",
+            "proves": "The movement payload records the negative two-inch modifier.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert budget['max_distance_inches'] == 10.0",
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_fly_take_to_the_skies_applies_budget_modifier",
+            "proves": "The resulting twelve-inch move has a ten-inch budget.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "qualifications": [],
+        "requirement_id": "21.03-two-inch-penalty",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Taking to the skies reduces the maximum move distance by two inches."
+      },
+      "retained_current_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514",
+      "row_id": "rule:21:21.03:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514"
+    },
+    {
+      "category": "21",
+      "current_owners": [
+        "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_order51_flight.py::test_mixed_unit_flight_benefits_belong_only_to_flying_models",
+        "tests/unit/test_order51_flight.py::test_heavy_uses_each_models_accepted_vertical_distance"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert capabilities.ignores_vertical_distance is (selected and index == 0)",
+          "nodeid": "tests/unit/test_order51_flight.py::test_mixed_unit_flight_benefits_belong_only_to_flying_models",
+          "original_assertion_present": true,
+          "proves": "Vertical-distance exemption belongs only to Flying models with flight selected.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert isclose(rows[model.model_instance_id].distance_inches, expected, abs_tol=1e-09)",
+          "nodeid": "tests/unit/test_order51_flight.py::test_heavy_uses_each_models_accepted_vertical_distance",
+          "original_assertion_present": true,
+          "proves": "Accepted movement history records the expected distance per model.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert capabilities.ignores_vertical_distance is (selected and index == 0)",
+            "nodeid": "tests/unit/test_order51_flight.py::test_mixed_unit_flight_benefits_belong_only_to_flying_models",
+            "proves": "Vertical-distance exemption belongs only to Flying models with flight selected.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert isclose(rows[model.model_instance_id].distance_inches, expected, abs_tol=1e-09)",
+            "nodeid": "tests/unit/test_order51_flight.py::test_heavy_uses_each_models_accepted_vertical_distance",
+            "proves": "Accepted movement history records the expected distance per model.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "qualifications": [],
+        "requirement_id": "21.03-ignore-vertical-distance",
+        "source_blocks": [
+          5
+        ],
+        "summary": "While taking to the skies, Flying models do not count vertical distance."
+      },
+      "retained_current_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514",
+      "row_id": "rule:21:21.03:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514"
+    },
+    {
+      "category": "21",
+      "current_owners": [
+        "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10h_pathing_smoke.py::test_fly_take_to_the_skies_can_transit_enemy_models_and_engagement_range"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert enemy_base_context.validate().is_valid",
+          "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_fly_take_to_the_skies_can_transit_enemy_models_and_engagement_range",
+          "original_assertion_present": true,
+          "proves": "The witnessed flight path can cross an enemy base.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert enemy_base_context.validate().is_valid",
+            "nodeid": "tests/unit/test_phase10h_pathing_smoke.py::test_fly_take_to_the_skies_can_transit_enemy_models_and_engagement_range",
+            "proves": "The witnessed flight path can cross an enemy base.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "qualifications": [],
+        "requirement_id": "21.03-all-model-transit",
+        "source_blocks": [
+          6
+        ],
+        "summary": "Flying models taking to the skies may move through enemy and Monster/Vehicle models."
+      },
+      "retained_current_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514",
+      "row_id": "rule:21:21.03:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514"
+    },
+    {
+      "category": "21",
+      "current_owners": [
+        "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase10m_movement_actions.py::test_mustered_fly_unit_takes_to_the_skies_over_exact_dense_non_ruin",
+        "tests/unit/test_order97_semantic_evidence_18_25.py::test_committed_flight_grants_general_terrain_transit"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert all((result.is_valid for result in resolution.terrain_path_legality_results))",
+          "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_mustered_fly_unit_takes_to_the_skies_over_exact_dense_non_ruin",
+          "original_assertion_present": true,
+          "proves": "The actual Flying unit\u2019s dense-terrain path passes all terrain legality checks.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert capabilities.can_move_through_terrain",
+          "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_committed_flight_grants_general_terrain_transit",
+          "original_assertion_present": true,
+          "proves": "Committed flight grants unrestricted terrain transit in Normal, Advance, Fall Back and Charge modes.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert capabilities.ignores_vertical_distance",
+          "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_committed_flight_grants_general_terrain_transit",
+          "original_assertion_present": true,
+          "proves": "The same modes ignore vertical distance.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert all((result.is_valid for result in resolution.terrain_path_legality_results))",
+            "nodeid": "tests/unit/test_phase10m_movement_actions.py::test_mustered_fly_unit_takes_to_the_skies_over_exact_dense_non_ruin",
+            "proves": "The actual Flying unit\u2019s dense-terrain path passes all terrain legality checks.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert capabilities.can_move_through_terrain",
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_committed_flight_grants_general_terrain_transit",
+            "proves": "Committed flight grants unrestricted terrain transit in Normal, Advance, Fall Back and Charge modes.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert capabilities.ignores_vertical_distance",
+            "nodeid": "tests/unit/test_order97_semantic_evidence_18_25.py::test_committed_flight_grants_general_terrain_transit",
+            "proves": "The same modes ignore vertical distance.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet"
+        ],
+        "qualifications": [],
+        "requirement_id": "21.03-all-terrain-transit",
+        "source_blocks": [
+          7
+        ],
+        "summary": "Flying models taking to the skies may move horizontally and vertically through every terrain category."
+      },
+      "retained_current_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514",
+      "row_id": "rule:21:21.03:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514"
+    },
+    {
+      "category": "24",
+      "current_owners": [
+        "src/warhammer40k_core/engine/weapon_abilities.py:has_weapon_keyword"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert SHOOTER in state.shooting_phase_state.shot_unit_ids",
+          "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+          "original_assertion_present": true,
+          "proves": "The advanced Assault case completes shooting through the shared facade and records the unit as having shot.",
+          "role": "facade"
+        },
+        {
+          "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+          "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+          "original_assertion_present": true,
+          "proves": "The same accepted Assault sequence reproduces from replay.",
+          "role": "replay"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert SHOOTER in state.shooting_phase_state.shot_unit_ids",
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+            "proves": "The advanced Assault case completes shooting through the shared facade and records the unit as having shot.",
+            "role": "facade"
+          },
+          {
+            "assertion": "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_order34_completed_shooting_restricts_actions_through_exact_phase_boundary",
+            "proves": "The same accepted Assault sequence reproduces from replay.",
+            "role": "replay"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/weapon_abilities.py:has_weapon_keyword"
+        ],
+        "qualifications": [],
+        "requirement_id": "24.04-assault-shooting-permission",
+        "source_blocks": [
+          1
+        ],
+        "summary": "A unit containing an Assault weapon may use Assault shooting."
+      },
+      "retained_current_source_sha256": "c469c131459cd5978bf0c05ba60242e6f38c8b8510c695a75f2b10b17cd44253",
+      "row_id": "rule:24:24.04:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "c469c131459cd5978bf0c05ba60242e6f38c8b8510c695a75f2b10b17cd44253"
+    },
+    {
+      "category": "24",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+        "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_declaration_applies_rapid_blast_melta_and_heavy_modifiers",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert pool_payload['hit_roll_modifier'] == 1",
+          "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_declaration_applies_rapid_blast_melta_and_heavy_modifiers",
+          "original_assertion_present": true,
+          "proves": "Qualifying Heavy pool has a plus-one hit modifier.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+          "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+          "original_assertion_present": true,
+          "proves": "Out-of-phase attacks carry no Heavy source.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert pool_payload['hit_roll_modifier'] == 1",
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_declaration_applies_rapid_blast_melta_and_heavy_modifiers",
+            "proves": "Qualifying Heavy pool has a plus-one hit modifier.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+            "proves": "Out-of-phase attacks carry no Heavy source.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+          "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+        ],
+        "qualifications": [],
+        "requirement_id": "24.16-own-phase-hit-bonus",
+        "source_blocks": [
+          1
+        ],
+        "summary": "Heavy adds one to hit only in the attacker\u2019s own Shooting phase."
+      },
+      "retained_current_source_sha256": "7896508df49e0334d6fd938bf6bf4305897500d58a893bc8b68b84eed1febc82",
+      "row_id": "rule:24:24.16:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "7896508df49e0334d6fd938bf6bf4305897500d58a893bc8b68b84eed1febc82"
+    },
+    {
+      "category": "24",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+        "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_engaged_unit"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+          "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_engaged_unit",
+          "original_assertion_present": true,
+          "proves": "The engaged attack receives no Heavy source.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_engaged_unit",
+            "proves": "The engaged attack receives no Heavy source.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+          "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+        ],
+        "qualifications": [],
+        "requirement_id": "24.16-unengaged-required",
+        "source_blocks": [
+          2
+        ],
+        "summary": "Heavy requires the attacking unit to be unengaged."
+      },
+      "retained_current_source_sha256": "7896508df49e0334d6fd938bf6bf4305897500d58a893bc8b68b84eed1febc82",
+      "row_id": "rule:24:24.16:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "7896508df49e0334d6fd938bf6bf4305897500d58a893bc8b68b84eed1febc82"
+    },
+    {
+      "category": "24",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+        "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_unit_set_up_this_turn",
+        "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_disembarked_unit_set_up_this_turn"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+          "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_unit_set_up_this_turn",
+          "original_assertion_present": true,
+          "proves": "A newly set-up attacker receives no Heavy source.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+          "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_disembarked_unit_set_up_this_turn",
+          "original_assertion_present": true,
+          "proves": "Disembark setup also denies Heavy.",
+          "role": "semantic"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_unit_set_up_this_turn",
+            "proves": "A newly set-up attacker receives no Heavy source.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+            "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_disembarked_unit_set_up_this_turn",
+            "proves": "Disembark setup also denies Heavy.",
+            "role": "semantic"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+          "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+        ],
+        "qualifications": [],
+        "requirement_id": "24.16-not-set-up-this-turn",
+        "source_blocks": [
+          3
+        ],
+        "summary": "Heavy requires the attacking unit not to have been set up this turn."
+      },
+      "retained_current_source_sha256": "7896508df49e0334d6fd938bf6bf4305897500d58a893bc8b68b84eed1febc82",
+      "row_id": "rule:24:24.16:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "7896508df49e0334d6fd938bf6bf4305897500d58a893bc8b68b84eed1febc82"
+    },
+    {
+      "category": "24",
+      "current_owners": [
+        "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+        "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+      ],
+      "current_source_disposition": null,
+      "current_successor": null,
+      "current_test_nodes": [
+        "tests/unit/test_order51_flight.py::test_heavy_uses_each_models_accepted_vertical_distance",
+        "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack"
+      ],
+      "original_evidence_dispositions": [
+        {
+          "assertion": "assert models_within_turn_distance(state=state, model_ids=ids, maximum_inches=3) is (selected and (not mixed))",
+          "nodeid": "tests/unit/test_order51_flight.py::test_heavy_uses_each_models_accepted_vertical_distance",
+          "original_assertion_present": true,
+          "proves": "The shared distance query checks every model including vertical movement and mixed flight.",
+          "role": "semantic"
+        },
+        {
+          "assertion": "assert all((isclose(row.distance_inches, 2 if flying else sqrt(13), abs_tol=1e-09) for row in state.model_movement_history))",
+          "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+          "original_assertion_present": true,
+          "proves": "Accepted movement records two inches for flight and sqrt(13) for walking on the same vertical path.",
+          "role": "facade"
+        },
+        {
+          "assertion": "assert roll['capped_modifier'] == int(flying)",
+          "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+          "original_assertion_present": true,
+          "proves": "The actual Heavy hit gains +1 exactly for the flight path that stayed within three counted inches.",
+          "role": "facade"
+        },
+        {
+          "assertion": "assert session.to_persistence_payload() == before",
+          "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+          "original_assertion_present": true,
+          "proves": "A malformed movement submission leaves authoritative session state unchanged.",
+          "role": "invalid"
+        }
+      ],
+      "original_requirement": {
+        "evidence": [
+          {
+            "assertion": "assert models_within_turn_distance(state=state, model_ids=ids, maximum_inches=3) is (selected and (not mixed))",
+            "nodeid": "tests/unit/test_order51_flight.py::test_heavy_uses_each_models_accepted_vertical_distance",
+            "proves": "The shared distance query checks every model including vertical movement and mixed flight.",
+            "role": "semantic"
+          },
+          {
+            "assertion": "assert all((isclose(row.distance_inches, 2 if flying else sqrt(13), abs_tol=1e-09) for row in state.model_movement_history))",
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+            "proves": "Accepted movement records two inches for flight and sqrt(13) for walking on the same vertical path.",
+            "role": "facade"
+          },
+          {
+            "assertion": "assert roll['capped_modifier'] == int(flying)",
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+            "proves": "The actual Heavy hit gains +1 exactly for the flight path that stayed within three counted inches.",
+            "role": "facade"
+          },
+          {
+            "assertion": "assert session.to_persistence_payload() == before",
+            "nodeid": "tests/unit/test_order97_facade_evidence.py::test_heavy_accepted_vertical_movement_reaches_facade_attack",
+            "proves": "A malformed movement submission leaves authoritative session state unchanged.",
+            "role": "invalid"
+          }
+        ],
+        "owners": [
+          "src/warhammer40k_core/engine/phases/shooting_targeting.py:_heavy_hit_roll_modifier_applies",
+          "src/warhammer40k_core/engine/model_movement_history.py:models_within_turn_distance"
+        ],
+        "qualifications": [],
+        "requirement_id": "24.16-every-model-at-most-three",
+        "source_blocks": [
+          4
+        ],
+        "summary": "Heavy requires no model in the unit to have moved more than three inches this turn, using accepted movement measurement."
+      },
+      "retained_current_source_sha256": "7896508df49e0334d6fd938bf6bf4305897500d58a893bc8b68b84eed1febc82",
+      "row_id": "rule:24:24.16:1",
+      "runtime_pass_claimed": false,
+      "selected_source_sha256": "7896508df49e0334d6fd938bf6bf4305897500d58a893bc8b68b84eed1febc82"
+    }
+  ],
+  "meaning": "Exact retained wording, control characters, original typo and block fingerprints preserved. No new mirror/App/official provider observation."
+}
