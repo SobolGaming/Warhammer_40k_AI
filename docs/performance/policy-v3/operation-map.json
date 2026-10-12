@@ -6046,7 +6046,7 @@
     "d09-native-regression-fixtures": {
       "paths": [
         "tests/d09_heavy_helpers.py",
-      "tests/d09_test_preservation_helpers.py",
+        "tests/d09_test_preservation_helpers.py",
         "tests/unit/test_order97_facade_evidence.py"
       ],
       "owners": [
@@ -6082,6 +6082,44 @@
     "d09-authenticated-source-bytes": {
       "paths": [
         ".gitattributes"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d10-physical-profile-validation": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py"
+      ],
+      "owners": [
+        "_attack_pools_or_validation"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d10-native-regressions-and-analytical-equipment": {
+      "paths": [
+        "tests/d10_profile_helpers.py",
+        "tests/d10_test_preservation_helpers.py",
+        "tests/unit/test_order97_attack_evidence.py",
+        "tests/unit/test_phase13b_shooting_phase_declarations.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "d10-retained-source-publication": {
+      "paths": [
+        "data/source_audits/d10/*",
+        "data/source_audits/d10/baseline/*",
+        "contracts/migrations/44.3.31-to-44.3.32.md"
       ],
       "owners": [
         "@document"

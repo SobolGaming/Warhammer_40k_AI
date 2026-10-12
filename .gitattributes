@@ -5,3 +5,5 @@ data/source_audits/order135/retained-current-sources.json -text
 data/source_audits/order135/source-reconciliation.json -text
 # D09 retains the complete sealed handoff snapshot's original byte fingerprint.
 data/source_audits/d09/selected-source.json -text
+# D10 retains the complete sealed selected source/acceptance bytes.
+data/source_audits/d10/selected-source-and-acceptance.json -text

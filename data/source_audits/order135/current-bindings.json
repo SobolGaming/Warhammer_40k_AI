@@ -1161,6 +1161,30 @@
       "authority": "data/source_audits/d04/assertion-exceptions.json",
       "qualification_reference": "docs/D04_COMBAT_BATTLE_SHOCK_SCOPE.md",
       "qualification": "Analytical predeclared cargo/HILLS recipe, no faction grant or provider certification. Native standalone survivor through current grouped dispatch, canonical attached survivor, canonical ten-model all-killed hazard, pending FNP and Command pass/fail controls; current OC/Action/target queries and normal objective resolver. Shared direct-owner idempotence on native attached status does not claim a second native Combat decision. Actual native CP spend, mission Action execution and scoring delta remain unavailable in this recipe; existing legitimate shared consumer regressions are required separately. Valid-state restore/fork/all roles/events/exact replay are tested with current receipts; static bindings do not certify runtime. Emergency remains unselected. Current public scalar-shaped wrapper delegates to the whole-unit resolver. Retained scalar native owner and lifecycle continuation wiring are separate owner obligations; native standalone scenes do not certify scalar-owner execution."
+    },
+    "04.01.03-obligation-01": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py:_attack_pools_or_validation",
+        "src/warhammer40k_core/engine/weapon_instances.py:equipped_weapon_profile_instances_for_model"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order97_attack_evidence.py::test_one_copy_cannot_select_two_profiles_and_exact_request_retries",
+        "tests/unit/test_order97_attack_evidence.py::test_independent_physical_weapons_can_choose_different_profiles"
+      ],
+      "disposition": "D10 native physical-copy selection and legal separate-copy/model controls; original acceptance assertions retained unchanged. No static runtime pass claim.",
+      "qualification_reference": "docs/D10_PHYSICAL_WEAPON_PROFILE_SCOPE.md"
+    },
+    "04.01.03-obligation-03": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py:_attack_pools_or_validation",
+        "src/warhammer40k_core/engine/weapon_instances.py:equipped_weapon_profile_instances_for_model"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order97_attack_evidence.py::test_one_copy_cannot_select_two_profiles_and_exact_request_retries",
+        "tests/unit/test_order97_attack_evidence.py::test_independent_physical_weapons_can_choose_different_profiles"
+      ],
+      "disposition": "D10 native physical-copy selection and legal separate-copy/model controls; original acceptance assertions retained unchanged. No static runtime pass claim.",
+      "qualification_reference": "docs/D10_PHYSICAL_WEAPON_PROFILE_SCOPE.md"
     }
   },
   "source_supersessions": {

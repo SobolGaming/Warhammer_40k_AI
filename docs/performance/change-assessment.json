@@ -1,496 +1,380 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "70cad74c1cb57133db2408f744fe895d4cd0b12f",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a9d8eac3204b20102a97edd80d333e449a2109e37512cfd376a6a9a0e18cb968",
-  "operation_map_sha256": "2ea6da3fce8a9949e42a47f818dc0e98a084321dff41914c0567a0f1a4d5cc54",
+  "base": "53256c54bf9b34596ac2247ca27622d9b8480af6",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ebe3aed1d27e6b22d21ef7148effd3c8e3c61225b473834d2f84e53897bd2781",
+  "operation_map_sha256": "7197d57e83c2de3c00ddeb8a58f92050d9f20c653d5876f4fd079531a60bc36a",
   "changes": {
     ".gitattributes": {
-      "before_sha256": "c90e2818a649fa9f2fb5f3e4230a83ebb76f1f46b3f60b525f31018fc0fe6f21",
-      "after_sha256": "47b9a5665800a97534d86c5944e013a6ec0d3076377a962416345d6eef6a1f4d",
+      "before_sha256": "47b9a5665800a97534d86c5944e013a6ec0d3076377a962416345d6eef6a1f4d",
+      "after_sha256": "5283ab75cf504103f5737df087d7046c2c990e795d7387fe1603c79e8cc427a1",
       "owners": {
         "@document": {
-          "before": "c90e2818a649fa9f2fb5f3e4230a83ebb76f1f46b3f60b525f31018fc0fe6f21",
-          "after": "47b9a5665800a97534d86c5944e013a6ec0d3076377a962416345d6eef6a1f4d"
-        }
-      }
-    },
-    "ci/test_shards/durations.json": {
-      "before_sha256": "0c64bcbdb061489dbf5bc91d595d3698d2bb1a224bd64be570444a7e1a4b6bdc",
-      "after_sha256": "769cd11b8a2b8ac1878d5a434ff85806740d1e4fbca242b68c0f4ac485d65472",
-      "owners": {
-        "@document": {
-          "before": "0c64bcbdb061489dbf5bc91d595d3698d2bb1a224bd64be570444a7e1a4b6bdc",
-          "after": "769cd11b8a2b8ac1878d5a434ff85806740d1e4fbca242b68c0f4ac485d65472"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "7537074dd3cebb16ab93f305bd493d87ed0e263622e6fa2bdad4ea1cbcff890b",
-      "after_sha256": "5a5d955fe3102e40365925ef507c42396571bbe766bba94639a790de411bdb20",
-      "owners": {
-        "@document": {
-          "before": "7537074dd3cebb16ab93f305bd493d87ed0e263622e6fa2bdad4ea1cbcff890b",
-          "after": "5a5d955fe3102e40365925ef507c42396571bbe766bba94639a790de411bdb20"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "b6851035626b1e956411b64ad99646abdbeafa203e454a69d21cfe42cc9b44ef",
-      "after_sha256": "83e6f97100620d41bd30ebebff7dd05fc08752ccff53598bfa11c855787c05f3",
-      "owners": {
-        "@document": {
-          "before": "b6851035626b1e956411b64ad99646abdbeafa203e454a69d21cfe42cc9b44ef",
-          "after": "83e6f97100620d41bd30ebebff7dd05fc08752ccff53598bfa11c855787c05f3"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "19293d1a8fbc543f531a67b9e4b02d2ab2e4d258bca2487cd5ca9c37751b729e",
-      "after_sha256": "8892f4962da071b4ffa459b8681bbe8e1689f65d478c41ba08ea35dab189d7f8",
-      "owners": {
-        "@document": {
-          "before": "19293d1a8fbc543f531a67b9e4b02d2ab2e4d258bca2487cd5ca9c37751b729e",
-          "after": "8892f4962da071b4ffa459b8681bbe8e1689f65d478c41ba08ea35dab189d7f8"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "211ec6efaf3a855a4df9e8d45801dee2d69ac3143785032caf1eed4fd89c4af6",
-      "after_sha256": "3b64b11e14e76245686da6ff5799216d736eae9a37c601d6e2f09fc94f095c2e",
-      "owners": {
-        "@document": {
-          "before": "211ec6efaf3a855a4df9e8d45801dee2d69ac3143785032caf1eed4fd89c4af6",
-          "after": "3b64b11e14e76245686da6ff5799216d736eae9a37c601d6e2f09fc94f095c2e"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "227ddabf5e8a56a3089cc7e448ec16584787b98be80ee882a28846e2621bd7f7",
-      "after_sha256": "1b8206c21058466e88a798113089f9c2daf5d37f987e89f9e6d00917aabe2c24",
-      "owners": {
-        "@document": {
-          "before": "227ddabf5e8a56a3089cc7e448ec16584787b98be80ee882a28846e2621bd7f7",
-          "after": "1b8206c21058466e88a798113089f9c2daf5d37f987e89f9e6d00917aabe2c24"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "19d9d8b6eb2317d0045e31f699974400219eb81c5f29e1e4047ff4d87cdeaab9",
-      "after_sha256": "63ec216edc8e903d14863736e90dd659fee5a30e66591f300fc3834362fda9de",
-      "owners": {
-        "@document": {
-          "before": "19d9d8b6eb2317d0045e31f699974400219eb81c5f29e1e4047ff4d87cdeaab9",
-          "after": "63ec216edc8e903d14863736e90dd659fee5a30e66591f300fc3834362fda9de"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "0a697410d2363f3dd65cf976c12c0184f1bc820905e4f2bc9f4fa591b30d4508",
-      "after_sha256": "e20700bda2dee13a5fea3fd4eb12269691669f971f5f0e9eb5f0c706e189ced4",
-      "owners": {
-        "@document": {
-          "before": "0a697410d2363f3dd65cf976c12c0184f1bc820905e4f2bc9f4fa591b30d4508",
-          "after": "e20700bda2dee13a5fea3fd4eb12269691669f971f5f0e9eb5f0c706e189ced4"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "e1f0bf47cc1439b79d363b24937c05160095c0f08b6cbc3a03b2bc2e343260c4",
-      "after_sha256": "20725aff5c6e6521e45940daa93f415c8d18f984bb60e8ec8b0ba2715f80a30b",
-      "owners": {
-        "@document": {
-          "before": "e1f0bf47cc1439b79d363b24937c05160095c0f08b6cbc3a03b2bc2e343260c4",
-          "after": "20725aff5c6e6521e45940daa93f415c8d18f984bb60e8ec8b0ba2715f80a30b"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "ad044c7e81eed6e0d312b8f39919e021795e35d3d0abc2ab0b35fb4cbb7e0441",
-      "after_sha256": "9624eb67dcd305e104db71523df6d069bb358551e398dc1fff970003d6a50af4",
-      "owners": {
-        "@document": {
-          "before": "ad044c7e81eed6e0d312b8f39919e021795e35d3d0abc2ab0b35fb4cbb7e0441",
-          "after": "9624eb67dcd305e104db71523df6d069bb358551e398dc1fff970003d6a50af4"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "379762e71a120557932b7ef5bbd8cbdcc3c54bc811d195c90cc4a178885d5c7f",
-      "after_sha256": "3a59b47ad8b739aeb5b4c8084cc67c76e27354c013cebe6547d020b3ef4acdbb",
-      "owners": {
-        "@document": {
-          "before": "379762e71a120557932b7ef5bbd8cbdcc3c54bc811d195c90cc4a178885d5c7f",
-          "after": "3a59b47ad8b739aeb5b4c8084cc67c76e27354c013cebe6547d020b3ef4acdbb"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "2ab6234e693cf61c72ae308d23eff938233d594c039ceb585429e922627e1af7",
-      "after_sha256": "1d19f2d0e39a2383c85abcf2caac861d7e36e7b7dc10da2788c7b34f3df24f33",
-      "owners": {
-        "@document": {
-          "before": "2ab6234e693cf61c72ae308d23eff938233d594c039ceb585429e922627e1af7",
-          "after": "1d19f2d0e39a2383c85abcf2caac861d7e36e7b7dc10da2788c7b34f3df24f33"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "52cc81cad3e3abafb03b3bde7f5dac97c56e7bc178e9a6664fc8daa2122542ce",
-      "after_sha256": "24c9834b5a36961ebab779b827b5790f7f4bad4644540824ff651823e1ef0086",
-      "owners": {
-        "@document": {
-          "before": "52cc81cad3e3abafb03b3bde7f5dac97c56e7bc178e9a6664fc8daa2122542ce",
-          "after": "24c9834b5a36961ebab779b827b5790f7f4bad4644540824ff651823e1ef0086"
+          "before": "47b9a5665800a97534d86c5944e013a6ec0d3076377a962416345d6eef6a1f4d",
+          "after": "5283ab75cf504103f5737df087d7046c2c990e795d7387fe1603c79e8cc427a1"
         }
       }
     },
     "conformance/typescript/src/contract.ts": {
-      "before_sha256": "ddde37f4b66f548cca91a4a4b72c1a0b1b9d46b1a14ebda4eefb02993ccde01e",
-      "after_sha256": "62e55f9cfe9eb7a10889f291b455dc6f6954f2fdfe4bae9f341f1ff1e95f1178",
+      "before_sha256": "62e55f9cfe9eb7a10889f291b455dc6f6954f2fdfe4bae9f341f1ff1e95f1178",
+      "after_sha256": "78eb91ea8dbdf51867d55da36531a6cdf2dfb4fcd7db4dc7540040a0b127f143",
       "owners": {
         "@document": {
-          "before": "ddde37f4b66f548cca91a4a4b72c1a0b1b9d46b1a14ebda4eefb02993ccde01e",
-          "after": "62e55f9cfe9eb7a10889f291b455dc6f6954f2fdfe4bae9f341f1ff1e95f1178"
+          "before": "62e55f9cfe9eb7a10889f291b455dc6f6954f2fdfe4bae9f341f1ff1e95f1178",
+          "after": "78eb91ea8dbdf51867d55da36531a6cdf2dfb4fcd7db4dc7540040a0b127f143"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "3f1d246b7aa555deac59f511a22f5e0ba1bdb67650214345659ca178fe4c6b79",
-      "after_sha256": "9d6c739c12e99a5e3d18a511aa3b6b221b1be6528860686d1ac57637ab9b121e",
+      "before_sha256": "9d6c739c12e99a5e3d18a511aa3b6b221b1be6528860686d1ac57637ab9b121e",
+      "after_sha256": "33156121a82da67246cc679dc4fa56080971d8713c5a93e2252fb76e395c5d43",
       "owners": {
         "@document": {
-          "before": "3f1d246b7aa555deac59f511a22f5e0ba1bdb67650214345659ca178fe4c6b79",
-          "after": "9d6c739c12e99a5e3d18a511aa3b6b221b1be6528860686d1ac57637ab9b121e"
+          "before": "9d6c739c12e99a5e3d18a511aa3b6b221b1be6528860686d1ac57637ab9b121e",
+          "after": "33156121a82da67246cc679dc4fa56080971d8713c5a93e2252fb76e395c5d43"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "eea68f3fe737f0d981de8ef115d02012f3771b8f7da2133b4a62ea6217a87449",
-      "after_sha256": "79f3d47b69788daf3c3fb796f35d467aa71c4eb18b81172a1ee4e8107bb6c03c",
+      "before_sha256": "79f3d47b69788daf3c3fb796f35d467aa71c4eb18b81172a1ee4e8107bb6c03c",
+      "after_sha256": "b8f9d12cb3700949a2ba8fd7c0425541c16da1119d0e6d2aa6686e0dee7fdaed",
       "owners": {
         "@document": {
-          "before": "eea68f3fe737f0d981de8ef115d02012f3771b8f7da2133b4a62ea6217a87449",
-          "after": "79f3d47b69788daf3c3fb796f35d467aa71c4eb18b81172a1ee4e8107bb6c03c"
+          "before": "79f3d47b69788daf3c3fb796f35d467aa71c4eb18b81172a1ee4e8107bb6c03c",
+          "after": "b8f9d12cb3700949a2ba8fd7c0425541c16da1119d0e6d2aa6686e0dee7fdaed"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "04de1f95a9d7629d7bed8fd85b5ef168afd5749354014ac94e52f1e2be48a2e6",
-      "after_sha256": "1d3d119198bec9e27ca9f9d17e8674d3d34e117a68ed550a4d8ff5c40a3f5f33",
+      "before_sha256": "1d3d119198bec9e27ca9f9d17e8674d3d34e117a68ed550a4d8ff5c40a3f5f33",
+      "after_sha256": "1563b41a19d699675174dcf193ff6b13e59f8a34a94b832f23a63997a0cb0cac",
       "owners": {
         "@document": {
-          "before": "04de1f95a9d7629d7bed8fd85b5ef168afd5749354014ac94e52f1e2be48a2e6",
-          "after": "1d3d119198bec9e27ca9f9d17e8674d3d34e117a68ed550a4d8ff5c40a3f5f33"
+          "before": "1d3d119198bec9e27ca9f9d17e8674d3d34e117a68ed550a4d8ff5c40a3f5f33",
+          "after": "1563b41a19d699675174dcf193ff6b13e59f8a34a94b832f23a63997a0cb0cac"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "d83e28bae20c9863e5583c66415f5c804ed66fcd26ffac4ff21d4a276602e605",
-      "after_sha256": "4ea89909291a685055c6cee0168307466fd42f5da282689b87e6298c28b94630",
+      "before_sha256": "4ea89909291a685055c6cee0168307466fd42f5da282689b87e6298c28b94630",
+      "after_sha256": "37ea55d196289767cf02ac358f9af44f808e0be5a9469dbbdb7d2ea8854a6680",
       "owners": {
         "@document": {
-          "before": "d83e28bae20c9863e5583c66415f5c804ed66fcd26ffac4ff21d4a276602e605",
-          "after": "4ea89909291a685055c6cee0168307466fd42f5da282689b87e6298c28b94630"
+          "before": "4ea89909291a685055c6cee0168307466fd42f5da282689b87e6298c28b94630",
+          "after": "37ea55d196289767cf02ac358f9af44f808e0be5a9469dbbdb7d2ea8854a6680"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "c80fbe43edc1e0c1ad24e13de651766f23d3995523a14f66d782bd76264f09a2",
-      "after_sha256": "3bd29105618436e74d0c97dddedbe2b5ca378eab9e4cc7bb96fd08ea35746bce",
+      "before_sha256": "3bd29105618436e74d0c97dddedbe2b5ca378eab9e4cc7bb96fd08ea35746bce",
+      "after_sha256": "9266a2da2d596748e67e15f66c0da0654e2c3892a9a8d03700e4b57811aec5f1",
       "owners": {
         "@document": {
-          "before": "c80fbe43edc1e0c1ad24e13de651766f23d3995523a14f66d782bd76264f09a2",
-          "after": "3bd29105618436e74d0c97dddedbe2b5ca378eab9e4cc7bb96fd08ea35746bce"
+          "before": "3bd29105618436e74d0c97dddedbe2b5ca378eab9e4cc7bb96fd08ea35746bce",
+          "after": "9266a2da2d596748e67e15f66c0da0654e2c3892a9a8d03700e4b57811aec5f1"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "3014a061ca72dd29c3998de8a33f811cf1c7be875d6ceed3d57434f3a56ef78b",
-      "after_sha256": "7b9db7341256e22c75567acf1a5f86c56977d278ef698d1f68367575190bcd38",
+      "before_sha256": "7b9db7341256e22c75567acf1a5f86c56977d278ef698d1f68367575190bcd38",
+      "after_sha256": "481baafb0ba35828abda99249cdda2acfc569d0b17351d2927a71ad71951e9f8",
       "owners": {
         "@document": {
-          "before": "3014a061ca72dd29c3998de8a33f811cf1c7be875d6ceed3d57434f3a56ef78b",
-          "after": "7b9db7341256e22c75567acf1a5f86c56977d278ef698d1f68367575190bcd38"
+          "before": "7b9db7341256e22c75567acf1a5f86c56977d278ef698d1f68367575190bcd38",
+          "after": "481baafb0ba35828abda99249cdda2acfc569d0b17351d2927a71ad71951e9f8"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "d4a3df553750e0ff8364647e891879854df15a819ad585dd5820e33010f8c0f4",
-      "after_sha256": "2d61ec7008e58b9ae1dbd2f542be9e87b59e9007707b350ce3f784e88fde82a7",
+      "before_sha256": "2d61ec7008e58b9ae1dbd2f542be9e87b59e9007707b350ce3f784e88fde82a7",
+      "after_sha256": "50985893f66c9bbb4230156c0deefcca9641ac25fbc89a163cb2de07faf0413a",
       "owners": {
         "@document": {
-          "before": "d4a3df553750e0ff8364647e891879854df15a819ad585dd5820e33010f8c0f4",
-          "after": "2d61ec7008e58b9ae1dbd2f542be9e87b59e9007707b350ce3f784e88fde82a7"
+          "before": "2d61ec7008e58b9ae1dbd2f542be9e87b59e9007707b350ce3f784e88fde82a7",
+          "after": "50985893f66c9bbb4230156c0deefcca9641ac25fbc89a163cb2de07faf0413a"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "e70baa5d9163be7731ba4cdc4ef421a04374cf66717cab651e8b3661382ad54d",
-      "after_sha256": "a3bd50eb106dfff79c4b60539ed8c68ca8eef2f82d278c2f3c88e349a11d0375",
+      "before_sha256": "a3bd50eb106dfff79c4b60539ed8c68ca8eef2f82d278c2f3c88e349a11d0375",
+      "after_sha256": "10f6adc99127472f08ddac1deea8b216329d7052006db1a61e98d15fba6d7616",
       "owners": {
         "@document": {
-          "before": "e70baa5d9163be7731ba4cdc4ef421a04374cf66717cab651e8b3661382ad54d",
-          "after": "a3bd50eb106dfff79c4b60539ed8c68ca8eef2f82d278c2f3c88e349a11d0375"
+          "before": "a3bd50eb106dfff79c4b60539ed8c68ca8eef2f82d278c2f3c88e349a11d0375",
+          "after": "10f6adc99127472f08ddac1deea8b216329d7052006db1a61e98d15fba6d7616"
         }
       }
     },
-    "contracts/migrations/44.3.30-to-44.3.31.md": {
+    "contracts/migrations/44.3.31-to-44.3.32.md": {
       "before_sha256": null,
-      "after_sha256": "a3e1d13c559237c91bd8b95d9da49bdfde71a7991329a5d8f317445951ede992",
+      "after_sha256": "3c295bfe74f78f32812c15c9e280f89311c875bb7e2f690714f8ea7f5971b744",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a3e1d13c559237c91bd8b95d9da49bdfde71a7991329a5d8f317445951ede992"
+          "after": "3c295bfe74f78f32812c15c9e280f89311c875bb7e2f690714f8ea7f5971b744"
         }
       }
     },
     "contracts/openapi.yaml": {
-      "before_sha256": "5af064459261ce74c8b77c9bdb993e68889d35f47470e8ac729a675395fa516f",
-      "after_sha256": "a7d7b435e8670c9dfade9483f586abf71012c8e064b676e027250ff26907f2f4",
+      "before_sha256": "a7d7b435e8670c9dfade9483f586abf71012c8e064b676e027250ff26907f2f4",
+      "after_sha256": "b80071e802b9e944a80e00b58bab82a1c7072d60358fbd8d2673e85a60665035",
       "owners": {
         "@document": {
-          "before": "5af064459261ce74c8b77c9bdb993e68889d35f47470e8ac729a675395fa516f",
-          "after": "a7d7b435e8670c9dfade9483f586abf71012c8e064b676e027250ff26907f2f4"
+          "before": "a7d7b435e8670c9dfade9483f586abf71012c8e064b676e027250ff26907f2f4",
+          "after": "b80071e802b9e944a80e00b58bab82a1c7072d60358fbd8d2673e85a60665035"
         }
       }
     },
-    "data/source_audits/d09/baseline/tests/unit/test_order97_facade_evidence.py.txt": {
+    "data/source_audits/d10/baseline/tests/unit/test_order97_attack_evidence.py.txt": {
       "before_sha256": null,
-      "after_sha256": "4bca5a0e6d0275458cbf34971ff3f984def0db4bc65509b110039a9fe7c6a263",
+      "after_sha256": "28232bb21f15d834ac57d3106bbc31f5e640f846e11ac3716aba3ae81340524e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4bca5a0e6d0275458cbf34971ff3f984def0db4bc65509b110039a9fe7c6a263"
+          "after": "28232bb21f15d834ac57d3106bbc31f5e640f846e11ac3716aba3ae81340524e"
         }
       }
     },
-    "data/source_audits/d09/baseline/tests/unit/test_phase13b_shooting_declarations.py.txt": {
+    "data/source_audits/d10/baseline/tests/unit/test_phase13b_shooting_phase_declarations.py.txt": {
       "before_sha256": null,
-      "after_sha256": "03e0fe35297d74bdfa3e27b341e19c239a4ab945c277564b2b12583cfda6a6d6",
+      "after_sha256": "fccb77a79c0cc9d8413f4a87dcc32065fbb92a2e1fe376bf801fca5640b97b9e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "03e0fe35297d74bdfa3e27b341e19c239a4ab945c277564b2b12583cfda6a6d6"
+          "after": "fccb77a79c0cc9d8413f4a87dcc32065fbb92a2e1fe376bf801fca5640b97b9e"
         }
       }
     },
-    "data/source_audits/d09/original-Advance-negative.py.txt": {
+    "data/source_audits/d10/selected-source-and-acceptance.json": {
       "before_sha256": null,
-      "after_sha256": "8d099a09fc5d55f225b403c01eccfa2de9d8d1e8bc39ae61ad7dbb49a059bbd0",
+      "after_sha256": "812b7a20354c7a2de2e2f053ae9041133d88360591f886ff53879e3fa26fa3a5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8d099a09fc5d55f225b403c01eccfa2de9d8d1e8bc39ae61ad7dbb49a059bbd0"
+          "after": "812b7a20354c7a2de2e2f053ae9041133d88360591f886ff53879e3fa26fa3a5"
         }
       }
     },
-    "data/source_audits/d09/selected-source.json": {
+    "data/source_audits/d10/test-preservation.json": {
       "before_sha256": null,
-      "after_sha256": "be5af0ee2066593a787160dab807865f9f86f63304dcc2a5a2a910da4341bfd4",
+      "after_sha256": "72438dd5d19606ce123595fb60df662e8e6a98cc7cdf85b8dae36ae70dd51fbf",
       "owners": {
         "@document": {
           "before": null,
-          "after": "be5af0ee2066593a787160dab807865f9f86f63304dcc2a5a2a910da4341bfd4"
+          "after": "72438dd5d19606ce123595fb60df662e8e6a98cc7cdf85b8dae36ae70dd51fbf"
         }
       }
     },
-    "data/source_audits/d09/test-preservation.json": {
-      "before_sha256": null,
-      "after_sha256": "a7d6949a94a38a31d0779bb065840b4ba3c4f344c4893debcbadc4076619f575",
+    "data/source_audits/order135/current-bindings.json": {
+      "before_sha256": "f171ed97c0858c4744efe797dd5669d91d5547015eedd0d1e78b742dfd79da44",
+      "after_sha256": "476c1f60543a408de873471fc1c6a8b7513d271b86ae218a1f3f83f19639acbf",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "a7d6949a94a38a31d0779bb065840b4ba3c4f344c4893debcbadc4076619f575"
+          "before": "f171ed97c0858c4744efe797dd5669d91d5547015eedd0d1e78b742dfd79da44",
+          "after": "476c1f60543a408de873471fc1c6a8b7513d271b86ae218a1f3f83f19639acbf"
         }
       }
     },
     "data/source_audits/order135/current-inventory.json": {
-      "before_sha256": "bc8004b2cdd1754d31ffdd41fae254b1123b22b1b4b7fb94e5f680d19fb15eca",
-      "after_sha256": "ff842a79fe64875bb4bdcb40adcd957bd1b21eeb5c5cbbf5636daeaa6d914fb3",
+      "before_sha256": "ff842a79fe64875bb4bdcb40adcd957bd1b21eeb5c5cbbf5636daeaa6d914fb3",
+      "after_sha256": "a388399be055674b6f002a67493422af00f4eed8b399956d3c1a3ba61f803608",
       "owners": {
         "@document": {
-          "before": "bc8004b2cdd1754d31ffdd41fae254b1123b22b1b4b7fb94e5f680d19fb15eca",
-          "after": "ff842a79fe64875bb4bdcb40adcd957bd1b21eeb5c5cbbf5636daeaa6d914fb3"
+          "before": "ff842a79fe64875bb4bdcb40adcd957bd1b21eeb5c5cbbf5636daeaa6d914fb3",
+          "after": "a388399be055674b6f002a67493422af00f4eed8b399956d3c1a3ba61f803608"
+        }
+      }
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "593f841286a9d954c2fbbdb09ffbbf19c9ce1dce6c0c9779b68674ba8eb48163",
+      "after_sha256": "baf59de99331081cec2316af4d7b8c54182de49d69fb4d7d44a0c83e84356af0",
+      "owners": {
+        "@document": {
+          "before": "593f841286a9d954c2fbbdb09ffbbf19c9ce1dce6c0c9779b68674ba8eb48163",
+          "after": "baf59de99331081cec2316af4d7b8c54182de49d69fb4d7d44a0c83e84356af0"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "1a0c3f4cf05a4339c80e6a6195663fb99dc396a1feafc6b8f8677a8bdf5caaad",
-      "after_sha256": "faf87f3d3bd1d6c56ae7aee26e185739ad023b155f04ab6cba87e0174a00fdb2",
+      "before_sha256": "faf87f3d3bd1d6c56ae7aee26e185739ad023b155f04ab6cba87e0174a00fdb2",
+      "after_sha256": "23cf29b3e31ce1aea6477164d47e27d69de262a16893b608e09c527f482e53b2",
       "owners": {
         "@document": {
-          "before": "1a0c3f4cf05a4339c80e6a6195663fb99dc396a1feafc6b8f8677a8bdf5caaad",
-          "after": "faf87f3d3bd1d6c56ae7aee26e185739ad023b155f04ab6cba87e0174a00fdb2"
+          "before": "faf87f3d3bd1d6c56ae7aee26e185739ad023b155f04ab6cba87e0174a00fdb2",
+          "after": "23cf29b3e31ce1aea6477164d47e27d69de262a16893b608e09c527f482e53b2"
         }
       }
     },
-    "docs/D09_HEAVY_SHORT_ADVANCE_SCOPE.md": {
+    "docs/D10_PHYSICAL_WEAPON_PROFILE_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "877181cfdbae1847dba8a875906575812f08d1508d1d4963e1306ce0d1c5b76e",
+      "after_sha256": "7771e197c331a32eff147f15a084d733e86116fbfd9996310bf06fcbcdb2d1d1",
       "owners": {
         "@document": {
           "before": null,
-          "after": "877181cfdbae1847dba8a875906575812f08d1508d1d4963e1306ce0d1c5b76e"
+          "after": "7771e197c331a32eff147f15a084d733e86116fbfd9996310bf06fcbcdb2d1d1"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "9abfb66413db5092cfef31e2e7c14017281e3f39ca91df46960359e2db314fbf",
-      "after_sha256": "d57c560aecb7bf59eec312a4e637bad041ef813c030473533299f43b289312a8",
+      "before_sha256": "d57c560aecb7bf59eec312a4e637bad041ef813c030473533299f43b289312a8",
+      "after_sha256": "f8feb624156fecd1a32383f84386045d8631e9eb489367ce977c06430d7d6f7c",
       "owners": {
         "@document": {
-          "before": "9abfb66413db5092cfef31e2e7c14017281e3f39ca91df46960359e2db314fbf",
-          "after": "d57c560aecb7bf59eec312a4e637bad041ef813c030473533299f43b289312a8"
+          "before": "d57c560aecb7bf59eec312a4e637bad041ef813c030473533299f43b289312a8",
+          "after": "f8feb624156fecd1a32383f84386045d8631e9eb489367ce977c06430d7d6f7c"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "aae2f846c4726e1e9821ea806e02a2164f2475e631fd18ce561a607a9f81e809",
-      "after_sha256": "5114d16b5c4511353c81c0d203d10425307235ae6ba1b2f2bf536a0c9dd6ae6f",
+      "before_sha256": "5114d16b5c4511353c81c0d203d10425307235ae6ba1b2f2bf536a0c9dd6ae6f",
+      "after_sha256": "82a17a7166d78d4aeab112c7dad6271218d3d226eb1d47a6e83c1cda8b076399",
       "owners": {
         "@document": {
-          "before": "aae2f846c4726e1e9821ea806e02a2164f2475e631fd18ce561a607a9f81e809",
-          "after": "5114d16b5c4511353c81c0d203d10425307235ae6ba1b2f2bf536a0c9dd6ae6f"
+          "before": "5114d16b5c4511353c81c0d203d10425307235ae6ba1b2f2bf536a0c9dd6ae6f",
+          "after": "82a17a7166d78d4aeab112c7dad6271218d3d226eb1d47a6e83c1cda8b076399"
         }
       }
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "5705b1ec76969a8e67f82a1cd331cbe77f7df22969554d552692099e63d01a3b",
-      "after_sha256": "8ba237391367953f2498c09cfa3e39430a6dd4a015a5dc82a29df3055fc3f4b9",
+      "before_sha256": "8ba237391367953f2498c09cfa3e39430a6dd4a015a5dc82a29df3055fc3f4b9",
+      "after_sha256": "0e87686ef805874c28112033a1a997f234bdb2c8a7bdbea77ff96bb342c772cb",
       "owners": {
         "@module": {
-          "before": "3d931737f9322530ca60a7121c3d01f51d5177c343d1be4d58801f738b1967ca",
-          "after": "0e91aff5414c57d358a3ac9d186655736e330ab7e45113b5f2b74bd33ad5e46b"
+          "before": "0e91aff5414c57d358a3ac9d186655736e330ab7e45113b5f2b74bd33ad5e46b",
+          "after": "012b724663cf3486cd6b7277ade7135ad7d8b326a56c297f1e33e04e34d40036"
         }
       }
     },
-    "src/warhammer40k_core/engine/phases/shooting_targeting.py": {
-      "before_sha256": "fd8e9eeb6079a2be86d813ac5dd8f5ca6a8076cd9e5ad0de2b675c357397f5a2",
-      "after_sha256": "5918b92e34f4b141759ef973c6ab2f8189c3195c85af28b46921bd048d6a754d",
+    "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py": {
+      "before_sha256": "ba561707fd0ce84bb0d66695f8294c3b58f60eff18882b95a5374c127634b5a1",
+      "after_sha256": "2e604814a27ec5340ab7cc913d0284fc260aec5ea5b4dad1b96b476f2c8c8bb9",
       "owners": {
-        "_rules_unit_within_heavy_movement_allowance": {
-          "before": "3f9de6cc0bb0f27bdf010f8fb5a6fb5d2ba9826a683a54e7c131f0ca48cba537",
-          "after": "98d7bcea86bb774d6ba49db553e7f533040a79632a0ed9cd4ac29fc0d9f6469d"
+        "_attack_pools_or_validation": {
+          "before": "d3189605b7edbdcd51cce15896e7678dd50670f8ba01c662d6d8d1bf147a3bf0",
+          "after": "db54767dea297ed0562ff72614fd04be34cad9b34f55f964fdb3ce651df331e6"
         }
       }
     },
-    "tests/code_quality/test_d07_upper_floor_preservation.py": {
-      "before_sha256": "74a3ef6f97b64a28bdd841ae126e9eba62fc54570b3119115318bdc4ee44a944",
-      "after_sha256": "b8a72157228d20cce7fddb5491cf6c97dad8de23512684033b56962fe26069da",
-      "owners": {
-        "@module": {
-          "before": "855f49cc0897b7a5b86ccb10d73969d67b42e319f0d57eabff7a8ccd09f84fd9",
-          "after": "7640011d5b1c4d03cbef8f8860d538161836be4de69533771e4c1361de87505a"
-        },
-        "test_d07_complete_sources_archives_and_original_tests_remain_pinned": {
-          "before": "8511ae7a7b28fcba2a88d9189a8f4981d8057b13400fcc14aa63b8807620278b",
-          "after": "9cb340a32af524643e736d73e9409aa4044903665f41d1939941e2ee06ae079f"
-        }
-      }
-    },
-    "tests/code_quality/test_d09_heavy.py": {
+    "tests/code_quality/test_d10_profiles.py": {
       "before_sha256": null,
-      "after_sha256": "ada2b6c699edd9e799efbeb85e390bcc6552526cf7ff368e92a4b9bc833e470a",
+      "after_sha256": "63dd2a028d2faf8d1f2ae602cc866e8caecc87a11b678d79cfc9abfe2c14e67d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b7ccdefa4ed57d5844771c5dd8dece1772e22193e264df3142737da072a48978"
+          "after": "b9ae0f978092d7c8cffc5cb6edec78f550bf8bc45b703cf1202455ea1ded6e6c"
         },
-        "test_heavy_uses_setup_and_accepted_distance_without_action_label_veto": {
+        "test_complete_original_tests_keep_assertions_decorators_and_unrelated_ast": {
           "before": null,
-          "after": "d5d7ee30749ab2e04756519be0049a3172c0249f3c92f53b48037c1935ff1fb0"
+          "after": "f764bcca5ff9eb5353fe12776184a0bd74a94028bbdc39e3feee4490f4a24e46"
         },
-        "test_original_advanced_negative_keeps_every_gameplay_assertion": {
+        "test_duplicate_guard_uses_authenticated_physical_copy_before_profile_consumers": {
           "before": null,
-          "after": "68da00e1bd01598c0924ae85a28fdbb3d794ae0c669a190a184566b7f1951756"
-        }
-      }
-    },
-    "tests/d09_heavy_helpers.py": {
-      "before_sha256": null,
-      "after_sha256": "0db7f4659a8911cb5871deae00e6ef299bd8b6519b9f64617208e33604429913",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "aeaf52540a46dcbf2536b54659c52b8f209472798dc57fe9d0d22689b60755f5"
-        },
-        "assert_heavy_checkpoint": {
-          "before": null,
-          "after": "dd950cb4f0fcfd3df64c6b001d5d5c48a166f3df053058565812ac4fe38a6b8a"
-        },
-        "complete_heavy_attack": {
-          "before": null,
-          "after": "17f02ab559bacebcbb55dbb05c03dac2bad7fdfa9e6a22cb17e38987e8382f3c"
-        },
-        "decline_native_windows": {
-          "before": null,
-          "after": "eb67f706a2f3bb2c799e23adca9f95563d5a552e5cec034f17da2bd19361a1d8"
-        },
-        "heavy_session": {
-          "before": null,
-          "after": "1fff28ade68c4073ef12cd57970084a9b4a8c1b581364b95fb3bf550b84e0df5"
-        },
-        "heavy_unit_id": {
-          "before": null,
-          "after": "39ee313c9fdbec3921eab898df77b67a78032265dbc11f16e709e0d9f8fe0d5a"
-        },
-        "move_heavy_unit": {
-          "before": null,
-          "after": "2a2076ccf5c75701855bb2190b1e056574700c56278017a25601e95e81765abc"
-        },
-        "reach_second_player_movement": {
-          "before": null,
-          "after": "bea752c0e94c1529928c8b2d9b22989bb62cde315a3e1fb43c5b07892e8ff28d"
+          "after": "c2c99429c8b1ab1ecda125b0c2f3f5d947056fc808806ad21a3e32049800f90b"
         }
       }
     },
     "tests/d09_test_preservation_helpers.py": {
-      "before_sha256": null,
-      "after_sha256": "5c4146f5bdba7d8160c74b4c4e4e8063a8236f58016464ea8a2eeb8633cf56e5",
+      "before_sha256": "5c4146f5bdba7d8160c74b4c4e4e8063a8236f58016464ea8a2eeb8633cf56e5",
+      "after_sha256": "96684cdfcb12400d9ba35b3a7e7a1298f6e62563842f28adfca506ed1a22af93",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "76ce095a13d4e7649395e0bbbf19c59dcba32f65c2b87a15c8b7fa0e86057197"
+          "before": "76ce095a13d4e7649395e0bbbf19c59dcba32f65c2b87a15c8b7fa0e86057197",
+          "after": "9a89caa9e927e9430edfc6cbd2ef2021cd459842dda437fd26cdccec22cecf98"
         },
         "preserved_d09_predecessor_test_bytes": {
-          "before": null,
-          "after": "2f850bf572772653f66e56494ddbb4f2b905ba3a17cf8ea69602dcd7dfc8ad0f"
+          "before": "2f850bf572772653f66e56494ddbb4f2b905ba3a17cf8ea69602dcd7dfc8ad0f",
+          "after": "59c9670c63e98b69759e4ec20ff4759cdeebb4c4414ddfcea2fce76ac3632265"
         }
       }
     },
-    "tests/unit/test_order97_facade_evidence.py": {
-      "before_sha256": "4bca5a0e6d0275458cbf34971ff3f984def0db4bc65509b110039a9fe7c6a263",
-      "after_sha256": "a62e7b0ec38394ca970bd0a079c3a7c94673060bde1fdf127f7386c1facf2a97",
+    "tests/d10_profile_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "72934c25f7ebcd2db1b7f3f24b4515fa08dc3a121e006829f33575a7cbc6cabb",
       "owners": {
         "@module": {
-          "before": "913c88a8915b75ce9232968f0c158ad86dbd8487383df55b71d394b4f76a427e",
-          "after": "ac49f12cfc939cdec3b0a6f9f8135239f762f48949d432b388e71c467bf88d80"
-        },
-        "test_d09_advance_keeps_accepted_vertical_flight_distance": {
           "before": null,
-          "after": "19c606e6000183977f35bff55bf7d26763702d25d7c32945ddf8c3901836c75d"
+          "after": "99c4843e2f3cfe788fa29ce21318aabf4106e5f9915a94670f5fa9475b3c6e53"
         },
-        "test_d09_every_physical_model_counts_return_path": {
+        "advertised_weapons": {
           "before": null,
-          "after": "55f9b090da8a6d4d6c6fb061726be7f64c7e5917c1db4073aa404e975495c771"
+          "after": "14e83bcb653ce31730e146fc9b86d3ef38b8c12358b85159ccde9dc71938e48b"
         },
-        "test_d09_heavy_grants_no_advance_shooting_permission": {
+        "declaration_request": {
           "before": null,
-          "after": "6ac89ff51add355d3e8f0aac59b50e39655543a6fdeceb26dcc94ef7fd2e2a06"
+          "after": "ab293f3369f27760b6d13996d31935f671495109c2e74487fbb8187cda8f14a2"
         },
-        "test_d09_native_heavy_short_move_and_long_move": {
+        "finish_profile_attack": {
           "before": null,
-          "after": "5112cd53693097563bc26557e6f1e7a16e335fd395b01751fcdd04ed8d0da3e1"
+          "after": "3824288ab7656eaf5396ce2966da753453ce5c440265cdfba2949dbf0a5ed3b0"
+        },
+        "profile_catalog": {
+          "before": null,
+          "after": "31c59fcac707f1263d7a420d804f246d756e152eef79318664aa9f92a9df384e"
+        },
+        "profile_checkpoint": {
+          "before": null,
+          "after": "b6893e456e0f510e23e1bc82253f27d1b6b72e1a2cd4237f27652fbb996c279f"
+        },
+        "profile_proposal": {
+          "before": null,
+          "after": "1e757d903c5229e481140bc2e3544c257b5375a268a2812ea40216ba0115fd72"
+        },
+        "profile_session": {
+          "before": null,
+          "after": "4360dbb849c650d6d290640712eba581c717689bacb85a476b94629ad346da68"
+        },
+        "submit_profile": {
+          "before": null,
+          "after": "27ad6b35ac4ef8bf71a7fcd24c4d6b0ef91f5b744b4fde113e8450f654884929"
         }
       }
     },
-    "tests/unit/test_phase13b_shooting_declarations.py": {
-      "before_sha256": "03e0fe35297d74bdfa3e27b341e19c239a4ab945c277564b2b12583cfda6a6d6",
-      "after_sha256": "7302211caf393b50454d2e69488a6470574df9266e91de740f9414d0c4cfafbf",
+    "tests/d10_test_preservation_helpers.py": {
+      "before_sha256": null,
+      "after_sha256": "afe34af272073ec89341d65d76c9ff3d47c1b5bffdf3658b8e8e11d707b0c84b",
       "owners": {
-        "test_phase13d_advanced_unit_allowed_to_shoot_does_not_gain_heavy_modifier": {
-          "before": "cbf7de22a29474373fd20ea0666681df7c609edf86023750367a6aabaffbbf51",
-          "after": "48ab8899527e5e2fb76928bd2fefd0072fadea4ac3637c744b9d98f3c684cfbe"
+        "@module": {
+          "before": null,
+          "after": "af11b28dbfce88e5864fbdb79ff4eabf2a54e42594d84218d3d8343082e0b798"
+        },
+        "preserved_d10_predecessor_test_bytes": {
+          "before": null,
+          "after": "2b8cc9b74c59f0d73f23a5755c17e227deffb3be4619c7eb0d57e249267cf1e3"
+        }
+      }
+    },
+    "tests/unit/test_order97_attack_evidence.py": {
+      "before_sha256": "28232bb21f15d834ac57d3106bbc31f5e640f846e11ac3716aba3ae81340524e",
+      "after_sha256": "0df66af7f283a8c6959c4eab29ac12d2b657f8dd33389297b9b891855ff96dd3",
+      "owners": {
+        "@module": {
+          "before": "d167e85ecc44603cdbfd81bb04c7c7f5893d73672ac470a8cf8423eae00529c1",
+          "after": "1cdbabb34410c84f78a8da7b62233b3009cc7195b6e13f89f96a83ef27235ae4"
+        },
+        "test_independent_physical_weapons_can_choose_different_profiles": {
+          "before": null,
+          "after": "b3007288f5595058be0c2b29d37fb3f70684d91b42934db3a79e0ad7e89ca370"
+        },
+        "test_one_copy_cannot_select_two_profiles_and_exact_request_retries": {
+          "before": null,
+          "after": "6e04087f855e9c3aeca2106a1e3082ab72ef81b26b1fd72cc31453685ca3070b"
+        },
+        "test_profile_selection_rejects_stale_wrong_player_and_unadvertised_copy_atomically": {
+          "before": null,
+          "after": "dd8c522532b6ee67881ac8a5c5f2791a0f01456c1b9756353eb4d8746278e2e5"
+        }
+      }
+    },
+    "tests/unit/test_phase13b_shooting_phase_declarations.py": {
+      "before_sha256": "fccb77a79c0cc9d8413f4a87dcc32065fbb92a2e1fe376bf801fca5640b97b9e",
+      "after_sha256": "f3f2a26845a2dbdf91dacb3a61adc238aceaf6e7c147e76f13243d5ac9355b48",
+      "owners": {
+        "@module": {
+          "before": "9d57be890cac273cb67df8ddd0a48ef56d4965eae5cc91875e8bf02a3f938e60",
+          "after": "7b26c595e57f81361753885d737e7646fbf12dd25fe50a22ef67c5387d90cb9b"
+        },
+        "_catalog_with_ctan_power_selection_limit": {
+          "before": "5f0638d397bda24ff7952f00ecc5eb2f661b92a990ab89c7a363ae042e8b1e4d",
+          "after": "b5bc85e13c027431ce76d6aa1f54b3ff73b018a85020b2549bb76dd9bdc8e2b1"
         }
       }
     }
@@ -502,139 +386,9 @@
         "d09-authenticated-source-bytes"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/durations.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
@@ -642,9 +396,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -652,9 +406,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -662,9 +416,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -672,9 +426,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -682,9 +436,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -692,9 +446,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -702,9 +456,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -712,9 +466,9 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -722,19 +476,19 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
-    "contracts/migrations/44.3.30-to-44.3.31.md": {
+    "contracts/migrations/44.3.31-to-44.3.32.md": {
       "category": "rule_semantics",
       "operations": [
-        "d09-retained-source-publication"
+        "d10-retained-source-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "contracts/openapi.yaml": {
       "category": "rule_semantics",
@@ -742,59 +496,59 @@
         "contract-42-1-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
-    "data/source_audits/d09/baseline/tests/unit/test_order97_facade_evidence.py.txt": {
+    "data/source_audits/d10/baseline/tests/unit/test_order97_attack_evidence.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "d09-retained-source-publication"
+        "d10-retained-source-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
-    "data/source_audits/d09/baseline/tests/unit/test_phase13b_shooting_declarations.py.txt": {
+    "data/source_audits/d10/baseline/tests/unit/test_phase13b_shooting_phase_declarations.py.txt": {
       "category": "rule_semantics",
       "operations": [
-        "d09-retained-source-publication"
+        "d10-retained-source-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
-    "data/source_audits/d09/original-Advance-negative.py.txt": {
+    "data/source_audits/d10/selected-source-and-acceptance.json": {
       "category": "rule_semantics",
       "operations": [
-        "d09-retained-source-publication"
+        "d10-retained-source-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
-    "data/source_audits/d09/selected-source.json": {
+    "data/source_audits/d10/test-preservation.json": {
       "category": "rule_semantics",
       "operations": [
-        "d09-retained-source-publication"
+        "d10-retained-source-publication"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
-    "data/source_audits/d09/test-preservation.json": {
+    "data/source_audits/order135/current-bindings.json": {
       "category": "rule_semantics",
       "operations": [
-        "d09-retained-source-publication"
+        "order135-current-source-audit"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "data/source_audits/order135/current-inventory.json": {
       "category": "rule_semantics",
@@ -802,33 +556,41 @@
         "order135-current-source-audit"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
-    "docs/D09_HEAVY_SHORT_ADVANCE_SCOPE.md": {
+    "docs/D10_PHYSICAL_WEAPON_PROFILE_SCOPE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -836,9 +598,9 @@
         "order108-terrain-semantics"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
@@ -846,45 +608,27 @@
         "order129-flight-history"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
-    "src/warhammer40k_core/engine/phases/shooting_targeting.py": {
+    "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py": {
       "category": "rule_semantics",
       "operations": [
-        "d09-heavy-source-predicate"
+        "d10-physical-profile-validation"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
-    "tests/code_quality/test_d07_upper_floor_preservation.py": {
+    "tests/code_quality/test_d10_profiles.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "tests/code_quality/test_d09_heavy.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
-    },
-    "tests/d09_heavy_helpers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "d09-native-regression-fixtures"
-      ],
-      "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
     "tests/d09_test_preservation_helpers.py": {
       "category": "rule_semantics",
@@ -892,29 +636,49 @@
         "d09-native-regression-fixtures"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
-    "tests/unit/test_order97_facade_evidence.py": {
+    "tests/d10_profile_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "d09-native-regression-fixtures"
+        "d10-native-regressions-and-analytical-equipment"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     },
-    "tests/unit/test_phase13b_shooting_declarations.py": {
+    "tests/d10_test_preservation_helpers.py": {
       "category": "rule_semantics",
       "operations": [
-        "d09-original-negative-fixture"
+        "d10-native-regressions-and-analytical-equipment"
       ],
       "selected_families": [],
-      "rationale": "Bounded D09 source-defined Heavy predicate, genuine native regression fixture, original assertion preservation, or required truthful runtime/contract/source publication. No deliberate performance change.",
-      "source_obligation": "Complete retained 24.16 requires own Shooting, unengaged, no setup this turn and every model moving at most three counted inches; 24.04/10.05 supplies separate Assault firing admission. Original stationary/Indirect owner remains unchanged.",
-      "unchanged_work": "No geometry/search, cache, serializer, replay format, dependency or measured workload changes. The Heavy action-label veto is replaced with the existing setup query and unchanged cumulative accepted-distance owner. Historical reports, ceilings and failures remain unchanged; current serial smoke and live controls remain required."
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
+    },
+    "tests/unit/test_order97_attack_evidence.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "d10-native-regressions-and-analytical-equipment"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
+    },
+    "tests/unit/test_phase13b_shooting_phase_declarations.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "d10-native-regressions-and-analytical-equipment"
+      ],
+      "selected_families": [],
+      "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
+      "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
+      "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
     }
   },
   "milestone": "ordinary",

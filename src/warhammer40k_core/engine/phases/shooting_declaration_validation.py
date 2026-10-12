@@ -367,7 +367,7 @@ def _attack_pools_or_validation(
     )
     attack_pools: list[RangedAttackPool] = []
     targetless: list[TargetlessWeapon] = []
-    seen_declaration_keys: set[tuple[str, str, str, str, str | None, str | None]] = set()
+    seen_weapon_instance_ids: set[str] = set()
     model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
     shooting_weapon_selection_counts: dict[tuple[str, str, WeaponKeyword, str], int] = {}
     snap_target_unit_ids: set[str] = set()
@@ -381,14 +381,6 @@ def _attack_pools_or_validation(
     )
     for declaration_index, declaration in enumerate(proposal.declarations, start=1):
         key = _declaration_available_weapon_key(declaration)
-        if key in seen_declaration_keys:
-            return ShootingProposalValidationResult.invalid(
-                proposal_request_id=proposal.proposal_request_id,
-                violation_code="duplicate_weapon_declaration",
-                message="Each physical weapon copy/profile declaration may be used once.",
-                field="declarations",
-            )
-        seen_declaration_keys.add(key)
         weapon = available_weapon_by_key.get(key)
         if weapon is None:
             return ShootingProposalValidationResult.invalid(
@@ -397,6 +389,17 @@ def _attack_pools_or_validation(
                 message="Declared weapon is not available to the selected shooting unit.",
                 field="declarations",
             )
+        # Authenticate the advertised bearer, copy, profile and borrowed source
+        # first. Alternative profiles then share this equipped physical-copy ID.
+        # Firing Deck retains the embarked source copy's ID, not a transport copy.
+        if weapon["weapon_instance_id"] in seen_weapon_instance_ids:
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="duplicate_weapon_declaration",
+                message="Each physical weapon copy may select only one profile and target.",
+                field="declarations",
+            )
+        seen_weapon_instance_ids.add(weapon["weapon_instance_id"])
         weapon_profile = weapon["weapon_profile"]
         source_unit = _component_unit_for_declaration(
             rules_unit=rules_unit,

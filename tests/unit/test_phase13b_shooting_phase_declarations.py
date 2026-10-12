@@ -22,6 +22,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _attack_pool_for_test,
     _attack_step_payloads,
     _blocking_ruin,
+    _canonical_catalog,
     _catalog_with_extra_bolt_profile,
     _catalog_with_lone_operative_datasheet,
     _catalog_with_replaced_bolt_profiles,
@@ -72,6 +73,7 @@ from warhammer40k_core.core.terrain_areas import TerrainAreaClassification
 from warhammer40k_core.core.visibility import (
     VisibilityBlockerKind,
 )
+from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AttackProfile,
@@ -4198,7 +4200,19 @@ def _catalog_with_ctan_power_selection_limit() -> ArmyCatalog:
         _ctan_power_profile(base, profile_id="ctan-cosmic-fire", name="Cosmic Fire"),
         _ctan_power_profile(base, profile_id="ctan-times-arrow", name="Time's Arrow"),
     )
-    catalog = _catalog_with_replaced_bolt_profiles(ctan_profiles)
+    # These are independently named Powers weapons, not alternate profiles
+    # of one rifle. Equip one separate physical weapon for each power before
+    # mustering; the original baseline/damaged caps still count all three.
+    catalog = _canonical_catalog()
+    power_wargear = tuple(
+        Wargear(
+            wargear_id=f"ctan-power:{profile.profile_id}",
+            name=profile.name,
+            weapon_profiles=(profile,),
+        )
+        for profile in ctan_profiles
+    )
+    catalog = replace(catalog, wargear=(*catalog.wargear, *power_wargear))
     damaged_effect = DamagedEffectDefinition(
         damaged_effect_id="core-intercessor-like-infantry:damaged:ctan-power-selection",
         model_profile_id="core-intercessor-like",
@@ -4218,6 +4232,16 @@ def _catalog_with_ctan_power_selection_limit() -> ArmyCatalog:
                     datasheet,
                     composition=tuple(
                         replace(composition, min_models=1) for composition in datasheet.composition
+                    ),
+                    wargear_options=(
+                        DatasheetWargearOption(
+                            option_id="d10-independent-ctan-powers",
+                            model_profile_id="core-intercessor-like",
+                            default_wargear_ids=tuple(item.wargear_id for item in power_wargear),
+                            allowed_wargear_ids=tuple(item.wargear_id for item in power_wargear),
+                            min_selections=3,
+                            max_selections=3,
+                        ),
                     ),
                     damaged_effects=(damaged_effect,),
                 )
