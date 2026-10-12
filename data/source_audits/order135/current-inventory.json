@@ -43349,8 +43349,8 @@
       "sha256": "cc83944e0c9c2839bc24d7bac138c6187853ddcfebd9a4f39791f91b84975909"
     },
     "src/warhammer40k_core/engine/phases/fight_melee.py": {
-      "bytes": 17403,
-      "sha256": "7a219db6d69a9f4ece4fc6fa971d837423e1fcde3143c2cc9e002f7164dcdd87"
+      "bytes": 17433,
+      "sha256": "00f42e80318a3d0cadad534535c3a642b723cf969e001a06166aa3aa281cbaba"
     },
     "src/warhammer40k_core/engine/phases/movement_geometry.py": {
       "bytes": 33192,
@@ -43805,8 +43805,8 @@
       "sha256": "85ac9e44ee2c1ce449a6f8a0b4335da21663c0d075dca984b5d177c36d879314"
     },
     "tests/unit/test_d12_no_melee_continuation.py": {
-      "bytes": 8193,
-      "sha256": "65fed4de6fd4cb0b3455934a9419c7f5b5d607387d15fa1369cde3657f208764"
+      "bytes": 8194,
+      "sha256": "9b4d57b4d6d4a587bcf6dcc8056484313966ccdeb7953f313f975a4ff67a5dfa"
     },
     "tests/unit/test_damaged_effects.py": {
       "bytes": 28823,
@@ -46715,7 +46715,7 @@
       "symbol_ast_sha256": "fabc4d689fb9916368b1ee11341b0ebd0a56508cecfa5bf70d5fa78c35e2e499"
     },
     "src/warhammer40k_core/engine/phases/fight_melee.py:_apply_melee_declaration_decision": {
-      "file_sha256": "7a219db6d69a9f4ece4fc6fa971d837423e1fcde3143c2cc9e002f7164dcdd87",
+      "file_sha256": "00f42e80318a3d0cadad534535c3a642b723cf969e001a06166aa3aa281cbaba",
       "resolved_path": "src/warhammer40k_core/engine/phases/fight_melee.py",
       "symbol_ast_sha256": "42ddeacdd31a4c3ab4fd416cda8e9d84d7af86f277b1fe029c0612815dc32fbe"
     },
@@ -106518,7 +106518,7 @@
         "assert pending_request(session) == declaration_request"
       ],
       "complete_current_body": "@pytest.mark.parametrize('player', ['player-a', 'player-b'])\ndef test_d12_armed_attached_melee_empty_rejects_atomically_and_retries(player: str) -> None:\n    session = epic_scene(player=player, support=True, armed_bodyguard=True)\n    request = epic_request(session, player=player)\n    state = session.lifecycle.state\n    assert state is not None\n    unit = epic_unit_from_state(state, player=player)\n    chosen = next((model for model in unit.alive_models() if 'CHARACTER' in model.keywords))\n    submit_epic(session, request, epic_proposal(request, model_id=chosen.model_instance_id))\n    declaration_request = pending_request(session)\n    assert declaration_request.decision_type == 'submit_melee_declaration'\n    melee = MeleeDeclarationProposalRequest.from_decision_request(declaration_request)\n    assert any((row['engaged_target_unit_instance_ids'] for row in _melee_rows(melee)))\n    before = session.to_persistence_payload()\n    status = session.submit_parameterized_payload(request_id=declaration_request.request_id, result_id=declaration_request.request_id + ':mandatory-empty-invalid', payload=_empty_melee_payload(melee))\n    assert status.status_kind is LifecycleStatusKind.INVALID\n    assert session.to_persistence_payload() == before\n    assert pending_request(session) == declaration_request\n    submit_all_melee(session, declaration_request)\n    finish_epic_fight(session, unit_id=unit.unit_instance_id)\n    epic_checkpoint(session)",
-      "file_sha256": "65fed4de6fd4cb0b3455934a9419c7f5b5d607387d15fa1369cde3657f208764",
+      "file_sha256": "9b4d57b4d6d4a587bcf6dcc8056484313966ccdeb7953f313f975a4ff67a5dfa",
       "resolved_path": "tests/unit/test_d12_no_melee_continuation.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "874f36d227298f39d4cdd8ead325378625e7f3840b9f94736e9dfead0954ff6c"
@@ -106554,7 +106554,7 @@
         "assert grant.effect_id not in {effect.effect_id for effect in clone_state.persisting_effects}"
       ],
       "complete_current_body": "@pytest.mark.parametrize('player', ['player-a', 'player-b'])\ndef test_d12_dead_leader_support_no_usable_melee_completes_and_replays(player: str) -> None:\n    session = epic_scene(player=player, support=True, dead='leader')\n    request = epic_request(session, player=player)\n    state = session.lifecycle.state\n    assert state is not None\n    unit = epic_unit_from_state(state, player=player)\n    dead = next((model for model in unit.own_models if not model.is_alive))\n    support = next((model for model in unit.alive_models() if 'CHARACTER' in model.keywords))\n    assert unit.unit_instance_id.startswith('attached-unit:')\n    assert ':support:' in support.model_instance_id\n    before = session.to_persistence_payload()\n    status = session.submit_parameterized_payload(request_id=request.request_id, result_id=request.request_id + ':dead-invalid', payload=validate_json_value({'proposal': epic_proposal(request, model_id=dead.model_instance_id).to_payload()}))\n    assert status.status_kind is LifecycleStatusKind.INVALID\n    assert session.to_persistence_payload() == before\n    cp = state.command_point_total(player)\n    submit_epic(session, request, epic_proposal(request, model_id=support.model_instance_id))\n    assert state.command_point_total(player) == cp - 1\n    grant = state.persisting_effects[-1]\n    grant_payload = grant.effect_payload\n    assert isinstance(grant_payload, dict)\n    assert grant_payload['effect_kind'] == 'epic_challenge_precision'\n    assert grant_payload['model_instance_id'] == support.model_instance_id\n    epic_checkpoint(session)\n    declaration_request = pending_request(session)\n    assert declaration_request.decision_type == 'submit_melee_declaration'\n    melee = MeleeDeclarationProposalRequest.from_decision_request(declaration_request)\n    assert len(melee.available_weapons) == 1\n    row = _melee_rows(melee)[0]\n    assert row['model_instance_id'] == support.model_instance_id\n    assert row['engaged_target_unit_instance_ids'] == []\n    assert melee.target_unit_instance_ids\n    empty = _empty_melee_payload(melee)\n    forced = dict(empty)\n    forced['declarations'] = [{'attacker_model_instance_id': row['model_instance_id'], 'weapon_instance_id': row['weapon_instance_id'], 'wargear_id': row['wargear_id'], 'weapon_profile_id': row['weapon_profile_id'], 'target_allocations': [{'target_unit_instance_id': melee.target_unit_instance_ids[0]}]}]\n    before = session.to_persistence_payload()\n    status = session.submit_parameterized_payload(request_id=declaration_request.request_id, result_id=declaration_request.request_id + ':nonengaged-invalid', payload=forced)\n    assert status.status_kind is LifecycleStatusKind.INVALID\n    assert session.to_persistence_payload() == before\n    assert pending_request(session) == declaration_request\n    event_start = len(session.lifecycle.decision_controller.event_log.records)\n    record_count = len(session.lifecycle.to_payload()['decisions']['records'])\n    status = session.submit_parameterized_payload(request_id=declaration_request.request_id, result_id=declaration_request.request_id + ':legal-empty-retry', payload=empty)\n    assert status.status_kind is not LifecycleStatusKind.INVALID\n    assert len(session.lifecycle.to_payload()['decisions']['records']) == record_count + 1\n    added = session.lifecycle.decision_controller.event_log.records[event_start:]\n    assert any((event.event_type == 'melee_declaration_not_available' for event in added))\n    assert any((event.event_type == 'fight_activation_completed' for event in added))\n    assert not any((event.event_type in {'melee_declaration_accepted', 'unit_has_fought'} or 'dice' in event.event_type for event in added))\n    assert not any((isinstance(event.payload, dict) and event.payload.get('unit_instance_id') == unit.unit_instance_id and (event.event_type == 'counter_offensive_requested') for event in added))\n    restored, fork = epic_checkpoint(session)\n    for clone in (session, restored, fork):\n        for _ in range(60):\n            clone_state = clone.lifecycle.state\n            assert clone_state is not None\n            if clone_state.current_battle_phase is not BattlePhase.FIGHT:\n                assert grant.effect_id not in {effect.effect_id for effect in clone_state.persisting_effects}\n                break\n            next_request = pending_request(clone)\n            if next_request.decision_type == 'submit_melee_declaration':\n                submit_all_melee(clone, next_request)\n            else:\n                submit_completion_request(clone)\n        else:\n            raise AssertionError('No-melee completion did not continue through native Fight expiry.')\n        epic_checkpoint(clone)\n    assert restored.to_persistence_payload() == fork.to_persistence_payload() == session.to_persistence_payload()",
-      "file_sha256": "65fed4de6fd4cb0b3455934a9419c7f5b5d607387d15fa1369cde3657f208764",
+      "file_sha256": "9b4d57b4d6d4a587bcf6dcc8056484313966ccdeb7953f313f975a4ff67a5dfa",
       "resolved_path": "tests/unit/test_d12_no_melee_continuation.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "49a20598c3691bca4e39fc05e5e2d004550455fbd6de1fa4f8d36fcf4e34570b"

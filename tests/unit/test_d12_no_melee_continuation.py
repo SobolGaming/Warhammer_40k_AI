@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-from tests.fight_completion_helpers import submit_completion_request
 from tests.epic_challenge_helpers import (
     epic_checkpoint,
     epic_proposal,
@@ -14,7 +13,9 @@ from tests.epic_challenge_helpers import (
     submit_all_melee,
     submit_epic,
 )
+from tests.fight_completion_helpers import submit_completion_request
 from tests.psychic_modifier_helpers import pending_request
+
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_resolution import MeleeDeclarationProposalRequest
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind

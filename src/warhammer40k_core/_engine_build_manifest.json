@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bfd9257af731cca48429f7ec294d22712173fefce784c28315cff672d2e4c51e",
-  "fingerprint": "bfd9257af731cca48429f7ec294d22712173fefce784c28315cff672d2e4c51e",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b4bb4f0f34e7de50aeb5fde4c9db41923a401c7359388ef55f6a9ec93d6a7c0c",
+  "fingerprint": "b4bb4f0f34e7de50aeb5fde4c9db41923a401c7359388ef55f6a9ec93d6a7c0c",
   "resource_count": 3106,
   "resources": [
     {
@@ -11280,9 +11280,9 @@
       "sha256": "4e0d86169e653185c148bc9cc5a88b323bd8b864988f73bd1d301217650f46d3"
     },
     {
-      "byte_length": 17403,
+      "byte_length": 17433,
       "path": "warhammer40k_core/engine/phases/fight_melee.py",
-      "sha256": "7a219db6d69a9f4ece4fc6fa971d837423e1fcde3143c2cc9e002f7164dcdd87"
+      "sha256": "00f42e80318a3d0cadad534535c3a642b723cf969e001a06166aa3aa281cbaba"
     },
     {
       "byte_length": 12961,

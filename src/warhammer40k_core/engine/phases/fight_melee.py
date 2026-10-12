@@ -354,7 +354,9 @@ def _apply_melee_declaration_decision(
     if not proposal.declarations:
         activation = require_fight_state(state).active_activation
         if activation is None:
-            raise GameLifecycleError("Accepted melee declaration requires an active fight activation.")
+            raise GameLifecycleError(
+                "Accepted melee declaration requires an active fight activation."
+            )
         return _complete_active_fight_activation_without_melee_declaration(
             handler=handler,
             state=state,

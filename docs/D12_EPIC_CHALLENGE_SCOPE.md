@@ -192,3 +192,12 @@ independently verified by both SAME reviewers. Every original source, test guard
 numeric ceiling, operation mapping and complete-profile checker remains intact;
 new exact owner mappings identify the two additional completion owners. The
 old runtime RELEASE does not authorize this executable successor.
+
+The first successor's full mypy and pyright checks passed; Ruff then rejected
+one long new exception line and the new module's import order. Those receipts
+remain exact. Formatting preserves the complete production AST, every test
+function/assertion/branch/decorator AST and the full import inventory. The
+retained four-case measurement binds its actual preformat input bytes and is
+qualified separately; it is not repeated or relabeled as a formatted-source
+run. Regenerated raw runtime identity and the new exact-source gates remain
+required, and final timings still come only from the complete passing cohort.

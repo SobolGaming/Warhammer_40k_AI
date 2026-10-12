@@ -23,7 +23,7 @@
     },
     "src/warhammer40k_core/engine/phases/fight_melee.py": {
       "before_sha256": "a89abfd22eaf0de2dddb5208c458f4f1f55e51d1dc0ccd6c88dc22b9dee3d819",
-      "after_sha256": "7a219db6d69a9f4ece4fc6fa971d837423e1fcde3143c2cc9e002f7164dcdd87",
+      "after_sha256": "00f42e80318a3d0cadad534535c3a642b723cf969e001a06166aa3aa281cbaba",
       "owners": {
         "_apply_melee_declaration_decision": {
           "before": "82cf2843ba49874be79fdc28820d73285a8c80f654f0748a944b787fe3fe39f9",
