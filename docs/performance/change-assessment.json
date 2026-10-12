@@ -286,11 +286,11 @@
     },
     "tests/code_quality/test_d12_epic_challenge.py": {
       "before_sha256": null,
-      "after_sha256": "128f81643a0fa072a9c708853bc76468fff2bfa2a3f6fb040178dc2bd4087a6e",
+      "after_sha256": "d7759f772edb40298404c02b60fcdab332a6be9fadb926d15ed42c6ffbbba51b",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a5da93419ac141975b5382e096fea69c9d86d2ef5f0fa48f49c672cc368c93cd"
+          "after": "7d1546647436256623f34f9b6cd5a1293d16f5b6e9ea8d1bc94b1eeb490135df"
         },
         "test_d12_all_original_test_branches_assertions_and_decorators_remain_exact": {
           "before": null,
@@ -298,7 +298,7 @@
         },
         "test_d12_performance_rule_scope_requires_exact_base_category_and_owner_bytes": {
           "before": null,
-          "after": "d52fc5fb2fa7b05697d4ddc74f67a691e12c13d5ecf19df66baca97661f6934c"
+          "after": "0f1f02b1703d60a55f1c2c7261c347598c35e68a1ce8b6b935d57232d1931284"
         },
         "test_d12_retained_complete_source_and_original_acceptance_are_exact": {
           "before": null,
@@ -406,19 +406,19 @@
     },
     "tools/performance_policy.py": {
       "before_sha256": "c2f9cddcfa9bebc2117ec6fdd74a0ff5453515d89910808dca113a534e5099d5",
-      "after_sha256": "5d87a742b854438a9a73c9af72ec87aab7c07ce560c3b6af56a990a6dd0ec085",
+      "after_sha256": "447892a1b2a95a6b2e3493bc38a6b7ab53a181ffabef4b275e77760b01f728d1",
       "owners": {
         "@module": {
           "before": "3a85392259ccbde45e59acccf3c759c75b4627158c08bb357a130fb792e6a867",
           "after": "17d158459892d0a346e215e2afc915f011fb827bb1187d086e2c68e77e6f20e3"
         },
-        "_d12_smoke_operations": {
+        "d12_rule_semantics_smoke_operations": {
           "before": null,
-          "after": "cc8002669ec3a24c9afab30917115c4c7000a4cdb4f751c68ad6368aaae3493d"
+          "after": "5963918a11ae8635991b6971d00daf21106cac11bf1eeeb84c42ce2b58d7adbf"
         },
         "validate_assessment": {
           "before": "3ac72bfd9d7cc3c4d66f89b5f9571487c826a35bf47f1d0542d1846700cb608e",
-          "after": "f4af635637601cd234d24dab47711721618f2cc84fef3b67bdeaae602cf53a04"
+          "after": "42b721dce62897255da1fa599cdf7e5ba69165c3dc6c8c7b78f4cc2a12fa3808"
         }
       }
     }

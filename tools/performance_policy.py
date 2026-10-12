@@ -288,7 +288,9 @@ def _d04_smoke_operations(*, base: str, path: str, category: str, change: object
     return frozenset(_strings(object_value(scope["smoke_operations"])[path]))
 
 
-def _d12_smoke_operations(*, base: str, path: str, category: str, change: object) -> frozenset[str]:
+def d12_rule_semantics_smoke_operations(
+    *, base: str, path: str, category: str, change: object
+) -> frozenset[str]:
     """Bind the two selected D12 identity rule repairs to exact owner bytes."""
     if base != "35768d18d398ee1a40061e63d134cb63f8c2b086" or category != "rule_semantics":
         return frozenset()
@@ -410,7 +412,9 @@ def validate_assessment(
                 base=base, path=path, category=category, change=changes[path]
             )
             | _d04_smoke_operations(base=base, path=path, category=category, change=changes[path])
-            | _d12_smoke_operations(base=base, path=path, category=category, change=changes[path])
+            | d12_rule_semantics_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
         )
         required = {
             family

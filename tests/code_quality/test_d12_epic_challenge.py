@@ -6,8 +6,9 @@ import ast
 import hashlib
 import json
 from pathlib import Path
+from typing import cast
 
-from tools.performance_policy import _d12_smoke_operations
+from tools.performance_policy import d12_rule_semantics_smoke_operations
 
 ROOT = Path(__file__).resolve().parents[2]
 AUDIT = ROOT / "data/source_audits/d12"
@@ -88,14 +89,17 @@ def test_d12_performance_rule_scope_requires_exact_base_category_and_owner_bytes
     assert scope["smoke_operations"] == {path: [name] for path, name in operations.items()}
     assert set(scope["changes"]) == set(operations)
     for path, name in operations.items():
-        change = scope["changes"][path]
-        assert _d12_smoke_operations(
+        change = cast(dict[str, object], scope["changes"][path])
+        no_owners: dict[str, object] = {}
+        assert d12_rule_semantics_smoke_operations(
             base=scope["base"], path=path, category="rule_semantics", change=change
         ) == frozenset({name})
         for base, category, value in (
             ("wrong-base", "rule_semantics", change),
             (scope["base"], "serialization_or_replay_work", change),
             (scope["base"], "rule_semantics", {**change, "after_sha256": "different"}),
-            (scope["base"], "rule_semantics", {**change, "owners": {}}),
+            (scope["base"], "rule_semantics", {**change, "owners": no_owners}),
         ):
-            assert not _d12_smoke_operations(base=base, path=path, category=category, change=value)
+            assert not d12_rule_semantics_smoke_operations(
+                base=base, path=path, category=category, change=value
+            )
