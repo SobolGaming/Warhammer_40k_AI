@@ -14,6 +14,136 @@
         }
       }
     },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "769cd11b8a2b8ac1878d5a434ff85806740d1e4fbca242b68c0f4ac485d65472",
+      "after_sha256": "35a7dd0e57c0e0a2c812b71701d4037abca2ba7b768c792730e788f73de2a204",
+      "owners": {
+        "@document": {
+          "before": "769cd11b8a2b8ac1878d5a434ff85806740d1e4fbca242b68c0f4ac485d65472",
+          "after": "35a7dd0e57c0e0a2c812b71701d4037abca2ba7b768c792730e788f73de2a204"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "5a5d955fe3102e40365925ef507c42396571bbe766bba94639a790de411bdb20",
+      "after_sha256": "1333efb881dca4f9604eebd0333b66d35ee75a77ea1d4ace34288a39fae0682d",
+      "owners": {
+        "@document": {
+          "before": "5a5d955fe3102e40365925ef507c42396571bbe766bba94639a790de411bdb20",
+          "after": "1333efb881dca4f9604eebd0333b66d35ee75a77ea1d4ace34288a39fae0682d"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "83e6f97100620d41bd30ebebff7dd05fc08752ccff53598bfa11c855787c05f3",
+      "after_sha256": "a5ee1b713ba6ffb6ce9e938d51a2289306da27b6d68443cbd97585e81bebeeb2",
+      "owners": {
+        "@document": {
+          "before": "83e6f97100620d41bd30ebebff7dd05fc08752ccff53598bfa11c855787c05f3",
+          "after": "a5ee1b713ba6ffb6ce9e938d51a2289306da27b6d68443cbd97585e81bebeeb2"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "8892f4962da071b4ffa459b8681bbe8e1689f65d478c41ba08ea35dab189d7f8",
+      "after_sha256": "bc313b0d2ca717525cfbf7b7d70f0456bad7b951c9b06a6877953e29242ec888",
+      "owners": {
+        "@document": {
+          "before": "8892f4962da071b4ffa459b8681bbe8e1689f65d478c41ba08ea35dab189d7f8",
+          "after": "bc313b0d2ca717525cfbf7b7d70f0456bad7b951c9b06a6877953e29242ec888"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "3b64b11e14e76245686da6ff5799216d736eae9a37c601d6e2f09fc94f095c2e",
+      "after_sha256": "f6d26a230c834a721c60916c54fcc12a8ee8f54946e7b80f2461dd61acb60546",
+      "owners": {
+        "@document": {
+          "before": "3b64b11e14e76245686da6ff5799216d736eae9a37c601d6e2f09fc94f095c2e",
+          "after": "f6d26a230c834a721c60916c54fcc12a8ee8f54946e7b80f2461dd61acb60546"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "1b8206c21058466e88a798113089f9c2daf5d37f987e89f9e6d00917aabe2c24",
+      "after_sha256": "77a32685228b7e0d70fe53cd45c839b24658e3bf825f9fd1463dab00315a8a62",
+      "owners": {
+        "@document": {
+          "before": "1b8206c21058466e88a798113089f9c2daf5d37f987e89f9e6d00917aabe2c24",
+          "after": "77a32685228b7e0d70fe53cd45c839b24658e3bf825f9fd1463dab00315a8a62"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "63ec216edc8e903d14863736e90dd659fee5a30e66591f300fc3834362fda9de",
+      "after_sha256": "6563972114290261829576c10e58fd4d838d39d025673a4c431965d41a19dc5d",
+      "owners": {
+        "@document": {
+          "before": "63ec216edc8e903d14863736e90dd659fee5a30e66591f300fc3834362fda9de",
+          "after": "6563972114290261829576c10e58fd4d838d39d025673a4c431965d41a19dc5d"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "e20700bda2dee13a5fea3fd4eb12269691669f971f5f0e9eb5f0c706e189ced4",
+      "after_sha256": "45544c598b387ad80f1e4bcea3ceac382f31fe19657c23f5cbeea376963f308e",
+      "owners": {
+        "@document": {
+          "before": "e20700bda2dee13a5fea3fd4eb12269691669f971f5f0e9eb5f0c706e189ced4",
+          "after": "45544c598b387ad80f1e4bcea3ceac382f31fe19657c23f5cbeea376963f308e"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "20725aff5c6e6521e45940daa93f415c8d18f984bb60e8ec8b0ba2715f80a30b",
+      "after_sha256": "f4ec58d73521fac1621899f50e2156d8ad301777bbab1d3bdcdb10070c107461",
+      "owners": {
+        "@document": {
+          "before": "20725aff5c6e6521e45940daa93f415c8d18f984bb60e8ec8b0ba2715f80a30b",
+          "after": "f4ec58d73521fac1621899f50e2156d8ad301777bbab1d3bdcdb10070c107461"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "9624eb67dcd305e104db71523df6d069bb358551e398dc1fff970003d6a50af4",
+      "after_sha256": "872225902ed46ade47899e45c809468a136530e4d41749630aafdd70a5f1540e",
+      "owners": {
+        "@document": {
+          "before": "9624eb67dcd305e104db71523df6d069bb358551e398dc1fff970003d6a50af4",
+          "after": "872225902ed46ade47899e45c809468a136530e4d41749630aafdd70a5f1540e"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "3a59b47ad8b739aeb5b4c8084cc67c76e27354c013cebe6547d020b3ef4acdbb",
+      "after_sha256": "35993b59110405a95fd8e24867fbb8bc9e616acf52d2467936c63634b6b257f3",
+      "owners": {
+        "@document": {
+          "before": "3a59b47ad8b739aeb5b4c8084cc67c76e27354c013cebe6547d020b3ef4acdbb",
+          "after": "35993b59110405a95fd8e24867fbb8bc9e616acf52d2467936c63634b6b257f3"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "1d19f2d0e39a2383c85abcf2caac861d7e36e7b7dc10da2788c7b34f3df24f33",
+      "after_sha256": "38254d5a181a088162116b72f0a4cc65bb49b76e8b69058bf799e5d67de71431",
+      "owners": {
+        "@document": {
+          "before": "1d19f2d0e39a2383c85abcf2caac861d7e36e7b7dc10da2788c7b34f3df24f33",
+          "after": "38254d5a181a088162116b72f0a4cc65bb49b76e8b69058bf799e5d67de71431"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "24c9834b5a36961ebab779b827b5790f7f4bad4644540824ff651823e1ef0086",
+      "after_sha256": "33ea5fdbc9238d643ab03bd56c9cb3717ca9b4a2b18356340e22d5772129f862",
+      "owners": {
+        "@document": {
+          "before": "24c9834b5a36961ebab779b827b5790f7f4bad4644540824ff651823e1ef0086",
+          "after": "33ea5fdbc9238d643ab03bd56c9cb3717ca9b4a2b18356340e22d5772129f862"
+        }
+      }
+    },
     "conformance/typescript/src/contract.ts": {
       "before_sha256": "62e55f9cfe9eb7a10889f291b455dc6f6954f2fdfe4bae9f341f1ff1e95f1178",
       "after_sha256": "78eb91ea8dbdf51867d55da36531a6cdf2dfb4fcd7db4dc7540040a0b127f143",
@@ -397,6 +527,136 @@
       "rationale": "Bounded D10 physical weapon profile rule, admitted native regression fixtures and assertion preservation, or required truthful current source/runtime/contract/client publication. No deliberate performance change.",
       "source_obligation": "Complete retained04.01.03 requires one profile per selected physical weapon while preserving independent models/copies and Hunter targeting. Equipped IDs retain physical bearer/wargear/copy and borrowed FiringDeck source identity.",
       "unchanged_work": "The existing one-pass declaration validator and seen-set lookup remain linear in the declaration count; authenticate its existing available key before keying the repeated-copy rule by the already-derived physical ID. No new search, cache, serializer, replay format, runtime dependency or measured workload. Analytical Powers equipment fixture now has separately admitted items with all original cap/assertions exact. Historical reports, failures and ceilings remain unchanged. Current quiet serial smoke and live source/work/cache controls remain mandatory."
+    },
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavior-shard-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only12 CI scheduling manifests and their duration metadata from the one authenticated current D10 complete passing cohort: retained16 serial cases plus11330 successor remainder cases. All342 behavioral files and11346 cases are preserved.",
+      "source_obligation": "D10 delivery requires every current behavioral case once, current finite phase/JUnit durations, complete canonical inventory and unchanged test/source bodies. The current PASS cohort alone supplies this scheduling profile.",
+      "unchanged_work": "Only deterministic largest-processing-time scheduling metadata changes. Every test body/assertion/decorator, runtime resource, contract, dependency and executable source remains byte-identical to reviewed bf049. Original timing manifests and failed/historical evidence retained; worker_benchmark.json and all benchmarks remain unchanged. No performance or provider certification."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
