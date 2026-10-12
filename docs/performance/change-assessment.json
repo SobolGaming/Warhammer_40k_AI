@@ -26,131 +26,131 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "35a7dd0e57c0e0a2c812b71701d4037abca2ba7b768c792730e788f73de2a204",
-      "after_sha256": "9fe8b2b7dcc239adf66e57a76e946d12e88229b3c17c5fe20ac3d51798267460",
+      "after_sha256": "7a1d12158cc0d459b9ffdc91a5fa776e2d9944ff55d0c6295e244b16c4843484",
       "owners": {
         "@document": {
           "before": "35a7dd0e57c0e0a2c812b71701d4037abca2ba7b768c792730e788f73de2a204",
-          "after": "9fe8b2b7dcc239adf66e57a76e946d12e88229b3c17c5fe20ac3d51798267460"
+          "after": "7a1d12158cc0d459b9ffdc91a5fa776e2d9944ff55d0c6295e244b16c4843484"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "1333efb881dca4f9604eebd0333b66d35ee75a77ea1d4ace34288a39fae0682d",
-      "after_sha256": "20f5333c9fd17cc117353a6c074e6d64cbc64863b26102b61b2bd85555fa1a72",
+      "after_sha256": "27d369807aa12cfa698eb26f531ee367ea44af43584eae66e9dc9d29b00e5072",
       "owners": {
         "@document": {
           "before": "1333efb881dca4f9604eebd0333b66d35ee75a77ea1d4ace34288a39fae0682d",
-          "after": "20f5333c9fd17cc117353a6c074e6d64cbc64863b26102b61b2bd85555fa1a72"
+          "after": "27d369807aa12cfa698eb26f531ee367ea44af43584eae66e9dc9d29b00e5072"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "a5ee1b713ba6ffb6ce9e938d51a2289306da27b6d68443cbd97585e81bebeeb2",
-      "after_sha256": "94edccd84e780b7a9e15edf67fe36959d1062a1feb93bbf984c34d4fc27f1dfa",
+      "after_sha256": "7253c57346d32d2011b47a3fa6d8189fce9323e005c6bc1552b7e00a658e666c",
       "owners": {
         "@document": {
           "before": "a5ee1b713ba6ffb6ce9e938d51a2289306da27b6d68443cbd97585e81bebeeb2",
-          "after": "94edccd84e780b7a9e15edf67fe36959d1062a1feb93bbf984c34d4fc27f1dfa"
+          "after": "7253c57346d32d2011b47a3fa6d8189fce9323e005c6bc1552b7e00a658e666c"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "bc313b0d2ca717525cfbf7b7d70f0456bad7b951c9b06a6877953e29242ec888",
-      "after_sha256": "6fadda221ff89982aacde1809722d5b5db63f00daed22ff257c374eea39f063e",
+      "after_sha256": "916c366513171e2e6663e4b6950b45b7dceba6916805bb27389838d368e37623",
       "owners": {
         "@document": {
           "before": "bc313b0d2ca717525cfbf7b7d70f0456bad7b951c9b06a6877953e29242ec888",
-          "after": "6fadda221ff89982aacde1809722d5b5db63f00daed22ff257c374eea39f063e"
+          "after": "916c366513171e2e6663e4b6950b45b7dceba6916805bb27389838d368e37623"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "f6d26a230c834a721c60916c54fcc12a8ee8f54946e7b80f2461dd61acb60546",
-      "after_sha256": "15440c47c2975c50703b91f5a0738a693c67b86a368025367b9d12b036a4afb5",
+      "after_sha256": "c9c79ec46e68673fde70f73fd61698f7ca62a335f0698adb99efd3f996f2e4e5",
       "owners": {
         "@document": {
           "before": "f6d26a230c834a721c60916c54fcc12a8ee8f54946e7b80f2461dd61acb60546",
-          "after": "15440c47c2975c50703b91f5a0738a693c67b86a368025367b9d12b036a4afb5"
+          "after": "c9c79ec46e68673fde70f73fd61698f7ca62a335f0698adb99efd3f996f2e4e5"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "77a32685228b7e0d70fe53cd45c839b24658e3bf825f9fd1463dab00315a8a62",
-      "after_sha256": "07d41e57dc09b7bd8a706fa18dbfa6869c0c3eaf6f24deadd86a96741889593e",
+      "after_sha256": "ef43545c16a6c616eacfcc55166ca0ce111400bb728618787a11a14ab39f94f8",
       "owners": {
         "@document": {
           "before": "77a32685228b7e0d70fe53cd45c839b24658e3bf825f9fd1463dab00315a8a62",
-          "after": "07d41e57dc09b7bd8a706fa18dbfa6869c0c3eaf6f24deadd86a96741889593e"
+          "after": "ef43545c16a6c616eacfcc55166ca0ce111400bb728618787a11a14ab39f94f8"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "6563972114290261829576c10e58fd4d838d39d025673a4c431965d41a19dc5d",
-      "after_sha256": "be3c1ceb812c111c9306262992be227c229f014af7a678f3ca6b3a23133d0c80",
+      "after_sha256": "efe968fc466060bdd69308a8355a93f434ac19f2ee870a3fd689f6b9cea5115b",
       "owners": {
         "@document": {
           "before": "6563972114290261829576c10e58fd4d838d39d025673a4c431965d41a19dc5d",
-          "after": "be3c1ceb812c111c9306262992be227c229f014af7a678f3ca6b3a23133d0c80"
+          "after": "efe968fc466060bdd69308a8355a93f434ac19f2ee870a3fd689f6b9cea5115b"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "45544c598b387ad80f1e4bcea3ceac382f31fe19657c23f5cbeea376963f308e",
-      "after_sha256": "6ab7358968922ff9a545bef6e8859164de4ea15e00676954097ce763b36e4813",
+      "after_sha256": "932f5f807f554e60382561cde632f4795d70550417540d5e80b8aa9f466cfc84",
       "owners": {
         "@document": {
           "before": "45544c598b387ad80f1e4bcea3ceac382f31fe19657c23f5cbeea376963f308e",
-          "after": "6ab7358968922ff9a545bef6e8859164de4ea15e00676954097ce763b36e4813"
+          "after": "932f5f807f554e60382561cde632f4795d70550417540d5e80b8aa9f466cfc84"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "f4ec58d73521fac1621899f50e2156d8ad301777bbab1d3bdcdb10070c107461",
-      "after_sha256": "5eb2e1132a3868cb67fd54c7888b66d764e1e924767231c990d18d7627e77d8d",
+      "after_sha256": "10e7d2dee2c74bae866b8f37001c3e05e7bb5f3b7492574b99c4e9ba8f87fe2e",
       "owners": {
         "@document": {
           "before": "f4ec58d73521fac1621899f50e2156d8ad301777bbab1d3bdcdb10070c107461",
-          "after": "5eb2e1132a3868cb67fd54c7888b66d764e1e924767231c990d18d7627e77d8d"
+          "after": "10e7d2dee2c74bae866b8f37001c3e05e7bb5f3b7492574b99c4e9ba8f87fe2e"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "872225902ed46ade47899e45c809468a136530e4d41749630aafdd70a5f1540e",
-      "after_sha256": "10de846ca95f0c774b00f51f90bd303324a05b158bdd62dc52d99cfa81f1d349",
+      "after_sha256": "e26d76cf38ccef3829e2b42b0e3fc73a95da92a7783dce1f1d1584a30d33c86b",
       "owners": {
         "@document": {
           "before": "872225902ed46ade47899e45c809468a136530e4d41749630aafdd70a5f1540e",
-          "after": "10de846ca95f0c774b00f51f90bd303324a05b158bdd62dc52d99cfa81f1d349"
+          "after": "e26d76cf38ccef3829e2b42b0e3fc73a95da92a7783dce1f1d1584a30d33c86b"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "35993b59110405a95fd8e24867fbb8bc9e616acf52d2467936c63634b6b257f3",
-      "after_sha256": "4defebea8c1f513a69efbc9c40574c2588960ba072a73bdbc2ef3c2dd9117b33",
+      "after_sha256": "5bc6cc6db5b993c4189181db89b3fd0041865fd50e8842068888db936b4c8c23",
       "owners": {
         "@document": {
           "before": "35993b59110405a95fd8e24867fbb8bc9e616acf52d2467936c63634b6b257f3",
-          "after": "4defebea8c1f513a69efbc9c40574c2588960ba072a73bdbc2ef3c2dd9117b33"
+          "after": "5bc6cc6db5b993c4189181db89b3fd0041865fd50e8842068888db936b4c8c23"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "38254d5a181a088162116b72f0a4cc65bb49b76e8b69058bf799e5d67de71431",
-      "after_sha256": "a76d6390bb47b2b9064a1d2069ebbb6d0cda9bc761862fdaf5ded5c2e2683bad",
+      "after_sha256": "a08036473b6a9db7c3512e8bbe4c7849c27f029e1c242ea2bef171c9a8812bdb",
       "owners": {
         "@document": {
           "before": "38254d5a181a088162116b72f0a4cc65bb49b76e8b69058bf799e5d67de71431",
-          "after": "a76d6390bb47b2b9064a1d2069ebbb6d0cda9bc761862fdaf5ded5c2e2683bad"
+          "after": "a08036473b6a9db7c3512e8bbe4c7849c27f029e1c242ea2bef171c9a8812bdb"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "33ea5fdbc9238d643ab03bd56c9cb3717ca9b4a2b18356340e22d5772129f862",
-      "after_sha256": "b4cf2e5bcaed74bbf3cdf01b9682e033f13149abb8769b4fa8b48342c2dc2f9c",
+      "after_sha256": "d91772115ebd62f93f1914a86d126c1b02c9e41e3157e9cbc4a632ca27c3db2f",
       "owners": {
         "@document": {
           "before": "33ea5fdbc9238d643ab03bd56c9cb3717ca9b4a2b18356340e22d5772129f862",
-          "after": "b4cf2e5bcaed74bbf3cdf01b9682e033f13149abb8769b4fa8b48342c2dc2f9c"
+          "after": "d91772115ebd62f93f1914a86d126c1b02c9e41e3157e9cbc4a632ca27c3db2f"
         }
       }
     },
@@ -634,9 +634,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -644,9 +644,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -654,9 +654,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -664,9 +664,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -674,9 +674,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -684,9 +684,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -694,9 +694,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -704,9 +704,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -714,9 +714,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -724,9 +724,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -734,9 +734,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -744,9 +744,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -754,9 +754,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Bounded D12 physical CHARACTER membership and necessary native split history repair, faithful declared analytical controls, original acceptance preservation and current source/runtime/contract/client publication. No deliberate performance change. Necessary normal no-usable-melee completion uses existing helper with forwarded ReactionQueue; not intended performance work.",
-      "source_obligation": "Complete retained 15.03 selects one physical CHARACTER model of the selected friendly CHARACTER rules unit. Unit keyword union does not promote models. Full 01.02.06 and category19 govern balanced native splitting, current physical ownership and attached casualty identity. Original57/six primary219 support rows remain exact. Existing complete Fight-step/unable-to-fight/Normal-Fight/consolidation/Fight-on-Death clauses retain valid empty declaration completion and actual-fight distinction.",
-      "unchanged_work": "Existing RulesUnitView and physical model APIs resolve already-authoritative membership; preflight and effect share that bounded validator. Historical model inventory remains one linear scan, adding only an exact model plus validated split-source key to resolve current successors during frozen membership validation. No new search algorithm, cache, serialized field, replay format, runtime dependency or measured workload. Timing/CP/targeting/effect consumer and phase expiry are unchanged. Original fixtures/assertions/branches/ceilings and historical receipts remain unchanged. Quiet serial current-runtime smoke and all live semantic/work/cache checks remain mandatory; no full-game certification. Empty legal melee completion reuses existing transition; ordinary armed declarations, mandatory attacks, budgets, producer/validator/nonempty builder/global lifecycle remain unchanged. No additional loop/query/cache/serialized field or RNG draw; no compatibility conversion."
+      "rationale": "Metadata-only final timing replacement: all 344 values and every profile record come exclusively from the successful complete current C2 behavioral cohort. The unchanged standard generator balances twelve manifests; no intended performance optimization or executable/test change. Existing category, mandatory operation, selected families, numeric ceilings and every live gate remain unchanged.",
+      "source_obligation": "Original README requires an authentic successful complete-current-inventory profile. Current same-source original 16 alone plus ONE observer-free 32-worker 343-file covered remainder supply 11,384 passed cases across all 344 files, with exact unique three-phase/controller/JUnit/source joins and owned process closure. No historical, provisional bootstrap, failed/stopped, reviewer or benchmark measurements supply final values. All retained source obligations and every original assertion remain exact.",
+      "unchanged_work": "Only current JUnit-derived positive rounded duration values, the single complete-current profile evidence record and standard LPT manifest assignments change. No production, test/helper, source/acceptance, runtime identity, contract/client, generator/checker, operation-map/family/ceiling or workload byte changes from d900ba05. Original and failed receipts stay immutable. Same independent reviewers must prove every nonmetadata blob unchanged and narrowly renew exact-final CLEAN; fresh final serial smoke and complete quality remain required. Local Windows file-duration sums are not wall-time or hosted-runner/full-game performance certification."
     },
     "conformance/typescript/src/contract.ts": {
       "category": "rule_semantics",
