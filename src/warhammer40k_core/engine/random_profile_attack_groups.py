@@ -18,7 +18,7 @@ from warhammer40k_core.engine.attack_sequence_validation import (
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, canonical_json
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool, RangedAttackPoolPayload
 
 
@@ -41,6 +41,8 @@ def validate_profile_attack_group(
     by_record = {record.record_id: record for record in decisions}
     pools: tuple[RangedAttackPool, ...] = ()
     actor: str | None = None
+    declaration_frame: dict[str, JsonValue] | None = None
+    source_phase: BattlePhase | None = None
     selected: GatheredAttackGroup | None = None
     used: set[int] = set()
     for event in events:
@@ -70,6 +72,33 @@ def validate_profile_attack_group(
                 raise GameLifecycleError("Random defensive profile lacks its accepted declaration.")
             actor = record.result.actor_id
             pools = _declared_pools(body)
+            source_phase = (
+                BattlePhase.FIGHT
+                if event.event_type == "melee_declaration_accepted"
+                else BattlePhase.SHOOTING
+            )
+            if event.event_type == "melee_declaration_accepted":
+                proposal_request = body.get("proposal_request")
+                proposal = body.get("proposal")
+                declaration_frame = {
+                    "game_id": body.get("game_id"),
+                    "battle_round": body.get("battle_round"),
+                    "unit_instance_id": proposal_request.get("unit_instance_id")
+                    if isinstance(proposal_request, dict)
+                    else None,
+                    "player_id": proposal.get("player_id") if isinstance(proposal, dict) else None,
+                }
+            else:
+                declaration_frame = {
+                    "game_id": body.get("game_id"),
+                    "battle_round": body.get("battle_round"),
+                    "unit_instance_id": body.get("unit_instance_id"),
+                    "player_id": body.get(
+                        "player_id"
+                        if event.event_type == "out_of_phase_shooting_declaration_accepted"
+                        else "active_player_id"
+                    ),
+                }
         elif event.event_type == "target_replacement_resolved":
             context = body.get("context")
             if isinstance(context, dict) and context.get("action_id") == sequence_id:
@@ -125,16 +154,60 @@ def validate_profile_attack_group(
                 used_pool_indices=tuple(sorted(used)),
                 gathered_group=selected,
             )
-            expected_indices = tuple(
-                index
-                for index, pool in enumerate(pools)
-                if index not in used
-                and pool.target_unit_instance_id == selected.target_unit_instance_id
-                and identical_attack_signature(
-                    pool, target_has_character=selected.target_has_character
+            if selected.native_snapshots:
+                from warhammer40k_core.engine.attack_sequence_state import AttackSequence
+                from warhammer40k_core.engine.native_attack_gathering import (
+                    gathered_groups_for_pending_request,
                 )
-                == selected.signature
-            )
+
+                first = selected.native_snapshots[0]
+                if (
+                    actor is None
+                    or declaration_frame is None
+                    or source_phase is None
+                    or first.source_phase is not source_phase
+                    or request.get("phase") != source_phase.value
+                    or type(declaration_frame.get("game_id")) is not str
+                    or request.get("game_id") != declaration_frame.get("game_id")
+                    or type(request.get("battle_round")) is not int
+                    or request.get("battle_round") != first.battle_round
+                    or request.get("battle_round") != declaration_frame.get("battle_round")
+                    or declaration_frame.get("player_id") != actor
+                    or request.get("attacker_player_id") != actor
+                    or type(request.get("attacking_unit_instance_id")) is not str
+                    or request.get("attacking_unit_instance_id")
+                    != declaration_frame.get("unit_instance_id")
+                ):
+                    raise GameLifecycleError("Random defensive native group frame drifted.")
+                boundary = AttackSequence(
+                    sequence_id=sequence_id,
+                    source_phase=source_phase,
+                    attacker_player_id=actor,
+                    attacking_unit_instance_id=cast(str, request["attacking_unit_instance_id"]),
+                    attack_pools=pools,
+                    used_pool_indices=tuple(sorted(used)),
+                )
+                groups = gathered_groups_for_pending_request(
+                    attack_sequence=boundary,
+                    target_unit_instance_id=selected.target_unit_instance_id,
+                    target_has_character=selected.target_has_character,
+                    request=record.request,
+                )
+                matches = tuple(group for group in groups if group.group_id == selected.group_id)
+                if len(matches) != 1 or matches[0] != selected:
+                    raise GameLifecycleError("Random defensive native selected boundary drifted.")
+                expected_indices = matches[0].pool_indices
+            else:
+                expected_indices = tuple(
+                    index
+                    for index, pool in enumerate(pools)
+                    if index not in used
+                    and pool.target_unit_instance_id == selected.target_unit_instance_id
+                    and identical_attack_signature(
+                        pool, target_has_character=selected.target_has_character
+                    )
+                    == selected.signature
+                )
             if (
                 selected.pool_indices != expected_indices
                 or selected.group_id != record.result.selected_option_id

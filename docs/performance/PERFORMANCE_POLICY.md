@@ -138,6 +138,24 @@ waiver of correctness, reviews, CI, smoke or aggregate gates.
 
 ## Current-change budgets and historical qualification
 
+### S25 identical applicable weapon gathering
+
+The standing bounded rule-repair default applies to S25's source-backed
+cross-bearer gathering and Hit-before-Wound correction. This changes rule
+equivalence and preserves individual physical weapons, attacks, dice occurrences,
+source ownership and native continuation. It is not deliberate performance work.
+
+`policy-v3/s25-rule-semantics.json` binds the exact base, complete before/after
+file hashes and changed owner AST hashes for the thirteen affected paths with
+existing sensitive operation mappings. Only those exact `rule_semantics` rows
+use the required serial current-runtime smoke instead of detailed comparisons.
+Original mappings, families, historical measurements, limits and live semantic,
+work and cache checks remain intact. Newly encountered owners receive explicit
+path/owner mappings; an unmapped owner still fails. Base, file or owner drift,
+performance categories and cache changes cannot inherit this classification.
+Both independent reviewers must assess its exact applicability. No component
+budget, provider-wide, Core-completion or full-game certification is claimed.
+
 Order126's bounded sequential-occupancy source repair follows the owner's
 subsequent-order smoke default. `policy-v3/order126-rule-semantics.json` binds
 the sole sensitive geometry row to exact base

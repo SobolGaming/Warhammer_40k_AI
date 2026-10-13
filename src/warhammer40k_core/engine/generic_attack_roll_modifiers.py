@@ -99,9 +99,9 @@ def _dice_roll_modifiers_for_attack(
 ) -> tuple[RollModifier, ...]:
     # Match the shared internal provider gates, as Hit/Critical Wound providers do.
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
-        _matching_generic_attack_effects,  # pyright: ignore[reportPrivateUsage]
+        _matching_generic_attack_effects,
         _required_int_parameter,  # pyright: ignore[reportPrivateUsage]
-        _roll_type_matches,  # pyright: ignore[reportPrivateUsage]
+        _roll_type_matches,
     )
 
     modifiers: list[RollModifier] = []

@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import cast
 
 from tools.performance_order103_exception import RECOGNITION, validate_owner_recognition
+from tools.performance_s25_rule_semantics import s25_rule_semantics_smoke_operations
 
 POLICY = "rules-engine-performance-v3"
 ASSESSMENT = "docs/performance/change-assessment.json"
@@ -413,6 +414,9 @@ def validate_assessment(
             )
             | _d04_smoke_operations(base=base, path=path, category=category, change=changes[path])
             | d12_rule_semantics_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | s25_rule_semantics_smoke_operations(
                 base=base, path=path, category=category, change=changes[path]
             )
         )

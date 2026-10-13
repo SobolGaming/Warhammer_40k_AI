@@ -19,6 +19,10 @@ from tests.retained_attack_helpers import (
     pending_retained_attack,
     unending_fidelity_catalog,
 )
+from tests.s25_original_fixture_controls import (
+    RETAINED_DISTINCT_LEADER_DATASHEET_ID,
+    retained_distinct_weapon_catalog,
+)
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -575,7 +579,7 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
 ) -> None:
     profile = retained_sources.stratagem_profile()
     lifecycle, units = fight_lifecycle(
-        catalog=unending_fidelity_catalog(),
+        catalog=retained_distinct_weapon_catalog(unending_fidelity_catalog()),
         # Contract 41 authenticates new SaveOption evidence in retention hashes;
         # this fixture ID preserves the required first-pool casualty branch.
         game_id="order93-fidelity-retention-3:d07:68"
@@ -583,7 +587,10 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
         else "order56-fidelity-1-order64-0:d07:785",
         alpha_unit_ids=("alpha",),
         enemy_unit_ids=("enemy", "leader") if attached else ("enemy",),
-        enemy_unit_specs={"enemy": ("core-intercessor-like-infantry", "core-intercessor-like", 1)}
+        enemy_unit_specs={
+            "enemy": ("core-intercessor-like-infantry", "core-intercessor-like", 1),
+            "leader": (RETAINED_DISTINCT_LEADER_DATASHEET_ID, "core-character-leader", 1),
+        }
         if attached
         else None,
         enemy_attachment_declarations=(

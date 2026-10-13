@@ -1,0 +1,223 @@
+{
+  "base": "b652c9f8148963a5a9f9a79d5ddf5e9bd230d971",
+  "changes": {
+    "src/warhammer40k_core/engine/attack_reroll_dispatch.py": {
+      "before_sha256": "0ae24a591d9488f8c97dbd50899a6f3603ba1f9ffd45649f53f6486d1b541084",
+      "after_sha256": "a5afe0ddb7e85fe0c44b3a0e641ae0d1a3b0952e56aea0b7e2644cd99cdf9271",
+      "owners": {
+        "validate_wound_reroll_request": {
+          "before": "13cf74d4c72851a6fe79e2d7bb5d6d82e6b5f87b171a90c12ee7e9d783a23e53",
+          "after": "e49e69b48e223a0d9a803c10d0e101cccf2c688bf6d3ee3286fdc1300675e342"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py": {
+      "before_sha256": "791b3fb129dc9048f0927bd6df8a61dcc1d8a649fd52adf1d12236cb157b6595",
+      "after_sha256": "6087b8bc630c374e50bf30b2d2022be03fd5a69f173354d0234ce97d65faa049",
+      "owners": {
+        "apply_source_backed_attack_dice_reroll_decision": {
+          "before": "b64063345882b95a908059325dbef64e25c98898ee24aecd70a41e967524e051",
+          "after": "c9d682d70dc6dac3c8ee3d16ce3aa1ff77313ca121ca2ad4c0977c342b2c938c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
+      "before_sha256": "1146390c40f76e4b6796735fc2d9ee1d0676deb3f3e9d832db0ec7cf71685307",
+      "after_sha256": "9e12d813883103ef5381430e71963ef44a791e72fd05b3e080655511c4fffa99",
+      "owners": {
+        "_select_or_request_next_gathered_group": {
+          "before": "6844f014c40134be48f1bc34615c65e1296ac4b2d768dc72320452e856d289f0",
+          "after": "9eee42311de031bcb33cc82d6061cc272048e2b1542bcc74f317e39492643f4b"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py": {
+      "before_sha256": "5498bdac0c7aae0c79bcfec0f5ce6c3a6bc3c300cd7690718f50974781ec378e",
+      "after_sha256": "36ec7a2edf0dcdb6008651e95ef3a932d3cfa8cfcf8daf8e40ed505381e8f585",
+      "owners": {
+        "_grouped_attack_context_payload": {
+          "before": "a9af7e2ab5c2a307c97a88efca4ffe1a9afbeea80754c0b99784e3684acf500b",
+          "after": "b4d3ff8cd0b5fe67f0b6f9974beda70f0fdc323b4e7e9bb0017add8207ac555d"
+        },
+        "_resolve_grouped_damage_from": {
+          "before": "db637459079fba1a039d1e2d02f7207441b976866bc89d9afc81e52cc205835f",
+          "after": "646f98dbd13f7a67077a5101e60a27b23c43f660a94fcc5444d3b5c8eed2b17c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_model.py": {
+      "before_sha256": "ff87e6341dc5c2eecd462bc8373117a62fbbf6596ea5f6eb6a31dc6207f1fb6d",
+      "after_sha256": "f8e6f1376edf76fd5232376d8208a9abb0f9a2bf1f0cb2afa1161a918bd2ce98",
+      "owners": {
+        "@module": {
+          "before": "647bcdf9018fe6d8a59b8559fd14a92a0d10cad8b10ee85c1d3a9bc32ef47a5a",
+          "after": "a7df3dbb8ead3b8cff79c5cb2868a5a58c5fca9a0d8c232d24aa53d093ac6c3e"
+        },
+        "GatheredAttackGroup": {
+          "before": "e5808a6785598c4cc32a09cfb95930232fed3988a90a3dc29560ad7b310d8d55",
+          "after": "ed09526e7e4392a58b64ee22af1efff9177560011689050c8499000dbc9e04b3"
+        },
+        "GatheredAttackGroup.__post_init__": {
+          "before": "5496b9dd2edd3e78c8bd37ee2cd3a32303860c9d1a9242c163fcef69bcf66f05",
+          "after": "95bc06d45d15ec9484f998f76067ca7b7399536ff1402567f7caede902ef49a3"
+        },
+        "GatheredAttackGroup.from_payload": {
+          "before": "e4544c712e588dc4fd2b31cfe7cfa4619153b68291a577c795f943a21daf7174",
+          "after": "34d35fed7da8e0ed1f5429e043a9657848435aa787a2f671a3ade8cfef27f5bc"
+        },
+        "GatheredAttackGroup.to_payload": {
+          "before": "6bca1ace915f9c594376f69b4340ef5ee1185ac3dba37e863dd92518ce1503b7",
+          "after": "0a6246942bad6fd6bdd9ea39b940ffa369d6ee6b5acb4fa24a3c648c3acb7005"
+        },
+        "GatheredAttackGroupPayload": {
+          "before": "aa1b7081a2c12cbf9d50c81c23402b03b902a3f771f863b231f18558c21e9c56",
+          "after": "f4dc5208cfff51a483a5b302192075d0f0dec2004a854012eea98cb9a4914a5e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_selection.py": {
+      "before_sha256": "a281d79e1461e540fe27f7a2df214191f6a134fb0d6a5b7e8367b005037a7e44",
+      "after_sha256": "2682a62955430073dd8a6a7ee3e0342a03e63f0f9938529a5c15d694c6dae3c1",
+      "owners": {
+        "_synthetic_pool_for_gathered_group": {
+          "before": "8ee74ae9d1ca95a173ea6b2b90ebcecc883c8944be3e02d91cf9863dc8449408",
+          "after": "2c4d3ab49bad03535069da49af06e596f445e48c80aee66be740f7aed6518891"
+        },
+        "build_select_attack_weapon_group_request": {
+          "before": "3e4b25eec6b63a58030e0aa2c7d46d913cee79fc5aef4861cf931d3aab1f7a56",
+          "after": "e4088852dea62759383bab906c500cb900c2ffc0d41f2e8ff5357b2b44b41919"
+        },
+        "request_for_gathered_attack_groups": {
+          "before": null,
+          "after": "3b3b4f2ae6bbd4981ddf5408af1903c012a3855a69f38fc3c92446c7e663f02a"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_validation.py": {
+      "before_sha256": "2ada4f0647df92707e71a664af76d6d4846b128d7a0413542e3c10b96b89f05e",
+      "after_sha256": "f6d120d91becfedc5d9966c714042865d04e9baf89d49a60d981ee9e6aff09d2",
+      "owners": {
+        "_validate_gathered_group_matches_attack_pools": {
+          "before": "40e64fac8d7f2fd066aca63b9f95248955c1eab1893aafc150484527e95bf735",
+          "after": "6c514d16c5be8ce555ab87b379bf50d84ba56f4e47d5517d2e33765fb19fbb7c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/gathered_attack_dice.py": {
+      "before_sha256": "8bc6808089539ce0c65c626fc84479ce720ab53d27a8ebba70093b3b40462791",
+      "after_sha256": "4267869645a78b07f0da73485bd7f10c6e93a69721c3c9c58873add651ad519b",
+      "owners": {
+        "resolve_gathered_attack_dice": {
+          "before": "ac63acee9979ae18f01b4f032cc454b708af76fcd94c55c6a8a8a6930d29bd60",
+          "after": "e9a38dcd8bfeaafa7f71988b8e9834658f621267e90e3d536c73828e95315682"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/obscuring_model_cover.py": {
+      "before_sha256": "9b56bcdac090fa87dde23301c1b599e585bbd37558044bbbb4c24a491df154af",
+      "after_sha256": "762b553dbfd400cae925bde94a301813805c937fc3d74a2f8267c9ee0a1d5554",
+      "owners": {
+        "obscuring_model_cover_inventories": {
+          "before": null,
+          "after": "b5c619a38e329ebc9849666d9a9eba631613e8f067f86d446da5c50baf349bb4"
+        },
+        "obscuring_model_cover_sources": {
+          "before": "0791729ec1830a8bc46cb00efceda878a213864a584a712b1e27e09ad4da732d",
+          "after": "b1de9b263cf4ccd71743b08e6957843192370265d227c2b967d118f2c90c6b2f"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/fight.py": {
+      "before_sha256": "cc83944e0c9c2839bc24d7bac138c6187853ddcfebd9a4f39791f91b84975909",
+      "after_sha256": "85db1b94649a35c8688b86127c2ba18932a4783ecea4233b125021e6b6001478",
+      "owners": {
+        "@module": {
+          "before": "715a2b52088cf86994de2cb715838d2f2373d3101e5ef1dd6867f64ad6479844",
+          "after": "a143caa6812183fde41712756bfe55833bfa137a2b00c4af3bf8b800f36cfc26"
+        },
+        "invalid_fight_attack_sequence_selection_status": {
+          "before": "f33dba76c6114f7c630254f3076837e18447d2b549ae0f66af8a89fb79c2e184",
+          "after": "3aed676ff0b4cb5e40325a649e96876ab77baeebccc7b842972def12a67c8c3e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/shooting_handler.py": {
+      "before_sha256": "7eb62dc82222d2ebe0f6c1dccee3ef2b6ccaf9ae766b13ccb12ab1ed87a22c75",
+      "after_sha256": "72ea90baad2c2f0eb80ba88d6d3f74ae04a5882248e5551b18a72eabd0345f74",
+      "owners": {
+        "ShootingPhaseHandler.invalid_attack_sequence_selection_status": {
+          "before": "f819b44d268376a89c174b4d75d759e33d9e7f64efb3a8552be5fd191deb6943",
+          "after": "c5cf04692c4efa890c165e9c83f6ac40a2a884dcd73b7a0dcd0fb4593f3ce8b9"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/psychic_preparation.py": {
+      "before_sha256": "645a96a18240a55451798a3ccb3120ee46ac5534e1d09790bff771846207d4b0",
+      "after_sha256": "b98ad890cdb239219d7343e33a262e541f72ebebbae6554bd86c0b4cc20f85df",
+      "owners": {
+        "psychic_preparation_frontier": {
+          "before": "afa4b95d4d0ac105dfc8aeabf67137e31a30630f200d6cc031d51355314959e1",
+          "after": "a4322ccd732fd5cd8c054ab1c5307905352c8d03aaf55d0ad3490e90ca885ee0"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/random_profile_attack_groups.py": {
+      "before_sha256": "abbae5d1acf8c2cfbac7450f2545c790cd5fecbb15195b6dc3692b6961ca4aa4",
+      "after_sha256": "7801bbfc569fec0936af85eff7f4182062d27ea5662ff1230c89495d0805e9c0",
+      "owners": {
+        "@module": {
+          "before": "fb24baffbb2062cc00c3a5db948aff818c4369280636dc2858e3a515089a5151",
+          "after": "4f7baab7a342e5795da5aed83ad5517b0fe6a04f2b6041a08efe18818db4d93b"
+        },
+        "validate_profile_attack_group": {
+          "before": "e74ce6aa83e9b29bbfa4c9a36d4561ed7522b11a05dd2e6cd77e42aa3d3af6ac",
+          "after": "bcfbc4c5d7d3a91ac41b0dcacaff72e37e687253bf15a03287d7a6e76474f9b8"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/engine/attack_reroll_dispatch.py": [
+      "order135-gathered-attack-steps"
+    ],
+    "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py": [
+      "order135-gathered-attack-steps"
+    ],
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": [
+      "order103-src-warhammer40k_core-engine-attack_sequence_group_selection"
+    ],
+    "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py": [
+      "order135-gathered-attack-steps"
+    ],
+    "src/warhammer40k_core/engine/attack_sequence_model.py": [
+      "order103-src-warhammer40k_core-engine-attack_sequence_model"
+    ],
+    "src/warhammer40k_core/engine/attack_sequence_selection.py": [
+      "order103-src-warhammer40k_core-engine-attack_sequence_selection"
+    ],
+    "src/warhammer40k_core/engine/attack_sequence_validation.py": [
+      "order103-src-warhammer40k_core-engine-attack_sequence_validation"
+    ],
+    "src/warhammer40k_core/engine/gathered_attack_dice.py": [
+      "order135-gathered-attack-steps"
+    ],
+    "src/warhammer40k_core/engine/obscuring_model_cover.py": [
+      "order135-visibility-hot-consumers"
+    ],
+    "src/warhammer40k_core/engine/phases/fight.py": [
+      "order103-src-warhammer40k_core-engine-phases-fight"
+    ],
+    "src/warhammer40k_core/engine/phases/shooting_handler.py": [
+      "order103-src-warhammer40k_core-engine-phases-shooting_handler"
+    ],
+    "src/warhammer40k_core/engine/psychic_preparation.py": [
+      "order135-gathered-attack-steps"
+    ],
+    "src/warhammer40k_core/engine/random_profile_attack_groups.py": [
+      "order103-src-warhammer40k_core-engine-random_profile_attack_groups"
+    ]
+  },
+  "authority": "Standing owner-approved sequential-remediation default uses serial current-runtime smoke and an exact-base assessment for bounded rules repairs. Detailed comparisons remain mandatory for deliberate performance changes or demonstrated serious regressions. This scope recognizes only these exact S25 file/owner before/after hashes, category rule_semantics and explicit existing sensitive operations; no original mapping/ceiling/history/work/cache check or final gate is changed.",
+  "source_obligation": "Complete selected S25 04.03/04.03.01 gather identical applicable weapons; 05 requires all Hits before Wounds within that pool. Complete02.02.03 preserves independent physical random A/D and other characteristic occurrences; physical ownership, timing, CP, dice/causal authority and native persistence/replay/continuation remain required. D02 grouped Save chronology and unproven neighboring investigations are separate.",
+  "unchanged_work": "This is a bounded rules correction, not deliberate performance optimization. Existing individual physical weapon/attack ownership, roll occurrence, target queries, allocation, provider evaluation, expiry, frequency guards, serializer/replay format and RNG authority remain operative. Comparison-only semantic/source normalization adds bounded linear descriptor and source scans; genuinely different or unknown dependencies remain conservative. Fixed Damage skips an unused pre-roll query; real random Damage remains resolved per allocated attack. No geometry/search algorithm, cache policy, numerical budget, dependency, original assertion/branch/ceiling or benchmark workload changes; two original pre-start fixtures preserve the active-budget and genuinely remaining-group branches. Exact-base serial current-runtime smoke and all live semantic/work/cache controls remain required. No component-budget, provider-wide or full-game certification is claimed."
+}

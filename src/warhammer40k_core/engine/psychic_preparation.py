@@ -73,7 +73,7 @@ def psychic_preparation_frontier(
     relevant = tuple(relevant_records)
     consumed: list[DecisionRecord] = []
     completed: list[str] = []
-    for context in contexts:
+    for index, context in enumerate(contexts):
         current_records = tuple(
             record
             for record in relevant
@@ -81,7 +81,7 @@ def psychic_preparation_frontier(
             and record.request.payload["attack_context_id"] == context
         )
         evaluated = evaluate_attack_weapon_profile(
-            pool=pool,
+            pool=replace(sequence, attack_index=index).current_pool(),
             decisions=decisions,
             manager=None,
             attack_context_id=context,

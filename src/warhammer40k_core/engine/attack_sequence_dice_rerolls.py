@@ -908,6 +908,30 @@ def apply_source_backed_attack_dice_reroll_decision(
     ):
         raise GameLifecycleError(f"{phase_label} dice reroll attack context drift.")
     current_pool = attack_sequence.current_pool()
+    if (
+        attack_sequence.current_gathered_group is not None
+        and attack_sequence.current_gathered_group.native_snapshots
+        and roll_type in {"attack_sequence.hit", "attack_sequence.wound"}
+    ):
+        from warhammer40k_core.engine.gathered_dice_occurrence import unresolved_dice_occurrence
+
+        occurrence = unresolved_dice_occurrence(
+            sequence=attack_sequence, events=decisions.event_log.records
+        )
+        if occurrence.sequence.attack_context_id() != attack_context_id:
+            raise GameLifecycleError(f"{phase_label} dice reroll physical occurrence drift.")
+        current_pool = occurrence.sequence.current_pool()
+    elif (
+        attack_sequence.current_gathered_group is not None
+        and attack_sequence.current_gathered_group.native_snapshots
+    ):
+        from warhammer40k_core.engine.native_attack_gathering import (
+            native_pool_for_wound_occurrence,
+        )
+
+        current_pool = native_pool_for_wound_occurrence(
+            attack_sequence, decisions.event_log.records, attack_context_id
+        )
     if _payload_string(attack_context, key="weapon_profile_id") != current_pool.weapon_profile_id:
         raise GameLifecycleError(f"{phase_label} dice reroll weapon profile drift.")
     _validate_current_source_backed_attack_reroll_context_if_required(

@@ -18,6 +18,7 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityHookBinding,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_gathering_dependencies import AttackGatheringDependency
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartEffectContext,
@@ -105,6 +106,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=SAVE_OPTION_MODIFIER_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=waaagh_save_option_modifier,
+                gathering_dependency=AttackGatheringDependency.TARGET_ONLY,
             ),
         ),
     )

@@ -643,6 +643,7 @@ def save_option_modifier_bindings(
                         source,
                         descriptor,
                     ),
+                    gathering_dependency=descriptor.gathering_dependency,
                 )
             )
     return tuple(sorted(bindings, key=lambda binding: binding.modifier_id))

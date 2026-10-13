@@ -18,6 +18,7 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.core.weapon_skill_modifiers import with_weapon_skill_modifier
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_gathering_dependencies import AttackGatheringDependency
 from warhammer40k_core.engine.battle_shock_historical_authority import (
     HistoricalBattleShockAuthorityContext,
 )
@@ -215,6 +216,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=SAVE_OPTION_MODIFIER_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=voice_of_command_save_option_modifier,
+                gathering_dependency=AttackGatheringDependency.TARGET_ONLY,
             ),
         ),
         weapon_profile_modifier_bindings=(

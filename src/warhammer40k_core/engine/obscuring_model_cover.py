@@ -38,9 +38,15 @@ COVER_FROM_OBSCURING_MODELS = "cover_from_obscuring_models"
 
 
 def obscuring_model_cover_sources(*, state: GameState, pool: RangedAttackPool) -> JsonValue:
+    return obscuring_model_cover_inventories(state=state, pool=pool)[0]
+
+
+def obscuring_model_cover_inventories(
+    *, state: GameState, pool: RangedAttackPool
+) -> tuple[JsonValue, JsonValue]:
     """Re-evaluate present source groups against this attacking model, without mutation."""
     if pool.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE:
-        return None
+        return None, None
     grants = tuple(
         effect
         for effect in state.persisting_effects
@@ -50,9 +56,10 @@ def obscuring_model_cover_sources(*, state: GameState, pool: RangedAttackPool) -
         )
     )
     if not grants:
-        return None
+        return None, None
     target = rules_unit_view_by_id(state=state, unit_instance_id=pool.target_unit_instance_id)
     commitments: list[JsonValue] = []
+    applicable: list[JsonValue] = []
     source_groups: list[tuple[tuple[str, ...], JsonValue]] = []
     grant_ids = {effect.effect_id for effect in grants}
     for view in rules_unit_views_for_state(state=state):
@@ -83,6 +90,7 @@ def obscuring_model_cover_sources(*, state: GameState, pool: RangedAttackPool) -
         )
         if view.unit_instance_id == target.unit_instance_id:
             commitments.append(evidence)
+            applicable.append(evidence)
         else:
             source_groups.append((model_ids, evidence))
     if source_groups:
@@ -106,7 +114,11 @@ def obscuring_model_cover_sources(*, state: GameState, pool: RangedAttackPool) -
                 commitments.append(
                     {"grant": evidence, "visibility_context": context.context_fingerprint()}
                 )
-    return {"sources": commitments} if commitments else None
+                applicable.append({"grant": evidence, "applies": True})
+    return (
+        {"sources": commitments} if commitments else None,
+        {"sources": applicable} if applicable else None,
+    )
 
 
 def _visibility_context(*, state: GameState, pool: RangedAttackPool) -> TerrainVisibilityContext:

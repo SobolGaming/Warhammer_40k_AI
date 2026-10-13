@@ -10,6 +10,7 @@ from warhammer40k_core.core.dice import D3RollResult, DiceExpression, DiceRollSp
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_gathering_wound_rules import WoundGatheringContext
 from warhammer40k_core.engine.battle_round_hooks import (
     SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
     BattleRoundStartHookBinding,
@@ -281,6 +282,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=DOOM_WOUND_MODIFIER_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=harbingers_doom_wound_roll_modifier,
+                gathering_handler=harbingers_doom_wound_gathering_modifier,
             ),
         ),
     )
@@ -592,6 +594,12 @@ def harbingers_darkness_model_ability_grant(context: ModelAbilityGrantContext) -
 def harbingers_doom_wound_roll_modifier(context: WoundRollModifierContext) -> int:
     if type(context) is not WoundRollModifierContext:
         raise GameLifecycleError("Harbingers of Dread Doom wound modifier requires context.")
+    return harbingers_doom_wound_gathering_modifier(context)
+
+
+def harbingers_doom_wound_gathering_modifier(
+    context: WoundRollModifierContext | WoundGatheringContext,
+) -> int:
     if context.target_unit_instance_id not in context.state.battle_shocked_unit_ids:
         return 0
     if not unit_has_active_dread(

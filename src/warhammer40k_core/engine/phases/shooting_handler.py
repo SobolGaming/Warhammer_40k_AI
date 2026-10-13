@@ -780,12 +780,20 @@ class ShootingPhaseHandler:
                     "selected_target_unit_instance_id": selected_group.target_unit_instance_id,
                 },
             )
-        current_groups = gathered_attack_groups_for_target(
+        from warhammer40k_core.engine.native_attack_gathering import (
+            gathered_groups_for_pending_request,
+        )
+        from warhammer40k_core.engine.attack_sequence_selection import (
+            request_for_gathered_attack_groups,
+        )
+
+        current_groups = gathered_groups_for_pending_request(
             attack_sequence=attack_sequence,
             target_unit_instance_id=selected_group.target_unit_instance_id,
             target_has_character=target_has_character_for_attack_group(
                 state=state, target_unit_instance_id=selected_group.target_unit_instance_id
             ),
+            request=request,
         )
         if selected_group.group_id not in {group.group_id for group in current_groups}:
             return LifecycleStatus.invalid(
@@ -796,11 +804,12 @@ class ShootingPhaseHandler:
                     "selected_group_id": selected_group.group_id,
                 },
             )
-        expected_request = build_select_attack_weapon_group_request(
+        expected_request = request_for_gathered_attack_groups(
             request_id=request.request_id,
             state=state,
             attack_sequence=attack_sequence,
             target_unit_instance_id=selected_group.target_unit_instance_id,
+            groups=current_groups,
         )
         return _invalid_if_current_option_payload_drifted(
             state=state,

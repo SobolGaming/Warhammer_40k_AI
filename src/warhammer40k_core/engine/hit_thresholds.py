@@ -26,10 +26,10 @@ class HitThresholds:
 
 def resolve_hit_thresholds(context: HitRollMinimumUnmodifiedSuccessContext) -> HitThresholds:
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
-        _matching_generic_attack_effects,  # pyright: ignore[reportPrivateUsage]
+        _matching_generic_attack_effects,
         _required_int_parameter,  # pyright: ignore[reportPrivateUsage]
         _required_string_parameter,  # pyright: ignore[reportPrivateUsage]
-        _roll_type_matches,  # pyright: ignore[reportPrivateUsage]
+        _roll_type_matches,
         generic_rule_modifier_source_id,
     )
 

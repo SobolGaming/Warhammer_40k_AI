@@ -345,8 +345,8 @@ def defer_grouped_devastating_wounds(
 ]:
     current = attack_sequence
     normal_contexts: list[tuple[AttackSequence, AttackResolutionContextPayload]] = []
-    pool = attack_sequence.current_pool()
     for wounded_sequence, attack_context in wounded_contexts:
+        pool = wounded_sequence.current_pool()
         target_keywords = rules_unit_view_by_id(
             state=state,
             unit_instance_id=attack_context["target_unit_instance_id"],

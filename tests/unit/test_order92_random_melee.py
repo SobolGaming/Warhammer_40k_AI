@@ -183,7 +183,7 @@ def _all_committed(session: LocalGameSession) -> tuple[DecisionRequest, list[dic
 def test_all_weapons_commit_before_dice_and_each_budget_is_conserved(
     extra: bool, models: int
 ) -> None:
-    session = random_melee_session(extra=extra, attacker_models=models)
+    session = random_melee_session(extra=extra, attacker_models=models, pause_at_first_hit=True)
     request, budgets = _all_committed(session)
     assert len(budgets) == models * (2 if extra else 1)
     assert len({cast(str, b["weapon_instance_id"]) for b in budgets}) == len(budgets)
