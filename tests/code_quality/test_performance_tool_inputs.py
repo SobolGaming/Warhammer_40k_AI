@@ -31,6 +31,7 @@ from tools.performance_tool_inputs import (
     FAMILY,
     HARNESS,
     INDEX,
+    MAP_PATH,
     REPORT_ARCHIVE,
     REQUIRED,
     SCHEMA,
@@ -472,7 +473,7 @@ def test_audit_manifest_rejects_unpinned_pdf_reference(reference: str | None) ->
 
 def _archival_fixture(tmp_path: Path) -> tuple[dict[str, str], dict[str, object]]:
     root = Path(__file__).resolve().parents[2]
-    for name in (SPEC_ARCHIVE, REPORT_ARCHIVE, APPLICABILITY):
+    for name in (SPEC_ARCHIVE, REPORT_ARCHIVE, APPLICABILITY, MAP_PATH):
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes((root / name).read_bytes())
@@ -590,3 +591,35 @@ def test_original_edition_assertion_preserves_active_reference_boundary(
     assert result.returncode == (0 if active is None else 1), result.stdout + result.stderr
     if active is not None:
         assert "AssertionError" in result.stdout
+
+
+@pytest.mark.parametrize(
+    "mutation", ["existing-operation", "new-path", "new-family", "extra-entry"]
+)
+def test_restore_mapping_bridge_rejects_unapproved_delta(tmp_path: Path, mutation: str) -> None:
+    from tools.performance_tool_inputs import MEASURED_BASE
+
+    current, report = _archival_fixture(tmp_path)
+    target = tmp_path / MAP_PATH
+    mapping = json.loads(target.read_bytes())
+    operations = mapping["operations"]
+    if mutation == "existing-operation":
+        operations["runtime-dependency"]["mandatory"] = False
+        operations["runtime-dependency"]["families"] = []
+    elif mutation == "new-path":
+        operations["ci-restore-internal-diagnostic"]["paths"].append("src/unapproved.py")
+    elif mutation == "new-family":
+        operations["ci-restore-internal-diagnostic"]["families"] = [FAMILY]
+    else:
+        operations["unapproved"] = operations["ci-restore-internal-diagnostic"]
+    target.write_text(json.dumps(mapping))
+    current[MAP_PATH] = hashlib.sha256(target.read_bytes()).hexdigest()
+    proof_path = tmp_path / APPLICABILITY
+    proof = json.loads(proof_path.read_bytes())
+    proof["current_input_digest"] = digest(current)
+    proof["changes"][MAP_PATH]["after"] = current[MAP_PATH]
+    proof_path.write_text(json.dumps(proof))
+    with pytest.raises(ValueError, match="map delta differs"):
+        retained_tool_comparison_inputs(
+            tmp_path, current=current, report=report, base=MEASURED_BASE
+        )

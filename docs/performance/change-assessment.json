@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "22a12094cfe3839d8fe8c5296ec0a7e7d32abade",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3dac52df9bba355343defa9547c58e6b1feb03f8b45e5d6d32031e611075d9bb",
-  "operation_map_sha256": "4b7cd26c3a3f7344f77ed5d0f93e3020867c8fbde260834ab99eae5b3feab057",
+  "operation_map_sha256": "8d669a8074412eaf3af9b98e1047c90678294cabf321fe45a6e8a9961eff83db",
   "changes": {
     ".github/workflows/linux-attribution.yml": {
       "before_sha256": null,
@@ -14,6 +14,16 @@
         }
       }
     },
+    ".github/workflows/restore-internal.yml": {
+      "before_sha256": null,
+      "after_sha256": "27833dad42821e87fd8118aeef5d6827ec1a6db6f0cc442fc39382cc088698d4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "27833dad42821e87fd8118aeef5d6827ec1a6db6f0cc442fc39382cc088698d4"
+        }
+      }
+    },
     ".github/workflows/source-reuse.yml": {
       "before_sha256": null,
       "after_sha256": "9f9afbab04c8769868d5f69acef868823d6bd58be7e5b605a0b9b239a5a4f930",
@@ -21,6 +31,294 @@
         "@document": {
           "before": null,
           "after": "9f9afbab04c8769868d5f69acef868823d6bd58be7e5b605a0b9b239a5a4f930"
+        }
+      }
+    },
+    "ci/restore-internal/check_ci_attribution_supervisor.py": {
+      "before_sha256": null,
+      "after_sha256": "7c8b85d11761f71cd63ae66fb1647f63fd8fddab9f60094cafba068ec3652008",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "79f8c65da6a6d2e8e988859eccc2c817f61d2400ec679e0158c64f4fbbc07772"
+        },
+        "checks": {
+          "before": null,
+          "after": "f6466fa9a1c82df00d5cedc005f1f79f3fd88d0baecee550c4c31af3f12fcc2c"
+        },
+        "child": {
+          "before": null,
+          "after": "1f28b0c4388478a2df85ab215bd8cef98d64337858102cb1f02af5dd99b64e55"
+        },
+        "controller": {
+          "before": null,
+          "after": "79aa99ace60b1e0b9cbdda3fc0ab25e26a543a4df24806ede578b258a223fefb"
+        },
+        "main": {
+          "before": null,
+          "after": "e18629ec738a3d1596809e670bcf882917f20407286fe53d545424522c7a999a"
+        },
+        "wait_file": {
+          "before": null,
+          "after": "ef79e4b59c1392e999c3404359133bdff235f9864991f5ee8c717d61d3728c40"
+        }
+      }
+    },
+    "ci/restore-internal/check_restore_internal_harness.py": {
+      "before_sha256": null,
+      "after_sha256": "6c84b7b940b6c59c914adb2784989484f06a9d7ce1453f67edcfd1c18da89089",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "4d97b0f94ec1d79c5658107427d36029b728f4ed546a70fac39c521d1ebfd5a2"
+        },
+        "HarnessControls": {
+          "before": null,
+          "after": "ec3cd062d588792f23c35baa306101f020af9ddfbe7bfc308fb67715fac7aed7"
+        },
+        "HarnessControls.install": {
+          "before": null,
+          "after": "fe9ff440757a323cbfcdba85bdac13641329c986b5248740541a96eb5cd4a1df"
+        },
+        "HarnessControls.setUp": {
+          "before": null,
+          "after": "d4bcf10952ffccbff408715d710f4b0dce89db90f0a40b93a8acb602c6344d52"
+        },
+        "HarnessControls.tearDown": {
+          "before": null,
+          "after": "9aaae9e456119b349d73f300289d794402cf9f8bf5bd2de7ef6d705415884f57"
+        },
+        "HarnessControls.test_ample_budget_admission_still_passes": {
+          "before": null,
+          "after": "ca9490adbf880a92e329c8c11f7e12fe6c5f90af1b8b809f108546ca90e9573d"
+        },
+        "HarnessControls.test_classmethod_argument_result_and_descriptor_identity": {
+          "before": null,
+          "after": "27a3d0509af9babbac3cfc19d3cdc5cf36830ec4c52ed1445ea7a92d57a887c5"
+        },
+        "HarnessControls.test_command_rejects_wrong_mode_and_inside_checkout": {
+          "before": null,
+          "after": "461e51112c57d5856c1c484d84919de3151f06402ada272bce39ad477284ab6c"
+        },
+        "HarnessControls.test_external_descriptor_drift_restores_then_fails": {
+          "before": null,
+          "after": "2a1d034623619231353944b20c1cd429eaa12574d262f40af61d6909319c5326"
+        },
+        "HarnessControls.test_final_source_verification_cannot_cross_success_deadline": {
+          "before": null,
+          "after": "21c4d21e4f9e31bf9e9fb5e7373887f64dbed41ff2fd0e92cec1c90e9f259b92"
+        },
+        "HarnessControls.test_manifest_digest_and_frozen_revision_rejection": {
+          "before": null,
+          "after": "af422c8e051ab73faf1a6cd82e29e563f89006d3b03d4712452474221a9c3191"
+        },
+        "HarnessControls.test_module_function_exception_is_unchanged": {
+          "before": null,
+          "after": "6ba492363776906714f036a465f32e97dc056dd61730710010b1f6cfedf1c130"
+        },
+        "HarnessControls.test_nested_restore_exclusive_and_purpose": {
+          "before": null,
+          "after": "7e124aee946fb9cc90b1b7f2517d505cddd26e0891d91c999864c7f3bec27d96"
+        },
+        "HarnessControls.test_partial_receipt_cannot_claim_complete": {
+          "before": null,
+          "after": "c45d07e2f8e048ada4e8924c0bdf9bce392c3e7a4451a81a1c69dc3f11f97db3"
+        },
+        "HarnessControls.test_periodic_write_failure_preserves_original_outcomes": {
+          "before": null,
+          "after": "3b8e92715c0a1126c316e2b4a439ed7f223eaf67bff2297bfecda38a556fc2b1"
+        },
+        "HarnessControls.test_phase_restores_after_exception": {
+          "before": null,
+          "after": "8a97c65c8be0e96e443d0f0b5857fcfc1a55ac91e060b79edc9c13043159445b"
+        },
+        "HarnessControls.test_source_blob_check_rejects_git_hidden_worktree_drift": {
+          "before": null,
+          "after": "8e758bed94df725aec2c47c2d68368a95a618a251b010401b0171dba7ac3fec7"
+        },
+        "HarnessControls.test_source_verification_consumes_admission_margin": {
+          "before": null,
+          "after": "c6bd14bb93a29fab1a7b26bca43a3b30539c0ace9cc41a95fdf1e1e9c1494846"
+        },
+        "HarnessControls.test_staticmethod_identity": {
+          "before": null,
+          "after": "be9e2887d8441d8332fc35c05f0898b59df6d0a06d46b018459a3044eef07223"
+        },
+        "HarnessControls.test_terminal_io_crossing_deadline_cannot_retain_success": {
+          "before": null,
+          "after": "5e57c41141e2a0a107189e551d53ed8994267b991d4b952793d41bad32fba150"
+        },
+        "HarnessControls.test_wrong_node_fails_before_running": {
+          "before": null,
+          "after": "2eb2aed11f18b1bb5a9a27940121403bad0f18406cf423726e817b91509f2bea"
+        },
+        "HarnessControls.test_wrong_output_rejects_before_runtime_import": {
+          "before": null,
+          "after": "a12c1c765319176238947989cb1127ec5a5dc1ea5b79fad63e602b2b3952a756"
+        }
+      }
+    },
+    "ci/restore-internal/ci_attribution_supervisor.py": {
+      "before_sha256": null,
+      "after_sha256": "efbb32849dbe057f8a7df57c76be881ec69f1353da4d80a018850ee802e05cb9",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "cc8154eee280f221a8ae79487a1cc1263b6284fea9abc29fe6ab30b92c22784c"
+        },
+        "cleanup": {
+          "before": null,
+          "after": "f34da8c9e35c2295731e824944cca25476e6a1656cbd05960f61450228aed128"
+        },
+        "run_owned": {
+          "before": null,
+          "after": "8a19c0bab5bdacb34979f07606ebaf5ba06501af4607f1be817a74bc01c5b89d"
+        },
+        "signal_group": {
+          "before": null,
+          "after": "0771e51d3d227795d99f375199b977302067e57e06bd6289fed59cc992f74e6b"
+        }
+      }
+    },
+    "ci/restore-internal/manifest.json": {
+      "before_sha256": null,
+      "after_sha256": "0dd49c8f4883da8a754158e85062fef6dae1c912d5de282b6a3950946fe8b0f8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0dd49c8f4883da8a754158e85062fef6dae1c912d5de282b6a3950946fe8b0f8"
+        }
+      }
+    },
+    "ci/restore-internal/restore_internal_campaign.py": {
+      "before_sha256": null,
+      "after_sha256": "95ec0b7ddec0e0390b3fc081f74107cbd34ab998183f5b37a169cf0e4c2f1ebb",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "49a84c06ce9d4993928a6fd29d3fe870cdafe21a2cb2e18c44d04598e371b952"
+        },
+        "check_sources": {
+          "before": null,
+          "after": "fe1fd510e767af1f2af72f747053916e803787dcc8d2db8383ab31a678ecad9d"
+        },
+        "command": {
+          "before": null,
+          "after": "461a78ed634725d8191b441ec521cbeb685757f0cc677f9df3ec0dadf8e74fdc"
+        },
+        "completion_status": {
+          "before": null,
+          "after": "fa93f89e305c439568cf4f35bac725c74e5e7e6465652e7022bdbba0944d5ef2"
+        },
+        "digest": {
+          "before": null,
+          "after": "098dcd052499729dac4ec736fd9724919ae303b625eef48568cc78f821d638d3"
+        },
+        "environment": {
+          "before": null,
+          "after": "e9456b608d81b104013741ade4b9ce8dcb0ddb3c1c06558fca1eb6803bf00739"
+        },
+        "git": {
+          "before": null,
+          "after": "bf4d4a514835bc11d46372c491dfd7a518dbb2c82e1fa533e8b53786d8358f6c"
+        },
+        "main": {
+          "before": null,
+          "after": "a8495bc7870cb1c524d49cdc5d4beaf27a38bc02af4b05146555423e4deee791"
+        },
+        "publish_terminal": {
+          "before": null,
+          "after": "5334f877e9d7ba753c83d40ce9a36caa95c7f38f3df7cbd03ea1e4dead60f164"
+        },
+        "read_host_file": {
+          "before": null,
+          "after": "f988ca6b87fde215f1542741ffaa4dd9c924bb9ace38ed4a5351f5469f91d987"
+        },
+        "read_manifest": {
+          "before": null,
+          "after": "5864aeeea23cf8f6f43a65f69a15f1d2e7adfee2bb807f5dbe3bb70242da45a6"
+        },
+        "require_budget": {
+          "before": null,
+          "after": "1e155a624518805704a4f1ba4e26cf35f33e6abc163ce13a9a20508e7c7dbb84"
+        },
+        "verify_after_invocation": {
+          "before": null,
+          "after": "30b7eb0336f5f147028d279f484e295738404a3aa0dfb02a6a43a72bb7d02a79"
+        },
+        "verify_for_launch": {
+          "before": null,
+          "after": "0372600f01f16a96926054cbf8fcc94d179b37c2418844b30c57c2938aecbbc2"
+        },
+        "write": {
+          "before": null,
+          "after": "25af430a5f41f2a42c14a3b66fadf7be1f1eeb9e10b4e4f7485bc36c1b3ca2ce"
+        }
+      }
+    },
+    "ci/restore-internal/restore_internal_plugin.py": {
+      "before_sha256": null,
+      "after_sha256": "5f2f2ca8e01eb4610160fb62ae824ddd566bf0a0ea3b695365dc126f48a4c9cf",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "492d7b03b7e2d3e491286ffb2768b6afc819dd01ff77a98b9ee55decdd259378"
+        },
+        "install": {
+          "before": null,
+          "after": "68d1fa31e1e49f5a24a56c4ad9e5bfdd044721ae57c5c8106bd68b4e551a8380"
+        },
+        "phase_span": {
+          "before": null,
+          "after": "0ef4b7f4ae7bc4c9a368d1e1f1bf5b2b271ea5924c68fb872f748d9dc3258f22"
+        },
+        "pytest_addoption": {
+          "before": null,
+          "after": "7bd489e9f52ccd5ab7e35f953a9c060f485c20c7649a204bbcf4577ec4a39432"
+        },
+        "pytest_collection": {
+          "before": null,
+          "after": "55b48ebb0bc0ebeea51a8a7861b7ff6c30f8e6edbf30da46b2efff3f5d69d9e9"
+        },
+        "pytest_collection_finish": {
+          "before": null,
+          "after": "670e14e5f7e9ec4d4a75e95cc36f3a52d4181728a4956a3959b506a2fdf188c2"
+        },
+        "pytest_runtest_call": {
+          "before": null,
+          "after": "d9118a81049049abc8d6dafeffec27bb2707f1932db03a37846249e3d1b3f914"
+        },
+        "pytest_runtest_logreport": {
+          "before": null,
+          "after": "d64bf867e8634d11ba4522edb1cae835293b076bd9b08fc2fcf345970564ad0b"
+        },
+        "pytest_runtest_setup": {
+          "before": null,
+          "after": "5542d659bd365d81ed34b23ffe7e64a511be748c5daab3cd6225448d2a51d250"
+        },
+        "pytest_runtest_teardown": {
+          "before": null,
+          "after": "da6c0273de5312b1ebfe916b19ed3819a55945c2ff215e041a347b7f71556a79"
+        },
+        "pytest_sessionfinish": {
+          "before": null,
+          "after": "8f3a94f00617a448877db5239fb28c684dbbae0ba34fdf08f3225fad3d0c67bb"
+        },
+        "pytest_sessionstart": {
+          "before": null,
+          "after": "9102ee1361dea999c04c9b1bcfebd59d81ae0b781c76e7699049f37961981a8a"
+        },
+        "pytest_unconfigure": {
+          "before": null,
+          "after": "474cb5f2a23884b7ef8d62436fee5d3540479f3436156c4ee9ad1c60961327fa"
+        },
+        "restore_originals": {
+          "before": null,
+          "after": "50d5b04e12c3f9025eb358bedb5880adc0127fbd8614938ae73f0e3c44077796"
+        },
+        "write_receipt": {
+          "before": null,
+          "after": "929517b3c491958980da100bdabb8aa640b4c1bb6ce3bafcc4b60f89008d8dc6"
         }
       }
     },
@@ -86,11 +384,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "0b80d34a84ae30555830d97f8bf0ba7d062655725d8188495a4046ec6f92fc54",
-      "after_sha256": "bfcde4860e036a5a0d1d0de1e7c003cd80446767405b5408849fce2616e2a008",
+      "after_sha256": "31ab2200dee42a0d8f72902d51822c4d0f400680b0132aa8466215be2dab86e1",
       "owners": {
         "@document": {
           "before": "0b80d34a84ae30555830d97f8bf0ba7d062655725d8188495a4046ec6f92fc54",
-          "after": "bfcde4860e036a5a0d1d0de1e7c003cd80446767405b5408849fce2616e2a008"
+          "after": "31ab2200dee42a0d8f72902d51822c4d0f400680b0132aa8466215be2dab86e1"
         }
       }
     },
@@ -106,11 +404,11 @@
     },
     "docs/performance/policy-v3/source-token-provenance-applicability.json": {
       "before_sha256": null,
-      "after_sha256": "e8ae034bf7babe6ecc3d18ff692da64dca35449f983a8965faf7d7102366e8a8",
+      "after_sha256": "449161575a758d7e50c062b4610f08805ad3b1c61f085368b19d294b4fc85e84",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e8ae034bf7babe6ecc3d18ff692da64dca35449f983a8965faf7d7102366e8a8"
+          "after": "449161575a758d7e50c062b4610f08805ad3b1c61f085368b19d294b4fc85e84"
         }
       }
     },
@@ -450,15 +748,15 @@
     },
     "tests/code_quality/test_performance_tool_inputs.py": {
       "before_sha256": null,
-      "after_sha256": "29d4735cab25fa693cc138e4a8d24014735bc0c7ae67f1744b64d01b5f81dba2",
+      "after_sha256": "9521b6ccfa06058451df6772d4bd75eac560c4b99cd150544deca9b34ad06226",
       "owners": {
         "@module": {
           "before": null,
-          "after": "0ff3a92766a5dffb3eeccf7ae97143d1c55304becfaa14c604581d0a7950d630"
+          "after": "db221c38d8152fe4adfd01f2c9ee40b6697ee6571dc5bf987b0e9e019b3d0524"
         },
         "_archival_fixture": {
           "before": null,
-          "after": "2efb7956b187b9c0170515066422111f168739bee73f03313ca3122f79665b9a"
+          "after": "23588bca573e6ac5a0880c9bdb1515ecdf13ae8ae0be2f4cdbcf81ce49515ed1"
         },
         "_binding": {
           "before": null,
@@ -539,6 +837,10 @@
         "test_original_edition_assertion_preserves_active_reference_boundary": {
           "before": null,
           "after": "1dc3add2731c64568483f83e5c7e54d8b3e54e61cd3f012fda01c526bd81b861"
+        },
+        "test_restore_mapping_bridge_rejects_unapproved_delta": {
+          "before": null,
+          "after": "5d7a1c468404baae3360a11f8f6a82154087f4a6d59568a00bf6920b645e4738"
         },
         "test_retained_output_accepts_numbered_directory_and_current_alias": {
           "before": null,
@@ -640,11 +942,11 @@
     },
     "tools/performance_tool_inputs.py": {
       "before_sha256": null,
-      "after_sha256": "b0cb561116825af83679d105a5529336c7178145d70174f4de37bf988275d926",
+      "after_sha256": "157a1e0339d1d5534ff6b8ab6070e15f09ed5bcef9fecf62be2e6ea3d13f810a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "2ae802dd2fd00c1421ea395a41f2d1ed92218cd4d325589817a3213b3fda46c2"
+          "after": "07aa492429a3a9c9cb5dd43e22688ad66e5ea7477069d435a76a90065a9807a6"
         },
         "_object": {
           "before": null,
@@ -684,7 +986,7 @@
         },
         "retained_tool_comparison_inputs": {
           "before": null,
-          "after": "8cf4022e434e949f88d7c9953b876c4f59b5e7cf89c077d0664eda1988bbb111"
+          "after": "d79b9282c00a6afb023efb14fa4edb2e27e0e2bfd6d6517769bf68660218f92a"
         },
         "validate_audit_manifest": {
           "before": null,
@@ -693,6 +995,10 @@
         "validate_binding": {
           "before": null,
           "after": "cecd9580a1e6855bc8fe725e550dbf694ed8c20c0260d7a2d95db1a2c8f884b8"
+        },
+        "validate_restore_operation_mapping": {
+          "before": null,
+          "after": "ba28f38acb27b1b27f236e0f4570e5b727e75862c5cb28ac59ee4ea0af3c5191"
         },
         "validate_spec": {
           "before": null,
@@ -754,7 +1060,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add opt-in baseline CI attribution and non-engine harness checks. Existing engine code, original test bodies and historical measurement drivers are unchanged. No optimization or comparative speedup is claimed.",
+      "rationale": "Retain every prior operation and family unchanged; add exactly one non-runtime diagnostic owner covering the six new external harness/manifest paths. The applicability validator independently checks this exact parsed delta against the measured Git map.",
       "source_obligation": null,
       "unchanged_work": "Native rules, persistence, replay, validators, source preservation and required CI gates remain unchanged. This new diagnostic workflow has bounded exploratory measurements, not a changed historical workload or engine operation. Current serial smoke remains mandatory."
     },
@@ -949,6 +1255,74 @@
       "rationale": "Retain exact provenance archive bytes and authenticate the narrow three-file governance correction against the measured Git revision and complete original inventory.",
       "source_obligation": null,
       "unchanged_work": "The original edition scanner and every measured common, treatment and harness byte remain unchanged; source paths and archive bytes remain exact. No new performance measurement is claimed."
+    },
+    ".github/workflows/restore-internal.yml": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add the exact independently reviewed external restore-attribution harness with fixed source snapshot, bounded diagnostic clocks and fail-closed artifact ownership. This is new diagnostic instrumentation, not a replacement historical measurement or production optimization.",
+      "source_obligation": null,
+      "unchanged_work": "All engine, original test, source-reuse treatment/common/harness inputs and historical records remain exact. The independent source-reuse map bridge admits only this exact six-file diagnostic operation addition. Mandatory current smoke remains required; no performance improvement or whole-CI acceptance is claimed."
+    },
+    "ci/restore-internal/check_ci_attribution_supervisor.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci-restore-internal-diagnostic"
+      ],
+      "selected_families": [],
+      "rationale": "Add the exact independently reviewed external restore-attribution harness with fixed source snapshot, bounded diagnostic clocks and fail-closed artifact ownership. This is new diagnostic instrumentation, not a replacement historical measurement or production optimization.",
+      "source_obligation": null,
+      "unchanged_work": "All engine, original test, source-reuse treatment/common/harness inputs and historical records remain exact. The independent source-reuse map bridge admits only this exact six-file diagnostic operation addition. Mandatory current smoke remains required; no performance improvement or whole-CI acceptance is claimed."
+    },
+    "ci/restore-internal/check_restore_internal_harness.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci-restore-internal-diagnostic"
+      ],
+      "selected_families": [],
+      "rationale": "Add the exact independently reviewed external restore-attribution harness with fixed source snapshot, bounded diagnostic clocks and fail-closed artifact ownership. This is new diagnostic instrumentation, not a replacement historical measurement or production optimization.",
+      "source_obligation": null,
+      "unchanged_work": "All engine, original test, source-reuse treatment/common/harness inputs and historical records remain exact. The independent source-reuse map bridge admits only this exact six-file diagnostic operation addition. Mandatory current smoke remains required; no performance improvement or whole-CI acceptance is claimed."
+    },
+    "ci/restore-internal/ci_attribution_supervisor.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci-restore-internal-diagnostic"
+      ],
+      "selected_families": [],
+      "rationale": "Add the exact independently reviewed external restore-attribution harness with fixed source snapshot, bounded diagnostic clocks and fail-closed artifact ownership. This is new diagnostic instrumentation, not a replacement historical measurement or production optimization.",
+      "source_obligation": null,
+      "unchanged_work": "All engine, original test, source-reuse treatment/common/harness inputs and historical records remain exact. The independent source-reuse map bridge admits only this exact six-file diagnostic operation addition. Mandatory current smoke remains required; no performance improvement or whole-CI acceptance is claimed."
+    },
+    "ci/restore-internal/manifest.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci-restore-internal-diagnostic"
+      ],
+      "selected_families": [],
+      "rationale": "Add the exact independently reviewed external restore-attribution harness with fixed source snapshot, bounded diagnostic clocks and fail-closed artifact ownership. This is new diagnostic instrumentation, not a replacement historical measurement or production optimization.",
+      "source_obligation": null,
+      "unchanged_work": "All engine, original test, source-reuse treatment/common/harness inputs and historical records remain exact. The independent source-reuse map bridge admits only this exact six-file diagnostic operation addition. Mandatory current smoke remains required; no performance improvement or whole-CI acceptance is claimed."
+    },
+    "ci/restore-internal/restore_internal_campaign.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci-restore-internal-diagnostic"
+      ],
+      "selected_families": [],
+      "rationale": "Add the exact independently reviewed external restore-attribution harness with fixed source snapshot, bounded diagnostic clocks and fail-closed artifact ownership. This is new diagnostic instrumentation, not a replacement historical measurement or production optimization.",
+      "source_obligation": null,
+      "unchanged_work": "All engine, original test, source-reuse treatment/common/harness inputs and historical records remain exact. The independent source-reuse map bridge admits only this exact six-file diagnostic operation addition. Mandatory current smoke remains required; no performance improvement or whole-CI acceptance is claimed."
+    },
+    "ci/restore-internal/restore_internal_plugin.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci-restore-internal-diagnostic"
+      ],
+      "selected_families": [],
+      "rationale": "Add the exact independently reviewed external restore-attribution harness with fixed source snapshot, bounded diagnostic clocks and fail-closed artifact ownership. This is new diagnostic instrumentation, not a replacement historical measurement or production optimization.",
+      "source_obligation": null,
+      "unchanged_work": "All engine, original test, source-reuse treatment/common/harness inputs and historical records remain exact. The independent source-reuse map bridge admits only this exact six-file diagnostic operation addition. Mandatory current smoke remains required; no performance improvement or whole-CI acceptance is claimed."
     }
   },
   "milestone": "ordinary",

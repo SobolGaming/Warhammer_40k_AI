@@ -26,6 +26,7 @@ PROVENANCE_CONTROLS = frozenset(
         "tools/performance_tool_inputs.py",
         "scripts/check_performance_policy.py",
         "tests/code_quality/test_performance_tool_inputs.py",
+        "docs/performance/policy-v3/operation-map.json",
     }
 )
 MAP_PATH = "docs/performance/policy-v3/operation-map.json"
@@ -256,13 +257,46 @@ def read_role_spec(root: Path) -> dict[str, object]:
     return spec
 
 
+def validate_restore_operation_mapping(root: Path) -> None:
+    """The sole additional map entry owns six new external diagnostic files."""
+    before = _object(
+        json.loads(
+            subprocess.check_output(["git", "show", f"{MEASURED_HEAD}:{MAP_PATH}"], cwd=root)
+        )
+    )
+    operations = _object(before["operations"])
+    if "ci-restore-internal-diagnostic" in operations:
+        raise ValueError("Measured map unexpectedly contains the new diagnostic.")
+    operations["ci-restore-internal-diagnostic"] = {
+        "paths": [
+            "ci/restore-internal/" + name
+            for name in (
+                "check_ci_attribution_supervisor.py",
+                "check_restore_internal_harness.py",
+                "ci_attribution_supervisor.py",
+                "manifest.json",
+                "restore_internal_campaign.py",
+                "restore_internal_plugin.py",
+            )
+        ],
+        "owners": ["*"],
+        "families": [],
+        "sensitive": False,
+        "mandatory": False,
+    }
+    current = _object(json.loads((root / MAP_PATH).read_bytes(), object_pairs_hook=_unique_object))
+    if current != before:
+        raise ValueError("Restore diagnostic map delta differs from the exact approved addition.")
+
+
 def retained_tool_comparison_inputs(
     root: Path, *, current: dict[str, str], report: dict[str, object], base: str
 ) -> tuple[dict[str, str], str | None]:
-    """Bridge only three explicitly hashed provenance controls, never measured work."""
+    """Bridge only explicitly hashed provenance controls, never measured work."""
     if not (root / SPEC_ARCHIVE).exists():
         return current, None
     read_role_spec(root)
+    validate_restore_operation_mapping(root)
     archive = root / REPORT_ARCHIVE
     raw_report = archive.read_bytes()
     if (
