@@ -1,20 +1,15 @@
 """Gathered original rolls precede later-step choices through public authority."""
 
-import json
 from typing import cast
 
-import pytest
-from tests.d02_save_step_helpers import native_save_step_shooting_request
-from tests.lethal_hits_helpers import attack_completed, complete_attack
+from tests.lethal_hits_helpers import complete_attack
 from tests.order128_helpers import assert_checkpoint
 from tests.order135_gathered_step_helpers import native_gathered_shooting_request
 from tests.phase13b_shooting_declaration_helpers import proposal_from_request
 from tests.psychic_modifier_helpers import submit_fixture_request
 
-from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import LifecycleStatusKind
-from warhammer40k_core.engine.stratagems import DECLINE_STRATAGEM_WINDOW_OPTION_ID
 
 
 def test_native_gathered_hit_and_wound_steps_precede_reroll_choices() -> None:
@@ -98,94 +93,3 @@ def test_native_gathered_hit_and_wound_steps_precede_reroll_choices() -> None:
     ]
     assert len(original_hits) == 3
     assert max(original_hits) < min(original_wounds)
-
-
-@pytest.mark.parametrize("attacking_player", ["player-a", "player-b"])
-@pytest.mark.parametrize("use_reroll", [True, False])
-def test_native_save_step_precedes_command_reroll_and_survives_continuation(
-    attacking_player: str, use_reroll: bool
-) -> None:
-    """05.00: all original saves in one physical pool precede any reroll choice."""
-    session, request = native_save_step_shooting_request(
-        attacks=12, attacking_player=attacking_player
-    )
-    defender = "player-b" if attacking_player == "player-a" else "player-a"
-    target = "army-beta:scalar" if attacking_player == "player-a" else "army-alpha:scalar"
-    proposal = proposal_from_request(request=request, target_unit_id=target).to_payload()
-    proposal["declarations"] = proposal["declarations"][:1]
-    status = session.submit_parameterized_payload(
-        request_id=request.request_id,
-        result_id="independent-multiattack-declaration",
-        payload=validate_json_value(proposal),
-    )
-    assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
-    for _ in range(80):
-        pending = session.advance_until_decision_or_terminal().decision_request
-        assert pending is not None
-        request = pending
-        if request.decision_type == "use_stratagem" and _original_save_indices(session):
-            break
-        submit_fixture_request(session, request)
-        assert not attack_completed(session), "Native actual dice did not reach a save choice."
-    else:
-        raise AssertionError("Native save choice was not reached within the decision bound.")
-    assert request.actor_id == defender
-    successful_wounds = sum(
-        event.event_type == "attack_sequence_step"
-        and isinstance(event.payload, dict)
-        and event.payload["step"] == "wound"
-        and cast(dict[str, JsonValue], event.payload["payload"])["successful"] is True
-        for event in session.lifecycle.decision_controller.event_log.records
-    )
-    assert successful_wounds >= 2, "The actual-dice scene must exercise multiple saves."
-    assert len(_original_save_indices(session)) == successful_wounds
-    assert_checkpoint(session)
-    checkpoint = json.loads(json.dumps(session.to_persistence_payload()))
-    restored = LocalGameSession.from_persistence_payload(checkpoint)
-    forked = session.fork()
-    for branch in (session, restored, forked):
-        pending = branch.advance_until_decision_or_terminal().decision_request
-        assert pending is not None
-        assert pending.to_payload() == request.to_payload()
-        state = branch.lifecycle.state
-        assert state is not None
-        before = state.command_point_total(defender)
-        option = next(
-            option.option_id
-            for option in pending.options
-            if (option.option_id != DECLINE_STRATAGEM_WINDOW_OPTION_ID) == use_reroll
-        )
-        status = branch.submit_option(
-            request_id=pending.request_id,
-            option_id=option,
-            result_id="d02-save-reroll-choice",
-        )
-        assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
-        assert state.command_point_total(defender) == before - int(use_reroll)
-        complete_attack(branch)
-        events = branch.lifecycle.decision_controller.event_log.records
-        saves = _original_save_indices(branch)
-        assert len(saves) == successful_wounds, "Resume must not duplicate original dice."
-        rerolls = [
-            index
-            for index, event in enumerate(events)
-            if event.event_type == "dice_reroll_resolved"
-        ]
-        assert len(rerolls) == int(use_reroll)
-        if use_reroll:
-            assert max(saves) < min(rerolls)
-    assert session.lifecycle.to_payload() == restored.lifecycle.to_payload()
-    assert session.lifecycle.to_payload() == forked.lifecycle.to_payload()
-    assert_checkpoint(session)
-
-
-def _original_save_indices(session: LocalGameSession) -> list[int]:
-    return [
-        index
-        for index, event in enumerate(session.lifecycle.decision_controller.event_log.records)
-        if event.event_type == "dice_rolled"
-        and isinstance(event.payload, dict)
-        and isinstance(event.payload.get("spec"), dict)
-        and cast(dict[str, JsonValue], event.payload["spec"])["roll_type"]
-        in {"attack_sequence.save.armour", "attack_sequence.save.invulnerable"}
-    ]

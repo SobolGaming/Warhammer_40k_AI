@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "b3b3ecd423c22c2a7fd47a4df2c9baf0ba5860d5",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3dac52df9bba355343defa9547c58e6b1feb03f8b45e5d6d32031e611075d9bb",
-  "operation_map_sha256": "8d384f028897657d5ee9bb7478b760c702a602a2aa48e55216010f6bfe3c20ee",
+  "operation_map_sha256": "beb25dcc698d55f306848ae865d843ed3c563b45e32628639276b1136775d728",
   "changes": {
     "README.md": {
       "before_sha256": "28043dc5ad6a1a83f18a75b119af1fe8ff639f75b25259c81a5640457608fc32",
@@ -94,16 +94,6 @@
         }
       }
     },
-    "data/source_audits/order135/current-inventory.json": {
-      "before_sha256": "9a8bb036fc9e33281c2660d7c1a80d29dcee5a622227f6119266a95d6bfb12cb",
-      "after_sha256": "a53e66e451b937f2f36f0b1457f521aefec6a5920f59a41deeaf0d555f35a078",
-      "owners": {
-        "@document": {
-          "before": "9a8bb036fc9e33281c2660d7c1a80d29dcee5a622227f6119266a95d6bfb12cb",
-          "after": "a53e66e451b937f2f36f0b1457f521aefec6a5920f59a41deeaf0d555f35a078"
-        }
-      }
-    },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "before_sha256": "7b98b1ef3aa3adc72a4d66f541d19ac52427c979f4576977400ab4ca75c814a0",
       "after_sha256": "29b16bbb5912f03386566de7d5b2677e59a343c3d48abb74a3805f52bc11cb59",
@@ -156,11 +146,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c7534626e361870139ab0598fdd09b5c3e6cbf062dad98fd08b1534f73b55ae9",
-      "after_sha256": "4234f18578b8880add9fb726216b72d4460fb0cfbc963e2993593efa506395df",
+      "after_sha256": "0b80d34a84ae30555830d97f8bf0ba7d062655725d8188495a4046ec6f92fc54",
       "owners": {
         "@document": {
           "before": "c7534626e361870139ab0598fdd09b5c3e6cbf062dad98fd08b1534f73b55ae9",
-          "after": "4234f18578b8880add9fb726216b72d4460fb0cfbc963e2993593efa506395df"
+          "after": "0b80d34a84ae30555830d97f8bf0ba7d062655725d8188495a4046ec6f92fc54"
         }
       }
     },
@@ -204,13 +194,13 @@
         }
       }
     },
-    "tests/code_quality/test_performance_policy.py": {
-      "before_sha256": "f21c4726c30d75d7f8ddc534d0172d5a4485b98bdece6bac06bd2f64e349c6a3",
-      "after_sha256": "8d37ee8fac6ec02b1299491e723950fc388b0e05bea18c2c0150f41615a61d54",
+    "tests/code_quality/test_d02_performance_assessment.py": {
+      "before_sha256": null,
+      "after_sha256": "150f89747eebb82281bb7ad2986de395a9a572c7a1c270a7a0e172f9a2263437",
       "owners": {
         "@module": {
-          "before": "a49efcea4924e5b6afbd931551030bde32122441c0f66fad7932722ea46c6c84",
-          "after": "63ba74af87ffc47224324a93095ac5021c8c9144b16f7c40a05b194be712c988"
+          "before": null,
+          "after": "0a6018cfb062be988ff16ac49f3b25aeb87dffba08e018390beacd59523053ea"
         },
         "test_d02_assessment_keeps_sensitive_performance_categories_blocking": {
           "before": null,
@@ -268,13 +258,13 @@
         }
       }
     },
-    "tests/unit/test_order135_gathered_attack_steps.py": {
-      "before_sha256": "b65da7f92131dfe467875d6eaeba6e10892274e5d549e55ddcafe505ed960e57",
-      "after_sha256": "adcb16b62234862c896bf56d1694d255345eb2c2ec458b895fc1630089aef9a1",
+    "tests/unit/test_s25_continuation_and_persistence.py": {
+      "before_sha256": "2d4d3577ad21d3aaa087ace9ee1d622a03f7f6093ee7f95be53b2d26cea16d46",
+      "after_sha256": "eb13625e9955913442e75b9bc5acd3f84af01779cb770101acdc55da2dda2d44",
       "owners": {
         "@module": {
-          "before": "13d74fa420e065b850ad5499de8a307d8323b31331b2a276b1c6685d1a82c29d",
-          "after": "1ffeb4ab78539ddd5627cf85ad95bbf6da093e91179bdc3a97fba9735951103b"
+          "before": "956e0a4093a7bde61ddf5203650a8600478fd93a5227ef34d0be55a304e844c2",
+          "after": "fe9042db0488d64564f055035a23bc515e238c386af843e16823ab058dd8e652"
         },
         "_original_save_indices": {
           "before": null,
@@ -394,16 +384,6 @@
       "source_obligation": "Complete retained 05.00-obligation-01 and 05.03 require all original Save dice in the selected pool before reroll choices. 04.03/04.03.01 and 05.03.02 preserve gathered and post-roll pool boundaries; 05.04 keeps physical selection, save checking and low-to-high damage. Original source and acceptance remain intact.",
       "unchanged_work": "Tests, generated examples and governance inputs retain original assertions, historical measurements and exact-head gates. They implement no engine optimization; the changed runtime remains subject to real serial smoke and all live checks."
     },
-    "data/source_audits/order135/current-inventory.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "order135-current-source-audit"
-      ],
-      "selected_families": [],
-      "rationale": "D02 exact-source Save-step correctness, regression and required generated/governance support. Both independent reviewers must judge applicability.",
-      "source_obligation": "Complete retained 05.00-obligation-01 and 05.03 require all original Save dice in the selected pool before reroll choices. 04.03/04.03.01 and 05.03.02 preserve gathered and post-roll pool boundaries; 05.04 keeps physical selection, save checking and low-to-high damage. Original source and acceptance remain intact.",
-      "unchanged_work": "Tests, generated examples and governance inputs retain original assertions, historical measurements and exact-head gates. They implement no engine optimization; the changed runtime remains subject to real serial smoke and all live checks."
-    },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
@@ -488,7 +468,7 @@
       "source_obligation": "Complete retained 05.00-obligation-01 and 05.03 require all original Save dice in the selected pool before reroll choices. 04.03/04.03.01 and 05.03.02 preserve gathered and post-roll pool boundaries; 05.04 keeps physical selection, save checking and low-to-high damage. Original source and acceptance remain intact.",
       "unchanged_work": "Bounded rule-order repair, not a performance optimization. Original dice count/specs, model/save option queries, exact journal reuse and legal reroll consumers are unchanged. Two local passes separate rolling from choices; no extra persistent cursor, cache, serializer, geometry/search algorithm, dependency, budget or historical measurement changes. Required exact-base serial smoke and all live semantic/work/cache checks remain mandatory; no component/full-game certification."
     },
-    "tests/code_quality/test_performance_policy.py": {
+    "tests/code_quality/test_d02_performance_assessment.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -524,10 +504,11 @@
       "source_obligation": "Complete retained 05.00-obligation-01 and 05.03 require all original Save dice in the selected pool before reroll choices. 04.03/04.03.01 and 05.03.02 preserve gathered and post-roll pool boundaries; 05.04 keeps physical selection, save checking and low-to-high damage. Original source and acceptance remain intact.",
       "unchanged_work": "Tests, generated examples and governance inputs retain original assertions, historical measurements and exact-head gates. They implement no engine optimization; the changed runtime remains subject to real serial smoke and all live checks."
     },
-    "tests/unit/test_order135_gathered_attack_steps.py": {
+    "tests/unit/test_s25_continuation_and_persistence.py": {
       "category": "rule_semantics",
       "operations": [
-        "order135-regressions"
+        "d02-tests-unit-test_s25_continuation_and_persistence",
+        "s25-tests-unit-test_s25_continuation_and_persistence"
       ],
       "selected_families": [],
       "rationale": "D02 exact-source Save-step correctness, regression and required generated/governance support. Both independent reviewers must judge applicability.",
