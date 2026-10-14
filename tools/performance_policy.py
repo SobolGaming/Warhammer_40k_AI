@@ -14,6 +14,7 @@ from typing import cast
 
 from tools.performance_order103_exception import RECOGNITION, validate_owner_recognition
 from tools.performance_s25_rule_semantics import s25_rule_semantics_smoke_operations
+from tools.performance_tool_inputs import binding_enabled, validate_binding
 
 POLICY = "rules-engine-performance-v3"
 ASSESSMENT = "docs/performance/change-assessment.json"
@@ -492,7 +493,13 @@ def validate_comparison(
     specification: dict[str, object],
     base_runtime_id: str,
     expected_inputs: dict[str, str],
+    expected_binding: dict[str, object] | None = None,
 ) -> list[dict[str, object]]:
+    tool_binding = binding_enabled(family, specification)
+    if tool_binding:
+        validate_binding(observed=report.get("input_binding"), expected=expected_binding)
+    elif expected_binding is not None:
+        raise ValueError("Tool input roles cannot alter unrelated comparisons.")
     _keys(
         report,
         {
@@ -507,7 +514,8 @@ def validate_comparison(
             "head",
             "historical_failures",
         }
-        | ({"owner_exception"} if "owner_exception" in report else set()),
+        | ({"owner_exception"} if "owner_exception" in report else set())
+        | ({"input_binding"} if tool_binding else set()),
     )
     if (
         report["policy"],

@@ -186,6 +186,20 @@
       "samples_per_case": 5,
       "budget_profile": "current-change-relative-v1",
       "workload_id": "order96-sustained-d3-optional-wound-rerolls-v1"
+    },
+    "external_contract_source_reuse": {
+      "driver": "tests/code_quality/test_phase18m_conformance_boundary.py",
+      "historical_workload_reference": "tests/code_quality/test_phase18m_conformance_boundary.py",
+      "cases": [
+        "orphan-write-independent-check"
+      ],
+      "samples_per_case": 3,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "external-contract-orphan-write-independent-check-v1",
+      "input_binding": {
+        "schema": "tool-input-roles-v1",
+        "role_specification": "docs/performance/policy-v3/source-token-input-roles.json"
+      }
     }
   },
   "operations": {
@@ -7243,6 +7257,40 @@
       ],
       "families": [],
       "sensitive": false,
+      "mandatory": true
+    },
+    "external-contract-proposal-source-index": {
+      "paths": [
+        "scripts/build_external_contract.py",
+        "scripts/proposal_source_index.py"
+      ],
+      "owners": [
+        "@module",
+        "_proposal_kind_tokens",
+        "_SourceTokens",
+        "ProposalSourceIndex",
+        "ProposalSourceIndex.__init__",
+        "ProposalSourceIndex.tokens",
+        "_proposal_tokens",
+        "_string_constant"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "source-reuse-measurement": {
+      "paths": [
+        "scripts/source_reuse_experiment.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
       "mandatory": true
     }
   },

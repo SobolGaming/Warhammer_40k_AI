@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "22a12094cfe3839d8fe8c5296ec0a7e7d32abade",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3dac52df9bba355343defa9547c58e6b1feb03f8b45e5d6d32031e611075d9bb",
-  "operation_map_sha256": "5d74d865e9159e8cc4064a811b7c8693c51886e1470b4a75de15dcc3ccca152e",
+  "operation_map_sha256": "4b7cd26c3a3f7344f77ed5d0f93e3020867c8fbde260834ab99eae5b3feab057",
   "changes": {
     ".github/workflows/linux-attribution.yml": {
       "before_sha256": null,
@@ -11,6 +11,26 @@
         "@document": {
           "before": null,
           "after": "5ad43ddd6cb85be5ce54a0ac635d24bd5e8a02584c03c42b95e732823d57ef64"
+        }
+      }
+    },
+    ".github/workflows/source-reuse.yml": {
+      "before_sha256": null,
+      "after_sha256": "9f9afbab04c8769868d5f69acef868823d6bd58be7e5b605a0b9b239a5a4f930",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9f9afbab04c8769868d5f69acef868823d6bd58be7e5b605a0b9b239a5a4f930"
+        }
+      }
+    },
+    "docs/performance/SOURCE_TOKEN_REUSE_WORKLOAD.md": {
+      "before_sha256": null,
+      "after_sha256": "aa3562b39aed1207ff1b26f0b46ee062abd3649a669ee3bdd67b51c34dce5652",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "aa3562b39aed1207ff1b26f0b46ee062abd3649a669ee3bdd67b51c34dce5652"
         }
       }
     },
@@ -46,11 +66,35 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "0b80d34a84ae30555830d97f8bf0ba7d062655725d8188495a4046ec6f92fc54",
-      "after_sha256": "c8ab4110c144a5f133ba0290e09176f99d890d26fdde0a23fee7698bc3dc854e",
+      "after_sha256": "bfcde4860e036a5a0d1d0de1e7c003cd80446767405b5408849fce2616e2a008",
       "owners": {
         "@document": {
           "before": "0b80d34a84ae30555830d97f8bf0ba7d062655725d8188495a4046ec6f92fc54",
-          "after": "c8ab4110c144a5f133ba0290e09176f99d890d26fdde0a23fee7698bc3dc854e"
+          "after": "bfcde4860e036a5a0d1d0de1e7c003cd80446767405b5408849fce2616e2a008"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-input-roles.json": {
+      "before_sha256": null,
+      "after_sha256": "0a980b4370c0bc6284cb87e9bc257a52e8d46096b650b2f807163104cfffe563",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0a980b4370c0bc6284cb87e9bc257a52e8d46096b650b2f807163104cfffe563"
+        }
+      }
+    },
+    "scripts/build_external_contract.py": {
+      "before_sha256": "9a552473064acd404cee6d1487bdaa20c007378f4f27ec524d80b71017e64bc6",
+      "after_sha256": "78cd9a3a7ba061f98d0e97c47fa1c07091cf8e119d5b0e08fd32081f34f2a210",
+      "owners": {
+        "@module": {
+          "before": "10a17897064912caa39f883696192dcd066fe1ba59d3d03ffb1cd22f1cfaf68d",
+          "after": "b125e906e0a6303b564b2b3adf263bdce81219522baaedece297b210033ea450"
+        },
+        "_proposal_kind_tokens": {
+          "before": "2e3370589cb159c8e09eb1fe33cd89765156da4c0e378e540a7b495d876f5085",
+          "after": "fb802326c3d1affdbafd6e91a51f76e60cb6578231559d93afc5cadb2bfa0ed2"
         }
       }
     },
@@ -99,6 +143,20 @@
         "wait_file": {
           "before": null,
           "after": "ef79e4b59c1392e999c3404359133bdff235f9864991f5ee8c717d61d3728c40"
+        }
+      }
+    },
+    "scripts/check_performance_policy.py": {
+      "before_sha256": "7de13ee1e0650f12bd711f104a831b6921244489a367a87fa1e11ea95b2c1b24",
+      "after_sha256": "ff839b651b80890b49ab3061493c5695c542ee1cda6cdf77d78d3bf902f027b4",
+      "owners": {
+        "@module": {
+          "before": "6ed659b42171dfaf6154cf4261abda6f2addda6836c2376cd2cb58c2c2ee782d",
+          "after": "46252108c0dda085ea4438cfcf10ce13234a1d79e66c7d73bd110b00572cc9a3"
+        },
+        "validate_current": {
+          "before": "9ba4d301d593b9d85a3d32177e9a06084ec9defa5b917f9c43a9368538fd28ef",
+          "after": "112ac93f1ff18d51e3d7e8dca5965bdc9c964443bde9cc9eb006de61135a9035"
         }
       }
     },
@@ -222,6 +280,110 @@
         }
       }
     },
+    "scripts/proposal_source_index.py": {
+      "before_sha256": null,
+      "after_sha256": "eec3465c4a3c17c5a1869782e45bd1f61c2ba646e6ca6f0f6037a117e65205d4",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "78fbe4b506f1d0e0f9d97428d75538c6a63c0ca41456f85e64fa46f5999bd010"
+        },
+        "ProposalSourceIndex": {
+          "before": null,
+          "after": "e449034499aff2ff406f532128a08a200758fa0388b8ce6cdc1ae1a70f3f190e"
+        },
+        "ProposalSourceIndex.__init__": {
+          "before": null,
+          "after": "a81e595f7ea1e80ffe04aa8f20a24ba8cd2224b363854f1ce46c34283a6a351d"
+        },
+        "ProposalSourceIndex.tokens": {
+          "before": null,
+          "after": "1ee67e2988b7b616db4e46a26b92f070b706a1b5672a1d0336f648cd1439e9cf"
+        },
+        "_SourceTokens": {
+          "before": null,
+          "after": "1f2a1787ea289620cbc103e04f8c706e625458565b3f108d53ebae5ccdb0ee22"
+        },
+        "_proposal_tokens": {
+          "before": null,
+          "after": "6c5423a2d8c7fec89cc126c73904da3d5220f1d32b3e7c46b31904c134e6b759"
+        },
+        "_string_constant": {
+          "before": null,
+          "after": "e86f473033e2cdacfd71f4c0858ae1109e8bb03964161494c80863a37a67c0f6"
+        }
+      }
+    },
+    "scripts/source_reuse_experiment.py": {
+      "before_sha256": null,
+      "after_sha256": "35540be02aed66e5388ad5f513ee8b6622a5b57b65b73b587422cb6e227a2954",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e157e982b516c912180f2ce8c15e4e031f3adb0d4d473b1ae3e8cd3f9add5f04"
+        },
+        "check_arm": {
+          "before": null,
+          "after": "8076ddcda1f069c4197d5a62ffaf965fa1d138e610e0fe5c17b909bfa052c007"
+        },
+        "environment": {
+          "before": null,
+          "after": "740a1aa89237fe21fea9bc9ae1ce78cc2dc106a7f6dd0a8bccb8dace77e27cd3"
+        },
+        "git": {
+          "before": null,
+          "after": "980f09b3724bd3b61e18e17e9bad929eb47b8bd58ef254e47bc9ede249a964e5"
+        },
+        "junit_cases": {
+          "before": null,
+          "after": "6ad83dd8a02556a8849cca447785e284c5e24b83b668f6a1d100b5a632246b0f"
+        },
+        "main": {
+          "before": null,
+          "after": "9b89136381dcab46ceab08c5e19805e638da1a229589dfadaa51ebe41d542957"
+        },
+        "micro": {
+          "before": null,
+          "after": "84975f527620c8e20c36d63fff061cc5011e5c0bcbfcb20db5c713a598c800c4"
+        },
+        "optional_metadata": {
+          "before": null,
+          "after": "c9f09bd6bae1989e4ca16e5cb6459c1c8a51218234c1f380139c7752782ba65b"
+        },
+        "pytest_command": {
+          "before": null,
+          "after": "b10b7803addada83d4b3f91d00334e4c9ecc752c57292ad7982e857b2e163094"
+        },
+        "retained_contract_tree": {
+          "before": null,
+          "after": "b080a3335708e2228aa2a7abce5d7b6f89140d60bfbf8aa81ab37703d3138fab"
+        },
+        "run": {
+          "before": null,
+          "after": "386c11d1dfee532eba608dd7d858c40df244f6536acaadbe24965267afd1935a"
+        },
+        "scanner": {
+          "before": null,
+          "after": "ac5639b987a84c2aa3c0650e0140f0eb42bb88bb24f54cb62bb40a98dca1bc9f"
+        },
+        "sha": {
+          "before": null,
+          "after": "7a0249256f2c77be9509011acfedd9c78845eed378c8ef495d89f3cfcfbab289"
+        },
+        "validate_paths": {
+          "before": null,
+          "after": "d237ad577cd5167f02a1fd97fbdb3986d0a255729daf61520078b932d5860ba5"
+        },
+        "validate_test_command": {
+          "before": null,
+          "after": "644ce61c7e6550fd9cdcb70441e8a137bd730c31a586258a6a8cd220cebc6e15"
+        },
+        "write": {
+          "before": null,
+          "after": "e2f4a132c6c5dee020251f0c238bc710a1d1575bf4056bdb96dc7253d00e5deb"
+        }
+      }
+    },
     "tests/code_quality/d02_assessment_history.py": {
       "before_sha256": null,
       "after_sha256": "38c217eb5c17d51844c51f1a69acccb483da6d9a3ac3ece8a24c5297fe7f8e0d",
@@ -245,6 +407,226 @@
           "after": "80dae10d73dbb24ff373d59a60ae742d925f69cae626e22a8c92d32eb0657b5b"
         }
       }
+    },
+    "tests/code_quality/test_performance_tool_inputs.py": {
+      "before_sha256": null,
+      "after_sha256": "55b77f9d294326f2bb79aad57f184b7f56efa84b5d1ce8b5f3a3aea83337ea6c",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "be14f04d2527cb90d68316c853ec9be5357a5d2f224277c279883558ce8036e3"
+        },
+        "_binding": {
+          "before": null,
+          "after": "9c0d68716f92ec6222f16b8d53be861750f2203fc99e3c6dc44d3cb34d6815f7"
+        },
+        "_directory_alias": {
+          "before": null,
+          "after": "d7644b922cd114a3d7f144aa04682fb012aea995e8ad08c0fc96b0bd3c68dcc2"
+        },
+        "_inventories": {
+          "before": null,
+          "after": "3b00ed9b1fa5d1dfcf0ef0dd116b8571343acfea83e5a69d319a639b09daa69c"
+        },
+        "_report": {
+          "before": null,
+          "after": "ef9b506e8292cfc8860c33257764fe2b9f47ff978e6d4b2633c761ad8eb4ee78"
+        },
+        "_spec": {
+          "before": null,
+          "after": "f0b9ecc0d947fe7f5c671e260d06abbee522e6f7321fb071ba86094b761e40cf"
+        },
+        "_validate": {
+          "before": null,
+          "after": "5a8a65b47f26b4bccb96f84809c7f30e6e03708b21d65a36087befa0dac246e7"
+        },
+        "test_actual_git_binding_rejects_stale_source_but_allows_evidence_only_descendant": {
+          "before": null,
+          "after": "28d38707a9104ca6f0effd319d9139220175a2a7ff3275a0201a03003ef4f3fe"
+        },
+        "test_audit_manifest_rejects_unpinned_pdf_reference": {
+          "before": null,
+          "after": "f568f673e1ea3a454cde24312f76aa8c0bd60ea0ed3f7e4fb85420f04313bd39"
+        },
+        "test_external_command_preflight_rejects_changed_node_workers_and_coverage": {
+          "before": null,
+          "after": "b5d1a445ba622185540bd2589aa47f6c02a7dd7acd8c5f802441998a745a5845"
+        },
+        "test_external_harness_must_match_both_arms_and_actual_candidate": {
+          "before": null,
+          "after": "1014772395de997390c6ddebf0d1375b683ed8b41ef99958877b96c3f44d69f0"
+        },
+        "test_external_paths_require_owned_exact_destinations": {
+          "before": null,
+          "after": "c5761982953d61b2815e5fcba5af9989bbbfc28055982526f96299d2d096c6c7"
+        },
+        "test_legacy_schema_and_numeric_budget_remain_strict": {
+          "before": null,
+          "after": "3f526b5a9073e1456f038921233a796e51bed7f56db4eaca42d2e2ef7cbb6cb1"
+        },
+        "test_only_verified_base_helper_absence_is_accepted": {
+          "before": null,
+          "after": "8d5f7eec39612305523cf7377947dddebb28d9c16f9a73c134446632696ccff5"
+        },
+        "test_optional_host_metadata_preserves_value_and_observed_missing_files": {
+          "before": null,
+          "after": "0fb4b81c5d44f50fab00d485d0fc335f26875e4114a5dea6bf2c81b1a2ce2ffd"
+        },
+        "test_optional_host_metadata_records_permission_error": {
+          "before": null,
+          "after": "b0651bc1dcf8c8e57986627550d8ed9675ed05667c0831827b4cc8665ad97a67"
+        },
+        "test_retained_output_accepts_numbered_directory_and_current_alias": {
+          "before": null,
+          "after": "f7a1a8bb38243f8f75be1003ba40b7026350d28e9f603925cc0649984e1c916f"
+        },
+        "test_retained_output_rejects_escaping_and_missing_targets": {
+          "before": null,
+          "after": "4532abc4e3e873001487a46f5ff4182b56510ab5a03f32de537e41e27ad2722c"
+        },
+        "test_role_specification_rejects_unreviewed_or_ambiguous_exclusions": {
+          "before": null,
+          "after": "336797508fcd7987c44257eb42740c82a98dae9b464e60382f5d15b9c281af5c"
+        },
+        "test_stale_swapped_or_omitted_binding_is_rejected": {
+          "before": null,
+          "after": "75c9fa1d4c3357593c86d2a8e3769a66109eea89e11da36813cc435f24db47be"
+        },
+        "test_true_common_change_or_unknown_dependency_rejected": {
+          "before": null,
+          "after": "09185d0f4235cc9431a792479b4442e9faab43067de3269f4c6a06f73643dd6a"
+        },
+        "test_truthful_treatment_and_six_diagnostics_keep_independent_identity": {
+          "before": null,
+          "after": "e6d733def6afc474fe4c08da209ca06c3fe6a7533fc83189964d03ebeca93618"
+        }
+      }
+    },
+    "tests/code_quality/test_proposal_source_index.py": {
+      "before_sha256": null,
+      "after_sha256": "c0c7cdde98eb4d228147fabca586b18c65e7b27d886aec087030e0fc311345e8",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "53beefc4f8628bfecbabc6aaacf4c88abb1596ab90def673fb6c36e2b6b9005a"
+        },
+        "parsed_files": {
+          "before": null,
+          "after": "0d5f182faf4cf46f23deaa8f27a59ea5cb76b11da0b75d39f5b0168833c9ed60"
+        },
+        "test_builder_wrapper_rereads_inventory_and_changed_source_root": {
+          "before": null,
+          "after": "2d994e1cc2f13b94efa3fcdcc7e0236a43994e944dde5801c294ef31298e3927"
+        },
+        "test_byte_change_with_same_size_and_mtime_invalidates": {
+          "before": null,
+          "after": "b41d04391a6755de4cb0151e4f584a5771f30cf71731692df2f562f699e6636c"
+        },
+        "test_current_inventory_adds_removes_and_drops_previous_roots": {
+          "before": null,
+          "after": "047437dea72291c04dd894e610c48d87e87f850547c11fee2526cfac9b18c702"
+        },
+        "test_fresh_processes_start_without_a_shared_index": {
+          "before": null,
+          "after": "729341e5d0f2b94c97d97a0c94c204991ccc58e82eb6a09e3cc9ea85021fbe75"
+        },
+        "test_identical_bytes_reuse_tokens_but_fresh_instances_parse": {
+          "before": null,
+          "after": "79011ff1a1ff82989ed07aa1e34df6ff89791697e84341edb1bb4ec390d95707"
+        },
+        "test_identical_content_at_distinct_paths_retains_path_identity": {
+          "before": null,
+          "after": "0b6a21e3cc1510201789da0fa3bab1173efc7003a6390498d93022d75df1ee0b"
+        },
+        "test_partial_failure_does_not_publish_new_entries": {
+          "before": null,
+          "after": "a2817cd3df3220ccae73cf57aa8f7541d84f11e70ca7fe4e05d471cc5f2a9a49"
+        },
+        "test_results_are_immutable_and_newlines_match_text_loading": {
+          "before": null,
+          "after": "eac615064532f010ac5f692c586b87449c43918ce562981e8af5cdea0fea521c"
+        },
+        "test_source_index_preserves_literal_proposal_grammar": {
+          "before": null,
+          "after": "6fec6c7a790036d6ebbb9320b67c9b37c976642203aedc5492308accb56617de"
+        },
+        "test_warm_entry_never_hides_decode_or_missing_file_errors": {
+          "before": null,
+          "after": "e6072a2b5cfc607166a5bc2c0ad428a33f25a8dc4f4808855e92f44aa07029ea"
+        },
+        "test_warm_entry_never_hides_syntax_errors": {
+          "before": null,
+          "after": "7404db828116fc75c5bf3a85abb2af365359bdcbe28b839ced562f3ff5bc0007"
+        }
+      }
+    },
+    "tools/performance_policy.py": {
+      "before_sha256": "fd1badc481f57f0bc00f7fd491a2adad8443148f072e323f93d290866ce45130",
+      "after_sha256": "aa60098fa31683b49d4bc1154ac35764caf86d6e3de5622ac2535afa4ed10dde",
+      "owners": {
+        "@module": {
+          "before": "ba327b3b21b156550fd2535d3dd245709fab7865d468990814de4c9aa4aea469",
+          "after": "ac784ef7f6a1db6326b5102add78a7434b1866cdadc45a9d358ecb09816d4685"
+        },
+        "validate_comparison": {
+          "before": "72bcfb9cd7a3ba9d41ef1829354c9f002601b486a00e2bbf9f85a9b295b4c964",
+          "after": "6cfdc0ef250317c9025e99e257bd87caf799d927107162509cb8ff0dafb81ff0"
+        }
+      }
+    },
+    "tools/performance_tool_inputs.py": {
+      "before_sha256": null,
+      "after_sha256": "d98f74606899b79ef4b3223e5e496e1e8bb9411bc15cacba0ca5dd95aa321dbe",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "5c940497deddc940904d71a26ff6f0b6f582a832b5af8ecd36147495f92d706a"
+        },
+        "_object": {
+          "before": null,
+          "after": "7911dad7e2ce96bb5b1229982d7c7cafc752fde0ca13b1a2ead723c0db41d30f"
+        },
+        "_paths": {
+          "before": null,
+          "after": "ae921bb8a509df45b17a8e6a808003ee69c112d602f13da8151464a492f72d09"
+        },
+        "_selected": {
+          "before": null,
+          "after": "3c82f7f52b3d10b6b3cc0603ea0a735572b628395f4ebb665f7340e2d1a2f2a8"
+        },
+        "_unique_object": {
+          "before": null,
+          "after": "aa54e93af9e34fd8d75cb3d97854694cd89d7b9f4af2cada5292cc6579f9d93e"
+        },
+        "binding_enabled": {
+          "before": null,
+          "after": "1980f03beaa995fb65141183866185ba29dfa4d21e455925a9e97a9900f73f66"
+        },
+        "classify_inputs": {
+          "before": null,
+          "after": "b5eebe175df076f2aac90c00498b49f59daea6fe78b590437e75119a9ad19a1c"
+        },
+        "comparison_inputs": {
+          "before": null,
+          "after": "8009289ba8d241074d8ef0d57a98b5576326b9be495ea1e6fbd9a10ad66beb43"
+        },
+        "digest": {
+          "before": null,
+          "after": "4790318b419b24362ab7c7c03798b2486eeae769e5c771bfe5e286b2626d4367"
+        },
+        "validate_audit_manifest": {
+          "before": null,
+          "after": "59caf7b21ca16628782731f45e4bd55197935cf5510a20b51973352c586afb3b"
+        },
+        "validate_binding": {
+          "before": null,
+          "after": "cecd9580a1e6855bc8fe725e550dbf694ed8c20c0260d7a2d95db1a2c8f884b8"
+        },
+        "validate_spec": {
+          "before": null,
+          "after": "7b56b9f85f7b3853aea43e55b48ab4a78ec2fd8da16481ce3fd1029d95ae4479"
+        }
+      }
     }
   },
   "rows": {
@@ -256,6 +638,46 @@
       "source_obligation": null,
       "unchanged_work": "Native rules, persistence, replay, validators, source preservation and required CI gates remain unchanged. This new diagnostic workflow has bounded exploratory measurements, not a changed historical workload or engine operation. Current serial smoke remains mandatory."
     },
+    ".github/workflows/source-reuse.yml": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact family-only input-role validation and independently bound common/treatment/control identities; preserve all unrelated comparison semantics and thresholds.",
+      "source_obligation": null,
+      "unchanged_work": "No engine rule, original semantic assertion or historical evidence is modified; the new tool family still requires three real matched samples and current smoke."
+    },
+    "docs/performance/SOURCE_TOKEN_REUSE_WORKLOAD.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add focused source-index correctness controls and explicit reviewed comparison specification; no engine semantics, original assertions, source provenance or historical evidence are altered.",
+      "source_obligation": null,
+      "unchanged_work": "These governance/quality additions do not bypass cache performance obligations: builder and helper are separately classified as cache_policy and require the new detailed family."
+    },
+    "docs/performance/policy-v3/d02-final-history/assessment.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve exact merged D02 historical inputs and original test function ASTs while continuing to exercise the live policy validator; current PR assessment remains independently validated.",
+      "source_obligation": null,
+      "unchanged_work": "Original D02 assertions, branches and negative controls remain unchanged. Frozen historical bytes and test function equivalence are checked fail-closed. No engine or historical measurement workload changes."
+    },
+    "docs/performance/policy-v3/d02-final-history/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve exact merged D02 historical inputs and original test function ASTs while continuing to exercise the live policy validator; current PR assessment remains independently validated.",
+      "source_obligation": null,
+      "unchanged_work": "Original D02 assertions, branches and negative controls remain unchanged. Frozen historical bytes and test function equivalence are checked fail-closed. No engine or historical measurement workload changes."
+    },
+    "docs/performance/policy-v3/d02-final-history/test_d02_performance_assessment.py.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve exact merged D02 historical inputs and original test function ASTs while continuing to exercise the live policy validator; current PR assessment remains independently validated.",
+      "source_obligation": null,
+      "unchanged_work": "Original D02 assertions, branches and negative controls remain unchanged. Frozen historical bytes and test function equivalence are checked fail-closed. No engine or historical measurement workload changes."
+    },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
@@ -263,6 +685,26 @@
       "rationale": "Add opt-in baseline CI attribution and non-engine harness checks. Existing engine code, original test bodies and historical measurement drivers are unchanged. No optimization or comparative speedup is claimed.",
       "source_obligation": null,
       "unchanged_work": "Native rules, persistence, replay, validators, source preservation and required CI gates remain unchanged. This new diagnostic workflow has bounded exploratory measurements, not a changed historical workload or engine operation. Current serial smoke remains mandatory."
+    },
+    "docs/performance/policy-v3/source-token-input-roles.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact family-only input-role validation and independently bound common/treatment/control identities; preserve all unrelated comparison semantics and thresholds.",
+      "source_obligation": null,
+      "unchanged_work": "No engine rule, original semantic assertion or historical evidence is modified; the new tool family still requires three real matched samples and current smoke."
+    },
+    "scripts/build_external_contract.py": {
+      "category": "cache_policy",
+      "operations": [
+        "external-contract-proposal-source-index"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Reuse only immutable proposal token tuples after fresh source enumeration and exact byte equality in a sequential generator instance. Detailed actual-base/head tool comparison is mandatory and pending.",
+      "source_obligation": "Keep the original literal assignment grammar, source paths, current file reads and malformed-input errors; never reuse generated outputs or persistence validation results.",
+      "unchanged_work": "Source bytes are reread for every lookup; fresh write, independent check and nested regeneration processes remain separate. All original test assertions and runtime restore/replay paths remain unchanged."
     },
     "scripts/check_ci_attribution_commands.py": {
       "category": "measured_workload",
@@ -283,6 +725,14 @@
       "rationale": "Add opt-in baseline CI attribution and non-engine harness checks. Existing engine code, original test bodies and historical measurement drivers are unchanged. No optimization or comparative speedup is claimed.",
       "source_obligation": null,
       "unchanged_work": "Native rules, persistence, replay, validators, source preservation and required CI gates remain unchanged. This new diagnostic workflow has bounded exploratory measurements, not a changed historical workload or engine operation. Current serial smoke remains mandatory."
+    },
+    "scripts/check_performance_policy.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact family-only input-role validation and independently bound common/treatment/control identities; preserve all unrelated comparison semantics and thresholds.",
+      "source_obligation": null,
+      "unchanged_work": "No engine rule, original semantic assertion or historical evidence is modified; the new tool family still requires three real matched samples and current smoke."
     },
     "scripts/ci_attribution.py": {
       "category": "measured_workload",
@@ -324,29 +774,29 @@
       "source_obligation": null,
       "unchanged_work": "Native rules, persistence, replay, validators, source preservation and required CI gates remain unchanged. This new diagnostic workflow has bounded exploratory measurements, not a changed historical workload or engine operation. Current serial smoke remains mandatory."
     },
-    "docs/performance/policy-v3/d02-final-history/assessment.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Preserve exact merged D02 historical inputs and original test function ASTs while continuing to exercise the live policy validator; current PR assessment remains independently validated.",
-      "source_obligation": null,
-      "unchanged_work": "Original D02 assertions, branches and negative controls remain unchanged. Frozen historical bytes and test function equivalence are checked fail-closed. No engine or historical measurement workload changes."
+    "scripts/proposal_source_index.py": {
+      "category": "cache_policy",
+      "operations": [
+        "external-contract-proposal-source-index"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Reuse only immutable proposal token tuples after fresh source enumeration and exact byte equality in a sequential generator instance. Detailed actual-base/head tool comparison is mandatory and pending.",
+      "source_obligation": "Keep the original literal assignment grammar, source paths, current file reads and malformed-input errors; never reuse generated outputs or persistence validation results.",
+      "unchanged_work": "Source bytes are reread for every lookup; fresh write, independent check and nested regeneration processes remain separate. All original test assertions and runtime restore/replay paths remain unchanged."
     },
-    "docs/performance/policy-v3/d02-final-history/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Preserve exact merged D02 historical inputs and original test function ASTs while continuing to exercise the live policy validator; current PR assessment remains independently validated.",
+    "scripts/source_reuse_experiment.py": {
+      "category": "measured_workload",
+      "operations": [
+        "source-reuse-measurement"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "A bounded external comparison controller measures actual base/head source reuse and the complete original regeneration test with fresh independent processes.",
       "source_obligation": null,
-      "unchanged_work": "Original D02 assertions, branches and negative controls remain unchanged. Frozen historical bytes and test function equivalence are checked fail-closed. No engine or historical measurement workload changes."
-    },
-    "docs/performance/policy-v3/d02-final-history/test_d02_performance_assessment.py.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Preserve exact merged D02 historical inputs and original test function ASTs while continuing to exercise the live policy validator; current PR assessment remains independently validated.",
-      "source_obligation": null,
-      "unchanged_work": "Original D02 assertions, branches and negative controls remain unchanged. Frozen historical bytes and test function equivalence are checked fail-closed. No engine or historical measurement workload changes."
+      "unchanged_work": "No engine rule, original semantic assertion or historical evidence is modified; the new tool family still requires three real matched samples and current smoke."
     },
     "tests/code_quality/d02_assessment_history.py": {
       "category": "governance",
@@ -363,9 +813,43 @@
       "rationale": "Preserve exact merged D02 historical inputs and original test function ASTs while continuing to exercise the live policy validator; current PR assessment remains independently validated.",
       "source_obligation": null,
       "unchanged_work": "Original D02 assertions, branches and negative controls remain unchanged. Frozen historical bytes and test function equivalence are checked fail-closed. No engine or historical measurement workload changes."
+    },
+    "tests/code_quality/test_performance_tool_inputs.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact family-only input-role validation and independently bound common/treatment/control identities; preserve all unrelated comparison semantics and thresholds.",
+      "source_obligation": null,
+      "unchanged_work": "No engine rule, original semantic assertion or historical evidence is modified; the new tool family still requires three real matched samples and current smoke."
+    },
+    "tests/code_quality/test_proposal_source_index.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add focused source-index correctness controls and explicit reviewed comparison specification; no engine semantics, original assertions, source provenance or historical evidence are altered.",
+      "source_obligation": null,
+      "unchanged_work": "These governance/quality additions do not bypass cache performance obligations: builder and helper are separately classified as cache_policy and require the new detailed family."
+    },
+    "tools/performance_policy.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact family-only input-role validation and independently bound common/treatment/control identities; preserve all unrelated comparison semantics and thresholds.",
+      "source_obligation": null,
+      "unchanged_work": "No engine rule, original semantic assertion or historical evidence is modified; the new tool family still requires three real matched samples and current smoke."
+    },
+    "tools/performance_tool_inputs.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact family-only input-role validation and independently bound common/treatment/control identities; preserve all unrelated comparison semantics and thresholds.",
+      "source_obligation": null,
+      "unchanged_work": "No engine rule, original semantic assertion or historical evidence is modified; the new tool family still requires three real matched samples and current smoke."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "external_contract_source_reuse": "docs/performance/current/source-token-reuse-v1.json"
+  },
   "full_game": null
 }

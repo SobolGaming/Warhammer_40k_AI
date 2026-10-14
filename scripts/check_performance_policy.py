@@ -32,6 +32,7 @@ from tools.performance_policy import (
     validate_comparison,
     validate_full_game,
 )
+from tools.performance_tool_inputs import binding_enabled, comparison_inputs
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -201,11 +202,39 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
         if not isinstance(driver, str) or driver not in inputs:
             raise ValueError("Selected measurement driver is missing.")
         comparison = read_object(root / path)
-        measured_inputs, applicability_sha = retained_comparison_inputs(
-            root, current=inputs, report=comparison, base=base, runtime_id=runtime_id
-        )
+        if binding_enabled(family, specification):
+            measured_inputs, applicability_sha = inputs, None
+        else:
+            measured_inputs, applicability_sha = retained_comparison_inputs(
+                root, current=inputs, report=comparison, base=base, runtime_id=runtime_id
+            )
         if applicability_sha is not None:
             retained_applicability[family] = applicability_sha
+        tool_inputs = (
+            comparison_inputs(
+                root,
+                base=base,
+                family=family,
+                head_input_digest=input_digest,
+                measured_head=str(
+                    object_value(
+                        object_value(object_value(comparison["input_binding"])["sides"])["head"]
+                    )["revision"]
+                ),
+            )
+            if binding_enabled(family, specification)
+            else None
+        )
+        fixture_digest = canonical_digest(
+            {
+                name: value
+                for name, value in measured_inputs.items()
+                if name.startswith(("tests/", "scripts/"))
+                and not name.startswith("tests/code_quality/")
+            }
+        )
+        if tool_inputs is not None:
+            fixture_digest = str(tool_inputs["common_sha256"])
         approved_failures.extend(
             validate_comparison(
                 comparison,
@@ -218,15 +247,9 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
                 expected_inputs={
                     "lock_sha256": measured_inputs["uv.lock"],
                     "workload_sha256": measured_inputs[driver],
-                    "fixture_sha256": canonical_digest(
-                        {
-                            name: value
-                            for name, value in measured_inputs.items()
-                            if name.startswith(("tests/", "scripts/"))
-                            and not name.startswith("tests/code_quality/")
-                        }
-                    ),
+                    "fixture_sha256": fixture_digest,
                 },
+                expected_binding=tool_inputs,
             )
         )
     if assessment["milestone"] == "rules_complete":
