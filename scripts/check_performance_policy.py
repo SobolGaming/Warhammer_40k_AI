@@ -33,6 +33,9 @@ from tools.performance_policy import (
     validate_full_game,
 )
 from tools.performance_tool_inputs import (
+    SCHEMA as HISTORICAL_TOOL_SCHEMA,
+)
+from tools.performance_tool_inputs import (
     binding_enabled,
     comparison_inputs,
     retained_tool_comparison_inputs,
@@ -207,9 +210,14 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
             raise ValueError("Selected measurement driver is missing.")
         comparison = read_object(root / path)
         if binding_enabled(family, specification):
-            measured_inputs, applicability_sha = retained_tool_comparison_inputs(
-                root, current=inputs, report=comparison, base=base
-            )
+            tool_schema = str(object_value(specification["input_binding"])["schema"])
+            if tool_schema == HISTORICAL_TOOL_SCHEMA:
+                measured_inputs, applicability_sha = retained_tool_comparison_inputs(
+                    root, current=inputs, report=comparison, base=base
+                )
+            else:
+                # Fresh v2 records bind current inputs; no historical applicability bridge.
+                measured_inputs, applicability_sha = inputs, None
         else:
             measured_inputs, applicability_sha = retained_comparison_inputs(
                 root, current=inputs, report=comparison, base=base, runtime_id=runtime_id
@@ -222,6 +230,7 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
                 base=base,
                 family=family,
                 head_input_digest=canonical_digest(measured_inputs),
+                schema=str(object_value(specification["input_binding"])["schema"]),
                 measured_head=str(
                     object_value(
                         object_value(object_value(comparison["input_binding"])["sides"])["head"]

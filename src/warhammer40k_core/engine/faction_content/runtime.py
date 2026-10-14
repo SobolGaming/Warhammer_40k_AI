@@ -44,11 +44,7 @@ def build_runtime_content_bundle_for_armies(
         raise GameLifecycleError("Runtime content bundle build requires GameConfig.")
     if type(armies) is not tuple:
         raise GameLifecycleError("Runtime content bundle build requires army tuple.")
-    activation = runtime_content_activation_for_armies(config=config, armies=armies)
-    manifest = runtime_content_manifest_for_ruleset(
-        ruleset_descriptor=config.ruleset_descriptor,
-        config=config,
-    )
+    activation, manifest = _activation_with_manifest(config=config, armies=armies)
     contributions = load_runtime_content_contributions(
         activation=activation,
         manifest=manifest,
@@ -75,6 +71,16 @@ def runtime_content_activation_for_armies(
         raise GameLifecycleError("Runtime content activation build requires GameConfig.")
     if type(armies) is not tuple:
         raise GameLifecycleError("Runtime content activation build requires army tuple.")
+    activation, _manifest = _activation_with_manifest(config=config, armies=armies)
+    return activation
+
+
+def _activation_with_manifest(
+    *,
+    config: GameConfig,
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[RuntimeContentActivation, RuntimeContentManifest]:
+    """Keep one fresh immutable manifest through resolution and contribution loading."""
     roster_activation = RuntimeContentActivation.from_armies(
         armies=armies,
         catalog=config.army_catalog,
@@ -83,7 +89,7 @@ def runtime_content_activation_for_armies(
         ruleset_descriptor=config.ruleset_descriptor,
         config=config,
     )
-    return manifest.resolve_activation(roster_activation)
+    return manifest.resolve_activation(roster_activation), manifest
 
 
 def runtime_content_manifest_for_ruleset(

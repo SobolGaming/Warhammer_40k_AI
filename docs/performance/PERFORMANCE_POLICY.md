@@ -138,6 +138,34 @@ waiver of correctness, reviews, CI, smoke or aggregate gates.
 
 ## Current-change budgets and historical qualification
 
+### Fresh source-token measurements after manifest reuse
+
+`tool-input-roles-v2` is limited to the existing
+`external_contract_source_reuse` family at actual PR base
+`22a12094cfe3839d8fe8c5296ec0a7e7d32abade`. Its explicit specification is
+`policy-v3/source-token-input-roles-v2.json.txt`. The source-token builder/index
+and runtime manifest builder are treatment; the engine identity and eight
+enumerated contract outputs have distinct per-side byte commitments. Every other
+runtime, source, fixture, dependency and copied-contract byte must still match.
+The specification cannot supply arbitrary exclusions. Independent Git/current
+inventories authenticate the measured revision and identical external harness;
+evidence-only descendants must preserve every selected measured byte.
+
+Fresh evidence retains the original orphan-write/independent-check case,
+three samples per arm, unchanged relative budget, serial execution and real
+generator/checker assertions. It additionally records all three complete
+generated contract trees for each arm. Their membership and raw hashes must
+equal that arm's independently bound contract inputs; missing files, stripped
+identity fields and cross-arm substitutions fail. Side-specific generated
+identity changes still require independent semantic review.
+
+The v1 specification, report and provenance applicability remain immutable
+historical records. V2 does not invoke their historical-input bridge or accept
+the old measured revision as fresh evidence. Original v1 quality assertions
+use the complete hash-authenticated `40a7275` historical fixture; new v2
+controls inspect current admission. Neither changes historical failure status,
+the runtime smoke requirement, final correctness gates or full-pipeline target.
+
 ### D02 original Save-step ordering
 
 D02 applies the standing bounded rule-repair smoke default to the shared Save

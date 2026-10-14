@@ -496,8 +496,17 @@ def validate_comparison(
     expected_binding: dict[str, object] | None = None,
 ) -> list[dict[str, object]]:
     tool_binding = binding_enabled(family, specification)
+    from tools import performance_tool_inputs_v2 as fresh
+
+    fresh_binding = (
+        tool_binding and object_value(specification["input_binding"])["schema"] == fresh.SCHEMA
+    )
     if tool_binding:
         validate_binding(observed=report.get("input_binding"), expected=expected_binding)
+        if fresh_binding:
+            fresh.validate_generated_evidence(
+                report.get("generated_output_binding"), object_value(expected_binding)
+            )
     elif expected_binding is not None:
         raise ValueError("Tool input roles cannot alter unrelated comparisons.")
     _keys(
@@ -515,7 +524,8 @@ def validate_comparison(
             "historical_failures",
         }
         | ({"owner_exception"} if "owner_exception" in report else set())
-        | ({"input_binding"} if tool_binding else set()),
+        | ({"input_binding"} if tool_binding else set())
+        | ({"generated_output_binding"} if fresh_binding else set()),
     )
     if (
         report["policy"],

@@ -19,7 +19,7 @@ from scripts.source_reuse_experiment import (
     validate_paths,
     validate_test_command,
 )
-from tools.performance_policy import POLICY, runtime_inputs, validate_comparison
+from tools.performance_policy import POLICY, validate_comparison
 from tools.performance_tool_inputs import (
     APPLICABILITY,
     AUDIT_INPUTS,
@@ -472,14 +472,10 @@ def test_audit_manifest_rejects_unpinned_pdf_reference(reference: str | None) ->
 
 
 def _archival_fixture(tmp_path: Path) -> tuple[dict[str, str], dict[str, object]]:
+    from tests.code_quality.tool_input_history import archival_fixture
+
     root = Path(__file__).resolve().parents[2]
-    for name in (SPEC_ARCHIVE, REPORT_ARCHIVE, APPLICABILITY, MAP_PATH):
-        target = tmp_path / name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes((root / name).read_bytes())
-    # Read-only access to immutable Git objects; this fixture performs no Git mutations.
-    (tmp_path / ".git").write_text(f"gitdir: {(root / '.git').as_posix()}\n")
-    return runtime_inputs(root), json.loads((root / REPORT_ARCHIVE).read_bytes())
+    return archival_fixture(root, tmp_path)
 
 
 def test_archival_provenance_preserves_exact_measured_inventory(tmp_path: Path) -> None:

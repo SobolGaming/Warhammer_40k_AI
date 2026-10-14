@@ -197,8 +197,8 @@
       "budget_profile": "current-change-relative-v1",
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
-        "schema": "tool-input-roles-v1",
-        "role_specification": "docs/performance/policy-v3/source-token-input-roles.json"
+        "schema": "tool-input-roles-v2",
+        "role_specification": "docs/performance/policy-v3/source-token-input-roles-v2.json.txt"
       }
     }
   },
@@ -7301,6 +7301,38 @@
         "ci/restore-internal/manifest.json",
         "ci/restore-internal/restore_internal_campaign.py",
         "ci/restore-internal/restore_internal_plugin.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "runtime-manifest-build-reuse": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/runtime.py"
+      ],
+      "owners": [
+        "build_runtime_content_bundle_for_armies",
+        "runtime_content_activation_for_armies",
+        "_activation_with_manifest"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "manifest-validation-harness": {
+      "paths": [
+        "ci/manifest-validation/check_ci_attribution_supervisor.py",
+        "ci/manifest-validation/ci_attribution_supervisor.py",
+        "ci/manifest-validation/manifest_campaign.py",
+        "ci/manifest-validation/reconstruction_worker.py",
+        "ci/manifest-validation/source_reuse_experiment.py",
+        "ci/manifest-validation/source_token_arm.py",
+        "ci/manifest-validation/manifest.json"
       ],
       "owners": [
         "*"

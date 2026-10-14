@@ -146,15 +146,21 @@ def validate_spec(spec: dict[str, object]) -> None:
 
 
 def binding_enabled(family: str, specification: dict[str, object]) -> bool:
+    from tools import performance_tool_inputs_v2 as fresh
+
     declaration = specification.get("input_binding")
-    expected = {"schema": SCHEMA, "role_specification": SPEC_PATH}
+    supported = (
+        {"schema": SCHEMA, "role_specification": SPEC_PATH},
+        {"schema": fresh.SCHEMA, "role_specification": fresh.SPEC_PATH},
+    )
     if family == FAMILY:
         if (
-            declaration != expected
+            declaration not in supported
             or specification.get("workload_id") != WORKLOAD_ID
             or specification.get("driver") != WORKLOAD
             or specification.get("cases") != ["orphan-write-independent-check"]
             or specification.get("samples_per_case") != 3
+            or specification.get("budget_profile") != "current-change-relative-v1"
         ):
             raise ValueError("Tool family requires its exact input-binding capability.")
         return True
@@ -234,6 +240,12 @@ def _unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
             raise ValueError("Duplicate role specification key.")
         result[key] = value
     return result
+
+
+# Shared strict primitives for versioned admission; v1 behavior remains unchanged.
+input_object = _object
+input_paths = _paths
+unique_input_object = _unique_object
 
 
 def validate_audit_manifest(content: bytes) -> None:
@@ -332,12 +344,27 @@ def retained_tool_comparison_inputs(
 
 
 def comparison_inputs(
-    root: Path, *, base: str, family: str, head_input_digest: str, measured_head: str | None = None
+    root: Path,
+    *,
+    base: str,
+    family: str,
+    head_input_digest: str,
+    measured_head: str | None = None,
+    schema: str = SCHEMA,
 ) -> dict[str, object]:
     """Hash actual base Git bytes and every current selected file independently."""
     if family != FAMILY:
         raise ValueError("Tool input roles are restricted to the declared family.")
-    spec = read_role_spec(root)
+    from tools import performance_tool_inputs_v2 as fresh
+
+    if schema not in {SCHEMA, fresh.SCHEMA}:
+        raise ValueError("Unsupported tool input-binding schema.")
+    spec = read_role_spec(root) if schema == SCHEMA else fresh.read_role_spec(root)
+    additional: frozenset[str] = frozenset() if schema == SCHEMA else fresh.SELECTED
+
+    def selected(path: str) -> bool:
+        return _selected(path) or path in additional
+
     git = ["git", "-c", f"safe.directory={root.as_posix()}"]
     entries = subprocess.check_output([*git, "ls-tree", "-r", "-z", base], cwd=root)
     objects: dict[str, str] = {}
@@ -345,7 +372,7 @@ def comparison_inputs(
         if row:
             metadata, path = row.split("\t", 1)
             mode, kind, oid = metadata.split()
-            if _selected(path):
+            if selected(path):
                 if kind != "blob" or mode not in {"100644", "100755"}:
                     raise ValueError("Tool comparison requires regular source files.")
                 objects[path] = oid
@@ -389,7 +416,7 @@ def comparison_inputs(
     if (root / SPEC_ARCHIVE).exists():
         current_paths.add(SPEC_PATH)
     for path in sorted(current_paths):
-        if _selected(path):
+        if selected(path):
             source = root / (
                 SPEC_ARCHIVE if path == SPEC_PATH and (root / SPEC_ARCHIVE).exists() else path
             )
@@ -417,7 +444,9 @@ def comparison_inputs(
         for row in measured_tree.decode().split("\0"):
             if row:
                 metadata, path = row.split("\t", 1)
-                if _selected(path):
+                if schema == fresh.SCHEMA and path == SPEC_ARCHIVE:
+                    path = SPEC_PATH
+                if selected(path):
                     mode, kind, oid = metadata.split()
                     if kind != "blob" or mode not in {"100644", "100755"}:
                         raise ValueError("Measured tool inputs must be regular Git blobs.")
@@ -425,7 +454,7 @@ def comparison_inputs(
         # A report's revision is an untrusted locator, never an expected hash source.
         # Authenticate its actual Git bytes against independently read current bytes.
         # This permits evidence-only descendant commits without a self-reference cycle.
-        if (root / SPEC_ARCHIVE).exists():
+        if schema == SCHEMA and (root / SPEC_ARCHIVE).exists():
             from tools.performance_policy import runtime_inputs
 
             archived_report = _object(json.loads((root / REPORT_ARCHIVE).read_bytes()))
@@ -445,8 +474,10 @@ def comparison_inputs(
         if measured_blobs != head_git_blobs:
             raise ValueError("Measured head Git inputs do not equal the current source inventory.")
         revision = measured_head
-    harness = {path: head_inputs[path] for path in HARNESS}
-    return classify_inputs(
+    harness_paths = HARNESS if schema == SCHEMA else fresh.HARNESS
+    harness = {path: head_inputs[path] for path in harness_paths}
+    classifier = classify_inputs if schema == SCHEMA else fresh.classify_inputs
+    return classifier(
         spec=spec,
         base=base_inputs,
         head=head_inputs,
