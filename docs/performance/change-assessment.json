@@ -94,6 +94,16 @@
         }
       }
     },
+    "data/source_audits/order135/current-inventory.json": {
+      "before_sha256": "9a8bb036fc9e33281c2660d7c1a80d29dcee5a622227f6119266a95d6bfb12cb",
+      "after_sha256": "a53e66e451b937f2f36f0b1457f521aefec6a5920f59a41deeaf0d555f35a078",
+      "owners": {
+        "@document": {
+          "before": "9a8bb036fc9e33281c2660d7c1a80d29dcee5a622227f6119266a95d6bfb12cb",
+          "after": "a53e66e451b937f2f36f0b1457f521aefec6a5920f59a41deeaf0d555f35a078"
+        }
+      }
+    },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "before_sha256": "7b98b1ef3aa3adc72a4d66f541d19ac52427c979f4576977400ab4ca75c814a0",
       "after_sha256": "29b16bbb5912f03386566de7d5b2677e59a343c3d48abb74a3805f52bc11cb59",
@@ -378,6 +388,16 @@
       "category": "rule_semantics",
       "operations": [
         "contract-42-1-publication"
+      ],
+      "selected_families": [],
+      "rationale": "D02 exact-source Save-step correctness, regression and required generated/governance support. Both independent reviewers must judge applicability.",
+      "source_obligation": "Complete retained 05.00-obligation-01 and 05.03 require all original Save dice in the selected pool before reroll choices. 04.03/04.03.01 and 05.03.02 preserve gathered and post-roll pool boundaries; 05.04 keeps physical selection, save checking and low-to-high damage. Original source and acceptance remain intact.",
+      "unchanged_work": "Tests, generated examples and governance inputs retain original assertions, historical measurements and exact-head gates. They implement no engine optimization; the changed runtime remains subject to real serial smoke and all live checks."
+    },
+    "data/source_audits/order135/current-inventory.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-current-source-audit"
       ],
       "selected_families": [],
       "rationale": "D02 exact-source Save-step correctness, regression and required generated/governance support. Both independent reviewers must judge applicability.",

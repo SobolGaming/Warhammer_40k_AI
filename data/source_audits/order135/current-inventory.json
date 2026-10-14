@@ -43957,8 +43957,8 @@
       "sha256": "e4a2c15557cc0d4d660b4f91f36acc93c8565e6c51f8b69d1ee462c13184bc11"
     },
     "tests/unit/test_order135_gathered_attack_steps.py": {
-      "bytes": 3933,
-      "sha256": "b65da7f92131dfe467875d6eaeba6e10892274e5d549e55ddcafe505ed960e57"
+      "bytes": 8597,
+      "sha256": "adcb16b62234862c896bf56d1694d255345eb2c2ec458b895fc1630089aef9a1"
     },
     "tests/unit/test_order135_objective_overlap.py": {
       "bytes": 2422,
@@ -111085,7 +111085,7 @@
         "assert len(wounds) == successful_hits"
       ],
       "complete_current_body": "def test_native_gathered_hit_and_wound_steps_precede_reroll_choices() -> None:\n    session, request = native_gathered_shooting_request()\n    proposal = proposal_from_request(request=request, target_unit_id='army-beta:scalar').to_payload()\n    proposal['declarations'] = proposal['declarations'][:1]\n    status = session.submit_parameterized_payload(request_id=request.request_id, result_id='independent-multiattack-declaration', payload=validate_json_value(proposal))\n    assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()\n    checked_hit = False\n    checked_wound = False\n    for _ in range(80):\n        pending = session.advance_until_decision_or_terminal().decision_request\n        assert pending is not None\n        request = pending\n        rolls = [cast(dict[str, JsonValue], event.payload) for event in session.lifecycle.decision_controller.event_log.records if event.event_type == 'dice_rolled']\n        hits = [row for row in rolls if cast(dict[str, JsonValue], row['spec'])['roll_type'] == 'attack_sequence.hit']\n        wounds = [row for row in rolls if cast(dict[str, JsonValue], row['spec'])['roll_type'] == 'attack_sequence.wound']\n        if hits and (not checked_hit):\n            assert len(hits) == 3, 'All gathered original Hits must exist before a Hit choice.'\n            assert not wounds\n            assert_checkpoint(session)\n            checked_hit = True\n        if wounds:\n            assert len(hits) == 3, 'No Wound or wound reroll may precede another gathered Hit.'\n            hit_steps = [event.payload for event in session.lifecycle.decision_controller.event_log.records if event.event_type == 'attack_sequence_step' and isinstance(event.payload, dict) and (event.payload.get('step') == 'hit')]\n            successful_hits = sum((cast(dict[str, JsonValue], row['payload'])['successful'] is True for row in hit_steps))\n            assert len(wounds) == successful_hits\n            assert_checkpoint(session)\n            checked_wound = True\n            break\n        submit_fixture_request(session, request)\n    assert checked_hit\n    assert checked_wound\n    complete_attack(session)\n    assert_checkpoint(session)\n    events = session.lifecycle.decision_controller.event_log.records\n    original_hits = [index for index, event in enumerate(events) if event.event_type == 'dice_rolled' and isinstance(event.payload, dict) and isinstance(event.payload.get('spec'), dict) and (cast(dict[str, JsonValue], event.payload['spec']).get('roll_type') == 'attack_sequence.hit')]\n    original_wounds = [index for index, event in enumerate(events) if event.event_type == 'dice_rolled' and isinstance(event.payload, dict) and isinstance(event.payload.get('spec'), dict) and (cast(dict[str, JsonValue], event.payload['spec']).get('roll_type') == 'attack_sequence.wound')]\n    assert len(original_hits) == 3\n    assert max(original_hits) < min(original_wounds)",
-      "file_sha256": "b65da7f92131dfe467875d6eaeba6e10892274e5d549e55ddcafe505ed960e57",
+      "file_sha256": "adcb16b62234862c896bf56d1694d255345eb2c2ec458b895fc1630089aef9a1",
       "resolved_path": "tests/unit/test_order135_gathered_attack_steps.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "8ad46307a219a72db75eb96d333a861e84fd427cc4de672b277b43c827adf766"
