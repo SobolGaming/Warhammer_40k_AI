@@ -138,6 +138,22 @@ waiver of correctness, reviews, CI, smoke or aggregate gates.
 
 ## Current-change budgets and historical qualification
 
+### D02 original Save-step ordering
+
+D02 applies the standing bounded rule-repair smoke default to the shared Save
+owner. `policy-v3/d02-rule-semantics.json` pins the exact base, file and changed
+owner hashes for its existing sensitive gathered-step operation. Original Save
+rolls precede reroll choices; dice quantities/specs, journal reuse, physical
+allocation and low-to-high damage retain their existing owners. This is not a
+performance optimization. Different bases, owners, hashes or performance
+categories cannot use this recognition. All original mappings, budgets, live
+checks, serial smoke and independent exact-head reviews remain required.
+
+S25's completed assessment and operation map are retained byte-exact under
+`policy-v3/s25-final-history/`, with hash-checked historical test fixtures. Its
+original assertions still validate that S25 record; D02's current assessment
+is separately bound to its own base. No historical measurement is refreshed.
+
 ### S25 identical applicable weapon gathering
 
 The standing bounded rule-repair default applies to S25's source-backed
