@@ -34,6 +34,16 @@
         }
       }
     },
+    "docs/performance/current/source-token-reuse-v1.json": {
+      "before_sha256": null,
+      "after_sha256": "24bd1ebd1890a3b8b15bcc6a9a8b1c07e0d520875fad37338f1e77910e9659fb",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "24bd1ebd1890a3b8b15bcc6a9a8b1c07e0d520875fad37338f1e77910e9659fb"
+        }
+      }
+    },
     "docs/performance/policy-v3/d02-final-history/assessment.json": {
       "before_sha256": null,
       "after_sha256": "5fede0aca5404959780115897c9b8e0b70cb07719411d18a3fe912fe577c5502",
@@ -81,6 +91,16 @@
         "@document": {
           "before": null,
           "after": "0a980b4370c0bc6284cb87e9bc257a52e8d46096b650b2f807163104cfffe563"
+        }
+      }
+    },
+    "docs/performance/source-token-reuse-v1-provenance.json": {
+      "before_sha256": null,
+      "after_sha256": "e341aa43b24f677160b8c77232f9622fd2c174458fba3f8addeea5236c78c832",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e341aa43b24f677160b8c77232f9622fd2c174458fba3f8addeea5236c78c832"
         }
       }
     },
@@ -845,6 +865,22 @@
       "rationale": "Add exact family-only input-role validation and independently bound common/treatment/control identities; preserve all unrelated comparison semantics and thresholds.",
       "source_obligation": null,
       "unchanged_work": "No engine rule, original semantic assertion or historical evidence is modified; the new tool family still requires three real matched samples and current smoke."
+    },
+    "docs/performance/current/source-token-reuse-v1.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Integrate authenticated three-pair source-reuse measurements and exact invocation provenance from run 38638193930; no measured source/workload bytes change.",
+      "source_obligation": null,
+      "unchanged_work": "Preserve original assertions, full input binding, real sample counts, thresholds, historical records and required current serial smoke."
+    },
+    "docs/performance/source-token-reuse-v1-provenance.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Integrate authenticated three-pair source-reuse measurements and exact invocation provenance from run 38638193930; no measured source/workload bytes change.",
+      "source_obligation": null,
+      "unchanged_work": "Preserve original assertions, full input binding, real sample counts, thresholds, historical records and required current serial smoke."
     }
   },
   "milestone": "ordinary",
