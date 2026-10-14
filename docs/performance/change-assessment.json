@@ -24,6 +24,16 @@
         }
       }
     },
+    "docs/performance/.gitattributes": {
+      "before_sha256": null,
+      "after_sha256": "8dbb525eb4bb56c510fed2162c7a8969e940e8fb770361e14ac541182675a35e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8dbb525eb4bb56c510fed2162c7a8969e940e8fb770361e14ac541182675a35e"
+        }
+      }
+    },
     "docs/performance/SOURCE_TOKEN_REUSE_WORKLOAD.md": {
       "before_sha256": null,
       "after_sha256": "aa3562b39aed1207ff1b26f0b46ee062abd3649a669ee3bdd67b51c34dce5652",
@@ -34,7 +44,7 @@
         }
       }
     },
-    "docs/performance/current/source-token-reuse-v1.json": {
+    "docs/performance/current/source-token-reuse-v1.json.txt": {
       "before_sha256": null,
       "after_sha256": "24bd1ebd1890a3b8b15bcc6a9a8b1c07e0d520875fad37338f1e77910e9659fb",
       "owners": {
@@ -84,13 +94,23 @@
         }
       }
     },
-    "docs/performance/policy-v3/source-token-input-roles.json": {
+    "docs/performance/policy-v3/source-token-input-roles.json.txt": {
       "before_sha256": null,
       "after_sha256": "0a980b4370c0bc6284cb87e9bc257a52e8d46096b650b2f807163104cfffe563",
       "owners": {
         "@document": {
           "before": null,
           "after": "0a980b4370c0bc6284cb87e9bc257a52e8d46096b650b2f807163104cfffe563"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-provenance-applicability.json": {
+      "before_sha256": null,
+      "after_sha256": "e8ae034bf7babe6ecc3d18ff692da64dca35449f983a8965faf7d7102366e8a8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e8ae034bf7babe6ecc3d18ff692da64dca35449f983a8965faf7d7102366e8a8"
         }
       }
     },
@@ -168,15 +188,15 @@
     },
     "scripts/check_performance_policy.py": {
       "before_sha256": "7de13ee1e0650f12bd711f104a831b6921244489a367a87fa1e11ea95b2c1b24",
-      "after_sha256": "ff839b651b80890b49ab3061493c5695c542ee1cda6cdf77d78d3bf902f027b4",
+      "after_sha256": "04b990c75551aa646786effe15aaadd8efe55649f6c7bcd64e290ff30409a2cd",
       "owners": {
         "@module": {
           "before": "6ed659b42171dfaf6154cf4261abda6f2addda6836c2376cd2cb58c2c2ee782d",
-          "after": "46252108c0dda085ea4438cfcf10ce13234a1d79e66c7d73bd110b00572cc9a3"
+          "after": "2fa9022b5f3da997fe2d34c2852e861b26b68049083879273df0e99c4a4e3ed8"
         },
         "validate_current": {
           "before": "9ba4d301d593b9d85a3d32177e9a06084ec9defa5b917f9c43a9368538fd28ef",
-          "after": "112ac93f1ff18d51e3d7e8dca5965bdc9c964443bde9cc9eb006de61135a9035"
+          "after": "433f868b7034144bb4d10427eb46c8e735f06c47b5bb3a0d28a82a34830402c2"
         }
       }
     },
@@ -430,11 +450,15 @@
     },
     "tests/code_quality/test_performance_tool_inputs.py": {
       "before_sha256": null,
-      "after_sha256": "55b77f9d294326f2bb79aad57f184b7f56efa84b5d1ce8b5f3a3aea83337ea6c",
+      "after_sha256": "29d4735cab25fa693cc138e4a8d24014735bc0c7ae67f1744b64d01b5f81dba2",
       "owners": {
         "@module": {
           "before": null,
-          "after": "be14f04d2527cb90d68316c853ec9be5357a5d2f224277c279883558ce8036e3"
+          "after": "0ff3a92766a5dffb3eeccf7ae97143d1c55304becfaa14c604581d0a7950d630"
+        },
+        "_archival_fixture": {
+          "before": null,
+          "after": "2efb7956b187b9c0170515066422111f168739bee73f03313ca3122f79665b9a"
         },
         "_binding": {
           "before": null,
@@ -463,6 +487,22 @@
         "test_actual_git_binding_rejects_stale_source_but_allows_evidence_only_descendant": {
           "before": null,
           "after": "28d38707a9104ca6f0effd319d9139220175a2a7ff3275a0201a03003ef4f3fe"
+        },
+        "test_archival_provenance_preserves_exact_measured_inventory": {
+          "before": null,
+          "after": "b8e06997018e8ea378ab1d8c0d929bad2244e74a0137f64593e1b17f2ae6c389"
+        },
+        "test_archival_provenance_rejects_changed_measured_inputs": {
+          "before": null,
+          "after": "765b5daf475ef8367ad822050dcd722981440b34e1afc4ca6f2acc2dc41ddca3"
+        },
+        "test_archival_provenance_rejects_identity_drift": {
+          "before": null,
+          "after": "2db413ca869d1a87a40b4fde24b1afacc79209e4cedafeb82c000d147444a9d3"
+        },
+        "test_archival_role_layout_rejects_ambiguous_original": {
+          "before": null,
+          "after": "04693dd48cf271a57e80404a1c1081805aa82b9ab89bf02bd558caa72e352bc1"
         },
         "test_audit_manifest_rejects_unpinned_pdf_reference": {
           "before": null,
@@ -495,6 +535,10 @@
         "test_optional_host_metadata_records_permission_error": {
           "before": null,
           "after": "b0651bc1dcf8c8e57986627550d8ed9675ed05667c0831827b4cc8665ad97a67"
+        },
+        "test_original_edition_assertion_preserves_active_reference_boundary": {
+          "before": null,
+          "after": "1dc3add2731c64568483f83e5c7e54d8b3e54e61cd3f012fda01c526bd81b861"
         },
         "test_retained_output_accepts_numbered_directory_and_current_alias": {
           "before": null,
@@ -596,11 +640,11 @@
     },
     "tools/performance_tool_inputs.py": {
       "before_sha256": null,
-      "after_sha256": "d98f74606899b79ef4b3223e5e496e1e8bb9411bc15cacba0ca5dd95aa321dbe",
+      "after_sha256": "b0cb561116825af83679d105a5529336c7178145d70174f4de37bf988275d926",
       "owners": {
         "@module": {
           "before": null,
-          "after": "5c940497deddc940904d71a26ff6f0b6f582a832b5af8ecd36147495f92d706a"
+          "after": "2ae802dd2fd00c1421ea395a41f2d1ed92218cd4d325589817a3213b3fda46c2"
         },
         "_object": {
           "before": null,
@@ -628,11 +672,19 @@
         },
         "comparison_inputs": {
           "before": null,
-          "after": "8009289ba8d241074d8ef0d57a98b5576326b9be495ea1e6fbd9a10ad66beb43"
+          "after": "6499391587c7be6357109f649dde56f23bd5cbba91095241eecf8fcaef2980d5"
         },
         "digest": {
           "before": null,
           "after": "4790318b419b24362ab7c7c03798b2486eeae769e5c771bfe5e286b2626d4367"
+        },
+        "read_role_spec": {
+          "before": null,
+          "after": "bd0966b58e0d1a0bb52f7053c3a3f2151a293d94f8c781f2134e01d2ad33faf3"
+        },
+        "retained_tool_comparison_inputs": {
+          "before": null,
+          "after": "8cf4022e434e949f88d7c9953b876c4f59b5e7cf89c077d0664eda1988bbb111"
         },
         "validate_audit_manifest": {
           "before": null,
@@ -705,14 +757,6 @@
       "rationale": "Add opt-in baseline CI attribution and non-engine harness checks. Existing engine code, original test bodies and historical measurement drivers are unchanged. No optimization or comparative speedup is claimed.",
       "source_obligation": null,
       "unchanged_work": "Native rules, persistence, replay, validators, source preservation and required CI gates remain unchanged. This new diagnostic workflow has bounded exploratory measurements, not a changed historical workload or engine operation. Current serial smoke remains mandatory."
-    },
-    "docs/performance/policy-v3/source-token-input-roles.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add exact family-only input-role validation and independently bound common/treatment/control identities; preserve all unrelated comparison semantics and thresholds.",
-      "source_obligation": null,
-      "unchanged_work": "No engine rule, original semantic assertion or historical evidence is modified; the new tool family still requires three real matched samples and current smoke."
     },
     "scripts/build_external_contract.py": {
       "category": "cache_policy",
@@ -866,14 +910,6 @@
       "source_obligation": null,
       "unchanged_work": "No engine rule, original semantic assertion or historical evidence is modified; the new tool family still requires three real matched samples and current smoke."
     },
-    "docs/performance/current/source-token-reuse-v1.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Integrate authenticated three-pair source-reuse measurements and exact invocation provenance from run 38638193930; no measured source/workload bytes change.",
-      "source_obligation": null,
-      "unchanged_work": "Preserve original assertions, full input binding, real sample counts, thresholds, historical records and required current serial smoke."
-    },
     "docs/performance/source-token-reuse-v1-provenance.json": {
       "category": "governance",
       "operations": [],
@@ -881,11 +917,43 @@
       "rationale": "Integrate authenticated three-pair source-reuse measurements and exact invocation provenance from run 38638193930; no measured source/workload bytes change.",
       "source_obligation": null,
       "unchanged_work": "Preserve original assertions, full input binding, real sample counts, thresholds, historical records and required current serial smoke."
+    },
+    "docs/performance/current/source-token-reuse-v1.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain exact provenance archive bytes and authenticate the narrow three-file governance correction against the measured Git revision and complete original inventory.",
+      "source_obligation": null,
+      "unchanged_work": "The original edition scanner and every measured common, treatment and harness byte remain unchanged; source paths and archive bytes remain exact. No new performance measurement is claimed."
+    },
+    "docs/performance/policy-v3/source-token-input-roles.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain exact provenance archive bytes and authenticate the narrow three-file governance correction against the measured Git revision and complete original inventory.",
+      "source_obligation": null,
+      "unchanged_work": "The original edition scanner and every measured common, treatment and harness byte remain unchanged; source paths and archive bytes remain exact. No new performance measurement is claimed."
+    },
+    "docs/performance/policy-v3/source-token-provenance-applicability.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain exact provenance archive bytes and authenticate the narrow three-file governance correction against the measured Git revision and complete original inventory.",
+      "source_obligation": null,
+      "unchanged_work": "The original edition scanner and every measured common, treatment and harness byte remain unchanged; source paths and archive bytes remain exact. No new performance measurement is claimed."
+    },
+    "docs/performance/.gitattributes": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain exact provenance archive bytes and authenticate the narrow three-file governance correction against the measured Git revision and complete original inventory.",
+      "source_obligation": null,
+      "unchanged_work": "The original edition scanner and every measured common, treatment and harness byte remain unchanged; source paths and archive bytes remain exact. No new performance measurement is claimed."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "external_contract_source_reuse": "docs/performance/current/source-token-reuse-v1.json"
+    "external_contract_source_reuse": "docs/performance/current/source-token-reuse-v1.json.txt"
   },
   "full_game": null
 }

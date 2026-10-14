@@ -1,0 +1,19 @@
+{
+  "schema": "source-token-provenance-applicability-v1",
+  "measured_head": "1009fd82e077239abf854e9179d87b0affe8186e",
+  "current_input_digest": "271b63e0fce6fe2d56bbba24310a0cb8983993ee3e87f6bccb47228b82ac04ab",
+  "changes": {
+    "scripts/check_performance_policy.py": {
+      "before": "ff839b651b80890b49ab3061493c5695c542ee1cda6cdf77d78d3bf902f027b4",
+      "after": "04b990c75551aa646786effe15aaadd8efe55649f6c7bcd64e290ff30409a2cd"
+    },
+    "tests/code_quality/test_performance_tool_inputs.py": {
+      "before": "55b77f9d294326f2bb79aad57f184b7f56efa84b5d1ce8b5f3a3aea83337ea6c",
+      "after": "29d4735cab25fa693cc138e4a8d24014735bc0c7ae67f1744b64d01b5f81dba2"
+    },
+    "tools/performance_tool_inputs.py": {
+      "before": "d98f74606899b79ef4b3223e5e496e1e8bb9411bc15cacba0ca5dd95aa321dbe",
+      "after": "b0cb561116825af83679d105a5529336c7178145d70174f4de37bf988275d926"
+    }
+  }
+}

@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import os
 import subprocess
+import sys
 from pathlib import Path
 from typing import cast
 
@@ -17,8 +19,9 @@ from scripts.source_reuse_experiment import (
     validate_paths,
     validate_test_command,
 )
-from tools.performance_policy import POLICY, validate_comparison
+from tools.performance_policy import POLICY, runtime_inputs, validate_comparison
 from tools.performance_tool_inputs import (
+    APPLICABILITY,
     AUDIT_INPUTS,
     AUDIT_MANIFEST,
     AUDIT_PDF,
@@ -28,8 +31,10 @@ from tools.performance_tool_inputs import (
     FAMILY,
     HARNESS,
     INDEX,
+    REPORT_ARCHIVE,
     REQUIRED,
     SCHEMA,
+    SPEC_ARCHIVE,
     SPEC_PATH,
     TREATMENT,
     WORKLOAD,
@@ -37,6 +42,9 @@ from tools.performance_tool_inputs import (
     binding_enabled,
     classify_inputs,
     comparison_inputs,
+    digest,
+    read_role_spec,
+    retained_tool_comparison_inputs,
     validate_audit_manifest,
     validate_spec,
 )
@@ -460,3 +468,125 @@ def test_audit_manifest_rejects_unpinned_pdf_reference(reference: str | None) ->
     with pytest.raises(ValueError, match="exact required common PDF"):
         validate_audit_manifest(json.dumps({"source_pdf_filename": reference}).encode())
     validate_audit_manifest(json.dumps({"source_pdf_filename": Path(AUDIT_PDF).name}).encode())
+
+
+def _archival_fixture(tmp_path: Path) -> tuple[dict[str, str], dict[str, object]]:
+    root = Path(__file__).resolve().parents[2]
+    for name in (SPEC_ARCHIVE, REPORT_ARCHIVE, APPLICABILITY):
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((root / name).read_bytes())
+    # Read-only access to immutable Git objects; this fixture performs no Git mutations.
+    (tmp_path / ".git").write_text(f"gitdir: {(root / '.git').as_posix()}\n")
+    return runtime_inputs(root), json.loads((root / REPORT_ARCHIVE).read_bytes())
+
+
+def test_archival_provenance_preserves_exact_measured_inventory(tmp_path: Path) -> None:
+    from tools.performance_tool_inputs import MEASURED_BASE, MEASURED_INPUT_DIGEST
+
+    current, report = _archival_fixture(tmp_path)
+    measured, proof_sha = retained_tool_comparison_inputs(
+        tmp_path, current=current, report=report, base=MEASURED_BASE
+    )
+    assert digest(measured) == MEASURED_INPUT_DIGEST
+    assert proof_sha == hashlib.sha256((tmp_path / APPLICABILITY).read_bytes()).hexdigest()
+    assert read_role_spec(tmp_path)["required_dependencies"] == sorted(REQUIRED)
+
+
+@pytest.mark.parametrize(
+    "path", ["src/unapproved.py", BUILDER, WORKLOAD, "scripts/ci_attribution_supervisor.py"]
+)
+def test_archival_provenance_rejects_changed_measured_inputs(tmp_path: Path, path: str) -> None:
+    from tools.performance_tool_inputs import MEASURED_BASE
+
+    current, report = _archival_fixture(tmp_path)
+    current[path] = "f" * 64
+    proof_path = tmp_path / APPLICABILITY
+    proof = json.loads(proof_path.read_bytes())
+    proof["current_input_digest"] = digest(current)
+    proof_path.write_text(json.dumps(proof))
+    with pytest.raises(ValueError, match="Unapproved measured input"):
+        retained_tool_comparison_inputs(
+            tmp_path, current=current, report=report, base=MEASURED_BASE
+        )
+
+
+@pytest.mark.parametrize(
+    "mutation", ["spec", "report", "proof", "before", "after", "scope", "base"]
+)
+def test_archival_provenance_rejects_identity_drift(tmp_path: Path, mutation: str) -> None:
+    from tools.performance_tool_inputs import MEASURED_BASE
+
+    current, report = _archival_fixture(tmp_path)
+    base = MEASURED_BASE
+    if mutation in {"spec", "report"}:
+        target = tmp_path / (SPEC_ARCHIVE if mutation == "spec" else REPORT_ARCHIVE)
+        target.write_bytes(target.read_bytes() + b" ")
+    elif mutation == "base":
+        base = "a" * 40
+    else:
+        target = tmp_path / APPLICABILITY
+        proof = json.loads(target.read_bytes())
+        if mutation == "proof":
+            proof["current_input_digest"] = "f" * 64
+        elif mutation == "scope":
+            proof["changes"]["src/unapproved.py"] = {"before": None, "after": "f" * 64}
+        else:
+            proof["changes"]["tools/performance_tool_inputs.py"][mutation] = "f" * 64
+        target.write_text(json.dumps(proof))
+    with pytest.raises(ValueError, match=r"changed|drift"):
+        retained_tool_comparison_inputs(tmp_path, current=current, report=report, base=base)
+
+
+def test_archival_role_layout_rejects_ambiguous_original(tmp_path: Path) -> None:
+    _archival_fixture(tmp_path)
+    (tmp_path / SPEC_PATH).write_bytes((tmp_path / SPEC_ARCHIVE).read_bytes())
+    with pytest.raises(ValueError, match="Ambiguous"):
+        read_role_spec(tmp_path)
+
+
+@pytest.mark.parametrize("active", [None, "historical-json", "active-source", "active-json"])
+def test_original_edition_assertion_preserves_active_reference_boundary(
+    tmp_path: Path, active: str | None
+) -> None:
+    root = Path(__file__).resolve().parents[2]
+    original = "tests/code_quality/test_phase14a_source_identity.py"
+    target = tmp_path / original
+    target.parent.mkdir(parents=True)
+    target.write_bytes((root / original).read_bytes())
+    for name in (SPEC_ARCHIVE, REPORT_ARCHIVE):
+        archived = tmp_path / name
+        archived.parent.mkdir(parents=True, exist_ok=True)
+        archived.write_bytes((root / name).read_bytes())
+        if active == "historical-json":
+            archived.with_suffix("").write_bytes(archived.read_bytes())
+    if active in {"active-source", "active-json"}:
+        target = tmp_path / (
+            "src/obsolete.py" if active == "active-source" else "docs/obsolete.json"
+        )
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps("warhammer_40000_" + "1" + "0" + "th"))
+    config = tmp_path / "pytest.ini"
+    config.write_text("[pytest]\n")
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-B",
+            "-m",
+            "pytest",
+            "-c",
+            str(config),
+            original + "::test_active_code_tests_and_docs_do_not_reference_retired_edition_ids",
+            "-q",
+            "-n",
+            "0",
+            "--no-cov",
+        ],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert result.returncode == (0 if active is None else 1), result.stdout + result.stderr
+    if active is not None:
+        assert "AssertionError" in result.stdout

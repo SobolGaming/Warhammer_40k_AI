@@ -32,7 +32,11 @@ from tools.performance_policy import (
     validate_comparison,
     validate_full_game,
 )
-from tools.performance_tool_inputs import binding_enabled, comparison_inputs
+from tools.performance_tool_inputs import (
+    binding_enabled,
+    comparison_inputs,
+    retained_tool_comparison_inputs,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -203,7 +207,9 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
             raise ValueError("Selected measurement driver is missing.")
         comparison = read_object(root / path)
         if binding_enabled(family, specification):
-            measured_inputs, applicability_sha = inputs, None
+            measured_inputs, applicability_sha = retained_tool_comparison_inputs(
+                root, current=inputs, report=comparison, base=base
+            )
         else:
             measured_inputs, applicability_sha = retained_comparison_inputs(
                 root, current=inputs, report=comparison, base=base, runtime_id=runtime_id
@@ -215,7 +221,7 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
                 root,
                 base=base,
                 family=family,
-                head_input_digest=input_digest,
+                head_input_digest=canonical_digest(measured_inputs),
                 measured_head=str(
                     object_value(
                         object_value(object_value(comparison["input_binding"])["sides"])["head"]
