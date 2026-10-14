@@ -23,9 +23,12 @@ jobs:
     env:
       PYTHONDONTWRITEBYTECODE: "1"
       PYTHONHASHSEED: "0"
-      UV_CACHE_DIR: ${{ runner.temp }}/attribution-uv-cache
-      ATTRIBUTION_OUTPUT: ${{ runner.temp }}/linux-attribution
     steps:
+      - name: Initialize isolated diagnostic directories
+        shell: bash
+        run: |
+          printf 'UV_CACHE_DIR=%s/attribution-uv-cache\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+          printf 'ATTRIBUTION_OUTPUT=%s/linux-attribution\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
       - name: Checkout exact approved PR head
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
