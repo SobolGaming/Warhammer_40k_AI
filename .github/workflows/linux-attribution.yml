@@ -1,0 +1,77 @@
+name: linux-attribution
+
+# Parent-reviewed opt-in only. Normal ci.yml and required checks are unchanged.
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: linux-attribution-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  attribution:
+    if: >-
+      github.event.label.name == 'ci-linux-attribution' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'codex/test-ci-restructure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONHASHSEED: "0"
+      UV_CACHE_DIR: ${{ runner.temp }}/attribution-uv-cache
+      ATTRIBUTION_OUTPUT: ${{ runner.temp }}/linux-attribution
+    steps:
+      - name: Checkout exact approved PR head
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up matching Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14.5"
+      - name: Set up matching uv without restoring dependency cache
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: "0.11.29"
+          enable-cache: false
+      - name: Install locked test dependencies
+        timeout-minutes: 4
+        run: uv sync --locked --no-default-groups --group test
+      - name: Require exact diagnostic commands and safe output destinations
+        timeout-minutes: 1
+        run: >-
+          uv run --no-sync python scripts/check_ci_attribution_commands.py
+          --output "$RUNNER_TEMP/linux-attribution-commands"
+      - name: Require synthetic Linux process-group cleanup checks
+        timeout-minutes: 2
+        # No project imports or engine tests; failure prevents the expensive campaign.
+        run: >-
+          uv run --no-sync python scripts/check_ci_attribution_supervisor.py
+          checks "$RUNNER_TEMP/linux-attribution-supervisor"
+      - name: Execute four bounded native Linux invocations
+        timeout-minutes: 59
+        # timeout also bounds hashing/collection/cleanup and kills the owned process group.
+        run: >-
+          timeout --signal=TERM --kill-after=10s 3530s
+          uv run --no-sync python scripts/ci_attribution.py
+          --output "$ATTRIBUTION_OUTPUT"
+      - name: Upload diagnostic evidence independently of required coverage artifacts
+        if: always()
+        timeout-minutes: 2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: linux-attribution-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/linux-attribution/
+            ${{ runner.temp }}/linux-attribution-supervisor/
+            ${{ runner.temp }}/linux-attribution-commands/
+          if-no-files-found: error
+          retention-days: 14
+          include-hidden-files: true
