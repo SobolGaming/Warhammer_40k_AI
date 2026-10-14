@@ -10,12 +10,14 @@ import pytest
 from tools.performance_policy import validate_assessment
 from tools.performance_s25_rule_semantics import BASE, SCOPE, s25_rule_semantics_smoke_operations
 
+from tests.s25_assessment_history_helpers import s25_final_assessment_bytes
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_s25_scope_matches_complete_current_source_rows() -> None:
     scope = json.loads((ROOT / SCOPE).read_bytes())
-    assessment = json.loads((ROOT / "docs/performance/change-assessment.json").read_bytes())
+    assessment = json.loads(s25_final_assessment_bytes("assessment.json"))
     assert scope["base"] == assessment["base"] == BASE
     assert set(scope["changes"]) == set(scope["smoke_operations"])
     assert scope["changes"]
@@ -61,11 +63,9 @@ def test_s25_scope_rejects_base_category_path_and_hash_drift() -> None:
 
 
 def test_s25_scope_retains_detailed_requirements_for_performance_changes() -> None:
-    assessment = json.loads((ROOT / "docs/performance/change-assessment.json").read_bytes())
+    assessment = json.loads(s25_final_assessment_bytes("assessment.json"))
     scope = json.loads((ROOT / SCOPE).read_bytes())
-    operation_map = json.loads(
-        (ROOT / "docs/performance/policy-v3/operation-map.json").read_bytes()
-    )
+    operation_map = json.loads(s25_final_assessment_bytes("operation-map.json"))
     for path in scope["changes"]:
         for category in (
             "algorithm_or_search",

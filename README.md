@@ -1,3 +1,6 @@
+D02 completes original Save rolls before reroll choices within the selected pool.
+See [source, ownership and validation scope](docs/D02_SAVE_STEP_SCOPE.md).
+
 D12 restores legal attached CHARACTER model selection for Epic Challenge through
 the shared rules-unit validator, retaining physical keywords and model-owned
 Precision. See [source, scope and controls](docs/D12_EPIC_CHALLENGE_SCOPE.md).

@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:810b1f59c378797ce106581ca7f4bcc76bc01bb3edc03bfdf4b8904bd88aba50",
-  "fingerprint": "810b1f59c378797ce106581ca7f4bcc76bc01bb3edc03bfdf4b8904bd88aba50",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3dac52df9bba355343defa9547c58e6b1feb03f8b45e5d6d32031e611075d9bb",
+  "fingerprint": "3dac52df9bba355343defa9547c58e6b1feb03f8b45e5d6d32031e611075d9bb",
   "resource_count": 3116,
   "resources": [
     {
@@ -985,9 +985,9 @@
       "sha256": "9e12d813883103ef5381430e71963ef44a791e72fd05b3e080655511c4fffa99"
     },
     {
-      "byte_length": 62285,
+      "byte_length": 62980,
       "path": "warhammer40k_core/engine/attack_sequence_grouped_allocation.py",
-      "sha256": "36ec7a2edf0dcdb6008651e95ef3a932d3cfa8cfcf8daf8e40ed505381e8f585"
+      "sha256": "be9720699c28f4cf9b62ef8cf132f8c99532a98fb6c99e2c5d1f856a49b1e7fb"
     },
     {
       "byte_length": 42126,

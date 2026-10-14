@@ -7860,3 +7860,13 @@ the matching runtime. No old-runtime compatibility converter or new provider,
 faction, SWARM or full Core certification is supplied.
 
 [Contract migration](../contracts/migrations/44.3.29-to-44.3.30.md).
+
+
+## D02 grouped Save-step timing
+
+All original Save dice in the selected pool now precede source-backed and Core
+Command Re-roll choices. Existing finite reroll requests, physical contexts,
+viewer redaction, persistence and replay schemas cover this timing correction.
+No decision family, field or option shape is added. Runtime identity and generated
+examples are refreshed; old-runtime artifacts still require their producing
+runtime. See [source and scope](D02_SAVE_STEP_SCOPE.md).

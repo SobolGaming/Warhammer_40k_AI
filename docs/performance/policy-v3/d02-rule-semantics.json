@@ -1,0 +1,23 @@
+{
+  "base": "b3b3ecd423c22c2a7fd47a4df2c9baf0ba5860d5",
+  "changes": {
+    "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py": {
+      "before_sha256": "36ec7a2edf0dcdb6008651e95ef3a932d3cfa8cfcf8daf8e40ed505381e8f585",
+      "after_sha256": "be9720699c28f4cf9b62ef8cf132f8c99532a98fb6c99e2c5d1f856a49b1e7fb",
+      "owners": {
+        "_roll_grouped_saves": {
+          "before": "b17636236f160d464fb63773010e5c8be674802d95b41b4bbf0a854c9b087353",
+          "after": "514dffa9b87a49e00c206aad87ae4f2f1b796fba412479fd822c28033e089e30"
+        }
+      }
+    }
+  },
+  "smoke_operations": {
+    "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py": [
+      "order135-gathered-attack-steps"
+    ]
+  },
+  "source_obligation": "Complete retained 05.00-obligation-01 and 05.03 require all original Save dice in the selected pool before reroll choices. 04.03/04.03.01 and 05.03.02 preserve gathered and post-roll pool boundaries; 05.04 keeps physical selection, save checking and low-to-high damage. Original source and acceptance remain intact.",
+  "unchanged_work": "Bounded rule-order repair, not a performance optimization. Original dice count/specs, model/save option queries, exact journal reuse and legal reroll consumers are unchanged. Two local passes separate rolling from choices; no extra persistent cursor, cache, serializer, geometry/search algorithm, dependency, budget or historical measurement changes. Required exact-base serial smoke and all live semantic/work/cache checks remain mandatory; no component/full-game certification.",
+  "authority": "Standing bounded sequential rules-remediation smoke default; exact file/owner/base only. All other detailed-family requirements and original limits remain unchanged."
+}

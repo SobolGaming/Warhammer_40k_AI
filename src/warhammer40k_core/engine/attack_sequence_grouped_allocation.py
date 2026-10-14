@@ -1029,7 +1029,12 @@ def _roll_grouped_saves(
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[tuple[SaveDieEntryPayload, ...], LifecycleStatus | None]:
-    results: list[SaveDieEntryPayload] = []
+    # 05.00/05.03: roll the selected pool's original dice together, before
+    # offering any reroll. Allocation/save checks still happen during the
+    # low-to-high damage walk; no later post-roll pool is included here.
+    # Re-entry reconstructs these dice from their exact journal specs, including
+    # accepted rerolls, without storing a second authoritative progress cursor.
+    rolled: list[tuple[AttackResolutionContextPayload, str, SaveOption | None, DiceRollState]] = []
     for wounded_sequence, attack_context in wounded_contexts:
         current_model_id = _current_model_id_for_allocation_group(
             state=state,
@@ -1064,6 +1069,11 @@ def _roll_grouped_saves(
                     attack_context_id=attack_context["attack_context_id"],
                 ),
             )
+        rolled.append((attack_context, current_model_id, save_roll_option, roll_state))
+
+    results: list[SaveDieEntryPayload] = []
+    for attack_context, current_model_id, save_roll_option, roll_state in rolled:
+        if save_roll_option is not None:
             status = _request_source_backed_save_reroll_if_available(
                 state=state,
                 decisions=decisions,

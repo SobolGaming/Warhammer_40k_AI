@@ -27,6 +27,7 @@ ORDER131_SCOPE = "docs/performance/policy-v3/order131-rule-semantics.json"
 ORDER132_SCOPE = "docs/performance/policy-v3/order132-rule-semantics.json"
 D04_SCOPE = "docs/performance/policy-v3/d04-rule-semantics.json"
 D12_SCOPE = "docs/performance/policy-v3/d12-rule-semantics.json"
+D02_SCOPE = "docs/performance/policy-v3/d02-rule-semantics.json"
 CATEGORIES = frozenset(
     {
         "governance",
@@ -301,6 +302,22 @@ def d12_rule_semantics_smoke_operations(
     return frozenset(_strings(object_value(scope["smoke_operations"])[path]))
 
 
+def d02_rule_semantics_smoke_operations(
+    *, base: str, path: str, category: str, change: object
+) -> frozenset[str]:
+    """Bind the bounded Save-step correction to its exact base and owner bytes."""
+    if base != "b3b3ecd423c22c2a7fd47a4df2c9baf0ba5860d5" or category != "rule_semantics":
+        return frozenset()
+    scope = read_object(Path(__file__).resolve().parents[1] / D02_SCOPE)
+    changes = object_value(scope["changes"])
+    if scope["base"] != base or path not in changes or changes[path] != change:
+        return frozenset()
+    operations = frozenset(_strings(object_value(scope["smoke_operations"])[path]))
+    if operations != frozenset({"order135-gathered-attack-steps"}):
+        raise ValueError("D02 smoke scope must retain its sole exact Save-step operation.")
+    return operations
+
+
 def validate_assessment(
     assessment: dict[str, object],
     *,
@@ -417,6 +434,9 @@ def validate_assessment(
                 base=base, path=path, category=category, change=changes[path]
             )
             | s25_rule_semantics_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | d02_rule_semantics_smoke_operations(
                 base=base, path=path, category=category, change=changes[path]
             )
         )
