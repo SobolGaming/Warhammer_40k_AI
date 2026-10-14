@@ -31,6 +31,11 @@ from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
     AllocatedAttackDamageModifierContext,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_gathering_dependencies import AttackGatheringDependency
+from warhammer40k_core.engine.attack_gathering_wound_rules import (
+    WoundGatheringContext,
+    WoundGatheringPredicate,
+)
 from warhammer40k_core.engine.battle_shock_historical_authority import (
     HistoricalBattleShockAuthorityContext,
 )
@@ -47,6 +52,7 @@ from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
     current_source_model_ids as _current_source_model_ids,
 )
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
+    defensive_strength_toughness_gathering_handler,
     defensive_strength_toughness_wound_handler,
     half_range_weapon_ability_handler,
     passive_self_defensive_hit_handler,
@@ -364,6 +370,8 @@ class CatalogDatasheetRuleRuntime:
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
                 handler=self._save_option_handler(source, descriptor),
+                gathering_dependency=AttackGatheringDependency.TARGET_ONLY,
+                gathering_modified_characteristics=(Characteristic.INVULNERABLE_SAVE,),
             )
             for source, descriptor in self._described_sources(
                 invulnerable_save_descriptor_for_clause
@@ -374,6 +382,8 @@ class CatalogDatasheetRuleRuntime:
                 modifier_id=f"{source.binding_id}:conditional-invulnerable-save",
                 source_id=source.rule_ir.source_id,
                 handler=self._conditional_invulnerable_save_handler(source, descriptor),
+                gathering_dependency=AttackGatheringDependency.ATTACK_KIND_AND_TARGET,
+                gathering_modified_characteristics=(Characteristic.INVULNERABLE_SAVE,),
             )
             for source, descriptor in self._described_sources(
                 conditional_invulnerable_save_descriptor_for_clause
@@ -389,6 +399,7 @@ class CatalogDatasheetRuleRuntime:
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
                 handler=self._allocated_attack_damage_modifier_handler(source, descriptor),
+                gathering_dependency=AttackGatheringDependency.TARGET_ONLY,
             )
             for source, descriptor in self._described_sources(
                 allocated_attack_damage_modifier_descriptor_for_clause
@@ -448,6 +459,7 @@ class CatalogDatasheetRuleRuntime:
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
                 handler=self._failed_save_damage_replacement_handler(source, descriptor),
+                gathering_dependency=AttackGatheringDependency.TARGET_ONLY,
             )
             for source, descriptor in self._described_sources(
                 first_failed_save_damage_replacement_descriptor_for_clause
@@ -563,6 +575,7 @@ class CatalogDatasheetRuleRuntime:
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
                 handler=self._wound_roll_handler(source),
+                gathering_handler=self._wound_roll_handler(source),
             )
             for source in self._sources(clause_is_leading_unit_wound_roll_modifier)
         )
@@ -571,6 +584,8 @@ class CatalogDatasheetRuleRuntime:
                 modifier_id=f"{source.binding_id}:defensive-strength-toughness",
                 source_id=source.rule_ir.source_id,
                 handler=defensive_strength_toughness_wound_handler(source),
+                gathering_handler=defensive_strength_toughness_gathering_handler(source),
+                gathering_predicate=WoundGatheringPredicate.STRENGTH_GREATER_THAN_TOUGHNESS,
             )
             for source in self._sources(clause_is_defensive_strength_toughness_wound_modifier)
         )
@@ -1048,8 +1063,8 @@ class CatalogDatasheetRuleRuntime:
 
     def _wound_roll_handler(
         self, source: _CatalogClauseSource
-    ) -> Callable[[WoundRollModifierContext], int]:
-        def handler(context: WoundRollModifierContext) -> int:
+    ) -> Callable[[WoundRollModifierContext | WoundGatheringContext], int]:
+        def handler(context: WoundRollModifierContext | WoundGatheringContext) -> int:
             if not _source_applies_to_rules_unit(
                 source=source,
                 context_unit_id=context.attacking_unit_instance_id,

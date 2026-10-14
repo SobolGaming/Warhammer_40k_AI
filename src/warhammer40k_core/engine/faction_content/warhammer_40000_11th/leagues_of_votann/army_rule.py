@@ -7,6 +7,10 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_gathering_wound_rules import (
+    WoundGatheringContext,
+    WoundGatheringPredicate,
+)
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartContext,
     CommandPhaseStartEffectContext,
@@ -88,6 +92,8 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=PRIORITISED_EFFICIENCY_WOUND_MODIFIER_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=prioritised_efficiency_wound_roll_modifier,
+                gathering_handler=prioritised_efficiency_wound_gathering_modifier,
+                gathering_predicate=WoundGatheringPredicate.STRENGTH_GREATER_THAN_TOUGHNESS,
             ),
         ),
     )
@@ -273,6 +279,15 @@ def prioritised_efficiency_hit_roll_modifier(context: HitRollModifierContext) ->
 def prioritised_efficiency_wound_roll_modifier(context: WoundRollModifierContext) -> int:
     if type(context) is not WoundRollModifierContext:
         raise GameLifecycleError("Prioritised Efficiency wound modifier requires context.")
+    modifier = prioritised_efficiency_wound_gathering_modifier(context)
+    if modifier == 0 or context.strength <= context.toughness:
+        return 0
+    return modifier
+
+
+def prioritised_efficiency_wound_gathering_modifier(
+    context: WoundRollModifierContext | WoundGatheringContext,
+) -> int:
     if context.source_phase not in {BattlePhase.SHOOTING, BattlePhase.FIGHT}:
         return 0
     owner_id, target_unit = _unit_owner_and_instance_by_id(
@@ -292,8 +307,6 @@ def prioritised_efficiency_wound_roll_modifier(context: WoundRollModifierContext
     ):
         return 0
     if _unit_has_keyword(target_unit, "VEHICLE"):
-        return 0
-    if context.strength <= context.toughness:
         return 0
     return -1
 

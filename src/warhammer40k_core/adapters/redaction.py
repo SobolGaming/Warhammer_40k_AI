@@ -116,6 +116,7 @@ _INTERNAL_BASE_CONTACT_AUTHORITY_KEYS = frozenset(
 _INTERNAL_TARGET_REPLACEMENT_AUTHORITY_KEYS = frozenset(
     {"target_replacement_authority_sha256", "charge_target_authority_sha256"}
 )
+_INTERNAL_GATHERING_AUTHORITY_KEYS = frozenset({"native_snapshots"})
 
 
 class RedactedLifecycleStatusPayload(TypedDict):
@@ -853,6 +854,7 @@ def _without_internal_authority_commitments(value: JsonValue) -> JsonValue:
                 | _INTERNAL_PSYCHIC_AUTHORITY_KEYS
                 | _INTERNAL_INGRESS_AUTHORITY_KEYS
                 | _INTERNAL_TARGET_REPLACEMENT_AUTHORITY_KEYS
+                | _INTERNAL_GATHERING_AUTHORITY_KEYS
                 | _INTERNAL_BASE_CONTACT_AUTHORITY_KEYS
                 | _INTERNAL_REVIVAL_AUTHORITY_KEYS
                 | _INTERNAL_FAILED_SETUP_AUTHORITY_KEYS

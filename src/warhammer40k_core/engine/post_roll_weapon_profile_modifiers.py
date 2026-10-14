@@ -6,6 +6,10 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
+from warhammer40k_core.engine.attack_gathering_dependencies import (
+    AttackGatheringDependency,
+    validate_gathering_dependency,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 if TYPE_CHECKING:
@@ -95,8 +99,10 @@ class PostRollWeaponProfileModifierBinding:
     modifier_id: str
     source_id: str
     handler: PostRollWeaponProfileModifierHandler
+    gathering_dependency: AttackGatheringDependency = AttackGatheringDependency.UNKNOWN
 
     def __post_init__(self) -> None:
+        validate_gathering_dependency(self.gathering_dependency)
         _validate_identifier("post-roll weapon profile modifier modifier_id", self.modifier_id)
         _validate_identifier("post-roll weapon profile modifier source_id", self.source_id)
         if not callable(self.handler):

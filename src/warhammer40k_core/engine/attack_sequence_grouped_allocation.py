@@ -489,6 +489,7 @@ def _resolve_grouped_damage_from(
             attack_sequence=attack_sequence,
             attack_context=attack_context,
         )
+        pool = save_attack_sequence.current_pool()
         ordered_groups = current_pending.ordered_allocation_groups()
         current_group = _current_allocation_group_for_order(
             state=state,
@@ -946,7 +947,17 @@ def _grouped_attack_context_payload(
 ) -> AttackResolutionContextPayload:
     if not attack_contexts:
         raise GameLifecycleError("Grouped attack context requires wound contexts.")
-    first_context = attack_contexts[0]
+    first_context: AttackResolutionContextPayload = {**attack_contexts[0]}
+    if (
+        attack_sequence.current_gathered_group is not None
+        and attack_sequence.current_gathered_group.native_snapshots
+    ):
+        # The aggregate request represents the primary contribution. Actual
+        # wounds retain their own complete contexts in attack_contexts.
+        first_context["attacker_model_instance_id"] = pool.attacker_model_instance_id
+        first_context["weapon_profile_id"] = pool.weapon_profile_id
+        first_context["selected_weapon_ability_ids"] = list(pool.selected_weapon_ability_ids)
+        first_context["damage_profile"] = pool.weapon_profile.damage_profile.to_payload()
     return {
         **first_context,
         "attack_context_id": (

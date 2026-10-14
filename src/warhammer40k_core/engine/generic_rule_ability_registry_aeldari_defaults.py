@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Protocol, cast
 
 from warhammer40k_core.core.modifiers import ModifierTerm
+from warhammer40k_core.engine.attack_gathering_dependencies import AttackGatheringDependency
 from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationRequestContext,
     BattleFormationResultContext,
@@ -287,6 +288,7 @@ def aeldari_corsair_coterie_save_option_modifier_abilities() -> tuple[
             modifier_id_builder=_corsair_voidstone_save_option_modifier_id,
             context_predicate=_corsair_save_option_context_predicate,
             modifier_builder=_corsair_voidstone_save_option_modifier,
+            gathering_dependency=AttackGatheringDependency.TARGET_ONLY,
         ),
     )
 

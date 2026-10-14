@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b4bb4f0f34e7de50aeb5fde4c9db41923a401c7359388ef55f6a9ec93d6a7c0c",
-  "fingerprint": "b4bb4f0f34e7de50aeb5fde4c9db41923a401c7359388ef55f6a9ec93d6a7c0c",
-  "resource_count": 3106,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:810b1f59c378797ce106581ca7f4bcc76bc01bb3edc03bfdf4b8904bd88aba50",
+  "fingerprint": "810b1f59c378797ce106581ca7f4bcc76bc01bb3edc03bfdf4b8904bd88aba50",
+  "resource_count": 3116,
   "resources": [
     {
       "byte_length": 113,
@@ -90,9 +90,9 @@
       "sha256": "cfc9251707017cf4c26f45a5777fbb6bea20fcecd99d2348af6f1e3065d13576"
     },
     {
-      "byte_length": 42301,
+      "byte_length": 42423,
       "path": "warhammer40k_core/adapters/redaction.py",
-      "sha256": "a0ac480eb868c17deba272a8fb942eac02decd93bb02b764748fa4761deb5f51"
+      "sha256": "ac48ed875dfa793661fcae8d1cd0e4068803c6f85e7b7d2924bc9a9f4b529a3e"
     },
     {
       "byte_length": 1598,
@@ -780,9 +780,9 @@
       "sha256": "010e03c360390239f79752c269c46ddc442a8e0402701db17e5d0c3a40c66665"
     },
     {
-      "byte_length": 2955,
+      "byte_length": 3245,
       "path": "warhammer40k_core/engine/allocated_attack_damage_modifiers.py",
-      "sha256": "b95f51a50f1287cfe37c25a74bb9f7a0dddde4101bd26ced960a30b965897b9a"
+      "sha256": "fa41a4d8aa3c845cd7a42206c7f437ed2b774218ccae08b4799047b406bef5ad"
     },
     {
       "byte_length": 15671,
@@ -855,6 +855,16 @@
       "sha256": "8c5bb8e369b54eb59b09993af5d1ffd416204dbb2e8ff2ce9f648abfe9d56854"
     },
     {
+      "byte_length": 1673,
+      "path": "warhammer40k_core/engine/attack_gathering_dependencies.py",
+      "sha256": "4b1968078fcbd9c4dd691009b7c78066ddfe7f67863b542bca25e8ac0111f5e7"
+    },
+    {
+      "byte_length": 2268,
+      "path": "warhammer40k_core/engine/attack_gathering_wound_rules.py",
+      "sha256": "41b82dc51abfc6d80d571624c504009d4f330ac66a8bfadabf162b8656a839bf"
+    },
+    {
       "byte_length": 8039,
       "path": "warhammer40k_core/engine/attack_hit_authority.py",
       "sha256": "a0be32ea85edd0626c1d6de3ec3803067bdc4dfc9f79f35e4a147b63ea76513d"
@@ -880,9 +890,9 @@
       "sha256": "1f50f995e456db575bda1573277f8b36e67e617eb40aea54045099c0522fb8c6"
     },
     {
-      "byte_length": 12116,
+      "byte_length": 12758,
       "path": "warhammer40k_core/engine/attack_reroll_dispatch.py",
-      "sha256": "0ae24a591d9488f8c97dbd50899a6f3603ba1f9ffd45649f53f6486d1b541084"
+      "sha256": "a5afe0ddb7e85fe0c44b3a0e641ae0d1a3b0952e56aea0b7e2644cd99cdf9271"
     },
     {
       "byte_length": 12108,
@@ -955,14 +965,14 @@
       "sha256": "f6bef97eb658ca613228c742dd3d425e08ca815f468f20f17b50095dd0cfe60d"
     },
     {
-      "byte_length": 69201,
+      "byte_length": 70289,
       "path": "warhammer40k_core/engine/attack_sequence_dice_rerolls.py",
-      "sha256": "791b3fb129dc9048f0927bd6df8a61dcc1d8a649fd52adf1d12236cb157b6595"
+      "sha256": "6087b8bc630c374e50bf30b2d2022be03fd5a69f173354d0234ce97d65faa049"
     },
     {
-      "byte_length": 19524,
+      "byte_length": 19651,
       "path": "warhammer40k_core/engine/attack_sequence_dispatch.py",
-      "sha256": "83d317bd332927fcad1c2195ed8bbdb16a3c3ff461328cd275725769f491c754"
+      "sha256": "91b438673c2f819989e7ccf2a94e069d1d6cd02eafae6a5c6f5c9b166e9b8767"
     },
     {
       "byte_length": 25559,
@@ -970,14 +980,14 @@
       "sha256": "550554909ee838d02a50a99ef05c4b5e55090589942a873c38438da75d5996ee"
     },
     {
-      "byte_length": 69515,
+      "byte_length": 70002,
       "path": "warhammer40k_core/engine/attack_sequence_group_selection.py",
-      "sha256": "1146390c40f76e4b6796735fc2d9ee1d0676deb3f3e9d832db0ec7cf71685307"
+      "sha256": "9e12d813883103ef5381430e71963ef44a791e72fd05b3e080655511c4fffa99"
     },
     {
-      "byte_length": 61569,
+      "byte_length": 62285,
       "path": "warhammer40k_core/engine/attack_sequence_grouped_allocation.py",
-      "sha256": "5498bdac0c7aae0c79bcfec0f5ce6c3a6bc3c300cd7690718f50974781ec378e"
+      "sha256": "36ec7a2edf0dcdb6008651e95ef3a932d3cfa8cfcf8daf8e40ed505381e8f585"
     },
     {
       "byte_length": 42126,
@@ -995,9 +1005,9 @@
       "sha256": "c8ef0b591db3606386901f9b22fa64e7b96ab7949f5d2cdc7f3c08eb74c3ac49"
     },
     {
-      "byte_length": 66804,
+      "byte_length": 67541,
       "path": "warhammer40k_core/engine/attack_sequence_model.py",
-      "sha256": "ff87e6341dc5c2eecd462bc8373117a62fbbf6596ea5f6eb6a31dc6207f1fb6d"
+      "sha256": "f8e6f1376edf76fd5232376d8208a9abb0f9a2bf1f0cb2afa1161a918bd2ce98"
     },
     {
       "byte_length": 3953,
@@ -1005,9 +1015,9 @@
       "sha256": "0c779916dd85ca77f916ae397d7d68bccb5cc1ba6350ec57f791e7b98c6e8c06"
     },
     {
-      "byte_length": 19855,
+      "byte_length": 19860,
       "path": "warhammer40k_core/engine/attack_sequence_post_roll.py",
-      "sha256": "3da5a6abe0b3c7d864ce8610217ed76b0f82fde0ff56fe743edf24c20c987a86"
+      "sha256": "039a873aebc525749d317e756be32a860ff41090b0557cd6e673f5f3cc69fd46"
     },
     {
       "byte_length": 16006,
@@ -1015,19 +1025,19 @@
       "sha256": "2e8ae6413a3c9b66bae3cdaa921461f9683886ad74231c7681878630321e5f69"
     },
     {
-      "byte_length": 32478,
+      "byte_length": 33925,
       "path": "warhammer40k_core/engine/attack_sequence_selection.py",
-      "sha256": "a281d79e1461e540fe27f7a2df214191f6a134fb0d6a5b7e8367b005037a7e44"
+      "sha256": "2682a62955430073dd8a6a7ee3e0342a03e63f0f9938529a5c15d694c6dae3c1"
     },
     {
-      "byte_length": 59836,
+      "byte_length": 60575,
       "path": "warhammer40k_core/engine/attack_sequence_state.py",
-      "sha256": "57bf140d3ba00c3b11808ed71977be2b1c02224a32492a7ac886ab4889dfbc4d"
+      "sha256": "1d9099f3042b97dd9ffd68ad52cf3a67d94fbc2d52fd9add723746cf623e604e"
     },
     {
-      "byte_length": 46141,
+      "byte_length": 46472,
       "path": "warhammer40k_core/engine/attack_sequence_validation.py",
-      "sha256": "2ada4f0647df92707e71a664af76d6d4846b128d7a0413542e3c10b96b89f05e"
+      "sha256": "f6d120d91becfedc5d9966c714042865d04e9baf89d49a60d981ee9e6aff09d2"
     },
     {
       "byte_length": 4295,
@@ -1250,9 +1260,9 @@
       "sha256": "60c496b1bb07620a974a3f3be069dddeecedb5ea2aa0d8032b6692017f764128"
     },
     {
-      "byte_length": 9837,
+      "byte_length": 10604,
       "path": "warhammer40k_core/engine/catalog_attack_context_rule_runtime.py",
-      "sha256": "aff635dd11b03f426c6d0a6da8c2ba9555c86e8b2cc642d44694e86751912f93"
+      "sha256": "a920a36eb083279fdee81ee52a037e75cb8570ee0f08a068ab1c265bc72083d1"
     },
     {
       "byte_length": 38927,
@@ -1325,9 +1335,9 @@
       "sha256": "c1476de065b3bf0af89da609d00dd90ac09a15350f8409fb61d6efa6f06f9206"
     },
     {
-      "byte_length": 63490,
+      "byte_length": 64551,
       "path": "warhammer40k_core/engine/catalog_datasheet_rule_runtime.py",
-      "sha256": "044683f2a932407553d07f549f083a90f511feea2a9eb2596ec4c10742de258e"
+      "sha256": "bc7b7420dad140b189c3b31f6b671d8d99954c6478a16feb28be0a5d31fab0cf"
     },
     {
       "byte_length": 39907,
@@ -1420,9 +1430,14 @@
       "sha256": "c806f7be22ed51453a13316e2f269337ca6c1be9cb0f0f76d4ac32ad629311ed"
     },
     {
-      "byte_length": 34820,
+      "byte_length": 39742,
       "path": "warhammer40k_core/engine/catalog_modifier_ignore.py",
-      "sha256": "006fe5eebf219c7c2a08052a962a7c6d474f1537e50c8da56d99dfdb9bc33483"
+      "sha256": "662059f7bc68e13d8824b3bad5a2b5b17c2c02b59662d03a47fb4c98d02276ad"
+    },
+    {
+      "byte_length": 9477,
+      "path": "warhammer40k_core/engine/catalog_modifier_ignore_sources.py",
+      "sha256": "59b8320721f7f8311227422309f018f1021411deb4a185c72757e054a74b5504"
     },
     {
       "byte_length": 20404,
@@ -3665,9 +3680,9 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 53829,
+      "byte_length": 53998,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/astra_militarum/army_rule.py",
-      "sha256": "ec1e58c392cc54de1bf17f36383b8c0c40cdfde6e9684a2154a97d6083780958"
+      "sha256": "ae5a12e67e9bd9079622606448a10ad9384ea31e8dd860f7b7d231767966e555"
     },
     {
       "byte_length": 4685,
@@ -3965,9 +3980,9 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 35477,
+      "byte_length": 36044,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/black_templars/army_rule.py",
-      "sha256": "36b2c29d9ff21365c6edc9ab0505b2fdae34a61876548e8b8d05dfbde610acbb"
+      "sha256": "2595ebbdda2271e1448c9a0e76664a00bedbca060a3f09611b2b6c2070842b38"
     },
     {
       "byte_length": 172,
@@ -4665,9 +4680,9 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 48768,
+      "byte_length": 49114,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_knights/army_rule.py",
-      "sha256": "f9d9b26bb103e633e792fb33a491991791440ba155fa70bf81c18348ace4942b"
+      "sha256": "d4d26c51749828e8083d4f0651b0bb403aa1c45350e33edc474f61b6e1d5cab2"
     },
     {
       "byte_length": 24731,
@@ -5600,9 +5615,9 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 26878,
+      "byte_length": 27047,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/death_guard/army_rule.py",
-      "sha256": "01045e2a99a2c19a71209302e8f4c78b745334954c8d2c12ebdd05f56fbecc59"
+      "sha256": "bdd441581dd86d4a748ad81698efeb36a7a7c93411ebf9e9a8e39ecb892bae7c"
     },
     {
       "byte_length": 172,
@@ -7330,9 +7345,9 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 22278,
+      "byte_length": 22817,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/leagues_of_votann/army_rule.py",
-      "sha256": "7bec2511c795fd7b5543b038c6c3956afdc4495e58df8bfe933b6a799d3e987b"
+      "sha256": "cea91279a4d064a06fe16647123e0bca844d2d521fe9420c26836256602b8416"
     },
     {
       "byte_length": 172,
@@ -7925,9 +7940,9 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 23633,
+      "byte_length": 23802,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/orks/army_rule.py",
-      "sha256": "c7079e8411143fed90dd11e7085c57bc2959a9a88e8e846113781332f302a38c"
+      "sha256": "11a52b1e4ddc299af6664b3b3657d892dea4b01fd534edf130014c6ab9d07a90"
     },
     {
       "byte_length": 3589,
@@ -8250,9 +8265,9 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 16179,
+      "byte_length": 16522,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/space_marines/army_rule.py",
-      "sha256": "e68133cbf7888cde39225240b6b6b56ae29087baa1e8a5e07efbbf701bed2d73"
+      "sha256": "c1a1b5d79380f927fb5bd3454929e292b029cf5b0a2ace334d14c62f91541561"
     },
     {
       "byte_length": 3396,
@@ -10280,9 +10295,9 @@
       "sha256": "c283456cdaee769a0478d4765caae1f15fd9a2903bcf41ab6c61409674f76240"
     },
     {
-      "byte_length": 5712,
+      "byte_length": 5748,
       "path": "warhammer40k_core/engine/gathered_attack_dice.py",
-      "sha256": "8bc6808089539ce0c65c626fc84479ce720ab53d27a8ebba70093b3b40462791"
+      "sha256": "4267869645a78b07f0da73485bd7f10c6e93a69721c3c9c58873add651ad519b"
     },
     {
       "byte_length": 6570,
@@ -10290,14 +10305,14 @@
       "sha256": "9cc2b99891ba7b0608b4211846f57e7e2466fc83fa10d6ad97723e1e1f34f124"
     },
     {
-      "byte_length": 5255,
+      "byte_length": 5177,
       "path": "warhammer40k_core/engine/generic_attack_roll_modifiers.py",
-      "sha256": "ebf801748b573a5c4d9922571d779c5b77ea206af07368f0b6343794ab91633e"
+      "sha256": "7e084b0f9c2bd4c768ced77306ec9b8dbb0386e592b19b26b4f718fad315cec4"
     },
     {
-      "byte_length": 6241,
+      "byte_length": 6163,
       "path": "warhammer40k_core/engine/generic_attack_save_modifiers.py",
-      "sha256": "953422bc69eb3f853475bdd5c077c3b1b42ec8703e8d0164696b4397171bf0c0"
+      "sha256": "88299631d03e87b18783c2fb64f5c5076ebd07bf336a77495d0086edb99012fc"
     },
     {
       "byte_length": 29095,
@@ -10320,14 +10335,14 @@
       "sha256": "85dcbaa511dbf6a3f0c65ce98b3427eaafffabafe2c7f979e6df77fcad4affaf"
     },
     {
-      "byte_length": 54285,
+      "byte_length": 54575,
       "path": "warhammer40k_core/engine/generic_rule_ability_registry.py",
-      "sha256": "0f29139659b76788df439a05253ac08ef2c117dc4356a91141ffe268bff57b5a"
+      "sha256": "a29d9e1d6964a29cb6a68413cdd551a65618dd71faee2bbf920c1d64c5b86c24"
     },
     {
-      "byte_length": 24840,
+      "byte_length": 25005,
       "path": "warhammer40k_core/engine/generic_rule_ability_registry_aeldari_defaults.py",
-      "sha256": "4f438448aea9b373bd29ba676b474e046a7156862151b00357117fc1ee9316c4"
+      "sha256": "b91b11446aaae90029c08742ec666b7688ab2961cbfb00a435055f86ce2307a1"
     },
     {
       "byte_length": 3548,
@@ -10375,9 +10390,9 @@
       "sha256": "fc8b3d642ad69a68c85aad9ac394cacdb6c0f63750809f7985b41bd34d771a55"
     },
     {
-      "byte_length": 51093,
+      "byte_length": 56631,
       "path": "warhammer40k_core/engine/generic_rule_attack_hooks.py",
-      "sha256": "f53a688cf8d6613d07493eb3455aaf6836d2d6723036a7f6b659d0fe914c13a9"
+      "sha256": "863c3205083438ae645f640400522a81f8f47880f5f8d2947c4e8fb68ef93fe4"
     },
     {
       "byte_length": 2362,
@@ -10405,9 +10420,9 @@
       "sha256": "e5f0203d94716ac413db3fc8c88f18167d422222ed5b8f7f8a076bee0e4f0489"
     },
     {
-      "byte_length": 62485,
+      "byte_length": 62559,
       "path": "warhammer40k_core/engine/generic_rule_lifecycle_hooks.py",
-      "sha256": "41e40cc3fd15aedba99154ceea364eab15242f04e37795989b95c5f14fb00e2a"
+      "sha256": "a4a9510c853488c16e523251b7a5e5578b54f2b9fce3c4ed147109c3a5ef32d6"
     },
     {
       "byte_length": 1324,
@@ -10515,9 +10530,9 @@
       "sha256": "eaf765156c1fc8a92d32b9575f8003567104e76390a2a90b6c8327c94c977029"
     },
     {
-      "byte_length": 5935,
+      "byte_length": 5857,
       "path": "warhammer40k_core/engine/hit_thresholds.py",
-      "sha256": "9726ca4e77ede3524d00666d365338dfd7b74f68abe1fa5259ff212338472258"
+      "sha256": "18c06e22f89ba8240ad66fefcba8425b0fb11b756572654e6a1ef26c2a06f9ae"
     },
     {
       "byte_length": 5186,
@@ -11125,6 +11140,41 @@
       "sha256": "27252596ddf9090a4ca9dd5487932acd83de896bda6487f8c06c0b6d5a5602d1"
     },
     {
+      "byte_length": 45453,
+      "path": "warhammer40k_core/engine/native_attack_gathering.py",
+      "sha256": "272e33b147918a115fee57f998d13733ef4999b43e57dab0f84149954cf504fc"
+    },
+    {
+      "byte_length": 4118,
+      "path": "warhammer40k_core/engine/native_gathering_characteristic_rules.py",
+      "sha256": "892b83d36c3f2b9251fd10a4929b92842428ce9f992e33450986c233173ece0a"
+    },
+    {
+      "byte_length": 2634,
+      "path": "warhammer40k_core/engine/native_gathering_cover_rules.py",
+      "sha256": "319b8e220ea7d02caabfac61afc3a41554893a0a6ee8588c809833ab616c52ab"
+    },
+    {
+      "byte_length": 5076,
+      "path": "warhammer40k_core/engine/native_gathering_numeric_rules.py",
+      "sha256": "0905dc436d632cc8baebffa5769a322097f896545e77aa8240d6769431f140ce"
+    },
+    {
+      "byte_length": 16617,
+      "path": "warhammer40k_core/engine/native_gathering_permission_relevance.py",
+      "sha256": "90ea27af2322efeb15ab0970d9f27229e82940801b55f08fe16c0c99892e1150"
+    },
+    {
+      "byte_length": 8496,
+      "path": "warhammer40k_core/engine/native_gathering_subject_rules.py",
+      "sha256": "acdab13fe2fdae3acf8c3649bf21c8527cc370498cb2c11d16e9d8c4b26dd456"
+    },
+    {
+      "byte_length": 3376,
+      "path": "warhammer40k_core/engine/native_gathering_weapon_source_rules.py",
+      "sha256": "e74bd88b96024a31512c26fff3dcf13dc946aa7435b4d3dbbaa8026cd243c574"
+    },
+    {
       "byte_length": 10523,
       "path": "warhammer40k_core/engine/nonattack_modifier_evaluation.py",
       "sha256": "ffdad2ec228e773f9706460717604f3bb0b6ff82339cd5d51898dc97494b6ff3"
@@ -11200,9 +11250,9 @@
       "sha256": "fef9f598dfba2b6d63905044d96d3311ef17d0cadc0b6fa319f40b4fcdf5c23f"
     },
     {
-      "byte_length": 7412,
+      "byte_length": 7842,
       "path": "warhammer40k_core/engine/obscuring_model_cover.py",
-      "sha256": "9b56bcdac090fa87dde23301c1b599e585bbd37558044bbbb4c24a491df154af"
+      "sha256": "762b553dbfd400cae925bde94a301813805c937fc3d74a2f8267c9ee0a1d5554"
     },
     {
       "byte_length": 43730,
@@ -11270,9 +11320,9 @@
       "sha256": "87a09a56764b9e0fcde3c024a94ca547a807a74eec5336d93c653b44924bf0f8"
     },
     {
-      "byte_length": 134965,
+      "byte_length": 135153,
       "path": "warhammer40k_core/engine/phases/fight.py",
-      "sha256": "cc83944e0c9c2839bc24d7bac138c6187853ddcfebd9a4f39791f91b84975909"
+      "sha256": "85db1b94649a35c8688b86127c2ba18932a4783ecea4233b125021e6b6001478"
     },
     {
       "byte_length": 2169,
@@ -11445,9 +11495,9 @@
       "sha256": "2b11eb3682570dc4fdbb5189a23a77598590fc8412902bfdee17e7e5889e6724"
     },
     {
-      "byte_length": 60772,
+      "byte_length": 61094,
       "path": "warhammer40k_core/engine/phases/shooting_handler.py",
-      "sha256": "7eb62dc82222d2ebe0f6c1dccee3ef2b6ccaf9ae766b13ccb12ab1ed87a22c75"
+      "sha256": "72ea90baad2c2f0eb80ba88d6d3f74ae04a5882248e5551b18a72eabd0345f74"
     },
     {
       "byte_length": 16714,
@@ -11525,9 +11575,9 @@
       "sha256": "ebbfa4bc43b91344144b1d59951cd5452c596448337be0a05dc14aecbcd7cdf2"
     },
     {
-      "byte_length": 5921,
+      "byte_length": 6211,
       "path": "warhammer40k_core/engine/post_roll_weapon_profile_modifiers.py",
-      "sha256": "ff6c156cf54d6ce5de6b2ce1c87cc4e9bbfa8b7475922a2812e06ee86cd6ed7f"
+      "sha256": "44cb66076cd74df723148a320060244e199202947e424133e3fa03e3b5481927"
     },
     {
       "byte_length": 92797,
@@ -12005,9 +12055,9 @@
       "sha256": "ef40df18761ceaf15832bce619df249a1fd7039552b84b8077664013f032cbfc"
     },
     {
-      "byte_length": 6082,
+      "byte_length": 6148,
       "path": "warhammer40k_core/engine/psychic_preparation.py",
-      "sha256": "645a96a18240a55451798a3ccb3120ee46ac5534e1d09790bff771846207d4b0"
+      "sha256": "b98ad890cdb239219d7343e33a262e541f72ebebbae6554bd86c0b4cc20f85df"
     },
     {
       "byte_length": 1383,
@@ -12020,9 +12070,9 @@
       "sha256": "76a0ff22895267c3d53c8f70c020b85846f7ed4856fbbde45d3b870dcd8dde20"
     },
     {
-      "byte_length": 7708,
+      "byte_length": 11681,
       "path": "warhammer40k_core/engine/random_profile_attack_groups.py",
-      "sha256": "abbae5d1acf8c2cfbac7450f2545c790cd5fecbb15195b6dc3692b6961ca4aa4"
+      "sha256": "7801bbfc569fec0936af85eff7f4182062d27ea5662ff1230c89495d0805e9c0"
     },
     {
       "byte_length": 12482,
@@ -12065,9 +12115,9 @@
       "sha256": "9b16b49dee240fa9b8fde5f40ba3d93a2123dbff14af914e4c3efb4ae715f697"
     },
     {
-      "byte_length": 11286,
+      "byte_length": 14492,
       "path": "warhammer40k_core/engine/random_weapon_restore.py",
-      "sha256": "f8b2e12272948c7809516ee9840ec23d9cec2975bb9258a95ccc040a197e7301"
+      "sha256": "b6e5588ba8c6bac4487581d0fd796fe6c22880661c396a7bb8313ca5b9c3e253"
     },
     {
       "byte_length": 9693,
@@ -12345,9 +12395,9 @@
       "sha256": "6a26ac11e306cb47dd9b70fa5a40756cbf8b7c3732a6607a5da74498565e0648"
     },
     {
-      "byte_length": 8383,
+      "byte_length": 9303,
       "path": "warhammer40k_core/engine/rule_ir_weapon_modifiers.py",
-      "sha256": "04d67ae613efae90e708fa7bc088f9b78d2a401ea9f55120f6baf5f60fa7d9a7"
+      "sha256": "156f985084ac71f09b96d0a7f6ec91ee6d30437febc673f4e43c889efa0a028b"
     },
     {
       "byte_length": 60599,
@@ -12455,9 +12505,9 @@
       "sha256": "87d0d69c762333163564703ffc7ec72a0b7eb731e1a157e1d4861585b0875106"
     },
     {
-      "byte_length": 55702,
+      "byte_length": 56756,
       "path": "warhammer40k_core/engine/runtime_modifiers.py",
-      "sha256": "532cfdbd1c88b1d024557e161036d553544e6cd01a3206c249a5cc192eb7c98c"
+      "sha256": "876b2bcf0c91c89c8b379dcc59a40d2b75add5459f839b4b5125bc7eb0adeef1"
     },
     {
       "byte_length": 20012,

@@ -76,7 +76,16 @@ def _select_or_request_next_gathered_group(
     state: GameState,
     decisions: DecisionController,
     attack_sequence: AttackSequence,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    has_custom_callbacks: bool,
 ) -> tuple[AttackSequence, LifecycleStatus | None]:
+    from warhammer40k_core.engine.native_attack_gathering import (
+        native_gathered_attack_groups_for_target,
+    )
+    from warhammer40k_core.engine.attack_sequence_selection import (
+        request_for_gathered_attack_groups,
+    )
+
     current = attack_sequence
     while current.current_gathered_group is None and not current.is_complete:
         target_ids = unresolved_target_unit_ids(current)
@@ -127,21 +136,25 @@ def _select_or_request_next_gathered_group(
             current = current.with_selected_target_unit(target_id)
             continue
         target_unit_instance_id = current.selected_target_unit_instance_id
-        groups = gathered_attack_groups_for_target(
+        groups = native_gathered_attack_groups_for_target(
+            state=state,
+            registry=runtime_modifier_registry,
             attack_sequence=current,
             target_unit_instance_id=target_unit_instance_id,
             target_has_character=target_has_character_for_attack_group(
                 state=state, target_unit_instance_id=target_unit_instance_id
             ),
+            has_custom_callbacks=has_custom_callbacks,
         )
         if not groups:
             current = current.without_selected_target_unit()
             continue
-        request = build_select_attack_weapon_group_request(
+        request = request_for_gathered_attack_groups(
             request_id=state.next_decision_request_id(),
             state=state,
             attack_sequence=current,
             target_unit_instance_id=target_unit_instance_id,
+            groups=groups,
         )
         if len(groups) > 1:
             decisions.request_decision(request)

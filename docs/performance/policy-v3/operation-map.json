@@ -6208,6 +6208,913 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "s25-src-warhammer40k_core-adapters-redaction": {
+      "paths": [
+        "src/warhammer40k_core/adapters/redaction.py"
+      ],
+      "owners": [
+        "_without_internal_authority_commitments"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-allocated_attack_damage_modifiers": {
+      "paths": [
+        "src/warhammer40k_core/engine/allocated_attack_damage_modifiers.py"
+      ],
+      "owners": [
+        "@module",
+        "AllocatedAttackDamageModifierBinding",
+        "AllocatedAttackDamageModifierBinding.__post_init__"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-attack_gathering_dependencies": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_gathering_dependencies.py"
+      ],
+      "owners": [
+        "@module",
+        "AttackGatheringDependency",
+        "validate_gathering_dependency",
+        "validate_save_gathering_characteristics"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-attack_gathering_wound_rules": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_gathering_wound_rules.py"
+      ],
+      "owners": [
+        "@module",
+        "WoundGatheringContext",
+        "WoundGatheringContext.__post_init__",
+        "WoundGatheringPredicate",
+        "validate_wound_gathering_handler"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-attack_sequence_selection": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_selection.py"
+      ],
+      "owners": [
+        "_synthetic_pool_for_gathered_group",
+        "request_for_gathered_attack_groups"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-attack_sequence_state": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_state.py"
+      ],
+      "owners": [
+        "AttackSequence.__post_init__",
+        "AttackSequence.current_pool",
+        "_validate_persisted_attack_context_weapon_instance_id"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-catalog_attack_context_rule_runtime": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_attack_context_rule_runtime.py"
+      ],
+      "owners": [
+        "_defensive_wound_source_applies",
+        "defensive_strength_toughness_gathering_handler",
+        "defensive_strength_toughness_wound_handler"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-catalog_datasheet_rule_runtime": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_datasheet_rule_runtime.py"
+      ],
+      "owners": [
+        "CatalogDatasheetRuleRuntime._wound_roll_handler",
+        "CatalogDatasheetRuleRuntime.allocated_attack_damage_modifier_bindings",
+        "CatalogDatasheetRuleRuntime.failed_save_damage_replacement_bindings",
+        "CatalogDatasheetRuleRuntime.save_option_modifier_bindings",
+        "CatalogDatasheetRuleRuntime.wound_roll_modifier_bindings"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-catalog_modifier_ignore": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_modifier_ignore.py"
+      ],
+      "owners": [
+        "_modifier_ignore_permissions_for_subject",
+        "_modifier_ignore_subject_inventory",
+        "_persisted_subject_permissions",
+        "_require_permission_restriction_context",
+        "_require_permission_restriction_schema",
+        "modifier_ignore_permissions_for_subject",
+        "modifier_ignore_sources_for_gathering",
+        "modifier_ignore_templates_for_gathering"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-catalog_modifier_ignore_sources": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_modifier_ignore_sources.py"
+      ],
+      "owners": [
+        "@module",
+        "ModifierIgnoreGatheringSources",
+        "ModifierIgnoreSourceTemplate",
+        "explicit_modifier_ignore_kinds_for_gathering",
+        "persisted_modifier_ignore_source_templates"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-faction_content-warhammer_40000_11th-astra_militarum-army_rule": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/astra_militarum/army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "runtime_contribution"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-faction_content-warhammer_40000_11th-black_templars-army_rule": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/black_templars/army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "accept_any_challenge_wound_gathering_modifier",
+        "accept_any_challenge_wound_roll_modifier",
+        "runtime_contribution"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-faction_content-warhammer_40000_11th-chaos_knights-army_rule": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_knights/army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "harbingers_doom_wound_gathering_modifier",
+        "harbingers_doom_wound_roll_modifier",
+        "runtime_contribution"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-faction_content-warhammer_40000_11th-death_guard-army_rule": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/death_guard/army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "runtime_contribution"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-faction_content-warhammer_40000_11th-leagues_of_votann-army_rule": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/leagues_of_votann/army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "prioritised_efficiency_wound_gathering_modifier",
+        "prioritised_efficiency_wound_roll_modifier",
+        "runtime_contribution"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-faction_content-warhammer_40000_11th-orks-army_rule": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/orks/army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "runtime_contribution"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-faction_content-warhammer_40000_11th-space_marines-army_rule": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/space_marines/army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "oath_of_moment_wound_gathering_modifier",
+        "oath_of_moment_wound_roll_modifier",
+        "runtime_contribution"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-generic_attack_roll_modifiers": {
+      "paths": [
+        "src/warhammer40k_core/engine/generic_attack_roll_modifiers.py"
+      ],
+      "owners": [
+        "@text"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-generic_attack_save_modifiers": {
+      "paths": [
+        "src/warhammer40k_core/engine/generic_attack_save_modifiers.py"
+      ],
+      "owners": [
+        "@text"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-generic_rule_ability_registry": {
+      "paths": [
+        "src/warhammer40k_core/engine/generic_rule_ability_registry.py"
+      ],
+      "owners": [
+        "@module",
+        "GenericRuleSaveOptionModifierAbility",
+        "GenericRuleSaveOptionModifierAbility.__post_init__"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-generic_rule_ability_registry_aeldari_defaults": {
+      "paths": [
+        "src/warhammer40k_core/engine/generic_rule_ability_registry_aeldari_defaults.py"
+      ],
+      "owners": [
+        "@module",
+        "aeldari_corsair_coterie_save_option_modifier_abilities"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-generic_rule_attack_hooks": {
+      "paths": [
+        "src/warhammer40k_core/engine/generic_rule_attack_hooks.py"
+      ],
+      "owners": [
+        "_generic_effect_context_applies",
+        "_generic_effect_target_constraint_applies",
+        "_matching_generic_attack_effects",
+        "generic_effect_context_applies",
+        "generic_effect_gathering_context_applies"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-generic_rule_lifecycle_hooks": {
+      "paths": [
+        "src/warhammer40k_core/engine/generic_rule_lifecycle_hooks.py"
+      ],
+      "owners": [
+        "save_option_modifier_bindings"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-hit_thresholds": {
+      "paths": [
+        "src/warhammer40k_core/engine/hit_thresholds.py"
+      ],
+      "owners": [
+        "@text"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-native_attack_gathering": {
+      "paths": [
+        "src/warhammer40k_core/engine/native_attack_gathering.py"
+      ],
+      "owners": [
+        "@module",
+        "NativeAttackSnapshot",
+        "NativeAttackSnapshot.__post_init__",
+        "NativeAttackSnapshot.equivalence_key",
+        "NativeAttackSnapshot.from_payload",
+        "NativeAttackSnapshot.to_payload",
+        "NativeAttackSnapshot.validate_pool",
+        "NativeAttackSnapshotPayload",
+        "_canonical_object",
+        "_conservative_inventory",
+        "_current_applicable_rules",
+        "_dice_override_sources",
+        "_digest_object",
+        "_pool_digest",
+        "_post_roll_pool_for_context",
+        "_semantic_signature",
+        "gathered_groups_for_pending_request",
+        "groups_from_native_snapshots",
+        "native_attack_snapshot",
+        "native_context_pool",
+        "native_gathered_attack_groups_for_target",
+        "native_pool_for_wound_occurrence",
+        "validate_native_group_snapshots"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-native_gathering_characteristic_rules": {
+      "paths": [
+        "src/warhammer40k_core/engine/native_gathering_characteristic_rules.py"
+      ],
+      "owners": [
+        "@module",
+        "_compare_descriptor",
+        "_compare_operations",
+        "_compare_references",
+        "compare_characteristic_descriptors"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-native_gathering_cover_rules": {
+      "paths": [
+        "src/warhammer40k_core/engine/native_gathering_cover_rules.py"
+      ],
+      "owners": [
+        "@module",
+        "compare_cover_modifier",
+        "cover_gathering_inventories"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-native_gathering_numeric_rules": {
+      "paths": [
+        "src/warhammer40k_core/engine/native_gathering_numeric_rules.py"
+      ],
+      "owners": [
+        "@module",
+        "gathering_numeric_values",
+        "wound_gathering_inventory",
+        "wound_gathering_templates"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-native_gathering_permission_relevance": {
+      "paths": [
+        "src/warhammer40k_core/engine/native_gathering_permission_relevance.py"
+      ],
+      "owners": [
+        "@module",
+        "_generic_damage_source_may_apply",
+        "_has_profile_operations",
+        "_save_provider_may_modify",
+        "attacker_permission_kinds_for_gathering",
+        "generic_source_inventory",
+        "target_permission_kinds_for_gathering",
+        "unused_attack_characteristic_sources",
+        "unused_attacker_ignore_sources",
+        "unused_fixed_damage_roll_sources"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-native_gathering_subject_rules": {
+      "paths": [
+        "src/warhammer40k_core/engine/native_gathering_subject_rules.py"
+      ],
+      "owners": [
+        "@module",
+        "subject_rule_comparison"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-native_gathering_weapon_source_rules": {
+      "paths": [
+        "src/warhammer40k_core/engine/native_gathering_weapon_source_rules.py"
+      ],
+      "owners": [
+        "@module",
+        "owned_weapon_source_comparison"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-post_roll_weapon_profile_modifiers": {
+      "paths": [
+        "src/warhammer40k_core/engine/post_roll_weapon_profile_modifiers.py"
+      ],
+      "owners": [
+        "@module",
+        "PostRollWeaponProfileModifierBinding",
+        "PostRollWeaponProfileModifierBinding.__post_init__"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-random_profile_attack_groups": {
+      "paths": [
+        "src/warhammer40k_core/engine/random_profile_attack_groups.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-random_weapon_restore": {
+      "paths": [
+        "src/warhammer40k_core/engine/random_weapon_restore.py"
+      ],
+      "owners": [
+        "@module",
+        "validate_random_weapon_history"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-runtime_modifiers": {
+      "paths": [
+        "src/warhammer40k_core/engine/runtime_modifiers.py"
+      ],
+      "owners": [
+        "FailedSaveDamageReplacementBinding",
+        "FailedSaveDamageReplacementBinding.__post_init__",
+        "SaveOptionModifierBinding",
+        "SaveOptionModifierBinding.__post_init__",
+        "WoundRollModifierBinding",
+        "WoundRollModifierBinding.__post_init__"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_declared_rule_helpers": {
+      "paths": [
+        "tests/s25_declared_rule_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "declared_activated_reroll_ability",
+        "declared_activated_variant_ability",
+        "declared_own_ignore_ability",
+        "declared_uniform_hit_ability"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_fixed_damage_relevance_helpers": {
+      "paths": [
+        "tests/s25_fixed_damage_relevance_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "declared_fixed_damage_roll_ability"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_gathering_helpers": {
+      "paths": [
+        "tests/s25_gathering_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "native_two_bearer_inputs"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_generic_damage_permission_helpers": {
+      "paths": [
+        "tests/s25_generic_damage_permission_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "declared_shared_damage_permission"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_generic_source_relevance_helpers": {
+      "paths": [
+        "tests/s25_generic_source_relevance_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "declared_attack_relevance_characteristic"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_native_profile_helpers": {
+      "paths": [
+        "tests/s25_native_profile_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "native_profile_request"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_permission_relevance_helpers": {
+      "paths": [
+        "tests/s25_permission_relevance_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "declared_activated_relevance_ability",
+        "declared_passive_invulnerable_provider_ability"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_random_melee_gathering_helpers": {
+      "paths": [
+        "tests/s25_random_melee_gathering_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "random_ws_melee_request"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_shared_unit_permission_helpers": {
+      "paths": [
+        "tests/s25_shared_unit_permission_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "declared_shared_unit_permission_ability"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_applicability_inventory": {
+      "paths": [
+        "tests/unit/test_s25_applicability_inventory.py"
+      ],
+      "owners": [
+        "@module",
+        "group_count",
+        "inputs",
+        "test_different_operative_characteristics_remain_separate",
+        "test_equal_applicability_gathers_and_real_bearer_modifier_difference_separates",
+        "test_native_same_bearer_subgroup_keeps_each_actual_equipped_copy",
+        "test_shared_target_only_provider_has_no_physical_bearer_veto"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_conditional_rule_templates": {
+      "paths": [
+        "tests/unit/test_s25_conditional_rule_templates.py"
+      ],
+      "owners": [
+        "@module",
+        "test_symbolic_permission_keeps_numeric_predicate_and_nonnumeric_gates"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_continuation_and_persistence": {
+      "paths": [
+        "tests/unit/test_s25_continuation_and_persistence.py"
+      ],
+      "owners": [
+        "@module",
+        "generated_session",
+        "test_malformed_native_group_payload_rejects_without_changing_generated_state",
+        "test_restored_and_forked_native_pool_continue_with_exact_physical_dice_and_events"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_cross_bearer_gathering": {
+      "paths": [
+        "tests/unit/test_s25_cross_bearer_gathering.py"
+      ],
+      "owners": [
+        "@module",
+        "_declare_two_bearers",
+        "test_native_equal_bearers_keep_each_physical_attack_in_one_gathered_pool",
+        "test_native_gathered_hit_wound_save_boundaries_survive_retry_restore_and_completion"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_fixed_damage_relevance": {
+      "paths": [
+        "tests/unit/test_s25_fixed_damage_relevance.py"
+      ],
+      "owners": [
+        "@module",
+        "test_native_fixed_damage_excludes_only_unused_roll_sources"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_gathering_views": {
+      "paths": [
+        "tests/unit/test_s25_gathering_views.py"
+      ],
+      "owners": [
+        "@module",
+        "test_native_gathering_proofs_are_internal_on_all_role_views_and_event_deltas"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_generic_damage_permission": {
+      "paths": [
+        "tests/unit/test_s25_generic_damage_permission.py"
+      ],
+      "owners": [
+        "@module",
+        "test_native_generic_damage_permission_retains_actual_consumer_dependencies"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_generic_source_relevance": {
+      "paths": [
+        "tests/unit/test_s25_generic_source_relevance.py"
+      ],
+      "owners": [
+        "@module",
+        "test_native_generic_sources_follow_actual_attack_consumers"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_melee_gathering": {
+      "paths": [
+        "tests/unit/test_s25_melee_gathering.py"
+      ],
+      "owners": [
+        "@module",
+        "test_melee_cross_bearer_pool_preserves_rerolls_allocation_and_native_continuation"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_own_model_gathering": {
+      "paths": [
+        "tests/unit/test_s25_own_model_gathering.py"
+      ],
+      "owners": [
+        "@module",
+        "test_normal_uniform_own_model_clauses_gather_without_sharing_source_ownership"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_permission_relevance": {
+      "paths": [
+        "tests/unit/test_s25_permission_relevance.py"
+      ],
+      "owners": [
+        "@module",
+        "test_normal_native_relevant_operations_and_owned_selected_sources",
+        "test_public_selected_shared_unit_permission_keeps_source_and_attack_subjects",
+        "test_save_provider_output_inventory_keeps_unknown_and_validates_known_slots"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_physical_weapon_completion": {
+      "paths": [
+        "tests/unit/test_s25_physical_weapon_completion.py"
+      ],
+      "owners": [
+        "@module",
+        "test_native_physical_weapons_keep_random_counts_and_completion_authority"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_random_profile_gathering": {
+      "paths": [
+        "tests/unit/test_s25_random_profile_gathering.py"
+      ],
+      "owners": [
+        "@module",
+        "test_native_random_profiles_group_without_early_or_shared_occurrence_rolls",
+        "test_predeclared_random_ws_preserves_physical_melee_occurrences"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-src-warhammer40k_core-engine-rule_ir_weapon_modifiers": {
+      "paths": [
+        "src/warhammer40k_core/engine/rule_ir_weapon_modifiers.py"
+      ],
+      "owners": [
+        "rule_ir_modified_weapon_profile",
+        "rule_ir_weapon_characteristic_applies"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_characteristic_melee_projection_helpers": {
+      "paths": [
+        "tests/s25_characteristic_melee_projection_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "projection_melee_request"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_characteristic_projection_helpers": {
+      "paths": [
+        "tests/s25_characteristic_projection_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "declared_projection_ability",
+        "projection_shooting_request"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_characteristic_profile_gates": {
+      "paths": [
+        "tests/unit/test_s25_characteristic_profile_gates.py"
+      ],
+      "owners": [
+        "@module",
+        "test_admitted_melee_root_uses_actual_skill_and_range_gates",
+        "test_original_dispatch_validation_precedes_known_profile_noop"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_characteristic_projection": {
+      "paths": [
+        "tests/unit/test_s25_characteristic_projection.py"
+      ],
+      "owners": [
+        "@module",
+        "test_native_characteristic_sources_project_to_real_attack_subjects"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_original_fixture_controls": {
+      "paths": [
+        "tests/s25_original_fixture_controls.py"
+      ],
+      "owners": [
+        "@module",
+        "retained_distinct_weapon_catalog"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-unit-test_s25_consumed_attack_quantities": {
+      "paths": [
+        "tests/unit/test_s25_consumed_attack_quantities.py"
+      ],
+      "owners": [
+        "@module",
+        "test_actual_consumed_counts_share_hit_stage_without_sharing_physical_authority"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-data-source_audits-s25-baseline-tests-test_order92_random_melee.py.txt": {
+      "paths": [
+        "data/source_audits/s25/baseline-tests/test_order92_random_melee.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-data-source_audits-s25-baseline-tests-test_retained_shooting.py.txt": {
+      "paths": [
+        "data/source_audits/s25/baseline-tests/test_retained_shooting.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-data-source_audits-s25-test-preservation": {
+      "paths": [
+        "data/source_audits/s25/test-preservation.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "s25-tests-s25_test_preservation_helpers": {
+      "paths": [
+        "tests/s25_test_preservation_helpers.py"
+      ],
+      "owners": [
+        "@module",
+        "_expression",
+        "_git_blob",
+        "_one_call",
+        "_one_function",
+        "_one_keyword",
+        "_pinned_bytes",
+        "_same_ast",
+        "_same_manifest_value",
+        "assert_s25_fixture_only_ast",
+        "assert_s25_manifest_layout",
+        "preserved_s25_predecessor_test_bytes"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

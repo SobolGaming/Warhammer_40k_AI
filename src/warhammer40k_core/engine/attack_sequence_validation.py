@@ -110,7 +110,14 @@ def _validate_gathered_group_matches_attack_pools(
             raise GameLifecycleError("GatheredAttackGroup contribution pool drift.")
         if pool.target_unit_instance_id != gathered_group.target_unit_instance_id:
             raise GameLifecycleError("GatheredAttackGroup target pool drift.")
-        if (
+        if gathered_group.native_snapshots:
+            snapshot = next(
+                item
+                for item in gathered_group.native_snapshots
+                if item.pool_index == contribution.pool_index
+            )
+            snapshot.validate_pool(pool, target_has_character=gathered_group.target_has_character)
+        elif (
             identical_attack_signature(
                 pool, target_has_character=gathered_group.target_has_character
             )

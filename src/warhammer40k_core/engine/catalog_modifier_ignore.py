@@ -28,6 +28,9 @@ from warhammer40k_core.rules.rule_ir import (
 )
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.catalog_modifier_ignore_sources import (
+        ModifierIgnoreGatheringSources,
+    )
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.generic_rule_effect_targets import GenericAttackEffect
     from warhammer40k_core.engine.modifier_permission_context import ModifierPermissionAttackContext
@@ -280,12 +283,168 @@ def modifier_ignore_permissions_for_subject(
     weapon_profile_id: str | None = None,
     attack_context: ModifierPermissionAttackContext | None = None,
 ) -> tuple[CatalogModifierIgnorePermission, ...]:
+    return _modifier_ignore_permissions_for_subject(
+        state=state,
+        ability_index=ability_index,
+        unit_instance_id=unit_instance_id,
+        kind=kind,
+        model_instance_id=model_instance_id,
+        weapon_profile_id=weapon_profile_id,
+        attack_context=attack_context,
+        gathering_templates=False,
+    )
+
+
+def modifier_ignore_templates_for_gathering(
+    *,
+    state: GameState,
+    ability_index: AbilityCatalogIndex,
+    unit_instance_id: str,
+    kind: ModifierIgnoreKind,
+    model_instance_id: str | None = None,
+    weapon_profile_id: str | None = None,
+    attack_context: ModifierPermissionAttackContext,
+) -> tuple[CatalogModifierIgnorePermission, ...]:
+    """Read source templates; this does not grant an occurrence ignore choice."""
+    return _modifier_ignore_permissions_for_subject(
+        state=state,
+        ability_index=ability_index,
+        unit_instance_id=unit_instance_id,
+        kind=kind,
+        model_instance_id=model_instance_id,
+        weapon_profile_id=weapon_profile_id,
+        attack_context=attack_context,
+        gathering_templates=True,
+    )
+
+
+def modifier_ignore_sources_for_gathering(
+    *,
+    state: GameState,
+    ability_index: AbilityCatalogIndex,
+    unit_instance_id: str,
+    kind: ModifierIgnoreKind,
+    model_instance_id: str | None = None,
+    weapon_profile_id: str | None = None,
+    attack_context: ModifierPermissionAttackContext,
+) -> ModifierIgnoreGatheringSources:
+    """Read source templates; occurrence permission grammar stays at its consumer."""
+    from warhammer40k_core.engine.catalog_modifier_ignore_sources import (
+        ModifierIgnoreGatheringSources,
+        persisted_modifier_ignore_source_templates,
+    )
+
+    view, current_ids, model_id, profile_id, subject_context = _modifier_ignore_subject_inventory(
+        state=state,
+        ability_index=ability_index,
+        unit_instance_id=unit_instance_id,
+        kind=kind,
+        model_instance_id=model_instance_id,
+        weapon_profile_id=weapon_profile_id,
+        attack_context=attack_context,
+    )
+    if not current_ids or (model_id is not None and model_id not in current_ids):
+        return ModifierIgnoreGatheringSources((), ())
+    context = _permission_attack_context_for_subject(
+        state=state, view=view, model_id=model_id, profile_id=profile_id, context=attack_context
+    )
+    catalog = _catalog_subject_permissions(
+        state=state,
+        ability_index=ability_index,
+        view=view,
+        current_ids=current_ids,
+        model_id=model_id,
+        profile_id=profile_id,
+        kind=kind,
+        subject_context=subject_context,
+    )
+    return ModifierIgnoreGatheringSources(
+        tuple(sorted(catalog, key=lambda permission: permission.permission_id)),
+        persisted_modifier_ignore_source_templates(
+            state=state,
+            view=view,
+            current_ids=current_ids,
+            model_id=model_id,
+            kind=kind,
+            subject_context=subject_context,
+            context=context,
+        ),
+    )
+
+
+def _modifier_ignore_permissions_for_subject(
+    *,
+    state: GameState,
+    ability_index: AbilityCatalogIndex,
+    unit_instance_id: str,
+    kind: ModifierIgnoreKind,
+    model_instance_id: str | None,
+    weapon_profile_id: str | None,
+    attack_context: ModifierPermissionAttackContext | None,
+    gathering_templates: bool,
+) -> tuple[CatalogModifierIgnorePermission, ...]:
     """Resolve current permission sources without granting physical weapon authority.
 
     The calling operation owns the selected profile's equipped-weapon/AttackPool
     validation. This query additionally enforces every source record's model,
     wargear and profile constraint against that authenticated subject.
     """
+    view, current_ids, model_id, profile_id, subject_context = _modifier_ignore_subject_inventory(
+        state=state,
+        ability_index=ability_index,
+        unit_instance_id=unit_instance_id,
+        kind=kind,
+        model_instance_id=model_instance_id,
+        weapon_profile_id=weapon_profile_id,
+        attack_context=attack_context,
+    )
+    if not current_ids or (model_id is not None and model_id not in current_ids):
+        return ()
+    permissions = _catalog_subject_permissions(
+        state=state,
+        ability_index=ability_index,
+        view=view,
+        current_ids=current_ids,
+        model_id=model_id,
+        profile_id=profile_id,
+        kind=kind,
+        subject_context=subject_context,
+    )
+    if permissions and attack_context is not None:
+        _permission_attack_context_for_subject(
+            state=state,
+            view=view,
+            model_id=model_id,
+            profile_id=profile_id,
+            context=attack_context,
+        )
+    permissions.extend(
+        _persisted_subject_permissions(
+            state=state,
+            view=view,
+            current_ids=current_ids,
+            model_id=model_id,
+            profile_id=profile_id,
+            kind=kind,
+            subject_context=subject_context,
+            attack_context=attack_context,
+            gathering_templates=gathering_templates,
+        )
+    )
+    return tuple(sorted(permissions, key=lambda permission: permission.permission_id))
+
+
+def _modifier_ignore_subject_inventory(
+    *,
+    state: GameState,
+    ability_index: AbilityCatalogIndex,
+    unit_instance_id: str,
+    kind: ModifierIgnoreKind,
+    model_instance_id: str | None,
+    weapon_profile_id: str | None,
+    attack_context: ModifierPermissionAttackContext | None,
+) -> tuple[RulesUnitView, tuple[str, ...], str | None, str | None, dict[str, JsonValue]]:
+    """Shared physical subject lookup, with the original validation and presence owner."""
     from warhammer40k_core.engine.ability_presence import ability_presence
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.modifier_permission_context import ModifierPermissionAttackContext
@@ -316,8 +475,6 @@ def modifier_ignore_permissions_for_subject(
     if profile_id is not None and model_id is None:
         raise GameLifecycleError("Modifier-ignore weapon subject requires its model owner.")
     current_ids = ability_presence(state=state, rules_unit=view).active_model_ids
-    if not current_ids or (model_id is not None and model_id not in current_ids):
-        return ()
     subject_context: dict[str, JsonValue] = {
         "subject_unit_instance_id": view.unit_instance_id,
         "subject_component_unit_instance_id": requested_unit_id,
@@ -325,37 +482,7 @@ def modifier_ignore_permissions_for_subject(
         "subject_weapon_profile_id": profile_id,
         "subject_kind": kind.value,
     }
-    permissions = _catalog_subject_permissions(
-        state=state,
-        ability_index=ability_index,
-        view=view,
-        current_ids=current_ids,
-        model_id=model_id,
-        profile_id=profile_id,
-        kind=kind,
-        subject_context=subject_context,
-    )
-    if permissions and attack_context is not None:
-        _permission_attack_context_for_subject(
-            state=state,
-            view=view,
-            model_id=model_id,
-            profile_id=profile_id,
-            context=attack_context,
-        )
-    permissions.extend(
-        _persisted_subject_permissions(
-            state=state,
-            view=view,
-            current_ids=current_ids,
-            model_id=model_id,
-            profile_id=profile_id,
-            kind=kind,
-            subject_context=subject_context,
-            attack_context=attack_context,
-        )
-    )
-    return tuple(sorted(permissions, key=lambda permission: permission.permission_id))
+    return view, current_ids, model_id, profile_id, subject_context
 
 
 def _catalog_subject_permissions(
@@ -529,9 +656,11 @@ def _persisted_subject_permissions(
     kind: ModifierIgnoreKind,
     subject_context: dict[str, JsonValue],
     attack_context: ModifierPermissionAttackContext | None,
+    gathering_templates: bool = False,
 ) -> list[CatalogModifierIgnorePermission]:
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
         generic_effect_context_applies,
+        generic_effect_gathering_context_applies,
         generic_matching_unit_effect_applications,
     )
     from warhammer40k_core.engine.generic_rule_effect_targets import generic_effect_role_applies
@@ -606,11 +735,18 @@ def _persisted_subject_permissions(
             legacy_target_role_allowed=lambda _effect: True,
         ):
             continue
-        _require_permission_restriction_context(effect=effect, context=context)
+        _require_permission_restriction_schema(
+            effect=effect, context=context, defer_numeric_constraints=gathering_templates
+        )
         subject_model_id = (
             current_ids[0] if model_id is None and len(current_ids) == 1 else model_id
         )
-        if not generic_effect_context_applies(
+        context_query = (
+            generic_effect_gathering_context_applies
+            if gathering_templates
+            else generic_effect_context_applies
+        )
+        if not context_query(
             state=state,
             effect=effect,
             attacking_unit_instance_id=(
@@ -697,8 +833,11 @@ def _permission_attack_context_for_subject(
     )
 
 
-def _require_permission_restriction_context(
-    *, effect: GenericAttackEffect, context: ModifierPermissionAttackContext | None
+def _require_permission_restriction_schema(
+    *,
+    effect: GenericAttackEffect,
+    context: ModifierPermissionAttackContext | None,
+    defer_numeric_constraints: bool,
 ) -> None:
     from warhammer40k_core.engine.generic_rule_attack_conditions import (
         generic_rule_conditions_require_source_model_instance_id,
@@ -799,6 +938,7 @@ def _require_permission_restriction_context(
         context is not None
         and "attack_strength_greater_than_target_toughness" in constraints
         and (context.attack_strength is None or context.target_toughness is None)
+        and not defer_numeric_constraints
     ):
         raise UnsupportedModifierPermissionContextError(
             "Persisted modifier-ignore restriction is unsupported without resolved attack "

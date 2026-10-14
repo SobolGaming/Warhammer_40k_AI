@@ -160,8 +160,22 @@ def validate_wound_reroll_request(lifecycle: GameLifecycle, request: DecisionReq
         attack_sequence=sequence, attack_context_id=context_id
     ):
         raise GameLifecycleError("Wound reroll attack context drift.")
-    physical = _unresolved_gathered_wound(sequence=sequence, events=decisions.event_log.records)
-    pool = sequence.current_pool()
+    if (
+        sequence.current_gathered_group is not None
+        and sequence.current_gathered_group.native_snapshots
+    ):
+        from warhammer40k_core.engine.gathered_dice_occurrence import unresolved_dice_occurrence
+
+        occurrence = unresolved_dice_occurrence(
+            sequence=sequence, events=decisions.event_log.records
+        )
+        if occurrence.step != "wound" or occurrence.sequence.attack_context_id() != context_id:
+            raise GameLifecycleError("Wound reroll native physical occurrence drift.")
+        physical = occurrence.physical
+        pool = occurrence.sequence.current_pool()
+    else:
+        physical = _unresolved_gathered_wound(sequence=sequence, events=decisions.event_log.records)
+        pool = sequence.current_pool()
     if physical.spec != attack_sequence_wound_roll_spec(
         weapon_profile_id=pool.weapon_profile_id,
         attack_context_id=context_id,

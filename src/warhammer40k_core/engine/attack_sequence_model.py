@@ -15,6 +15,11 @@ from warhammer40k_core.engine.deferred_mortal_wounds import (
     DeferredMortalWoundsPayload,
 )
 from warhammer40k_core.engine.post_roll_attack_profiles import PostRollAttackPoolSetPayload
+from warhammer40k_core.engine.native_attack_gathering import (
+    NativeAttackSnapshot,
+    NativeAttackSnapshotPayload,
+    validate_native_group_snapshots,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -445,6 +450,7 @@ class GatheredAttackGroupPayload(TypedDict):
     pool_indices: list[int]
     total_attacks: int
     contributions: list[GatheredAttackContributionPayload]
+    native_snapshots: NotRequired[list[NativeAttackSnapshotPayload]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -1403,6 +1409,7 @@ class GatheredAttackGroup:
     pool_indices: tuple[int, ...]
     total_attacks: int
     contributions: tuple[GatheredAttackContribution, ...]
+    native_snapshots: tuple[NativeAttackSnapshot, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1450,13 +1457,14 @@ class GatheredAttackGroup:
             for contribution in self.contributions
         ):
             raise GameLifecycleError("GatheredAttackGroup contribution target drift.")
+        validate_native_group_snapshots(self)
 
     @property
     def primary_pool_index(self) -> int:
         return self.pool_indices[0]
 
     def to_payload(self) -> GatheredAttackGroupPayload:
-        return {
+        payload: GatheredAttackGroupPayload = {
             "group_id": self.group_id,
             "target_unit_instance_id": self.target_unit_instance_id,
             "target_has_character": self.target_has_character,
@@ -1465,6 +1473,11 @@ class GatheredAttackGroup:
             "total_attacks": self.total_attacks,
             "contributions": [contribution.to_payload() for contribution in self.contributions],
         }
+        if self.native_snapshots:
+            payload["native_snapshots"] = [
+                snapshot.to_payload() for snapshot in self.native_snapshots
+            ]
+        return payload
 
     @classmethod
     def from_payload(cls, payload: GatheredAttackGroupPayload) -> Self:
@@ -1478,5 +1491,9 @@ class GatheredAttackGroup:
             contributions=tuple(
                 GatheredAttackContribution.from_payload(contribution)
                 for contribution in payload["contributions"]
+            ),
+            native_snapshots=tuple(
+                NativeAttackSnapshot.from_payload(snapshot)
+                for snapshot in payload.get("native_snapshots", [])
             ),
         )

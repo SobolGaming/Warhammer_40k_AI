@@ -7,6 +7,7 @@ from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_gathering_dependencies import AttackGatheringDependency
 from warhammer40k_core.engine.battle_formation_hooks import (
     SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
     BattleFormationHookBinding,
@@ -121,6 +122,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=f"{HOOK_ID}:armour-save-option",
                 source_id=SOURCE_RULE_ID,
                 handler=nurgles_gift_save_option_modifier,
+                gathering_dependency=AttackGatheringDependency.TARGET_ONLY,
             ),
         ),
         movement_budget_modifier_bindings=(

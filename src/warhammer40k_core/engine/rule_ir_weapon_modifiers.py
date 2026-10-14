@@ -41,6 +41,26 @@ def rule_ir_weapon_selector_applies(
     return not names or _weapon_name_token(profile.name) in names
 
 
+def rule_ir_weapon_characteristic_applies(
+    *, characteristic: Characteristic, profile: WeaponProfile
+) -> bool:
+    """Pure property/profile gates of the actual generic weapon dispatcher.
+
+    This does not validate parameters, select a source, or apply an operation.
+    The dispatcher retains its original selector/operand/source validation order.
+    """
+    if characteristic in {Characteristic.BALLISTIC_SKILL, Characteristic.WEAPON_SKILL}:
+        return profile.skill.characteristic is characteristic
+    if characteristic is Characteristic.RANGE:
+        return profile.range_profile.kind is RangeProfileKind.DISTANCE
+    return characteristic in {
+        Characteristic.STRENGTH,
+        Characteristic.ARMOR_PENETRATION,
+        Characteristic.ATTACKS,
+        Characteristic.DAMAGE,
+    }
+
+
 def rule_ir_modified_weapon_profile(
     *, parameters: Mapping[str, object], profile: WeaponProfile, source_id: str, modifier_id: str
 ) -> WeaponProfile:
@@ -74,13 +94,17 @@ def rule_ir_modified_weapon_profile(
             source_ids=source_ids,
         )
     if characteristic in {Characteristic.BALLISTIC_SKILL, Characteristic.WEAPON_SKILL}:
-        if profile.skill.characteristic is not characteristic:
+        if not rule_ir_weapon_characteristic_applies(
+            characteristic=characteristic, profile=profile
+        ):
             return profile
         return with_weapon_skill_modifier(
             profile, modifier_id=modifier_id, source_id=source_id, delta=delta
         )
     if characteristic is Characteristic.RANGE:
-        if profile.range_profile.kind is not RangeProfileKind.DISTANCE:
+        if not rule_ir_weapon_characteristic_applies(
+            characteristic=characteristic, profile=profile
+        ):
             return profile
         return replace(
             profile,

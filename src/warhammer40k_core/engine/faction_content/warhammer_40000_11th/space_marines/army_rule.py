@@ -4,6 +4,7 @@ from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPe
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_gathering_wound_rules import WoundGatheringContext
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartEffectContext,
@@ -71,6 +72,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=OATH_WOUND_MODIFIER_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=oath_of_moment_wound_roll_modifier,
+                gathering_handler=oath_of_moment_wound_gathering_modifier,
             ),
         ),
     )
@@ -169,6 +171,12 @@ def apply_oath_of_moment_target_result(context: CommandPhaseStartResultContext) 
 def oath_of_moment_wound_roll_modifier(context: WoundRollModifierContext) -> int:
     if type(context) is not WoundRollModifierContext:
         raise GameLifecycleError("Oath of Moment wound modifier requires context.")
+    return oath_of_moment_wound_gathering_modifier(context)
+
+
+def oath_of_moment_wound_gathering_modifier(
+    context: WoundRollModifierContext | WoundGatheringContext,
+) -> int:
     if context.source_phase not in {BattlePhase.SHOOTING, BattlePhase.FIGHT}:
         return 0
     owner_id, attacking_unit = _unit_owner_and_instance_by_id(

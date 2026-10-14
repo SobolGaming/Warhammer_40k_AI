@@ -20,9 +20,9 @@ def generic_rule_modified_save_options(
     # Extracted save provider retains the same internal gates and parameter decoders.
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
         _characteristic_parameter,  # pyright: ignore[reportPrivateUsage]
-        _matching_generic_attack_effects,  # pyright: ignore[reportPrivateUsage]
+        _matching_generic_attack_effects,
         _required_int_parameter,  # pyright: ignore[reportPrivateUsage]
-        _roll_type_matches,  # pyright: ignore[reportPrivateUsage]
+        _roll_type_matches,
         generic_rule_matching_unit_effects,
         generic_rule_modifier_source_id,
     )

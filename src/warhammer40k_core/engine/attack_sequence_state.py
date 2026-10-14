@@ -240,6 +240,7 @@ class AttackSequence:
             for context in self.post_roll_attack_contexts:
                 raw_context = _validate_persisted_attack_context_weapon_instance_id(
                     value=context,
+                    attack_sequence=self,
                     expected_weapon_instance_id=expected_weapon_instance_id,
                     context_name="post-roll",
                 )
@@ -313,12 +314,14 @@ class AttackSequence:
             for save_die in self.pending_grouped_damage.sorted_save_dice:
                 _validate_persisted_attack_context_weapon_instance_id(
                     value=save_die["attack_context"],
+                    attack_sequence=self,
                     expected_weapon_instance_id=expected_weapon_instance_id,
                     context_name="pending grouped damage",
                 )
         if self.pending_destroyed_transport_disembark is not None:
             _validate_persisted_attack_context_weapon_instance_id(
                 value=self.pending_destroyed_transport_disembark.attack_context,
+                attack_sequence=self,
                 expected_weapon_instance_id=expected_weapon_instance_id,
                 context_name="pending destroyed Transport",
             )
@@ -363,7 +366,13 @@ class AttackSequence:
             pool = _synthetic_pool_for_gathered_group(
                 attack_pools=self.attack_pools,
                 gathered_group=self.current_gathered_group,
+                attack_index=self.attack_index,
             )
+            if any(
+                snapshot.source_phase is not self.source_phase
+                for snapshot in self.current_gathered_group.native_snapshots
+            ):
+                raise GameLifecycleError("AttackSequence native gathering source phase drift.")
         else:
             pool = self.attack_pools[self.pool_index]
         if self.post_roll_attack_pools is None or self.post_roll_attack_pools.selected_pool is None:
@@ -916,12 +925,18 @@ class AttackSequence:
 def _validate_persisted_attack_context_weapon_instance_id(
     *,
     value: object,
+    attack_sequence: AttackSequence,
     expected_weapon_instance_id: str,
     context_name: str,
 ) -> dict[str, object]:
     if not isinstance(value, dict):
         raise GameLifecycleError(f"AttackSequence {context_name} attack context must be an object.")
     raw_context = cast(dict[str, object], value)
+    from warhammer40k_core.engine.native_attack_gathering import native_context_pool
+
+    physical_pool = native_context_pool(attack_sequence, raw_context)
+    if physical_pool is not None:
+        expected_weapon_instance_id = physical_pool.weapon_instance_id
     weapon_instance_id = _validate_identifier(
         f"AttackSequence {context_name} weapon_instance_id",
         raw_context.get("weapon_instance_id"),

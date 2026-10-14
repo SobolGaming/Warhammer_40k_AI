@@ -243,6 +243,25 @@ def build_select_attack_weapon_group_request(
             state=state, target_unit_instance_id=target_id
         ),
     )
+    return request_for_gathered_attack_groups(
+        request_id=request_id,
+        state=state,
+        attack_sequence=attack_sequence,
+        target_unit_instance_id=target_id,
+        groups=groups,
+    )
+
+
+def request_for_gathered_attack_groups(
+    *,
+    request_id: str,
+    state: GameState,
+    attack_sequence: AttackSequence,
+    target_unit_instance_id: str,
+    groups: tuple[GatheredAttackGroup, ...],
+) -> DecisionRequest:
+    """One finite request builder for raw proofs and native semantic proofs."""
+    target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
     if not groups:
         raise GameLifecycleError("Attack weapon group selection requires unresolved groups.")
     return DecisionRequest(
@@ -407,6 +426,7 @@ def _synthetic_pool_for_gathered_group(
     *,
     attack_pools: tuple[RangedAttackPool, ...],
     gathered_group: GatheredAttackGroup,
+    attack_index: int = 0,
 ) -> RangedAttackPool:
     _validate_pool_indices_within_attack_pools(
         field_name="GatheredAttackGroup pool_indices",
@@ -414,6 +434,20 @@ def _synthetic_pool_for_gathered_group(
         attack_pools=attack_pools,
     )
     base_pool = attack_pools[gathered_group.primary_pool_index]
+    if gathered_group.native_snapshots:
+        if type(attack_index) is not int or not 0 <= attack_index < gathered_group.total_attacks:
+            raise GameLifecycleError("Native gathered physical attack index is outside the pool.")
+        offset = 0
+        for contribution in gathered_group.contributions:
+            offset += contribution.attacks
+            if attack_index < offset:
+                # Keep original model, weapon, profile, selected ability sources,
+                # targeting/Firing Deck and range evidence at this occurrence.
+                return replace(
+                    attack_pools[contribution.pool_index],
+                    attacks=gathered_group.total_attacks,
+                )
+        raise GameLifecycleError("Native gathered physical contribution is missing.")
     wargear_id = base_pool.wargear_id
     weapon_profile = base_pool.weapon_profile
     weapon_profile_id = base_pool.weapon_profile_id

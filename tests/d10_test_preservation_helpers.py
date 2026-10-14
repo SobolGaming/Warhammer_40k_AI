@@ -5,11 +5,14 @@ import hashlib
 import json
 from pathlib import Path
 
+from tests.s25_test_preservation_helpers import preserved_s25_predecessor_test_bytes
+
 ROOT = Path(__file__).resolve().parents[1]
 PRESERVATION_SHA256 = "c06f024250834310afaa16871f5d6be826e62aed100e06d40d05acf3d55f26ec"
 
 
 def preserved_d10_predecessor_test_bytes(path: str, current: bytes) -> bytes:
+    current = preserved_s25_predecessor_test_bytes(path, current)
     manifest_raw = (ROOT / "data/source_audits/d10/test-preservation.json").read_bytes()
     assert hashlib.sha256(manifest_raw).hexdigest() == PRESERVATION_SHA256
     rows = {row["path"]: row for row in json.loads(manifest_raw)["files"]}

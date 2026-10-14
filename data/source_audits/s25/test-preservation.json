@@ -1,0 +1,65 @@
+{
+  "schema": "s25-explicit-fixture-archival-preservation-v1",
+  "base": "b652c9f8148963a5a9f9a79d5ddf5e9bd230d971",
+  "base_tree": "9afc837e21d2340b6f26773d3b97e546809976c6",
+  "fixture_reviewed_head": "7a67043cc86d8772659769a94cffef289a6e3b2c",
+  "fixture_reviewed_tree": "55eb0071db356683f87f4fead17eaef5fb2ac444",
+  "qualifications": {
+    "actual_current_source_byte_equal_to_BASE": false,
+    "identical_rng_or_replay_history_claim": false,
+    "complete_original_assertions_With_branches_decorators_ceilings_preserved": true,
+    "archival_source_quality_only": true,
+    "runtime_compatibility_shim": false,
+    "passing_gate_or_CLEAN_credit": false
+  },
+  "review_evidence": {
+    "exact_design_SHA256": "de18d09f5696b3714e4f92162ab04dc90831171786c99024dd90ffba1e334201",
+    "same_coding_design_PROOF_SHA256": "0b357c3f468f7e84c077a30706f81688604bd43554d55004a08cfd3791d2d8c4",
+    "same_rules_design_PROOF_SHA256": "8f89e9f6eb04f3cd4b50bef3d6df5eacb0a29322125f5b56576f981011595acc",
+    "coding_bounded_fixture_closure_PROOF_SHA256": "7257238b1f9e0422c9fe817c6266eff923a0d2afb6f08fbcebce7928e2981821",
+    "rules_bounded_fixture_closure_PROOF_SHA256": "77ff1b358e590bc41ecae2dca0a15f31e3290d9f823ce4cfdc521c6310f644a0",
+    "complete_failed_quality_preserved_no_credit_SHA256": "86f14d432ac638f7ae9a4e376f8a719cd4f8b4bc908b2c836eb3f816eae7ec81"
+  },
+  "files": [
+    {
+      "path": "tests/integration/test_retained_shooting.py",
+      "baseline_archive": "data/source_audits/s25/baseline-tests/test_retained_shooting.py.txt",
+      "base_mode": "100644",
+      "base_git_blob": "c2a02eed6a0492a3c28d8d587fbfd758016b82ee",
+      "base_raw_bytes": 79179,
+      "base_raw_sha256": "766a18d87c0e93eefd247133cf7ff47aadfec78752bc5b676fa82c281d363037",
+      "current_mode": "100644",
+      "current_git_blob": "da1e922f32e17a107eb5c87893adb30c5d05d009",
+      "current_raw_bytes": 79460,
+      "current_raw_sha256": "72f1b2390db1f5013e96bcb43bd985a39115b5055470a128698e5c3b474c107a",
+      "current_lf_bytes": 79460,
+      "current_lf_sha256": "72f1b2390db1f5013e96bcb43bd985a39115b5055470a128698e5c3b474c107a"
+    },
+    {
+      "path": "tests/unit/test_order92_random_melee.py",
+      "baseline_archive": "data/source_audits/s25/baseline-tests/test_order92_random_melee.py.txt",
+      "base_mode": "100644",
+      "base_git_blob": "f95115c86521902eccd4dcb230f26c506a1f92b7",
+      "base_raw_bytes": 49099,
+      "base_raw_sha256": "791195d1226c39ce7856526c6653d0710648307e1fa80ec15ebd17f9c65c607d",
+      "current_mode": "100644",
+      "current_git_blob": "0ea4ce2f484f2d899b97c1d7f2dfe400dd0aada8",
+      "current_raw_bytes": 49124,
+      "current_raw_sha256": "aaec568588bd6c93867457cb1bbb9c9b397096802464de57b440f9e300befe59",
+      "current_lf_bytes": 49124,
+      "current_lf_sha256": "aaec568588bd6c93867457cb1bbb9c9b397096802464de57b440f9e300befe59"
+    }
+  ],
+  "helpers": [
+    {
+      "path": "tests/s25_original_fixture_controls.py",
+      "raw_bytes": 2715,
+      "raw_sha256": "65c77909ab6711f2687de7dedc39a840db5adb710e37b4f52126711698a8ebbd"
+    },
+    {
+      "path": "tests/random_melee_helpers.py",
+      "raw_bytes": 9924,
+      "raw_sha256": "407c76f7be4eded9ffcbe27c4593653be630d3a4114b5f441f2994d7a8a83bb8"
+    }
+  ]
+}

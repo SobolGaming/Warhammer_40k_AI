@@ -18,6 +18,10 @@ from warhammer40k_core.core.random_profile_values import (
     RandomProfileValuePayload,
 )
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
+from warhammer40k_core.engine.attack_sequence_model import (
+    GatheredAttackGroup,
+    GatheredAttackGroupPayload,
+)
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, canonical_json
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -61,6 +65,7 @@ def validate_random_weapon_history(
     if catalog is None:
         raise GameLifecycleError("Random weapon restore requires its authoritative catalog.")
     declarations: dict[str, tuple[str, tuple[RangedAttackPool, ...]]] = {}
+    native_groups: dict[str, GatheredAttackGroup] = {}
     post_roll_profiles: dict[str, WeaponProfile] = {}
     decisions = {record.result.result_id: record for record in decision_records}
     physical_rolls: dict[str, JsonValue] = {}
@@ -104,6 +109,42 @@ def validate_random_weapon_history(
                     for pool in raw_pools
                 ),
             )
+        elif event.event_type == "decision_recorded":
+            raw_result = body.get("result")
+            result_id = raw_result.get("result_id") if isinstance(raw_result, dict) else None
+            record = decisions.get(result_id) if isinstance(result_id, str) else None
+            if record is not None and record.request.decision_type == "select_attack_weapon_group":
+                raw_result_payload = record.result.payload
+                if not isinstance(raw_result_payload, dict):
+                    raise GameLifecycleError("Random weapon group selection payload is invalid.")
+                raw_group = raw_result_payload.get("gathered_group")
+                if not isinstance(raw_group, dict):
+                    raise GameLifecycleError("Random weapon group selection lacks its group.")
+                group = GatheredAttackGroup.from_payload(
+                    cast(GatheredAttackGroupPayload, raw_group)
+                )
+                sequence_id = raw_result_payload.get("sequence_id")
+                if group.native_snapshots:
+                    if (
+                        type(sequence_id) is not str
+                        or sequence_id not in declarations
+                        or canonical_json(body) != canonical_json(record.to_payload())
+                    ):
+                        raise GameLifecycleError(
+                            "Random weapon native group lacks accepted authority."
+                        )
+                    from warhammer40k_core.engine.attack_sequence_validation import (
+                        _validate_gathered_group_matches_attack_pools,
+                    )
+
+                    _validate_gathered_group_matches_attack_pools(
+                        attack_pools=declarations[sequence_id][1],
+                        used_pool_indices=(),
+                        gathered_group=group,
+                    )
+                    native_groups[sequence_id] = group
+                elif type(sequence_id) is str:
+                    native_groups.pop(sequence_id, None)
         elif event.event_type == "target_replacement_resolved":
             context = body.get("context")
             sequence_id = context.get("action_id") if isinstance(context, dict) else None
@@ -175,6 +216,24 @@ def validate_random_weapon_history(
             if declaration is None or declaration[0] != actor or pool_index >= len(declaration[1]):
                 raise GameLifecycleError("Random weapon occurrence lacks its accepted attack.")
             pool = declaration[1][pool_index]
+            selected_native_group = native_groups.get(sequence_id)
+            if selected_native_group is not None:
+                if (
+                    pool_index != selected_native_group.primary_pool_index
+                    or attack_index >= selected_native_group.total_attacks
+                ):
+                    raise GameLifecycleError("Random weapon native group occurrence drifted.")
+                offset = 0
+                for contribution in selected_native_group.contributions:
+                    if attack_index < offset + contribution.attacks:
+                        pool = replace(
+                            declaration[1][contribution.pool_index],
+                            attacks=selected_native_group.total_attacks,
+                        )
+                        break
+                    offset += contribution.attacks
+                else:
+                    raise GameLifecycleError("Random weapon native contribution is absent.")
             if (
                 attack_index >= pool.attacks
                 or any(

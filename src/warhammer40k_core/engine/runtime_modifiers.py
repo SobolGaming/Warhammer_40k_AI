@@ -14,6 +14,16 @@ from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
     AllocatedAttackDamageModifierBinding,
     AllocatedAttackDamageModifierContext,
 )
+from warhammer40k_core.engine.attack_gathering_dependencies import (
+    AttackGatheringDependency,
+    validate_gathering_dependency,
+    validate_save_gathering_characteristics,
+)
+from warhammer40k_core.engine.attack_gathering_wound_rules import (
+    WoundGatheringHandler,
+    WoundGatheringPredicate,
+    validate_wound_gathering_handler,
+)
 from warhammer40k_core.engine.model_ability_grants import ModelAbilityGrantBinding
 from warhammer40k_core.engine.movement_budget_modifiers import (
     MovementBudgetModifierApplication as MovementBudgetModifierApplication,
@@ -598,8 +608,11 @@ class WoundRollModifierBinding:
     modifier_id: str
     source_id: str
     handler: WoundRollModifierHandler
+    gathering_handler: WoundGatheringHandler | None = None
+    gathering_predicate: WoundGatheringPredicate = WoundGatheringPredicate.ALWAYS
 
     def __post_init__(self) -> None:
+        validate_wound_gathering_handler(self.gathering_handler, self.gathering_predicate)
         _validate_modifier_binding(
             field_prefix="Wound roll modifier",
             modifier_id=self.modifier_id,
@@ -628,8 +641,12 @@ class SaveOptionModifierBinding:
     modifier_id: str
     source_id: str
     handler: SaveOptionModifierHandler
+    gathering_dependency: AttackGatheringDependency = AttackGatheringDependency.UNKNOWN
+    gathering_modified_characteristics: tuple[Characteristic, ...] | None = None
 
     def __post_init__(self) -> None:
+        validate_gathering_dependency(self.gathering_dependency)
+        validate_save_gathering_characteristics(self.gathering_modified_characteristics)
         _validate_modifier_binding(
             field_prefix="save option modifier",
             modifier_id=self.modifier_id,
@@ -733,8 +750,10 @@ class FailedSaveDamageReplacementBinding:
     modifier_id: str
     source_id: str
     handler: FailedSaveDamageReplacementHandler
+    gathering_dependency: AttackGatheringDependency = AttackGatheringDependency.UNKNOWN
 
     def __post_init__(self) -> None:
+        validate_gathering_dependency(self.gathering_dependency)
         _validate_modifier_binding(
             field_prefix="failed-save damage replacement",
             modifier_id=self.modifier_id,

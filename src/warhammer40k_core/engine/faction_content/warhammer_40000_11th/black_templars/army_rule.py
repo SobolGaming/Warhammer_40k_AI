@@ -10,6 +10,10 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_gathering_wound_rules import (
+    WoundGatheringContext,
+    WoundGatheringPredicate,
+)
 from warhammer40k_core.engine.battle_round_hooks import (
     SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
     BattleRoundStartHookBinding,
@@ -200,6 +204,8 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=ACCEPT_ANY_CHALLENGE_WOUND_MODIFIER_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=accept_any_challenge_wound_roll_modifier,
+                gathering_handler=accept_any_challenge_wound_gathering_modifier,
+                gathering_predicate=WoundGatheringPredicate.STRENGTH_NOT_GREATER_THAN_TOUGHNESS,
             ),
         ),
         weapon_profile_modifier_bindings=(
@@ -378,6 +384,14 @@ def accept_any_challenge_wound_roll_modifier(context: WoundRollModifierContext) 
     if context.source_phase is not BattlePhase.FIGHT:
         return 0
     if context.strength > context.toughness:
+        return 0
+    return accept_any_challenge_wound_gathering_modifier(context)
+
+
+def accept_any_challenge_wound_gathering_modifier(
+    context: WoundRollModifierContext | WoundGatheringContext,
+) -> int:
+    if context.source_phase is not BattlePhase.FIGHT:
         return 0
     if not unit_has_active_templar_vow(
         context.state,

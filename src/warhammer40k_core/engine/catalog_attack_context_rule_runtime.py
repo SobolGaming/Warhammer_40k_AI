@@ -10,6 +10,7 @@ from warhammer40k_core.engine.ability_presence import (
     ability_spatial_relationship,
     active_ability_model_ids_for_unit,
 )
+from warhammer40k_core.engine.attack_gathering_wound_rules import WoundGatheringContext
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_record_current_wargear_bearer_model_ids,
@@ -102,20 +103,7 @@ def defensive_strength_toughness_wound_handler(
     source: CatalogDatasheetClauseSource,
 ) -> Callable[[WoundRollModifierContext], int]:
     def handler(context: WoundRollModifierContext) -> int:
-        if not source_applies_to_rules_unit(
-            source=source,
-            context_unit_id=context.target_unit_instance_id,
-            state=context.state,
-        ):
-            return 0
-        source_model_ids = current_source_model_ids(state=context.state, source=source)
-        if not source_model_ids:
-            return 0
-        if len(source_model_ids) != 1:
-            raise GameLifecycleError(
-                "Catalog THIS_MODEL defensive wound modifier requires one current source model."
-            )
-        if context.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE:
+        if not _defensive_wound_source_applies(source, context):
             return 0
         if context.strength <= context.toughness:
             return 0
@@ -125,6 +113,37 @@ def defensive_strength_toughness_wound_handler(
         return delta
 
     return handler
+
+
+def defensive_strength_toughness_gathering_handler(
+    source: CatalogDatasheetClauseSource,
+) -> Callable[[WoundGatheringContext], int]:
+    def handler(context: WoundGatheringContext) -> int:
+        if not _defensive_wound_source_applies(source, context):
+            return 0
+        delta = parameter_payload(source.clause.effects[0].parameters).get("delta")
+        if type(delta) is not int:
+            raise GameLifecycleError("Catalog defensive wound delta must be integer.")
+        return delta
+
+    return handler
+
+
+def _defensive_wound_source_applies(
+    source: CatalogDatasheetClauseSource, context: WoundRollModifierContext | WoundGatheringContext
+) -> bool:
+    if not source_applies_to_rules_unit(
+        source=source, context_unit_id=context.target_unit_instance_id, state=context.state
+    ):
+        return False
+    source_model_ids = current_source_model_ids(state=context.state, source=source)
+    if not source_model_ids:
+        return False
+    if len(source_model_ids) != 1:
+        raise GameLifecycleError(
+            "Catalog THIS_MODEL defensive wound modifier requires one current source model."
+        )
+    return context.weapon_profile.range_profile.kind is RangeProfileKind.DISTANCE
 
 
 def passive_self_defensive_hit_handler(

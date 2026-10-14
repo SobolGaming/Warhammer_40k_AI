@@ -43069,12 +43069,12 @@
       "sha256": "8e48f057ec07b80068c6b6239fb9b4885cbcdb8625f74e12c3d824480abeaee8"
     },
     "src/warhammer40k_core/engine/attack_sequence_dispatch.py": {
-      "bytes": 19524,
-      "sha256": "83d317bd332927fcad1c2195ed8bbdb16a3c3ff461328cd275725769f491c754"
+      "bytes": 19651,
+      "sha256": "91b438673c2f819989e7ccf2a94e069d1d6cd02eafae6a5c6f5c9b166e9b8767"
     },
     "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
-      "bytes": 69515,
-      "sha256": "1146390c40f76e4b6796735fc2d9ee1d0676deb3f3e9d832db0ec7cf71685307"
+      "bytes": 70002,
+      "sha256": "9e12d813883103ef5381430e71963ef44a791e72fd05b3e080655511c4fffa99"
     },
     "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
       "bytes": 42126,
@@ -43085,24 +43085,24 @@
       "sha256": "0319a909765e527d035ceac7db83aa7a06d68682e0e1667172176b7f6324b198"
     },
     "src/warhammer40k_core/engine/attack_sequence_model.py": {
-      "bytes": 66804,
-      "sha256": "ff87e6341dc5c2eecd462bc8373117a62fbbf6596ea5f6eb6a31dc6207f1fb6d"
+      "bytes": 67541,
+      "sha256": "f8e6f1376edf76fd5232376d8208a9abb0f9a2bf1f0cb2afa1161a918bd2ce98"
     },
     "src/warhammer40k_core/engine/attack_sequence_post_roll.py": {
-      "bytes": 19855,
-      "sha256": "3da5a6abe0b3c7d864ce8610217ed76b0f82fde0ff56fe743edf24c20c987a86"
+      "bytes": 19860,
+      "sha256": "039a873aebc525749d317e756be32a860ff41090b0557cd6e673f5f3cc69fd46"
     },
     "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py": {
       "bytes": 16006,
       "sha256": "2e8ae6413a3c9b66bae3cdaa921461f9683886ad74231c7681878630321e5f69"
     },
     "src/warhammer40k_core/engine/attack_sequence_selection.py": {
-      "bytes": 32478,
-      "sha256": "a281d79e1461e540fe27f7a2df214191f6a134fb0d6a5b7e8367b005037a7e44"
+      "bytes": 33925,
+      "sha256": "2682a62955430073dd8a6a7ee3e0342a03e63f0f9938529a5c15d694c6dae3c1"
     },
     "src/warhammer40k_core/engine/attack_sequence_state.py": {
-      "bytes": 59836,
-      "sha256": "57bf140d3ba00c3b11808ed71977be2b1c02224a32492a7ac886ab4889dfbc4d"
+      "bytes": 60575,
+      "sha256": "1d9099f3042b97dd9ffd68ad52cf3a67d94fbc2d52fd9add723746cf623e604e"
     },
     "src/warhammer40k_core/engine/attack_weapon_inventory.py": {
       "bytes": 4295,
@@ -43137,8 +43137,8 @@
       "sha256": "1efd7933cb822832e906fad399f23919e3e02203f770d461bf91850fd23b67e5"
     },
     "src/warhammer40k_core/engine/catalog_modifier_ignore.py": {
-      "bytes": 34820,
-      "sha256": "006fe5eebf219c7c2a08052a962a7c6d474f1537e50c8da56d99dfdb9bc33483"
+      "bytes": 39742,
+      "sha256": "662059f7bc68e13d8824b3bad5a2b5b17c2c02b59662d03a47fb4c98d02276ad"
     },
     "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
       "bytes": 250921,
@@ -43249,8 +43249,8 @@
       "sha256": "be128a034dad11a94c7f7bf024540a72d68a5033a1074fd2db0977fa6bd309ab"
     },
     "src/warhammer40k_core/engine/gathered_attack_dice.py": {
-      "bytes": 5712,
-      "sha256": "8bc6808089539ce0c65c626fc84479ce720ab53d27a8ebba70093b3b40462791"
+      "bytes": 5748,
+      "sha256": "4267869645a78b07f0da73485bd7f10c6e93a69721c3c9c58873add651ad519b"
     },
     "src/warhammer40k_core/engine/hazard.py": {
       "bytes": 2253,
@@ -43345,8 +43345,8 @@
       "sha256": "72cbdba37af1ff3b789a1a73908e2d3d9d4691111dca625635ee82beeaab45ec"
     },
     "src/warhammer40k_core/engine/phases/fight.py": {
-      "bytes": 134965,
-      "sha256": "cc83944e0c9c2839bc24d7bac138c6187853ddcfebd9a4f39791f91b84975909"
+      "bytes": 135153,
+      "sha256": "85db1b94649a35c8688b86127c2ba18932a4783ecea4233b125021e6b6001478"
     },
     "src/warhammer40k_core/engine/phases/fight_melee.py": {
       "bytes": 17433,
@@ -43385,8 +43385,8 @@
       "sha256": "2b11eb3682570dc4fdbb5189a23a77598590fc8412902bfdee17e7e5889e6724"
     },
     "src/warhammer40k_core/engine/phases/shooting_handler.py": {
-      "bytes": 60772,
-      "sha256": "7eb62dc82222d2ebe0f6c1dccee3ef2b6ccaf9ae766b13ccb12ab1ed87a22c75"
+      "bytes": 61094,
+      "sha256": "72ea90baad2c2f0eb80ba88d6d3f74ae04a5882248e5551b18a72eabd0345f74"
     },
     "src/warhammer40k_core/engine/phases/shooting_model.py": {
       "bytes": 48976,
@@ -43469,8 +43469,8 @@
       "sha256": "d5fb13f7bbadf43d60a03e31c42e6a1e530263b6c1ace57a937606eadb53d853"
     },
     "src/warhammer40k_core/engine/runtime_modifiers.py": {
-      "bytes": 55702,
-      "sha256": "532cfdbd1c88b1d024557e161036d553544e6cd01a3206c249a5cc192eb7c98c"
+      "bytes": 56756,
+      "sha256": "876b2bcf0c91c89c8b379dcc59a40d2b75add5459f839b4b5125bc7eb0adeef1"
     },
     "src/warhammer40k_core/engine/saves.py": {
       "bytes": 33214,
@@ -44081,8 +44081,8 @@
       "sha256": "8e2531e66bac3a1d381fd6f288dad9e88f97a93ad2f11da1c2fa8f7a7690c958"
     },
     "tests/unit/test_order92_random_melee.py": {
-      "bytes": 49099,
-      "sha256": "791195d1226c39ce7856526c6653d0710648307e1fa80ec15ebd17f9c65c607d"
+      "bytes": 49124,
+      "sha256": "aaec568588bd6c93867457cb1bbb9c9b397096802464de57b440f9e300befe59"
     },
     "tests/unit/test_order93_modifier_ignore.py": {
       "bytes": 25835,
@@ -46130,9 +46130,9 @@
       "symbol_ast_sha256": "a2f85ec4abc44b1ab929d4cc0fa708181beea18ca90465ba60f3230b44db11c9"
     },
     "src/warhammer40k_core/engine/attack_sequence_dispatch.py:resolve_attack_sequence_until_blocked": {
-      "file_sha256": "83d317bd332927fcad1c2195ed8bbdb16a3c3ff461328cd275725769f491c754",
+      "file_sha256": "91b438673c2f819989e7ccf2a94e069d1d6cd02eafae6a5c6f5c9b166e9b8767",
       "resolved_path": "src/warhammer40k_core/engine/attack_sequence_dispatch.py",
-      "symbol_ast_sha256": "75d80e2e6f38a25e89577cb5ac5c1785571e182fe4241b1686737ab1d6e2a345"
+      "symbol_ast_sha256": "1e6a5b1f49d53708b6685994eefaaa5a4d7bd4b3a86813751e444ecc9c0ea703"
     },
     "src/warhammer40k_core/engine/attack_sequence_group_selection.py:_apply_deferred_mortal_wounds": {
       "file_sha256": "8e48f057ec07b80068c6b6239fb9b4885cbcdb8625f74e12c3d824480abeaee8",
@@ -46155,19 +46155,19 @@
       "symbol_ast_sha256": "55f39e99882669743d23dda7f54a98ce3bca551de7e7aff211968c5540d09148"
     },
     "src/warhammer40k_core/engine/attack_sequence_model.py:attack_sequence_hit_roll_spec": {
-      "file_sha256": "ff87e6341dc5c2eecd462bc8373117a62fbbf6596ea5f6eb6a31dc6207f1fb6d",
+      "file_sha256": "f8e6f1376edf76fd5232376d8208a9abb0f9a2bf1f0cb2afa1161a918bd2ce98",
       "resolved_path": "src/warhammer40k_core/engine/attack_sequence_model.py",
       "symbol_ast_sha256": "e8b98f0fd770e3133d743c1a518d7d2488fdc4759b3165fae1ec63778bfb6397"
     },
     "src/warhammer40k_core/engine/attack_sequence_model.py:attack_sequence_wound_roll_spec": {
-      "file_sha256": "ff87e6341dc5c2eecd462bc8373117a62fbbf6596ea5f6eb6a31dc6207f1fb6d",
+      "file_sha256": "f8e6f1376edf76fd5232376d8208a9abb0f9a2bf1f0cb2afa1161a918bd2ce98",
       "resolved_path": "src/warhammer40k_core/engine/attack_sequence_model.py",
       "symbol_ast_sha256": "7ca3da0f141a44e77b038bdc26fc59e00a34ba56bbadd51039ebe4f846131a9e"
     },
     "src/warhammer40k_core/engine/attack_sequence_post_roll.py:defer_grouped_devastating_wounds": {
-      "file_sha256": "3da5a6abe0b3c7d864ce8610217ed76b0f82fde0ff56fe743edf24c20c987a86",
+      "file_sha256": "039a873aebc525749d317e756be32a860ff41090b0557cd6e673f5f3cc69fd46",
       "resolved_path": "src/warhammer40k_core/engine/attack_sequence_post_roll.py",
-      "symbol_ast_sha256": "97e3e68032ad361118548b2c2959ff6cdbd562191a3de0cf6b9ee1b4be4a6e8f"
+      "symbol_ast_sha256": "f422c175a6d6cbf6cd396b66f2d794b911921a3c840308d482a2e6108ac9bd0f"
     },
     "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py:_psychic_attack_modifier_ignore_request": {
       "file_sha256": "2e8ae6413a3c9b66bae3cdaa921461f9683886ad74231c7681878630321e5f69",
@@ -46180,19 +46180,19 @@
       "symbol_ast_sha256": "20beab4a6c91d0666e810e3524711a7cc6f4cde31f5b9292a07a46a9fa8914d4"
     },
     "src/warhammer40k_core/engine/attack_sequence_selection.py:identical_attack_signature": {
-      "file_sha256": "a281d79e1461e540fe27f7a2df214191f6a134fb0d6a5b7e8367b005037a7e44",
+      "file_sha256": "2682a62955430073dd8a6a7ee3e0342a03e63f0f9938529a5c15d694c6dae3c1",
       "resolved_path": "src/warhammer40k_core/engine/attack_sequence_selection.py",
       "symbol_ast_sha256": "edf0f07212562e5046a06302b1494d47c24a2e46cbfbe4df1802a3bf593ac06a"
     },
     "src/warhammer40k_core/engine/attack_sequence_selection.py:unresolved_target_unit_ids": {
-      "file_sha256": "a281d79e1461e540fe27f7a2df214191f6a134fb0d6a5b7e8367b005037a7e44",
+      "file_sha256": "2682a62955430073dd8a6a7ee3e0342a03e63f0f9938529a5c15d694c6dae3c1",
       "resolved_path": "src/warhammer40k_core/engine/attack_sequence_selection.py",
       "symbol_ast_sha256": "2b60864b8e5178c76a11d90ac255c3dc479cad0e745dd7e5717cdb77da866270"
     },
     "src/warhammer40k_core/engine/attack_sequence_state.py:AttackSequence": {
-      "file_sha256": "57bf140d3ba00c3b11808ed71977be2b1c02224a32492a7ac886ab4889dfbc4d",
+      "file_sha256": "1d9099f3042b97dd9ffd68ad52cf3a67d94fbc2d52fd9add723746cf623e604e",
       "resolved_path": "src/warhammer40k_core/engine/attack_sequence_state.py",
-      "symbol_ast_sha256": "a01f744c1242617ab39f5cadc0919829662b50b3244a36cd564b917fc68533e7"
+      "symbol_ast_sha256": "ecf8b5c639cbf428bda25df2203198a7602d9328a19015b245b60548adb626b7"
     },
     "src/warhammer40k_core/engine/attack_weapon_inventory.py:melee_weapon_selection_context": {
       "file_sha256": "e503ea9191802f2e8be33666aa967e5215bf7d9ffe512c70e3e7145e476913c5",
@@ -46245,9 +46245,9 @@
       "symbol_ast_sha256": "5576aa452a4d51c2a83139235f77d4c8d579101cf9a86c1ba7723ecf3f8f590f"
     },
     "src/warhammer40k_core/engine/catalog_modifier_ignore.py:modifier_ignore_permissions_for_subject": {
-      "file_sha256": "006fe5eebf219c7c2a08052a962a7c6d474f1537e50c8da56d99dfdb9bc33483",
+      "file_sha256": "662059f7bc68e13d8824b3bad5a2b5b17c2c02b59662d03a47fb4c98d02276ad",
       "resolved_path": "src/warhammer40k_core/engine/catalog_modifier_ignore.py",
-      "symbol_ast_sha256": "af85f27423f32ea0668b8f9964ed2324c65c2a049cc57d1dbeb2c06e12a385f3"
+      "symbol_ast_sha256": "fa0a3339b153f3d6b12a3eb7610e7b90a8e353e227ef405ba3b63ddd23f95425"
     },
     "src/warhammer40k_core/engine/catalog_rule_consumption.py:CatalogWeaponKeywordGrantRuntime": {
       "file_sha256": "82ba1bcc844d3164e51b66f895db5ca197974c315999e17119a69577ce68fe9a",
@@ -46520,9 +46520,9 @@
       "symbol_ast_sha256": "030db8864f6183d0acbbd20ff589ecf5e9386d6976bbcf0348c10c3c2a3c4ef3"
     },
     "src/warhammer40k_core/engine/gathered_attack_dice.py:resolve_gathered_attack_dice": {
-      "file_sha256": "8bc6808089539ce0c65c626fc84479ce720ab53d27a8ebba70093b3b40462791",
+      "file_sha256": "4267869645a78b07f0da73485bd7f10c6e93a69721c3c9c58873add651ad519b",
       "resolved_path": "src/warhammer40k_core/engine/gathered_attack_dice.py",
-      "symbol_ast_sha256": "ac63acee9979ae18f01b4f032cc454b708af76fcd94c55c6a8a8a6930d29bd60"
+      "symbol_ast_sha256": "e9a38dcd8bfeaafa7f71988b8e9834658f621267e90e3d536c73828e95315682"
     },
     "src/warhammer40k_core/engine/hazard.py:failed_hazard_roll_indices": {
       "file_sha256": "b25a78e39bd761540141589e634c7ef63ba9f8ad7f50cb64ca81fb04e8b5a4ef",
@@ -46690,27 +46690,27 @@
       "symbol_ast_sha256": "8d99cc99ce0d464dc31cfae5b1bf888feae1508b56bb39fe092c5430fdbcab29"
     },
     "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler": {
-      "file_sha256": "cc83944e0c9c2839bc24d7bac138c6187853ddcfebd9a4f39791f91b84975909",
+      "file_sha256": "85db1b94649a35c8688b86127c2ba18932a4783ecea4233b125021e6b6001478",
       "resolved_path": "src/warhammer40k_core/engine/phases/fight.py",
       "symbol_ast_sha256": "b54ef8e1c0dcfb438c20ab14a771fa58a41d87028f20b901f77138a6fb307746"
     },
     "src/warhammer40k_core/engine/phases/fight.py:FightPhaseHandler.apply_decision": {
-      "file_sha256": "cc83944e0c9c2839bc24d7bac138c6187853ddcfebd9a4f39791f91b84975909",
+      "file_sha256": "85db1b94649a35c8688b86127c2ba18932a4783ecea4233b125021e6b6001478",
       "resolved_path": "src/warhammer40k_core/engine/phases/fight.py",
       "symbol_ast_sha256": "bb53c7e629853f24f859a5df8eb92b3ac8ac533945b70a099c451aba019f38fb"
     },
     "src/warhammer40k_core/engine/phases/fight.py:_advance_to_next_fight_request": {
-      "file_sha256": "cc83944e0c9c2839bc24d7bac138c6187853ddcfebd9a4f39791f91b84975909",
+      "file_sha256": "85db1b94649a35c8688b86127c2ba18932a4783ecea4233b125021e6b6001478",
       "resolved_path": "src/warhammer40k_core/engine/phases/fight.py",
       "symbol_ast_sha256": "0e13d12f884af06a3185b476e570524605da2dd74469777ed349f4d7f90f60e4"
     },
     "src/warhammer40k_core/engine/phases/fight.py:_invalid_fight_pass_status": {
-      "file_sha256": "cc83944e0c9c2839bc24d7bac138c6187853ddcfebd9a4f39791f91b84975909",
+      "file_sha256": "85db1b94649a35c8688b86127c2ba18932a4783ecea4233b125021e6b6001478",
       "resolved_path": "src/warhammer40k_core/engine/phases/fight.py",
       "symbol_ast_sha256": "27beac7f20790c25aff13caba3183bf49e08cfaae380e34e0d0cdf13ecb15543"
     },
     "src/warhammer40k_core/engine/phases/fight.py:request_counteroffensive_if_available": {
-      "file_sha256": "cc83944e0c9c2839bc24d7bac138c6187853ddcfebd9a4f39791f91b84975909",
+      "file_sha256": "85db1b94649a35c8688b86127c2ba18932a4783ecea4233b125021e6b6001478",
       "resolved_path": "src/warhammer40k_core/engine/phases/fight.py",
       "symbol_ast_sha256": "fabc4d689fb9916368b1ee11341b0ebd0a56508cecfa5bf70d5fa78c35e2e499"
     },
@@ -46780,9 +46780,9 @@
       "symbol_ast_sha256": "77db9b728e2ac6138365ae90f87222e44e4acdeec70e52479b250fb56c262bca"
     },
     "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler": {
-      "file_sha256": "7eb62dc82222d2ebe0f6c1dccee3ef2b6ccaf9ae766b13ccb12ab1ed87a22c75",
+      "file_sha256": "72ea90baad2c2f0eb80ba88d6d3f74ae04a5882248e5551b18a72eabd0345f74",
       "resolved_path": "src/warhammer40k_core/engine/phases/shooting_handler.py",
-      "symbol_ast_sha256": "7e5e7c8beaeab8ecfecc6b4c2c39df0c4f0fc2a1e8b4f6e7c4c6d90b5723326e"
+      "symbol_ast_sha256": "e77099e1b6363a4c6a9ccc685467fea977f1f27e31b954dc3690f62e8daa3c17"
     },
     "src/warhammer40k_core/engine/phases/shooting_model.py:OutOfPhaseShootingState": {
       "file_sha256": "a5c9e8d74aacd6df1088df91882f20499ef1a763f5581d72fd3d5b9cb49798b5",
@@ -46945,7 +46945,7 @@
       "symbol_ast_sha256": "0eb0ff3a13b747b2d76a9cc6cf062a6b1c311a3bf37ca1b2cde066a75d16a06a"
     },
     "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry": {
-      "file_sha256": "532cfdbd1c88b1d024557e161036d553544e6cd01a3206c249a5cc192eb7c98c",
+      "file_sha256": "876b2bcf0c91c89c8b379dcc59a40d2b75add5459f839b4b5125bc7eb0adeef1",
       "resolved_path": "src/warhammer40k_core/engine/runtime_modifiers.py",
       "symbol_ast_sha256": "042ce171d3639d78085c8aa33b9259edabcfe465d26b61eeb758d74c2389a79e"
     },
@@ -113225,11 +113225,11 @@
         "assert {pool.weapon_instance_id for pool in sequence.attack_pools} == {cast(str, budget['weapon_instance_id']) for budget in budgets}",
         "assert ReplayRunner.from_payload(session.replay_artifact(artifact_id='multi-weapon')).run().reproduced_exactly"
       ],
-      "complete_current_body": "@pytest.mark.parametrize(('extra', 'models'), [(True, 1), (False, 2), (True, 2)])\ndef test_all_weapons_commit_before_dice_and_each_budget_is_conserved(extra: bool, models: int) -> None:\n    session = random_melee_session(extra=extra, attacker_models=models)\n    request, budgets = _all_committed(session)\n    assert len(budgets) == models * (2 if extra else 1)\n    assert len({cast(str, b['weapon_instance_id']) for b in budgets}) == len(budgets)\n    assert len({cast(str, cast(dict[str, JsonValue], b['roll'])['scope_id']) for b in budgets}) == len(budgets)\n    payload = declaration_payload(request)\n    payload['declarations'] = [cast(list[JsonValue], _split(request, budget, [cast(int, budget['base_attacks'])])['declarations'])[0] for budget in budgets]\n    declarations = cast(list[dict[str, JsonValue]], payload['declarations'])\n    first = cast(list[dict[str, JsonValue]], declarations[0]['target_allocations'])[0]\n    second = cast(list[dict[str, JsonValue]], declarations[1]['target_allocations'])[0]\n    first['attacks'] = cast(int, first['attacks']) + 1\n    second['attacks'] = cast(int, second['attacks']) - 1\n    before = session.lifecycle.to_payload()\n    status = session.submit_parameterized_payload(request_id=request.request_id, result_id='wrong-owner-total', payload=payload)\n    assert status.status_kind is LifecycleStatusKind.INVALID\n    assert session.lifecycle.to_payload() == before\n    first['attacks'] = budgets[0]['base_attacks']\n    second['attacks'] = budgets[1]['base_attacks']\n    status = session.submit_parameterized_payload(request_id=request.request_id, result_id='conserved', payload=payload)\n    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION\n    state = session.lifecycle.state\n    assert state is not None\n    assert state.fight_phase_state is not None\n    sequence = state.fight_phase_state.attack_sequence\n    assert sequence is not None\n    assert sum((pool.attacks for pool in sequence.attack_pools)) == sum((cast(int, budget['base_attacks']) for budget in budgets))\n    assert {pool.weapon_instance_id for pool in sequence.attack_pools} == {cast(str, budget['weapon_instance_id']) for budget in budgets}\n    assert ReplayRunner.from_payload(session.replay_artifact(artifact_id='multi-weapon')).run().reproduced_exactly",
-      "file_sha256": "791195d1226c39ce7856526c6653d0710648307e1fa80ec15ebd17f9c65c607d",
+      "complete_current_body": "@pytest.mark.parametrize(('extra', 'models'), [(True, 1), (False, 2), (True, 2)])\ndef test_all_weapons_commit_before_dice_and_each_budget_is_conserved(extra: bool, models: int) -> None:\n    session = random_melee_session(extra=extra, attacker_models=models, pause_at_first_hit=True)\n    request, budgets = _all_committed(session)\n    assert len(budgets) == models * (2 if extra else 1)\n    assert len({cast(str, b['weapon_instance_id']) for b in budgets}) == len(budgets)\n    assert len({cast(str, cast(dict[str, JsonValue], b['roll'])['scope_id']) for b in budgets}) == len(budgets)\n    payload = declaration_payload(request)\n    payload['declarations'] = [cast(list[JsonValue], _split(request, budget, [cast(int, budget['base_attacks'])])['declarations'])[0] for budget in budgets]\n    declarations = cast(list[dict[str, JsonValue]], payload['declarations'])\n    first = cast(list[dict[str, JsonValue]], declarations[0]['target_allocations'])[0]\n    second = cast(list[dict[str, JsonValue]], declarations[1]['target_allocations'])[0]\n    first['attacks'] = cast(int, first['attacks']) + 1\n    second['attacks'] = cast(int, second['attacks']) - 1\n    before = session.lifecycle.to_payload()\n    status = session.submit_parameterized_payload(request_id=request.request_id, result_id='wrong-owner-total', payload=payload)\n    assert status.status_kind is LifecycleStatusKind.INVALID\n    assert session.lifecycle.to_payload() == before\n    first['attacks'] = budgets[0]['base_attacks']\n    second['attacks'] = budgets[1]['base_attacks']\n    status = session.submit_parameterized_payload(request_id=request.request_id, result_id='conserved', payload=payload)\n    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION\n    state = session.lifecycle.state\n    assert state is not None\n    assert state.fight_phase_state is not None\n    sequence = state.fight_phase_state.attack_sequence\n    assert sequence is not None\n    assert sum((pool.attacks for pool in sequence.attack_pools)) == sum((cast(int, budget['base_attacks']) for budget in budgets))\n    assert {pool.weapon_instance_id for pool in sequence.attack_pools} == {cast(str, budget['weapon_instance_id']) for budget in budgets}\n    assert ReplayRunner.from_payload(session.replay_artifact(artifact_id='multi-weapon')).run().reproduced_exactly",
+      "file_sha256": "aaec568588bd6c93867457cb1bbb9c9b397096802464de57b440f9e300befe59",
       "resolved_path": "tests/unit/test_order92_random_melee.py",
       "runtime_pass_claimed": false,
-      "symbol_ast_sha256": "41849f904985588885335ac4b9d4dc3f39b4c02f24f11169d83c03efc7b309ca"
+      "symbol_ast_sha256": "bc6d4b03de5cbfae18a5bc5b68bb4e98da2c259905a75af801aa64a43f8ea793"
     },
     "tests/unit/test_order92_random_melee.py::test_multiple_profiles_commit_exactly_one_without_exposing_another_profile": {
       "assertion_mode": "inline",
@@ -113240,7 +113240,7 @@
         "assert LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint))).to_persistence_payload() == checkpoint"
       ],
       "complete_current_body": "def test_multiple_profiles_commit_exactly_one_without_exposing_another_profile() -> None:\n    session = random_melee_session(profiles=True)\n    request, budgets = _all_committed(session)\n    assert len(budgets) == 1\n    proposal = cast(dict[str, JsonValue], cast(dict[str, JsonValue], request.payload)['proposal_request'])\n    rows = cast(list[dict[str, JsonValue]], proposal['available_weapons'])\n    assert len(rows) == 1\n    assert rows[0]['weapon_profile_id'] == budgets[0]['weapon_profile_id']\n    session.submit_parameterized_payload(request_id=request.request_id, result_id='one-profile', payload=_split(request, budgets[0], [cast(int, budgets[0]['base_attacks'])]))\n    checkpoint = session.to_persistence_payload()\n    assert LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint))).to_persistence_payload() == checkpoint",
-      "file_sha256": "791195d1226c39ce7856526c6653d0710648307e1fa80ec15ebd17f9c65c607d",
+      "file_sha256": "aaec568588bd6c93867457cb1bbb9c9b397096802464de57b440f9e300befe59",
       "resolved_path": "tests/unit/test_order92_random_melee.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "10e96304e4ae4cb916c65ffddfd5921a6f2275c872e0fcd78194d3a5fdb09cac"

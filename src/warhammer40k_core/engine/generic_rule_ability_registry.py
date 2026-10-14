@@ -11,6 +11,10 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityContext,
     AdvanceEligibilityGrant,
 )
+from warhammer40k_core.engine.attack_gathering_dependencies import (
+    AttackGatheringDependency,
+    validate_gathering_dependency,
+)
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedCandidateHandler,
     AttackSequenceCompletedHandler,
@@ -996,12 +1000,14 @@ class GenericRuleSaveOptionModifierAbility:
     modifier_id_builder: GenericRuleModifierIdBuilder
     context_predicate: SaveOptionModifierContextPredicate
     modifier_builder: SaveOptionModifierBuilder
+    gathering_dependency: AttackGatheringDependency = AttackGatheringDependency.UNKNOWN
 
     @property
     def hook_family(self) -> GenericRuleAbilityHookFamily:
         return GenericRuleAbilityHookFamily.SAVE_OPTION_MODIFIER
 
     def __post_init__(self) -> None:
+        validate_gathering_dependency(self.gathering_dependency)
         _validate_single_descriptor_fields(
             self.ability_id,
             coverage_descriptor_id=self.coverage_descriptor_id,

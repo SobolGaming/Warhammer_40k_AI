@@ -129,6 +129,8 @@ def resolve_attack_sequence_until_blocked(
                 state=state,
                 decisions=decisions,
                 attack_sequence=current,
+                runtime_modifier_registry=runtime_modifiers,
+                has_custom_callbacks=bool(active_hooks.handlers),
             )
             if status is not None:
                 return current, allocated_model_ids, status

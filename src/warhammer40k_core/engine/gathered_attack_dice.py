@@ -79,7 +79,7 @@ def resolve_gathered_attack_dice(
                 stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
                 runtime_modifier_registry=runtime_modifier_registry,
                 hit_stage=stage,
-                gathered_pool=pool,
+                gathered_pool=current.current_pool(),
                 prepared_hits=prepared_hits,
                 rolled_hits=rolled_hits,
             )
@@ -116,7 +116,7 @@ def resolve_gathered_attack_dice(
                 stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
                 runtime_modifier_registry=runtime_modifier_registry,
                 wound_stage=stage,
-                gathered_pool=pool,
+                gathered_pool=current.current_pool(),
                 finalized_hit=hit,
                 prepared_wounds=prepared_wounds,
                 rolled_wounds=rolled_wounds,

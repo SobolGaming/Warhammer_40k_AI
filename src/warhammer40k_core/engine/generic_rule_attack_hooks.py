@@ -499,6 +499,7 @@ def _matching_generic_attack_effects(
     weapon_profile: WeaponProfile | None = None,
     attack_strength: int | None = None,
     target_toughness: int | None = None,
+    gathering_templates: bool = False,
 ) -> tuple[GenericAttackEffect, ...]:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -591,7 +592,12 @@ def _matching_generic_attack_effects(
                 legacy_target_role_allowed=legacy_target_role_allowed,
             ):
                 continue
-            if not generic_effect_context_applies(
+            context_query = (
+                generic_effect_gathering_context_applies
+                if gathering_templates
+                else generic_effect_context_applies
+            )
+            if not context_query(
                 state=state,
                 effect=generic_effect,
                 attacking_unit_instance_id=attacker_id,
@@ -662,6 +668,64 @@ def generic_effect_context_applies(
     attack_strength: int | None,
     target_toughness: int | None,
     subject_model_instance_id: str | None = None,
+) -> bool:
+    return _generic_effect_context_applies(
+        state=state,
+        effect=effect,
+        attacking_unit_instance_id=attacking_unit_instance_id,
+        attacker_model_instance_id=attacker_model_instance_id,
+        target_unit_instance_id=target_unit_instance_id,
+        source_phase=source_phase,
+        weapon_profile=weapon_profile,
+        attack_strength=attack_strength,
+        target_toughness=target_toughness,
+        subject_model_instance_id=subject_model_instance_id,
+        defer_numeric_constraints=False,
+    )
+
+
+def generic_effect_gathering_context_applies(
+    *,
+    state: object,
+    effect: GenericAttackEffect,
+    attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None,
+    target_unit_instance_id: str | None,
+    source_phase: object,
+    weapon_profile: WeaponProfile | None,
+    attack_strength: int | None,
+    target_toughness: int | None,
+    subject_model_instance_id: str | None = None,
+) -> bool:
+    """Match nonnumeric gates; the original effect retains its residual predicate."""
+    return _generic_effect_context_applies(
+        state=state,
+        effect=effect,
+        attacking_unit_instance_id=attacking_unit_instance_id,
+        attacker_model_instance_id=attacker_model_instance_id,
+        target_unit_instance_id=target_unit_instance_id,
+        source_phase=source_phase,
+        weapon_profile=weapon_profile,
+        attack_strength=attack_strength,
+        target_toughness=target_toughness,
+        subject_model_instance_id=subject_model_instance_id,
+        defer_numeric_constraints=True,
+    )
+
+
+def _generic_effect_context_applies(
+    *,
+    state: object,
+    effect: GenericAttackEffect,
+    attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None,
+    target_unit_instance_id: str | None,
+    source_phase: object,
+    weapon_profile: WeaponProfile | None,
+    attack_strength: int | None,
+    target_toughness: int | None,
+    subject_model_instance_id: str | None,
+    defer_numeric_constraints: bool,
 ) -> bool:
     if not generic_rule_triggering_attacker_applies(
         parameters=effect.parameters,
@@ -757,6 +821,7 @@ def generic_effect_context_applies(
         target_unit_instance_id=target_unit_instance_id,
         attack_strength=attack_strength,
         target_toughness=target_toughness,
+        defer_numeric_constraints=defer_numeric_constraints,
     )
 
 
@@ -966,12 +1031,20 @@ def _generic_effect_target_constraint_applies(
     target_unit_instance_id: str | None,
     attack_strength: int | None,
     target_toughness: int | None,
+    defer_numeric_constraints: bool = False,
 ) -> bool:
     return generic_rule_target_constraints_apply(
         state=state,
-        constraints=generic_rule_target_constraint_values(
-            parameters=effect.parameters,
-            conditions=effect.conditions,
+        constraints=tuple(
+            constraint
+            for constraint in generic_rule_target_constraint_values(
+                parameters=effect.parameters,
+                conditions=effect.conditions,
+            )
+            if not (
+                defer_numeric_constraints
+                and constraint == "attack_strength_greater_than_target_toughness"
+            )
         ),
         attacking_unit_instance_id=attacking_unit_instance_id,
         attacker_model_instance_id=attacker_model_instance_id,
@@ -1292,3 +1365,87 @@ def generic_hit_roll_modifiers(context: HitRollModifierContext) -> tuple[RollMod
         )
         if _roll_type_matches(effect.parameters, expected="hit")
     )
+
+
+# Declare the existing shared owner while preserving the prior public namespace.
+__all__ = (
+    "GENERIC_RULE_EFFECT_KIND",
+    "AdvanceRollModifierContext",
+    "AttackRole",
+    "BattlePhase",
+    "Callable",
+    "Characteristic",
+    "ChargeRollModifierContext",
+    "DamageRollModifierContext",
+    "GameLifecycleError",
+    "GenericAttackEffect",
+    "GenericRuleRerollPermissionContext",
+    "HitRollMinimumUnmodifiedSuccessContext",
+    "HitRollModifierContext",
+    "IdentifierValidator",
+    "JsonValue",
+    "Modifier",
+    "ModifierOperation",
+    "ModifierTerm",
+    "MovementBudgetModifierContext",
+    "PersistingEffect",
+    "RerollComponentSelectionPolicy",
+    "RerollPermission",
+    "RollModifier",
+    "RuleEffectKind",
+    "RuleTargetKind",
+    "RulesUnitEffectApplication",
+    "SaveOption",
+    "SaveOptionModifierContext",
+    "UnitCharacteristicModifierContext",
+    "WeaponProfile",
+    "WeaponProfileModifierContext",
+    "WoundRollModifierContext",
+    "_matching_generic_attack_effects",
+    "_roll_type_matches",
+    "annotations",
+    "attack_role_parameter",
+    "cast",
+    "characteristic_from_token",
+    "dataclass",
+    "generic_characteristic_operations_from_effects",
+    "generic_effect_context_applies",
+    "generic_effect_gathering_context_applies",
+    "generic_effect_role_applies",
+    "generic_hit_roll_modifiers",
+    "generic_matching_unit_effect_applications",
+    "generic_rule_characteristic_operations",
+    "generic_rule_conditions_from_payload",
+    "generic_rule_conditions_require_source_model_instance_id",
+    "generic_rule_damage_roll_modifier",
+    "generic_rule_effect_index_from_payload",
+    "generic_rule_hit_roll_modifier",
+    "generic_rule_matching_unit_effects",
+    "generic_rule_minimum_unmodified_hit_success",
+    "generic_rule_modified_movement_inches",
+    "generic_rule_modified_save_options",
+    "generic_rule_modified_unit_characteristic",
+    "generic_rule_modified_weapon_profile",
+    "generic_rule_modifier_source_id",
+    "generic_rule_movement_roll_modifiers",
+    "generic_rule_parameters_from_effect_payload",
+    "generic_rule_reroll_permission_context_for_unit",
+    "generic_rule_reroll_permission_contexts_for_unit",
+    "generic_rule_source_model_applies",
+    "generic_rule_source_model_instance_id_from_payload",
+    "generic_rule_target_allegiance_applies",
+    "generic_rule_target_allegiance_values",
+    "generic_rule_target_constraint_values",
+    "generic_rule_target_constraints_apply",
+    "generic_rule_target_proximity_keyword_gate_applies",
+    "generic_rule_triggering_attacker_applies",
+    "generic_rule_unit_characteristic_modifiers",
+    "generic_rule_wound_roll_modifier",
+    "generic_unit_effect_applies",
+    "rule_ir_modified_weapon_profile",
+    "rule_ir_weapon_ability_granted_profile",
+    "rule_ir_weapon_selector_applies",
+    "rules_unit_effect_applications",
+    "unit_has_required_keywords",
+    "validate_json_value",
+)
