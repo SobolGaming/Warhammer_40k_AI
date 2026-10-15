@@ -2174,6 +2174,26 @@
         }
       }
     },
+    "docs/performance/policy-v3/ci-compatibility-20261015/order97-original.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "78697c357cf227480a58cf22d2f1d201e621d1cb3e7c0e1631151613bacf3955",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "78697c357cf227480a58cf22d2f1d201e621d1cb3e7c0e1631151613bacf3955"
+        }
+      }
+    },
+    "docs/performance/policy-v3/ci-compatibility-20261015/phase14a-original.py.txt": {
+      "before_sha256": null,
+      "after_sha256": "22146cd184b4267c71b482cba021cd31387c8df1bd4a0d27f1157647cbc93e8b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "22146cd184b4267c71b482cba021cd31387c8df1bd4a0d27f1157647cbc93e8b"
+        }
+      }
+    },
     "docs/performance/policy-v3/d02-final-history/assessment.json": {
       "before_sha256": null,
       "after_sha256": "5fede0aca5404959780115897c9b8e0b70cb07719411d18a3fe912fe577c5502",
@@ -3694,11 +3714,11 @@
     },
     "tests/category_migration_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "a10efe257b1e08da113eb9ca03bc24cee85a08beea9685f37c4d5518081e72eb",
+      "after_sha256": "597e54b390d8c61d87cb1531ea7baee081a87ce3bd7ab2ca22b1a1dcfc3fb2aa",
       "owners": {
         "@module": {
           "before": null,
-          "after": "49da21fc4ed0bbe9c6231904d21ea596df89fbd74d1892e96badee91d890c6e0"
+          "after": "2e9543409a3f1d44c2ce45457b548c748619013bff0bd825a9e10c02da73d2ec"
         },
         "MigrationManifest": {
           "before": null,
@@ -3750,7 +3770,7 @@
         },
         "read_historical_test_bytes": {
           "before": null,
-          "after": "398e64a110382a441cc308b2f65f5108a399794315b47897bc847dbb6b64437b"
+          "after": "0d7f043a7d82fc876b276726124f5b6d04d421c3becdc6d5a846b49c636e3a05"
         },
         "verify_migrated_test": {
           "before": null,
@@ -3774,15 +3794,23 @@
     },
     "tests/code_quality/test_category_migration_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "59c3db01a2ad7af3a06a4f31e7810eb3f8a2a8214427a43266d5bebdbe8097f7",
+      "after_sha256": "3167e6d7b01b7fd9f0b99a49c4362e33e92fba4dfa0d6c8e44e0d121361575eb",
       "owners": {
         "@module": {
           "before": null,
-          "after": "04449d25f645bd4b83f42f7c8115376125524b30f518da0e32946261ef26bfea"
+          "after": "022aec16ea293f5c74c355b9a84717675269923d74cf07b945d7d58eac5aeeb5"
         },
         "_manifest": {
           "before": null,
           "after": "7f6690599949acbe1ab8ee94d7c43e28b67eefcd4a907be6afd51516fe7a3fef"
+        },
+        "edition_root": {
+          "before": null,
+          "after": "0cee818e4f968077b392dd242f67274dfaad3e25026de133b9f4c6fbf3bcd5b2"
+        },
+        "migrated_root": {
+          "before": null,
+          "after": "bb3e39f31e9dcab42da1a71424d7d2380a53abee7aeff543b139ab2aa4057378"
         },
         "preserved_root": {
           "before": null,
@@ -3792,6 +3820,18 @@
           "before": null,
           "after": "c31be94085812e63ce0ed650ea74db8f2ec43f3e1d55ba040140e7c0ea836bf3"
         },
+        "test_edition_maintenance_preserves_all_original_assertions": {
+          "before": null,
+          "after": "3b134801eef4dbf009990ff3cfae2a2d6c67278102badb7a1340869b26dfb1b3"
+        },
+        "test_edition_maintenance_rechecks_complete_bytes_after_success": {
+          "before": null,
+          "after": "1db0c813dd52d5d9a83f45f1a70d0957e23addabdf327da7f2ca6c2ee4cf63e0"
+        },
+        "test_edition_maintenance_rejects_an_assertion_change_even_with_recomputed_live_pin": {
+          "before": null,
+          "after": "ef0151b090cae1342caa76ea6a51c45b4b46e722461eec1f06623e09ac5e4483"
+        },
         "test_every_original_archive_has_complete_equivalent_live_successors": {
           "before": null,
           "after": "8a29b5a54a3bbeeae809bf04474af43ad4df2eeaeb1256933367d509cec5e28c"
@@ -3799,6 +3839,18 @@
         "test_live_reference_resolves_actual_current_module_without_archival_substitution": {
           "before": null,
           "after": "7f381ceb860ba1eb228b35a416aa1988639804dc7bd40d99fa40203501c75d12"
+        },
+        "test_order95_accepts_only_authenticated_live_migrated_owners": {
+          "before": null,
+          "after": "03ae8237373aa357172d9788b88558080e33a82d5f59eff43ab0d6528ceef887"
+        },
+        "test_order95_migrated_owner_cannot_reappear_at_the_retired_node": {
+          "before": null,
+          "after": "e16a1eb1398c237f772aaf4f8ed4593d0a913689ee4ad7f3d5c66f47f2838259"
+        },
+        "test_order95_successor_and_independent_migration_proof_reject_drift": {
+          "before": null,
+          "after": "d8f49cf003212cf96d81dc46b3e0efb6a33a134f58295428c15a4083a8ed6f62"
         },
         "test_returned_record_cannot_poison_the_next_manifest_verification": {
           "before": null,
@@ -3811,6 +3863,22 @@
         "test_unmigrated_historical_reader_keeps_actual_current_bytes": {
           "before": null,
           "after": "6de8cc673f44c7fd537061b88e03a709ae8548ca770c1e61ab25d0f3ccf373f5"
+        },
+        "test_utf8_maintenance_proves_only_the_encoding_edit_even_with_recomputed_live_pin": {
+          "before": null,
+          "after": "91c6eaeff4b5ab8acc3057b83ab9d8e4e5207a7016d7772258814b6500d7f5ff"
+        },
+        "test_utf8_maintenance_rejects_drift_after_success": {
+          "before": null,
+          "after": "e85225937a9c38d19408903c63b0181c8cc182f811440f2cbf22f883b921d6c9"
+        },
+        "test_utf8_maintenance_returns_original_only_after_exact_live_check": {
+          "before": null,
+          "after": "5b593de61a1b413009e34f504dfbb9b0720ea744040bafedf5433ad1c17851f2"
+        },
+        "utf8_root": {
+          "before": null,
+          "after": "04e7640ad25a35c08bc27d3cc15d446a97373f5d2a00f9083f219b207cb1a08a"
         }
       }
     },
@@ -3850,7 +3918,7 @@
     },
     "tests/code_quality/test_performance_category_migration.py": {
       "before_sha256": null,
-      "after_sha256": "c3daa9c7543342d2e28ce622f3078e16b9871ce81eea702492df43cb33d14e9a",
+      "after_sha256": "3a215830994717abdd58a5466391a57d82d57d1cb2aa5b341ffde7b4174f1d0f",
       "owners": {
         "@module": {
           "before": null,
@@ -3882,7 +3950,7 @@
         },
         "frozen_controls": {
           "before": null,
-          "after": "4ecd43c5525b9ac1e7df83a593434253a354118503b66b8b57466d111f44a86e"
+          "after": "5e6ad24ee6d4753dbf7067fe3e7c5ddb5d60bf34f9fc5a7dd8fa5a5dbaeed87f"
         },
         "read_archive": {
           "before": null,
@@ -3898,7 +3966,7 @@
         },
         "test_any_frozen_control_edit_is_rejected": {
           "before": null,
-          "after": "f674bd60e8ff75d90c4c067fa9e435639c46658c7dcc6113ccdec2944845cb72"
+          "after": "e7c37a246a51245981e6b5bcd5d1d1ef9bfa644a1faee05cbf1313122f571fa3"
         },
         "test_arbitrary_input_drift_is_not_a_migration": {
           "before": null,
@@ -3919,6 +3987,10 @@
         "test_direct_v2_api_still_rejects_migrated_current_source": {
           "before": null,
           "after": "a38430a8cd47fcc3f457a669d163788e092b58f8acae96e8328bb9c64b5e0d44"
+        },
+        "test_exact_compatibility_archive_membership_is_required": {
+          "before": null,
+          "after": "a3a4423a97650d9aa8e139225d793344837896dcb92c1e79f034236cef291062"
         },
         "test_exact_source_freeze_allows_only_the_declared_anchor_literal": {
           "before": null,
@@ -4233,6 +4305,32 @@
         "test_generated_parity_requires_all_exact_raw_bytes": {
           "before": null,
           "after": "2805b9ac4189af0a67362f35a98c131f9ea64f108554c3e39f2053ada5201d1d"
+        }
+      }
+    },
+    "tests/code_quality/test_phase14a_source_identity.py": {
+      "before_sha256": "22146cd184b4267c71b482cba021cd31387c8df1bd4a0d27f1157647cbc93e8b",
+      "after_sha256": "d67b860dbe557bd557536537d43c466176e2e6d14e1e48d6b8c08c1cb4d34eaf",
+      "owners": {
+        "_active_identity_text": {
+          "before": null,
+          "after": "e98f610b4ea67006daad3d1dec4c1dfcdf5fadfb61fbe39a2eda7c0fd8ab44d4"
+        },
+        "test_active_code_tests_and_docs_do_not_reference_retired_edition_ids": {
+          "before": "655d9188731811f19bfd6fb6d479c9d24fe045566950ec676346371f4ea9ceb0",
+          "after": "1bb331cf002e6f61e6ec19a7920f55c71027a72e039ee78b14ab9b51c151f1e0"
+        },
+        "test_historical_report_does_not_exempt_other_active_documents": {
+          "before": null,
+          "after": "e858c7cb6e97bfdabe36bc2591eba8498288ca0c6de83b6ab79511638957f7a8"
+        },
+        "test_historical_report_identity_exception_rejects_any_byte_drift": {
+          "before": null,
+          "after": "400c53f1ce69aa3fe3c60ee083dd7eb1fd5d09b86d88a63e7ffde2afa4404159"
+        },
+        "test_historical_report_keys_are_scoped_to_exact_reviewed_document": {
+          "before": null,
+          "after": "2818e8746a12abe287215f2fab800a296b5fda911bdf871404ec0decf39cfb89"
         }
       }
     },
@@ -19834,6 +19932,16 @@
         }
       }
     },
+    "tools/core_rules_order95_audit.py": {
+      "before_sha256": "24b2c0088b0d5fd775b1565df333f89586006fc7d83fda27a0b6bbb677133f0d",
+      "after_sha256": "6a9bbe2fe1bbf0f556629c0bec94b9778f81f192e3659d9d5022b7602ec5d558",
+      "owners": {
+        "@module": {
+          "before": "a5c1d956baa3c7ca7f8e5537e6bb0468dee7b52cc3b6531910830812a364eb5c",
+          "after": "a3fe67695a65032cb54a005ff9579c17589e9e33cfc111b20d8b8d2e8fe20865"
+        }
+      }
+    },
     "tools/core_rules_order97_inventory.py": {
       "before_sha256": "fe6298c193fdba5d2b09cf48938336846a8acbd876836eb57a953a3bdd1abf6d",
       "after_sha256": "e50a6dff0a66b81310c2799c939200fe76c186286b20eb9a70d9f90f8c038110",
@@ -19866,11 +19974,11 @@
     },
     "tools/performance_category_migration.py": {
       "before_sha256": null,
-      "after_sha256": "e8a162edf3ea26a3497fc86d4b13a1b611b0c89a6c0e99c46c4a0b0bffb9c2a1",
+      "after_sha256": "2d3b68dc3141880ad1d405602a4862c100a184aa59374dec41ab937c509470fa",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ccf60ba5769c55b35a99be94b738cbc2c0058b849ef22575bf98cc972a5d1870"
+          "after": "9b1060b176c266c8903955b19cfc30e592bd11b685827d4a2f829bc82891a095"
         },
         "_digest": {
           "before": null,
@@ -19930,11 +20038,11 @@
         },
         "reviewed_control_hashes": {
           "before": null,
-          "after": "fcb799517f42d33598f7d9ddaa633203c569ec281f6cc083cf0be1f2d3ee654a"
+          "after": "0bac1c790ee5994e20b1ab87a1a5ab7c0b48ee6829007443904a6920840e9770"
         },
         "verify_current_inventory": {
           "before": null,
-          "after": "97108c0b733e4caa1587a991c8c394cca677dc79f8f1a0e3da3b7f6619c7b1c5"
+          "after": "e957aeb57953fa2c585e72aa4eda54cadd3a94017008bd94519b5600b9fa14b8"
         },
         "verify_external_reads": {
           "before": null,
@@ -25685,6 +25793,40 @@
       "rationale": "Admit independently reviewed reconstruction evidence and explicit current input identities; preserve immutable raw reports, original comparison budgets and all historical controls.",
       "source_obligation": null,
       "unchanged_work": "No runtime, measured workload, dependency or original assertion change. Fresh source-token v2 evidence and current serial smoke are still required; this row does not certify them."
+    },
+    "docs/performance/policy-v3/ci-compatibility-20261015/order97-original.py.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Resolve the observed draft CI compatibility failure using exact authenticated predecessor evidence or a finite current-owner mapping; preserve the original failed receipt and source obligations.",
+      "source_obligation": "Retain original source/audit identities, all original assertions, and strict negative controls. Historical predecessor bytes are exposed only after exact current bytes and the declared semantic relation are verified.",
+      "unchanged_work": "No engine, benchmark workload, measured report, operation-map, limit, coverage threshold, skip or xfail change. Fresh current smoke and complete required native CI remain pending."
+    },
+    "docs/performance/policy-v3/ci-compatibility-20261015/phase14a-original.py.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Resolve the observed draft CI compatibility failure using exact authenticated predecessor evidence or a finite current-owner mapping; preserve the original failed receipt and source obligations.",
+      "source_obligation": "Retain original source/audit identities, all original assertions, and strict negative controls. Historical predecessor bytes are exposed only after exact current bytes and the declared semantic relation are verified.",
+      "unchanged_work": "No engine, benchmark workload, measured report, operation-map, limit, coverage threshold, skip or xfail change. Fresh current smoke and complete required native CI remain pending."
+    },
+    "tests/code_quality/test_phase14a_source_identity.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Resolve the observed draft CI compatibility failure using exact authenticated predecessor evidence or a finite current-owner mapping; preserve the original failed receipt and source obligations.",
+      "source_obligation": "Retain original source/audit identities, all original assertions, and strict negative controls. Historical predecessor bytes are exposed only after exact current bytes and the declared semantic relation are verified.",
+      "unchanged_work": "No engine, benchmark workload, measured report, operation-map, limit, coverage threshold, skip or xfail change. Fresh current smoke and complete required native CI remain pending."
+    },
+    "tools/core_rules_order95_audit.py": {
+      "category": "measured_workload",
+      "operations": [
+        "shock-source-generation-and-audit"
+      ],
+      "selected_families": [],
+      "rationale": "Resolve the observed draft CI compatibility failure using exact authenticated predecessor evidence or a finite current-owner mapping; preserve the original failed receipt and source obligations.",
+      "source_obligation": "Retain original source/audit identities, all original assertions, and strict negative controls. Historical predecessor bytes are exposed only after exact current bytes and the declared semantic relation are verified.",
+      "unchanged_work": "No engine, benchmark workload, measured report, operation-map, limit, coverage threshold, skip or xfail change. Fresh current smoke and complete required native CI remain pending."
     }
   },
   "milestone": "ordinary",

@@ -23,13 +23,23 @@ ASSESSMENT_MAP = "docs/performance/policy-v3/category-assessment-map-20261015"
 ASSESSMENT_MAP_SHA = "8d208df61242cabad2357158c161ae47aa67d8682275b7a181740faf166ee0ef"
 # Bind only after independent source review and the separate implementation commit.
 # Its sole permitted post-freeze source change is this None-to-commit literal.
-SOURCE_COMMIT: str | None = "ca8c7532668b0a2f7e07087914eeb48da0a83a1f"
+SOURCE_COMMIT: str | None = None
 SELF = "tools/performance_category_migration.py"
 CONTROLS = frozenset(
     {
         SELF,
         "scripts/check_performance_policy.py",
         "tests/code_quality/test_performance_category_migration.py",
+        "tests/category_migration_preservation.py",
+        "tests/code_quality/test_category_migration_preservation.py",
+        "tests/code_quality/test_phase14a_source_identity.py",
+        "tools/core_rules_order95_audit.py",
+    }
+)
+SOURCE_ARCHIVES = frozenset(
+    {
+        "docs/performance/policy-v3/ci-compatibility-20261015/order97-original.py.txt",
+        "docs/performance/policy-v3/ci-compatibility-20261015/phase14a-original.py.txt",
     }
 )
 
@@ -200,8 +210,15 @@ def reviewed_control_hashes(root: Path) -> dict[str, str]:
     _git(root, "merge-base", "--is-ancestor", SOURCE_COMMIT, "HEAD")
     marker = b"\nSOURCE_COMMIT: str | None = None"
     bound = f'\nSOURCE_COMMIT: str | None = "{SOURCE_COMMIT}"'.encode()
+    archive_root = root / "docs/performance/policy-v3/ci-compatibility-20261015"
+    if {
+        path.relative_to(root).as_posix()
+        for path in archive_root.rglob("*")
+        if path.is_file() or path.is_symlink()
+    } != SOURCE_ARCHIVES:
+        raise ValueError("Reviewed compatibility archive membership changed.")
     result: dict[str, str] = {}
-    for path in sorted(CONTROLS):
+    for path in sorted(CONTROLS | SOURCE_ARCHIVES):
         raw = _git(root, "show", SOURCE_COMMIT + ":" + path)
         if path == SELF:
             if raw.count(marker) != 1:
@@ -209,7 +226,8 @@ def reviewed_control_hashes(root: Path) -> dict[str, str]:
             raw = raw.replace(marker, bound, 1)
         if _read(root, path) != raw:
             raise ValueError("Reviewed adapter control bytes changed: " + path)
-        result[path] = _digest(raw)
+        if path in CONTROLS:
+            result[path] = _digest(raw)
     return result
 
 
@@ -262,7 +280,9 @@ def verify_current_inventory(
         raise ValueError("Current tool inputs differ from the finite migration cohort.")
     files = _strings(archive["MIGRATION_FILES.json.txt"])
     for name, digest in files.items():
-        if _digest(_read(root, name)) != digest:
+        # Only the exact independently frozen control cohort can supersede its
+        # own historical bytes. The original migration inventory stays immutable.
+        if _digest(_read(root, name)) != controls.get(name, digest):
             raise ValueError("Reviewed migration source/data changed: " + name)
     deletions = archive["MIGRATION_DELETIONS.json.txt"]
     if not isinstance(deletions, list):

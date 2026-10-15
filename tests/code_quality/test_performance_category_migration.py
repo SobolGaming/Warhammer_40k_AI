@@ -317,7 +317,7 @@ def frozen_controls(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     root.mkdir()
     subprocess.run(["git", "init", "--quiet", str(root)], check=True)
     marker = b"\nSOURCE_COMMIT: str | None = None"
-    for name in sorted(migration.CONTROLS):
+    for name in sorted(migration.CONTROLS | migration.SOURCE_ARCHIVES):
         raw = (ROOT / name).read_bytes()
         if name == migration.SELF and migration.SOURCE_COMMIT is not None:
             raw = raw.replace(
@@ -360,11 +360,25 @@ def test_exact_source_freeze_allows_only_the_declared_anchor_literal(frozen_cont
     }
 
 
-@pytest.mark.parametrize("name", sorted(migration.CONTROLS))
+@pytest.mark.parametrize("name", sorted(migration.CONTROLS | migration.SOURCE_ARCHIVES))
 def test_any_frozen_control_edit_is_rejected(frozen_controls: Path, name: str) -> None:
     path = frozen_controls / name
     path.write_bytes(path.read_bytes() + b"\n# unauthorized control change\n")
     with pytest.raises(ValueError, match="control bytes changed"):
+        migration.reviewed_control_hashes(frozen_controls)
+
+
+@pytest.mark.parametrize("mutation", ["extra", "missing"])
+def test_exact_compatibility_archive_membership_is_required(
+    frozen_controls: Path, mutation: str
+) -> None:
+    migration.reviewed_control_hashes(frozen_controls)
+    member = frozen_controls / sorted(migration.SOURCE_ARCHIVES)[0]
+    if mutation == "missing":
+        member.unlink()
+    else:
+        (member.parent / "unreviewed.txt").write_bytes(b"unreviewed")
+    with pytest.raises(ValueError, match="compatibility archive membership changed"):
         migration.reviewed_control_hashes(frozen_controls)
 
 

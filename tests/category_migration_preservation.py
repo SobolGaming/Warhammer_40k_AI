@@ -15,6 +15,14 @@ from typing import TypedDict, cast
 
 MANIFEST = "data/source_audits/category_migration/preservation.json"
 MANIFEST_SHA256 = "3214a0f3951b6fb921cd09e71bea7f741c06ba06a214db4f4573da5bd7d644e5"
+UTF8_TEST = "tests/code_quality/test_order97_inventory.py"
+UTF8_ARCHIVE = "docs/performance/policy-v3/ci-compatibility-20261015/order97-original.py.txt"
+UTF8_BEFORE_SHA256 = "78697c357cf227480a58cf22d2f1d201e621d1cb3e7c0e1631151613bacf3955"
+UTF8_AFTER_SHA256 = "7b4ce6c6d14243afe9f08fedf616e867f9555a5101e98de45bad130f66f32a99"
+EDITION_TEST = "tests/code_quality/test_phase14a_source_identity.py"
+EDITION_ARCHIVE = "docs/performance/policy-v3/ci-compatibility-20261015/phase14a-original.py.txt"
+EDITION_BEFORE_SHA256 = "22146cd184b4267c71b482cba021cd31387c8df1bd4a0d27f1157647cbc93e8b"
+EDITION_AFTER_SHA256 = "d67b860dbe557bd557536537d43c466176e2e6d14e1e48d6b8c08c1cb4d34eaf"
 MIGRATED_PATHS: frozenset[str] = frozenset(
     [
         "tests/integration/test_horror_split_materialization.py",
@@ -266,6 +274,53 @@ def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRec
 
 def read_historical_test_bytes(root: Path, relative: str) -> bytes:
     """Historical readers alone may request predecessor bytes after live verification."""
+    if relative == EDITION_TEST:
+        current = _read(root, relative).replace(b"\r\n", b"\n")
+        original = _read(root, EDITION_ARCHIVE)
+        if (
+            hashlib.sha256(current).hexdigest() != EDITION_AFTER_SHA256
+            or hashlib.sha256(original).hexdigest() != EDITION_BEFORE_SHA256
+        ):
+            raise ValueError("Exact edition-scanner maintenance bytes changed.")
+        before = b'_without_non_edition_references(path.read_text(encoding="utf-8"))'
+        after = b"_without_non_edition_references(_active_identity_text(path))"
+        if current.count(after) != 1:
+            raise ValueError("Exact edition-scanner maintenance call changed.")
+        old_tree = ast.parse(original)
+        new_tree = ast.parse(current.replace(after, before, 1))
+        additions = {
+            "_active_identity_text",
+            "test_historical_report_keys_are_scoped_to_exact_reviewed_document",
+            "test_historical_report_identity_exception_rejects_any_byte_drift",
+            "test_historical_report_does_not_exempt_other_active_documents",
+        }
+        if {
+            node.name
+            for node in new_tree.body
+            if isinstance(node, ast.FunctionDef) and node.name in additions
+        } != additions:
+            raise ValueError("Edition-scanner maintenance controls are incomplete.")
+        new_tree.body = [
+            node
+            for node in new_tree.body
+            if not (isinstance(node, ast.FunctionDef) and node.name in additions)
+        ]
+        if ast.dump(new_tree) != ast.dump(old_tree):
+            raise ValueError("Original edition assertions or unrelated semantics changed.")
+        return original
+    if relative == UTF8_TEST:
+        current = _read(root, relative).replace(b"\r\n", b"\n")
+        original = _read(root, UTF8_ARCHIVE)
+        before = b"audit.REPORT.read_text() == audit.markdown(inventory)"
+        after = b'audit.REPORT.read_text(encoding="utf-8") == audit.markdown(inventory)'
+        if (
+            hashlib.sha256(current).hexdigest() != UTF8_AFTER_SHA256
+            or hashlib.sha256(original).hexdigest() != UTF8_BEFORE_SHA256
+            or original.count(before) != 1
+            or original.replace(before, after, 1) != current
+        ):
+            raise ValueError("Exact Order97 UTF-8-only maintenance proof changed.")
+        return original
     if relative in MIGRATED_PATHS:
         return verify_migrated_test(root, relative)[0]
     return _read(root, relative)

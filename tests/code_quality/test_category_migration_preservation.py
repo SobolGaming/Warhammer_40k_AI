@@ -9,6 +9,11 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tools.core_rules_order95_audit import (
+    RETIRED_REFERENCE_SUCCESSORS,
+    AuditError,
+    validate_owner_reference,
+)
 
 from tests import category_migration_preservation as migration
 
@@ -179,3 +184,144 @@ def test_unmigrated_historical_reader_keeps_actual_current_bytes(tmp_path: Path)
     assert migration.live_test_reference(tmp_path, relative + "::test_current") == (
         relative + "::test_current"
     )
+
+
+MOVED = "tests/unit/test_phase9b_lifecycle.py"
+REFERENCE = MOVED + "::test_phase_wrap_switches_active_player"
+
+
+@pytest.fixture
+def migrated_root(tmp_path: Path) -> Path:
+    manifest = json.loads((ROOT / migration.MANIFEST).read_bytes())
+    record = manifest["originals"][MOVED]
+    for name in [migration.MANIFEST, record["archive"], *record["successors"]]:
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / name).read_bytes())
+    return tmp_path
+
+
+def test_order95_accepts_only_authenticated_live_migrated_owners(migrated_root: Path) -> None:
+    assert RETIRED_REFERENCE_SUCCESSORS[REFERENCE] == (
+        migration.live_test_reference(migrated_root, REFERENCE),
+    )
+    validate_owner_reference(REFERENCE, migrated_root)
+    validate_owner_reference(MOVED, migrated_root)
+    with pytest.raises(AuditError, match="reference is absent"):
+        validate_owner_reference(MOVED + "::test_unregistered_successor", migrated_root)
+
+
+@pytest.mark.parametrize("mutation", ["missing_successor", "changed_assertion", "archive"])
+def test_order95_successor_and_independent_migration_proof_reject_drift(
+    migrated_root: Path, mutation: str
+) -> None:
+    validate_owner_reference(REFERENCE, migrated_root)
+    _, record = migration.verify_migrated_test(migrated_root, MOVED)
+    successor = record["definitions"]["test_phase_wrap_switches_active_player"].split("::")[0]
+    target = migrated_root / (record["archive"] if mutation == "archive" else successor)
+    if mutation == "missing_successor":
+        target.unlink()
+    else:
+        raw = target.read_bytes()
+        target.write_bytes(
+            raw + b"\n# altered archival byte\n"
+            if mutation == "archive"
+            else raw.replace(b"assert ", b"assert True or ", 1)
+        )
+    if mutation == "missing_successor":
+        with pytest.raises(AuditError, match="reference is absent"):
+            validate_owner_reference(REFERENCE, migrated_root)
+    else:
+        with pytest.raises(ValueError, match="drifted"):
+            migration.verify_migrated_test(migrated_root, MOVED)
+
+
+def test_order95_migrated_owner_cannot_reappear_at_the_retired_node(migrated_root: Path) -> None:
+    validate_owner_reference(REFERENCE, migrated_root)
+    target = migrated_root / MOVED
+    target.write_bytes(
+        target.read_bytes() + b"\ndef test_phase_wrap_switches_active_player():\n    pass\n"
+    )
+    with pytest.raises(AuditError, match="retired owner was reintroduced"):
+        validate_owner_reference(REFERENCE, migrated_root)
+
+
+@pytest.fixture
+def utf8_root(tmp_path: Path) -> Path:
+    for name in (migration.UTF8_TEST, migration.UTF8_ARCHIVE):
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / name).read_bytes())
+    return tmp_path
+
+
+def test_utf8_maintenance_returns_original_only_after_exact_live_check(utf8_root: Path) -> None:
+    original = migration.read_historical_test_bytes(utf8_root, migration.UTF8_TEST)
+    assert hashlib.sha256(original).hexdigest() == migration.UTF8_BEFORE_SHA256
+    assert original == (ROOT / migration.UTF8_ARCHIVE).read_bytes()
+    assert (
+        b'audit.REPORT.read_text(encoding="utf-8")'
+        in (utf8_root / migration.UTF8_TEST).read_bytes()
+    )
+
+
+@pytest.mark.parametrize("member", ["live", "archive"])
+def test_utf8_maintenance_rejects_drift_after_success(utf8_root: Path, member: str) -> None:
+    migration.read_historical_test_bytes(utf8_root, migration.UTF8_TEST)
+    target = utf8_root / (migration.UTF8_TEST if member == "live" else migration.UTF8_ARCHIVE)
+    target.write_bytes(target.read_bytes() + b"\n")
+    with pytest.raises(ValueError, match="UTF-8-only maintenance proof changed"):
+        migration.read_historical_test_bytes(utf8_root, migration.UTF8_TEST)
+
+
+def test_utf8_maintenance_proves_only_the_encoding_edit_even_with_recomputed_live_pin(
+    utf8_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    target = utf8_root / migration.UTF8_TEST
+    changed = target.read_bytes().replace(b"assert ", b"assert True or ", 1).replace(b"\r\n", b"\n")
+    target.write_bytes(changed)
+    monkeypatch.setattr(migration, "UTF8_AFTER_SHA256", hashlib.sha256(changed).hexdigest())
+    with pytest.raises(ValueError, match="UTF-8-only maintenance proof changed"):
+        migration.read_historical_test_bytes(utf8_root, migration.UTF8_TEST)
+
+
+@pytest.fixture
+def edition_root(tmp_path: Path) -> Path:
+    for name in (migration.EDITION_TEST, migration.EDITION_ARCHIVE):
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / name).read_bytes())
+    return tmp_path
+
+
+def test_edition_maintenance_preserves_all_original_assertions(edition_root: Path) -> None:
+    original = migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+    assert hashlib.sha256(original).hexdigest() == migration.EDITION_BEFORE_SHA256
+
+
+@pytest.mark.parametrize("member", ["live", "archive"])
+def test_edition_maintenance_rechecks_complete_bytes_after_success(
+    edition_root: Path, member: str
+) -> None:
+    migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+    target = edition_root / (
+        migration.EDITION_TEST if member == "live" else migration.EDITION_ARCHIVE
+    )
+    target.write_bytes(target.read_bytes() + b"\n")
+    with pytest.raises(ValueError, match="edition-scanner maintenance bytes changed"):
+        migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+
+
+def test_edition_maintenance_rejects_an_assertion_change_even_with_recomputed_live_pin(
+    edition_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    target = edition_root / migration.EDITION_TEST
+    changed = target.read_bytes().replace(
+        b"assert not violations", b"assert True or not violations", 1
+    )
+    target.write_bytes(changed)
+    monkeypatch.setattr(migration, "EDITION_AFTER_SHA256", hashlib.sha256(changed).hexdigest())
+    with pytest.raises(
+        ValueError, match="Original edition assertions or unrelated semantics changed"
+    ):
+        migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
