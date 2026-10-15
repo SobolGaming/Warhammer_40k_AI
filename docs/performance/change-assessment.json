@@ -19974,11 +19974,11 @@
     },
     "tools/performance_category_migration.py": {
       "before_sha256": null,
-      "after_sha256": "2d3b68dc3141880ad1d405602a4862c100a184aa59374dec41ab937c509470fa",
+      "after_sha256": "c6fa7a7b40ba78f4fd91ae5be5b77475f05a2c2ddf5ce2471d72a07f6094684e",
       "owners": {
         "@module": {
           "before": null,
-          "after": "9b1060b176c266c8903955b19cfc30e592bd11b685827d4a2f829bc82891a095"
+          "after": "c0c071579871caf9c610e17dd3f5c24b9d8e8b6fecf0edb5dd912046e77c2961"
         },
         "_digest": {
           "before": null,
