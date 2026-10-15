@@ -11,7 +11,7 @@ from tests.charge_reroll_helpers import reroll_catalog
 from tests.phase13b_shooting_declaration_helpers import _config, _mustered_armies
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusteringError
-from warhammer40k_core.engine.faction_content import runtime
+from warhammer40k_core.engine.faction_content import loader, runtime
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.manifest import RuntimeContentManifest
@@ -24,7 +24,7 @@ def test_bundle_build_reuses_its_resolved_manifest_without_cross_build_state(
     config = _config(alpha_unit_ids=("alpha",), alpha_datasheets=None, enemy_datasheet=None)
     armies = _mustered_armies(config)
     original_manifest = runtime.runtime_content_manifest_for_ruleset
-    original_load = runtime.load_runtime_content_contributions
+    original_load = loader.load_runtime_content_contributions
     manifests: list[RuntimeContentManifest] = []
     consumed: list[RuntimeContentManifest] = []
 
