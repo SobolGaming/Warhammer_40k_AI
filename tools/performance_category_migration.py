@@ -23,7 +23,7 @@ ASSESSMENT_MAP = "docs/performance/policy-v3/category-assessment-map-20261015"
 ASSESSMENT_MAP_SHA = "8d208df61242cabad2357158c161ae47aa67d8682275b7a181740faf166ee0ef"
 # Bind only after independent source review and the separate implementation commit.
 # Its sole permitted post-freeze source change is this None-to-commit literal.
-SOURCE_COMMIT: str | None = None
+SOURCE_COMMIT: str | None = "ca8c7532668b0a2f7e07087914eeb48da0a83a1f"
 SELF = "tools/performance_category_migration.py"
 CONTROLS = frozenset(
     {
