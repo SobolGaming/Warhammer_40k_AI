@@ -21,7 +21,7 @@ EXTERNAL = "EXTERNAL_READS.json.txt"
 EXTERNAL_SHA = "0c80ce5afe982667d0c665d70ad3895ab5d3793b0b987d5c3c9ba7a5b29fd9da"
 # Bind only after independent source review and the separate implementation commit.
 # Its sole permitted post-freeze source change is this None-to-commit literal.
-SOURCE_COMMIT: str | None = None
+SOURCE_COMMIT: str | None = "48e2faf77efb682fb6b6e79df78577acd764d064"
 SELF = "tools/performance_category_migration.py"
 CONTROLS = frozenset(
     {
