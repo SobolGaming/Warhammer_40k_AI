@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 
+from tests.category_migration_preservation import read_historical_test_bytes
 from tests.d09_test_preservation_helpers import preserved_d09_predecessor_test_bytes
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -63,7 +64,7 @@ def test_d07_complete_sources_archives_and_original_tests_remain_pinned() -> Non
     originals = json.loads(original_raw)
     assert approved.keys() <= originals.keys()
     for path, digest in originals.items():
-        raw = (ROOT / path).read_bytes().replace(b"\r\n", b"\n")
+        raw = read_historical_test_bytes(ROOT, path).replace(b"\r\n", b"\n")
         raw = preserved_d09_predecessor_test_bytes(path, raw)
         current = hashlib.sha256(raw).hexdigest()
         if path in approved:

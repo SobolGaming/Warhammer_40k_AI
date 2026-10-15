@@ -44,7 +44,7 @@ def _digest(value: object) -> str:
 
 def _object(value: object) -> dict[str, object]:
     if not isinstance(value, dict):
-        raise ValueError("Reconstruction evidence requires an object.")
+        raise TypeError("Reconstruction evidence requires an object.")
     typed = cast(dict[object, object], value)
     if not all(isinstance(key, str) for key in typed):
         raise ValueError("Reconstruction evidence requires string keys.")
@@ -166,7 +166,7 @@ def validate_report(
         raise ValueError("Reconstruction campaign requires its original seven-sample workload.")
     pairs = report["ordered_pairs"]
     if not isinstance(pairs, list):
-        raise ValueError("Both original reconstruction pairs are required.")
+        raise TypeError("Both original reconstruction pairs are required.")
     typed_pairs = cast(list[object], pairs)
     if len(typed_pairs) != 2:
         raise ValueError("Both original reconstruction pairs are required.")

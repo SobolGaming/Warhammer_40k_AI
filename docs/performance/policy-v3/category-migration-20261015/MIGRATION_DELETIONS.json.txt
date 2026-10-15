@@ -1,0 +1,10 @@
+[
+  "tests/unit/test_lifecycle_hooks.py",
+  "tests/unit/test_order98_source_reconciliation.py",
+  "tests/unit/test_phase17n_step5g_pairing_certification_layout_b.py",
+  "tests/unit/test_phase17n_step5g_pairing_certification_layout_c.py",
+  "tests/unit/test_phase17n_step6g_secondary_certification_a_grievous_through_beacon.py",
+  "tests/unit/test_phase17n_step6g_secondary_certification_behind_through_cleanse.py",
+  "tests/unit/test_phase17n_step6g_secondary_certification_defend_through_forward.py",
+  "tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py"
+]

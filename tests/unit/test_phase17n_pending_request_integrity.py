@@ -1,67 +1,95 @@
 from __future__ import annotations
 
-from copy import deepcopy
-from dataclasses import replace
-from typing import cast
+from typing import cast as cast
 
-import pytest
-from tests.phase17n_primary_mission_helpers import (
-    phase17n_action_opportunity_fixture,
-    phase17n_consecrate_pending_fixture,
-    phase17n_direct_action_pending_fixture,
-    phase17n_locate_pending_fixture,
-    phase17n_punishment_pending_fixture,
-    phase17n_sensor_pending_fixture,
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT as PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT,
 )
-
-from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_record import DecisionRecord
-from warhammer40k_core.engine.decision_request import DecisionRequest
-from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.lifecycle import GameLifecycle
-from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
-    PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT,
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    DecisionController as DecisionController,
 )
-from warhammer40k_core.engine.primary_mission_choice_payloads import PrimaryMissionChoiceData
-from warhammer40k_core.engine.primary_mission_pending_request_integrity import (
-    validate_primary_mission_pending_request_integrity,
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    DecisionRecord as DecisionRecord,
 )
-from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
-
-type PendingFixture = tuple[GameState, DecisionController, DecisionRequest]
-
-
-@pytest.fixture(scope="module")
-def action_opportunity() -> PendingFixture:
-    return phase17n_action_opportunity_fixture()
-
-
-@pytest.fixture(scope="module")
-def direct_action() -> PendingFixture:
-    return phase17n_direct_action_pending_fixture()
-
-
-@pytest.fixture(scope="module")
-def locate_choice() -> PendingFixture:
-    return phase17n_locate_pending_fixture()
-
-
-@pytest.fixture(scope="module")
-def punishment_choice() -> PendingFixture:
-    return phase17n_punishment_pending_fixture()
-
-
-@pytest.fixture(scope="module")
-def consecrate_choice() -> PendingFixture:
-    return phase17n_consecrate_pending_fixture()
-
-
-@pytest.fixture(scope="module")
-def sensor_choice() -> PendingFixture:
-    return phase17n_sensor_pending_fixture()
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    DecisionRequest as DecisionRequest,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    DecisionResult as DecisionResult,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    GameLifecycle as GameLifecycle,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    GameLifecycleError as GameLifecycleError,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    GameState as GameState,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    JsonValue as JsonValue,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    PendingFixture as PendingFixture,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    PrimaryMissionChoiceData as PrimaryMissionChoiceData,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    RuntimeModifierRegistry as RuntimeModifierRegistry,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import __all__ as __all__
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    _controller_with_pending_request as _controller_with_pending_request,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    _validate as _validate,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    action_opportunity as action_opportunity,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    consecrate_choice as consecrate_choice,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import deepcopy as deepcopy
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    direct_action as direct_action,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    locate_choice as locate_choice,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    phase17n_action_opportunity_fixture as phase17n_action_opportunity_fixture,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    phase17n_consecrate_pending_fixture as phase17n_consecrate_pending_fixture,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    phase17n_direct_action_pending_fixture as phase17n_direct_action_pending_fixture,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    phase17n_locate_pending_fixture as phase17n_locate_pending_fixture,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    phase17n_punishment_pending_fixture as phase17n_punishment_pending_fixture,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    phase17n_sensor_pending_fixture as phase17n_sensor_pending_fixture,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    punishment_choice as punishment_choice,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import pytest as pytest
+from tests.shared.category_migration.phase17n_pending_request_integrity import replace as replace
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    sensor_choice as sensor_choice,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    validate_json_value as validate_json_value,
+)
+from tests.shared.category_migration.phase17n_pending_request_integrity import (
+    validate_primary_mission_pending_request_integrity as validate_primary_mission_pending_request_integrity,  # noqa: E501 - exact preserved export
+)
 
 
 def test_pending_step4_families_accept_exact_authoritative_requests(
@@ -369,35 +397,3 @@ def test_pending_step4_rejects_existing_record_and_post_request_mutation(
     )
     with pytest.raises(GameLifecycleError, match="impossible post-request event suffix"):
         _validate(state=state, decisions=mutated)
-
-
-def _validate(*, state: GameState, decisions: DecisionController) -> None:
-    validate_primary_mission_pending_request_integrity(
-        state=state,
-        decisions=decisions,
-        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-    )
-
-
-def _controller_with_pending_request(
-    *,
-    decisions: DecisionController,
-    request: DecisionRequest,
-    synchronize_requested_event: bool,
-) -> DecisionController:
-    payload = deepcopy(decisions.to_payload())
-    payload["queue"]["pending_requests"] = [request.to_payload()]
-    if synchronize_requested_event:
-        original_request_id = decisions.queue.pending_requests[0].request_id
-        for event in payload["event_log"]:
-            if event["event_type"] != "decision_requested":
-                continue
-            event_payload = event["payload"]
-            if not isinstance(event_payload, dict):
-                continue
-            if event_payload.get("request_id") == original_request_id:
-                event["payload"] = cast(JsonValue, request.to_payload())
-    return DecisionController.from_payload(payload)
-
-
-__all__ = ()

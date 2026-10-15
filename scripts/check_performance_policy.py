@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import cast
 
 from scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_SECONDS, WORKLOAD
+from tools.performance_category_migration import applies as migration_applies
 from tools.performance_order103_exception import retained_comparison_inputs
 from tools.performance_policy import (
     ASSESSMENT,
@@ -209,7 +210,19 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
         if not isinstance(driver, str) or driver not in inputs:
             raise ValueError("Selected measurement driver is missing.")
         comparison = read_object(root / path)
-        if binding_enabled(family, specification):
+        migration_binding: dict[str, object] | None = None
+        applicability_sha: str | None
+        migration = (
+            migration_applies(base=base, runtime_id=runtime_id, family=family)
+            and (root / "docs/performance/policy-v3/category-migration-20261015").exists()
+        )
+        if migration:
+            from tools.performance_category_migration import retained_inputs as migration_inputs
+
+            measured_inputs, migration_binding, applicability_sha = migration_inputs(
+                root, current=inputs, report=comparison, base=base, runtime_id=runtime_id
+            )
+        elif binding_enabled(family, specification):
             tool_schema = str(object_value(specification["input_binding"])["schema"])
             if tool_schema == HISTORICAL_TOOL_SCHEMA:
                 measured_inputs, applicability_sha = retained_tool_comparison_inputs(
@@ -234,20 +247,24 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
         if applicability_sha is not None:
             retained_applicability[family] = applicability_sha
         tool_inputs = (
-            comparison_inputs(
-                root,
-                base=base,
-                family=family,
-                head_input_digest=canonical_digest(measured_inputs),
-                schema=str(object_value(specification["input_binding"])["schema"]),
-                measured_head=str(
-                    object_value(
-                        object_value(object_value(comparison["input_binding"])["sides"])["head"]
-                    )["revision"]
-                ),
+            migration_binding
+            if migration
+            else (
+                comparison_inputs(
+                    root,
+                    base=base,
+                    family=family,
+                    head_input_digest=canonical_digest(measured_inputs),
+                    schema=str(object_value(specification["input_binding"])["schema"]),
+                    measured_head=str(
+                        object_value(
+                            object_value(object_value(comparison["input_binding"])["sides"])["head"]
+                        )["revision"]
+                    ),
+                )
+                if binding_enabled(family, specification)
+                else None
             )
-            if binding_enabled(family, specification)
-            else None
         )
         fixture_digest = canonical_digest(
             {

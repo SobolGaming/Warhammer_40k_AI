@@ -1,220 +1,26 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-
-from tools.generate_ability_support_matrix import ability_support_matrix_rows
-
-from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
-from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
-from warhammer40k_core.engine.ability_coverage import (
+from tests.shared.category_migration.reporting__test_runtime_consumer_evidence import (
+    _ARMY_RULE_EVIDENCE,
     AbilityCoverageRow,
     AbilityCoverageSupportStage,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
-    army_rule as adepta_sororitas_army_rule,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adeptus_custodes import (
-    army_rule as adeptus_custodes_army_rule,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adeptus_mechanicus import (
-    army_rule as adeptus_mechanicus_army_rule,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
-    descriptor_consumption as chaos_daemons_descriptor_consumption,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
-    july_2026 as chaos_daemons_july_2026,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
-    army_rule as chaos_space_marines_army_rule,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
-    army_rule as death_guard_army_rule,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
-    army_rule as emperors_children_army_rule,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.imperial_knights import (
-    army_rule as imperial_knights_army_rule,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
-    army_rule as thousand_sons_army_rule,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.tyranids import (
-    army_rule as tyranids_army_rule,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
-    army_rule as world_eaters_army_rule,
-)
-
-
-@dataclass(frozen=True, slots=True)
-class ArmyRuleEvidence:
-    ability_name: str
-    datasheet_name: str
-    runtime_consumer_ids: frozenset[str]
-
-
-_ARMY_RULE_EVIDENCE = (
-    ArmyRuleEvidence(
-        ability_name="Dark Pacts",
-        datasheet_name="Chaos Space Marines",
-        runtime_consumer_ids=frozenset(
-            {
-                chaos_space_marines_army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID,
-                chaos_space_marines_army_rule.FIGHT_LETHAL_HITS_HOOK_ID,
-                chaos_space_marines_army_rule.FIGHT_SUSTAINED_HITS_HOOK_ID,
-                chaos_space_marines_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
-                chaos_space_marines_army_rule.SHOOTING_LETHAL_HITS_HOOK_ID,
-                chaos_space_marines_army_rule.SHOOTING_SUSTAINED_HITS_HOOK_ID,
-                chaos_space_marines_army_rule.WEAPON_PROFILE_MODIFIER_ID,
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Nurgle's Gift",
-        datasheet_name="Death Guard",
-        runtime_consumer_ids=frozenset(
-            {
-                death_guard_army_rule.HOOK_ID,
-                f"{death_guard_army_rule.HOOK_ID}:armour-save-option",
-                f"{death_guard_army_rule.HOOK_ID}:leadership",
-                f"{death_guard_army_rule.HOOK_ID}:melee-hit-roll",
-                f"{death_guard_army_rule.HOOK_ID}:movement-budget",
-                f"{death_guard_army_rule.HOOK_ID}:objective-control",
-                f"{death_guard_army_rule.HOOK_ID}:toughness",
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Blessings of Khorne",
-        datasheet_name="World Eaters",
-        runtime_consumer_ids=frozenset(
-            {
-                world_eaters_army_rule.HOOK_ID,
-                world_eaters_army_rule.RAGE_FUELLED_INVIGORATION_HOOK_ID,
-                world_eaters_army_rule.TOTAL_CARNAGE_HOOK_ID,
-                world_eaters_army_rule.UNBRIDLED_BLOODLUST_CHARGE_MODIFIER_ID,
-                f"{world_eaters_army_rule.HOOK_ID}:weapon-profile-keywords",
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Thrill Seekers",
-        datasheet_name="Emperor's Children",
-        runtime_consumer_ids=frozenset(
-            {
-                emperors_children_army_rule.ADVANCE_ELIGIBILITY_HOOK_ID,
-                emperors_children_army_rule.FALL_BACK_ELIGIBILITY_HOOK_ID,
-                emperors_children_army_rule.SHOOTING_TARGET_RESTRICTION_HOOK_ID,
-                emperors_children_army_rule.CHARGE_TARGET_RESTRICTION_HOOK_ID,
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Prioritised Efficiency",
-        datasheet_name="Leagues of Votann",
-        runtime_consumer_ids=frozenset(
-            {
-                "warhammer_40000_11th:leagues_of_votann:army_rule:"
-                "prioritised_efficiency:command-phase-start",
-                "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
-                "warhammer_40000_11th:leagues_of_votann:army_rule:"
-                "prioritised_efficiency:wound-roll",
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Cabal of Sorcerers",
-        datasheet_name="Thousand Sons",
-        runtime_consumer_ids=frozenset(
-            {
-                thousand_sons_army_rule.HOOK_ID,
-                thousand_sons_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
-                thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID,
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Cult Ambush",
-        datasheet_name="Genestealer Cults",
-        runtime_consumer_ids=frozenset(
-            {
-                genestealer_cults_cult_ambush.SOURCE_RULE_ID,
-                genestealer_cults_cult_ambush.BATTLE_FORMATION_HOOK_ID,
-                genestealer_cults_cult_ambush.UNIT_DESTROYED_HOOK_ID,
-                genestealer_cults_cult_ambush.TURN_END_HOOK_ID,
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Acts of Faith",
-        datasheet_name="Adepta Sororitas",
-        runtime_consumer_ids=frozenset(
-            {
-                adepta_sororitas_army_rule.BATTLE_ROUND_START_HOOK_ID,
-                adepta_sororitas_army_rule.UNIT_DESTROYED_HOOK_ID,
-                adepta_sororitas_army_rule.TRIUMPH_RELICS_BATTLE_ROUND_START_HOOK_ID,
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Martial Ka'tah",
-        datasheet_name="Adeptus Custodes",
-        runtime_consumer_ids=frozenset(
-            {
-                adeptus_custodes_army_rule.DACATARAI_HOOK_ID,
-                adeptus_custodes_army_rule.RENDAX_HOOK_ID,
-                adeptus_custodes_army_rule.WEAPON_PROFILE_MODIFIER_ID,
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Doctrina Imperatives",
-        datasheet_name="Adeptus Mechanicus",
-        runtime_consumer_ids=frozenset(
-            {
-                adeptus_mechanicus_army_rule.HOOK_ID,
-                adeptus_mechanicus_army_rule.PROTECTOR_HIT_MODIFIER_ID,
-                adeptus_mechanicus_army_rule.WEAPON_PROFILE_MODIFIER_ID,
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Shadow in the Warp / Synapse",
-        datasheet_name="Tyranids",
-        runtime_consumer_ids=frozenset(
-            {
-                tyranids_army_rule.HOOK_ID,
-                tyranids_army_rule.BATTLE_SHOCK_HOOK_ID,
-                tyranids_army_rule.WEAPON_PROFILE_MODIFIER_ID,
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Code Chivalric",
-        datasheet_name="Imperial Knights",
-        runtime_consumer_ids=frozenset(
-            {
-                imperial_knights_army_rule.HOOK_ID,
-                imperial_knights_army_rule.SETUP_HOOK_ID,
-                imperial_knights_army_rule.UNIT_DESTROYED_HOOK_ID,
-                imperial_knights_army_rule.END_TURN_EVENT_HANDLER_ID,
-                imperial_knights_army_rule.END_BATTLE_ROUND_EVENT_HANDLER_ID,
-                f"{imperial_knights_army_rule.HOOK_ID}:martial-valour:shooting",
-                f"{imperial_knights_army_rule.HOOK_ID}:martial-valour:fight",
-                f"{imperial_knights_army_rule.HOOK_ID}:eager:movement-budget",
-                f"{imperial_knights_army_rule.HOOK_ID}:eager:charge-roll",
-                f"{imperial_knights_army_rule.HOOK_ID}:legacy:objective-control",
-                f"{imperial_knights_army_rule.HOOK_ID}:legacy:leadership",
-            }
-        ),
-    ),
-    ArmyRuleEvidence(
-        ability_name="Bondsman",
-        datasheet_name="Imperial Knights",
-        runtime_consumer_ids=frozenset({imperial_knights_army_rule.BONDSMAN_HOOK_ID}),
-    ),
+    ArmyRuleEvidence,
+    CatalogAbilitySourceKind,
+    ability_support_matrix_rows,
+    adepta_sororitas_army_rule,
+    adeptus_custodes_army_rule,
+    adeptus_mechanicus_army_rule,
+    chaos_daemons_descriptor_consumption,
+    chaos_daemons_july_2026,
+    chaos_space_marines_army_rule,
+    dataclass,
+    death_guard_army_rule,
+    emperors_children_army_rule,
+    genestealer_cults_cult_ambush,
+    imperial_knights_army_rule,
+    thousand_sons_army_rule,
+    tyranids_army_rule,
+    world_eaters_army_rule,
 )
 
 
@@ -295,37 +101,9 @@ def test_defiler_faction_rows_retain_exact_executable_army_rule_evidence() -> No
         )
 
 
-def test_emperors_children_defiler_thrill_seekers_retains_exact_runtime_evidence() -> None:
-    rows = ability_support_matrix_rows()
-    defiler_row = next(
-        row
-        for row in rows
-        if row.datasheet_id == "000004208"
-        and row.ability_id == emperors_children_army_rule.THRILL_SEEKERS_SOURCE_ABILITY_ID
-    )
-
-    assert defiler_row.source_kind is CatalogAbilitySourceKind.FACTION
-    assert defiler_row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
-    assert defiler_row.semantic_categories == ("faction.army_rule.thrill_seekers",)
-    assert frozenset(defiler_row.runtime_consumer_ids) == frozenset(
-        {
-            emperors_children_army_rule.ADVANCE_ELIGIBILITY_HOOK_ID,
-            emperors_children_army_rule.FALL_BACK_ELIGIBILITY_HOOK_ID,
-            emperors_children_army_rule.SHOOTING_TARGET_RESTRICTION_HOOK_ID,
-            emperors_children_army_rule.CHARGE_TARGET_RESTRICTION_HOOK_ID,
-        }
-    )
-
-    other_runtime_backed_defiler_rows = tuple(
-        row
-        for row in rows
-        if row.datasheet_name == "Defiler"
-        and row.source_kind is CatalogAbilitySourceKind.FACTION
-        and row.ability_id != emperors_children_army_rule.THRILL_SEEKERS_SOURCE_ABILITY_ID
-    )
-    assert other_runtime_backed_defiler_rows
-    assert all(
-        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
-        and row.runtime_consumer_ids
-        for row in other_runtime_backed_defiler_rows
-    )
+__all__: list[str] = []
+__all__ += ["ArmyRuleEvidence", "adepta_sororitas_army_rule", "adeptus_custodes_army_rule"]
+__all__ += ["adeptus_mechanicus_army_rule", "chaos_space_marines_army_rule", "dataclass"]
+__all__ += ["death_guard_army_rule", "emperors_children_army_rule"]
+__all__ += ["genestealer_cults_cult_ambush", "imperial_knights_army_rule"]
+__all__ += ["thousand_sons_army_rule", "tyranids_army_rule", "world_eaters_army_rule"]

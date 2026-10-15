@@ -1,135 +1,96 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-from dataclasses import replace
 from typing import cast
 
-import pytest
-from tests.parameterized_projection_helpers import assert_parameterized_projection
-
-from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.engine import (
-    catalog_return_on_death_runtime as catalog_return_on_death_runtime_module,
-)
-from warhammer40k_core.engine import return_on_death as return_on_death_module
-from warhammer40k_core.engine.abilities import (
+from tests.shared.category_migration.return_on_death import (
+    FIRST_DEATH_RETURN_TEXT,
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+    PARAMETERIZED_DECISION_OPTION_ID,
+    SOURCE_KEYWORD_SEQUENCE_PARTS,
+    SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
     AbilityDefinition,
     AbilitySourceKind,
     AbilityTimingDescriptor,
-)
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
-from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
-from warhammer40k_core.engine.catalog_return_on_death_runtime import CatalogReturnOnDeathRuntime
-from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_clauses_from_record
-from warhammer40k_core.engine.command_points import initial_command_point_ledgers
-from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
-from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import (
-    PARAMETERIZED_DECISION_OPTION_ID,
+    ArmyCatalog,
+    ArmyDefinition,
+    ArmyMusterRequest,
+    BattlePhase,
+    Callable,
+    CatalogReturnOnDeathRuntime,
+    DamageKind,
+    DecisionController,
     DecisionRequest,
-)
-from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
-from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.direct_mortal_wound_application import (
-    apply_direct_mortal_wounds_to_unit,
-)
-from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.lifecycle import GameLifecycle
-from warhammer40k_core.engine.list_validation import (
+    DecisionResult,
+    DestructionSourceKind,
     DetachmentSelection,
-    UnitMusterSelection,
-)
-from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    DiceExpression,
+    DiceRollManager,
+    DiceRollResult,
+    DiceRollSpec,
+    GameLifecycle,
+    GameLifecycleError,
+    GameLifecycleStage,
+    GameState,
+    JsonValue,
+    ModelPlacement,
+    ModelProfileSelection,
     MortalWoundDestructionEvidence,
-)
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
-from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.primary_destruction_evidence import (
-    RulesUnitObjectiveProximityWitness,
-)
-from warhammer40k_core.engine.return_on_death import (
-    SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+    ObjectiveRuleScope,
     PendingReturnOnDeath,
+    PhaseEndObjectiveControlContext,
+    Pose,
     ReturnDestroyedTargetScope,
     ReturnRestoreWoundsMode,
+    RulesetDescriptor,
+    RuleSourceText,
+    RulesUnitObjectiveProximityWitness,
+    RuntimeModifierRegistry,
+    TimingTriggerKind,
+    UnitDestroyedContext,
+    UnitInstance,
+    UnitMusterSelection,
+    UnitPlacement,
+    _battle_state_with_destroyed_beta_unit,
+    _battle_state_with_scenario,
+    _beta_unit,
+    _destroyed_model_placement_for_model,
+    _destroyed_position_payload_for_model,
+    _destroyed_position_payload_for_placement,
+    _destroyed_position_payload_for_placement_payload,
+    _first_alpha_model_pose,
+    _muster_request,
+    _mustered_armies,
+    _pending_return_on_death,
+    _placement_result,
+    _record_return_captures,
+    _return_on_death_record,
+    _roll_result,
+    _set_model_wounds,
+    _set_unit_wounds,
+    _unit_placement_at_destroyed_position,
+    _unit_placement_for_model_at_destroyed_position,
+    _unit_placement_for_unit,
+    apply_damage_to_model,
+    apply_direct_mortal_wounds_to_unit,
     apply_return_on_death_placement_decision,
+    assert_parameterized_projection,
     build_return_on_death_placement_request,
+    catalog_return_on_death_runtime_module,
+    catalog_rule_clauses_from_record,
+    compile_rule_source_text,
+    create_deterministic_battlefield_scenario,
+    datasheet_keyword_lexicon_source,
+    initial_command_point_ledgers,
+    initial_victory_point_ledgers,
     invalid_return_on_death_placement_status,
+    muster_army,
+    pytest,
+    replace,
+    resolve_return_phase_end_candidates,
+    return_on_death_module,
 )
-from warhammer40k_core.engine.return_on_death_sequencing import resolve_return_phase_end_candidates
-from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
-from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
-from warhammer40k_core.engine.sticky_objective_control import PhaseEndObjectiveControlContext
-from warhammer40k_core.engine.timing_windows import TimingTriggerKind
-from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
-from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.engine.wargear_selections import (
-    ModelProfileSelection,
-)
-from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
-from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
-from warhammer40k_core.rules.source_data import RuleSourceText
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
-)
-
-FIRST_DEATH_RETURN_TEXT = (
-    "The first time this model is destroyed, at the end of the phase, roll one D6: on "
-    "a 2+, set this model back up on the battlefield as close as possible to where it "
-    "was destroyed and not within Engagement Range of one or more enemy units, with "
-    "3 wounds remaining."
-)
-SOURCE_KEYWORD_SEQUENCE_PARTS = (
-    datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
-)
-
-
-def test_return_on_death_failed_roll_resolves_without_restoring_target() -> None:
-    state = _battle_state_with_destroyed_beta_unit()
-    pending = _pending_return_on_death(state=state, success_threshold=5)
-    state.record_pending_return_on_death(pending)
-    decisions = DecisionController()
-    manager = DiceRollManager(
-        state.game_id,
-        event_log=decisions.event_log,
-        injected_results=(_roll_result(pending=pending, value=1),),
-    )
-    from warhammer40k_core.engine.return_on_death_sequencing import return_phase_end_candidates
-    from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext
-
-    before_discovery = (state.to_payload(), decisions.to_payload())
-    assert state.current_battle_phase is not None
-    candidates = return_phase_end_candidates(
-        TurnEndRequestContext(
-            state=state,
-            decisions=decisions,
-            completed_phase=state.current_battle_phase,
-            trigger_kind=TimingTriggerKind.END_PHASE,
-        ),
-        dice_manager=manager,
-    )
-    assert (state.to_payload(), decisions.to_payload()) == before_discovery
-    assert len(candidates) == 1
-    assert candidates[0].participant.player_id == pending.owner_player_id
-
-    request = resolve_return_phase_end_candidates(
-        state=state,
-        decisions=decisions,
-        dice_manager=manager,
-    )
-
-    assert request is None
-    assert state.pending_return_on_death_by_id(pending.pending_id).resolved
-    assert state.battlefield_state is not None
-    assert set(_beta_unit(state).own_model_ids()) <= set(state.battlefield_state.removed_model_ids)
 
 
 def test_return_on_death_success_requests_placement_and_rejects_invalid_submission() -> None:
@@ -230,87 +191,6 @@ def test_return_on_death_full_health_restores_unit_and_battlefield_placement(
     )
 
 
-@pytest.mark.parametrize("whole_unit_destroyed", [True, False])
-def test_return_on_death_fixed_wounds_restores_exact_remaining_wounds(
-    whole_unit_destroyed: bool,
-) -> None:
-    state = _battle_state_with_scenario()
-    beta = _beta_unit(state)
-    if whole_unit_destroyed:
-        state = _battle_state_with_destroyed_beta_unit()
-    else:
-        model_id = beta.own_models[0].model_instance_id
-        _set_model_wounds(state, model_instance_id=model_id, wounds_remaining=0)
-        assert state.battlefield_state is not None
-        state.battlefield_state = state.battlefield_state.with_removed_models((model_id,))
-    pending = _pending_return_on_death(
-        state=state,
-        target_scope=ReturnDestroyedTargetScope.DESTROYED_MODEL,
-        restore_mode=ReturnRestoreWoundsMode.FIXED_REMAINING,
-        wounds_remaining=1,
-    )
-    state.record_pending_return_on_death(pending)
-    decisions = DecisionController()
-    request = build_return_on_death_placement_request(state=state, pending=pending)
-    decisions.request_decision(request)
-    destroyed_model_id = pending.destroyed_model_instance_id
-    assert destroyed_model_id is not None
-    result = _placement_result(
-        request=request,
-        placement=_unit_placement_for_model_at_destroyed_position(
-            state=state,
-            unit=_beta_unit(state),
-            model_instance_id=destroyed_model_id,
-        ),
-    )
-    decisions.submit_result(result)
-
-    resolved = apply_return_on_death_placement_decision(
-        state=state,
-        decisions=decisions,
-        request=request,
-        result=result,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
-    )
-
-    returned_model = next(
-        model
-        for model in _beta_unit(state).own_models
-        if model.model_instance_id == destroyed_model_id
-    )
-    assert resolved.resolved
-    assert returned_model.current_wounds == 1
-    assert bool(state.phase_movement_history) is whole_unit_destroyed
-    from warhammer40k_core.engine.phase_movement_history import validate_phase_movement_history
-
-    validate_phase_movement_history(state=state, events=decisions.event_log.records)
-    assert state.battlefield_state is not None
-    assert destroyed_model_id not in state.battlefield_state.removed_model_ids
-
-
-def test_return_on_death_stale_pending_submission_rejects_before_mutation() -> None:
-    state = _battle_state_with_destroyed_beta_unit()
-    pending = _pending_return_on_death(state=state)
-    state.record_pending_return_on_death(pending)
-    request = build_return_on_death_placement_request(state=state, pending=pending)
-    state.resolve_pending_return_on_death(pending.pending_id)
-    result = _placement_result(
-        request=request,
-        placement=_unit_placement_for_unit(state=state, unit=_beta_unit(state), x=20.0, y=20.0),
-    )
-
-    status = invalid_return_on_death_placement_status(
-        state=state,
-        request=request,
-        result=result,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
-    )
-
-    assert status is not None
-    assert state.battlefield_state is not None
-    assert set(_beta_unit(state).own_model_ids()) <= set(state.battlefield_state.removed_model_ids)
-
-
 def test_return_on_death_rejects_far_placement_when_destroyed_position_is_legal() -> None:
     state = _battle_state_with_destroyed_beta_unit()
     pending = _pending_return_on_death(state=state, success_threshold=2)
@@ -377,231 +257,6 @@ def test_return_on_death_rejects_far_placement_when_illegal_anchor_has_closer_ca
     assert status is not None
     assert state.battlefield_state is not None
     assert set(beta.own_model_ids()) <= set(state.battlefield_state.removed_model_ids)
-
-
-def test_return_on_death_rejects_zero_fixed_wounds_before_runtime_mutation() -> None:
-    state = _battle_state_with_destroyed_beta_unit()
-    with pytest.raises(GameLifecycleError, match="wounds_remaining"):
-        _pending_return_on_death(
-            state=state,
-            target_scope=ReturnDestroyedTargetScope.DESTROYED_MODEL,
-            restore_mode=ReturnRestoreWoundsMode.FIXED_REMAINING,
-            wounds_remaining=0,
-        )
-
-
-def test_return_on_death_pending_payload_round_trips() -> None:
-    state = _battle_state_with_destroyed_beta_unit()
-    pending = _pending_return_on_death(state=state)
-
-    assert PendingReturnOnDeath.from_payload(pending.to_payload()) == pending
-
-
-def test_return_on_death_runtime_empty_indexes_have_no_hooks() -> None:
-    state = _battle_state_with_scenario()
-    runtime = CatalogReturnOnDeathRuntime(
-        ability_indexes_by_player_id={
-            "player-a": AbilityCatalogIndex.from_records(()),
-            "player-b": AbilityCatalogIndex.from_records(()),
-        },
-        armies=tuple(state.army_definitions),
-    )
-
-    assert runtime.unit_destroyed_bindings() == ()
-    assert runtime.phase_end_bindings() == ()
-
-
-def test_return_on_death_runtime_fail_fast_filter_and_out_of_phase_paths() -> None:
-    state = _battle_state_with_destroyed_beta_unit()
-    beta = _beta_unit(state)
-    destroyed_model_id = beta.own_models[0].model_instance_id
-    current_phase = state.current_battle_phase
-    assert current_phase is not None
-    context = UnitDestroyedContext(
-        sequencing_active_player_id=cast(str, state.active_player_id),
-        state=state,
-        decisions=DecisionController(),
-        completed_phase=current_phase,
-        model_destroyed_event_id="event:return-runtime",
-        model_destroyed_payload={
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": current_phase.value,
-            "destroying_player_id": "player-a",
-            "target_unit_instance_id": beta.unit_instance_id,
-            "model_instance_id": destroyed_model_id,
-            "destroyed_model_placement": {"source": "runtime-test"},
-        },
-        destroying_player_id="player-a",
-        destroyed_unit_instance_id=beta.unit_instance_id,
-        destroyed_player_id="player-b",
-    )
-    runtime_missing_index = CatalogReturnOnDeathRuntime(
-        ability_indexes_by_player_id={},
-        armies=tuple(state.army_definitions),
-    )
-    with pytest.raises(GameLifecycleError, match="missing player ability index"):
-        runtime_missing_index.unit_destroyed_handler(context)
-
-    runtime = CatalogReturnOnDeathRuntime(
-        ability_indexes_by_player_id={
-            "player-b": AbilityCatalogIndex.from_records((_return_on_death_record(),))
-        },
-        armies=tuple(state.army_definitions),
-    )
-    with pytest.raises(GameLifecycleError, match="destroyed player drift"):
-        runtime.unit_destroyed_handler(
-            replace(context, destroying_player_id="player-b", destroyed_player_id="player-a")
-        )
-
-    filtered_state = _battle_state_with_scenario()
-    filtered_decisions = DecisionController()
-    filtered_phase = filtered_state.current_battle_phase
-    assert filtered_phase is not None
-    filtered_decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": "other-game",
-            "battle_round": filtered_state.battle_round,
-            "active_player_id": filtered_state.active_player_id,
-            "phase": filtered_phase.value,
-            "target_unit_instance_id": _beta_unit(filtered_state).unit_instance_id,
-            "model_instance_id": _beta_unit(filtered_state).own_models[0].model_instance_id,
-        },
-    )
-    filtered_decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": filtered_state.game_id,
-            "battle_round": filtered_state.battle_round + 1,
-            "active_player_id": filtered_state.active_player_id,
-            "phase": filtered_phase.value,
-            "target_unit_instance_id": _beta_unit(filtered_state).unit_instance_id,
-            "model_instance_id": _beta_unit(filtered_state).own_models[0].model_instance_id,
-        },
-    )
-    filtered_decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": filtered_state.game_id,
-            "battle_round": filtered_state.battle_round,
-            "active_player_id": "player-b",
-            "phase": filtered_phase.value,
-            "target_unit_instance_id": _beta_unit(filtered_state).unit_instance_id,
-            "model_instance_id": _beta_unit(filtered_state).own_models[0].model_instance_id,
-        },
-    )
-    out_of_phase_event = filtered_decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": filtered_state.game_id,
-            "battle_round": filtered_state.battle_round,
-            "active_player_id": filtered_state.active_player_id,
-            "phase": "movement",
-            "target_unit_instance_id": _beta_unit(filtered_state).unit_instance_id,
-            "model_instance_id": _beta_unit(filtered_state).own_models[0].model_instance_id,
-        },
-    )
-    _record_return_captures(
-        runtime,
-        PhaseEndObjectiveControlContext(
-            state=filtered_state,
-            event_log=filtered_decisions.event_log,
-            completed_phase=filtered_phase,
-            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-        ),
-    )
-    (out_of_phase_pending,) = filtered_state.pending_return_on_death
-    assert out_of_phase_pending.trigger_phase == filtered_phase.value
-    assert out_of_phase_pending.destroyed_position_payload == {
-        "source": "model_destroyed_event",
-        "model_destroyed_event_id": out_of_phase_event.event_id,
-        "model_destroyed_payload": out_of_phase_event.payload,
-    }
-
-    malformed_event_decisions = DecisionController()
-    malformed_event_decisions.event_log.append("model_destroyed", [])
-    with pytest.raises(GameLifecycleError, match="payload must be an object"):
-        _record_return_captures(
-            runtime,
-            PhaseEndObjectiveControlContext(
-                state=filtered_state,
-                event_log=malformed_event_decisions.event_log,
-                completed_phase=filtered_phase,
-                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-            ),
-        )
-
-    missing_index_state = _battle_state_with_scenario()
-    missing_index_decisions = DecisionController()
-    missing_index_phase = missing_index_state.current_battle_phase
-    assert missing_index_phase is not None
-    missing_index_beta = _beta_unit(missing_index_state)
-    missing_index_decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": missing_index_state.game_id,
-            "battle_round": missing_index_state.battle_round,
-            "active_player_id": missing_index_state.active_player_id,
-            "phase": missing_index_phase.value,
-            "target_unit_instance_id": missing_index_beta.unit_instance_id,
-            "model_instance_id": missing_index_beta.own_models[0].model_instance_id,
-        },
-    )
-    with pytest.raises(GameLifecycleError, match="missing player ability index"):
-        _record_return_captures(
-            runtime_missing_index,
-            PhaseEndObjectiveControlContext(
-                state=missing_index_state,
-                event_log=missing_index_decisions.event_log,
-                completed_phase=missing_index_phase,
-                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-            ),
-        )
-
-
-def test_first_death_return_unit_destroyed_hook_records_pending_once() -> None:
-    state = _battle_state_with_destroyed_beta_unit()
-    beta = _beta_unit(state)
-    destroyed_model_id = beta.own_models[0].model_instance_id
-    decisions = DecisionController()
-    runtime = CatalogReturnOnDeathRuntime(
-        ability_indexes_by_player_id={
-            "player-b": AbilityCatalogIndex.from_records((_return_on_death_record(),))
-        },
-        armies=tuple(state.army_definitions),
-    )
-    current_phase = state.current_battle_phase
-    assert current_phase is not None
-    context = UnitDestroyedContext(
-        sequencing_active_player_id=cast(str, state.active_player_id),
-        state=state,
-        decisions=decisions,
-        completed_phase=current_phase,
-        model_destroyed_event_id="event:unit-destroyed-return",
-        model_destroyed_payload={
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": current_phase.value,
-            "destroying_player_id": "player-a",
-            "target_unit_instance_id": beta.unit_instance_id,
-            "model_instance_id": destroyed_model_id,
-            "destroyed_model_placement": {"source": "unit-destroyed-test"},
-        },
-        destroying_player_id="player-a",
-        destroyed_unit_instance_id=beta.unit_instance_id,
-        destroyed_player_id="player-b",
-    )
-
-    bindings = runtime.unit_destroyed_bindings()
-    runtime.unit_destroyed_handler(context)
-    runtime.unit_destroyed_handler(context)
-
-    assert len(bindings) == 1
-    assert len(state.pending_return_on_death) == 1
-    assert state.pending_return_on_death[0].destroyed_model_instance_id == destroyed_model_id
 
 
 def test_return_on_death_catalog_helpers_reject_malformed_runtime_shapes() -> None:
@@ -712,252 +367,6 @@ def test_return_on_death_catalog_helpers_reject_malformed_runtime_shapes() -> No
     )
 
 
-def test_return_on_death_defensive_validation_rejects_malformed_pending_records() -> None:
-    state = _battle_state_with_destroyed_beta_unit()
-    pending = _pending_return_on_death(state=state)
-    malformed_pending_calls: tuple[Callable[[], PendingReturnOnDeath], ...] = (
-        lambda: replace(
-            pending,
-            target_scope=ReturnDestroyedTargetScope.DESTROYED_MODEL,
-            destroyed_model_instance_id=None,
-        ),
-        lambda: replace(pending, engagement_range_restriction=False),
-        lambda: replace(
-            pending,
-            restore_wounds_mode=ReturnRestoreWoundsMode.FULL_HEALTH,
-            wounds_remaining=1,
-        ),
-        lambda: replace(pending, roll_count=0),
-        lambda: replace(pending, success_threshold=1),
-        lambda: replace(pending, resolved=cast(bool, "no")),
-    )
-
-    for malformed_pending_call in malformed_pending_calls:
-        with pytest.raises(GameLifecycleError):
-            malformed_pending_call()
-
-    resolved = _pending_return_on_death(state=state, success_threshold=2).mark_resolved()
-    assert resolved.mark_resolved() == resolved
-
-
-def test_return_on_death_decision_and_restore_defensive_paths() -> None:
-    state = _battle_state_with_destroyed_beta_unit()
-    pending = _pending_return_on_death(state=state)
-    state.record_pending_return_on_death(pending)
-    request = build_return_on_death_placement_request(state=state, pending=pending)
-    placement = _unit_placement_for_unit(state=state, unit=_beta_unit(state), x=20.0, y=20.0)
-    result = _placement_result(request=request, placement=placement)
-    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
-
-    malformed_inputs = (
-        (
-            replace(request, decision_type="other_decision"),
-            result,
-        ),
-        (
-            replace(
-                request,
-                payload={
-                    **cast(dict[str, JsonValue], request.payload),
-                    "submission_kind": "other_submission",
-                },
-            ),
-            result,
-        ),
-        (
-            request,
-            replace(result, actor_id="player-a"),
-        ),
-        (
-            request,
-            replace(
-                result,
-                payload={
-                    "submission_kind": SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
-                    "attempted_placement": "not-an-object",
-                },
-            ),
-        ),
-    )
-    for malformed_request, malformed_result in malformed_inputs:
-        assert (
-            invalid_return_on_death_placement_status(
-                state=state,
-                request=malformed_request,
-                result=malformed_result,
-                ruleset_descriptor=descriptor,
-            )
-            is not None
-        )
-
-    with pytest.raises(GameLifecycleError, match="placement requires RulesetDescriptor"):
-        return_on_death_module._validate_return_on_death_placement(  # pyright: ignore[reportPrivateUsage]
-            state=state,
-            pending=pending,
-            placement=placement,
-            ruleset_descriptor=cast(RulesetDescriptor, object()),
-        )
-    no_battlefield_state = _battle_state_with_destroyed_beta_unit()
-    no_battlefield_state.battlefield_state = None
-    with pytest.raises(GameLifecycleError, match="requires battlefield_state"):
-        return_on_death_module._validate_return_on_death_placement(  # pyright: ignore[reportPrivateUsage]
-            state=no_battlefield_state,
-            pending=_pending_return_on_death(state=no_battlefield_state),
-            placement=placement,
-            ruleset_descriptor=descriptor,
-        )
-    with pytest.raises(GameLifecycleError, match="destroyed model placement evidence"):
-        return_on_death_module._validate_return_on_death_placement(  # pyright: ignore[reportPrivateUsage]
-            state=state,
-            pending=replace(pending, destroyed_position_payload={"source": "test"}),
-            placement=_unit_placement_at_destroyed_position(state=state, unit=_beta_unit(state)),
-            ruleset_descriptor=descriptor,
-        )
-    with pytest.raises(GameLifecycleError, match="destroyed position unit drift"):
-        return_on_death_module._assert_destroyed_position_anchor(  # pyright: ignore[reportPrivateUsage]
-            state=state,
-            pending=replace(pending, destroyed_unit_instance_id="unit:other"),
-            placement=_unit_placement_at_destroyed_position(state=state, unit=_beta_unit(state)),
-            ruleset_descriptor=descriptor,
-        )
-    model_pending = _pending_return_on_death(
-        state=state,
-        target_scope=ReturnDestroyedTargetScope.DESTROYED_MODEL,
-        restore_mode=ReturnRestoreWoundsMode.FIXED_REMAINING,
-        wounds_remaining=1,
-    )
-    model_pending_model_id = model_pending.destroyed_model_instance_id
-    assert model_pending_model_id is not None
-    with pytest.raises(GameLifecycleError, match="destroyed position model drift"):
-        return_on_death_module._assert_destroyed_position_anchor(  # pyright: ignore[reportPrivateUsage]
-            state=state,
-            pending=replace(
-                model_pending,
-                destroyed_model_instance_id=_beta_unit(state).own_models[1].model_instance_id,
-            ),
-            placement=_unit_placement_for_model_at_destroyed_position(
-                state=state,
-                unit=_beta_unit(state),
-                model_instance_id=model_pending_model_id,
-            ),
-            ruleset_descriptor=descriptor,
-        )
-    with pytest.raises(GameLifecycleError, match="missing destroyed anchor model"):
-        return_on_death_module._placement_for_model(  # pyright: ignore[reportPrivateUsage]
-            placement=_unit_placement_at_destroyed_position(state=state, unit=_beta_unit(state)),
-            model_instance_id="model:missing",
-        )
-    incomplete_payload = cast(
-        JsonValue,
-        {
-            "source": "model_destroyed_event",
-            "model_destroyed_payload": {"destroyed_model_placement": {"army_id": "army-beta"}},
-        },
-    )
-    with pytest.raises(GameLifecycleError, match="destroyed model placement is incomplete"):
-        return_on_death_module._destroyed_model_placement_from_pending(  # pyright: ignore[reportPrivateUsage]
-            replace(pending, destroyed_position_payload=incomplete_payload)
-        )
-    anchor_payload = _destroyed_model_placement_for_model(
-        model_instance_id=_beta_unit(state).own_models[0].model_instance_id,
-    ).to_payload()
-    malformed_pose_payload = cast(
-        JsonValue,
-        {
-            "source": "model_destroyed_event",
-            "model_destroyed_payload": {
-                "destroyed_model_placement": {**anchor_payload, "pose": "not-an-object"}
-            },
-        },
-    )
-    with pytest.raises(GameLifecycleError, match="placement pose must be object"):
-        return_on_death_module._destroyed_model_placement_from_pending(  # pyright: ignore[reportPrivateUsage]
-            replace(pending, destroyed_position_payload=malformed_pose_payload)
-        )
-    with pytest.raises(GameLifecycleError, match="currently supports exactly one D6"):
-        return_on_death_module._return_on_death_roll_spec(  # pyright: ignore[reportPrivateUsage]
-            state=state,
-            pending=replace(pending, roll_count=2),
-        )
-    with pytest.raises(GameLifecycleError, match="requires pending record"):
-        build_return_on_death_placement_request(
-            state=state,
-            pending=cast(PendingReturnOnDeath, object()),
-        )
-    with pytest.raises(GameLifecycleError, match="model is unknown"):
-        return_on_death_module._model_by_id(  # pyright: ignore[reportPrivateUsage]
-            state=state,
-            model_instance_id="model:missing",
-        )
-    with pytest.raises(GameLifecycleError, match="unit is unknown"):
-        return_on_death_module._unit_by_id(  # pyright: ignore[reportPrivateUsage]
-            state=state,
-            unit_instance_id="unit:missing",
-        )
-    with pytest.raises(GameLifecycleError, match="cannot update an unknown model"):
-        return_on_death_module._army_definitions_with_model_wounds(  # pyright: ignore[reportPrivateUsage]
-            armies=tuple(state.army_definitions),
-            model_instance_id="model:missing",
-            wounds_remaining=1,
-        )
-    with pytest.raises(GameLifecycleError, match="cannot update an unknown unit"):
-        return_on_death_module._army_definitions_with_unit_full_health(  # pyright: ignore[reportPrivateUsage]
-            armies=tuple(state.army_definitions),
-            unit_instance_id="unit:missing",
-        )
-
-
-def test_return_on_death_defensive_helpers_reject_malformed_payloads() -> None:
-    malformed_calls = (
-        lambda: return_on_death_module._payload_object([]),  # pyright: ignore[reportPrivateUsage]
-        lambda: return_on_death_module._payload_string(  # pyright: ignore[reportPrivateUsage]
-            {},
-            key="pending_id",
-        ),
-        lambda: return_on_death_module._target_scope_from_token(  # pyright: ignore[reportPrivateUsage]
-            1
-        ),
-        lambda: return_on_death_module._target_scope_from_token(  # pyright: ignore[reportPrivateUsage]
-            "unsupported"
-        ),
-        lambda: return_on_death_module._restore_wounds_mode_from_token(  # pyright: ignore[reportPrivateUsage]
-            1
-        ),
-        lambda: return_on_death_module._restore_wounds_mode_from_token(  # pyright: ignore[reportPrivateUsage]
-            "unsupported"
-        ),
-        lambda: return_on_death_module._validate_supported_token(  # pyright: ignore[reportPrivateUsage]
-            "placement_anchor",
-            "anywhere",
-            supported=("destroyed_position",),
-        ),
-        lambda: return_on_death_module._validate_identifier(  # pyright: ignore[reportPrivateUsage]
-            "pending_id",
-            1,
-        ),
-        lambda: return_on_death_module._validate_identifier(  # pyright: ignore[reportPrivateUsage]
-            "pending_id",
-            "",
-        ),
-        lambda: return_on_death_module._validate_non_negative_int(  # pyright: ignore[reportPrivateUsage]
-            "source_effect_index",
-            -1,
-        ),
-        lambda: return_on_death_module._validate_positive_int(  # pyright: ignore[reportPrivateUsage]
-            "roll_count",
-            0,
-        ),
-        lambda: return_on_death_module._validate_d6_threshold(  # pyright: ignore[reportPrivateUsage]
-            "success_threshold",
-            7,
-        ),
-    )
-
-    for malformed_call in malformed_calls:
-        with pytest.raises(GameLifecycleError):
-            malformed_call()
-
-
 def test_return_on_death_placement_validation_rejects_wrong_target_shapes() -> None:
     state = _battle_state_with_destroyed_beta_unit()
     pending = _pending_return_on_death(
@@ -981,76 +390,6 @@ def test_return_on_death_placement_validation_rejects_wrong_target_shapes() -> N
     )
 
     assert status is not None
-
-
-def test_first_death_return_phase_end_hook_captures_model_destroyed_once() -> None:
-    state = _battle_state_with_scenario()
-    beta = _beta_unit(state)
-    destroyed_model_id = beta.own_models[0].model_instance_id
-    assert state.battlefield_state is not None
-    destroyed_placement = state.battlefield_state.model_placement_by_id(
-        destroyed_model_id
-    ).to_payload()
-    _set_model_wounds(state, model_instance_id=destroyed_model_id, wounds_remaining=0)
-    state.battlefield_state = state.battlefield_state.with_removed_models((destroyed_model_id,))
-    decisions = DecisionController()
-    model_destroyed_event = decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": "command",
-            "destroying_player_id": "player-a",
-            "attacking_unit_instance_id": state.army_definitions[0].units[0].unit_instance_id,
-            "target_unit_instance_id": beta.unit_instance_id,
-            "model_instance_id": destroyed_model_id,
-            "damage_kind": "normal",
-            "damage_event_id": "damage:event:first-death",
-            "destroyed_model_placement": destroyed_placement,
-            "destroyed_model_rules_triggered": True,
-        },
-    )
-    runtime = CatalogReturnOnDeathRuntime(
-        ability_indexes_by_player_id={
-            "player-b": AbilityCatalogIndex.from_records((_return_on_death_record(),))
-        },
-        armies=tuple(state.army_definitions),
-    )
-    current_phase = state.current_battle_phase
-    assert current_phase is not None
-
-    _record_return_captures(
-        runtime,
-        PhaseEndObjectiveControlContext(
-            state=state,
-            event_log=decisions.event_log,
-            completed_phase=current_phase,
-            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-        ),
-    )
-    _record_return_captures(
-        runtime,
-        PhaseEndObjectiveControlContext(
-            state=state,
-            event_log=decisions.event_log,
-            completed_phase=current_phase,
-            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-        ),
-    )
-
-    assert len(state.pending_return_on_death) == 1
-    pending = state.pending_return_on_death[0]
-    assert pending.target_scope is ReturnDestroyedTargetScope.DESTROYED_MODEL
-    assert pending.destroyed_model_instance_id == destroyed_model_id
-    assert not pending.resolved
-    assert state.battlefield_state is not None
-    assert destroyed_model_id in state.battlefield_state.removed_model_ids
-    assert pending.destroyed_position_payload == {
-        "source": "model_destroyed_event",
-        "model_destroyed_event_id": model_destroyed_event.event_id,
-        "model_destroyed_payload": model_destroyed_event.payload,
-    }
 
 
 def test_mortal_wound_destruction_preserves_placement_through_return_on_death() -> None:
@@ -1176,372 +515,17 @@ def test_mortal_wound_destruction_preserves_placement_through_return_on_death() 
     assert returned_model.current_wounds == 1
 
 
-def _placement_result(*, request: DecisionRequest, placement: UnitPlacement) -> DecisionResult:
-    return DecisionResult(
-        result_id=f"result:{request.request_id}",
-        request_id=request.request_id,
-        decision_type=request.decision_type,
-        actor_id=request.actor_id,
-        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
-        payload=cast(
-            JsonValue,
-            {
-                "submission_kind": SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
-                "attempted_placement": placement.to_payload(),
-            },
-        ),
-    )
-
-
-def _pending_return_on_death(
-    *,
-    state: GameState,
-    success_threshold: int = 2,
-    target_scope: ReturnDestroyedTargetScope = ReturnDestroyedTargetScope.DESTROYED_UNIT,
-    restore_mode: ReturnRestoreWoundsMode = ReturnRestoreWoundsMode.FULL_HEALTH,
-    wounds_remaining: int | None = None,
-) -> PendingReturnOnDeath:
-    beta = _beta_unit(state)
-    return PendingReturnOnDeath(
-        pending_id="pending:return",
-        source_rule_id="rule:return",
-        source_ability_id="ability:return",
-        source_clause_id="clause:return",
-        source_effect_index=0,
-        owner_player_id="player-b",
-        target_scope=target_scope,
-        destroyed_unit_instance_id=beta.unit_instance_id,
-        destroyed_model_instance_id=(
-            beta.own_models[0].model_instance_id
-            if target_scope is ReturnDestroyedTargetScope.DESTROYED_MODEL
-            else None
-        ),
-        destroyed_position_payload=_destroyed_position_payload_for_model(
-            model_instance_id=beta.own_models[0].model_instance_id,
-        ),
-        trigger_battle_round=1,
-        trigger_phase="command",
-        resolution_timing="phase_end",
-        roll_expression="D6",
-        roll_count=1,
-        success_threshold=success_threshold,
-        placement_anchor="destroyed_position",
-        placement_preference="as_close_as_possible",
-        engagement_range_restriction=True,
-        restore_wounds_mode=restore_mode,
-        wounds_remaining=wounds_remaining,
-        resolved=False,
-    )
-
-
-def _roll_result(*, pending: PendingReturnOnDeath, value: int) -> DiceRollResult:
-    return DiceRollResult.from_values(
-        roll_id=f"roll:return:{value}",
-        spec=DiceRollSpec(
-            expression=DiceExpression(quantity=1, sides=6),
-            reason="return_on_death_phase_end_gate",
-            roll_type="return_on_death",
-            actor_id=pending.owner_player_id,
-            reroll_forbidden_rule_ids=(pending.source_rule_id,),
-        ),
-        values=(value,),
-        source="injected",
-    )
-
-
-def _battle_state_with_destroyed_beta_unit() -> GameState:
-    state = _battle_state_with_scenario()
-    beta = _beta_unit(state)
-    _set_unit_wounds(state, unit_instance_id=beta.unit_instance_id, wounds_remaining=0)
-    assert state.battlefield_state is not None
-    state.battlefield_state = state.battlefield_state.with_removed_models(beta.own_model_ids())
-    return state
-
-
-def _set_unit_wounds(
-    state: GameState,
-    *,
-    unit_instance_id: str,
-    wounds_remaining: int,
-) -> None:
-    updated_armies: list[ArmyDefinition] = []
-    for army in state.army_definitions:
-        updated_units: list[UnitInstance] = []
-        for unit in army.units:
-            if unit.unit_instance_id != unit_instance_id:
-                updated_units.append(unit)
-                continue
-            updated_units.append(
-                replace(
-                    unit,
-                    own_models=tuple(
-                        replace(model, wounds_remaining=wounds_remaining)
-                        for model in unit.own_models
-                    ),
-                )
-            )
-        updated_armies.append(replace(army, units=tuple(updated_units)))
-    state.army_definitions = updated_armies
-
-
-def _set_model_wounds(
-    state: GameState,
-    *,
-    model_instance_id: str,
-    wounds_remaining: int,
-) -> None:
-    updated_armies: list[ArmyDefinition] = []
-    for army in state.army_definitions:
-        updated_units: list[UnitInstance] = []
-        for unit in army.units:
-            updated_units.append(
-                replace(
-                    unit,
-                    own_models=tuple(
-                        replace(model, wounds_remaining=wounds_remaining)
-                        if model.model_instance_id == model_instance_id
-                        else model
-                        for model in unit.own_models
-                    ),
-                )
-            )
-        updated_armies.append(replace(army, units=tuple(updated_units)))
-    state.army_definitions = updated_armies
-
-
-def _return_on_death_record(*, wounds_remaining: int = 3) -> AbilityCatalogRecord:
-    source = RuleSourceText.from_raw(
-        objective_scope=ObjectiveRuleScope.CORE_RULES,
-        source_id="rule:first-death-return",
-        raw_text=FIRST_DEATH_RETURN_TEXT.replace(
-            "3 wounds remaining",
-            f"{wounds_remaining} wounds remaining",
-        ),
-    )
-    rule_ir = compile_rule_source_text(
-        source,
-        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
-    ).rule_ir
-    return AbilityCatalogRecord(
-        record_id="record:first-death-return",
-        definition=AbilityDefinition(
-            ability_id="ability:first-death-return",
-            name="First Death Return",
-            source_id=source.source_id,
-            when_descriptor="First destroyed model.",
-            effect_descriptor="Set back up at phase end.",
-            restrictions_descriptor="Not within Engagement Range.",
-            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_MODEL_DESTROYED),
-            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
-            replay_payload=cast(JsonValue, {"rule_ir": rule_ir.to_payload()}),
-        ),
-        source_kind=AbilitySourceKind.DATASHEET,
-        datasheet_id="core-intercessor-like-infantry",
-    )
-
-
-def _unit_placement_at_destroyed_position(*, state: GameState, unit: UnitInstance) -> UnitPlacement:
-    anchor = _destroyed_model_placement_for_model(
-        model_instance_id=unit.own_models[0].model_instance_id,
-    )
-    base_placement = _unit_placement_for_unit(
-        state=state,
-        unit=unit,
-        x=anchor.pose.position.x,
-        y=anchor.pose.position.y,
-    )
-    return base_placement.with_model_placements(
-        tuple(
-            anchor if placement.model_instance_id == anchor.model_instance_id else placement
-            for placement in base_placement.model_placements
-        )
-    )
-
-
-def _unit_placement_for_model_at_destroyed_position(
-    *,
-    state: GameState,
-    unit: UnitInstance,
-    model_instance_id: str,
-) -> UnitPlacement:
-    anchor = _destroyed_model_placement_for_model(model_instance_id=model_instance_id)
-    return UnitPlacement(
-        army_id=anchor.army_id,
-        player_id=anchor.player_id,
-        unit_instance_id=unit.unit_instance_id,
-        model_placements=(anchor,),
-    )
-
-
-def _destroyed_position_payload_for_model(*, model_instance_id: str) -> JsonValue:
-    destroyed_placement_payload = _destroyed_model_placement_for_model(
-        model_instance_id=model_instance_id,
-    ).to_payload()
-    return _destroyed_position_payload_for_placement_payload(
-        model_instance_id=model_instance_id,
-        destroyed_placement_payload=cast(JsonValue, destroyed_placement_payload),
-    )
-
-
-def _destroyed_position_payload_for_placement(placement: ModelPlacement) -> JsonValue:
-    return _destroyed_position_payload_for_placement_payload(
-        model_instance_id=placement.model_instance_id,
-        destroyed_placement_payload=cast(JsonValue, placement.to_payload()),
-    )
-
-
-def _destroyed_position_payload_for_placement_payload(
-    *,
-    model_instance_id: str,
-    destroyed_placement_payload: JsonValue,
-) -> JsonValue:
-    return cast(
-        JsonValue,
-        {
-            "source": "model_destroyed_event",
-            "model_destroyed_event_id": "event:test-destroyed-position",
-            "model_destroyed_payload": {
-                "model_instance_id": model_instance_id,
-                "destroyed_model_placement": destroyed_placement_payload,
-            },
-        },
-    )
-
-
-def _destroyed_model_placement_for_model(*, model_instance_id: str) -> ModelPlacement:
-    source_state = _battle_state_with_scenario()
-    assert source_state.battlefield_state is not None
-    return source_state.battlefield_state.model_placement_by_id(model_instance_id)
-
-
-def _unit_placement_for_unit(
-    *,
-    state: GameState,
-    unit: UnitInstance,
-    x: float,
-    y: float,
-) -> UnitPlacement:
-    army = next(
-        army for army in state.army_definitions if any(stored == unit for stored in army.units)
-    )
-    return UnitPlacement(
-        army_id=army.army_id,
-        player_id=army.player_id,
-        unit_instance_id=unit.unit_instance_id,
-        model_placements=tuple(
-            ModelPlacement(
-                army_id=army.army_id,
-                player_id=army.player_id,
-                unit_instance_id=unit.unit_instance_id,
-                model_instance_id=model.model_instance_id,
-                pose=Pose.at(x + (index * 2.0), y),
-            )
-            for index, model in enumerate(unit.own_models)
-        ),
-    )
-
-
-def _beta_unit(state: GameState) -> UnitInstance:
-    for army in state.army_definitions:
-        if army.player_id != "player-b":
-            continue
-        return army.units[0]
-    raise AssertionError("missing beta unit")
-
-
-def _first_alpha_model_pose(state: GameState) -> Pose:
-    assert state.battlefield_state is not None
-    for army in state.battlefield_state.placed_armies:
-        if army.player_id != "player-a":
-            continue
-        return army.unit_placements[0].model_placements[0].pose
-    raise AssertionError("missing alpha placement")
-
-
-def _battle_state_with_scenario() -> GameState:
-    scenario = create_deterministic_battlefield_scenario(
-        battlefield_id="return-on-death-battlefield",
-        armies=_mustered_armies(),
-    )
-    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
-    state = GameState(
-        game_id="return-on-death-game",
-        ruleset_descriptor_hash=descriptor.descriptor_hash,
-        stage=GameLifecycleStage.BATTLE,
-        setup_sequence=tuple(descriptor.setup_sequence.steps),
-        battle_phase_sequence=tuple(descriptor.battle_phase_sequence.phases),
-        setup_step_index=None,
-        battle_phase_index=0,
-        battle_round=1,
-        active_player_id="player-a",
-        player_ids=("player-a", "player-b"),
-        turn_order=("player-a", "player-b"),
-        tactical_secondary_draw_count=2,
-        command_point_ledgers=initial_command_point_ledgers(("player-a", "player-b")),
-        victory_point_ledgers=initial_victory_point_ledgers(("player-a", "player-b")),
-    )
-    for army in scenario.armies:
-        state.record_army_definition(army)
-    state.battlefield_state = scenario.battlefield_state
-    return state
-
-
-def _mustered_armies() -> tuple[ArmyDefinition, ...]:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
-    return (
-        muster_army(
-            catalog=catalog,
-            request=_muster_request(catalog=catalog, player_id="player-a", army_id="army-alpha"),
-        ),
-        muster_army(
-            catalog=catalog,
-            request=_muster_request(catalog=catalog, player_id="player-b", army_id="army-beta"),
-        ),
-    )
-
-
-def _muster_request(
-    *,
-    catalog: ArmyCatalog,
-    player_id: str,
-    army_id: str,
-) -> ArmyMusterRequest:
-    return ArmyMusterRequest(
-        army_id=army_id,
-        player_id=player_id,
-        catalog_id=catalog.catalog_id,
-        source_package_id=catalog.source_package_id,
-        ruleset_id=catalog.ruleset_id,
-        detachment_selection=DetachmentSelection(
-            faction_id="core-marine-force",
-            detachment_ids=("core-combined-arms",),
-        ),
-        force_disposition_id="purge-the-foe",
-        unit_selections=(
-            UnitMusterSelection(
-                unit_selection_id=f"{army_id}-unit",
-                datasheet_id="core-intercessor-like-infantry",
-                model_profile_selections=(
-                    ModelProfileSelection(
-                        model_profile_id="core-intercessor-like",
-                        model_count=5,
-                    ),
-                ),
-            ),
-        ),
-    )
-
-
-def _record_return_captures(
-    runtime: CatalogReturnOnDeathRuntime,
-    context: PhaseEndObjectiveControlContext,
-) -> tuple[()]:
-    for event_id, pending in runtime.pending_captures_for(context):
-        assert catalog_return_on_death_runtime_module.record_pending_return_on_death(
-            pending=pending,
-            state=context.state,
-            event_log=context.event_log,
-            phase=context.completed_phase.value,
-            model_destroyed_event_id=event_id,
-        )
-    return ()
+__all__: list[str] = []
+__all__ += ["AbilityDefinition", "AbilityTimingDescriptor", "ArmyCatalog", "ArmyDefinition"]
+__all__ += ["ArmyMusterRequest", "Callable", "DecisionResult", "DetachmentSelection"]
+__all__ += ["FIRST_DEATH_RETURN_TEXT", "DiceExpression", "DiceRollResult", "DiceRollSpec"]
+__all__ += ["GENERIC_RULE_IR_ABILITY_HANDLER_ID", "GameLifecycleStage", "GameState"]
+__all__ += ["ModelPlacement", "ModelProfileSelection", "ObjectiveRuleScope"]
+__all__ += ["PARAMETERIZED_DECISION_OPTION_ID", "PendingReturnOnDeath", "Pose", "RuleSourceText"]
+__all__ += ["SOURCE_KEYWORD_SEQUENCE_PARTS", "TimingTriggerKind", "UnitDestroyedContext"]
+__all__ += ["UnitInstance", "UnitMusterSelection", "_destroyed_position_payload_for_model"]
+__all__ += ["_destroyed_position_payload_for_placement_payload", "_muster_request"]
+__all__ += ["_mustered_armies", "_set_model_wounds", "_set_unit_wounds"]
+__all__ += ["_unit_placement_for_model_at_destroyed_position", "compile_rule_source_text"]
+__all__ += ["create_deterministic_battlefield_scenario", "datasheet_keyword_lexicon_source"]
+__all__ += ["initial_command_point_ledgers", "initial_victory_point_ledgers", "muster_army"]
