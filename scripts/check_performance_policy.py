@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import cast
 
 from scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_SECONDS, WORKLOAD
+from tools.performance_category_migration import applies as migration_applies
 from tools.performance_order103_exception import retained_comparison_inputs
 from tools.performance_policy import (
     ASSESSMENT,
@@ -31,6 +32,14 @@ from tools.performance_policy import (
     validate_assessment,
     validate_comparison,
     validate_full_game,
+)
+from tools.performance_tool_inputs import (
+    SCHEMA as HISTORICAL_TOOL_SCHEMA,
+)
+from tools.performance_tool_inputs import (
+    binding_enabled,
+    comparison_inputs,
+    retained_tool_comparison_inputs,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -201,11 +210,72 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
         if not isinstance(driver, str) or driver not in inputs:
             raise ValueError("Selected measurement driver is missing.")
         comparison = read_object(root / path)
-        measured_inputs, applicability_sha = retained_comparison_inputs(
-            root, current=inputs, report=comparison, base=base, runtime_id=runtime_id
+        migration_binding: dict[str, object] | None = None
+        applicability_sha: str | None
+        migration = (
+            migration_applies(base=base, runtime_id=runtime_id, family=family)
+            and (root / "docs/performance/policy-v3/category-migration-20261015").exists()
         )
+        if migration:
+            from tools.performance_category_migration import retained_inputs as migration_inputs
+
+            measured_inputs, migration_binding, applicability_sha = migration_inputs(
+                root, current=inputs, report=comparison, base=base, runtime_id=runtime_id
+            )
+        elif binding_enabled(family, specification):
+            tool_schema = str(object_value(specification["input_binding"])["schema"])
+            if tool_schema == HISTORICAL_TOOL_SCHEMA:
+                measured_inputs, applicability_sha = retained_tool_comparison_inputs(
+                    root, current=inputs, report=comparison, base=base
+                )
+            else:
+                # Fresh v2 records bind current inputs; no historical applicability bridge.
+                measured_inputs, applicability_sha = inputs, None
+        elif (
+            family == "reconstruction"
+            and comparison.get("schema") == "matched-reconstruction-abba-v1"
+        ):
+            from tools.performance_reconstruction_campaign import retained_inputs
+
+            measured_inputs, applicability_sha = retained_inputs(
+                root, current=inputs, report=comparison, base=base, runtime_id=runtime_id
+            )
+        else:
+            measured_inputs, applicability_sha = retained_comparison_inputs(
+                root, current=inputs, report=comparison, base=base, runtime_id=runtime_id
+            )
         if applicability_sha is not None:
             retained_applicability[family] = applicability_sha
+        tool_inputs = (
+            migration_binding
+            if migration
+            else (
+                comparison_inputs(
+                    root,
+                    base=base,
+                    family=family,
+                    head_input_digest=canonical_digest(measured_inputs),
+                    schema=str(object_value(specification["input_binding"])["schema"]),
+                    measured_head=str(
+                        object_value(
+                            object_value(object_value(comparison["input_binding"])["sides"])["head"]
+                        )["revision"]
+                    ),
+                )
+                if binding_enabled(family, specification)
+                else None
+            )
+        )
+        fixture_digest = canonical_digest(
+            {
+                name: value
+                for name, value in measured_inputs.items()
+                if name.startswith(("tests/", "scripts/"))
+                and not name.startswith("tests/code_quality/")
+            }
+        )
+        if tool_inputs is not None:
+            fixture_digest = str(tool_inputs["common_sha256"])
         approved_failures.extend(
             validate_comparison(
                 comparison,
@@ -218,15 +288,9 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
                 expected_inputs={
                     "lock_sha256": measured_inputs["uv.lock"],
                     "workload_sha256": measured_inputs[driver],
-                    "fixture_sha256": canonical_digest(
-                        {
-                            name: value
-                            for name, value in measured_inputs.items()
-                            if name.startswith(("tests/", "scripts/"))
-                            and not name.startswith("tests/code_quality/")
-                        }
-                    ),
+                    "fixture_sha256": fixture_digest,
                 },
+                expected_binding=tool_inputs,
             )
         )
     if assessment["milestone"] == "rules_complete":

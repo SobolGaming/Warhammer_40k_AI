@@ -21,6 +21,7 @@ from export_ui_contract_fixtures import (
 )
 from external_contract_session_examples import phase18e_session_examples
 from jsonschema import Draft202012Validator
+from proposal_source_index import ProposalSourceIndex
 from referencing import Resource
 from referencing.jsonschema import DRAFT202012, EMPTY_REGISTRY, Schema, SchemaRegistry
 from tacoma_2026_source_audit import audit_tacoma_2026_sources
@@ -116,6 +117,7 @@ COMPATIBILITY_DIR = CONTRACT_ROOT / "compatibility"
 MANIFEST_PATH = CONTRACT_ROOT / "manifest.json"
 OPENAPI_PATH = CONTRACT_ROOT / "openapi.yaml"
 SRC_ROOT = ROOT / "src" / "warhammer40k_core"
+_PROPOSAL_SOURCE_INDEX = ProposalSourceIndex()
 _SPECIAL_PARAMETERIZED_PAYLOAD_KINDS = frozenset(
     {
         "cult_ambush_marker_placement",
@@ -2022,26 +2024,7 @@ def _schema_registry(schemas: dict[str, Schema]) -> SchemaRegistry:
 
 
 def _proposal_kind_tokens() -> tuple[str, ...]:
-    values: set[str] = set()
-    for path in _source_paths():
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        for node in tree.body:
-            if isinstance(node, ast.Assign):
-                value = _string_constant(node.value)
-                if value is None:
-                    continue
-                for target in node.targets:
-                    if isinstance(target, ast.Name) and target.id.endswith(
-                        ("_PROPOSAL_KIND", "_PROPOSAL_PAYLOAD_KIND")
-                    ):
-                        values.add(value)
-            if isinstance(node, ast.ClassDef) and node.name == "ProposalKind":
-                for item in node.body:
-                    if isinstance(item, ast.Assign):
-                        value = _string_constant(item.value)
-                        if value is not None:
-                            values.add(value)
-    return tuple(sorted(values))
+    return _PROPOSAL_SOURCE_INDEX.tokens(_source_paths())
 
 
 def _parameterized_payload_kind_tokens() -> tuple[str, ...]:

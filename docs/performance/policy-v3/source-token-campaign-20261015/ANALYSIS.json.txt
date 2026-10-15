@@ -1,0 +1,94 @@
+{
+  "run": {
+    "id": 38677337982,
+    "head": "fe7566c89f6e170f493691430281847a547ae385",
+    "attempt": 1,
+    "url": "https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/38677337982"
+  },
+  "samples": {
+    "base": [
+      244.299,
+      242.874,
+      243.971
+    ],
+    "head": [
+      175.752,
+      175.422,
+      176.667
+    ]
+  },
+  "mean_limit": 304.6933333333333,
+  "maximum_limit": 366.54850000000005,
+  "base_mean_seconds": 243.71466666666666,
+  "head_mean_seconds": 175.947,
+  "numerical_budgets_passed": true,
+  "original_case_union": [
+    "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_has_required_sections_and_tables",
+    "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_lists_runtime_decision_and_proposal_tokens",
+    "tests.code_quality.test_decision_submission_catalog::test_retired_placement_fallback_decisions_do_not_reappear",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_check_regenerates_into_an_isolated_tree_before_validation",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_manifest_hashes_current_files_and_all_documentation",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_regeneration_discards_orphan_generated_fixtures",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_conformance_version_matches_published_contract",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_cross_backend_replay_uses_canonical_semantic_comparison",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_executable_client_is_operation_bound_without_identifier_conventions",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_package_pins_generation_typecheck_and_live_conformance",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_client_does_not_import_engine_internals",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_modules_respect_new_module_size_budget",
+    "tests.code_quality.test_proposal_source_index::test_builder_wrapper_rereads_inventory_and_changed_source_root",
+    "tests.code_quality.test_proposal_source_index::test_byte_change_with_same_size_and_mtime_invalidates",
+    "tests.code_quality.test_proposal_source_index::test_current_inventory_adds_removes_and_drops_previous_roots",
+    "tests.code_quality.test_proposal_source_index::test_fresh_processes_start_without_a_shared_index",
+    "tests.code_quality.test_proposal_source_index::test_identical_bytes_reuse_tokens_but_fresh_instances_parse",
+    "tests.code_quality.test_proposal_source_index::test_identical_content_at_distinct_paths_retains_path_identity",
+    "tests.code_quality.test_proposal_source_index::test_partial_failure_does_not_publish_new_entries",
+    "tests.code_quality.test_proposal_source_index::test_results_are_immutable_and_newlines_match_text_loading",
+    "tests.code_quality.test_proposal_source_index::test_source_index_preserves_literal_proposal_grammar",
+    "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_decode_or_missing_file_errors",
+    "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[A_PROPOSAL_KIND = (]",
+    "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[\\xef\\xbb\\xbfX = 1]"
+  ],
+  "regenerated_files_per_sample": 235,
+  "exact_generated_trees": 6,
+  "micro_work_counts": [
+    {
+      "side": "base",
+      "cold": 2942,
+      "warm": 2942
+    },
+    {
+      "side": "head",
+      "cold": 2942,
+      "warm": 0
+    },
+    {
+      "side": "head",
+      "cold": 2942,
+      "warm": 0
+    },
+    {
+      "side": "base",
+      "cold": 2942,
+      "warm": 2942
+    },
+    {
+      "side": "base",
+      "cold": 2942,
+      "warm": 2942
+    },
+    {
+      "side": "head",
+      "cold": 2942,
+      "warm": 0
+    }
+  ],
+  "mean_percent_reduction": 27.806150361625072,
+  "queue_seconds": 2.0,
+  "job_wall_seconds": 1703.0,
+  "job_elapsed_seconds": 1692.4366765022278,
+  "controller_seconds": 1629.1897122740002,
+  "head_input_digest": "ae4a930b7ae50c35969f642c984348e4c0d0d664dac82e878e28d91bf735ad24",
+  "report_sha256": "8cad88b88cac094de6b8bffc2c6a365b36e9c17c86705fe7621edcc8c4240fdc",
+  "qualification": "Complete one-host matched raw comparison and standalone original-validator check. Current-tree admission, separate seventh-controller provenance, final assessment and serial smoke remain required. Whole-pipeline target remains unproven."
+}

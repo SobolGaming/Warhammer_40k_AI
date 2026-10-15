@@ -1,19 +1,20 @@
-"""Real melee activation and the original strict generic weapon-dispatch guards."""
-
 from typing import cast
 
-import pytest
-from tests.epic_challenge_helpers import epic_checkpoint
-from tests.psychic_modifier_helpers import submit_fixture_request
-from tests.s25_characteristic_melee_projection_helpers import projection_melee_request
-
-from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.engine.decision_request import DecisionError
-from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.fight_resolution import MeleeDeclarationProposalRequest
-from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatusKind
-from warhammer40k_core.engine.rule_ir_weapon_modifiers import rule_ir_modified_weapon_profile
+from tests.shared.category_migration.s25_characteristic_profile_gates import (
+    ArmyCatalog,
+    Characteristic,
+    CharacteristicValue,
+    DecisionError,
+    GameLifecycleError,
+    JsonValue,
+    LifecycleStatusKind,
+    MeleeDeclarationProposalRequest,
+    epic_checkpoint,
+    projection_melee_request,
+    pytest,
+    rule_ir_modified_weapon_profile,
+    submit_fixture_request,
+)
 
 
 @pytest.mark.parametrize("player", ["player-a", "player-b"])
@@ -141,49 +142,5 @@ def test_admitted_melee_root_uses_actual_skill_and_range_gates(
         assert max(stages["hit"]) < min(stages["wound"])
 
 
-@pytest.mark.parametrize("melee", [False, True])
-@pytest.mark.parametrize("invalid", ["delta", "source", "characteristic"])
-def test_original_dispatch_validation_precedes_known_profile_noop(
-    melee: bool, invalid: str
-) -> None:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
-    weapon = next(
-        w
-        for w in catalog.wargear
-        if w.wargear_id == ("core-leader-blade" if melee else "core-bolt-rifle")
-    ).weapon_profiles[0]
-    parameters: dict[str, object] = {
-        "characteristic": "range" if melee else "weapon_skill",
-        "delta": 1,
-    }
-    assert (
-        rule_ir_modified_weapon_profile(
-            parameters=parameters,
-            profile=weapon,
-            source_id="analytical:s25-noop",
-            modifier_id="s25-noop",
-        )
-        == weapon
-    )
-    if invalid == "delta":
-        parameters["delta"] = True
-        error = "must be an integer"
-    elif invalid == "characteristic":
-        parameters["characteristic"] = "unknown"
-        error = "characteristic is invalid"
-    else:
-        error = "source_id must be non-empty"
-    with pytest.raises(GameLifecycleError, match=error):
-        rule_ir_modified_weapon_profile(
-            parameters=parameters,
-            profile=weapon,
-            source_id="" if invalid == "source" else "analytical:s25-noop",
-            modifier_id="s25-noop",
-        )
-    with pytest.raises(GameLifecycleError, match="characteristic is unsupported"):
-        rule_ir_modified_weapon_profile(
-            parameters={"characteristic": "leadership", "delta": 1},
-            profile=weapon,
-            source_id="analytical:s25-unsupported-weapon",
-            modifier_id="s25-unsupported-weapon",
-        )
+__all__: list[str] = []
+__all__ += ["ArmyCatalog", "GameLifecycleError", "rule_ir_modified_weapon_profile"]

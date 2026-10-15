@@ -1,0 +1,56 @@
+[
+  {
+    "case": "early",
+    "exit": 0,
+    "group_absent": true,
+    "handlers_restored": true
+  },
+  {
+    "case": "sigint",
+    "exit": 130,
+    "group_absent": true,
+    "handlers_restored": true
+  },
+  {
+    "case": "sigterm",
+    "exit": 143,
+    "group_absent": true,
+    "handlers_restored": true
+  },
+  {
+    "case": "launch-signal",
+    "exit": 130,
+    "group_absent": true,
+    "handlers_restored": true
+  },
+  {
+    "case": "exception",
+    "exit": 1,
+    "group_absent": true,
+    "handlers_restored": true
+  },
+  {
+    "case": "timeout",
+    "exit": 124,
+    "group_absent": true,
+    "handlers_restored": true
+  },
+  {
+    "case": "stubborn",
+    "exit": 124,
+    "group_absent": true,
+    "handlers_restored": true
+  },
+  {
+    "case": "launch-failure",
+    "exit": 1,
+    "group_absent": true,
+    "handlers_restored": true
+  },
+  {
+    "case": "receipt-failure",
+    "exit": 1,
+    "group_absent": true,
+    "handlers_restored": true
+  }
+]

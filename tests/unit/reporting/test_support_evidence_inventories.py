@@ -1,81 +1,21 @@
 from __future__ import annotations
 
-from tools.generate_ability_support_matrix import (
+from tests.shared.category_migration.reporting__test_support_evidence_inventories import (
     DATASHEET_SUPPORT_OVERALL_VALUES,
     MUSTERING_SUPPORT_STAGE_VALUES,
-    ability_support_matrix_rows,
-    datasheet_support_rows,
-    datasheet_support_rows_payload,
-    mustering_support_rows,
-    mustering_support_rows_payload,
-    runtime_content_semantic_coverage_payload,
-)
-
-from warhammer40k_core.engine import army_mustering
-from warhammer40k_core.engine.ability_coverage import (
     AbilityCoverageSupportStage,
     ability_coverage_category_rows,
     ability_coverage_category_rows_payload,
     ability_coverage_rows_payload,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    ability_support_matrix_rows,
+    army_mustering,
+    datasheet_support_rows,
+    datasheet_support_rows_payload,
     faction_detachments_2026_27,
+    mustering_support_rows,
+    mustering_support_rows_payload,
+    runtime_content_semantic_coverage_payload,
 )
-
-
-def test_support_evidence_inventories_are_complete() -> None:
-    ability_rows = ability_support_matrix_rows()
-    category_rows = ability_coverage_category_rows(ability_rows)
-    support_rows = datasheet_support_rows()
-    mustering_rows = mustering_support_rows()
-    runtime_payload = runtime_content_semantic_coverage_payload()
-
-    ability_row_ids = {row.coverage_row_id for row in ability_rows}
-    category_ability_row_ids = {
-        coverage_row_id
-        for category_row in category_rows
-        for coverage_row_id in category_row.coverage_row_ids
-    }
-    assert len(ability_row_ids) == len(ability_rows)
-    assert category_ability_row_ids == ability_row_ids
-
-    faction_ids = {row.faction_id for row in faction_detachments_2026_27.faction_rows()}
-    detachment_ids_by_faction = {
-        faction_id: {
-            row.detachment_id
-            for row in faction_detachments_2026_27.detachment_rows()
-            if row.faction_id == faction_id
-        }
-        for faction_id in faction_ids
-    }
-    assert len({(row.faction_id, row.datasheet_id) for row in support_rows}) == len(support_rows)
-    for support_row in support_rows:
-        assert support_row.overall in DATASHEET_SUPPORT_OVERALL_VALUES
-        assert support_row.faction_id in faction_ids
-        assert set(support_row.ability_coverage_row_ids) <= ability_row_ids
-        assert set(support_row.detachment_ids) <= detachment_ids_by_faction[support_row.faction_id]
-        assert set(support_row.supported_detachment_ids) <= set(support_row.detachment_ids)
-        if support_row.overall != "Full":
-            assert support_row.notes or support_row.ability_coverage_row_ids
-
-    known_mustering_source_ids = {
-        value
-        for name, value in vars(army_mustering).items()
-        if name.endswith("_SOURCE_ID") and type(value) is str
-    }
-    assert len({row.rule_id for row in mustering_rows}) == len(mustering_rows)
-    assert known_mustering_source_ids <= {row.source_id for row in mustering_rows}
-    for mustering_row in mustering_rows:
-        assert mustering_row.source_id
-        assert mustering_row.support_stage in MUSTERING_SUPPORT_STAGE_VALUES
-
-    runtime_factions = runtime_payload["factions"]
-    assert {row["faction_id"] for row in runtime_factions} == faction_ids
-    assert len({row["faction_id"] for row in runtime_factions}) == len(runtime_factions)
-    for faction in runtime_factions:
-        assert {row["detachment_id"] for row in faction["detachments"]} == (
-            detachment_ids_by_faction[faction["faction_id"]]
-        )
 
 
 def test_support_evidence_payloads_preserve_row_order_and_identity() -> None:
@@ -181,3 +121,9 @@ def test_faction_army_rule_categories_are_engine_consumed() -> None:
         assert category.ability_names == ability_names
         assert category.support_stages == (AbilityCoverageSupportStage.ENGINE_CONSUMED,)
         assert category.runtime_consumer_ids
+
+
+__all__: list[str] = []
+__all__ += ["DATASHEET_SUPPORT_OVERALL_VALUES", "MUSTERING_SUPPORT_STAGE_VALUES"]
+__all__ += ["army_mustering", "faction_detachments_2026_27"]
+__all__ += ["runtime_content_semantic_coverage_payload"]

@@ -1,0 +1,703 @@
+{
+  "schema": "source-token-reuse-pilot-provenance-v1",
+  "measured_head": "1009fd82e077239abf854e9179d87b0affe8186e",
+  "measured_tree": "835e7db740719dc7a6d0feeea8106f00bc286cc8",
+  "base": "22a12094cfe3839d8fe8c5296ec0a7e7d32abade",
+  "run_url": "https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/38638193930",
+  "run_id": 38638193930,
+  "job_id": 116106662659,
+  "attempt": 1,
+  "artifact_id": 11930231078,
+  "artifact_name": "source-reuse-38638193930-1",
+  "github_archive_sha256": "567cb5304394875271c3bfcf4fbbb85f827b95896181f72fdce9b5171bd5a5ac",
+  "authenticated_packet_seal_sha256": "67f2f04a8d172eb2ce02978722bca89d638c91eb2511718654cb01501d6c1d94",
+  "source_report_sha256": "cbc574eb5c4ee932645e0882c74f1910a7dbd8733852502bdc224dc4e47e6af0",
+  "committed_report_sha256": "24bd1ebd1890a3b8b15bcc6a9a8b1c07e0d520875fad37338f1e77910e9659fb",
+  "serialization": "Only CRLF-to-LF conversion; parsed JSON values exactly equal authenticated draft",
+  "original_invocations": [
+    {
+      "name": "original-0-base",
+      "argv": [
+        "/usr/bin/time",
+        "-v",
+        "-o",
+        "/home/runner/work/_temp/source-reuse-output/original-0-base/resource.txt",
+        "/home/runner/work/_temp/reuse-base/.venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "-q",
+        "-n",
+        "0",
+        "--no-cov",
+        "--durations=0",
+        "--durations-min=0",
+        "--basetemp=/home/runner/work/_temp/source-reuse-output/original-0-base/tmp",
+        "--junitxml=/home/runner/work/_temp/source-reuse-output/original-0-base/junit.xml"
+      ],
+      "cwd": "/home/runner/work/_temp/reuse-base",
+      "cap_seconds": 420,
+      "exit_code": 0,
+      "timeout": false,
+      "cancel_signal": null,
+      "pid": 2678,
+      "seconds": 153.65665251500002,
+      "cleanup_complete": true,
+      "descendants_remained": false,
+      "resource": {
+        "user_seconds": 153.19,
+        "system_seconds": 1.24,
+        "max_reported_rss_kib": 298384.0
+      },
+      "pytest_phases": [
+        {
+          "seconds": 152.06,
+          "phase": "call",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "setup",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "teardown",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        }
+      ],
+      "cases": [
+        {
+          "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+          "seconds": 152.059,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "original-1-head",
+      "argv": [
+        "/usr/bin/time",
+        "-v",
+        "-o",
+        "/home/runner/work/_temp/source-reuse-output/original-1-head/resource.txt",
+        "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/.venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "-q",
+        "-n",
+        "0",
+        "--no-cov",
+        "--durations=0",
+        "--durations-min=0",
+        "--basetemp=/home/runner/work/_temp/source-reuse-output/original-1-head/tmp",
+        "--junitxml=/home/runner/work/_temp/source-reuse-output/original-1-head/junit.xml"
+      ],
+      "cwd": "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI",
+      "cap_seconds": 420,
+      "exit_code": 0,
+      "timeout": false,
+      "cancel_signal": null,
+      "pid": 2791,
+      "seconds": 114.82687414899993,
+      "cleanup_complete": true,
+      "descendants_remained": false,
+      "resource": {
+        "user_seconds": 114.34,
+        "system_seconds": 1.35,
+        "max_reported_rss_kib": 310420.0
+      },
+      "pytest_phases": [
+        {
+          "seconds": 113.27,
+          "phase": "call",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "setup",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "teardown",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        }
+      ],
+      "cases": [
+        {
+          "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+          "seconds": 113.269,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "original-2-head",
+      "argv": [
+        "/usr/bin/time",
+        "-v",
+        "-o",
+        "/home/runner/work/_temp/source-reuse-output/original-2-head/resource.txt",
+        "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/.venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "-q",
+        "-n",
+        "0",
+        "--no-cov",
+        "--durations=0",
+        "--durations-min=0",
+        "--basetemp=/home/runner/work/_temp/source-reuse-output/original-2-head/tmp",
+        "--junitxml=/home/runner/work/_temp/source-reuse-output/original-2-head/junit.xml"
+      ],
+      "cwd": "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI",
+      "cap_seconds": 420,
+      "exit_code": 0,
+      "timeout": false,
+      "cancel_signal": null,
+      "pid": 2875,
+      "seconds": 114.838188414,
+      "cleanup_complete": true,
+      "descendants_remained": false,
+      "resource": {
+        "user_seconds": 114.27,
+        "system_seconds": 1.43,
+        "max_reported_rss_kib": 310936.0
+      },
+      "pytest_phases": [
+        {
+          "seconds": 113.2,
+          "phase": "call",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "setup",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "teardown",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        }
+      ],
+      "cases": [
+        {
+          "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+          "seconds": 113.196,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "original-3-base",
+      "argv": [
+        "/usr/bin/time",
+        "-v",
+        "-o",
+        "/home/runner/work/_temp/source-reuse-output/original-3-base/resource.txt",
+        "/home/runner/work/_temp/reuse-base/.venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "-q",
+        "-n",
+        "0",
+        "--no-cov",
+        "--durations=0",
+        "--durations-min=0",
+        "--basetemp=/home/runner/work/_temp/source-reuse-output/original-3-base/tmp",
+        "--junitxml=/home/runner/work/_temp/source-reuse-output/original-3-base/junit.xml"
+      ],
+      "cwd": "/home/runner/work/_temp/reuse-base",
+      "cap_seconds": 420,
+      "exit_code": 0,
+      "timeout": false,
+      "cancel_signal": null,
+      "pid": 2950,
+      "seconds": 152.37615740400008,
+      "cleanup_complete": true,
+      "descendants_remained": false,
+      "resource": {
+        "user_seconds": 151.95,
+        "system_seconds": 1.25,
+        "max_reported_rss_kib": 298444.0
+      },
+      "pytest_phases": [
+        {
+          "seconds": 150.68,
+          "phase": "call",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "setup",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "teardown",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        }
+      ],
+      "cases": [
+        {
+          "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+          "seconds": 150.677,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "original-4-base",
+      "argv": [
+        "/usr/bin/time",
+        "-v",
+        "-o",
+        "/home/runner/work/_temp/source-reuse-output/original-4-base/resource.txt",
+        "/home/runner/work/_temp/reuse-base/.venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "-q",
+        "-n",
+        "0",
+        "--no-cov",
+        "--durations=0",
+        "--durations-min=0",
+        "--basetemp=/home/runner/work/_temp/source-reuse-output/original-4-base/tmp",
+        "--junitxml=/home/runner/work/_temp/source-reuse-output/original-4-base/junit.xml"
+      ],
+      "cwd": "/home/runner/work/_temp/reuse-base",
+      "cap_seconds": 420,
+      "exit_code": 0,
+      "timeout": false,
+      "cancel_signal": null,
+      "pid": 3015,
+      "seconds": 152.894983958,
+      "cleanup_complete": true,
+      "descendants_remained": false,
+      "resource": {
+        "user_seconds": 152.42,
+        "system_seconds": 1.23,
+        "max_reported_rss_kib": 298068.0
+      },
+      "pytest_phases": [
+        {
+          "seconds": 151.31,
+          "phase": "call",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "setup",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "teardown",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        }
+      ],
+      "cases": [
+        {
+          "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+          "seconds": 151.315,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "name": "original-5-head",
+      "argv": [
+        "/usr/bin/time",
+        "-v",
+        "-o",
+        "/home/runner/work/_temp/source-reuse-output/original-5-head/resource.txt",
+        "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/.venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "-q",
+        "-n",
+        "0",
+        "--no-cov",
+        "--durations=0",
+        "--durations-min=0",
+        "--basetemp=/home/runner/work/_temp/source-reuse-output/original-5-head/tmp",
+        "--junitxml=/home/runner/work/_temp/source-reuse-output/original-5-head/junit.xml"
+      ],
+      "cwd": "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI",
+      "cap_seconds": 420,
+      "exit_code": 0,
+      "timeout": false,
+      "cancel_signal": null,
+      "pid": 3096,
+      "seconds": 115.046762296,
+      "cleanup_complete": true,
+      "descendants_remained": false,
+      "resource": {
+        "user_seconds": 114.47,
+        "system_seconds": 1.44,
+        "max_reported_rss_kib": 310844.0
+      },
+      "pytest_phases": [
+        {
+          "seconds": 113.47,
+          "phase": "call",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "setup",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        },
+        {
+          "seconds": 0.0,
+          "phase": "teardown",
+          "nodeid": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture"
+        }
+      ],
+      "cases": [
+        {
+          "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+          "seconds": 113.474,
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "run": 38638193930,
+    "head": "1009fd82e077239abf854e9179d87b0affe8186e",
+    "conclusion": "success",
+    "binding_matches_committed_source": true,
+    "common_files": 4278,
+    "host": {
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "python": "3.14.5 (main, May 11 2026, 02:45:53) [GCC 13.3.0]",
+      "cpus": 4,
+      "cpuinfo": "processor\t: 0\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 173\nmodel name\t: Intel(R) Xeon(R) 6973P-C\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 4197.443\ncache size\t: 491520 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 0\ncpu cores\t: 2\napicid\t\t: 0\ninitial apicid\t: 0\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 36\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch tpr_shadow ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 vnmi avx512vbmi umip waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid cldemote movdiri movdir64b fsrm serialize tsxldtrk ibt amx_bf16 avx512_fp16 amx_tile amx_int8 arch_capabilities\nvmx flags\t: vnmi invvpid ept_x_only ept_ad ept_1gb ept_5level tsc_offset vtpr ept vpid unrestricted_guest ept_mode_based_exec tsc_scaling usr_wait_pause\nbugs\t\t: spectre_v1 spectre_v2 spec_store_bypass swapgs retbleed bhi spectre_v2_user its\nbogomips\t: 5199.99\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 57 bits virtual\npower management:\n\nprocessor\t: 1\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 173\nmodel name\t: Intel(R) Xeon(R) 6973P-C\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 4200.798\ncache size\t: 491520 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 0\ncpu cores\t: 2\napicid\t\t: 1\ninitial apicid\t: 1\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 36\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch tpr_shadow ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 vnmi avx512vbmi umip waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid cldemote movdiri movdir64b fsrm serialize tsxldtrk ibt amx_bf16 avx512_fp16 amx_tile amx_int8 arch_capabilities\nvmx flags\t: vnmi invvpid ept_x_only ept_ad ept_1gb ept_5level tsc_offset vtpr ept vpid unrestricted_guest ept_mode_based_exec tsc_scaling usr_wait_pause\nbugs\t\t: spectre_v1 spectre_v2 spec_store_bypass swapgs retbleed bhi spectre_v2_user its\nbogomips\t: 5199.99\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 57 bits virtual\npower management:\n\nprocessor\t: 2\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 173\nmodel name\t: Intel(R) Xeon(R) 6973P-C\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 4039.612\ncache size\t: 491520 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 1\ncpu cores\t: 2\napicid\t\t: 2\ninitial apicid\t: 2\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 36\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch tpr_shadow ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 vnmi avx512vbmi umip waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid cldemote movdiri movdir64b fsrm serialize tsxldtrk ibt amx_bf16 avx512_fp16 amx_tile amx_int8 arch_capabilities\nvmx flags\t: vnmi invvpid ept_x_only ept_ad ept_1gb ept_5level tsc_offset vtpr ept vpid unrestricted_guest ept_mode_based_exec tsc_scaling usr_wait_pause\nbugs\t\t: spectre_v1 spectre_v2 spec_store_bypass swapgs retbleed bhi spectre_v2_user its\nbogomips\t: 5199.99\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 57 bits virtual\npower management:\n\nprocessor\t: 3\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 173\nmodel name\t: Intel(R) Xeon(R) 6973P-C\nstepping\t: 1\nmicrocode\t: 0xffffffff\ncpu MHz\t\t: 4169.807\ncache size\t: 491520 KB\nphysical id\t: 0\nsiblings\t: 4\ncore id\t\t: 1\ncpu cores\t: 2\napicid\t\t: 3\ninitial apicid\t: 3\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 36\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch tpr_shadow ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 vnmi avx512vbmi umip waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid cldemote movdiri movdir64b fsrm serialize tsxldtrk ibt amx_bf16 avx512_fp16 amx_tile amx_int8 arch_capabilities\nvmx flags\t: vnmi invvpid ept_x_only ept_ad ept_1gb ept_5level tsc_offset vtpr ept vpid unrestricted_guest ept_mode_based_exec tsc_scaling usr_wait_pause\nbugs\t\t: spectre_v1 spectre_v2 spec_store_bypass swapgs retbleed bhi spectre_v2_user its\nbogomips\t: 5199.99\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 57 bits virtual\npower management:\n\n",
+      "meminfo": "MemTotal:       16372440 kB\nMemFree:         8508144 kB\nMemAvailable:   14626328 kB\nBuffers:          108988 kB\nCached:          6133012 kB\nSwapCached:            0 kB\nActive:           769144 kB\nInactive:        5788948 kB\nActive(anon):     371748 kB\nInactive(anon):        0 kB\nActive(file):     397396 kB\nInactive(file):  5788948 kB\nUnevictable:       45352 kB\nMlocked:           42280 kB\nSwapTotal:       3145724 kB\nSwapFree:        3145724 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:           1157940 kB\nWriteback:         28980 kB\nAnonPages:        346300 kB\nMapped:           327056 kB\nShmem:             48300 kB\nKReclaimable:     277800 kB\nSlab:             374440 kB\nSReclaimable:     277800 kB\nSUnreclaim:        96640 kB\nKernelStack:        4240 kB\nPageTables:         6536 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:    11331944 kB\nCommitted_AS:    2052124 kB\nVmallocTotal:   13743895347199 kB\nVmallocUsed:       38012 kB\nVmallocChunk:          0 kB\nPercpu:             2224 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:     73728 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:         0 kB\nFilePmdMapped:         0 kB\nCmaTotal:              0 kB\nCmaFree:               0 kB\nUnaccepted:            0 kB\nBalloon:               0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:      109696 kB\nDirectMap2M:     4079616 kB\nDirectMap1G:    14680064 kB\n",
+      "cpu_max": {
+        "path": "/sys/fs/cgroup/cpu.max",
+        "status": "unavailable",
+        "value": null,
+        "error": "FileNotFoundError",
+        "reason": "[Errno 2] No such file or directory: '/sys/fs/cgroup/cpu.max'"
+      },
+      "memory_max": {
+        "path": "/sys/fs/cgroup/memory.max",
+        "status": "unavailable",
+        "value": null,
+        "error": "FileNotFoundError",
+        "reason": "[Errno 2] No such file or directory: '/sys/fs/cgroup/memory.max'"
+      }
+    },
+    "failure": null,
+    "complete": {
+      "complete": true,
+      "elapsed": 997.0541728730001,
+      "order": [
+        "base",
+        "head",
+        "head",
+        "base",
+        "base",
+        "head"
+      ],
+      "original_processes": 6,
+      "source_batches": 6,
+      "candidate_family_case_union": [
+        "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_has_required_sections_and_tables",
+        "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_lists_runtime_decision_and_proposal_tokens",
+        "tests.code_quality.test_decision_submission_catalog::test_retired_placement_fallback_decisions_do_not_reappear",
+        "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_check_regenerates_into_an_isolated_tree_before_validation",
+        "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_manifest_hashes_current_files_and_all_documentation",
+        "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_regeneration_discards_orphan_generated_fixtures",
+        "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_conformance_version_matches_published_contract",
+        "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_cross_backend_replay_uses_canonical_semantic_comparison",
+        "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_executable_client_is_operation_bound_without_identifier_conventions",
+        "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_package_pins_generation_typecheck_and_live_conformance",
+        "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_client_does_not_import_engine_internals",
+        "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_modules_respect_new_module_size_budget",
+        "tests.code_quality.test_proposal_source_index::test_builder_wrapper_rereads_inventory_and_changed_source_root",
+        "tests.code_quality.test_proposal_source_index::test_byte_change_with_same_size_and_mtime_invalidates",
+        "tests.code_quality.test_proposal_source_index::test_current_inventory_adds_removes_and_drops_previous_roots",
+        "tests.code_quality.test_proposal_source_index::test_fresh_processes_start_without_a_shared_index",
+        "tests.code_quality.test_proposal_source_index::test_identical_bytes_reuse_tokens_but_fresh_instances_parse",
+        "tests.code_quality.test_proposal_source_index::test_identical_content_at_distinct_paths_retains_path_identity",
+        "tests.code_quality.test_proposal_source_index::test_partial_failure_does_not_publish_new_entries",
+        "tests.code_quality.test_proposal_source_index::test_results_are_immutable_and_newlines_match_text_loading",
+        "tests.code_quality.test_proposal_source_index::test_source_index_preserves_literal_proposal_grammar",
+        "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_decode_or_missing_file_errors",
+        "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[A_PROPOSAL_KIND = (]",
+        "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[\\xef\\xbb\\xbfX = 1]"
+      ],
+      "qualification": "Bounded three-pair pilot; process-tree resource peak is max reported RSS, not concurrent summed RSS. No whole-CI claim."
+    },
+    "invocations": 14,
+    "qualification": "Authenticated bounded pilot. Source verification/oracle warms OS caches. Cold means application index only. Peak RSS includes all batch work and is not concurrent summed process-tree memory. No whole-CI claim.",
+    "paired_original": [
+      {
+        "base_seconds": 153.65665251500002,
+        "head_seconds": 114.82687414899993,
+        "delta_seconds": -38.829778366000085,
+        "percent_reduction": 25.2704830740794,
+        "base_invocation": "original-0-base",
+        "head_invocation": "original-1-head"
+      },
+      {
+        "base_seconds": 152.37615740400008,
+        "head_seconds": 114.838188414,
+        "delta_seconds": -37.53796899000008,
+        "percent_reduction": 24.63506734224462,
+        "base_invocation": "original-3-base",
+        "head_invocation": "original-2-head"
+      },
+      {
+        "base_seconds": 152.894983958,
+        "head_seconds": 115.046762296,
+        "delta_seconds": -37.848221662000014,
+        "percent_reduction": 24.754390681905466,
+        "base_invocation": "original-4-base",
+        "head_invocation": "original-5-head"
+      }
+    ],
+    "original_base_mean": 152.97593129233337,
+    "original_head_mean": 114.90394161966664,
+    "original_mean_percent_reduction": 24.88756848939332,
+    "relative_numeric_gate": {
+      "mean_limit": 191.26991411541673,
+      "max_limit": 230.58497877250002,
+      "passed": true,
+      "qualification": "Numeric calculation only, not completed full performance-policy gate/current smoke"
+    },
+    "source_scenarios": [
+      {
+        "reads": 1,
+        "base_seconds": [
+          2.813239017000001,
+          2.798217814999987,
+          2.8471575720000146
+        ],
+        "head_seconds": [
+          2.8739333190000025,
+          3.1232224970000004,
+          2.8114715060000037
+        ],
+        "base_mean": 2.8195381346666673,
+        "head_mean": 2.9362091073333354,
+        "percent_reduction": -4.13794625552959
+      },
+      {
+        "reads": 6,
+        "base_seconds": [
+          17.653793806999985,
+          17.34429228100001,
+          17.055451661999996
+        ],
+        "head_seconds": [
+          3.557234340000008,
+          3.3453310630000033,
+          3.400552345000051
+        ],
+        "base_mean": 17.351179249999998,
+        "head_mean": 3.4343725826666875,
+        "percent_reduction": 80.20669066244193
+      },
+      {
+        "reads": 3,
+        "base_seconds": [
+          8.495549151000006,
+          8.454265310000011,
+          8.754172026999981
+        ],
+        "head_seconds": [
+          3.040488035999971,
+          3.143698363000027,
+          3.0770861730000263
+        ],
+        "base_mean": 8.567995496,
+        "head_mean": 3.0870908573333415,
+        "percent_reduction": 63.96950886850301
+      }
+    ],
+    "parse_counts": [
+      {
+        "side": "base",
+        "cold": 2942,
+        "warm": 2942,
+        "peak_self_rss_kib": 93912
+      },
+      {
+        "side": "head",
+        "cold": 2942,
+        "warm": 0,
+        "peak_self_rss_kib": 123944
+      },
+      {
+        "side": "head",
+        "cold": 2942,
+        "warm": 0,
+        "peak_self_rss_kib": 124068
+      },
+      {
+        "side": "base",
+        "cold": 2942,
+        "warm": 2942,
+        "peak_self_rss_kib": 94068
+      },
+      {
+        "side": "base",
+        "cold": 2942,
+        "warm": 2942,
+        "peak_self_rss_kib": 94176
+      },
+      {
+        "side": "head",
+        "cold": 2942,
+        "warm": 0,
+        "peak_self_rss_kib": 123872
+      }
+    ],
+    "supervisor_cases": [
+      {
+        "case": "early",
+        "exit": 0,
+        "group_absent": true,
+        "handlers_restored": true
+      },
+      {
+        "case": "sigint",
+        "exit": 130,
+        "group_absent": true,
+        "handlers_restored": true
+      },
+      {
+        "case": "sigterm",
+        "exit": 143,
+        "group_absent": true,
+        "handlers_restored": true
+      },
+      {
+        "case": "launch-signal",
+        "exit": 130,
+        "group_absent": true,
+        "handlers_restored": true
+      },
+      {
+        "case": "exception",
+        "exit": 1,
+        "group_absent": true,
+        "handlers_restored": true
+      },
+      {
+        "case": "timeout",
+        "exit": 124,
+        "group_absent": true,
+        "handlers_restored": true
+      },
+      {
+        "case": "stubborn",
+        "exit": 124,
+        "group_absent": true,
+        "handlers_restored": true
+      },
+      {
+        "case": "launch-failure",
+        "exit": 1,
+        "group_absent": true,
+        "handlers_restored": true
+      },
+      {
+        "case": "receipt-failure",
+        "exit": 1,
+        "group_absent": true,
+        "handlers_restored": true
+      }
+    ],
+    "assertion_union": [
+      "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_has_required_sections_and_tables",
+      "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_lists_runtime_decision_and_proposal_tokens",
+      "tests.code_quality.test_decision_submission_catalog::test_retired_placement_fallback_decisions_do_not_reappear",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_check_regenerates_into_an_isolated_tree_before_validation",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_manifest_hashes_current_files_and_all_documentation",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_regeneration_discards_orphan_generated_fixtures",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_conformance_version_matches_published_contract",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_cross_backend_replay_uses_canonical_semantic_comparison",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_executable_client_is_operation_bound_without_identifier_conventions",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_package_pins_generation_typecheck_and_live_conformance",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_client_does_not_import_engine_internals",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_modules_respect_new_module_size_budget",
+      "tests.code_quality.test_proposal_source_index::test_builder_wrapper_rereads_inventory_and_changed_source_root",
+      "tests.code_quality.test_proposal_source_index::test_byte_change_with_same_size_and_mtime_invalidates",
+      "tests.code_quality.test_proposal_source_index::test_current_inventory_adds_removes_and_drops_previous_roots",
+      "tests.code_quality.test_proposal_source_index::test_fresh_processes_start_without_a_shared_index",
+      "tests.code_quality.test_proposal_source_index::test_identical_bytes_reuse_tokens_but_fresh_instances_parse",
+      "tests.code_quality.test_proposal_source_index::test_identical_content_at_distinct_paths_retains_path_identity",
+      "tests.code_quality.test_proposal_source_index::test_partial_failure_does_not_publish_new_entries",
+      "tests.code_quality.test_proposal_source_index::test_results_are_immutable_and_newlines_match_text_loading",
+      "tests.code_quality.test_proposal_source_index::test_source_index_preserves_literal_proposal_grammar",
+      "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_decode_or_missing_file_errors",
+      "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[A_PROPOSAL_KIND = (]",
+      "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[\\xef\\xbb\\xbfX = 1]"
+    ],
+    "generated_tree_files": 235,
+    "host_qualification": {
+      "pytest": "9.0.3",
+      "pytest-cov": "7.1.0",
+      "pytest-xdist": "3.8.0",
+      "coverage": "7.14.0",
+      "numpy": "2.4.6",
+      "shapely": "2.1.2",
+      "z3-solver": "4.15.4.0"
+    },
+    "clock": {
+      "created_at": "2026-10-14T21:10:40Z",
+      "job_started_at": "2026-10-14T21:10:43Z",
+      "job_completed_at": "2026-10-14T21:28:13Z",
+      "creation_to_job_start_seconds": 3.0,
+      "job_wall_seconds": 1050.0,
+      "creation_to_job_end_seconds": 1053.0
+    }
+  },
+  "resources": {
+    "base": {
+      "original_mean_max_reported_rss_mib": 291.3072916666667,
+      "original_mean_cpu_seconds": 153.76,
+      "micro_batch_mean_peak_self_rss_mib": 91.84765625
+    },
+    "head": {
+      "original_mean_max_reported_rss_mib": 303.4505208333333,
+      "original_mean_cpu_seconds": 115.76666666666667,
+      "micro_batch_mean_peak_self_rss_mib": 121.05598958333333
+    },
+    "original_mean_rss_increase_mib": 12.143229166666629,
+    "original_mean_rss_increase_percent": 4.168529080474137,
+    "qualification": "Reported maximum RSS, not simultaneous summed process-tree memory; micro batch peak includes oracle/all scenarios/proof, not retained index alone."
+  },
+  "qualification": "Three pairs on one provisional host; no whole-CI claim. Raw source archive and all 3005 extracted-file hashes retained in sealed task evidence. Current smoke remains separately required.",
+  "extracted_files": {
+    "artifact_zip_entries": 2991,
+    "logs": 14,
+    "combined": 3005
+  },
+  "independent_review": {
+    "decision": "FIT FOR INTEGRATION",
+    "report_sha256": "a937f35723243b450a2aa36942ee1a99c5190d67a28ee3ba92e51f14fb90fe81",
+    "seal_sha256": "7659f6be77af63c583d314a1b7697baf80f484bc6670526a5a52732f5125a466",
+    "scope": "Successful pilot evidence; no full-CI acceptance or merge approval"
+  }
+}

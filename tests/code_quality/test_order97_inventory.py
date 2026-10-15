@@ -48,7 +48,7 @@ def test_order97_inventory_covers_every_selected_clause_and_runtime_row() -> Non
     assert all(
         clause.evidence or clause.requirement_id in scheduled for clause in inventory.requirements
     )
-    assert audit.REPORT.read_text() == audit.markdown(inventory)
+    assert audit.REPORT.read_text(encoding="utf-8") == audit.markdown(inventory)
 
 
 @pytest.mark.parametrize(

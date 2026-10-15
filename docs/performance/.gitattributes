@@ -1,0 +1,3 @@
+# Immutable provenance archives retain exact measured source identities.
+current/source-token-reuse-v1.json.txt -text
+policy-v3/source-token-input-roles.json.txt -text

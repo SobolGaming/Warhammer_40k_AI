@@ -1,0 +1,45 @@
+{
+  "base": "22a12094cfe3839d8fe8c5296ec0a7e7d32abade",
+  "changes": {
+    "scripts/check_performance_policy.py": {
+      "after": "c449cd19ef3d167b7d8e86b92310060765edefd4668e80245b0737192fac91b5",
+      "before": "fb4bacd4baed8f0dc9f0ab1a128e6f4e58efc822bc574c0db6db203b4a667d59"
+    },
+    "tests/code_quality/test_performance_reconstruction_campaign.py": {
+      "after": "9e4ed11e92f06cfdea7b9967e9f018a2965d265a20ddbb3d2794259b6cd4cd2a",
+      "before": null
+    },
+    "tests/code_quality/test_runtime_manifest_reuse.py": {
+      "after": "122cb79b2f6d72990919d415b3dea078707ad9bc7e2fd16f72b1057dd16cc53d",
+      "before": "c86a6e1fee32e1d1a44fb49550ff2490318d3cfce5b38a649c9ca1ad86daeb41"
+    },
+    "tests/code_quality/tool_input_history.py": {
+      "after": "5c2cd034511c68272971567ddf8681de0b7ee036a2de80548527ba6ec32909f5",
+      "before": "9a2e8d605a678ca4b403f4bb53af77818490e9261e56ee446aca4fde889bf867"
+    },
+    "tools/performance_policy.py": {
+      "after": "cbc427774b6d8bb1e30af96310bd94d48eeffd28c99a87254aa9c90e9a0ee37d",
+      "before": "619588189149eb0b6744fe97cbb33bfb3ff5524d732bd57510ea02256c4a696c"
+    },
+    "tools/performance_reconstruction_campaign.py": {
+      "after": "d911cd7387a971d02ba40cd1ec99ab7af381cb2923af34ea2a1a0cf921a9c376",
+      "before": null
+    },
+    "tools/performance_tool_inputs.py": {
+      "after": "fd59737659100b67b1319bec0b288124116c9e4b3cc31ce9518133c1b34643a6",
+      "before": "008f9d6277262013876564322681a49d89b3ddbc6b81b9db2e9bf3688bd2cf6e"
+    },
+    "tools/performance_tool_inputs_v2.py": {
+      "after": "e32fbfcd15747522f64bfefde20318defe397e2c152a2d80743ada8ff68568b0",
+      "before": "a00c1499e18703218468605c511571b06b63dac86239a27b4f0a8db4c16f932f"
+    }
+  },
+  "current_input_digest": "ae4a930b7ae50c35969f642c984348e4c0d0d664dac82e878e28d91bf735ad24",
+  "measured_head": "1e70b261b30223f3a1b2e64ffd81593414eda2af",
+  "measured_input_digest": "6608cd744ddc59083b03f5a54060e691ce123a8b66c1d1dd85bd8e05b1c27592",
+  "measured_tree": "a96ee54373b24bc78642fa8987e7bd94aadb980b",
+  "report_canonical_sha256": "e7c453990b5957aa3c5481c4f06a0164f68cd119ca1845207bf0060ca923b399",
+  "review_sha256": "3d654f11aebc117e776dcd2d1c93e1e92a0d7a468e2a10400f7035522f144e51",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+  "schema": "reconstruction-control-applicability-v1"
+}

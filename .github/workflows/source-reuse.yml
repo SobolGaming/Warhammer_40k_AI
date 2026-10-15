@@ -1,0 +1,80 @@
+name: source-reuse-comparison
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-reuse-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  compare:
+    if: >-
+      github.event.label.name == 'ci-source-reuse' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'codex/test-ci-restructure'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      REVIEWED_HEAD: ${{ github.event.pull_request.head.sha }}
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - name: Reserve upload time inside the job ceiling
+        shell: bash
+        run: echo "REUSE_JOB_START=$(date +%s)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.14.5"
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          version: "0.11.29"
+          enable-cache: false
+      - name: Prepare exact independent trees and external harness
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          export UV_CACHE_DIR="$RUNNER_TEMP/reuse-uv-cache"
+          git worktree add --detach "$RUNNER_TEMP/reuse-base" 22a12094cfe3839d8fe8c5296ec0a7e7d32abade
+          uv sync --locked --no-default-groups --group test
+          uv sync --project "$RUNNER_TEMP/reuse-base" --locked --no-default-groups --group test
+          mkdir "$RUNNER_TEMP/reuse-harness"
+          cp scripts/source_reuse_experiment.py scripts/ci_attribution_supervisor.py scripts/check_ci_attribution_supervisor.py "$RUNNER_TEMP/reuse-harness/"
+          .venv/bin/python -B - <<'PY'
+          import json, os
+          from pathlib import Path
+          from tools.performance_policy import runtime_inputs, canonical_digest
+          from tools.performance_tool_inputs import comparison_inputs, FAMILY
+          root = Path.cwd()
+          binding = comparison_inputs(root, base="22a12094cfe3839d8fe8c5296ec0a7e7d32abade", family=FAMILY, head_input_digest=canonical_digest(runtime_inputs(root)))
+          (Path(os.environ["RUNNER_TEMP"]) / "reuse-binding.json").write_text(json.dumps(binding, indent=2) + "\n")
+          PY
+      - name: Run exact bounded comparison
+        timeout-minutes: 55
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=5s 3290s .venv/bin/python -B "$RUNNER_TEMP/reuse-harness/source_reuse_experiment.py" run --base-root "$RUNNER_TEMP/reuse-base" --head-root "$GITHUB_WORKSPACE" --binding "$RUNNER_TEMP/reuse-binding.json" --expected-head "$REVIEWED_HEAD" --output "$RUNNER_TEMP/source-reuse-output"
+      - name: Preserve every result and failed attempt
+        if: always()
+        timeout-minutes: 2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: source-reuse-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/source-reuse-output/
+            ${{ runner.temp }}/reuse-binding.json
+            ${{ runner.temp }}/reuse-harness/
+          if-no-files-found: error
+          retention-days: 14
+          include-hidden-files: true

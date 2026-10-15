@@ -1,0 +1,55 @@
+{
+  "samples": {
+    "base": [
+      244.299,
+      242.874,
+      243.971
+    ],
+    "head": [
+      175.752,
+      175.422,
+      176.667
+    ]
+  },
+  "mean_limit": 304.6933333333333,
+  "maximum_limit": 366.54850000000005,
+  "passed": true,
+  "generated_changed_paths": [
+    "examples/persistence/session-persistence.json",
+    "examples/sessions/session-command-outcome.json",
+    "examples/sessions/session-command-started.json",
+    "examples/sessions/session-metadata-created.json",
+    "examples/support-profile-player-a-redacted.json",
+    "examples/support-profile-player-b-redacted.json",
+    "examples/support-profile.json",
+    "manifest.json"
+  ],
+  "candidate_family_cases": [
+    "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_has_required_sections_and_tables",
+    "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_lists_runtime_decision_and_proposal_tokens",
+    "tests.code_quality.test_decision_submission_catalog::test_retired_placement_fallback_decisions_do_not_reappear",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_check_regenerates_into_an_isolated_tree_before_validation",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_manifest_hashes_current_files_and_all_documentation",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_regeneration_discards_orphan_generated_fixtures",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_conformance_version_matches_published_contract",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_cross_backend_replay_uses_canonical_semantic_comparison",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_executable_client_is_operation_bound_without_identifier_conventions",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_package_pins_generation_typecheck_and_live_conformance",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_client_does_not_import_engine_internals",
+    "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_modules_respect_new_module_size_budget",
+    "tests.code_quality.test_proposal_source_index::test_builder_wrapper_rereads_inventory_and_changed_source_root",
+    "tests.code_quality.test_proposal_source_index::test_byte_change_with_same_size_and_mtime_invalidates",
+    "tests.code_quality.test_proposal_source_index::test_current_inventory_adds_removes_and_drops_previous_roots",
+    "tests.code_quality.test_proposal_source_index::test_fresh_processes_start_without_a_shared_index",
+    "tests.code_quality.test_proposal_source_index::test_identical_bytes_reuse_tokens_but_fresh_instances_parse",
+    "tests.code_quality.test_proposal_source_index::test_identical_content_at_distinct_paths_retains_path_identity",
+    "tests.code_quality.test_proposal_source_index::test_partial_failure_does_not_publish_new_entries",
+    "tests.code_quality.test_proposal_source_index::test_results_are_immutable_and_newlines_match_text_loading",
+    "tests.code_quality.test_proposal_source_index::test_source_index_preserves_literal_proposal_grammar",
+    "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_decode_or_missing_file_errors",
+    "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[A_PROPOSAL_KIND = (]",
+    "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[\\xef\\xbb\\xbfX = 1]"
+  ],
+  "qualification": "Three-pair original JUnit timings. Raw evidence requires reviewed v2 input binding before policy admission."
+}

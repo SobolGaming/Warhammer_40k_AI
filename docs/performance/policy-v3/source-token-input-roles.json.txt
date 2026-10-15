@@ -1,0 +1,48 @@
+{
+  "schema": "tool-input-roles-v1",
+  "family": "external_contract_source_reuse",
+  "workload": "tests/code_quality/test_phase18m_conformance_boundary.py",
+  "treatment": [
+    "scripts/build_external_contract.py",
+    "scripts/proposal_source_index.py"
+  ],
+  "control_plane": {
+    ".github/workflows/source-reuse.yml": "Pinned identical external orchestration component for both arms; repository-local copy is not injected into either measured process.",
+    "docs/performance/policy-v3/operation-map.json": "Comparison policy or separate quality preparation input; not imported by the original generator workload. Per-side identities and full head digest remain mandatory.",
+    "docs/performance/policy-v3/source-token-input-roles.json": "Comparison policy or separate quality preparation input; not imported by the original generator workload. Per-side identities and full head digest remain mandatory.",
+    "scripts/check_ci_attribution_commands.py": "Repository diagnostic addition not loaded by the original test's write/check processes; its exact per-side bytes remain bound.",
+    "scripts/check_ci_attribution_supervisor.py": "Pinned identical external orchestration component for both arms; repository-local copy is not injected into either measured process.",
+    "scripts/check_performance_policy.py": "Comparison policy or separate quality preparation input; not imported by the original generator workload. Per-side identities and full head digest remain mandatory.",
+    "scripts/ci_attribution.py": "Repository diagnostic addition not loaded by the original test's write/check processes; its exact per-side bytes remain bound.",
+    "scripts/ci_attribution_plugin.py": "Repository diagnostic addition not loaded by the original test's write/check processes; its exact per-side bytes remain bound.",
+    "scripts/ci_attribution_profile.py": "Repository diagnostic addition not loaded by the original test's write/check processes; its exact per-side bytes remain bound.",
+    "scripts/ci_attribution_supervisor.py": "Pinned identical external orchestration component for both arms; repository-local copy is not injected into either measured process.",
+    "scripts/source_reuse_experiment.py": "Pinned identical external orchestration component for both arms; repository-local copy is not injected into either measured process.",
+    "tests/code_quality/d02_assessment_history.py": "Comparison policy or separate quality preparation input; not imported by the original generator workload. Per-side identities and full head digest remain mandatory.",
+    "tests/code_quality/test_d02_performance_assessment.py": "Comparison policy or separate quality preparation input; not imported by the original generator workload. Per-side identities and full head digest remain mandatory.",
+    "tests/code_quality/test_performance_tool_inputs.py": "Comparison policy or separate quality preparation input; not imported by the original generator workload. Per-side identities and full head digest remain mandatory.",
+    "tests/code_quality/test_proposal_source_index.py": "Comparison policy or separate quality preparation input; not imported by the original generator workload. Per-side identities and full head digest remain mandatory.",
+    "tools/performance_policy.py": "Comparison policy or separate quality preparation input; not imported by the original generator workload. Per-side identities and full head digest remain mandatory.",
+    "tools/performance_tool_inputs.py": "Comparison policy or separate quality preparation input; not imported by the original generator workload. Per-side identities and full head digest remain mandatory."
+  },
+  "required_dependencies": [
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Abilities.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_abilities.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_keywords.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_leader.json",
+    "docs/source_rules/faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf",
+    "docs/source_rules/tacoma-open-2026-source-package.json",
+    "pyproject.toml",
+    "tests/code_quality/test_phase18m_conformance_boundary.py",
+    "tests/conftest.py",
+    "tests/timing_plugin.py",
+    "uv.lock"
+  ],
+  "harness": [
+    ".github/workflows/source-reuse.yml",
+    "scripts/check_ci_attribution_supervisor.py",
+    "scripts/ci_attribution_supervisor.py",
+    "scripts/source_reuse_experiment.py"
+  ]
+}

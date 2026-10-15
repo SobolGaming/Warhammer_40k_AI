@@ -1,0 +1,1186 @@
+{
+  "tests/category_migration_preservation.py": {
+    "before": null,
+    "after": "a10efe257b1e08da113eb9ca03bc24cee85a08beea9685f37c4d5518081e72eb"
+  },
+  "tests/code_quality/test_category_migration_preservation.py": {
+    "before": null,
+    "after": "59c3db01a2ad7af3a06a4f31e7810eb3f8a2a8214427a43266d5bebdbe8097f7"
+  },
+  "tests/code_quality/test_d07_upper_floor_preservation.py": {
+    "before": "b8a72157228d20cce7fddb5491cf6c97dad8de23512684033b56962fe26069da",
+    "after": "458c7556140ccdf5920ee9a4021b3f22af511fa7d750a70efc706fe6ba467b51"
+  },
+  "tests/code_quality/test_order97_inventory.py": {
+    "before": "78697c357cf227480a58cf22d2f1d201e621d1cb3e7c0e1631151613bacf3955",
+    "after": "7b4ce6c6d14243afe9f08fedf616e867f9555a5101e98de45bad130f66f32a99"
+  },
+  "tests/factions/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/aeldari/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/aeldari/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/aeldari/unit/test_generic_rule_ability_registry.py": {
+    "before": null,
+    "after": "98aa14f618b2578760c34abbde73aeb8a3839f778e3c008acd51deaab8feac87"
+  },
+  "tests/factions/black_templars/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/black_templars/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/black_templars/unit/test_black_templars_army_rule.py": {
+    "before": null,
+    "after": "caade7cea6dae7b304efb346fb466dfe433dad6f94484a1ed3e1bb5f546443d0"
+  },
+  "tests/factions/chaos_daemons/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/chaos_daemons/integration/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py": {
+    "before": null,
+    "after": "6328ecbebaf0534354ad79046596ae1c1d119619313058461f442f4b1a80e6a5"
+  },
+  "tests/factions/chaos_daemons/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/chaos_daemons/unit/test_generic_ir_support_validation.py": {
+    "before": null,
+    "after": "966f376b04d2e4c49d83d6ee6ee1ff9056c76c7d4f41b3be12321e8d60b91bf5"
+  },
+  "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py": {
+    "before": null,
+    "after": "330da381d4fc22016bc38612c9a5c98905a3bd7398275e6100d68afc30a6adce"
+  },
+  "tests/factions/chaos_daemons/unit/test_source_overlays.py": {
+    "before": null,
+    "after": "d8fb952c76dcc0f9fff1fa676cc4bccf77f1a52f9aefeab8dbb01832ef873567"
+  },
+  "tests/factions/chaos_space_marines/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/chaos_space_marines/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/chaos_space_marines/unit/test_source_overlays.py": {
+    "before": null,
+    "after": "6128a4b72c9309650c7611716e779ff6ebe5db80ece6d4d06ed24cf3aadab3db"
+  },
+  "tests/factions/emperors_children/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/emperors_children/integration/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/emperors_children/integration/test_ws14_generic_ir_lifecycle.py": {
+    "before": null,
+    "after": "0edf3bc19424cf7882c9a24db3e877fd353696a3ed6718fb0d0ab4e9454ecc44"
+  },
+  "tests/factions/emperors_children/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/emperors_children/unit/test_generic_rule_ability_registry.py": {
+    "before": null,
+    "after": "71be8e20014bdf10c493e7df2ccb2069d155198a271e63553cf87a070c185634"
+  },
+  "tests/factions/emperors_children/unit/test_runtime_consumer_evidence.py": {
+    "before": null,
+    "after": "c672346fddce939216750dec92a6267ae0bf3747fbf7a564ed09e854ddbcd635"
+  },
+  "tests/factions/orks/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/orks/integration/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/orks/integration/test_ws14_generic_ir_lifecycle.py": {
+    "before": null,
+    "after": "010c10f67bd0ad474acac5b31f64453ef11132154decb98fe5ea492bf9e7d746"
+  },
+  "tests/factions/thousand_sons/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/thousand_sons/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/factions/thousand_sons/unit/test_source_overlays.py": {
+    "before": null,
+    "after": "1095545a0cd973b567fc1e2b45dd43000fb352b954d0c47f5a4ee3b59e344c6d"
+  },
+  "tests/infrastructure/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/adapters/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/adapters/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/adapters/unit/test_session_commands.py": {
+    "before": null,
+    "after": "8346b27cd1e0b893b7332d8b22b0092d245f6817b52603ff321de88f920b18d5"
+  },
+  "tests/infrastructure/decisions/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/decisions/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/decisions/unit/test_opportunity_windows.py": {
+    "before": null,
+    "after": "d4f9da68900a559438204bd2fb9500e12900a5441c2d1cab096127fb309aa1f6"
+  },
+  "tests/infrastructure/decisions/unit/test_physical_proposal_prevalidation.py": {
+    "before": null,
+    "after": "3b3172c020b40288408e17ae2c5cb7955d273743ad4b7bc01a96b8b06f7d9d8a"
+  },
+  "tests/infrastructure/lifecycle/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/lifecycle/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/lifecycle/unit/test_battlefield_transitions.py": {
+    "before": null,
+    "after": "f4634a690fb11943947ee09407fe16fb75bb8c5e9372d025d6c41fd92b5f8065"
+  },
+  "tests/infrastructure/lifecycle/unit/test_lifecycle.py": {
+    "before": null,
+    "after": "290ba7617a5a256464cb02fb86b4834ccc1d9f5a54a5b40a2f17c26ddab82cb5"
+  },
+  "tests/infrastructure/lifecycle/unit/test_prebattle.py": {
+    "before": null,
+    "after": "7b63023b342f9485f58c31803317662fa63d83a4e3bcfff71a990279e508723a"
+  },
+  "tests/infrastructure/missions/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/missions/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/missions/unit/test_boundary_checkpoint_physical_authority.py": {
+    "before": null,
+    "after": "e660c8b5b1105a013112bbaec5389b097945b9156ffd431df14cfa96b674c7ae"
+  },
+  "tests/infrastructure/missions/unit/test_boundary_checkpoint_redaction.py": {
+    "before": null,
+    "after": "3d439c333754f8f99031fcf3489a0799a8e6dd4ecd64b2f6b5ff76bfa26b26ae"
+  },
+  "tests/infrastructure/missions/unit/test_event_companion.py": {
+    "before": null,
+    "after": "ae6351e3f40fb9b9680770e513bcf301a80dd884b51b4a64c33b3d9d690fc563"
+  },
+  "tests/infrastructure/missions/unit/test_event_companion_part2.py": {
+    "before": null,
+    "after": "baf996721695969307039d0a87089b8404cd199d60341afe461bbcf85e469b33"
+  },
+  "tests/infrastructure/missions/unit/test_game_end_scoring.py": {
+    "before": null,
+    "after": "e8a9d70b39beb869b59e8e549ce09ccafbeaa4af0046d1530c38607a6ef681f8"
+  },
+  "tests/infrastructure/missions/unit/test_lifecycle.py": {
+    "before": null,
+    "after": "40ace2ed3e1240172653ae810310893a434833ad3cd17b2a08e927aa3811c5f7"
+  },
+  "tests/infrastructure/missions/unit/test_mission_pack.py": {
+    "before": null,
+    "after": "adfe31cbe36c2a657466861485e207a45518fb7ff72228b7a068bdac560bf1a2"
+  },
+  "tests/infrastructure/missions/unit/test_primary_scoring_boundary_lifecycle.py": {
+    "before": null,
+    "after": "64b2c43231faad9df0e69913d5ca94d8f284868e1784b25621d5d9f902f529f6"
+  },
+  "tests/infrastructure/missions/unit/test_primary_scoring_boundary_lifecycle_part2.py": {
+    "before": null,
+    "after": "675f65217305072b78c9f2cef6a8d547078e44fb12ddd056e6ad9e336ee90f9d"
+  },
+  "tests/infrastructure/missions/unit/test_primary_scoring_boundary_lifecycle_part3.py": {
+    "before": null,
+    "after": "51f229b78b74403717c439a990576e834d15df8344ba45efb9b1026b41669666"
+  },
+  "tests/infrastructure/missions/unit/test_primary_scoring_grammar.py": {
+    "before": null,
+    "after": "700625b01b744b4279ae57d0a19346f9cb5119eb7b43b5a62d730ef7ebeaefc9"
+  },
+  "tests/infrastructure/missions/unit/test_secondary_scoring_state_evidence_authority.py": {
+    "before": null,
+    "after": "41accb0efabf496a68ef6edfd5a97efc131f1c8a11c72ab4769aa477a3dc9bdd"
+  },
+  "tests/infrastructure/missions/unit/test_step5b_marker_conditions.py": {
+    "before": null,
+    "after": "e0c73a86ca4f8430331b24fb85748cff5c85c3189ad1592e313b1e3d360bbc12"
+  },
+  "tests/infrastructure/missions/unit/test_step5d_condemned_departure_conditions.py": {
+    "before": null,
+    "after": "462c487f44d4031768f5f51d78bae007032589698f87451e8ebbdaf180d2c084"
+  },
+  "tests/infrastructure/missions/unit/test_step5e_operation_marker_conditions.py": {
+    "before": null,
+    "after": "4a03e61e9eb61053048294a702f7cca6e9eb9226d562b77d2e0759af9efebb53"
+  },
+  "tests/infrastructure/missions/unit/test_step5f_surveil_conditions.py": {
+    "before": null,
+    "after": "753e184b2a71c5e2161e1057d71c295d12bd62ac73aea4f3192358ed778a54a1"
+  },
+  "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py": {
+    "before": null,
+    "after": "d682066797209b9152457a68d726f41313acc5fdb7d15ac17badedc11925954b"
+  },
+  "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py": {
+    "before": null,
+    "after": "0ee5e52f49e404ef87bcc5e255983b99a2b9aab68f9943090b3e612f5bab7109"
+  },
+  "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_c.py": {
+    "before": null,
+    "after": "ce3584778553eb5b0f563f8ff698126ae6aa8d1ecf26d496c3384836c16a7cf4"
+  },
+  "tests/infrastructure/missions/unit/test_step6g_secondary_certification.py": {
+    "before": null,
+    "after": "188ffe6cc56843bb5951da5d1e002eaf2ed0ebc1cfbda03ce8fddefc8b6597bd"
+  },
+  "tests/infrastructure/missions/unit/test_step6g_secondary_certification_a_grievous_through_beacon.py": {
+    "before": null,
+    "after": "13aed595779b934a3603310b91c175809101c6cc43ddc375192e8f12258b1623"
+  },
+  "tests/infrastructure/missions/unit/test_step6g_secondary_certification_behind_through_cleanse.py": {
+    "before": null,
+    "after": "6a099a2ed3e3da226679194bd544460753ba66aecd2f1e1f9236d2a78d04b83c"
+  },
+  "tests/infrastructure/missions/unit/test_step6g_secondary_certification_defend_through_forward.py": {
+    "before": null,
+    "after": "546d95b4f5303623efe67ec6d6f9680d9ce361ce9414422223ee2f5a8c6010c6"
+  },
+  "tests/infrastructure/missions/unit/test_step6g_secondary_certification_no_prisoners_through_secure.py": {
+    "before": null,
+    "after": "a32bb004822a9794a1511730d01aefb913ec005f5b8ea5c363d0a7593b42121c"
+  },
+  "tests/infrastructure/rule_execution/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/rule_execution/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/rule_execution/unit/test_generic_ir_support_validation.py": {
+    "before": null,
+    "after": "462e629107dfbe6b7d1b8e20c0552b8721d26de40396323bf57e9f32ffdc0f1e"
+  },
+  "tests/infrastructure/rule_execution/unit/test_generic_rule_ability_registry.py": {
+    "before": null,
+    "after": "9aaf2f77a7778d7c4c578ddda0a11bf05c068b6adea7fbb9f702b2046d1fd18e"
+  },
+  "tests/infrastructure/rule_execution/unit/test_generic_rule_effect_identity.py": {
+    "before": null,
+    "after": "b83719d03f7e9f95127842d429208450ad481ca40b165d14a89c98a59e08ff4f"
+  },
+  "tests/infrastructure/rule_execution/unit/test_rule_execution.py": {
+    "before": null,
+    "after": "4e4d834ad9703805623bf269433f2fde33b563eb994ea65d8a9503fdefc61172"
+  },
+  "tests/infrastructure/rule_execution/unit/test_rule_execution_part2.py": {
+    "before": null,
+    "after": "a85636534bb32e435c9799e509a732513b7ed3edcaf40af34741a5deb7fc8cf5"
+  },
+  "tests/infrastructure/runtime_content/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/runtime_content/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/runtime_content/unit/test_ability_registry.py": {
+    "before": null,
+    "after": "35513306150c0e4ea23b4b5a35fae84f061490ae907bb4a08fa3d8c5489a1bc9"
+  },
+  "tests/infrastructure/runtime_content/unit/test_runtime_content.py": {
+    "before": null,
+    "after": "012c38b8654d3ebea79921a5ea23901201d341b4f8e5f36432405b57ac2c3abe"
+  },
+  "tests/infrastructure/runtime_content/unit/test_runtime_content_part2.py": {
+    "before": null,
+    "after": "7f3d08ab74ec40de6364e18d58f4c7ad4010d9779ffeaa62228c6c5c2603f06c"
+  },
+  "tests/infrastructure/runtime_hooks/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/runtime_hooks/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/runtime_hooks/unit/test_lifecycle_hooks.py": {
+    "before": null,
+    "after": "03783dd671bcaf766a7e9a8e995bc62e2d148e91d8d551d10d7b903d88613940"
+  },
+  "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py": {
+    "before": null,
+    "after": "2097b78ccf59d264f9dfdba560697c84984afa0b7ad61c4ae18d208f1435a0a2"
+  },
+  "tests/infrastructure/setup/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/setup/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/setup/unit/test_deployment.py": {
+    "before": null,
+    "after": "9bb42234104ff2a21e538e311c60a5e40e18480bf3ad76f8a9255e88bf75c92f"
+  },
+  "tests/infrastructure/setup/unit/test_setup_completion.py": {
+    "before": null,
+    "after": "70381d17abc9fe99eee60277a7869b2daf404cc79adfd098df9b9d42c8acbd6e"
+  },
+  "tests/infrastructure/source/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/source/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/source/unit/test_phase17a1_transition_patches.py": {
+    "before": null,
+    "after": "ce7e150a39aa3112d8fcfed6548485b6b2f4486b62396d672c736b368811d72e"
+  },
+  "tests/infrastructure/source/unit/test_rule_text_normalization.py": {
+    "before": null,
+    "after": "70c1d0b7e017a11451c7939c14eb80fe07953e39557c5ae9c97d0fc46919bdab"
+  },
+  "tests/infrastructure/source/unit/test_ruleset_descriptor.py": {
+    "before": null,
+    "after": "22c98e48e8a4a3c623ab74da00d07a7186de49f27a3f9eb91e99a1aaefa06af8"
+  },
+  "tests/infrastructure/source/unit/test_source_identity.py": {
+    "before": null,
+    "after": "ad3acd1fbc00d9f21b1bb807fcb7e0ed4b1bc630074737d5cb8495c82d6595e1"
+  },
+  "tests/infrastructure/source/unit/test_source_identity_part2.py": {
+    "before": null,
+    "after": "def0f92d0a7622ae4366c3d70a5a9dcab3532b406b635ae4e60f6b1f4a811505"
+  },
+  "tests/infrastructure/source/unit/test_source_overlays.py": {
+    "before": null,
+    "after": "25ef150e96ce0e3236a57ac9afbaed5ef95ecd3a9aa7980fd999de4e86314e8e"
+  },
+  "tests/infrastructure/source/unit/test_source_reconciliation.py": {
+    "before": null,
+    "after": "e1a4a0883ab20effef0518e0e49ff34e5d107f46f1c0f9b1596e5e17e0701357"
+  },
+  "tests/infrastructure/source_governance/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/source_governance/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+    "before": null,
+    "after": "8dae54c9416de9a7e31c4d7a18616ed2f5a9f37b3923e8219319af3ac69fe59d"
+  },
+  "tests/infrastructure/source_governance/unit/test_named_handler_budget.py": {
+    "before": null,
+    "after": "a2079209e50e81baf0571445be86ccb6f02d6f648914475f57ac986d415188f7"
+  },
+  "tests/infrastructure/source_governance/unit/test_support_evidence_inventories.py": {
+    "before": null,
+    "after": "4af8b5a67dfc03bc05f378baf812bdaf79e12ae82ebc13081facce43e059c0fe"
+  },
+  "tests/integration/test_horror_split_materialization.py": {
+    "before": "b3299fa7d04a9cfd257ed205d99cd9f546a93463ae9de1a9343926d3328a284d",
+    "after": "eb7390e196f20bd17fa15821373ae97d5cc73ee7921bba5bddf3155c79f59334"
+  },
+  "tests/integration/test_ws14_generic_ir_lifecycle.py": {
+    "before": "de1a01e9343ed02b3241bec98ce13c20e45d7a6917ed39a6fb8a8c84e5413eae",
+    "after": "b4ce40d198fe4a76e8f85ca9c1ac145937f2da53e81f20a291685509ca805681"
+  },
+  "tests/rules/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules01/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules01/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules01/unit/test_table_quarters.py": {
+    "before": null,
+    "after": "678df4cb91ebbc65db2a5697603057ba0049d9219798c19680c52c5de74cbccb"
+  },
+  "tests/rules/rules01/unit/test_unit_splitting.py": {
+    "before": null,
+    "after": "420e8bc06b39dd925e10a9b7797b1f075c2c71be504fbaf5610aaa94c5ee4ff8"
+  },
+  "tests/rules/rules02/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules02/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules02/unit/test_s25_characteristic_profile_gates.py": {
+    "before": null,
+    "after": "7f95ada0153afe264f14effa1865b23fbb023deda479ce611ae79fb74d99d655"
+  },
+  "tests/rules/rules03/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules03/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules03/unit/test_deployment.py": {
+    "before": null,
+    "after": "6bb3a074e7672c69b2e5b3c6690b3c110d0c3013d60353f27db59cccb90e4adb"
+  },
+  "tests/rules/rules03/unit/test_setup.py": {
+    "before": null,
+    "after": "f49f7eeac946dee322ad821830198f66f29ca92dc437d91f92eb68ed171296d7"
+  },
+  "tests/rules/rules03/unit/test_unit_rule_effects.py": {
+    "before": null,
+    "after": "348454e2858350d4e472a1ff3818e8933c12b1c03f343a47ab5e74c8e0b380e6"
+  },
+  "tests/rules/rules04/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules04/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules04/unit/test_s25_permission_relevance.py": {
+    "before": null,
+    "after": "be09d3680ac4ac47c248a1962b24846a3791824821c14a5a4080f5cab8b73c07"
+  },
+  "tests/rules/rules07/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules07/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules07/unit/test_lifecycle.py": {
+    "before": null,
+    "after": "1764030ee985538e07c27bc40879f499d1a49bf1196673d7d4c20637daca1edb"
+  },
+  "tests/rules/rules18/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules18/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules18/unit/test_tactical_setup_proof.py": {
+    "before": null,
+    "after": "2474954b57893c198d49adcf2eaa6102077165cd040f1d6dc236b3cde77dec54"
+  },
+  "tests/rules/rules24/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules24/unit/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/rules/rules24/unit/test_facade_evidence.py": {
+    "before": null,
+    "after": "48a6df43fa23bda7c76caf55079e374d9cb8305b692dd5b85fe17c03f8343a91"
+  },
+  "tests/rules/rules24/unit/test_prebattle.py": {
+    "before": null,
+    "after": "d0d6cad486d7d6175cc94d888a74c5f1b50e284fdd316e595b6d1fdf95e56655"
+  },
+  "tests/rules/rules24/unit/test_return_on_death.py": {
+    "before": null,
+    "after": "2bcfa5c248da8049a0075dfbb56443d0393f94f9fef106e985a7088ccfc1afea"
+  },
+  "tests/rules/rules24/unit/test_tracked_targets.py": {
+    "before": null,
+    "after": "dcc2b33dcd03416284394f95a158758e6d27277c0c146913a27449428073e2a7"
+  },
+  "tests/shared/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/shared/category_migration/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/shared/category_migration/generic_ir_support_validation.py": {
+    "before": null,
+    "after": "147280ad1259f7fc0ac2f44842fa0c9c7f6919ea83ea7e248160ad4bb54fab4d"
+  },
+  "tests/shared/category_migration/generic_rule_ability_registry.py": {
+    "before": null,
+    "after": "a4b6ac2bc8e0941d236a6828528ba342586505e6dccec96d22931f90b7dd4a52"
+  },
+  "tests/shared/category_migration/generic_rule_effect_identity.py": {
+    "before": null,
+    "after": "5b7c6c3ddbe93af1bfcc3f45e27f2c1c78ca04b2577651bcd34a9f987fd9fd01"
+  },
+  "tests/shared/category_migration/horror_split_materialization.py": {
+    "before": null,
+    "after": "2c1294f23367ea6ba88e1a1caed88de039599b42519c061dd96eedbed314ec47"
+  },
+  "tests/shared/category_migration/lifecycle_hooks.py": {
+    "before": null,
+    "after": "9a3b7ec936a7ac9ecd85adefa280353dced8d09dafe47682608d6d1fcc4f62f6"
+  },
+  "tests/shared/category_migration/order135_tactical_setup_proof.py": {
+    "before": null,
+    "after": "3622e509477cdd15f648651c12ca60ee282c2e91aa4ce626cdc75cbea9eef689"
+  },
+  "tests/shared/category_migration/order54_setup.py": {
+    "before": null,
+    "after": "917e4c81b54de4b7be7b2161918f17f5eafff9cb41af1715b0b975d856b2c643"
+  },
+  "tests/shared/category_migration/order86_table_quarters.py": {
+    "before": null,
+    "after": "658276261b5881bafbf9157cc78c8a02370a37a03de871cf548551e904adbc0b"
+  },
+  "tests/shared/category_migration/order97_facade_evidence.py": {
+    "before": null,
+    "after": "ff46f28cb505b1e15c57921f5f524da45967de5331be788e56863125cbcc9a26"
+  },
+  "tests/shared/category_migration/order98_source_reconciliation.py": {
+    "before": null,
+    "after": "85fc1829679753712cdd601c39293b5179a1f3ccc504859ae64fafafc81b8328"
+  },
+  "tests/shared/category_migration/phase10d_battlefield_transitions.py": {
+    "before": null,
+    "after": "38b7a71d57f0be1198c0d6f872481a560bfb586ff68246e72495f5c7c4eb0b59"
+  },
+  "tests/shared/category_migration/phase11a_mission_pack.py": {
+    "before": null,
+    "after": "d2531aa9bfc6ae9295532bbeba4b53ac49d8f99afd2bcd5a7f2f85d655009c45"
+  },
+  "tests/shared/category_migration/phase11e_mission_scoring_cleanup.py": {
+    "before": null,
+    "after": "2930913051e7cac845ac5ca6c63f4dd90f96245540123b28d0714f7f741a6f8d"
+  },
+  "tests/shared/category_migration/phase11e_mission_scoring_cleanup_bindings.py": {
+    "before": null,
+    "after": "618be6e47640ff9596321bb93bc6c926c5432fcdc25a70d06d03e5aee91b5520"
+  },
+  "tests/shared/category_migration/phase11e_mission_scoring_cleanup_configuration.py": {
+    "before": null,
+    "after": "dcf42d1f5991ab5ced6061152472bc00e415117709c4c30846f8f709069a8553"
+  },
+  "tests/shared/category_migration/phase11e_mission_scoring_cleanup_history_and_reserves.py": {
+    "before": null,
+    "after": "3f579830b668704ccbfd4b94da524df1c74e297ab52614ae0168ef298e6144da"
+  },
+  "tests/shared/category_migration/phase11e_mission_scoring_cleanup_mission_lifecycle.py": {
+    "before": null,
+    "after": "517733fe30ac75772c1ac04d1d84256149016b42e85a10c0cb3f3baaaa8f652e"
+  },
+  "tests/shared/category_migration/phase11e_mission_scoring_cleanup_state_primitives.py": {
+    "before": null,
+    "after": "8fbe4e3117cc475ee065374dcccd2bd29d369e525bb04500941eb402e57bf2f6"
+  },
+  "tests/shared/category_migration/phase11e_mission_scoring_cleanup_tactical_ledgers.py": {
+    "before": null,
+    "after": "7ccc9c75d1067743bd067d28b00aaedb811f7e3d34ccc0020046624c704a484d"
+  },
+  "tests/shared/category_migration/phase11f_game_end_scoring.py": {
+    "before": null,
+    "after": "bf0e02cceb9186b1e29feda915ed702496a49c39ff57f9f5745715bc5c056e9e"
+  },
+  "tests/shared/category_migration/phase12d_ability_registry.py": {
+    "before": null,
+    "after": "fb1db0b6839b47c547b374169453ce67c1ec5474bf96c6fd0e99411aa609ee5d"
+  },
+  "tests/shared/category_migration/phase14a_source_identity.py": {
+    "before": null,
+    "after": "8b21c05364f67fbc7284d0c4c2f481b81af362aae9e856a499daa274a7408af3"
+  },
+  "tests/shared/category_migration/phase16a_deployment.py": {
+    "before": null,
+    "after": "271376170fc7f022f10e6c2bd939beaf607a1b6229c88d645145ae9e8c7f35b0"
+  },
+  "tests/shared/category_migration/phase16b_prebattle.py": {
+    "before": null,
+    "after": "271033e15c945cebdc9848cbb25bdf6331c2a91ca9dba7d45d433e3fc091958f"
+  },
+  "tests/shared/category_migration/phase16e_setup_completion.py": {
+    "before": null,
+    "after": "db5f0610faa5a6f1c80a0938e89b2e74cb9055beabd19795a5176b989a2bb5da"
+  },
+  "tests/shared/category_migration/phase17_source_overlays.py": {
+    "before": null,
+    "after": "2ba150601d4a2d4755ce72145e284a8c4d7a758a4044588490a6140460c9aec3"
+  },
+  "tests/shared/category_migration/phase17a1_transition_patches.py": {
+    "before": null,
+    "after": "9bf3ad77547be4a79779fdb013e38ad76649060d7d29fb695c6cf5cab0c1888f"
+  },
+  "tests/shared/category_migration/phase17d_rule_execution.py": {
+    "before": null,
+    "after": "dd70b28b22e8e792026bc07c8246438a9d49a5f944d4a70fee04b1eed58baa0d"
+  },
+  "tests/shared/category_migration/phase17g_black_templars_army_rule.py": {
+    "before": null,
+    "after": "bfd2ffd3e4cbc2e2f4485318faf8799ef276cd95c02e06e79698730e918e5c13"
+  },
+  "tests/shared/category_migration/phase17g_runtime_content.py": {
+    "before": null,
+    "after": "db1297ac648ad8c683d5f279ce6981661e3e3f4fbc338486cc21799af7d64d62"
+  },
+  "tests/shared/category_migration/phase17i_blocked_row_classification.py": {
+    "before": null,
+    "after": "ac2bea1338d8894211479eae5aeed6a278180c4ce08f89c7990476b68fbbf9bd"
+  },
+  "tests/shared/category_migration/phase17i_named_handler_budget.py": {
+    "before": null,
+    "after": "4ac9b4187ea66ad55ecf7c6de32c0edb8773d531e8ce2aff79c4364d7fe39692"
+  },
+  "tests/shared/category_migration/phase17j_event_companion.py": {
+    "before": null,
+    "after": "25e399d1f462fc7c501cf48a88591b794160d57aa380827a0ebd52efafede864"
+  },
+  "tests/shared/category_migration/phase17n_boundary_checkpoint_physical_authority.py": {
+    "before": null,
+    "after": "6abd98e70c0b78159a8c32f8a3cbeef77ad636a7d294bff5aa27079571de901c"
+  },
+  "tests/shared/category_migration/phase17n_boundary_checkpoint_redaction.py": {
+    "before": null,
+    "after": "aace6922774c7c5d79472b8d05026a9b61f76ea3616a459a6ef3b4aeb5612e46"
+  },
+  "tests/shared/category_migration/phase17n_pending_request_integrity.py": {
+    "before": null,
+    "after": "6e286f7aecf1b14f31aa80669465c8c27ac0185815b6992d2210596e93072334"
+  },
+  "tests/shared/category_migration/phase17n_primary_scoring_boundary_lifecycle.py": {
+    "before": null,
+    "after": "994698a1fd30c8e3b20dc3dd0590d68f2eb53eaaf49b073e3b981314a6c92000"
+  },
+  "tests/shared/category_migration/phase17n_primary_scoring_boundary_lifecycle_bindings.py": {
+    "before": null,
+    "after": "3a14594629f693c2515888fefec1e0433e24a518e9efc69b8ccb2dd767470d03"
+  },
+  "tests/shared/category_migration/phase17n_primary_scoring_conditions.py": {
+    "before": null,
+    "after": "4c643434b7c72647978d806f5129ef7874136d6bcce6d9bec8161a71e0f0f324"
+  },
+  "tests/shared/category_migration/phase17n_primary_scoring_conditions_bindings.py": {
+    "before": null,
+    "after": "279bf118cd95bad63a7f0e2fe0162a709c57de709d6021fb74c362441b8f8cc3"
+  },
+  "tests/shared/category_migration/phase17n_primary_scoring_conditions_common_fixtures.py": {
+    "before": null,
+    "after": "a5ac0b11d4d03edfbfc3e2bd767e0a72b35c64aaf0cdcdc47122635da7879173"
+  },
+  "tests/shared/category_migration/phase17n_primary_scoring_conditions_scoring_evidence.py": {
+    "before": null,
+    "after": "7fa82637269b43cbbd9bd46977dd90f8ed10f782da4a2efda110fe5beba292ec"
+  },
+  "tests/shared/category_migration/phase17n_primary_scoring_grammar.py": {
+    "before": null,
+    "after": "8d88644f5d89ed384132f38ce4aadaf52d007ef9e06793e1e4594c50dd8f0727"
+  },
+  "tests/shared/category_migration/phase17n_primary_scoring_position_history_integrity.py": {
+    "before": null,
+    "after": "b44ebf446712149ca98b5e9a95c26c6485f7bba2b3cf6da1b93b686a6fd785c4"
+  },
+  "tests/shared/category_migration/phase17n_primary_scoring_spatial_evidence.py": {
+    "before": null,
+    "after": "42a471ff039047296773e53884d95fd0082553f430b2008efb25b1cfc3334461"
+  },
+  "tests/shared/category_migration/phase17n_primary_scoring_state_bridge.py": {
+    "before": null,
+    "after": "91ff350975d221f3a1ee30d160faa17481c6e523620e7ca9399768fcff2719a3"
+  },
+  "tests/shared/category_migration/phase17n_step5b_marker_conditions.py": {
+    "before": null,
+    "after": "8cafca01607c34789c6493913fc172747ef6c9ec88170b56930cbb7f78279750"
+  },
+  "tests/shared/category_migration/phase17n_step5d_condemned_departure_conditions.py": {
+    "before": null,
+    "after": "71b53cc40639f0989e6d8562797a2b95a7f2acd3fbce07711470c46ed9a66402"
+  },
+  "tests/shared/category_migration/phase17n_step5e_operation_marker_conditions.py": {
+    "before": null,
+    "after": "c32e39046922f595ccfb760657048be55880e35e9db0607ab338795c02620a12"
+  },
+  "tests/shared/category_migration/phase17n_step5f_surveil_conditions.py": {
+    "before": null,
+    "after": "9b361f8945973bb2ac24e0032651d58e2c58953ce77395cca8ebc535aa78542a"
+  },
+  "tests/shared/category_migration/phase17n_step5g_pairing_certification.py": {
+    "before": null,
+    "after": "4e302d60d5a547c1a5819a046f031d53df667230033cc6c157bf6ba18aa020d7"
+  },
+  "tests/shared/category_migration/phase17n_step5g_pairing_certification_layout_b.py": {
+    "before": null,
+    "after": "be1c68d728ade69bab49780fb4ed3d14a82e7521cb8a126f48717104e6a9b2b6"
+  },
+  "tests/shared/category_migration/phase17n_step5g_pairing_certification_layout_c.py": {
+    "before": null,
+    "after": "0fbda6193d75bb73fe21449b65ceb3b93a87d201f5c229986b7e9304ec840fa1"
+  },
+  "tests/shared/category_migration/phase17n_step6g_secondary_certification.py": {
+    "before": null,
+    "after": "722d96624255517badb72d0c62430ffd211faea9a677636ffbccea60626f8102"
+  },
+  "tests/shared/category_migration/phase18b_opportunity_windows.py": {
+    "before": null,
+    "after": "9dc6e8287a0321b186052e4298a252f0effdd72ddaa1c1ae2b2d91f3af7e0d4e"
+  },
+  "tests/shared/category_migration/phase18f_session_commands.py": {
+    "before": null,
+    "after": "8e465a1d1afb9a628aacccfc2f8ad46ac5b107df0ce978600cc29285ae513f69"
+  },
+  "tests/shared/category_migration/phase18g_18h_session_security.py": {
+    "before": null,
+    "after": "d3908e62bd5134769700aa79dc1bdcc22c93658a057556c76248f4b9852f02d3"
+  },
+  "tests/shared/category_migration/phase18l_session_persistence.py": {
+    "before": null,
+    "after": "4f741f167c47cc99a2f0c38bbef1e1251fdff88fb0356685eaf38f68fb4ca382"
+  },
+  "tests/shared/category_migration/phase9b_lifecycle.py": {
+    "before": null,
+    "after": "ed3bb0ca207481b8977d01b61723ffc7030f4b692e6d0840ead2ad499f2d7373"
+  },
+  "tests/shared/category_migration/physical_proposal_prevalidation.py": {
+    "before": null,
+    "after": "55b5785a31225ee0c2e426a9e98de3fb5f04d657e0a8f6caa5f81e64859bfcc2"
+  },
+  "tests/shared/category_migration/primary_boundary_authority_history.py": {
+    "before": null,
+    "after": "a9fa13ed8b6f04e85c2b913b1c9767c64218a6a2c39de06524a2faffb1fc3df9"
+  },
+  "tests/shared/category_migration/primary_boundary_scoring_builders.py": {
+    "before": null,
+    "after": "03517bb22971ba4e9eaef16d70c6f52657c3ec50a55f2ec370fede0e239cabe4"
+  },
+  "tests/shared/category_migration/primary_boundary_state_and_geometry.py": {
+    "before": null,
+    "after": "ddbcfe488d3d81fb728be4281a1a457b959863f6afe2254cbc325030f4c91e87"
+  },
+  "tests/shared/category_migration/primary_conditions_decision_action_builders.py": {
+    "before": null,
+    "after": "0a8bff17c7c383a9d7a15c2b699babb25dba8800fc4464d54b1409f54d7b2624"
+  },
+  "tests/shared/category_migration/reporting__test_runtime_consumer_evidence.py": {
+    "before": null,
+    "after": "2606d89d43fffdecffafbb301fe19e561119a57629dbd29d2d7a8ba2bef261c9"
+  },
+  "tests/shared/category_migration/reporting__test_support_evidence_inventories.py": {
+    "before": null,
+    "after": "24726ec7ccb4df547ab96b04ba60ae104cb74564121d9e385654116db9037dbe"
+  },
+  "tests/shared/category_migration/return_on_death.py": {
+    "before": null,
+    "after": "d2bbf0ce05f7429fb3359c17f131f0c60b3e6659a82b5890b451d0c365cc368f"
+  },
+  "tests/shared/category_migration/rule_text_normalization.py": {
+    "before": null,
+    "after": "2ef407c96ff073b3d5176cc3c6d973e21a29fe611ebd84da2c01756bbb774f2e"
+  },
+  "tests/shared/category_migration/ruleset_descriptor.py": {
+    "before": null,
+    "after": "05de856a76a703aa7b06858355ab4443de0dee339c890b211c41f951f7ce24b0"
+  },
+  "tests/shared/category_migration/runtime_hook_bindings.py": {
+    "before": null,
+    "after": "22732adaa867c9813bed9b3ee9a687bc4e8e70afb0fd65a6ef9b248c25e31e4c"
+  },
+  "tests/shared/category_migration/s25_applicability_inventory.py": {
+    "before": null,
+    "after": "f171619063f460ee114a4ee931a7fe0bb6da98b8d8ce2485443876d2eaad2436"
+  },
+  "tests/shared/category_migration/s25_characteristic_profile_gates.py": {
+    "before": null,
+    "after": "9f83c55099c02d82c85c9d22c359037a14ce629ee45722ba982526823604ed8b"
+  },
+  "tests/shared/category_migration/s25_permission_relevance.py": {
+    "before": null,
+    "after": "af524df32bf29823d1b6faa905f263fbbb0bf382906e122a818aeaaa0bdf0693"
+  },
+  "tests/shared/category_migration/secondary_a_grievous_through_beacon.py": {
+    "before": null,
+    "after": "40a5729687f7f96fb597c446c657b643402c8515aaa37e49cb567057e9ef9536"
+  },
+  "tests/shared/category_migration/secondary_behind_through_cleanse.py": {
+    "before": null,
+    "after": "435bd49adc15ccc41fa1a53d19b14b6bd83a3f037723c891f71592c8416d92ea"
+  },
+  "tests/shared/category_migration/secondary_defend_through_forward.py": {
+    "before": null,
+    "after": "89b9b9656f5ef4c5892a7604051ef2a444c976132b560a9e46eb431e59f8d264"
+  },
+  "tests/shared/category_migration/secondary_no_prisoners_through_secure.py": {
+    "before": null,
+    "after": "0b9a696cf06517d1f3b3c3798d92b2f42fac99cab04ab201bd5c67e284c82712"
+  },
+  "tests/shared/category_migration/secondary_scoring_state_evidence_authority.py": {
+    "before": null,
+    "after": "d4b81831f598135f5863cd1a3c0f41dd0b0577d0eed791d8a79030ac9611b21b"
+  },
+  "tests/shared/category_migration/tracked_targets.py": {
+    "before": null,
+    "after": "4d5d33609eef3c637dc42c4b38883bc768986f289c98a0ef27f11dea1aa6bfeb"
+  },
+  "tests/shared/category_migration/unit_rule_effects.py": {
+    "before": null,
+    "after": "14df7126fc97aaca4c4eb7ad6d0e3451275f8d9269f2ef113a402d6125478c09"
+  },
+  "tests/shared/category_migration/unit_splitting.py": {
+    "before": null,
+    "after": "5e82f1c944bdd3700fb257e5834e7c456fc9fc304ab28c025ae40b9bb518e550"
+  },
+  "tests/shared/category_migration/ws14_generic_ir_lifecycle.py": {
+    "before": null,
+    "after": "18026d59b54182f87adba60e69eca20df3a51fdb6acc8e4e3c3e830a048a0630"
+  },
+  "tests/shared/category_migration/ws14_generic_ir_lifecycle_bindings.py": {
+    "before": null,
+    "after": "01ff111341a597e05445b62a4822fc98521b4d28fdd8999095c708486a1c054b"
+  },
+  "tests/shared/category_migration/ws14_generic_ir_lifecycle_court.py": {
+    "before": null,
+    "after": "76eefc5dd3220cf1084aeebf2d8c89d883af0c1d5fd5483ca2a57089ff180371"
+  },
+  "tests/shared/category_migration/ws14_generic_ir_lifecycle_more_dakka.py": {
+    "before": null,
+    "after": "4ee7c0fb1e21de9f228d0a7e5a56fb1e00ad944f7cdaee829704e3132719a861"
+  },
+  "tests/shared/category_migration/ws14_generic_ir_lifecycle_shared_lifecycle.py": {
+    "before": null,
+    "after": "a473cdbb5d9624bc93ff3b58fcd86c74faebc2dea1e3d1add782382d2fd01763"
+  },
+  "tests/shared/category_migration/ws14_generic_ir_lifecycle_spectacle.py": {
+    "before": null,
+    "after": "b796b2dd11bdd9f3eec1edc2e12d0817a04611a4da7cd33a8a0a223a2e85f901"
+  },
+  "tests/shared/repository_root.py": {
+    "before": null,
+    "after": "1cce7b87263b1b27937c5ff25c4be0d1da32cc74ed235255500d90d689186dbd"
+  },
+  "tests/unit/reporting/__init__.py": {
+    "before": null,
+    "after": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  "tests/unit/reporting/test_runtime_consumer_evidence.py": {
+    "before": "8cb14dd177d7f6b82c8ec23a0f9c7cc8b16f8efc26a671c964242437a06a0868",
+    "after": "5c055bffa0e6abb83f945c8828e6f1299739194df5fce1d0cb62f7cfa6fae33f"
+  },
+  "tests/unit/reporting/test_support_evidence_inventories.py": {
+    "before": "16770feeaa9a83f1cc9df444607989d4634bc6fbeb4e4140105525b4ca4c6879",
+    "after": "824fb3b0a125ae6a7669469a28bc9277e4120cb22003cdfab46af6c556ab978f"
+  },
+  "tests/unit/test_generic_ir_support_validation.py": {
+    "before": "e7a3654c77fd5dc2b554d23aa76a824ec2fc64734ca8532eb566e2c77e82e7a9",
+    "after": "323fd9e7e7e98ccdcbd85e3a2eeb054889a55b3d40f25432f80486f19d72a4e2"
+  },
+  "tests/unit/test_generic_rule_ability_registry.py": {
+    "before": "edd9de778318ab1837b971af356b3916b3bd61da15f54ed0692815cea47c89cd",
+    "after": "7a41153ecbd452c5d006dc231fb88e278ebd054b4550fd6d92f22421743ab942"
+  },
+  "tests/unit/test_generic_rule_effect_identity.py": {
+    "before": "e0b408f708d99f301c00a0a7fbc2cb1e776ff7e5ea490254a443ac850a89f909",
+    "after": "7657563abf398ffb3d4fa10c7318d0e025a2f781fa5fccb8df45c02e86f066fd"
+  },
+  "tests/unit/test_lifecycle_hooks.py": {
+    "before": "d189b27a681f89bd74f492998b3cc45654973ef0b7bb27b770b29778a5263955",
+    "after": null
+  },
+  "tests/unit/test_order135_tactical_setup_proof.py": {
+    "before": "85746a1bc7503af5e55077f11de4eba5133bb420c2f0cbdfeaf510fdbff17089",
+    "after": "b959d7428a897d578b745e02c549af006f93ea3843b23019cf2d6fa8d55a5259"
+  },
+  "tests/unit/test_order54_setup.py": {
+    "before": "b3a2be3c516f861cde67596a2fc30dc879850ad9be3c2a24d992aa9656ef513e",
+    "after": "bb1faa47003c1b17fef24f2d1b9bd24f476c504744498b278794db8a515ca19e"
+  },
+  "tests/unit/test_order86_table_quarters.py": {
+    "before": "5d0c9eb6726440f5578beebda0de9321949ce299029c30ced420830ac7aafbe4",
+    "after": "a878e4ce38c03c31e5a96c59eea66f8f4c423f0cbd5a46c49558fa73741de4ea"
+  },
+  "tests/unit/test_order97_facade_evidence.py": {
+    "before": "a62e7b0ec38394ca970bd0a079c3a7c94673060bde1fdf127f7386c1facf2a97",
+    "after": "8f30da22f4c01f6dc4a239d3d94c9080072986cd3dd2a76c03989efb72c859df"
+  },
+  "tests/unit/test_order98_source_reconciliation.py": {
+    "before": "268e368f77e47b17318e228a59b0231d3d80e1c3f8d82f29595a19a1ee409224",
+    "after": null
+  },
+  "tests/unit/test_phase10d_battlefield_transitions.py": {
+    "before": "2d827aef9d927c6f7779a2c5fda5b08c989dfb9ec7fec1da0b3a3ced377fe7e5",
+    "after": "1c3a131c7bfa7f23b47c2f992d0153a0bdc6db6ec43400591e9389e0c184fb08"
+  },
+  "tests/unit/test_phase11a_mission_pack.py": {
+    "before": "1c7546f49bc2a01785bf6b74acddbf4dbc36ee62c50b750ee5a87774b7eeab0e",
+    "after": "354d2997a0ebc5543873fccd738061844e633d169aa76a1b46b0d847817fee10"
+  },
+  "tests/unit/test_phase11e_mission_scoring_cleanup.py": {
+    "before": "3339334cb16e89e7b4aa1cffec1828e55db916538011cb4e42688a89f3575361",
+    "after": "5704133047a16d4606d2f1160b5cddffd139d1c61d0af3c6f156893db6cf2b1e"
+  },
+  "tests/unit/test_phase11f_game_end_scoring.py": {
+    "before": "8c2d74cb4c3a6f248ea03754cf944f2b9b79c1af88c11f2cae8e5282250375f0",
+    "after": "6d33af86332591ee443583e6eafc3c506f1614be7a51432b3243b8184ba1a2a4"
+  },
+  "tests/unit/test_phase12d_ability_registry.py": {
+    "before": "b88261c7e2752f122f275f88e524d1e566d0628be855326597188e9e438fb3ad",
+    "after": "6114f1b1065344a7c7d85cdd433e07943b1468049a8b1b847b6b97edeb0caf8a"
+  },
+  "tests/unit/test_phase14a_source_identity.py": {
+    "before": "704d5bdb5b99fb523fd62d1807a71123d1dc52ebc5354eabb0987523e4097e90",
+    "after": "51ae62d2de7415d7c32a3e03bea7a6746f713081f1f2c9b2491138b21ca1e6b6"
+  },
+  "tests/unit/test_phase16a_deployment.py": {
+    "before": "07cf2a94720555fae72ec8d8b656326af510c9a5c5c3c163b0ce5004d04a5643",
+    "after": "46f873f5c237e4c01c0492b4249f266a6fa5691be1be04e73b52826b082ba2cf"
+  },
+  "tests/unit/test_phase16b_prebattle.py": {
+    "before": "18e462f8c4750a61e063f36e1de942538a689c06d6ec563e5d18ea218f0f353c",
+    "after": "6f0c78337a4bf39ee28cea58606913ee0f4247ccf0ce25686f2455409867dcea"
+  },
+  "tests/unit/test_phase16e_setup_completion.py": {
+    "before": "d2d1f42f1c99f6811ce0e41d363b7ccd00ec4f0cba5ed20080eb8c2b0364969e",
+    "after": "33a8bbfa0d6f8ee6fcf75f295a844e3ecc7ebc405d9b4de27258f0625f9b7f98"
+  },
+  "tests/unit/test_phase17_source_overlays.py": {
+    "before": "170e309cd55cc6364679a30455bda79d42764332bb11c0990cf504d2ef2ee161",
+    "after": "7c9b7975b79a88b8c4f6e9b2aaf65331bb06e4f7ce7b9e62dbe50867fb80e20b"
+  },
+  "tests/unit/test_phase17a1_transition_patches.py": {
+    "before": "c797bc94acd30d238ecf7d4edaab83df17da3c0187b605db24c5ad4f3d2932ea",
+    "after": "8a5f4a0818195400869dbe2ebe2450f5583c553777c9a80a658f6ccd3db13929"
+  },
+  "tests/unit/test_phase17d_rule_execution.py": {
+    "before": "fae3adadbde3e070fb78772c2c60fce732729556b7ec8dc7e7edd350b406708e",
+    "after": "9817497d2b240c6e87125750f90d012350d8de0c018ff0f1c74e447474b274ff"
+  },
+  "tests/unit/test_phase17g_black_templars_army_rule.py": {
+    "before": "5988e37b38c64849d45de5a40b872aefd61d3da55b19b5ee10000592370e12d2",
+    "after": "8789b872c40cc9b6f66269ee396c1146782c8e2b76754fb8e921af36f4abc0c9"
+  },
+  "tests/unit/test_phase17g_runtime_content.py": {
+    "before": "540c678e3ff45208ef55eadb422fb028b90bb1ac5aaec2e73c790c5baeddb754",
+    "after": "0b01a4c693282ed72665844d6292bac1f02989fc0d2fa6451304245e339a55b0"
+  },
+  "tests/unit/test_phase17i_blocked_row_classification.py": {
+    "before": "de18e8161b59e2a072c7311135431547727cf2f28b33d16a65be809276da76bc",
+    "after": "3cd609d5452ed2173c618aaa66591af82af3e2000ff1511279a5d973b635d07b"
+  },
+  "tests/unit/test_phase17i_named_handler_budget.py": {
+    "before": "2a04ab5e5830c4b1bef9d421ab693049b616c4f3274037ab8ec0744292bcd13f",
+    "after": "1d50ba497696f9cd888b1bddf4827d31428a3f10f71871af63e92ea57322cee3"
+  },
+  "tests/unit/test_phase17j_event_companion.py": {
+    "before": "349d8cb3ebfacfa99f8d43d8818ca332d9c7951c657c61be7b168be2991201b5",
+    "after": "4dd5a07b2b3785e675343e9d57ffb3729db20ec1ca88f269bf3d357e4e530f6c"
+  },
+  "tests/unit/test_phase17n_boundary_checkpoint_physical_authority.py": {
+    "before": "1e6394b6945f762f0f23a56751521a46fb30bad7c80712ce6079864c29d45084",
+    "after": "79f5bff7ab287e6ebeb43c7840e0720e3f28482ad76d2de682b5547b5f10f1fc"
+  },
+  "tests/unit/test_phase17n_boundary_checkpoint_redaction.py": {
+    "before": "ef688fcc49209f47f4083b56d66cce99ca67ade4290a3895112b5417cd349479",
+    "after": "146f919ccb73e44cd6d1c864c070b935be3b78e5afc37013c7fa74fa56709bf0"
+  },
+  "tests/unit/test_phase17n_pending_request_integrity.py": {
+    "before": "fbc097289e92b101b604760bbf1997cf724e470247ccf1bf28ffcc286e401bb2",
+    "after": "4e7639670befd4c8bb1c6aa8fead660387d25e42feed72cfe155c7ab5db47211"
+  },
+  "tests/unit/test_phase17n_primary_scoring_boundary_lifecycle.py": {
+    "before": "935ed4bdddc1d65e9ebe2e344979e9cf39d5e076bd292f6e785257a323c10632",
+    "after": "7ba6af4f1aab5eef24d9bdabb87221b5378a0a003089c4cfeeddb72b9f6b1685"
+  },
+  "tests/unit/test_phase17n_primary_scoring_conditions.py": {
+    "before": "666391529f4a92239470e287be1b761dd2b627504c6141fd825bcdfaee757ab1",
+    "after": "f7775052d894865ab9bb0145f9b3a6a9eea014340acf06a235026674caaa914a"
+  },
+  "tests/unit/test_phase17n_primary_scoring_grammar.py": {
+    "before": "3dc373ad95228dd9e0a7e743c80b8cc98fee2e9fa0a6a8ab73d8a251676deb41",
+    "after": "e3063ca4b0456196fbe3f56223955160270ef0d912f2dd3f0dd9b3ed1830f541"
+  },
+  "tests/unit/test_phase17n_primary_scoring_position_history_integrity.py": {
+    "before": "1740a4f3125a693ebd0d398ffe3a177dccef447f4c4035e6a8a590bdbfb2ec7e",
+    "after": "1b261a9816e50f1e6e6268f6bd0edaf16c2294aa0ffbd4ab42a7f7a4e5c3d9cb"
+  },
+  "tests/unit/test_phase17n_primary_scoring_spatial_evidence.py": {
+    "before": "1e29ff6d31cd32974a9622b91aa14050257440d457c8dbb5e00820045b484166",
+    "after": "7b6276643dc3f2683fbebb0368faa29fb399840c630e23595ca840e93f4046ab"
+  },
+  "tests/unit/test_phase17n_primary_scoring_state_bridge.py": {
+    "before": "4690fd5963d6469bae13ad6b98149e09f6825d24122e9686ccabe2e32030b978",
+    "after": "a19485490859b304eae3661d9f28bd65831b47235d18de8e0f24bad23d09cd48"
+  },
+  "tests/unit/test_phase17n_step5b_marker_conditions.py": {
+    "before": "081e4543a449f597c626d51b112dabc4f3d97995c3288e789dc3ecbf2385b154",
+    "after": "b89eafe075c0d8a836495fd4621c68a37baa9344ce6126e6cf3083ce933ca698"
+  },
+  "tests/unit/test_phase17n_step5d_condemned_departure_conditions.py": {
+    "before": "fb89e296e8392c6ee8f91762c30124446eb92dddbb3be148e0d5e5324eb61d61",
+    "after": "c925fa7b7c0d98fd4ac233d25950d0a951c11956354f1168d7d3fe09b07edc77"
+  },
+  "tests/unit/test_phase17n_step5e_operation_marker_conditions.py": {
+    "before": "aca2e9f7598dd1f422f5e07956ea254f811947cd6c49a52b96ea76dd120a619b",
+    "after": "ff4f52e44e9a6cd0af7173da262cd4f869fe009519d93bf8f264d79ea4a3681a"
+  },
+  "tests/unit/test_phase17n_step5f_surveil_conditions.py": {
+    "before": "4a48f31414fde2b879de7a4f3bd925a56d6329d554eb462b4750b4310709f4bf",
+    "after": "359793acc79053c5c4046c7ddb3829372faaad46bd817cc8f8dbcde428d785ee"
+  },
+  "tests/unit/test_phase17n_step5g_pairing_certification.py": {
+    "before": "fb148786f8341c36060b05aaecc45ad04e89ff9e6b80fae476e386dff48c7b7c",
+    "after": "b22ec64e402cd45443b5a10a115d0bc5489f9a36227b4c66a27fb8a36279a8df"
+  },
+  "tests/unit/test_phase17n_step5g_pairing_certification_layout_b.py": {
+    "before": "ce01ad28510f50156d417f380e154dbd4e2b19be20e8982dc92aae7f3d2d1762",
+    "after": null
+  },
+  "tests/unit/test_phase17n_step5g_pairing_certification_layout_c.py": {
+    "before": "4e600b20185f17af309f8e26d2c48c8f18a18bc6d62bddd755cb7e489f01b38b",
+    "after": null
+  },
+  "tests/unit/test_phase17n_step6g_secondary_certification.py": {
+    "before": "c9775d49bc2bd220dea2e44de7350dc0bf223ddac03978fd980279014e6ce58a",
+    "after": "82475fe543634355281e231ff8c1ca80c9f8e3097e4af0b3d391629a9d11cea7"
+  },
+  "tests/unit/test_phase17n_step6g_secondary_certification_a_grievous_through_beacon.py": {
+    "before": "6c1db3d36ac15c4168a02b07660aca5e763a2eae3381bfa7eba069da1963f4a4",
+    "after": null
+  },
+  "tests/unit/test_phase17n_step6g_secondary_certification_behind_through_cleanse.py": {
+    "before": "53fce2ac1e65edd681276fd23958640d0e54f801e3fb915a37db69cdcca6d409",
+    "after": null
+  },
+  "tests/unit/test_phase17n_step6g_secondary_certification_defend_through_forward.py": {
+    "before": "95da8c7427602885485a84364872567d9e1ac1e0b2f02ad55183ad8af5bee49a",
+    "after": null
+  },
+  "tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py": {
+    "before": "5913a5c146e2b8f6edcf56bc2afd4bb067d814d4ddb2135753189ffd7e783d75",
+    "after": null
+  },
+  "tests/unit/test_phase18b_opportunity_windows.py": {
+    "before": "1f29c713d80d83f726a044d5ab9a5e6327d8b68ae59854821e2ec8456a2e0fdf",
+    "after": "042ba912de35266bb9c5ce0fe38b0195fc98aa67814e491e8dcda9d2679ac1f8"
+  },
+  "tests/unit/test_phase18f_session_commands.py": {
+    "before": "1c25fc2c4f0b9b286f8e877a924a8bb9acad4be948f22d881a497e519e4ea951",
+    "after": "2c930e224d8003ba1875ccf3dd829b6cddfcdeeaa3130201ce0b3effed9f6c92"
+  },
+  "tests/unit/test_phase18g_18h_session_security.py": {
+    "before": "fb1e7e35a7b2eb84067ee02ba9522118b02cb9f850eabbacfb99948fd522e2d1",
+    "after": "5e2f6318e786f73f678be2139219faea8bd721e0864e71427b5430f52fb21bab"
+  },
+  "tests/unit/test_phase18l_session_persistence.py": {
+    "before": "52f1e83de3f0364578a0c13a1aa857fdcb3eed06970129c54ee9c24f74d86287",
+    "after": "25934e3eb8fbf6a429748119a8a5dca06e0c001bd40f385b55f664e9c33fcc20"
+  },
+  "tests/unit/test_phase9b_lifecycle.py": {
+    "before": "7425405c9fb25dc513b4fb6136641e36ee46f190e0cbc7d0e4c22f92eb712eab",
+    "after": "d1491479a2b560d2b1c2912b5659636dea9fcc051fcf98ec4342ab9931309530"
+  },
+  "tests/unit/test_physical_proposal_prevalidation.py": {
+    "before": "9190fca0796cac9bd79cf48ac45f18999139e2318107fc2d38efb46a8d878b3f",
+    "after": "85d8653f54f260fc1259c3671d36a25e1f3e942a43ce0c7d8bf456ae077568d8"
+  },
+  "tests/unit/test_return_on_death.py": {
+    "before": "05aeae65291ac647ded04f3acf70921e845bffc385c8a3372f4779a15a1e48c0",
+    "after": "fdbc29fb8b0a4b38ccb8c270e068da6bef1bd98aba4475106ab9a2494dc3cbe6"
+  },
+  "tests/unit/test_rule_text_normalization.py": {
+    "before": "0e7e6b77315df62a08a81e3aa2c8287e0a6cbd6080430bdcf5a1170fc7e1ca5f",
+    "after": "45ccdf8dbaca2871dc99234b4dd336fcfb835c1448ceed797cef2ddf3ce43bcb"
+  },
+  "tests/unit/test_ruleset_descriptor.py": {
+    "before": "d9260ad72a89706009735cab7460038c669dc252e37e396d2cb2cafa878a5bb4",
+    "after": "98ea3e421d654ca84d6bc21f360f2383d60c740c108c63e0b250c67a663d951d"
+  },
+  "tests/unit/test_runtime_hook_bindings.py": {
+    "before": "c258a7f5086ae2f0498527ee02ff2977e65eaf32f2d0994ddd1c33807d4e2f0c",
+    "after": "43ecdda097a9a3071274ee71629b747438add1ec3d121a5b0ba859e93fa0fb82"
+  },
+  "tests/unit/test_s25_applicability_inventory.py": {
+    "before": "4c0f840f018d5936899ace18d688ecda762add4413b1cbc1b1b839fd9917722f",
+    "after": "deb7054d6c1fa9d42b6ce8076e90752b4986e86e3adf51c3081ced45a71c3430"
+  },
+  "tests/unit/test_s25_characteristic_profile_gates.py": {
+    "before": "efd9955225b206072adb7c8f408e6baac078133f1e3d37b8d56be0ca326404f7",
+    "after": "f3d9605686a09a01ddc487952c4c8a8894f37e05a98b6f35bd6e2e21b2e87a22"
+  },
+  "tests/unit/test_s25_permission_relevance.py": {
+    "before": "10817c34a98443e7a757dc0477cdcf21c849d319a0df0ed630d0d433ef46b0cb",
+    "after": "b816f3df05a5110e13b5a7908752a456164ef78f2e724b06f58326d6d7edd248"
+  },
+  "tests/unit/test_secondary_scoring_state_evidence_authority.py": {
+    "before": "3d66465b30efec186d0a93e2ae6a540388913e73e57fa8058a2150234b8d7291",
+    "after": "0f1ef56e16a8e560b1790560fb758a3a3b34bc67970e92df2c9c626c351def9e"
+  },
+  "tests/unit/test_tracked_targets.py": {
+    "before": "072259d08ea5e27a203ebc142534ccc91b2482bc1ffb8175ff7531158aa4837c",
+    "after": "059ab198bba828dc99b002f67d33f7296bef18606e5df81d94930f1d7174d827"
+  },
+  "tests/unit/test_unit_rule_effects.py": {
+    "before": "49aa5a02cf7a2a9669d0b1475acec1b030a2f18afb232b13a4bd524e0c606ff6",
+    "after": "9e98278bb54315a8eec57aa8a1376cd2fb8b334022aec0a31676ee1f195cac1d"
+  },
+  "tests/unit/test_unit_splitting.py": {
+    "before": "65d1eee66adc11cd441bffba0014d7cd543370d7b34532ea4145245451cf0735",
+    "after": "541d53c8067d1f23d332a8a34b3c1ee734c95456fcc79a5460f755526de8a7c6"
+  },
+  "tools/core_rules_order135_audit.py": {
+    "before": "44e1a8b9d02ce29138025988d1665537da7371eef724e3fe9fa5484d85ccec7e",
+    "after": "2d72adbbf3a548acdd6aeda6f0ac401635df595b68777a036e3ea871bb62d56f"
+  },
+  "tools/core_rules_order97_inventory.py": {
+    "before": "fe6298c193fdba5d2b09cf48938336846a8acbd876836eb57a953a3bdd1abf6d",
+    "after": "e50a6dff0a66b81310c2799c939200fe76c186286b20eb9a70d9f90f8c038110"
+  },
+  "tools/performance_reconstruction_campaign.py": {
+    "before": "d911cd7387a971d02ba40cd1ec99ab7af381cb2923af34ea2a1a0cf921a9c376",
+    "after": "9557ea09bc443eb1656a71f262f549539852d6daa9393da3a6e17a65a7dab5cf"
+  }
+}

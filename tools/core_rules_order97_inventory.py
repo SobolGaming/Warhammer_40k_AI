@@ -14,6 +14,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, cast
 
+from tests.category_migration_preservation import MIGRATED_PATHS, verify_migrated_test
+
 from tools.core_rules_40k_app_audit import roadmap_rows
 from tools.core_rules_order84_capture import fingerprint, source_inventory
 from tools.core_rules_order97_history import historical_evidence_path
@@ -30,7 +32,11 @@ class InventoryError(ValueError):
 
 
 def _path(reference: str, root: Path) -> Path:
-    path = root / reference
+    if reference in MIGRATED_PATHS:
+        _, migration = verify_migrated_test(root, reference)
+        path = root / migration["archive"]
+    else:
+        path = root / reference
     if Path(reference).is_absolute() or not path.resolve().is_relative_to(root.resolve()):
         raise InventoryError(f"Evidence path escapes the repository: {reference}.")
     if not path.is_file():
@@ -112,7 +118,7 @@ def _symbol(
         raise InventoryError(f"Evidence must identify an exact symbol: {reference}.")
     if filename not in trees:
         try:
-            trees[filename] = ast.parse(_path(filename, root).read_text())
+            trees[filename] = ast.parse(_path(filename, root).read_text(encoding="utf-8"))
         except (OSError, SyntaxError) as exc:
             raise InventoryError(f"Evidence Python cannot be parsed: {filename}.") from exc
     node: ast.AST = trees[filename]
@@ -172,7 +178,7 @@ def helper_source_paths(inventory: Inventory, *, root: Path = ROOT) -> set[str]:
         if filename in visited:
             continue
         visited.add(filename)
-        tree = ast.parse(_path(filename, root).read_text())
+        tree = ast.parse(_path(filename, root).read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if not isinstance(node, ast.ImportFrom) or not node.module:
                 continue
@@ -482,7 +488,9 @@ def _validate_followups(inventory: Inventory, root: Path) -> None:
     }
     if not source_gaps <= {r for f in followups for r in f.runtime_source_ids}:
         raise InventoryError("Unreconciled source rows require a scheduled source repair.")
-    planned = roadmap_rows((root / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text())
+    planned = roadmap_rows(
+        (root / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text(encoding="utf-8")
+    )
     owners = {finding: row for row in planned for finding in row.finding_ids}
     for finding in followups:
         if (
@@ -568,10 +576,10 @@ def main() -> int:
     inventory = load_inventory()
     rendered = markdown(inventory)
     if args.check:
-        if not REPORT.is_file() or REPORT.read_text() != rendered:
+        if not REPORT.is_file() or REPORT.read_text(encoding="utf-8") != rendered:
             raise InventoryError("Order 97 generated report is stale.")
     else:
-        REPORT.write_text(rendered)
+        REPORT.write_text(rendered, encoding="utf-8")
     print(f"Order 97: {len(inventory.requirements)} requirements; CAUDIT-01 remains open.")
     return 0
 

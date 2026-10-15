@@ -15,11 +15,17 @@ import json
 from pathlib import Path
 from typing import Any
 
+from tests.category_migration_preservation import (
+    MIGRATED_PATHS,
+    live_test_reference,
+    verify_migrated_test,
+)
+
 from tools.core_rules_order84_capture import capture_literals, fingerprint, source_inventory
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = Path("data/source_audits/order135")
-OUTPUT = AUDIT / "current-inventory.json"
+OUTPUT = AUDIT / "current-inventory-category-migration.json"
 SELECTED_SHA256 = "96f19958884c07990dba01c1506dea7a23793e1501c79f25a7b4598f00f23971"
 RETAINED_SHA256 = "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f"
 RECONCILIATION_SHA256 = "805d993c40aed49ac57d9f645164fa8ad3136060bfe4332c5f7271c0b59d1bab"
@@ -110,8 +116,12 @@ class LiveSymbols:
         filename, separator, name = reference.replace("::", ":").partition(":")
         if not separator or not name:
             raise CurrentAuditError("Malformed current symbol: " + reference)
+        current_reference = live_test_reference(
+            self.root, filename + "::" + name.replace(".", "::")
+        )
+        filename, _, name = current_reference.partition("::")
         node: ast.AST = self.tree(filename)
-        parts = name.split(".")
+        parts = name.replace("::", ".").split(".")
         for index, part in enumerate(parts):
             choices = [
                 child
@@ -186,6 +196,13 @@ class LiveSymbols:
         return self.tests[reference]
 
     def file_tests(self, filename: str) -> list[str]:
+        if filename in MIGRATED_PATHS:
+            _, record = verify_migrated_test(self.root, filename)
+            return [
+                successor
+                for name, successor in record["definitions"].items()
+                if name.startswith("test_")
+            ]
         return [
             filename + "::" + node.name
             for node in self.tree(filename).body
@@ -518,10 +535,10 @@ def build(root: Path = ROOT) -> dict[str, Any]:
         ),
         "retained_baseline_consumer_report": (
             root / AUDIT / "current-consumer-dispositions.md"
-        ).read_text(),
+        ).read_text(encoding="utf-8"),
         "retained_baseline_source_report": (
             root / AUDIT / "current-source-qualifications.md"
-        ).read_text(),
+        ).read_text(encoding="utf-8"),
         "runtime_pass_claimed": False,
         "qualification": (
             "All25 categories plus universal00; complete source observations, exact live owners "

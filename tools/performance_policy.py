@@ -14,6 +14,7 @@ from typing import cast
 
 from tools.performance_order103_exception import RECOGNITION, validate_owner_recognition
 from tools.performance_s25_rule_semantics import s25_rule_semantics_smoke_operations
+from tools.performance_tool_inputs import binding_enabled, validate_binding
 
 POLICY = "rules-engine-performance-v3"
 ASSESSMENT = "docs/performance/change-assessment.json"
@@ -492,7 +493,64 @@ def validate_comparison(
     specification: dict[str, object],
     base_runtime_id: str,
     expected_inputs: dict[str, str],
+    expected_binding: dict[str, object] | None = None,
 ) -> list[dict[str, object]]:
+    from tools import performance_reconstruction_campaign as campaign
+
+    if campaign.required(base=base, runtime_id=runtime_id, family=family) or (
+        report.get("schema") == campaign.SCHEMA or "ordered_pairs" in report
+    ):
+        return campaign.validate_report(
+            report,
+            base=base,
+            runtime_id=runtime_id,
+            input_digest=input_digest,
+            family=family,
+            specification=specification,
+            base_runtime_id=base_runtime_id,
+            expected_inputs=expected_inputs,
+            expected_binding=expected_binding,
+            validate_single=_validate_single_comparison,
+        )
+    return _validate_single_comparison(
+        report,
+        base=base,
+        runtime_id=runtime_id,
+        input_digest=input_digest,
+        family=family,
+        specification=specification,
+        base_runtime_id=base_runtime_id,
+        expected_inputs=expected_inputs,
+        expected_binding=expected_binding,
+    )
+
+
+def _validate_single_comparison(
+    report: dict[str, object],
+    *,
+    base: str,
+    runtime_id: str,
+    input_digest: str,
+    family: str,
+    specification: dict[str, object],
+    base_runtime_id: str,
+    expected_inputs: dict[str, str],
+    expected_binding: dict[str, object] | None = None,
+) -> list[dict[str, object]]:
+    tool_binding = binding_enabled(family, specification)
+    from tools import performance_tool_inputs_v2 as fresh
+
+    fresh_binding = (
+        tool_binding and object_value(specification["input_binding"])["schema"] == fresh.SCHEMA
+    )
+    if tool_binding:
+        validate_binding(observed=report.get("input_binding"), expected=expected_binding)
+        if fresh_binding:
+            fresh.validate_generated_evidence(
+                report.get("generated_output_binding"), object_value(expected_binding)
+            )
+    elif expected_binding is not None:
+        raise ValueError("Tool input roles cannot alter unrelated comparisons.")
     _keys(
         report,
         {
@@ -507,7 +565,9 @@ def validate_comparison(
             "head",
             "historical_failures",
         }
-        | ({"owner_exception"} if "owner_exception" in report else set()),
+        | ({"owner_exception"} if "owner_exception" in report else set())
+        | ({"input_binding"} if tool_binding else set())
+        | ({"generated_output_binding"} if fresh_binding else set()),
     )
     if (
         report["policy"],

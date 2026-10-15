@@ -1,0 +1,121 @@
+name: manifest-reuse-matched-validation
+on:
+  pull_request:
+    types: [labeled]
+permissions:
+  contents: read
+concurrency:
+  group: manifest-reuse-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+jobs:
+  reconstruction:
+    if: >-
+      github.event.label.name == 'ci-manifest-reuse' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'codex/test-ci-restructure' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONHASHSEED: "0"
+      MANIFEST_VALIDATION_SHA256: a77ed6667273fd5088bef10e973094e0a1c42b48760646b5732acff984e87621
+      MEASURED_HEAD: 1e70b261b30223f3a1b2e64ffd81593414eda2af
+    steps:
+      - name: Start absolute deadline before checkout and setup
+        shell: bash
+        run: echo "MANIFEST_JOB_STARTED=$(date +%s)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: control
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: 22a12094cfe3839d8fe8c5296ec0a7e7d32abade
+          path: base
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: ${{ env.MEASURED_HEAD }}
+          path: implementation
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.14.5"
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          version: "0.11.29"
+          enable-cache: false
+      - name: Authenticate reviewed external harness before any imports
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C "$GITHUB_WORKSPACE/implementation" rev-parse HEAD)" = "$MEASURED_HEAD"
+          mkdir "$RUNNER_TEMP/manifest-harness"
+          cp "$GITHUB_WORKSPACE/control/ci/manifest-validation/"* "$RUNNER_TEMP/manifest-harness/"
+          python -B - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'manifest-harness'
+          raw = (root / 'manifest.json').read_bytes()
+          assert hashlib.sha256(raw).hexdigest() == os.environ['MANIFEST_VALIDATION_SHA256']
+          manifest = json.loads(raw)
+          assert manifest['status'] == 'reviewed-executable'
+          assert manifest['sides']['head']['revision'] == os.environ['MEASURED_HEAD']
+          assert set(p.name for p in root.iterdir()) == set(manifest['harness']) | {'manifest.json'}
+          for name, expected in manifest['harness'].items():
+              p = root / name
+              assert p.is_file() and not p.is_symlink()
+              assert hashlib.sha256(p.read_bytes()).hexdigest() == expected
+          PY
+          export UV_CACHE_DIR="$RUNNER_TEMP/manifest-uv-cache"
+          uv sync --project "$GITHUB_WORKSPACE/implementation" --locked --no-default-groups --group test
+          uv sync --project "$GITHUB_WORKSPACE/base" --locked --no-default-groups --group test
+          cmp "$GITHUB_WORKSPACE/base/uv.lock" "$GITHUB_WORKSPACE/implementation/uv.lock"
+      - name: Run bounded reconstruction validation with reserved cleanup and upload time
+        shell: bash
+        run: |
+          set -euo pipefail
+          deadline=$((MANIFEST_JOB_STARTED + 1380))
+          remaining=$((deadline - $(date +%s) - 5))
+          test "$remaining" -gt 0
+          export MANIFEST_LAUNCH_DEADLINE="$deadline"
+          set +e
+          timeout --signal=TERM --kill-after=5s "${remaining}s" "$GITHUB_WORKSPACE/implementation/.venv/bin/python" -B "$RUNNER_TEMP/manifest-harness/manifest_campaign.py" --mode reconstruction --base "$GITHUB_WORKSPACE/base" --head "$GITHUB_WORKSPACE/implementation" --manifest "$RUNNER_TEMP/manifest-harness/manifest.json" --output "$RUNNER_TEMP/manifest-output" > "$RUNNER_TEMP/controller.stdout" 2> "$RUNNER_TEMP/controller.stderr"
+          result=$?
+          set -e
+          export MANIFEST_LAUNCH_EXIT="$result"
+          python -B - <<'PY'
+          import json, os, time
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP'])
+          terminal = root / 'manifest-output/terminal.json'
+          data = json.loads(terminal.read_bytes()) if terminal.is_file() else None
+          code = int(os.environ['MANIFEST_LAUNCH_EXIT'])
+          now, deadline = time.time(), int(os.environ['MANIFEST_LAUNCH_DEADLINE'])
+          complete = code == 0 and now <= deadline and data is not None and data['complete']
+          (root/'launch.json').write_text(json.dumps({'exit_code':code,'complete':complete,'finished_epoch':now,'deadline':deadline,'terminal':data},indent=2)+'\n')
+          if not complete:
+              raise SystemExit(code or 1)
+          PY
+      - name: Preserve every result and failed attempt
+        if: always()
+        timeout-minutes: 2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: manifest-reconstruction-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/manifest-output/
+            ${{ runner.temp }}/manifest-harness/
+            ${{ runner.temp }}/controller.stdout
+            ${{ runner.temp }}/controller.stderr
+            ${{ runner.temp }}/launch.json
+          if-no-files-found: error
+          retention-days: 14
+          include-hidden-files: true
+

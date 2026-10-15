@@ -1,0 +1,97 @@
+{
+  "complete": true,
+  "scenarios": [
+    {
+      "reads": 1,
+      "samples": [
+        {
+          "wall": 4.677974855000002,
+          "cpu": 4.677272574
+        }
+      ]
+    },
+    {
+      "reads": 6,
+      "samples": [
+        {
+          "wall": 4.635669591999999,
+          "cpu": 4.6346784969999995
+        },
+        {
+          "wall": 0.2506517859999917,
+          "cpu": 0.2504712480000002
+        },
+        {
+          "wall": 0.2472021909999853,
+          "cpu": 0.2471463889999992
+        },
+        {
+          "wall": 0.24944754400002012,
+          "cpu": 0.24944595199999853
+        },
+        {
+          "wall": 0.2526274310000076,
+          "cpu": 0.252625891000001
+        },
+        {
+          "wall": 0.24876240300000063,
+          "cpu": 0.24854794499999855
+        }
+      ]
+    },
+    {
+      "reads": 3,
+      "samples": [
+        {
+          "wall": 4.643581780999966,
+          "cpu": 4.642573209000002
+        },
+        {
+          "wall": 0.2533651620000228,
+          "cpu": 0.2531730909999972
+        },
+        {
+          "wall": 0.24831779200002302,
+          "cpu": 0.24829177600000207
+        }
+      ]
+    }
+  ],
+  "cold_parses": 2942,
+  "warm_parses": 0,
+  "tokens": [
+    "advance",
+    "charge_move",
+    "consolidate",
+    "cult_ambush_placement",
+    "deep_strike_placement",
+    "deployment_placement",
+    "disembark_placement",
+    "fall_back",
+    "healing_revival_placement",
+    "melee_declaration",
+    "model_materialization_placement",
+    "normal_move",
+    "pile_in",
+    "redeploy_placement",
+    "reinforcement_placement",
+    "scout_move",
+    "scout_reserve_setup",
+    "shooting_declaration",
+    "stratagem_target_binding",
+    "strategic_reserves_placement",
+    "surge_move"
+  ],
+  "python": "3.14.5 (main, May 11 2026, 02:45:53) [GCC 13.3.0]",
+  "dependencies": {
+    "pytest": "9.0.3",
+    "pytest-cov": "7.1.0",
+    "pytest-xdist": "3.8.0",
+    "coverage": "7.14.0",
+    "numpy": "2.4.6",
+    "shapely": "2.1.2",
+    "z3-solver": "4.15.4.0"
+  },
+  "peak_self_rss_kib": 124332,
+  "qualification": "Fresh application instances; uncontrolled OS page cache; instrumented proof excluded from times"
+}

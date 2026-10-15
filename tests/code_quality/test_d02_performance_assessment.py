@@ -5,16 +5,17 @@ from pathlib import Path
 
 import pytest
 from tools.performance_policy import (
-    ASSESSMENT,
     D02_SCOPE,
-    MAP,
     d02_rule_semantics_smoke_operations,
     object_value,
     read_object,
     validate_assessment,
 )
 
+from tests.code_quality.d02_assessment_history import ASSESSMENT, MAP, verify_d02_history
+
 ROOT = Path(__file__).resolve().parents[2]
+verify_d02_history(ROOT)
 
 
 def test_d02_save_scope_binds_exact_owner_and_rejects_unrelated_work() -> None:

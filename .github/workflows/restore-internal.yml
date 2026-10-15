@@ -1,0 +1,124 @@
+name: restore-internal-attribution
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: restore-internal-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  attribute:
+    if: >-
+      github.event.label.name == 'ci-restore-internal' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'codex/test-ci-restructure' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONHASHSEED: "0"
+      RESTORE_MANIFEST_SHA256: 0dd49c8f4883da8a754158e85062fef6dae1c912d5de282b6a3950946fe8b0f8
+      RESTORE_REVIEWED_HARNESS_REVISION: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Record first timestamp for the absolute diagnostic deadline
+        shell: bash
+        run: echo "RESTORE_JOB_STARTED=$(date +%s)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: control
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: 1096f0526a892b0cb5d6fd93d5166df7b973fdea
+          path: implementation
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.14.5"
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          version: "0.11.29"
+          enable-cache: false
+      - name: Authenticate external harness before any of its imports
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C "$GITHUB_WORKSPACE/control" rev-parse HEAD)" = "$RESTORE_REVIEWED_HARNESS_REVISION"
+          mkdir "$RUNNER_TEMP/restore-harness"
+          cp "$GITHUB_WORKSPACE/control/ci/restore-internal/"* "$RUNNER_TEMP/restore-harness/"
+          python -B - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          harness = Path(os.environ["RUNNER_TEMP"]) / "restore-harness"
+          raw = (harness / "manifest.json").read_bytes()
+          assert hashlib.sha256(raw).hexdigest() == os.environ["RESTORE_MANIFEST_SHA256"]
+          manifest = json.loads(raw)
+          assert set(p.name for p in harness.iterdir()) == set(manifest["harness"]) | {"manifest.json"}
+          for relative, expected in manifest["harness"].items():
+              path = harness / relative
+              assert not path.is_symlink() and path.is_file()
+              assert hashlib.sha256(path.read_bytes()).hexdigest() == expected
+          PY
+          export UV_CACHE_DIR="$RUNNER_TEMP/restore-uv-cache"
+          uv sync --project "$GITHUB_WORKSPACE/implementation" --locked --no-default-groups --group test
+          "$GITHUB_WORKSPACE/implementation/.venv/bin/python" -B -c 'import sys; assert sys.version_info[:3] == (3, 14, 5)'
+      - name: Run the single bounded diagnostic with an absolute outer watchdog
+        shell: bash
+        run: |
+          set -euo pipefail
+          deadline=$((RESTORE_JOB_STARTED + 1380))
+          remaining=$((deadline - $(date +%s) - 5))
+          test "$remaining" -gt 0
+          export RESTORE_LAUNCH_DEADLINE="$deadline"
+          export RESTORE_LAUNCH_ALLOWANCE="$remaining"
+          set +e
+          timeout --signal=TERM --kill-after=5s "${remaining}s" "$GITHUB_WORKSPACE/implementation/.venv/bin/python" -B "$RUNNER_TEMP/restore-harness/restore_internal_campaign.py" --root "$GITHUB_WORKSPACE/implementation" --manifest "$RUNNER_TEMP/restore-harness/manifest.json" --output "$RUNNER_TEMP/restore-output" > "$RUNNER_TEMP/restore-controller.stdout" 2> "$RUNNER_TEMP/restore-controller.stderr"
+          result=$?
+          set -e
+          export RESTORE_LAUNCH_EXIT="$result"
+          python -B - <<'PY'
+          import json, os, time
+          from pathlib import Path
+          deadline = int(os.environ["RESTORE_LAUNCH_DEADLINE"])
+          now = time.time()
+          code = int(os.environ["RESTORE_LAUNCH_EXIT"])
+          root = Path(os.environ["RUNNER_TEMP"])
+          terminal_path = root / "restore-output/terminal.json"
+          terminal = json.loads(terminal_path.read_bytes()) if terminal_path.is_file() else None
+          complete = code == 0 and now <= deadline and terminal is not None and terminal["complete"]
+          receipt = {
+              "exit_code": code, "complete": complete, "finished_epoch": now,
+              "absolute_deadline_epoch": deadline,
+              "outer_allowance_seconds": int(os.environ["RESTORE_LAUNCH_ALLOWANCE"]),
+              "kill_grace_seconds": 5, "harness_revision": os.environ["RESTORE_REVIEWED_HARNESS_REVISION"],
+              "terminal": terminal,
+          }
+          (root / "restore-launch.json").write_text(json.dumps(receipt, indent=2) + "\n")
+          if not complete:
+              raise SystemExit(code or 1)
+          PY
+      - name: Preserve every result and failed attempt
+        if: always()
+        timeout-minutes: 2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: restore-internal-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/restore-output/
+            ${{ runner.temp }}/restore-harness/
+            ${{ runner.temp }}/restore-controller.stdout
+            ${{ runner.temp }}/restore-controller.stderr
+            ${{ runner.temp }}/restore-launch.json
+          if-no-files-found: error
+          retention-days: 14
+          include-hidden-files: true

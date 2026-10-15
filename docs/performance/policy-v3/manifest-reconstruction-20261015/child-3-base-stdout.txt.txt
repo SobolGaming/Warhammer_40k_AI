@@ -1,0 +1,6 @@
+{"checkpoint": "ingress", "operation": "restore", "mean_seconds": 3.4386126005714623, "maximum_seconds": 3.5149175390000664}
+{"checkpoint": "ingress", "operation": "fork", "mean_seconds": 3.4926044159999816, "maximum_seconds": 3.6292734939999036}
+{"checkpoint": "rapid_disembark", "operation": "restore", "mean_seconds": 3.5207959987143016, "maximum_seconds": 3.625530516000026}
+{"checkpoint": "rapid_disembark", "operation": "fork", "mean_seconds": 3.591819952714299, "maximum_seconds": 3.679211566000049}
+{"checkpoint": "later_decision", "operation": "restore", "mean_seconds": 3.5561496365714254, "maximum_seconds": 3.6586605060000466}
+{"checkpoint": "later_decision", "operation": "fork", "mean_seconds": 3.5123111589999945, "maximum_seconds": 3.5674499560000186}

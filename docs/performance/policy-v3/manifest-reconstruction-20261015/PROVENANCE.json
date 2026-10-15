@@ -1,0 +1,115 @@
+{
+  "base": "22a12094cfe3839d8fe8c5296ec0a7e7d32abade",
+  "measured_head": "1e70b261b30223f3a1b2e64ffd81593414eda2af",
+  "measured_tree": "a96ee54373b24bc78642fa8987e7bd94aadb980b",
+  "report_path": "docs/performance/current/manifest-reconstruction-abba-20261015.json",
+  "report_sha256": "6a498b2e2054192bc525d95c5284082d4e35f44580c120b217d1cb9580853c8c",
+  "report_canonical_sha256": "e7c453990b5957aa3c5481c4f06a0164f68cd119ca1845207bf0060ca923b399",
+  "measured_input_digest": "6608cd744ddc59083b03f5a54060e691ce123a8b66c1d1dd85bd8e05b1c27592",
+  "measured_input_file_sha256": "99fc702194e6be1b5827f71ea1278f29db81b23acfe02c031ad5148f6c96b3c4",
+  "input_count": 4084,
+  "fixture_sha256": "c7395ab183e4394367120c87842bbd7edd83fbaf3939893fae726351ca767e12",
+  "source_raw_files": [
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-0-base-raw.json.txt",
+      "sha256": "a869010200f364550d1e8f00e56d12e0854e54a8ef855d49cf24846646727692"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-0-base-semantic.json.txt",
+      "sha256": "a0ec26d63cf507aafd30d3b7f6fede7ef69b814f3d389e02b068bf389fd54e61"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-0-base-receipt.json.txt",
+      "sha256": "55bed6655e733933b438477ffdaa28bc1cade13819c68e82fcd78a8b343ef91e"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-0-base-resource.txt.txt",
+      "sha256": "b110e88c03dac58ac33fdd154e93861527cda3513072209fd2d3c3b3889852b4"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-0-base-stdout.txt.txt",
+      "sha256": "f6d484de74823c564f430ef67d83cc8918e3b85354923ca599d08ba71dc53d65"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-0-base-stderr.txt.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-1-head-raw.json.txt",
+      "sha256": "5ef560f533293ec5c62fcdf538fd6fd81b9f330c7078a42d729f235c308b2241"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-1-head-semantic.json.txt",
+      "sha256": "a3f67868aa2aaec651666dd7c4970e73aaf2287d3729108dd14c4df2b7a2ce87"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-1-head-receipt.json.txt",
+      "sha256": "127ab5e872ff90ab5ca27fd881dcb58ddac1d6c57891e45c8c0571643f9e4fbb"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-1-head-resource.txt.txt",
+      "sha256": "7ef731dfc922e4326f21ee053e370df145a66c34a8aa8ebc2d0500d9e5bb5a79"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-1-head-stdout.txt.txt",
+      "sha256": "4cfa3ac61ed634c6fc26d73144afaefbb3ff4ad4431c0214f52629161ccc021f"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-1-head-stderr.txt.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-2-head-raw.json.txt",
+      "sha256": "285eaa35b66d18a455ca195e1b8ca4f879862dd66990c6c481564af82c0d94e0"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-2-head-semantic.json.txt",
+      "sha256": "a3f67868aa2aaec651666dd7c4970e73aaf2287d3729108dd14c4df2b7a2ce87"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-2-head-receipt.json.txt",
+      "sha256": "d69777f6ba3f719ab16459582a2a9e4c547878cfe7a38985b553a350d8287ede"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-2-head-resource.txt.txt",
+      "sha256": "81ed1287aef4c11a0b3fd73a48bb51a2ece3c35950e83c817dd79cd849591442"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-2-head-stdout.txt.txt",
+      "sha256": "f624c8b2f5d089d6c59e5806fb44c3f364aa98ef88d8bb29fdb4cc628c7a911f"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-2-head-stderr.txt.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-3-base-raw.json.txt",
+      "sha256": "7d9a918621af1e465d37874d53e4dc0f10bd10dfa8a19e89f9220c0b16bd313f"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-3-base-semantic.json.txt",
+      "sha256": "a0ec26d63cf507aafd30d3b7f6fede7ef69b814f3d389e02b068bf389fd54e61"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-3-base-receipt.json.txt",
+      "sha256": "8ff1ceb7669a28754b9b99327ca7659d16454dd7af15a2e2613e8cbd7218a3d3"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-3-base-resource.txt.txt",
+      "sha256": "a8cf73dbc9a3a347a624798c44c59913472de2ceb51d78d4e247928311df73f4"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-3-base-stdout.txt.txt",
+      "sha256": "6bb4846b74ac7a490e4efd1c546aa6524368be465de2c0bddbb97f749655d51e"
+    },
+    {
+      "path": "docs/performance/policy-v3/manifest-reconstruction-20261015/child-3-base-stderr.txt.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "review_sha256": "3d654f11aebc117e776dcd2d1c93e1e92a0d7a468e2a10400f7035522f144e51",
+  "run_id": 38658548079,
+  "control_head": "f7b5e322dfbff8eda63e7b409ea8d6d7ffe78e59",
+  "artifact_sha256": "4c4310bd2ea0046df5e4da66e4c5aa54783f3f9e179ef88a32849d970b0ab94d",
+  "scope": "Two unpooled predetermined pairs; cumulative candidate versus actual PR base; no isolated manifest/full-CI/memory-reduction claim."
+}

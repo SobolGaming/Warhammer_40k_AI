@@ -1,0 +1,527 @@
+[
+  {
+    "name": "cleanup-preflight",
+    "seconds": 14.32887484699998,
+    "cap": 120,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/cleanup-preflight/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation/.venv/bin/python",
+      "-B",
+      "/home/runner/work/_temp/manifest-harness/check_ci_attribution_supervisor.py",
+      "checks",
+      "/home/runner/work/_temp/manifest-output/cleanup-cases"
+    ],
+    "resource": {
+      "user_seconds": 9.79,
+      "system_seconds": 0.35,
+      "max_reported_rss_kib": 30372.0
+    },
+    "junit_cases": []
+  },
+  {
+    "name": "micro-0-base",
+    "seconds": 59.3371458,
+    "cap": 100,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/micro-0-base/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base/.venv/bin/python",
+      "-B",
+      "/home/runner/work/_temp/manifest-harness/source_reuse_experiment.py",
+      "micro",
+      "--root",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+      "--baseline",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+      "--output",
+      "/home/runner/work/_temp/manifest-output/micro-0.json"
+    ],
+    "resource": {
+      "user_seconds": 58.3,
+      "system_seconds": 0.99,
+      "max_reported_rss_kib": 94368.0
+    },
+    "junit_cases": []
+  },
+  {
+    "name": "micro-1-head",
+    "seconds": 25.89434277799998,
+    "cap": 100,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/micro-1-head/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation/.venv/bin/python",
+      "-B",
+      "/home/runner/work/_temp/manifest-harness/source_reuse_experiment.py",
+      "micro",
+      "--root",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation",
+      "--baseline",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+      "--output",
+      "/home/runner/work/_temp/manifest-output/micro-1.json"
+    ],
+    "resource": {
+      "user_seconds": 24.19,
+      "system_seconds": 1.66,
+      "max_reported_rss_kib": 124500.0
+    },
+    "junit_cases": []
+  },
+  {
+    "name": "micro-2-head",
+    "seconds": 25.847725187000037,
+    "cap": 100,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/micro-2-head/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation/.venv/bin/python",
+      "-B",
+      "/home/runner/work/_temp/manifest-harness/source_reuse_experiment.py",
+      "micro",
+      "--root",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation",
+      "--baseline",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+      "--output",
+      "/home/runner/work/_temp/manifest-output/micro-2.json"
+    ],
+    "resource": {
+      "user_seconds": 24.18,
+      "system_seconds": 1.65,
+      "max_reported_rss_kib": 124508.0
+    },
+    "junit_cases": []
+  },
+  {
+    "name": "micro-3-base",
+    "seconds": 59.37852067099999,
+    "cap": 100,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/micro-3-base/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base/.venv/bin/python",
+      "-B",
+      "/home/runner/work/_temp/manifest-harness/source_reuse_experiment.py",
+      "micro",
+      "--root",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+      "--baseline",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+      "--output",
+      "/home/runner/work/_temp/manifest-output/micro-3.json"
+    ],
+    "resource": {
+      "user_seconds": 58.29,
+      "system_seconds": 1.06,
+      "max_reported_rss_kib": 94404.0
+    },
+    "junit_cases": []
+  },
+  {
+    "name": "micro-4-base",
+    "seconds": 59.304098151000005,
+    "cap": 100,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/micro-4-base/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base/.venv/bin/python",
+      "-B",
+      "/home/runner/work/_temp/manifest-harness/source_reuse_experiment.py",
+      "micro",
+      "--root",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+      "--baseline",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+      "--output",
+      "/home/runner/work/_temp/manifest-output/micro-4.json"
+    ],
+    "resource": {
+      "user_seconds": 58.29,
+      "system_seconds": 0.98,
+      "max_reported_rss_kib": 94452.0
+    },
+    "junit_cases": []
+  },
+  {
+    "name": "micro-5-head",
+    "seconds": 25.863088736999998,
+    "cap": 100,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/micro-5-head/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation/.venv/bin/python",
+      "-B",
+      "/home/runner/work/_temp/manifest-harness/source_reuse_experiment.py",
+      "micro",
+      "--root",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation",
+      "--baseline",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+      "--output",
+      "/home/runner/work/_temp/manifest-output/micro-5.json"
+    ],
+    "resource": {
+      "user_seconds": 24.18,
+      "system_seconds": 1.66,
+      "max_reported_rss_kib": 124332.0
+    },
+    "junit_cases": []
+  },
+  {
+    "name": "cheap-family",
+    "seconds": 20.526408180000033,
+    "cap": 90,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/cheap-family/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation/.venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/code_quality/test_proposal_source_index.py",
+      "tests/code_quality/test_phase18m_conformance_boundary.py",
+      "tests/code_quality/test_decision_submission_catalog.py",
+      "-k",
+      "not test_external_contract_write_mode_removes_orphan_generated_fixture",
+      "-q",
+      "-n",
+      "0",
+      "--no-cov",
+      "--durations=0",
+      "--durations-min=0",
+      "--basetemp=/home/runner/work/_temp/manifest-output/cheap-family/tmp",
+      "--junitxml=/home/runner/work/_temp/manifest-output/cheap-family/junit.xml"
+    ],
+    "resource": {
+      "user_seconds": 20.34,
+      "system_seconds": 0.49,
+      "max_reported_rss_kib": 234556.0
+    },
+    "junit_cases": [
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_source_index_preserves_literal_proposal_grammar",
+        "seconds": 0.002
+      },
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_identical_bytes_reuse_tokens_but_fresh_instances_parse",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_byte_change_with_same_size_and_mtime_invalidates",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_current_inventory_adds_removes_and_drops_previous_roots",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_identical_content_at_distinct_paths_retains_path_identity",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[A_PROPOSAL_KIND = (]",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[\\xef\\xbb\\xbfX = 1]",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_decode_or_missing_file_errors",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_partial_failure_does_not_publish_new_entries",
+        "seconds": 0.002
+      },
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_results_are_immutable_and_newlines_match_text_loading",
+        "seconds": 0.002
+      },
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_fresh_processes_start_without_a_shared_index",
+        "seconds": 0.451
+      },
+      {
+        "id": "tests.code_quality.test_proposal_source_index::test_builder_wrapper_rereads_inventory_and_changed_source_root",
+        "seconds": 6.988
+      },
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_client_does_not_import_engine_internals",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_modules_respect_new_module_size_budget",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_package_pins_generation_typecheck_and_live_conformance",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_conformance_version_matches_published_contract",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_check_regenerates_into_an_isolated_tree_before_validation",
+        "seconds": 0.0
+      },
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_manifest_hashes_current_files_and_all_documentation",
+        "seconds": 0.028
+      },
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_regeneration_discards_orphan_generated_fixtures",
+        "seconds": 0.023
+      },
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_executable_client_is_operation_bound_without_identifier_conventions",
+        "seconds": 0.001
+      },
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_cross_backend_replay_uses_canonical_semantic_comparison",
+        "seconds": 0.0
+      },
+      {
+        "id": "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_has_required_sections_and_tables",
+        "seconds": 0.0
+      },
+      {
+        "id": "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_lists_runtime_decision_and_proposal_tokens",
+        "seconds": 9.85
+      },
+      {
+        "id": "tests.code_quality.test_decision_submission_catalog::test_retired_placement_fallback_decisions_do_not_reappear",
+        "seconds": 0.126
+      }
+    ]
+  },
+  {
+    "name": "original-0-base",
+    "seconds": 246.63455260100005,
+    "cap": 420,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/original-0-base/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base/.venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+      "-q",
+      "-n",
+      "0",
+      "--no-cov",
+      "--durations=0",
+      "--durations-min=0",
+      "--basetemp=/home/runner/work/_temp/manifest-output/original-0-base/tmp",
+      "--junitxml=/home/runner/work/_temp/manifest-output/original-0-base/junit.xml"
+    ],
+    "resource": {
+      "user_seconds": 245.64,
+      "system_seconds": 1.94,
+      "max_reported_rss_kib": 298320.0
+    },
+    "junit_cases": [
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "seconds": 244.299
+      }
+    ]
+  },
+  {
+    "name": "original-1-head",
+    "seconds": 178.11503620100007,
+    "cap": 420,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/original-1-head/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation/.venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+      "-q",
+      "-n",
+      "0",
+      "--no-cov",
+      "--durations=0",
+      "--durations-min=0",
+      "--basetemp=/home/runner/work/_temp/manifest-output/original-1-head/tmp",
+      "--junitxml=/home/runner/work/_temp/manifest-output/original-1-head/junit.xml"
+    ],
+    "resource": {
+      "user_seconds": 176.2,
+      "system_seconds": 2.85,
+      "max_reported_rss_kib": 310892.0
+    },
+    "junit_cases": [
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "seconds": 175.752
+      }
+    ]
+  },
+  {
+    "name": "original-2-head",
+    "seconds": 177.78204853499994,
+    "cap": 420,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/original-2-head/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation/.venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+      "-q",
+      "-n",
+      "0",
+      "--no-cov",
+      "--durations=0",
+      "--durations-min=0",
+      "--basetemp=/home/runner/work/_temp/manifest-output/original-2-head/tmp",
+      "--junitxml=/home/runner/work/_temp/manifest-output/original-2-head/junit.xml"
+    ],
+    "resource": {
+      "user_seconds": 175.83,
+      "system_seconds": 2.91,
+      "max_reported_rss_kib": 322988.0
+    },
+    "junit_cases": [
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "seconds": 175.422
+      }
+    ]
+  },
+  {
+    "name": "original-3-base",
+    "seconds": 245.20176656400008,
+    "cap": 420,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/original-3-base/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base/.venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+      "-q",
+      "-n",
+      "0",
+      "--no-cov",
+      "--durations=0",
+      "--durations-min=0",
+      "--basetemp=/home/runner/work/_temp/manifest-output/original-3-base/tmp",
+      "--junitxml=/home/runner/work/_temp/manifest-output/original-3-base/junit.xml"
+    ],
+    "resource": {
+      "user_seconds": 244.13,
+      "system_seconds": 2.0,
+      "max_reported_rss_kib": 310268.0
+    },
+    "junit_cases": [
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "seconds": 242.874
+      }
+    ]
+  },
+  {
+    "name": "original-4-base",
+    "seconds": 246.33196639699986,
+    "cap": 420,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/original-4-base/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base/.venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+      "-q",
+      "-n",
+      "0",
+      "--no-cov",
+      "--durations=0",
+      "--durations-min=0",
+      "--basetemp=/home/runner/work/_temp/manifest-output/original-4-base/tmp",
+      "--junitxml=/home/runner/work/_temp/manifest-output/original-4-base/junit.xml"
+    ],
+    "resource": {
+      "user_seconds": 245.34,
+      "system_seconds": 1.93,
+      "max_reported_rss_kib": 297956.0
+    },
+    "junit_cases": [
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "seconds": 243.971
+      }
+    ]
+  },
+  {
+    "name": "original-5-head",
+    "seconds": 179.0505252920002,
+    "cap": 420,
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/runner/work/_temp/manifest-output/original-5-head/resource.txt",
+      "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation/.venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+      "-q",
+      "-n",
+      "0",
+      "--no-cov",
+      "--durations=0",
+      "--durations-min=0",
+      "--basetemp=/home/runner/work/_temp/manifest-output/original-5-head/tmp",
+      "--junitxml=/home/runner/work/_temp/manifest-output/original-5-head/junit.xml"
+    ],
+    "resource": {
+      "user_seconds": 177.13,
+      "system_seconds": 2.87,
+      "max_reported_rss_kib": 311428.0
+    },
+    "junit_cases": [
+      {
+        "id": "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+        "seconds": 176.667
+      }
+    ]
+  }
+]

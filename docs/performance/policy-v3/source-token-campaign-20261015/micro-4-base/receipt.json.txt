@@ -1,0 +1,27 @@
+{
+  "name": "micro-4-base",
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "-o",
+    "/home/runner/work/_temp/manifest-output/micro-4-base/resource.txt",
+    "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base/.venv/bin/python",
+    "-B",
+    "/home/runner/work/_temp/manifest-harness/source_reuse_experiment.py",
+    "micro",
+    "--root",
+    "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+    "--baseline",
+    "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+    "--output",
+    "/home/runner/work/_temp/manifest-output/micro-4.json"
+  ],
+  "cap": 100,
+  "exit_code": 0,
+  "timeout": false,
+  "cancel_signal": null,
+  "pid": 3543,
+  "seconds": 59.304098151000005,
+  "cleanup_complete": true,
+  "descendants_remained": false
+}

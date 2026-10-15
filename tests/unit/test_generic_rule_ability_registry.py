@@ -1,296 +1,134 @@
 from __future__ import annotations
 
-import copy
-from collections.abc import Callable
-from dataclasses import replace
 from typing import cast
 
-import pytest
-from tests.unit_keyword_helpers import with_unit_keywords
-
-from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.datasheet import BaseSizeDefinition
-from warhammer40k_core.core.model_keywords import ModelKeywordAssignment
-from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.core.weapon_profiles import WeaponKeyword
-from warhammer40k_core.engine import (
-    generic_detachment_rule_effects as generic_detachment_effects,
-)
-from warhammer40k_core.engine import (
-    generic_rule_advance_move_lifecycle_hooks as advance_move_lifecycle_hooks,
-)
-from warhammer40k_core.engine import (
-    generic_rule_lifecycle_hook_handlers,
-    generic_rule_lifecycle_hooks,
-    generic_rule_selected_to_fight_effects,
-)
-from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilityContext
-from warhammer40k_core.engine.advance_hooks import AdvanceMoveContext, AdvanceMoveGrant
-from warhammer40k_core.engine.army_mustering import (
+from tests.shared.category_migration.generic_rule_ability_registry import (
+    _ENEMY_UNIT_ID,
+    _RANGERS_UNIT_ID,
+    _SHROUD_RUNNERS_UNIT_ID,
+    _WARPTIDE_UNIT_ID,
+    CORE_FIRE_OVERWATCH_HANDLER_ID,
+    DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
+    AdvanceEligibilityContext,
+    AdvanceMoveContext,
+    AdvanceMoveGrant,
+    ArmyCatalog,
     ArmyDefinition,
     ArmyMusterRequest,
-    EnhancementAssignment,
-)
-from warhammer40k_core.engine.battle_formation_hooks import (
+    BaseSizeDefinition,
     BattleFormationRequestContext,
     BattleFormationResultContext,
-)
-from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.effects import (
+    BattlePhase,
+    Callable,
+    Characteristic,
+    CharacteristicValue,
+    DecisionController,
+    DetachmentSelection,
     EffectExpiration,
-    PersistingEffect,
-    generic_rule_persisting_effect,
-)
-from warhammer40k_core.engine.enhancement_effects import EnhancementEffectContext
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detachments.corsair_coterie import (  # noqa: E501
-    enhancements as corsair_enhancements,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
-    army_rule as dark_pacts,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children.detachments.court_of_the_phoenician import (  # noqa: E501
-    rule as court_rule,
-)
-from warhammer40k_core.engine.fall_back_hooks import FallBackEligibilityContext
-from warhammer40k_core.engine.fight_activation_abilities import FightActivationAbilityContext
-from warhammer40k_core.engine.fight_phase_start_hooks import (
+    EnhancementAssignment,
+    EnhancementEffectContext,
+    FallBackEligibilityContext,
+    FightActivationAbilityContext,
     FightPhaseStartRequestContext,
     FightPhaseStartResultContext,
-)
-from warhammer40k_core.engine.fight_unit_selected_hooks import FightUnitSelectedContext
-from warhammer40k_core.engine.game_state import GameConfig, GameState
-from warhammer40k_core.engine.generic_rule_ability_effects import (
-    generic_rule_ability_effects_for_unit,
-    rule_ir_grants_any_ability,
-)
-from warhammer40k_core.engine.generic_rule_ability_registry import (
+    FightUnitSelectedContext,
+    GameConfig,
+    GameLifecycleError,
+    GameLifecycleStage,
+    GameState,
     GenericRuleAbilityHookFamily,
     GenericRuleAbilityRegistry,
     GenericRuleAbilitySource,
-)
-from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
-    DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
-)
-from warhammer40k_core.engine.list_validation import (
-    DetachmentSelection,
-    UnitMusterSelection,
-)
-from warhammer40k_core.engine.movement_end_surge_hooks import MovementEndSurgeContext
-from warhammer40k_core.engine.phase import (
-    BattlePhase,
-    GameLifecycleError,
-    GameLifecycleStage,
-    SetupStep,
-)
-from warhammer40k_core.engine.reserve_arrival_hooks import ReserveArrivalDistanceContext
-from warhammer40k_core.engine.rule_execution import RuleExecutionResult, RuleExecutionStatus
-from warhammer40k_core.engine.runtime_modifiers import (
+    JsonValue,
+    ModelGeometry,
+    ModelInstance,
+    ModelKeywordAssignment,
+    ModelProfileSelection,
+    ModifierOperation,
+    ModifierTerm,
+    MovementEndSurgeContext,
     ObjectiveControlModifierContext,
+    PersistingEffect,
+    PhaseEndObjectiveControlContext,
+    ReserveArrivalDistanceContext,
+    RuleEffectKind,
+    RuleExecutionResult,
+    RuleExecutionStatus,
+    RuleIR,
+    RulesetDescriptor,
+    RuleTargetKind,
+    RuntimeContentActivation,
     SaveOptionModifierContext,
-)
-from warhammer40k_core.engine.shooting_unit_selected_hooks import ShootingUnitSelectedContext
-from warhammer40k_core.engine.sticky_objective_control import PhaseEndObjectiveControlContext
-from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
+    SetupStep,
+    ShootingTargetRestrictionContext,
+    ShootingUnitSelectedContext,
+    StartingStrengthRecord,
+    StratagemCategory,
     StratagemCostChoiceRequestContext,
     StratagemCostChoiceResultContext,
-)
-from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierContext
-from warhammer40k_core.engine.stratagems import (
-    CORE_FIRE_OVERWATCH_HANDLER_ID,
-    StratagemCategory,
+    StratagemCostModifierContext,
     StratagemDefinition,
     StratagemEligibilityContext,
     StratagemTargetBinding,
     StratagemTargetKind,
     StratagemTargetSpec,
     StratagemTimingDescriptor,
-)
-from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionContext
-from warhammer40k_core.engine.timing_windows import TimingTriggerKind
-from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
-from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
-from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
-from warhammer40k_core.engine.unit_state import StartingStrengthRecord
-from warhammer40k_core.engine.wargear_selections import (
-    ModelProfileSelection,
-)
-from warhammer40k_core.geometry.model_geometry import ModelGeometry
-from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleTargetKind
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_ir,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    TimingTriggerKind,
+    TurnEndRequestContext,
+    TurnEndResultContext,
+    UnitDestroyedContext,
+    UnitInstance,
+    UnitMusterSelection,
+    WeaponKeyword,
+    _aeldari_corsair_coterie_source,
+    _aeldari_path_of_the_outcast_source,
+    _army,
+    _blood_legion_source,
+    _court_of_the_phoenician_source,
+    _grant_ability_effect,
+    _keyword_any_state,
+    _minimal_warptide_game_config,
+    _model,
+    _muster_request,
+    _owner_player_id_for_unit_id,
+    _raise_selected_to_fight_payload_error,
+    _selected_to_fight_effect_payload,
+    _selected_to_fight_grant_payload,
+    _selected_to_fight_reroll_payload,
+    _shadow_legion_enhancement_source,
+    _shadow_legion_source,
+    _unit,
+    _warptide_activation,
+    _warptide_cost_modifier_context,
+    _warptide_grant_ability_effect,
+    _warptide_setup_state,
+    _warptide_source,
+    _warptide_state,
+    advance_move_lifecycle_hooks,
+    blood_legion_ir,
+    copy,
+    corsair_enhancements,
+    corsair_ir,
+    court_ir,
+    court_rule,
+    dark_pacts,
     faction_execution_2026_27,
     faction_generic_ir_support_2026_27,
+    generic_detachment_effects,
+    generic_rule_ability_effects_for_unit,
+    generic_rule_lifecycle_hook_handlers,
+    generic_rule_lifecycle_hooks,
+    generic_rule_persisting_effect,
+    generic_rule_selected_to_fight_effects,
+    path_outcast_ir,
+    pytest,
+    replace,
+    rule_ir_grants_any_ability,
+    shadow_legion_ir,
+    validate_json_value,
+    warptide_ir,
+    with_unit_keywords,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    faction_shadow_legion_ir_support_2026_27 as shadow_legion_ir,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    faction_warptide_ir_support_2026_27 as warptide_ir,
-)
-
-_RANGERS_UNIT_ID = "army-a:rangers"
-_SHROUD_RUNNERS_UNIT_ID = "army-a:shroud-runners"
-_ENEMY_UNIT_ID = "army-b:target"
-_WARPTIDE_UNIT_ID = "army-a:daemonettes"
-
-
-def test_default_generic_rule_ability_registry_maps_shadow_legion_grants() -> None:
-    source = _shadow_legion_source()
-    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
-
-    advance = registry.advance_eligibility_abilities[0]
-    assert advance.hook_family is GenericRuleAbilityHookFamily.ADVANCE_ELIGIBILITY
-    assert advance.ability_ids() == (shadow_legion_ir.CAN_ADVANCE_AND_SHOOT_AND_CHARGE_ABILITY,)
-    assert (
-        advance.coverage_descriptor_id
-        == shadow_legion_ir.SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
-    )
-    assert advance.source_rule_id == dark_pacts.SHADOW_LEGION_SOURCE_RULE_ID
-    assert advance.hook_id(source) == (
-        "phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:advance-eligibility"
-    )
-
-    restriction = registry.shooting_target_restriction_abilities[0]
-    assert restriction.hook_family is GenericRuleAbilityHookFamily.SHOOTING_TARGET_RESTRICTION
-    assert restriction.ability_ids() == (shadow_legion_ir.SNAP_SHOOTING_TARGET_FORBIDDEN_ABILITY,)
-    assert restriction.hook_id(source) == (
-        "phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:snap-target-restriction"
-    )
-
-    shooting_grants = registry.shooting_unit_selected_grant_abilities
-    assert {descriptor.hook_family for descriptor in shooting_grants} == {
-        GenericRuleAbilityHookFamily.SHOOTING_UNIT_SELECTED_GRANT
-    }
-    assert {descriptor.ability_id for descriptor in shooting_grants} == {
-        shadow_legion_ir.SHADOW_LEGION_DARK_PACT_LETHAL_HITS_CHOICE_ABILITY,
-        shadow_legion_ir.SHADOW_LEGION_DARK_PACT_SUSTAINED_HITS_1_CHOICE_ABILITY,
-    }
-    assert {descriptor.hook_id(source) for descriptor in shooting_grants} == {
-        "phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:shooting:lethal_hits",
-        (
-            "phase17f:phase17e:chaos-daemons:shadow-legion:rule:"
-            "shadow-legion:shooting:sustained_hits_1"
-        ),
-    }
-
-    fight_grants = tuple(
-        descriptor
-        for descriptor in registry.fight_unit_selected_grant_abilities
-        if descriptor.coverage_descriptor_id
-        == shadow_legion_ir.SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
-    )
-    assert {descriptor.hook_family for descriptor in fight_grants} == {
-        GenericRuleAbilityHookFamily.FIGHT_UNIT_SELECTED_GRANT
-    }
-    assert {descriptor.hook_id(source) for descriptor in fight_grants} == {
-        "phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:fight:lethal_hits",
-        ("phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:fight:sustained_hits_1"),
-    }
-
-    attack_completion = registry.attack_sequence_completed_abilities[0]
-    assert attack_completion.hook_family is GenericRuleAbilityHookFamily.ATTACK_SEQUENCE_COMPLETED
-    assert set(attack_completion.ability_ids()) == {
-        shadow_legion_ir.SHADOW_LEGION_DARK_PACT_LETHAL_HITS_CHOICE_ABILITY,
-        shadow_legion_ir.SHADOW_LEGION_DARK_PACT_SUSTAINED_HITS_1_CHOICE_ABILITY,
-    }
-    assert attack_completion.hook_id(source) == (
-        "phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:dark-pact-completion"
-    )
-
-    fnp = next(
-        descriptor
-        for descriptor in registry.mortal_wound_feel_no_pain_abilities
-        if descriptor.source_kind == dark_pacts.SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND
-    )
-    assert fnp.hook_family is GenericRuleAbilityHookFamily.MORTAL_WOUND_FEEL_NO_PAIN_CONTINUATION
-    assert fnp.source_kind == dark_pacts.SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND
-
-    weapon_profile = registry.weapon_profile_modifier_abilities[0]
-    assert weapon_profile.hook_family is GenericRuleAbilityHookFamily.WEAPON_PROFILE_MODIFIER
-    assert weapon_profile.modifier_id(source) == (
-        "phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:dark-pact-weapon-profile"
-    )
-
-
-def test_default_generic_rule_ability_registry_maps_blood_legion_grants() -> None:
-    source = _blood_legion_source()
-    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
-
-    surge = registry.movement_end_surge_abilities[0]
-    assert surge.hook_family is GenericRuleAbilityHookFamily.MOVEMENT_END_SURGE
-    assert surge.ability_ids() == (blood_legion_ir.MURDERCALL_SURGE_ABILITY,)
-    assert (
-        surge.coverage_descriptor_id == blood_legion_ir.BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
-    )
-    assert surge.source_rule_id == blood_legion_ir.BLOOD_LEGION_SOURCE_RULE_ID
-    assert surge.hook_id(source) == blood_legion_ir.MURDERCALL_HOOK_ID
-
-    sticky = registry.phase_end_objective_control_abilities[0]
-    assert sticky.hook_family is GenericRuleAbilityHookFamily.PHASE_END_OBJECTIVE_CONTROL
-    assert sticky.ability_ids() == (blood_legion_ir.BLOOD_TAINTED_STICKY_OBJECTIVE_ABILITY,)
-    assert (
-        sticky.coverage_descriptor_id == blood_legion_ir.BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
-    )
-    assert sticky.source_rule_id == blood_legion_ir.BLOOD_LEGION_SOURCE_RULE_ID
-    assert sticky.hook_id(source) == blood_legion_ir.BLOOD_TAINTED_HOOK_ID
-
-
-def test_default_generic_rule_ability_registry_maps_warptide_grants() -> None:
-    source = _warptide_source(warptide_ir.WARPTIDE_DETACHMENT_RULE_DESCRIPTOR_ID)
-    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
-
-    advance_move = next(
-        descriptor
-        for descriptor in registry.advance_move_abilities
-        if descriptor.ability_ids() == (warptide_ir.SHUDDERBLINK_ASSAULT_AFTER_ADVANCE_ABILITY,)
-    )
-    assert advance_move.hook_family is GenericRuleAbilityHookFamily.ADVANCE_MOVE
-    assert advance_move.coverage_descriptor_id == warptide_ir.WARPTIDE_DETACHMENT_RULE_DESCRIPTOR_ID
-    assert advance_move.source_rule_id == warptide_ir.WARPTIDE_SOURCE_RULE_ID
-    assert advance_move.hook_id(source) == warptide_ir.SHUDDERBLINK_ADVANCE_MOVE_HOOK_ID
-
-    advance_eligibility = next(
-        descriptor
-        for descriptor in registry.advance_eligibility_abilities
-        if descriptor.ability_ids() == (warptide_ir.SHUDDERBLINK_CHARGE_AFTER_ADVANCE_ABILITY,)
-    )
-    assert advance_eligibility.hook_family is GenericRuleAbilityHookFamily.ADVANCE_ELIGIBILITY
-    assert (
-        advance_eligibility.coverage_descriptor_id
-        == warptide_ir.WARPTIDE_DETACHMENT_RULE_DESCRIPTOR_ID
-    )
-    assert advance_eligibility.source_rule_id == warptide_ir.WARPTIDE_SOURCE_RULE_ID
-    assert (
-        advance_eligibility.hook_id(source) == warptide_ir.SHUDDERBLINK_ADVANCE_ELIGIBILITY_HOOK_ID
-    )
-
-    soul_hungry_source = _warptide_source(warptide_ir.SOUL_HUNGRY_SLAUGHTERERS_DESCRIPTOR_ID)
-    soul_hungry = next(
-        descriptor
-        for descriptor in registry.stratagem_cost_modifier_abilities
-        if descriptor.ability_ids() == (warptide_ir.SOUL_HUNGRY_SLAUGHTERERS_COST_ABILITY,)
-    )
-    assert soul_hungry.hook_family is GenericRuleAbilityHookFamily.STRATAGEM_COST_MODIFIER
-    assert soul_hungry.coverage_descriptor_id == warptide_ir.SOUL_HUNGRY_SLAUGHTERERS_DESCRIPTOR_ID
-    assert soul_hungry.source_rule_id == warptide_ir.SOUL_HUNGRY_SLAUGHTERERS_SOURCE_RULE_ID
-    assert soul_hungry.modifier_id(soul_hungry_source) == (
-        warptide_ir.SOUL_HUNGRY_SLAUGHTERERS_COST_MODIFIER_ID
-    )
 
 
 def test_warptide_shudderblink_advance_move_grant_is_automatic_assault() -> None:
@@ -408,59 +246,6 @@ def test_warptide_advance_move_lifecycle_binding_dispatches_generic_handler() ->
     assert grant.automatic is True
     with pytest.raises(GameLifecycleError, match="requires context"):
         bindings[0].handler(cast(AdvanceMoveContext, object()))
-
-
-def test_warptide_battle_formation_handler_records_generic_rule_effects() -> None:
-    state = _warptide_setup_state()
-    source = _warptide_source(warptide_ir.WARPTIDE_DETACHMENT_RULE_DESCRIPTOR_ID)
-    bindings = generic_detachment_effects.generic_detachment_rule_battle_formation_hook_bindings(
-        activation=_warptide_activation(),
-        execution_records=(source.record,),
-    )
-    decisions = DecisionController()
-    request_handler = bindings[0].request_handler
-
-    assert request_handler is not None
-    assert (
-        request_handler(
-            BattleFormationRequestContext(
-                state=state,
-                decisions=decisions,
-                config=_minimal_warptide_game_config(),
-            )
-        )
-        is None
-    )
-
-    effects = state.persisting_effects_for_unit(_WARPTIDE_UNIT_ID)
-    effect_abilities: set[str] = set()
-    for effect in effects:
-        payload = effect.effect_payload
-        assert isinstance(payload, dict)
-        rule_effect = payload["effect"]
-        assert isinstance(rule_effect, dict)
-        parameters = rule_effect["parameters"]
-        assert isinstance(parameters, list)
-        for parameter in parameters:
-            assert isinstance(parameter, dict)
-            if parameter.get("key") == "ability":
-                value = parameter.get("value")
-                assert isinstance(value, str)
-                effect_abilities.add(value)
-    assert effect_abilities == {
-        warptide_ir.SHUDDERBLINK_ASSAULT_AFTER_ADVANCE_ABILITY,
-        warptide_ir.SHUDDERBLINK_CHARGE_AFTER_ADVANCE_ABILITY,
-    }
-    assert decisions.event_log.records[-1].event_type == "generic_detachment_rule_effects_applied"
-
-    request_handler(
-        BattleFormationRequestContext(
-            state=state,
-            decisions=decisions,
-            config=_minimal_warptide_game_config(),
-        )
-    )
-    assert len(state.persisting_effects_for_unit(_WARPTIDE_UNIT_ID)) == 2
 
 
 def test_warptide_advance_move_lifecycle_bindings_are_fail_fast() -> None:
@@ -654,282 +439,11 @@ def test_warptide_soul_hungry_cost_modifier_rejects_wrong_contexts() -> None:
         descriptor.modifier_id(cast(GenericRuleAbilitySource, object()))
 
 
-def test_default_generic_rule_ability_registry_maps_shadow_legion_enhancement_grants() -> None:
-    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
-
-    leaping_source = _shadow_legion_enhancement_source(
-        shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    leaping = next(
-        ability
-        for ability in registry.enhancement_effect_abilities
-        if ability.ability_ids() == (shadow_legion_ir.LEAPING_SHADOWS_SCOUTS_ABILITY,)
-    )
-    assert leaping.hook_family is GenericRuleAbilityHookFamily.ENHANCEMENT_EFFECT
-    assert leaping.ability_ids() == (shadow_legion_ir.LEAPING_SHADOWS_SCOUTS_ABILITY,)
-    assert (
-        leaping.coverage_descriptor_id == shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    assert leaping.source_rule_id == shadow_legion_ir.LEAPING_SHADOWS_SOURCE_RULE_ID
-    assert leaping.enhancement_id == shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_ID
-    assert leaping.effect_id(leaping_source) == (
-        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
-        "enhancement:leaping_shadows:scouts_9"
-    )
-
-    mantle_source = _shadow_legion_enhancement_source(
-        shadow_legion_ir.MANTLE_OF_GLOOM_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    mantle = registry.objective_control_modifier_abilities[0]
-    assert mantle.hook_family is GenericRuleAbilityHookFamily.OBJECTIVE_CONTROL_MODIFIER
-    assert mantle.ability_ids() == (shadow_legion_ir.MANTLE_OF_GLOOM_OBJECTIVE_CONTROL_ABILITY,)
-    assert (
-        mantle.coverage_descriptor_id == shadow_legion_ir.MANTLE_OF_GLOOM_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    assert mantle.source_rule_id == shadow_legion_ir.MANTLE_OF_GLOOM_SOURCE_RULE_ID
-    assert mantle.modifier_id(mantle_source) == (
-        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
-        "enhancement:mantle_of_gloom:objective-control"
-    )
-
-    fade_source = _shadow_legion_enhancement_source(
-        shadow_legion_ir.FADE_TO_DARKNESS_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    unit_destroyed = registry.unit_destroyed_abilities[0]
-    assert unit_destroyed.hook_family is GenericRuleAbilityHookFamily.UNIT_DESTROYED
-    assert unit_destroyed.ability_ids() == (shadow_legion_ir.FADE_TO_DARKNESS_RESERVES_ABILITY,)
-    assert (
-        unit_destroyed.coverage_descriptor_id
-        == shadow_legion_ir.FADE_TO_DARKNESS_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    assert unit_destroyed.source_rule_id == shadow_legion_ir.FADE_TO_DARKNESS_SOURCE_RULE_ID
-    assert unit_destroyed.hook_id(fade_source) == (
-        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
-        "enhancement:fade_to_darkness:unit-destroyed"
-    )
-
-    turn_end = registry.turn_end_abilities[0]
-    assert turn_end.hook_family is GenericRuleAbilityHookFamily.TURN_END
-    assert turn_end.ability_ids() == (shadow_legion_ir.FADE_TO_DARKNESS_RESERVES_ABILITY,)
-    assert (
-        turn_end.coverage_descriptor_id
-        == shadow_legion_ir.FADE_TO_DARKNESS_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    assert turn_end.source_rule_id == shadow_legion_ir.FADE_TO_DARKNESS_SOURCE_RULE_ID
-    assert turn_end.hook_id(fade_source) == (
-        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
-        "enhancement:fade_to_darkness:turn-end-reserves"
-    )
-
-    malice_source = _shadow_legion_enhancement_source(
-        shadow_legion_ir.MALICE_MADE_MANIFEST_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    fight_start = registry.fight_phase_start_abilities[0]
-    assert fight_start.hook_family is GenericRuleAbilityHookFamily.FIGHT_PHASE_START
-    assert fight_start.ability_ids() == (
-        shadow_legion_ir.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_ABILITY,
-    )
-    assert (
-        fight_start.coverage_descriptor_id
-        == shadow_legion_ir.MALICE_MADE_MANIFEST_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    assert fight_start.source_rule_id == shadow_legion_ir.MALICE_MADE_MANIFEST_SOURCE_RULE_ID
-    assert fight_start.hook_id(malice_source) == (
-        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
-        "enhancement:malice_made_manifest"
-    )
-
-    malice_fnp = next(
-        descriptor
-        for descriptor in registry.mortal_wound_feel_no_pain_abilities
-        if descriptor.coverage_descriptor_id
-        == shadow_legion_ir.MALICE_MADE_MANIFEST_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    assert (
-        malice_fnp.hook_family
-        is GenericRuleAbilityHookFamily.MORTAL_WOUND_FEEL_NO_PAIN_CONTINUATION
-    )
-    assert malice_fnp.ability_ids() == (
-        shadow_legion_ir.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_ABILITY,
-    )
-    assert malice_fnp.source_rule_id == shadow_legion_ir.MALICE_MADE_MANIFEST_SOURCE_RULE_ID
-    assert malice_fnp.source_kind == shadow_legion_ir.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_SOURCE_KIND
-    assert malice_fnp.hook_id(malice_source) == (
-        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
-        "enhancement:malice_made_manifest:mortal-wound-fnp"
-    )
-
-
-def test_default_generic_rule_ability_registry_maps_corsair_coterie_enhancement_grants() -> None:
-    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
-
-    archraider_source = _aeldari_corsair_coterie_source(
-        corsair_ir.ARCHRAIDER_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    archraider = next(
-        descriptor
-        for descriptor in registry.enhancement_effect_abilities
-        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_MARKER_ABILITY,)
-    )
-    assert archraider.hook_family is GenericRuleAbilityHookFamily.ENHANCEMENT_EFFECT
-    assert archraider.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
-    assert archraider.enhancement_id == corsair_ir.ARCHRAIDER_ENHANCEMENT_ID
-    assert archraider.effect_id(archraider_source) == corsair_enhancements.ARCHRAIDER_EFFECT_ID
-
-    archraider_setup = next(
-        descriptor
-        for descriptor in registry.battle_formation_abilities
-        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_MODEL_SELECTION_ABILITY,)
-    )
-    assert archraider_setup.hook_family is GenericRuleAbilityHookFamily.BATTLE_FORMATION
-    assert archraider_setup.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
-    assert (
-        archraider_setup.hook_id(archraider_source) == corsair_enhancements.ARCHRAIDER_SETUP_HOOK_ID
-    )
-
-    archraider_cost_choice = next(
-        descriptor
-        for descriptor in registry.stratagem_cost_choice_abilities
-        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_STRATAGEM_COST_CHOICE_ABILITY,)
-    )
-    assert archraider_cost_choice.hook_family is GenericRuleAbilityHookFamily.STRATAGEM_COST_CHOICE
-    assert archraider_cost_choice.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
-    assert (
-        archraider_cost_choice.hook_id(archraider_source)
-        == corsair_enhancements.ARCHRAIDER_COST_CHOICE_HOOK_ID
-    )
-
-    archraider_cost_modifier = next(
-        descriptor
-        for descriptor in registry.stratagem_cost_modifier_abilities
-        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_STRATAGEM_COST_MODIFIER_ABILITY,)
-    )
-    assert (
-        archraider_cost_modifier.hook_family is GenericRuleAbilityHookFamily.STRATAGEM_COST_MODIFIER
-    )
-    assert archraider_cost_modifier.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
-    assert (
-        archraider_cost_modifier.modifier_id(archraider_source)
-        == corsair_enhancements.ARCHRAIDER_COST_MODIFIER_ID
-    )
-
-    infamy_source = _aeldari_corsair_coterie_source(corsair_ir.INFAMY_ENHANCEMENT_DESCRIPTOR_ID)
-    infamy = next(
-        descriptor
-        for descriptor in registry.enhancement_effect_abilities
-        if descriptor.ability_ids() == (corsair_ir.INFAMY_MARKER_ABILITY,)
-    )
-    assert infamy.source_rule_id == corsair_ir.INFAMY_SOURCE_RULE_ID
-    assert infamy.enhancement_id == corsair_ir.INFAMY_ENHANCEMENT_ID
-    assert infamy.effect_id(infamy_source) == corsair_enhancements.INFAMY_EFFECT_ID
-
-    infamy_oc = next(
-        descriptor
-        for descriptor in registry.objective_control_modifier_abilities
-        if descriptor.ability_ids() == (corsair_ir.INFAMY_OBJECTIVE_CONTROL_ABILITY,)
-    )
-    assert infamy_oc.hook_family is GenericRuleAbilityHookFamily.OBJECTIVE_CONTROL_MODIFIER
-    assert infamy_oc.source_rule_id == corsair_ir.INFAMY_SOURCE_RULE_ID
-    assert (
-        infamy_oc.modifier_id(infamy_source)
-        == corsair_enhancements.INFAMY_OBJECTIVE_CONTROL_MODIFIER_ID
-    )
-
-    voidstone_source = _aeldari_corsair_coterie_source(
-        corsair_ir.VOIDSTONE_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    voidstone = next(
-        descriptor
-        for descriptor in registry.enhancement_effect_abilities
-        if descriptor.ability_ids() == (corsair_ir.VOIDSTONE_MARKER_ABILITY,)
-    )
-    assert voidstone.source_rule_id == corsair_ir.VOIDSTONE_SOURCE_RULE_ID
-    assert voidstone.enhancement_id == corsair_ir.VOIDSTONE_ENHANCEMENT_ID
-    assert voidstone.effect_id(voidstone_source) == corsair_enhancements.VOIDSTONE_EFFECT_ID
-
-    voidstone_save = next(
-        descriptor
-        for descriptor in registry.save_option_modifier_abilities
-        if descriptor.ability_ids() == (corsair_ir.VOIDSTONE_SAVE_OPTION_ABILITY,)
-    )
-    assert voidstone_save.hook_family is GenericRuleAbilityHookFamily.SAVE_OPTION_MODIFIER
-    assert voidstone_save.source_rule_id == corsair_ir.VOIDSTONE_SOURCE_RULE_ID
-    assert (
-        voidstone_save.modifier_id(voidstone_source)
-        == corsair_enhancements.VOIDSTONE_SAVE_MODIFIER_ID
-    )
-
-    webway_source = _aeldari_corsair_coterie_source(
-        corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_DESCRIPTOR_ID
-    )
-    webway = next(
-        descriptor
-        for descriptor in registry.enhancement_effect_abilities
-        if descriptor.ability_ids() == (corsair_ir.WEBWAY_PATHSTONE_MARKER_ABILITY,)
-    )
-    assert webway.source_rule_id == corsair_ir.WEBWAY_PATHSTONE_SOURCE_RULE_ID
-    assert webway.enhancement_id == corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_ID
-    assert webway.effect_id(webway_source) == corsair_enhancements.WEBWAY_PATHSTONE_EFFECT_ID
-
-    webway_deep_strike = next(
-        descriptor
-        for descriptor in registry.enhancement_effect_abilities
-        if descriptor.ability_ids() == (corsair_ir.WEBWAY_PATHSTONE_DEEP_STRIKE_ABILITY,)
-    )
-    assert webway_deep_strike.source_rule_id == corsair_ir.WEBWAY_PATHSTONE_SOURCE_RULE_ID
-    assert webway_deep_strike.enhancement_id == corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_ID
-    assert (
-        webway_deep_strike.effect_id(webway_source)
-        == corsair_enhancements.WEBWAY_PATHSTONE_DEEP_STRIKE_EFFECT_ID
-    )
-
-    webway_turn_end = next(
-        descriptor
-        for descriptor in registry.turn_end_abilities
-        if descriptor.ability_ids() == (corsair_ir.WEBWAY_PATHSTONE_RESERVES_ABILITY,)
-    )
-    assert webway_turn_end.hook_family is GenericRuleAbilityHookFamily.TURN_END
-    assert webway_turn_end.source_rule_id == corsair_ir.WEBWAY_PATHSTONE_SOURCE_RULE_ID
-    assert (
-        webway_turn_end.hook_id(webway_source)
-        == corsair_enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID
-    )
-
-
-def test_default_generic_rule_ability_registry_maps_court_detachment_cost_grant() -> None:
-    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
-    source = _court_of_the_phoenician_source()
-
-    master_of_the_pageant = next(
-        descriptor
-        for descriptor in registry.stratagem_cost_modifier_abilities
-        if descriptor.ability_ids()
-        == (court_ir.MASTER_OF_THE_PAGEANT_STRATAGEM_COST_REDUCTION_ABILITY,)
-    )
-
-    assert master_of_the_pageant.hook_family is GenericRuleAbilityHookFamily.STRATAGEM_COST_MODIFIER
-    assert master_of_the_pageant.coverage_descriptor_id == (
-        court_ir.COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID
-    )
-    assert master_of_the_pageant.source_rule_id == court_rule.COURT_OF_THE_PHOENICIAN_RULE_SOURCE_ID
-    assert (
-        master_of_the_pageant.modifier_id(source)
-        == court_rule.MASTER_OF_THE_PAGEANT_COST_MODIFIER_ID
-    )
-
-
 def test_court_runtime_contribution_delegates_cost_modifier_to_generic_ir() -> None:
     contribution = court_rule.runtime_contribution()
 
     assert contribution.contribution_id == court_rule.CONTRIBUTION_ID
     assert contribution.stratagem_cost_modifier_bindings == ()
-
-
-def test_generic_rule_ability_registry_rejects_duplicate_descriptors() -> None:
-    descriptor = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.advance_eligibility_abilities[0]
-
-    with pytest.raises(GameLifecycleError, match="descriptors must be unique"):
-        GenericRuleAbilityRegistry(advance_eligibility_abilities=(descriptor, descriptor))
 
 
 def test_generic_rule_ability_source_validates_rule_ir_hash() -> None:
@@ -1077,179 +591,6 @@ def test_selected_to_fight_rule_ir_payload_helpers_accept_canonical_payload() ->
     generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
         payload
     )
-
-
-@pytest.mark.parametrize(
-    ("case", "expected_error"),
-    [
-        ("missing_effect", "requires effect object"),
-        ("parameters_not_list", "requires parameters"),
-        ("parameter_not_object", "parameter must be an object"),
-        ("parameter_missing_key", "parameter requires key"),
-        ("duplicate_parameter", "parameters must be unique"),
-    ],
-)
-def test_generic_lifecycle_effect_parameter_validation_fails_closed(
-    case: str,
-    expected_error: str,
-) -> None:
-    payload: dict[str, JsonValue] = {
-        "effect": {"parameters": [{"key": "model_proximity_inches", "value": 3.0}]}
-    }
-    effect = cast(dict[str, JsonValue], payload["effect"])
-    if case == "missing_effect":
-        payload["effect"] = None
-    elif case == "parameters_not_list":
-        effect["parameters"] = None
-    elif case == "parameter_not_object":
-        effect["parameters"] = ["invalid"]
-    elif case == "parameter_missing_key":
-        effect["parameters"] = [{"value": 3.0}]
-    elif case == "duplicate_parameter":
-        effect["parameters"] = [
-            {"key": "model_proximity_inches", "value": 3.0},
-            {"key": "model_proximity_inches", "value": 4.0},
-        ]
-    else:
-        raise AssertionError(f"Unhandled test case: {case}")
-
-    with pytest.raises(GameLifecycleError, match=expected_error):
-        generic_rule_lifecycle_hooks._effect_parameters(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-
-
-def test_generic_lifecycle_scalar_parameter_validation_is_typed_and_positive() -> None:
-    assert (
-        generic_rule_lifecycle_hooks._optional_bool_parameter(  # pyright: ignore[reportPrivateUsage]
-            {}, "requires_charge_move"
-        )
-        is False
-    )
-    assert (
-        generic_rule_lifecycle_hooks._optional_bool_parameter(  # pyright: ignore[reportPrivateUsage]
-            {"requires_charge_move": True}, "requires_charge_move"
-        )
-        is True
-    )
-    with pytest.raises(GameLifecycleError, match="must be a bool"):
-        generic_rule_lifecycle_hooks._optional_bool_parameter(  # pyright: ignore[reportPrivateUsage]
-            {"requires_charge_move": 1}, "requires_charge_move"
-        )
-
-    assert (
-        generic_rule_lifecycle_hooks._positive_float_parameter(  # pyright: ignore[reportPrivateUsage]
-            {"distance": 3}, "distance"
-        )
-        == 3.0
-    )
-    assert (
-        generic_rule_lifecycle_hooks._positive_float_parameter(  # pyright: ignore[reportPrivateUsage]
-            {"distance": 3.5}, "distance"
-        )
-        == 3.5
-    )
-    with pytest.raises(GameLifecycleError, match="must be numeric"):
-        generic_rule_lifecycle_hooks._positive_float_parameter(  # pyright: ignore[reportPrivateUsage]
-            {"distance": "three"}, "distance"
-        )
-    with pytest.raises(GameLifecycleError, match="must be positive"):
-        generic_rule_lifecycle_hooks._positive_float_parameter(  # pyright: ignore[reportPrivateUsage]
-            {"distance": 0}, "distance"
-        )
-
-
-def test_generic_lifecycle_record_and_assignment_validation_fails_closed() -> None:
-    source = _shadow_legion_source()
-    missing_rule_id = replace(source.record, rule_id=None)
-    missing_hash = copy.copy(source.record)
-    object.__setattr__(missing_hash, "rule_ir_hash", None)
-    stale_hash = copy.copy(source.record)
-    object.__setattr__(stale_hash, "rule_ir_hash", "stale-rule-ir-hash")
-
-    with pytest.raises(GameLifecycleError, match="requires rule_id"):
-        generic_rule_lifecycle_hooks._record_rule_id(  # pyright: ignore[reportPrivateUsage]
-            missing_rule_id
-        )
-    with pytest.raises(GameLifecycleError, match="requires rule_ir_hash"):
-        generic_rule_lifecycle_hooks._validate_record_rule_ir_hash(  # pyright: ignore[reportPrivateUsage]
-            record=missing_hash,
-            rule_ir=source.rule_ir,
-        )
-    with pytest.raises(GameLifecycleError, match="stale RuleIR hash"):
-        generic_rule_lifecycle_hooks._validate_record_rule_ir_hash(  # pyright: ignore[reportPrivateUsage]
-            record=stale_hash,
-            rule_ir=source.rule_ir,
-        )
-    with pytest.raises(GameLifecycleError, match="resolver must be callable"):
-        generic_rule_lifecycle_hooks._rule_ir_for_record(  # pyright: ignore[reportPrivateUsage]
-            source.record,
-            rule_ir_resolver=cast(Callable[[str], RuleIR], object()),
-        )
-    with pytest.raises(GameLifecycleError, match="must grant exactly one ability"):
-        generic_rule_lifecycle_hooks._single_grant_ability_payload(  # pyright: ignore[reportPrivateUsage]
-            (),
-            ability="fight_activation_melee_targeting_distance",
-        )
-    with pytest.raises(GameLifecycleError, match="assignments must be a mapping"):
-        generic_rule_lifecycle_hooks._validate_assignment_mapping(  # pyright: ignore[reportPrivateUsage]
-            object()
-        )
-    with pytest.raises(GameLifecycleError, match="requires runtime assignments"):
-        generic_rule_lifecycle_hooks._validate_assignment_mapping(  # pyright: ignore[reportPrivateUsage]
-            {"army-a:bearer": object()}
-        )
-
-
-def test_generic_lifecycle_binding_inputs_fail_closed() -> None:
-    activation = _warptide_activation()
-
-    with pytest.raises(GameLifecycleError, match="Fall Back bindings require activation"):
-        generic_rule_lifecycle_hooks.fall_back_eligibility_hook_bindings(
-            activation=cast(RuntimeContentActivation, object()),
-            execution_records=(),
-        )
-    with pytest.raises(GameLifecycleError, match="Fall Back bindings require execution records"):
-        generic_rule_lifecycle_hooks.fall_back_eligibility_hook_bindings(
-            activation=activation,
-            execution_records=cast(
-                tuple[faction_execution_2026_27.Phase17FExecutionRecord, ...],
-                [],
-            ),
-        )
-    with pytest.raises(GameLifecycleError, match="Fall Back bindings require execution records"):
-        generic_rule_lifecycle_hooks.fall_back_eligibility_hook_bindings(
-            activation=activation,
-            execution_records=(cast(faction_execution_2026_27.Phase17FExecutionRecord, object()),),
-        )
-    with pytest.raises(GameLifecycleError, match="fight activation bindings require activation"):
-        generic_rule_lifecycle_hooks.fight_activation_ability_hook_bindings(
-            activation=cast(RuntimeContentActivation, object()),
-            execution_records=(),
-        )
-    with pytest.raises(
-        GameLifecycleError, match="fight activation bindings require execution records"
-    ):
-        generic_rule_lifecycle_hooks.fight_activation_ability_hook_bindings(
-            activation=activation,
-            execution_records=cast(
-                tuple[faction_execution_2026_27.Phase17FExecutionRecord, ...],
-                [],
-            ),
-        )
-    with pytest.raises(GameLifecycleError, match="RuleIR resolver must be callable"):
-        generic_rule_lifecycle_hooks.fight_activation_ability_hook_bindings(
-            activation=activation,
-            execution_records=(),
-            rule_ir_resolver=cast(Callable[[str], RuleIR], object()),
-        )
-    with pytest.raises(
-        GameLifecycleError, match="fight activation bindings require execution records"
-    ):
-        generic_rule_lifecycle_hooks.fight_activation_ability_hook_bindings(
-            activation=activation,
-            execution_records=(cast(faction_execution_2026_27.Phase17FExecutionRecord, object()),),
-        )
 
 
 def test_selected_to_fight_enhancement_bearer_and_entrypoints_require_exact_types() -> None:
@@ -1588,744 +929,23 @@ def test_generic_lifecycle_generated_handlers_reject_wrong_context_types() -> No
         )
 
 
-def test_generic_lifecycle_shared_handlers_reject_wrong_context_types() -> None:
-    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
-    source = _shadow_legion_source()
-
-    fight_grant = (
-        generic_rule_lifecycle_hook_handlers.fight_unit_selected_grant_handler_for_descriptor(
-            source,
-            registry.fight_unit_selected_grant_abilities[0],
-        )
-    )
-    with pytest.raises(GameLifecycleError, match="requires context"):
-        fight_grant(cast(FightUnitSelectedContext, object()))
-
-    battle_request = (
-        generic_rule_lifecycle_hook_handlers.battle_formation_request_handler_for_descriptor(
-            source,
-            registry.battle_formation_abilities[0],
-        )
-    )
-    battle_result = (
-        generic_rule_lifecycle_hook_handlers.battle_formation_result_handler_for_descriptor(
-            source,
-            registry.battle_formation_abilities[0],
-        )
-    )
-    with pytest.raises(GameLifecycleError, match="requires context"):
-        battle_request(cast(BattleFormationRequestContext, object()))
-    with pytest.raises(GameLifecycleError, match="requires context"):
-        battle_result(cast(BattleFormationResultContext, object()))
-
-    cost_choice_request = (
-        generic_rule_lifecycle_hook_handlers.stratagem_cost_choice_request_handler_for_descriptor(
-            source,
-            registry.stratagem_cost_choice_abilities[0],
-        )
-    )
-    cost_choice_result = (
-        generic_rule_lifecycle_hook_handlers.stratagem_cost_choice_result_handler_for_descriptor(
-            source,
-            registry.stratagem_cost_choice_abilities[0],
-        )
-    )
-    with pytest.raises(GameLifecycleError, match="requires context"):
-        cost_choice_request(cast(StratagemCostChoiceRequestContext, object()))
-    with pytest.raises(GameLifecycleError, match="requires context"):
-        cost_choice_result(cast(StratagemCostChoiceResultContext, object()))
-
-    cost_modifier = (
-        generic_rule_lifecycle_hook_handlers.stratagem_cost_modifier_handler_for_descriptor(
-            source,
-            registry.stratagem_cost_modifier_abilities[0],
-        )
-    )
-    save_modifier = (
-        generic_rule_lifecycle_hook_handlers.save_option_modifier_handler_for_descriptor(
-            source,
-            registry.save_option_modifier_abilities[0],
-        )
-    )
-    with pytest.raises(GameLifecycleError, match="requires context"):
-        cost_modifier(cast(StratagemCostModifierContext, object()))
-    with pytest.raises(GameLifecycleError, match="requires context"):
-        save_modifier(cast(SaveOptionModifierContext, object()))
-
-
-def test_generic_lifecycle_internal_sources_require_exact_types_and_rule_id() -> None:
-    source = _shadow_legion_source()
-
-    with pytest.raises(GameLifecycleError, match="requires execution record"):
-        generic_rule_lifecycle_hooks._GenericFallBackEligibilitySource(  # pyright: ignore[reportPrivateUsage]
-            record=cast(faction_execution_2026_27.Phase17FExecutionRecord, object()),
-            rule_ir=source.rule_ir,
-        )
-    with pytest.raises(GameLifecycleError, match="requires RuleIR"):
-        generic_rule_lifecycle_hooks._GenericFallBackEligibilitySource(  # pyright: ignore[reportPrivateUsage]
-            record=source.record,
-            rule_ir=cast(RuleIR, object()),
-        )
-    with pytest.raises(GameLifecycleError, match="requires execution record"):
-        generic_rule_lifecycle_hooks._GenericFightActivationAbilitySource(  # pyright: ignore[reportPrivateUsage]
-            record=cast(faction_execution_2026_27.Phase17FExecutionRecord, object()),
-            rule_ir=source.rule_ir,
-            assignments_by_bearer_unit_id={},
-        )
-    with pytest.raises(GameLifecycleError, match="requires RuleIR"):
-        generic_rule_lifecycle_hooks._GenericFightActivationAbilitySource(  # pyright: ignore[reportPrivateUsage]
-            record=source.record,
-            rule_ir=cast(RuleIR, object()),
-            assignments_by_bearer_unit_id={},
-        )
-    with pytest.raises(GameLifecycleError, match="requires rule_id"):
-        generic_rule_lifecycle_hooks._GenericFightActivationAbilitySource(  # pyright: ignore[reportPrivateUsage]
-            record=replace(source.record, rule_id=None),
-            rule_ir=source.rule_ir,
-            assignments_by_bearer_unit_id={},
-        )
-
-
-def _raise_selected_to_fight_payload_error(
-    *,
-    case: str,
-    payload: dict[str, JsonValue],
-) -> None:
-    effect = cast(dict[str, JsonValue], payload["effect"])
-    parameters = cast(list[JsonValue], effect["parameters"])
-    if case == "missing_effect":
-        payload["effect"] = None
-        generic_rule_selected_to_fight_effects._effect_kind(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "missing_kind":
-        effect["kind"] = None
-        generic_rule_selected_to_fight_effects._effect_kind(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "unknown_kind":
-        effect["kind"] = "unsupported"
-        generic_rule_selected_to_fight_effects._effect_kind(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "parameters_not_list":
-        effect["parameters"] = None
-        generic_rule_selected_to_fight_effects._effect_parameters(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "parameter_not_object":
-        effect["parameters"] = ["invalid"]
-        generic_rule_selected_to_fight_effects._effect_parameters(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "parameter_missing_key":
-        effect["parameters"] = [{"value": 1}]
-        generic_rule_selected_to_fight_effects._effect_parameters(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "duplicate_parameter":
-        parameters.append({"key": "mortal_wounds_dice_quantity", "value": 1})
-        generic_rule_selected_to_fight_effects._effect_parameters(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "wrong_target":
-        payload["target"] = {"kind": RuleTargetKind.THIS_UNIT.value}
-        generic_rule_selected_to_fight_effects._require_this_model_target(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "wrong_dice_quantity":
-        generic_rule_selected_to_fight_effects._validate_self_mortal_wound_parameters(  # pyright: ignore[reportPrivateUsage]
-            {"mortal_wounds_dice_quantity": 2}
-        )
-    elif case == "wrong_dice_sides":
-        generic_rule_selected_to_fight_effects._validate_self_mortal_wound_parameters(  # pyright: ignore[reportPrivateUsage]
-            {"mortal_wounds_dice_quantity": 1, "mortal_wounds_dice_sides": 6}
-        )
-    elif case == "wrong_modifier":
-        generic_rule_selected_to_fight_effects._validate_self_mortal_wound_parameters(  # pyright: ignore[reportPrivateUsage]
-            {
-                "mortal_wounds_dice_quantity": 1,
-                "mortal_wounds_dice_sides": 3,
-                "mortal_wounds_modifier": 0,
-            }
-        )
-    elif case == "missing_duration":
-        payload["duration"] = None
-        generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "wrong_duration_kind":
-        payload["duration"] = {"kind": "end_phase"}
-        generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "duration_parameters_not_list":
-        duration = cast(dict[str, JsonValue], payload["duration"])
-        duration["parameters"] = None
-        generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "duration_parameter_not_object":
-        duration = cast(dict[str, JsonValue], payload["duration"])
-        duration["parameters"] = ["invalid"]
-        generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    elif case == "wrong_duration_endpoint":
-        duration = cast(dict[str, JsonValue], payload["duration"])
-        duration["parameters"] = [{"key": "endpoint", "value": "turn"}]
-        generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
-            payload
-        )
-    else:
-        raise AssertionError(f"Unhandled test case: {case}")
-
-
-def _selected_to_fight_grant_payload(ability_id: str) -> dict[str, JsonValue]:
-    return {
-        "target": {"kind": RuleTargetKind.THIS_MODEL.value},
-        "effect": {
-            "kind": RuleEffectKind.GRANT_ABILITY.value,
-            "parameters": [{"key": "ability", "value": ability_id}],
-        },
-    }
-
-
-def _selected_to_fight_reroll_payload(roll_type: str) -> dict[str, JsonValue]:
-    return {
-        "target": {"kind": RuleTargetKind.THIS_MODEL.value},
-        "effect": {
-            "kind": RuleEffectKind.REROLL_PERMISSION.value,
-            "parameters": [{"key": "roll_type", "value": roll_type}],
-        },
-        "duration": {
-            "kind": "until_timing_endpoint",
-            "parameters": [{"key": "endpoint", "value": "phase"}],
-        },
-    }
-
-
-def _selected_to_fight_effect_payload() -> dict[str, JsonValue]:
-    return {
-        "target": {"kind": RuleTargetKind.THIS_MODEL.value},
-        "effect": {
-            "kind": RuleEffectKind.INFLICT_MORTAL_WOUNDS.value,
-            "parameters": [
-                {"key": "mortal_wounds_dice_quantity", "value": 1},
-                {"key": "mortal_wounds_dice_sides", "value": 3},
-                {"key": "mortal_wounds_modifier", "value": 1},
-            ],
-        },
-        "duration": {
-            "kind": "until_timing_endpoint",
-            "parameters": [{"key": "endpoint", "value": "phase"}],
-        },
-    }
-
-
-def _shadow_legion_source() -> GenericRuleAbilitySource:
-    record = next(
-        record
-        for record in faction_execution_2026_27.execution_records()
-        if record.coverage_descriptor_id
-        == shadow_legion_ir.SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
-    )
-    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
-        record.coverage_descriptor_id
-    )
-    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
-
-
-def _blood_legion_source() -> GenericRuleAbilitySource:
-    record = next(
-        record
-        for record in faction_execution_2026_27.execution_records()
-        if record.coverage_descriptor_id
-        == blood_legion_ir.BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
-    )
-    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
-        record.coverage_descriptor_id
-    )
-    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
-
-
-def _warptide_source(coverage_descriptor_id: str) -> GenericRuleAbilitySource:
-    record = next(
-        record
-        for record in faction_execution_2026_27.execution_records()
-        if record.coverage_descriptor_id == coverage_descriptor_id
-    )
-    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
-        record.coverage_descriptor_id
-    )
-    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
-
-
-def _court_of_the_phoenician_source() -> GenericRuleAbilitySource:
-    record = next(
-        record
-        for record in faction_execution_2026_27.execution_records()
-        if record.coverage_descriptor_id
-        == court_ir.COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID
-    )
-    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
-        record.coverage_descriptor_id
-    )
-    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
-
-
-def _shadow_legion_enhancement_source(coverage_descriptor_id: str) -> GenericRuleAbilitySource:
-    record = next(
-        record
-        for record in faction_execution_2026_27.execution_records()
-        if record.coverage_descriptor_id == coverage_descriptor_id
-    )
-    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
-        record.coverage_descriptor_id
-    )
-    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
-
-
-def _aeldari_path_of_the_outcast_source(coverage_descriptor_id: str) -> GenericRuleAbilitySource:
-    record = next(
-        record
-        for record in faction_execution_2026_27.execution_records()
-        if record.coverage_descriptor_id == coverage_descriptor_id
-    )
-    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
-        record.coverage_descriptor_id
-    )
-    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
-
-
-def _aeldari_corsair_coterie_source(coverage_descriptor_id: str) -> GenericRuleAbilitySource:
-    record = next(
-        record
-        for record in faction_execution_2026_27.execution_records()
-        if record.coverage_descriptor_id == coverage_descriptor_id
-    )
-    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
-        record.coverage_descriptor_id
-    )
-    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
-
-
-def _keyword_any_state() -> GameState:
-    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
-    rangers = _unit(
-        unit_instance_id=_RANGERS_UNIT_ID,
-        datasheet_id="aeldari-rangers",
-        name="Rangers",
-        keywords=(path_outcast_ir.RANGERS_KEYWORD, "INFANTRY"),
-        faction_keywords=("AELDARI",),
-    )
-    shroud_runners = _unit(
-        unit_instance_id=_SHROUD_RUNNERS_UNIT_ID,
-        datasheet_id="aeldari-shroud-runners",
-        name="Shroud Runners",
-        keywords=(path_outcast_ir.SHROUD_RUNNERS_KEYWORD, "MOUNTED"),
-        faction_keywords=("AELDARI",),
-    )
-    enemy = _unit(
-        unit_instance_id=_ENEMY_UNIT_ID,
-        datasheet_id="opfor-target",
-        name="Target",
-        keywords=("INFANTRY",),
-        faction_keywords=("OPFOR",),
-    )
-    friendly_army = _army(
-        army_id="army-a",
-        player_id="player-a",
-        ruleset=ruleset,
-        faction_id="aeldari",
-        detachment_id="path-of-the-outcast",
-        units=(rangers, shroud_runners),
-    )
-    enemy_army = _army(
-        army_id="army-b",
-        player_id="player-b",
-        ruleset=ruleset,
-        faction_id="opfor",
-        detachment_id="target-practice",
-        units=(enemy,),
-    )
-    battle_phases = tuple(ruleset.battle_phase_sequence.phases)
-    return GameState(
-        game_id="generic-rule-ability-keyword-any",
-        ruleset_descriptor_hash=ruleset.descriptor_hash,
-        stage=GameLifecycleStage.BATTLE,
-        setup_sequence=tuple(ruleset.setup_sequence.steps),
-        battle_phase_sequence=battle_phases,
-        player_ids=("player-a", "player-b"),
-        turn_order=("player-a", "player-b"),
-        tactical_secondary_draw_count=2,
-        setup_step_index=None,
-        battle_phase_index=battle_phases.index(BattlePhase.SHOOTING),
-        battle_round=1,
-        active_player_id="player-a",
-        army_definitions=[friendly_army, enemy_army],
-        starting_strength_records=[
-            StartingStrengthRecord.from_unit(player_id="player-a", unit=rangers),
-            StartingStrengthRecord.from_unit(player_id="player-a", unit=shroud_runners),
-            StartingStrengthRecord.from_unit(player_id="player-b", unit=enemy),
-        ],
-    )
-
-
-def _warptide_state() -> GameState:
-    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
-    daemon = _unit(
-        unit_instance_id=_WARPTIDE_UNIT_ID,
-        datasheet_id="chaos-daemons-daemonettes",
-        name="Daemonettes",
-        keywords=(warptide_ir.BATTLELINE_KEYWORD,),
-        faction_keywords=(warptide_ir.LEGIONES_DAEMONICA_KEYWORD,),
-    )
-    enemy = _unit(
-        unit_instance_id=_ENEMY_UNIT_ID,
-        datasheet_id="opfor-target",
-        name="Target",
-        keywords=("INFANTRY",),
-        faction_keywords=("OPFOR",),
-    )
-    friendly_army = _army(
-        army_id="army-a",
-        player_id="player-a",
-        ruleset=ruleset,
-        faction_id=warptide_ir.CHAOS_DAEMONS_FACTION_ID,
-        detachment_id=warptide_ir.WARPTIDE_DETACHMENT_ID,
-        units=(daemon,),
-    )
-    enemy_army = _army(
-        army_id="army-b",
-        player_id="player-b",
-        ruleset=ruleset,
-        faction_id="opfor",
-        detachment_id="target-practice",
-        units=(enemy,),
-    )
-    battle_phases = tuple(ruleset.battle_phase_sequence.phases)
-    return GameState(
-        game_id="generic-rule-ability-warptide",
-        ruleset_descriptor_hash=ruleset.descriptor_hash,
-        stage=GameLifecycleStage.BATTLE,
-        setup_sequence=tuple(ruleset.setup_sequence.steps),
-        battle_phase_sequence=battle_phases,
-        player_ids=("player-a", "player-b"),
-        turn_order=("player-a", "player-b"),
-        tactical_secondary_draw_count=2,
-        setup_step_index=None,
-        battle_phase_index=battle_phases.index(BattlePhase.MOVEMENT),
-        battle_round=1,
-        active_player_id="player-a",
-        army_definitions=[friendly_army, enemy_army],
-        starting_strength_records=[
-            StartingStrengthRecord.from_unit(player_id="player-a", unit=daemon),
-            StartingStrengthRecord.from_unit(player_id="player-b", unit=enemy),
-        ],
-    )
-
-
-def _warptide_activation() -> RuntimeContentActivation:
-    return RuntimeContentActivation(
-        selected_faction_ids=(warptide_ir.CHAOS_DAEMONS_FACTION_ID,),
-        selected_detachment_ids=(warptide_ir.WARPTIDE_DETACHMENT_ID,),
-        selected_enhancement_ids=(),
-        selected_stratagem_ids=(),
-        selected_datasheet_ids=(),
-        selected_wargear_ids=(),
-        selected_weapon_profile_ids=(),
-        selected_weapon_keywords=(),
-        loaded_unit_instance_ids=(),
-    )
-
-
-def _warptide_setup_state() -> GameState:
-    battle_state = _warptide_state()
-    return replace(
-        battle_state,
-        stage=GameLifecycleStage.SETUP,
-        setup_step_index=battle_state.setup_sequence.index(SetupStep.DECLARE_BATTLE_FORMATIONS),
-        battle_phase_index=None,
-        battle_round=0,
-        active_player_id=None,
-    )
-
-
-def _minimal_warptide_game_config() -> GameConfig:
-    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
-    return GameConfig(
-        game_id="generic-rule-ability-warptide",
-        allow_legacy_non_strict_rosters=True,
-        ruleset_descriptor=ruleset,
-        army_catalog=catalog,
-        army_muster_requests=(
-            _muster_request(
-                catalog=catalog,
-                player_id="player-a",
-                army_id="army-a",
-                unit_selection_id="intercessor-unit-1",
-            ),
-            _muster_request(
-                catalog=catalog,
-                player_id="player-b",
-                army_id="army-b",
-                unit_selection_id="intercessor-unit-2",
-            ),
-        ),
-        player_ids=("player-a", "player-b"),
-        turn_order=("player-a", "player-b"),
-        fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
-    )
-
-
-def _muster_request(
-    *,
-    catalog: ArmyCatalog,
-    player_id: str,
-    army_id: str,
-    unit_selection_id: str,
-) -> ArmyMusterRequest:
-    return ArmyMusterRequest(
-        army_id=army_id,
-        player_id=player_id,
-        catalog_id=catalog.catalog_id,
-        source_package_id=catalog.source_package_id,
-        ruleset_id=catalog.ruleset_id,
-        detachment_selection=DetachmentSelection(
-            faction_id="core-marine-force",
-            detachment_ids=("core-combined-arms",),
-        ),
-        force_disposition_id="purge-the-foe",
-        unit_selections=(
-            UnitMusterSelection(
-                unit_selection_id=unit_selection_id,
-                datasheet_id="core-intercessor-like-infantry",
-                model_profile_selections=(
-                    ModelProfileSelection(
-                        model_profile_id="core-intercessor-like",
-                        model_count=5,
-                    ),
-                ),
-            ),
-        ),
-    )
-
-
-def _warptide_cost_modifier_context(
-    *,
-    state: GameState,
-    target_unit_id: str,
-) -> StratagemCostModifierContext:
-    definition = StratagemDefinition(
-        stratagem_id="fire-overwatch",
-        name="fire-overwatch",
-        source_id="source:fire-overwatch",
-        command_point_cost=1,
-        category=StratagemCategory.STRATEGIC_PLOY,
-        when_descriptor="when",
-        target_descriptor="target",
-        effect_descriptor="effect",
-        restrictions_descriptor="restrictions",
-        timing=StratagemTimingDescriptor(
-            trigger_kind=TimingTriggerKind.END_PHASE,
-            phase=BattlePhase.MOVEMENT,
-        ),
-        target_spec=StratagemTargetSpec(target_kind=StratagemTargetKind.FRIENDLY_UNIT),
-        handler_id=CORE_FIRE_OVERWATCH_HANDLER_ID,
-    )
-    eligibility_context = StratagemEligibilityContext.from_state(
-        state=state,
-        player_id="player-a",
-        trigger_kind=TimingTriggerKind.END_PHASE,
-        trigger_payload=None,
-    )
-    return StratagemCostModifierContext(
-        state=state,
-        definition=definition,
-        eligibility_context=eligibility_context,
-        target_binding=StratagemTargetBinding(
-            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
-            target_player_id=_owner_player_id_for_unit_id(target_unit_id),
-            target_unit_instance_id=target_unit_id,
-        ),
-        effect_selection=None,
-        base_command_point_cost=1,
-    )
-
-
-def _army(
-    *,
-    army_id: str,
-    player_id: str,
-    ruleset: RulesetDescriptor,
-    faction_id: str,
-    detachment_id: str,
-    units: tuple[UnitInstance, ...],
-) -> ArmyDefinition:
-    return ArmyDefinition(
-        army_id=army_id,
-        player_id=player_id,
-        catalog_id="generic-rule-ability-test-catalog",
-        source_package_id=path_outcast_ir.SOURCE_PACKAGE_ID,
-        ruleset_id=ruleset.ruleset_id,
-        detachment_selection=DetachmentSelection(
-            faction_id=faction_id,
-            detachment_ids=(detachment_id,),
-        ),
-        force_disposition_id="purge-the-foe",
-        units=units,
-    )
-
-
-def _unit(
-    *,
-    unit_instance_id: str,
-    datasheet_id: str,
-    name: str,
-    keywords: tuple[str, ...],
-    faction_keywords: tuple[str, ...],
-) -> UnitInstance:
-    model = _model(
-        model_instance_id=f"{unit_instance_id}:model-001",
-        datasheet_id=datasheet_id,
-        model_profile_id=f"{datasheet_id}-profile",
-        name=f"{name} model",
-        keywords=keywords,
-    )
-    return with_unit_keywords(
-        UnitInstance(
-            unit_instance_id=unit_instance_id,
-            datasheet_id=datasheet_id,
-            name=name,
-            datasheet_abilities=(),
-            datasheet_source_ids=(f"source:{datasheet_id}",),
-            own_models=(model,),
-            wargear_selections=(),
-        ),
-        keywords=keywords,
-        faction_keywords=faction_keywords,
-    )
-
-
-def _model(
-    *,
-    model_instance_id: str,
-    datasheet_id: str,
-    model_profile_id: str,
-    name: str,
-    keywords: tuple[str, ...],
-) -> ModelInstance:
-    base_size = BaseSizeDefinition.circular(32.0)
-    return ModelInstance(
-        keyword_assignment=ModelKeywordAssignment(
-            datasheet_id=datasheet_id,
-            model_profile_id=model_profile_id,
-            keywords=(),
-            faction_keywords=(),
-            source_ids=(f"source:{model_profile_id}",),
-        ),
-        model_instance_id=model_instance_id,
-        datasheet_id=datasheet_id,
-        model_profile_id=model_profile_id,
-        name=name,
-        characteristics=(
-            CharacteristicValue.from_raw(Characteristic.WOUNDS, 1),
-            CharacteristicValue.from_raw(Characteristic.LEADERSHIP, 7),
-        ),
-        base_size=base_size,
-        geometry=ModelGeometry.from_base_size(
-            base_size,
-            keywords=keywords,
-            geometry_source_id=model_profile_id,
-        ),
-        starting_wounds=1,
-        wounds_remaining=1,
-        wargear_ids=(),
-        source_ids=(f"source:{model_profile_id}",),
-    )
-
-
-def _grant_ability_effect(
-    *,
-    source: GenericRuleAbilitySource,
-    effect_id: str,
-    target_unit_instance_id: str,
-    ability: str,
-    required_keyword_any: tuple[str, ...],
-) -> PersistingEffect:
-    return generic_rule_persisting_effect(
-        effect_id=effect_id,
-        source_rule_id=source.rule_ir.source_id,
-        owner_player_id=_owner_player_id_for_unit_id(target_unit_instance_id),
-        target_unit_instance_ids=(target_unit_instance_id,),
-        started_battle_round=1,
-        started_phase=BattlePhase.SHOOTING,
-        expiration=EffectExpiration.end_of_battle(),
-        effect_payload=validate_json_value(
-            {
-                "effect_kind": "generic_rule_execution",
-                "coverage_descriptor_id": source.record.coverage_descriptor_id,
-                "execution_id": source.record.execution_id,
-                "target_unit_instance_ids": [target_unit_instance_id],
-                "target": {"kind": RuleTargetKind.THIS_UNIT.value},
-                "effect": {
-                    "kind": RuleEffectKind.GRANT_ABILITY.value,
-                    "parameters": [
-                        {"key": "ability", "value": ability},
-                        {"key": "required_keyword_any", "value": list(required_keyword_any)},
-                    ],
-                },
-            }
-        ),
-    )
-
-
-def _warptide_grant_ability_effect(
-    *,
-    source: GenericRuleAbilitySource,
-    effect_id: str,
-    target_unit_instance_id: str,
-    ability: str,
-) -> PersistingEffect:
-    return generic_rule_persisting_effect(
-        effect_id=effect_id,
-        source_rule_id=source.rule_ir.source_id,
-        owner_player_id=_owner_player_id_for_unit_id(target_unit_instance_id),
-        target_unit_instance_ids=(target_unit_instance_id,),
-        started_battle_round=1,
-        started_phase=BattlePhase.MOVEMENT,
-        expiration=EffectExpiration.end_of_battle(),
-        effect_payload=validate_json_value(
-            {
-                "effect_kind": "generic_rule_execution",
-                "coverage_descriptor_id": source.record.coverage_descriptor_id,
-                "execution_id": source.record.execution_id,
-                "target_unit_instance_ids": [target_unit_instance_id],
-                "target": {"kind": RuleTargetKind.THIS_UNIT.value},
-                "effect": {
-                    "kind": RuleEffectKind.GRANT_ABILITY.value,
-                    "parameters": [
-                        {"key": "ability", "value": ability},
-                        {
-                            "key": "required_faction_keyword_sequence",
-                            "value": [warptide_ir.LEGIONES_DAEMONICA_KEYWORD],
-                        },
-                        {
-                            "key": "required_keyword_sequence",
-                            "value": [warptide_ir.BATTLELINE_KEYWORD],
-                        },
-                    ],
-                },
-            }
-        ),
-    )
-
-
-def _owner_player_id_for_unit_id(unit_instance_id: str) -> str:
-    if unit_instance_id.startswith("army-a:"):
-        return "player-a"
-    if unit_instance_id.startswith("army-b:"):
-        return "player-b"
-    raise AssertionError(f"Unknown test unit ID: {unit_instance_id}")
+__all__: list[str] = []
+__all__ += ["ArmyCatalog", "ArmyMusterRequest", "BaseSizeDefinition"]
+__all__ += ["BattleFormationRequestContext", "BattleFormationResultContext"]
+__all__ += ["CORE_FIRE_OVERWATCH_HANDLER_ID", "Callable", "Characteristic", "CharacteristicValue"]
+__all__ += ["DecisionController", "DetachmentSelection", "EffectExpiration", "GameConfig"]
+__all__ += ["GameLifecycleStage", "GameState", "GenericRuleAbilityHookFamily"]
+__all__ += ["GenericRuleAbilityRegistry", "ModelGeometry", "ModelKeywordAssignment"]
+__all__ += ["ModelProfileSelection", "RuleIR", "RulesetDescriptor", "SaveOptionModifierContext"]
+__all__ += ["SetupStep", "StartingStrengthRecord", "StratagemCategory"]
+__all__ += ["StratagemCostChoiceRequestContext", "StratagemCostChoiceResultContext"]
+__all__ += ["StratagemDefinition", "StratagemEligibilityContext", "StratagemTargetBinding"]
+__all__ += ["StratagemTargetKind", "StratagemTargetSpec", "StratagemTimingDescriptor"]
+__all__ += ["TimingTriggerKind", "UnitMusterSelection", "_aeldari_corsair_coterie_source"]
+__all__ += ["_army", "_blood_legion_source", "_court_of_the_phoenician_source"]
+__all__ += ["_minimal_warptide_game_config", "_model", "_muster_request"]
+__all__ += ["_owner_player_id_for_unit_id", "_shadow_legion_enhancement_source", "_unit"]
+__all__ += ["_warptide_setup_state", "blood_legion_ir", "copy", "corsair_enhancements"]
+__all__ += ["corsair_ir", "court_ir", "dark_pacts", "faction_generic_ir_support_2026_27"]
+__all__ += ["generic_detachment_effects", "generic_rule_lifecycle_hook_handlers"]
+__all__ += ["generic_rule_persisting_effect", "validate_json_value", "with_unit_keywords"]

@@ -1,0 +1,23 @@
+{
+  "schema": "source-token-provenance-applicability-v1",
+  "measured_head": "1009fd82e077239abf854e9179d87b0affe8186e",
+  "current_input_digest": "5bca782a3ad86167109e6b80f4f18619a7620e3a4383adee58efd557974e85a9",
+  "changes": {
+    "docs/performance/policy-v3/operation-map.json": {
+      "before": "bfcde4860e036a5a0d1d0de1e7c003cd80446767405b5408849fce2616e2a008",
+      "after": "31ab2200dee42a0d8f72902d51822c4d0f400680b0132aa8466215be2dab86e1"
+    },
+    "scripts/check_performance_policy.py": {
+      "before": "ff839b651b80890b49ab3061493c5695c542ee1cda6cdf77d78d3bf902f027b4",
+      "after": "04b990c75551aa646786effe15aaadd8efe55649f6c7bcd64e290ff30409a2cd"
+    },
+    "tests/code_quality/test_performance_tool_inputs.py": {
+      "before": "55b77f9d294326f2bb79aad57f184b7f56efa84b5d1ce8b5f3a3aea83337ea6c",
+      "after": "9521b6ccfa06058451df6772d4bd75eac560c4b99cd150544deca9b34ad06226"
+    },
+    "tools/performance_tool_inputs.py": {
+      "before": "d98f74606899b79ef4b3223e5e496e1e8bb9411bc15cacba0ca5dd95aa321dbe",
+      "after": "157a1e0339d1d5534ff6b8ab6070e15f09ed5bcef9fecf62be2e6ea3d13f810a"
+    }
+  }
+}

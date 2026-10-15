@@ -285,7 +285,7 @@ def test_active_code_tests_and_docs_do_not_reference_retired_edition_ids() -> No
     violations: list[str] = []
 
     for path in _scanned_paths():
-        text = _without_non_edition_references(path.read_text(encoding="utf-8"))
+        text = _without_non_edition_references(_active_identity_text(path))
         relative_path = path.relative_to(ROOT).as_posix()
         for token in _retired_identity_tokens():
             if token in text:
@@ -457,6 +457,77 @@ def _without_non_edition_references(text: str) -> str:
     # Only its complete quoted spelling is recognized; adjacent tokens stay visible.
     phase_reference = '"tests/unit/test_phase10e_model_geometry.py"'
     return _without_hex_identities(text).replace(phase_reference, '""')
+
+
+def _active_identity_text(path: Path) -> str:
+    """Keep exact historical hash-map keys distinct from active edition identities."""
+    raw = path.read_bytes()
+    if path != ROOT / "docs/performance/current/source-token-reuse-v2.json":
+        return raw.decode("utf-8")
+    assert hashlib.sha256(raw).hexdigest() == (
+        "8cad88b88cac094de6b8bffc2c6a365b36e9c17c86705fe7621edcc8c4240fdc"
+    ), "The historical input-hash report requires its exact reviewed bytes."
+    report = json.loads(raw)
+    common = report["input_binding"]["common"]
+    prefix = "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/"
+    historical = {
+        "Abilities.json": "ad836ea16f2e2e1b5ab64a03e6731ad99a2d27994ab01c0df01ec267c71ea39c",
+        "Datasheets.json": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32",
+        "Datasheets_abilities.json": (
+            "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+        ),
+        "Datasheets_keywords.json": (
+            "697a2656222bf4dfd1f933f2e8bfd4dff0b37ed19abdd3f8e345b3afe2540531"
+        ),
+        "Datasheets_leader.json": (
+            "6dcc73d4706fa32675fe77b83532cc573cd96e8196e9c7b7e8097b96e3c2fc68"
+        ),
+    }
+    for name, digest in historical.items():
+        assert common.pop(prefix + name) == digest
+    # Only those five keys in the authenticated common inventory are removed.
+    # Every other field and occurrence is still checked; the report is never rewritten.
+    return json.dumps(report)
+
+
+def test_historical_report_keys_are_scoped_to_exact_reviewed_document() -> None:
+    path = ROOT / "docs/performance/current/source-token-reuse-v2.json"
+    before = path.read_bytes()
+    observed = _active_identity_text(path)
+    assert not any(
+        token in _without_non_edition_references(observed) for token in _retired_identity_tokens()
+    )
+    assert path.read_bytes() == before
+
+
+@pytest.mark.parametrize("mutation", ["key", "digest", "adjacent_identity"])
+def test_historical_report_identity_exception_rejects_any_byte_drift(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
+    relative = "docs/performance/current/source-token-reuse-v2.json"
+    report = json.loads((ROOT / relative).read_bytes())
+    key = next(k for k in report["input_binding"]["common"] if "10th-edition" in k)
+    if mutation == "key":
+        value = report["input_binding"]["common"].pop(key)
+        report["input_binding"]["common"][key + ".extra"] = value
+    elif mutation == "digest":
+        report["input_binding"]["common"][key] = "f" * 64
+    else:
+        report["new_runtime_edition"] = _retired_identity_tokens()[0]
+    path = tmp_path / relative
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps(report), encoding="utf-8")
+    monkeypatch.setattr(f"{__name__}.ROOT", tmp_path)
+    with pytest.raises(AssertionError, match="exact reviewed bytes"):
+        _active_identity_text(path)
+
+
+def test_historical_report_does_not_exempt_other_active_documents(tmp_path: Path) -> None:
+    path = tmp_path / "other.json"
+    raw = (ROOT / "docs/performance/current/source-token-reuse-v2.json").read_bytes()
+    path.write_bytes(raw)
+    assert _active_identity_text(path) == raw.decode("utf-8")
+    assert "10th" in _active_identity_text(path)
 
 
 def _python_constant_strings(source: str) -> tuple[str, ...]:

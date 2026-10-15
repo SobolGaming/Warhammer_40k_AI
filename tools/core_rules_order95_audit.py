@@ -41,6 +41,11 @@ RETIRED_REFERENCE_SUCCESSORS = {
         "tests/unit/test_v963_shock_disembark.py::"
         "test_v963_shock_rejects_passenger_engagement_without_mutation",
     ),
+    # Category migration retains the exact assertion in this authenticated live
+    # successor; the original Order95 observation and owner string stay immutable.
+    "tests/unit/test_phase9b_lifecycle.py::test_phase_wrap_switches_active_player": (
+        "tests/rules/rules07/unit/test_lifecycle.py::test_phase_wrap_switches_active_player",
+    ),
 }
 
 
