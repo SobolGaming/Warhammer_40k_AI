@@ -1,0 +1,110 @@
+name: source-token-baseline-progress-diagnostic
+on:
+  pull_request:
+    types: [labeled]
+permissions:
+  contents: read
+concurrency:
+  group: source-token-diagnostic-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+jobs:
+  source_token:
+    if: >-
+      github.event.label.name == 'ci-source-token-diagnostic-v1' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'codex/test-ci-restructure' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONHASHSEED: "0"
+      DIAGNOSTIC_MANIFEST_SHA256: 015a3ad4b779b0662546fff517b7517c8874b8b8d0fa67e1eac6f8a66aaa94bf
+    steps:
+      - name: Start absolute deadline before checkout and setup
+        shell: bash
+        run: echo "DIAGNOSTIC_JOB_STARTED=$(date +%s)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: control
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: 22a12094cfe3839d8fe8c5296ec0a7e7d32abade
+          path: base
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.14.5"
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          version: "0.11.29"
+          enable-cache: false
+      - name: Authenticate reviewed external harness before any imports
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir "$RUNNER_TEMP/diagnostic-harness"
+          cp "$GITHUB_WORKSPACE/control/ci/source-token-diagnostic/"* "$RUNNER_TEMP/diagnostic-harness/"
+          python -B - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'diagnostic-harness'
+          raw = (root / 'diagnostic-manifest.json').read_bytes()
+          assert hashlib.sha256(raw).hexdigest() == os.environ['DIAGNOSTIC_MANIFEST_SHA256']
+          manifest = json.loads(raw)
+          assert manifest['status'] == 'reviewed-executable'
+          assert manifest['base']['revision'] == '22a12094cfe3839d8fe8c5296ec0a7e7d32abade'
+          assert set(p.name for p in root.iterdir()) == set(manifest['harness']) | {'diagnostic-manifest.json'}
+          for name, expected in manifest['harness'].items():
+              p = root / name
+              assert p.is_file() and not p.is_symlink()
+              assert hashlib.sha256(p.read_bytes()).hexdigest() == expected
+          PY
+          export UV_CACHE_DIR="$RUNNER_TEMP/manifest-uv-cache"
+          uv sync --project "$GITHUB_WORKSPACE/base" --locked --no-default-groups --group test
+      - name: Run one original-cap baseline progress diagnostic with reserved cleanup and upload time
+        shell: bash
+        run: |
+          set -euo pipefail
+          deadline=$((DIAGNOSTIC_JOB_STARTED + 480))
+          remaining=$((deadline - $(date +%s) - 5))
+          test "$remaining" -gt 0
+          export MANIFEST_LAUNCH_DEADLINE="$deadline"
+          set +e
+          timeout --signal=TERM --kill-after=5s "${remaining}s" "$GITHUB_WORKSPACE/base/.venv/bin/python" -B "$RUNNER_TEMP/diagnostic-harness/diagnostic_controller.py" "$GITHUB_WORKSPACE/base" "$RUNNER_TEMP/manifest-output" > "$RUNNER_TEMP/controller.stdout" 2> "$RUNNER_TEMP/controller.stderr"
+          result=$?
+          set -e
+          export MANIFEST_LAUNCH_EXIT="$result"
+          python -B - <<'PY'
+          import json, os, time
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP'])
+          terminal = root / 'manifest-output/terminal.json'
+          data = json.loads(terminal.read_bytes()) if terminal.is_file() else None
+          code = int(os.environ['MANIFEST_LAUNCH_EXIT'])
+          now, deadline = time.time(), int(os.environ['MANIFEST_LAUNCH_DEADLINE'])
+          complete = code == 0 and now <= deadline and data is not None and data['complete']
+          (root/'launch.json').write_text(json.dumps({'exit_code':code,'complete':complete,'finished_epoch':now,'deadline':deadline,'terminal':data},indent=2)+'\n')
+          if not complete:
+              raise SystemExit(code or 1)
+          PY
+      - name: Preserve every result and failed attempt
+        if: always()
+        timeout-minutes: 2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: source-token-diagnostic-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/manifest-output/
+            ${{ runner.temp }}/diagnostic-harness/
+            ${{ runner.temp }}/controller.stdout
+            ${{ runner.temp }}/controller.stderr
+            ${{ runner.temp }}/launch.json
+          if-no-files-found: error
+          retention-days: 14
+          include-hidden-files: true
