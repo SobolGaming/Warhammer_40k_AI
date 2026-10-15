@@ -73,8 +73,14 @@ def test_actual_current_and_original_git_inventories_match_finite_cohorts() -> N
         base=migration.BASE, runtime_id=reconstruction.RUNTIME, family="reconstruction"
     )
     current, tools = _current(archive)
-    assert policy.runtime_inputs(ROOT) == current
-    assert migration.current_tool_inventory(ROOT) == tools
+    actual_current, actual_tools = migration.assessment_map_inputs(
+        ROOT,
+        archive=archive,
+        current=policy.runtime_inputs(ROOT),
+        tools=migration.current_tool_inventory(ROOT),
+    )
+    assert actual_current == current
+    assert actual_tools == tools
     assert (
         migration.measured_snapshot(ROOT, migration.MEASURED)
         == archive["TOOL_MEASURED_INPUTS.json.txt"]
@@ -444,3 +450,99 @@ def test_external_proof_is_separately_pinned_without_repinning_old_measurement_m
         assert (archive / "POLICY_MEASURED_INPUTS.json.txt").read_bytes() == measured
     finally:
         target.write_bytes(before)
+
+
+@pytest.fixture
+def assessment_map_root(tmp_path: Path) -> Path:
+    shutil.copytree(ROOT / migration.ASSESSMENT_MAP, tmp_path / migration.ASSESSMENT_MAP)
+    target = tmp_path / original.MAP_PATH
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(ROOT / original.MAP_PATH, target)
+    return tmp_path
+
+
+def _map_inputs(root: Path) -> tuple[dict[str, str], dict[str, str]]:
+    digest = hashlib.sha256((root / original.MAP_PATH).read_bytes()).hexdigest()
+    values = {original.MAP_PATH: digest, "src/unchanged.py": "a" * 64}
+    return values.copy(), values.copy()
+
+
+def test_assessment_map_proof_preserves_every_nonmap_input_and_caller_dictionary(
+    assessment_map_root: Path,
+) -> None:
+    current, tools = _map_inputs(assessment_map_root)
+    before_current, before_tools = current.copy(), tools.copy()
+    archive = read_archive()
+    old_sha = _inputs(archive, "POLICY_CURRENT_INPUTS.json.txt")[original.MAP_PATH]
+    verified_current, verified_tools = migration.assessment_map_inputs(
+        assessment_map_root, archive=archive, current=current, tools=tools
+    )
+    assert verified_current == before_current | {original.MAP_PATH: old_sha}
+    assert verified_tools == before_tools | {original.MAP_PATH: old_sha}
+    assert current == before_current
+    assert tools == before_tools
+    assert verified_current is not current
+    assert verified_tools is not tools
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["current", "original", "proof", "missing", "extra", "family", "old_operation", "wildcard"],
+)
+def test_assessment_map_real_file_drift_rejects_even_with_reported_hashes_updated(
+    assessment_map_root: Path, mutation: str
+) -> None:
+    directory = assessment_map_root / migration.ASSESSMENT_MAP
+    live = assessment_map_root / original.MAP_PATH
+    if mutation == "current":
+        live.write_bytes(live.read_bytes() + b" ")
+    elif mutation == "original":
+        old = directory / "original-operation-map.json.txt"
+        old.write_bytes(old.read_bytes() + b" ")
+    elif mutation == "proof":
+        proof_path = directory / "assessment-map-additions.json.txt"
+        proof_path.write_bytes(proof_path.read_bytes() + b" ")
+    elif mutation == "missing":
+        (directory / "original-operation-map.json.txt").unlink()
+    elif mutation == "extra":
+        (directory / "unreviewed.json").write_text("{}", encoding="utf-8")
+    else:
+        value = policy.read_object(live)
+        if mutation == "family":
+            policy.object_value(value["families"]).clear()
+        elif mutation == "old_operation":
+            policy.object_value(value["operations"]).pop("runtime-manifest-build-reuse")
+        else:
+            operation = next(
+                item
+                for key, item in policy.object_value(value["operations"]).items()
+                if key.startswith("ci-restructure-")
+            )
+            policy.object_value(operation)["paths"] = ["src/*"]
+        live.write_text(json.dumps(value), encoding="utf-8")
+        proof_path = directory / "assessment-map-additions.json.txt"
+        proof = policy.read_object(proof_path)
+        proof["current_sha256"] = hashlib.sha256(live.read_bytes()).hexdigest()
+        proof_path.write_text(json.dumps(proof), encoding="utf-8")
+    current, tools = _map_inputs(assessment_map_root)
+    with pytest.raises(ValueError, match=r"map|operation"):
+        migration.assessment_map_inputs(
+            assessment_map_root, archive=read_archive(), current=current, tools=tools
+        )
+
+
+@pytest.mark.parametrize("inventory", ["current", "tools"])
+@pytest.mark.parametrize("mutation", ["omit", "forge"])
+def test_assessment_map_actual_input_hashes_cannot_be_omitted_or_forged(
+    assessment_map_root: Path, inventory: str, mutation: str
+) -> None:
+    current, tools = _map_inputs(assessment_map_root)
+    target = current if inventory == "current" else tools
+    if mutation == "omit":
+        target.pop(original.MAP_PATH)
+    else:
+        target[original.MAP_PATH] = "f" * 64
+    with pytest.raises(ValueError, match="input identities disagree"):
+        migration.assessment_map_inputs(
+            assessment_map_root, archive=read_archive(), current=current, tools=tools
+        )

@@ -19,9 +19,11 @@ ARCHIVE = "docs/performance/policy-v3/category-migration-20261015"
 INVENTORY_SHA = "018f9b0167c57e63dfbeabe2418096ab4d60f6270dbc6cc4d966aeef8b7c2154"
 EXTERNAL = "EXTERNAL_READS.json.txt"
 EXTERNAL_SHA = "0c80ce5afe982667d0c665d70ad3895ab5d3793b0b987d5c3c9ba7a5b29fd9da"
+ASSESSMENT_MAP = "docs/performance/policy-v3/category-assessment-map-20261015"
+ASSESSMENT_MAP_SHA = "8d208df61242cabad2357158c161ae47aa67d8682275b7a181740faf166ee0ef"
 # Bind only after independent source review and the separate implementation commit.
 # Its sole permitted post-freeze source change is this None-to-commit literal.
-SOURCE_COMMIT: str | None = "48e2faf77efb682fb6b6e79df78577acd764d064"
+SOURCE_COMMIT: str | None = None
 SELF = "tools/performance_category_migration.py"
 CONTROLS = frozenset(
     {
@@ -284,6 +286,51 @@ def verify_current_inventory(
         verify_migrated_test(root, name)
 
 
+def assessment_map_inputs(
+    root: Path,
+    *,
+    archive: dict[str, object],
+    current: dict[str, str],
+    tools: dict[str, str],
+) -> tuple[dict[str, str], dict[str, str]]:
+    """Relate only the pinned metadata additions to the unchanged measured map."""
+    members = {"original-operation-map.json.txt", "assessment-map-additions.json.txt"}
+    if {p.name for p in (root / ASSESSMENT_MAP).iterdir()} != members:
+        raise ValueError("Assessment map proof membership changed.")
+    proof_raw = _read(root, ASSESSMENT_MAP + "/assessment-map-additions.json.txt")
+    if _digest(proof_raw) != ASSESSMENT_MAP_SHA:
+        raise ValueError("Pinned assessment map proof changed.")
+    proof = _object(json.loads(proof_raw))
+    if proof.keys() != {"schema", "original_sha256", "current_sha256", "added_operations"}:
+        raise ValueError("Assessment map proof fields changed.")
+    if proof["schema"] != "exact-ci-restructure-operation-map-additions-v1":
+        raise ValueError("Assessment map proof schema changed.")
+    old_sha = _strings(archive["POLICY_CURRENT_INPUTS.json.txt"])[original.MAP_PATH]
+    old_raw = _read(root, ASSESSMENT_MAP + "/original-operation-map.json.txt")
+    if proof["original_sha256"] != old_sha or _digest(old_raw) != old_sha:
+        raise ValueError("Original measured operation map changed.")
+    live_raw = _read(root, original.MAP_PATH)
+    live_sha = _digest(live_raw)
+    if proof["current_sha256"] != live_sha:
+        raise ValueError("Current operation map differs from its exact proof.")
+    if current.get(original.MAP_PATH) != live_sha or tools.get(original.MAP_PATH) != live_sha:
+        raise ValueError("Actual operation map input identities disagree.")
+    old_map = _object(json.loads(old_raw))
+    old_operations = _object(old_map["operations"])
+    additions = _object(proof["added_operations"])
+    if additions.keys() & old_operations.keys():
+        raise ValueError("Existing operation cannot be replaced by an addition.")
+    expected = old_map | {"operations": old_operations | additions}
+    if _object(json.loads(live_raw)) != expected:
+        raise ValueError("Original operations, families or budgets changed.")
+    # The complete pinned additions were independently reviewed as exact literal
+    # infrastructure paths/owners. No report-provided roles or wildcard exemption.
+    return (
+        current | {original.MAP_PATH: old_sha},
+        tools | {original.MAP_PATH: old_sha},
+    )
+
+
 def retained_inputs(
     root: Path,
     *,
@@ -308,8 +355,11 @@ def retained_inputs(
     external_receipt = verify_external_reads(root, _object(archive[EXTERNAL]))
     controls = reviewed_control_hashes(root)
     tool_inputs = current_tool_inventory(root)
+    verified_current, verified_tools = assessment_map_inputs(
+        root, archive=archive, current=current, tools=tool_inputs
+    )
     verify_current_inventory(
-        root, archive=archive, current=current, tools=tool_inputs, controls=controls
+        root, archive=archive, current=verified_current, tools=verified_tools, controls=controls
     )
     _git(root, "merge-base", "--is-ancestor", MEASURED, "HEAD")
     if _git(root, "rev-parse", MEASURED + "^{tree}").decode().strip() != TREE:
@@ -359,6 +409,7 @@ def retained_inputs(
             "archive_sha256": INVENTORY_SHA,
             "historical_receipt": historical_receipt,
             "external_read_receipt": external_receipt,
+            "assessment_map_proof_sha256": ASSESSMENT_MAP_SHA,
         }
     )
     return measured, binding, receipt
