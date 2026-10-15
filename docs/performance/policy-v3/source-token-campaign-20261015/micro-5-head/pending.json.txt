@@ -1,0 +1,20 @@
+{
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "-o",
+    "/home/runner/work/_temp/manifest-output/micro-5-head/resource.txt",
+    "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation/.venv/bin/python",
+    "-B",
+    "/home/runner/work/_temp/manifest-harness/source_reuse_experiment.py",
+    "micro",
+    "--root",
+    "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation",
+    "--baseline",
+    "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+    "--output",
+    "/home/runner/work/_temp/manifest-output/micro-5.json"
+  ],
+  "envelope_seconds": 100,
+  "execution_seconds": 90
+}

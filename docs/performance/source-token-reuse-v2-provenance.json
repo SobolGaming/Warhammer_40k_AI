@@ -1,0 +1,203 @@
+{
+  "schema": "source-token-v3-complete-campaign-provenance-v1",
+  "run": {
+    "id": 38677337982,
+    "head": "fe7566c89f6e170f493691430281847a547ae385",
+    "attempt": 1,
+    "url": "https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/38677337982"
+  },
+  "job": 116233837719,
+  "attempt": 1,
+  "measured_base": "22a12094cfe3839d8fe8c5296ec0a7e7d32abade",
+  "measured_head": "241f413ce9b83586d0aff4fd87ce50f8157c0163",
+  "orchestration_commit": "fe7566c89f6e170f493691430281847a547ae385",
+  "orchestration_tree": "0cf8595d0796fec91d98a340489bfec1608c3f2f",
+  "manifest_sha256": "b7cb26b6796258880b9eb999db2b8c858ce763804f7f42baff8b174b2b8f1a59",
+  "shipping_payloads": {
+    "ci/source-token-campaign/check_ci_attribution_supervisor.py": {
+      "sha256": "7c8b85d11761f71cd63ae66fb1647f63fd8fddab9f60094cafba068ec3652008",
+      "git_blob": "cf5f85c14670ef717f8e381e7da07f2ba06597da"
+    },
+    "ci/source-token-campaign/ci_attribution_supervisor.py": {
+      "sha256": "efbb32849dbe057f8a7df57c76be881ec69f1353da4d80a018850ee802e05cb9",
+      "git_blob": "a56426e3341365d27b28fd7eac8a9d821692c8a0"
+    },
+    "ci/source-token-campaign/manifest_campaign.py": {
+      "sha256": "efbe57a5785715ff88db11230dab083ffb43cd6d522e9df785b9b5b64b6489f9",
+      "git_blob": "ce7f5b29e6c31781952abbb70d5ecc3fb62df501"
+    },
+    "ci/source-token-campaign/reconstruction_worker.py": {
+      "sha256": "d8f157d87c6a88008bcee8eecdb77bc23dd4b2885fea738a17595ab4ab3e4a3f",
+      "git_blob": "beaaed11cae326bc9ba080f94a33535d0faf126a"
+    },
+    "ci/source-token-campaign/source_reuse_experiment.py": {
+      "sha256": "1b5989d63b299de7d605b3cde95c9ee5f75bccc832b7a26844048d75bf34e0ba",
+      "git_blob": "73883b666c8a69eacf99e9ebb634afa43a342c7d"
+    },
+    "ci/source-token-campaign/source_token_arm.py": {
+      "sha256": "0df68e89b320f13191d1899f96179fd19b656a23d5d1c76b620a785085a7fd4e",
+      "git_blob": "4ff3f364b62d1c48067f8215655dc792fadab3bc"
+    },
+    "ci/source-token-campaign/source_token_campaign.py": {
+      "sha256": "cf3b2b93e8938843ad31fe155d06e727c1f6c714022c0fede30b40daa08b9049",
+      "git_blob": "b247c4b0707f48d60be8ef9f9abe0bc2967a5737"
+    },
+    "ci/source-token-campaign/manifest.json": {
+      "sha256": "b7cb26b6796258880b9eb999db2b8c858ce763804f7f42baff8b174b2b8f1a59",
+      "git_blob": "783c4a6d700fc884db4e6dc2446dac91e8870738"
+    },
+    ".github/workflows/source-token-v3.yml": {
+      "sha256": "3dac4638d06dbc30c13e47fcfe7bc3e281a711d3a190d9a2d940524372cb18ff",
+      "git_blob": "47a17bb4c37c5a61e41ee27858d08b4d0cfe0ab8"
+    }
+  },
+  "reviewed_binding": {
+    "decision": "GO",
+    "head": "fe7566c89f6e170f493691430281847a547ae385",
+    "tree": "0cf8595d0796fec91d98a340489bfec1608c3f2f",
+    "review_path": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-14\\task-2\\SOURCE_TOKEN_STOP_BOUND_FINAL_REVIEW_20261015_R1\\REVIEW.md",
+    "review_sha256": "c12dcc79e587183ea592b98d15e9c23ed785a37bec51b147176b5594e91199f4",
+    "review_seal_sha256": "d85b200738a014879de2190a56aff6a7dafa788696ce7551ece81fbc2ebe5f2d"
+  },
+  "artifact": {
+    "id": 11947488793,
+    "name": "source-token-v3-38677337982-1",
+    "bytes": 22276429,
+    "sha256": "24c9ee6ea4146ff8f77c5dc2d19ee939cd06b8a68430d835986b565b3bd83129",
+    "github_digest_verified": true
+  },
+  "raw_evidence_archive": "docs/performance/policy-v3/source-token-campaign-20261015",
+  "raw_evidence_inventory_sha256": "1fb5a8d15bbcd7ed8d9dbc66266ddc59bbfc27280f458a288c26e15d14a47ab7",
+  "report_sha256": "8cad88b88cac094de6b8bffc2c6a365b36e9c17c86705fe7621edcc8c4240fdc",
+  "parsed_report_equal_to_validated_draft": true,
+  "original_six_file_binding": {
+    "base": {
+      "ci/manifest-validation/source_reuse_experiment.py": "1b5989d63b299de7d605b3cde95c9ee5f75bccc832b7a26844048d75bf34e0ba",
+      "ci/manifest-validation/source_token_arm.py": "0df68e89b320f13191d1899f96179fd19b656a23d5d1c76b620a785085a7fd4e",
+      "ci/manifest-validation/ci_attribution_supervisor.py": "efbb32849dbe057f8a7df57c76be881ec69f1353da4d80a018850ee802e05cb9",
+      "ci/manifest-validation/reconstruction_worker.py": "d8f157d87c6a88008bcee8eecdb77bc23dd4b2885fea738a17595ab4ab3e4a3f",
+      "ci/manifest-validation/manifest_campaign.py": "efbe57a5785715ff88db11230dab083ffb43cd6d522e9df785b9b5b64b6489f9",
+      "ci/manifest-validation/check_ci_attribution_supervisor.py": "7c8b85d11761f71cd63ae66fb1647f63fd8fddab9f60094cafba068ec3652008"
+    },
+    "head": {
+      "ci/manifest-validation/source_reuse_experiment.py": "1b5989d63b299de7d605b3cde95c9ee5f75bccc832b7a26844048d75bf34e0ba",
+      "ci/manifest-validation/source_token_arm.py": "0df68e89b320f13191d1899f96179fd19b656a23d5d1c76b620a785085a7fd4e",
+      "ci/manifest-validation/ci_attribution_supervisor.py": "efbb32849dbe057f8a7df57c76be881ec69f1353da4d80a018850ee802e05cb9",
+      "ci/manifest-validation/reconstruction_worker.py": "d8f157d87c6a88008bcee8eecdb77bc23dd4b2885fea738a17595ab4ab3e4a3f",
+      "ci/manifest-validation/manifest_campaign.py": "efbe57a5785715ff88db11230dab083ffb43cd6d522e9df785b9b5b64b6489f9",
+      "ci/manifest-validation/check_ci_attribution_supervisor.py": "7c8b85d11761f71cd63ae66fb1647f63fd8fddab9f60094cafba068ec3652008"
+    },
+    "sha256": "1ff59d61b0c499231cdf3aef0d8d18306542b3078c1d87fb0b625b990b11c72b"
+  },
+  "separate_successor_controller": {
+    "path": "ci/source-token-campaign/source_token_campaign.py",
+    "sha256": "cf3b2b93e8938843ad31fe155d06e727c1f6c714022c0fede30b40daa08b9049",
+    "commit": "fe7566c89f6e170f493691430281847a547ae385",
+    "tree": "0cf8595d0796fec91d98a340489bfec1608c3f2f",
+    "qualification": "Separate orchestration provenance. This seventh controller is not represented as part of the original six-member v2 measured harness or its historical control cohort."
+  },
+  "limits": {
+    "micro_execution_seconds": 90,
+    "micro_envelope_seconds": 100,
+    "original_pytest_execution_seconds": 410,
+    "original_pytest_envelope_seconds": 420,
+    "job_seconds": 3600,
+    "absolute_seconds": 3480,
+    "upload_reserve_seconds": 120
+  },
+  "results": {
+    "run": {
+      "id": 38677337982,
+      "head": "fe7566c89f6e170f493691430281847a547ae385",
+      "attempt": 1,
+      "url": "https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/38677337982"
+    },
+    "samples": {
+      "base": [
+        244.299,
+        242.874,
+        243.971
+      ],
+      "head": [
+        175.752,
+        175.422,
+        176.667
+      ]
+    },
+    "mean_limit": 304.6933333333333,
+    "maximum_limit": 366.54850000000005,
+    "base_mean_seconds": 243.71466666666666,
+    "head_mean_seconds": 175.947,
+    "numerical_budgets_passed": true,
+    "original_case_union": [
+      "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_has_required_sections_and_tables",
+      "tests.code_quality.test_decision_submission_catalog::test_decision_submission_catalog_lists_runtime_decision_and_proposal_tokens",
+      "tests.code_quality.test_decision_submission_catalog::test_retired_placement_fallback_decisions_do_not_reappear",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_check_regenerates_into_an_isolated_tree_before_validation",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_manifest_hashes_current_files_and_all_documentation",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_regeneration_discards_orphan_generated_fixtures",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_external_contract_write_mode_removes_orphan_generated_fixture",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_conformance_version_matches_published_contract",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_cross_backend_replay_uses_canonical_semantic_comparison",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_executable_client_is_operation_bound_without_identifier_conventions",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_package_pins_generation_typecheck_and_live_conformance",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_client_does_not_import_engine_internals",
+      "tests.code_quality.test_phase18m_conformance_boundary::test_phase18m_typescript_modules_respect_new_module_size_budget",
+      "tests.code_quality.test_proposal_source_index::test_builder_wrapper_rereads_inventory_and_changed_source_root",
+      "tests.code_quality.test_proposal_source_index::test_byte_change_with_same_size_and_mtime_invalidates",
+      "tests.code_quality.test_proposal_source_index::test_current_inventory_adds_removes_and_drops_previous_roots",
+      "tests.code_quality.test_proposal_source_index::test_fresh_processes_start_without_a_shared_index",
+      "tests.code_quality.test_proposal_source_index::test_identical_bytes_reuse_tokens_but_fresh_instances_parse",
+      "tests.code_quality.test_proposal_source_index::test_identical_content_at_distinct_paths_retains_path_identity",
+      "tests.code_quality.test_proposal_source_index::test_partial_failure_does_not_publish_new_entries",
+      "tests.code_quality.test_proposal_source_index::test_results_are_immutable_and_newlines_match_text_loading",
+      "tests.code_quality.test_proposal_source_index::test_source_index_preserves_literal_proposal_grammar",
+      "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_decode_or_missing_file_errors",
+      "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[A_PROPOSAL_KIND = (]",
+      "tests.code_quality.test_proposal_source_index::test_warm_entry_never_hides_syntax_errors[\\xef\\xbb\\xbfX = 1]"
+    ],
+    "regenerated_files_per_sample": 235,
+    "exact_generated_trees": 6,
+    "micro_work_counts": [
+      {
+        "side": "base",
+        "cold": 2942,
+        "warm": 2942
+      },
+      {
+        "side": "head",
+        "cold": 2942,
+        "warm": 0
+      },
+      {
+        "side": "head",
+        "cold": 2942,
+        "warm": 0
+      },
+      {
+        "side": "base",
+        "cold": 2942,
+        "warm": 2942
+      },
+      {
+        "side": "base",
+        "cold": 2942,
+        "warm": 2942
+      },
+      {
+        "side": "head",
+        "cold": 2942,
+        "warm": 0
+      }
+    ],
+    "mean_percent_reduction": 27.806150361625072,
+    "queue_seconds": 2.0,
+    "job_wall_seconds": 1703.0,
+    "job_elapsed_seconds": 1692.4366765022278,
+    "controller_seconds": 1629.1897122740002,
+    "head_input_digest": "ae4a930b7ae50c35969f642c984348e4c0d0d664dac82e878e28d91bf735ad24",
+    "report_sha256": "8cad88b88cac094de6b8bffc2c6a365b36e9c17c86705fe7621edcc8c4240fdc",
+    "qualification": "Complete one-host matched raw comparison and standalone original-validator check. Current-tree admission, separate seventh-controller provenance, final assessment and serial smoke remain required. Whole-pipeline target remains unproven."
+  },
+  "qualification": "Complete serial three-sample-per-side original comparison on one provisional Linux host. Inputs are independently rebuilt from fixed Git snapshots. Current finite migration/map applicability, actual assessment and serial smoke must still pass; this is not whole-required-CI acceptance. Original failed run and diagnostic remain retained without acceptance credit."
+}

@@ -1,0 +1,25 @@
+# Exact source-token campaign binding renewal
+
+**GO:** commit `fe7566c89f6e170f493691430281847a547ae385`, tree `0cf8595d0796fec91d98a340489bfec1608c3f2f`.
+
+The parent may proceed under the existing authorization to publish this exact commit, verify the exact remote PR/event head, tree and shipping payloads, and activate the single first-attempt `ci-source-token-v3` Linux campaign. No additional local source review blocker remains. Remote identity must still be checked before activation; this review did not query, publish or launch anything.
+
+Same sole independent reviewer. This is a narrow static unchanged-source/metadata renewal of SOURCE_TOKEN_DIAGNOSTIC_AND_STOP_BOUND_REVIEW_20261015_R1, report SHAb61a042a8accd00a395ee6217994a549995aa6bfa4cb2877fb385b7c9810e39f. No project imports, tests, probes, compilation, benchmarks, runtime duplication or broader re-review occurred.
+
+I independently authenticated and copied all21 payloads of source-token-stop-bound-final-1. Inventory SHA: `b0918a2b8ab19120a0939c4986279c02ae3e4af6733198cf991fe0496c845cb6`. Its REVIEW.md SHA is `aa4efbf054c9aafa6cd3f340fb63b701df49aa3e296a69d4646b4eb9e44af461`.
+
+Actual local Git objects confirm the stated tree and sole parent `a67e2fa62e61f7cb790737089e0d879bcf5161b4`. The commit adds exactly nine paths: eight files in ci/source-token-campaign and .github/workflows/source-token-v3.yml. Every committed raw SHA-256 and Git blob matches the sealed binding. There are no edits or deletions elsewhere; assessment, operation-map, adapter and all other parent-tree files remain unchanged in this commit. Uncommitted or separately prepared future assessment work is not part of this reviewed identity.
+
+All seven Python files are byte-identical to the reviewed correction. Complete manifest text differs only by `prepared-not-executable` → `reviewed-executable`; complete workflow text differs only by the corresponding manifest SHA substitution.
+
+- Final manifest SHA: `b7cb26b6796258880b9eb999db2b8c858ce763804f7f42baff8b174b2b8f1a59`.
+- Final workflow SHA: `3dac4638d06dbc30c13e47fcfe7bc3e281a711d3a190d9a2d940524372cb18ff`.
+- Separately authenticated successor controller SHA: `cf3b2b93e8938843ad31fe155d06e727c1f6c714022c0fede30b40daa08b9049`.
+
+The reviewed symmetric90-second execution/100-second envelope applies only to the exact six micro children. Base22a12094cfe3839d8fe8c5296ec0a7e7d32abade and measured head241f413ce9b83586d0aff4fd87ce50f8157c0163 remain fixed. Original workloads, sample counts, assertions, generated-output checks, numerical acceptance inequalities, cleanup and no-retry behavior are unchanged. The3480-second absolute/3600-second job ceilings and120-second upload reserve remain intact;3330seconds of maximum child envelopes still share remaining time with setup/authentication/postchecks. The existing full-envelope-plus65second check continues to reject insufficient launch budget.
+
+The original six-file v2 workload/harness binding remains unchanged. The additional successor controller remains separately pinned by this reviewed commit and launch manifest; retain that orchestration provenance and actual cap receipts alongside any resulting evidence. This renewal does not rewrite historical bindings or give the diagnostic numerical acceptance credit.
+
+No broader performance or whole-pipeline success is claimed. The earlier timeout remains failed, and the one48.695-second diagnostic does not establish its cause or statistically guarantee the new allowance. Fresh complete matched results, current policy admission/assessment, serial smoke and final aggregate/native gates remain required. The600-second whole-required-CI acceptance target remains unproven.
+
+No action was denied or left with an uncertain external outcome. Supporting immutable evidence includes STATIC_CHECKS.json, the independent PowerShell verification script, handoff and copied packet.

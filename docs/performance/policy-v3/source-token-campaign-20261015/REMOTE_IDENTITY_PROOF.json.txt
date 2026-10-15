@@ -1,0 +1,16 @@
+{
+  "head": "fe7566c89f6e170f493691430281847a547ae385",
+  "tree": "0cf8595d0796fec91d98a340489bfec1608c3f2f",
+  "campaign_files": {
+    "ci/source-token-campaign/check_ci_attribution_supervisor.py": "7c8b85d11761f71cd63ae66fb1647f63fd8fddab9f60094cafba068ec3652008",
+    "ci/source-token-campaign/ci_attribution_supervisor.py": "efbb32849dbe057f8a7df57c76be881ec69f1353da4d80a018850ee802e05cb9",
+    "ci/source-token-campaign/manifest_campaign.py": "efbe57a5785715ff88db11230dab083ffb43cd6d522e9df785b9b5b64b6489f9",
+    "ci/source-token-campaign/reconstruction_worker.py": "d8f157d87c6a88008bcee8eecdb77bc23dd4b2885fea738a17595ab4ab3e4a3f",
+    "ci/source-token-campaign/source_reuse_experiment.py": "1b5989d63b299de7d605b3cde95c9ee5f75bccc832b7a26844048d75bf34e0ba",
+    "ci/source-token-campaign/source_token_arm.py": "0df68e89b320f13191d1899f96179fd19b656a23d5d1c76b620a785085a7fd4e",
+    "ci/source-token-campaign/source_token_campaign.py": "cf3b2b93e8938843ad31fe155d06e727c1f6c714022c0fede30b40daa08b9049",
+    "ci/source-token-campaign/manifest.json": "b7cb26b6796258880b9eb999db2b8c858ce763804f7f42baff8b174b2b8f1a59",
+    ".github/workflows/source-token-v3.yml": "3dac4638d06dbc30c13e47fcfe7bc3e281a711d3a190d9a2d940524372cb18ff"
+  },
+  "remote_blobs_match": true
+}

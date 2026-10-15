@@ -2014,6 +2014,16 @@
         }
       }
     },
+    "docs/performance/current/source-token-reuse-v2.json": {
+      "before_sha256": null,
+      "after_sha256": "8cad88b88cac094de6b8bffc2c6a365b36e9c17c86705fe7621edcc8c4240fdc",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8cad88b88cac094de6b8bffc2c6a365b36e9c17c86705fe7621edcc8c4240fdc"
+        }
+      }
+    },
     "docs/performance/history/source-token-reuse-v1.json.txt": {
       "before_sha256": null,
       "after_sha256": "24bd1ebd1890a3b8b15bcc6a9a8b1c07e0d520875fad37338f1e77910e9659fb",
@@ -2554,6 +2564,756 @@
         }
       }
     },
+    "docs/performance/policy-v3/source-token-campaign-20261015/ANALYSIS.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "85cc87056b3686cf2b760cc7b2f05d5767a2920075c70968749e2607572afa10",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "85cc87056b3686cf2b760cc7b2f05d5767a2920075c70968749e2607572afa10"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/DOWNLOAD_MANIFEST.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "717ae277faaad2bab5c5a89297f1de37f017c83d2d2bd2e1b53c23ea7a54b492",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "717ae277faaad2bab5c5a89297f1de37f017c83d2d2bd2e1b53c23ea7a54b492"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/EXACT_BINDING_GO.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "d5e692b2ee6a30b9203d0a0dcea93f047cf08ef516cb877da5e37021579da054",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d5e692b2ee6a30b9203d0a0dcea93f047cf08ef516cb877da5e37021579da054"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/EXACT_BINDING_REVIEW.md.txt": {
+      "before_sha256": null,
+      "after_sha256": "c12dcc79e587183ea592b98d15e9c23ed785a37bec51b147176b5594e91199f4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c12dcc79e587183ea592b98d15e9c23ed785a37bec51b147176b5594e91199f4"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/FINAL_BINDING.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "49dd0c546fad20d74635254af267f268eff6f55e563a2063495a8a9e28a55cf1",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "49dd0c546fad20d74635254af267f268eff6f55e563a2063495a8a9e28a55cf1"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/INVENTORY.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "1fb5a8d15bbcd7ed8d9dbc66266ddc59bbfc27280f458a288c26e15d14a47ab7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1fb5a8d15bbcd7ed8d9dbc66266ddc59bbfc27280f458a288c26e15d14a47ab7"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/INVOCATIONS.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "7899cfe9e99ee5b3d371ecc06f09e5ca6d2b5170d806de73ea96e8cec9a435c8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "7899cfe9e99ee5b3d371ecc06f09e5ca6d2b5170d806de73ea96e8cec9a435c8"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/REMOTE_IDENTITY_PROOF.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "e6fde945fdb4d07e2b2f0d64a5d6984f421e8806f40cbbe5e637184cedb8d6c8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e6fde945fdb4d07e2b2f0d64a5d6984f421e8806f40cbbe5e637184cedb8d6c8"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cheap-family/junit.xml.txt": {
+      "before_sha256": null,
+      "after_sha256": "fa2878febf8aa92e682f0bffabfea802cdaf567f5dd9c776e77d64795eea25da",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fa2878febf8aa92e682f0bffabfea802cdaf567f5dd9c776e77d64795eea25da"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cheap-family/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "1b345f1f02ba9e4e76cf836129f160b3112bc1193e4935fecbee3dd17a4f1bcb",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1b345f1f02ba9e4e76cf836129f160b3112bc1193e4935fecbee3dd17a4f1bcb"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cheap-family/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "b220f79977d43830f90044644eb3bfd236f7a505b44e32d7149d7a8d53c8a6e3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b220f79977d43830f90044644eb3bfd236f7a505b44e32d7149d7a8d53c8a6e3"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cheap-family/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "1654bbb4e17b97dd5f415102e3cd890fb194f242bbbd9dc74d325fe3c756afda",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1654bbb4e17b97dd5f415102e3cd890fb194f242bbbd9dc74d325fe3c756afda"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cleanup-cases/results.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "27f195f68e73d0f92150db1e0a442fa85b3583159a4bec8a46941453fb498c34",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "27f195f68e73d0f92150db1e0a442fa85b3583159a4bec8a46941453fb498c34"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cleanup-preflight/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "364ba6c70ff509204a289469acf503aa08aaad252dd2308f2b6716a8947e4b12",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "364ba6c70ff509204a289469acf503aa08aaad252dd2308f2b6716a8947e4b12"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cleanup-preflight/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "70f63b20bd42ba0584e92226b19a3498313766ea98280858aad903ed6da4556c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "70f63b20bd42ba0584e92226b19a3498313766ea98280858aad903ed6da4556c"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cleanup-preflight/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "70837cc5eb82d07f8f6f296b3f92d51a62707f1f9445907d845a3bef3de1ad2b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "70837cc5eb82d07f8f6f296b3f92d51a62707f1f9445907d845a3bef3de1ad2b"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/generated-output-binding.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "e792a3411da3159e6b07046abe86af6a70a987cafe5a6ab06e3bf4d868122930",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e792a3411da3159e6b07046abe86af6a70a987cafe5a6ab06e3bf4d868122930"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/host.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "63860bbeb37c7afc1f87255da6032e65791fb3c66f4c4379fd83b6e4f2f2ccb9",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "63860bbeb37c7afc1f87255da6032e65791fb3c66f4c4379fd83b6e4f2f2ccb9"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-0-base/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "4af3f30a2765d7c1fe6c8a656647414e14fd1714ae8b07f46acbb3a09d3776e9",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4af3f30a2765d7c1fe6c8a656647414e14fd1714ae8b07f46acbb3a09d3776e9"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-0-base/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "945e22ce13dcf8e9195bff0f591f66c97681f5609067624a2d50b0d2ca8c0f70",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "945e22ce13dcf8e9195bff0f591f66c97681f5609067624a2d50b0d2ca8c0f70"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-0-base/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "833fa5c6a3636773d51404b9514632ff6869c734dd90e791a023648efc68886a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "833fa5c6a3636773d51404b9514632ff6869c734dd90e791a023648efc68886a"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-0.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "5dd1b3bc78d8c5bcecdb79bca0b256ea9f55d1b6b418f0b9318b87d8bbec7ac0",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5dd1b3bc78d8c5bcecdb79bca0b256ea9f55d1b6b418f0b9318b87d8bbec7ac0"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-1-head/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "1161c26b419d1a781954f797bd291b49a8234fb8201a12c1d58d7ce1d1a9089f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1161c26b419d1a781954f797bd291b49a8234fb8201a12c1d58d7ce1d1a9089f"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-1-head/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "df104c856d8c06e7268b171849ee67cf869165be8017df4eea102802ac5b7d93",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "df104c856d8c06e7268b171849ee67cf869165be8017df4eea102802ac5b7d93"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-1-head/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "8f5a41d810b94495f8a5dea692ada6de1a5ab5462ac32ec1dc23d3ddf2e07887",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8f5a41d810b94495f8a5dea692ada6de1a5ab5462ac32ec1dc23d3ddf2e07887"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-1.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "629cef71b6792c83385eace9f312e854568b7ea2cc3272e18464456fa500e040",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "629cef71b6792c83385eace9f312e854568b7ea2cc3272e18464456fa500e040"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-2-head/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "89fdea873b085ffe01a147f94d92785555857e115ccc257536e8d1223e2fface",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "89fdea873b085ffe01a147f94d92785555857e115ccc257536e8d1223e2fface"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-2-head/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "597c42f5f331bc17550e431dae7e63cb6f3142c539073a1955de069b85f5c1db",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "597c42f5f331bc17550e431dae7e63cb6f3142c539073a1955de069b85f5c1db"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-2-head/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "6da800273c605cf7bf075d7009463287105b02d1fd58ffc7001b688c09916501",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6da800273c605cf7bf075d7009463287105b02d1fd58ffc7001b688c09916501"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-2.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "f84ffa51910684f22bbf89467fe4c9a66556c91ab33472501907695e2c6b4eda",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f84ffa51910684f22bbf89467fe4c9a66556c91ab33472501907695e2c6b4eda"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-3-base/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "e88a25d20b8629b81b72d2bc2b9042fc800146b368f32337c41f79b04444db2b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e88a25d20b8629b81b72d2bc2b9042fc800146b368f32337c41f79b04444db2b"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-3-base/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "a83536f2062c947e86183a3844fece0cd722f9b2250de1230d713804526c60ea",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a83536f2062c947e86183a3844fece0cd722f9b2250de1230d713804526c60ea"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-3-base/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "abee771d7d72916376883f69398db6e0491ce307ab03a4aa5e955d523700c08b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "abee771d7d72916376883f69398db6e0491ce307ab03a4aa5e955d523700c08b"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-3.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "16efd2c1f6d0b9dfe259fc85765555b0857ce8401fffde30502f4a44f87289ed",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "16efd2c1f6d0b9dfe259fc85765555b0857ce8401fffde30502f4a44f87289ed"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-4-base/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "1b63e529beaacce5d2532a01fdb19d31dd272b5dc846bb42128c7addbf442751",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1b63e529beaacce5d2532a01fdb19d31dd272b5dc846bb42128c7addbf442751"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-4-base/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "bf799c8017737a94b877f5beb1f59869906466b850f79a37e3b0c7c14bd7e992",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bf799c8017737a94b877f5beb1f59869906466b850f79a37e3b0c7c14bd7e992"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-4-base/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "2f99985a930ef8343d2979886d9ad96d11d024c19c4b838b4689ceca24f8ce3e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2f99985a930ef8343d2979886d9ad96d11d024c19c4b838b4689ceca24f8ce3e"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-4.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "c0b21036791c0709cc5d120a090f01197ac75270990dcdf54a7d816803f96369",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c0b21036791c0709cc5d120a090f01197ac75270990dcdf54a7d816803f96369"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-5-head/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "ac9d1d55f059b8b50580fa1c098a354637d3379902ca1a667bfaff1ba3f0f635",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ac9d1d55f059b8b50580fa1c098a354637d3379902ca1a667bfaff1ba3f0f635"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-5-head/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "6b954a5bd1bae7a8eeb92bdaa0faf0ebb4620f0ae1e1a0b0cf29814ace07cb2f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6b954a5bd1bae7a8eeb92bdaa0faf0ebb4620f0ae1e1a0b0cf29814ace07cb2f"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-5-head/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "b18e216790844fa1ca0f0e32117c66f395d22b727f79d8fd4bd7daca7b6d7457",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b18e216790844fa1ca0f0e32117c66f395d22b727f79d8fd4bd7daca7b6d7457"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-5.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "da9e671836c023e57eec96b8480ce77c63a32b647a21a379c1ce4cfa1055e023",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "da9e671836c023e57eec96b8480ce77c63a32b647a21a379c1ce4cfa1055e023"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-0-base/generated-tree.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "fe369ed3a1786d5ce209edfa589d389bd7e148dfa922243773aaa22e72fce5d4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fe369ed3a1786d5ce209edfa589d389bd7e148dfa922243773aaa22e72fce5d4"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-0-base/junit.xml.txt": {
+      "before_sha256": null,
+      "after_sha256": "8a94c9a161d1255f220283ad513cfb5221f8b523695e4907384da6553f047c19",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8a94c9a161d1255f220283ad513cfb5221f8b523695e4907384da6553f047c19"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-0-base/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "734a8e3d9fbe11f88bf06103bed71a9c78db4e6c1f34b73faad436372a56b4e3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "734a8e3d9fbe11f88bf06103bed71a9c78db4e6c1f34b73faad436372a56b4e3"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-0-base/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "d6472844f2098261c42ca7e5aceee8191bd102005cd6bc6d9b142b890b3e6098",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d6472844f2098261c42ca7e5aceee8191bd102005cd6bc6d9b142b890b3e6098"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-0-base/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "9b1c644d02e4b68e19b32d5408ff8f58e27b74da969a231ca4e3c3933c83bc76",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9b1c644d02e4b68e19b32d5408ff8f58e27b74da969a231ca4e3c3933c83bc76"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-1-head/generated-tree.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "a2bb0eea511215e2cdaf093c0f3e377ff18b805c2059062dff1973c78248c59d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a2bb0eea511215e2cdaf093c0f3e377ff18b805c2059062dff1973c78248c59d"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-1-head/junit.xml.txt": {
+      "before_sha256": null,
+      "after_sha256": "cbb67c368b81bfc56b9a5d89c3494a30de31c2c0a5fb826009b4154879ced032",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "cbb67c368b81bfc56b9a5d89c3494a30de31c2c0a5fb826009b4154879ced032"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-1-head/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "d737912f8f8f49269f8af38b640b3e13588a7591a318d0c53fd8ff793fc17db5",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d737912f8f8f49269f8af38b640b3e13588a7591a318d0c53fd8ff793fc17db5"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-1-head/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "e65744120f96b77ada19957371c5fb39fd5d3edf108791a3bab56f64a5559645",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e65744120f96b77ada19957371c5fb39fd5d3edf108791a3bab56f64a5559645"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-1-head/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "8c76fcd3d4c2d57d194098eb1ceca9cc3735aeafe02fbb6dec7cccdfa8d4fbe2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8c76fcd3d4c2d57d194098eb1ceca9cc3735aeafe02fbb6dec7cccdfa8d4fbe2"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-2-head/generated-tree.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "a2bb0eea511215e2cdaf093c0f3e377ff18b805c2059062dff1973c78248c59d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a2bb0eea511215e2cdaf093c0f3e377ff18b805c2059062dff1973c78248c59d"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-2-head/junit.xml.txt": {
+      "before_sha256": null,
+      "after_sha256": "db5c2ce47f3c596edcc31c685457ba709d41d48eff2076ceb643e7065bbbc5a7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "db5c2ce47f3c596edcc31c685457ba709d41d48eff2076ceb643e7065bbbc5a7"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-2-head/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "81357c0a949c07193861aac19cf935d8f679f52cebb32bc1a0dc9c6645a46937",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "81357c0a949c07193861aac19cf935d8f679f52cebb32bc1a0dc9c6645a46937"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-2-head/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "5e3b509997488041571a6f9157fe05f7e90fa8b1abe7cb427705efe7271ed9b2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5e3b509997488041571a6f9157fe05f7e90fa8b1abe7cb427705efe7271ed9b2"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-2-head/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "692e3d1f9b7722f1caedbc943d1584a0324b8d66a9f08587e9945d20277452ca",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "692e3d1f9b7722f1caedbc943d1584a0324b8d66a9f08587e9945d20277452ca"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-3-base/generated-tree.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "fe369ed3a1786d5ce209edfa589d389bd7e148dfa922243773aaa22e72fce5d4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fe369ed3a1786d5ce209edfa589d389bd7e148dfa922243773aaa22e72fce5d4"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-3-base/junit.xml.txt": {
+      "before_sha256": null,
+      "after_sha256": "7e88a936c3249ea06f312e3de9e77cb0bd2c74648bc021bfe5eea6b7e29faeb2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "7e88a936c3249ea06f312e3de9e77cb0bd2c74648bc021bfe5eea6b7e29faeb2"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-3-base/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "293d82d3d3b55512fd957f31ed796d26e2d9ae2929f0bcb234d253d7a29684f8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "293d82d3d3b55512fd957f31ed796d26e2d9ae2929f0bcb234d253d7a29684f8"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-3-base/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "2720a8794fae75cae3d5532b3fd13aad446a99bc51b656d1dae179d678cd1082",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2720a8794fae75cae3d5532b3fd13aad446a99bc51b656d1dae179d678cd1082"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-3-base/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "12bae7f8b85653d077bd8064a3866c81e975efa2bf36c9f5f2f79c1a61ae28a3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "12bae7f8b85653d077bd8064a3866c81e975efa2bf36c9f5f2f79c1a61ae28a3"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-4-base/generated-tree.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "fe369ed3a1786d5ce209edfa589d389bd7e148dfa922243773aaa22e72fce5d4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fe369ed3a1786d5ce209edfa589d389bd7e148dfa922243773aaa22e72fce5d4"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-4-base/junit.xml.txt": {
+      "before_sha256": null,
+      "after_sha256": "205c8f7922b8eba6864c38bc5e4e26874fc09f018a85684906137b635a6054f2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "205c8f7922b8eba6864c38bc5e4e26874fc09f018a85684906137b635a6054f2"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-4-base/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "ed50d5924aa06f64137e1d8454956c8de72071b5055649013b244b942dc4d4d8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ed50d5924aa06f64137e1d8454956c8de72071b5055649013b244b942dc4d4d8"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-4-base/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "63bff8ff69abe0423f89d2e84137526365055d2302d375590207f4a38783044d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "63bff8ff69abe0423f89d2e84137526365055d2302d375590207f4a38783044d"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-4-base/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "9d4d327acbf9eb85033753645bfa2aae543c34b2735644ed61b6ab33a4613c5b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9d4d327acbf9eb85033753645bfa2aae543c34b2735644ed61b6ab33a4613c5b"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-5-head/generated-tree.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "a2bb0eea511215e2cdaf093c0f3e377ff18b805c2059062dff1973c78248c59d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a2bb0eea511215e2cdaf093c0f3e377ff18b805c2059062dff1973c78248c59d"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-5-head/junit.xml.txt": {
+      "before_sha256": null,
+      "after_sha256": "d0d0f654bcb530e93b4d0bb8c0180f9774e50e0dc9c6e9c98275bd266a3c8adb",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d0d0f654bcb530e93b4d0bb8c0180f9774e50e0dc9c6e9c98275bd266a3c8adb"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-5-head/pending.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "2d399da394cbf89ce8adf7b640808ad11e345cdb4cacb9af8f67bd93d4db6a53",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2d399da394cbf89ce8adf7b640808ad11e345cdb4cacb9af8f67bd93d4db6a53"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-5-head/receipt.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "b391f109ad8f5e92ff1f09b4105c36a25c571a1420d25fcc3c686a25f6e823c4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b391f109ad8f5e92ff1f09b4105c36a25c571a1420d25fcc3c686a25f6e823c4"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-5-head/resource.txt.txt": {
+      "before_sha256": null,
+      "after_sha256": "121444448b72d1b6a151ecdd205e28eda50485cf135a043aa1981b91d00fd92a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "121444448b72d1b6a151ecdd205e28eda50485cf135a043aa1981b91d00fd92a"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/receipts.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "052d962ebc9ba90ad4c9e6a9568b6462cac9106ce166abcd4092dbae0f71c259",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "052d962ebc9ba90ad4c9e6a9568b6462cac9106ce166abcd4092dbae0f71c259"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/relative-budgets.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "8c8fd604cca64595d7dbba43d5d113f6f577ad8672258872893b39cc34f8875a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8c8fd604cca64595d7dbba43d5d113f6f577ad8672258872893b39cc34f8875a"
+        }
+      }
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/terminal.json.txt": {
+      "before_sha256": null,
+      "after_sha256": "b913e9c355e7c01620d93114ab931318d9c095fd0dae6a948f9c0130633c1383",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b913e9c355e7c01620d93114ab931318d9c095fd0dae6a948f9c0130633c1383"
+        }
+      }
+    },
     "docs/performance/policy-v3/source-token-input-roles-v2.json.txt": {
       "before_sha256": null,
       "after_sha256": "d58c622d12c10d910d679da78801aaea2ff94f3d4dfd5fc4c23f6e6f1bbc9d33",
@@ -2591,6 +3351,16 @@
         "@document": {
           "before": null,
           "after": "e341aa43b24f677160b8c77232f9622fd2c174458fba3f8addeea5236c78c832"
+        }
+      }
+    },
+    "docs/performance/source-token-reuse-v2-provenance.json": {
+      "before_sha256": null,
+      "after_sha256": "1bfcefb8867aa7a3e3558449bde7ca0df296f82f11802c2fb1682e9db6a0c577",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1bfcefb8867aa7a3e3558449bde7ca0df296f82f11802c2fb1682e9db6a0c577"
         }
       }
     },
@@ -19096,11 +19866,11 @@
     },
     "tools/performance_category_migration.py": {
       "before_sha256": null,
-      "after_sha256": "44903922a14cf9a181b988604c9113e4a54854972e9250666cc1fbb3061ce01f",
+      "after_sha256": "e8a162edf3ea26a3497fc86d4b13a1b611b0c89a6c0e99c46c4a0b0bffb9c2a1",
       "owners": {
         "@module": {
           "before": null,
-          "after": "f0e4e6edb155e65ad56668e05850a566c7452fb306e4316710f97a8fe03a8735"
+          "after": "ccf60ba5769c55b35a99be94b738cbc2c0058b849ef22575bf98cc972a5d1870"
         },
         "_digest": {
           "before": null,
@@ -20721,6 +21491,14 @@
       "source_obligation": null,
       "unchanged_work": "No runtime, measured workload, dependency or original assertion change. Fresh source-token v2 evidence and current serial smoke are still required; this row does not certify them."
     },
+    "docs/performance/current/source-token-reuse-v2.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
     "docs/performance/history/source-token-reuse-v1.json.txt": {
       "category": "governance",
       "operations": [],
@@ -21153,6 +21931,606 @@
       "source_obligation": "Retain the exact original operation-map bytes and original measured inventories. Require the source-reviewed applicability adapter, exact proof membership and hashes, and unchanged existing operations and all non-operation fields.",
       "unchanged_work": "No historical measurement or input map is rewritten. No report-provided exclusion, wildcard owner, rules repair, relaxed numerical budget or omitted CI gate is introduced. Current actual assessment, fresh source-token comparison and serial smoke remain required."
     },
+    "docs/performance/policy-v3/source-token-campaign-20261015/ANALYSIS.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/DOWNLOAD_MANIFEST.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/EXACT_BINDING_GO.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/EXACT_BINDING_REVIEW.md.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/FINAL_BINDING.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/INVENTORY.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/INVOCATIONS.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/REMOTE_IDENTITY_PROOF.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cheap-family/junit.xml.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cheap-family/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cheap-family/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cheap-family/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cleanup-cases/results.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cleanup-preflight/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cleanup-preflight/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/cleanup-preflight/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/generated-output-binding.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/host.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-0-base/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-0-base/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-0-base/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-0.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-1-head/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-1-head/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-1-head/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-1.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-2-head/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-2-head/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-2-head/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-2.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-3-base/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-3-base/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-3-base/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-3.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-4-base/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-4-base/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-4-base/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-4.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-5-head/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-5-head/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-5-head/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/micro-5.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-0-base/generated-tree.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-0-base/junit.xml.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-0-base/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-0-base/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-0-base/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-1-head/generated-tree.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-1-head/junit.xml.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-1-head/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-1-head/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-1-head/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-2-head/generated-tree.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-2-head/junit.xml.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-2-head/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-2-head/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-2-head/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-3-base/generated-tree.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-3-base/junit.xml.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-3-base/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-3-base/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-3-base/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-4-base/generated-tree.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-4-base/junit.xml.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-4-base/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-4-base/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-4-base/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-5-head/generated-tree.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-5-head/junit.xml.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-5-head/pending.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-5-head/receipt.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/original-5-head/resource.txt.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/receipts.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/relative-budgets.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
+    "docs/performance/policy-v3/source-token-campaign-20261015/terminal.json.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
     "docs/performance/policy-v3/source-token-input-roles-v2.json.txt": {
       "category": "governance",
       "operations": [],
@@ -21185,6 +22563,14 @@
       "source_obligation": null,
       "unchanged_work": "Preserve original assertions, full input binding, real sample counts, thresholds, historical records and required current serial smoke."
     },
+    "docs/performance/source-token-reuse-v2-provenance.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve reviewed provenance, evidence admission and repository governance for the exact CI restructuring scope; no engine behavior is introduced by this artifact.",
+      "source_obligation": "Retain original source identities, assertion obligations and independent review evidence without weakening any gate.",
+      "unchanged_work": "Historical measured maps and reports remain unchanged. This classification does not waive fresh comparisons, serial smoke, or the full required pipeline."
+    },
     "scripts/build_external_contract.py": {
       "category": "cache_policy",
       "operations": [
@@ -21193,7 +22579,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "Reuse only immutable proposal token tuples after fresh source enumeration and exact byte equality in a sequential generator instance. Detailed actual-base/head tool comparison is mandatory and pending.",
+      "rationale": "Reuse only immutable proposal token tuples after fresh source enumeration and exact byte equality in a sequential generator instance. The complete three-sample-per-side comparison against actual base22a12094 and fixed measured head241f413c is retained from native run38677337982; current-tree applicability and current smoke remain mandatory.",
       "source_obligation": "Keep the original literal assignment grammar, source paths, current file reads and malformed-input errors; never reuse generated outputs or persistence validation results.",
       "unchanged_work": "Source bytes are reread for every lookup; fresh write, independent check and nested regeneration processes remain separate. All original test assertions and runtime restore/replay paths remain unchanged."
     },
@@ -21273,7 +22659,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "Reuse only immutable proposal token tuples after fresh source enumeration and exact byte equality in a sequential generator instance. Detailed actual-base/head tool comparison is mandatory and pending.",
+      "rationale": "Reuse only immutable proposal token tuples after fresh source enumeration and exact byte equality in a sequential generator instance. The complete three-sample-per-side comparison against actual base22a12094 and fixed measured head241f413c is retained from native run38677337982; current-tree applicability and current smoke remain mandatory.",
       "source_obligation": "Keep the original literal assignment grammar, source paths, current file reads and malformed-input errors; never reuse generated outputs or persistence validation results.",
       "unchanged_work": "Source bytes are reread for every lookup; fresh write, independent check and nested regeneration processes remain separate. All original test assertions and runtime restore/replay paths remain unchanged."
     },
@@ -21285,7 +22671,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "A bounded external comparison controller measures actual base/head source reuse and the complete original regeneration test with fresh independent processes.",
+      "rationale": "Retain the original external measurement controller and its historical provenance. Fresh v2 validation uses its fixed six-member workload/harness binding plus the separately reviewed seventh campaign controller, with all original regeneration assertions and fresh independent processes.",
       "source_obligation": null,
       "unchanged_work": "No engine rule, original semantic assertion or historical evidence is modified; the new tool family still requires three real matched samples and current smoke."
     },

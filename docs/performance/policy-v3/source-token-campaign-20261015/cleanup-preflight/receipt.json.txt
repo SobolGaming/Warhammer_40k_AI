@@ -1,0 +1,22 @@
+{
+  "name": "cleanup-preflight",
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "-o",
+    "/home/runner/work/_temp/manifest-output/cleanup-preflight/resource.txt",
+    "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation/.venv/bin/python",
+    "-B",
+    "/home/runner/work/_temp/manifest-harness/check_ci_attribution_supervisor.py",
+    "checks",
+    "/home/runner/work/_temp/manifest-output/cleanup-cases"
+  ],
+  "cap": 120,
+  "exit_code": 0,
+  "timeout": false,
+  "cancel_signal": null,
+  "pid": 3136,
+  "seconds": 14.32887484699998,
+  "cleanup_complete": true,
+  "descendants_remained": false
+}

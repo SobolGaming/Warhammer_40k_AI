@@ -1,0 +1,70 @@
+{
+  "status": "local-final-binding-awaiting-exact-review-GO",
+  "head": "fe7566c89f6e170f493691430281847a547ae385",
+  "tree": "0cf8595d0796fec91d98a340489bfec1608c3f2f",
+  "parent": "a67e2fa62e61f7cb790737089e0d879bcf5161b4",
+  "source_packet_seal": "2d9a06eea6667b1321ac7890ff3ab8764dee81cfa1d4a0f785c746c843a5340e",
+  "seven_python_payloads_byte_identical": true,
+  "manifest_only_status_change": true,
+  "manifest_before_sha256": "26e1ab240a4c369dead8b86a0be26fe4968c1fd8de14659e45bbd2bb48d9344c",
+  "manifest_after_sha256": "b7cb26b6796258880b9eb999db2b8c858ce763804f7f42baff8b174b2b8f1a59",
+  "workflow_only_manifest_hash_change": true,
+  "files": {
+    "ci/source-token-campaign/check_ci_attribution_supervisor.py": {
+      "sha256": "7c8b85d11761f71cd63ae66fb1647f63fd8fddab9f60094cafba068ec3652008",
+      "git_blob": "cf5f85c14670ef717f8e381e7da07f2ba06597da"
+    },
+    "ci/source-token-campaign/ci_attribution_supervisor.py": {
+      "sha256": "efbb32849dbe057f8a7df57c76be881ec69f1353da4d80a018850ee802e05cb9",
+      "git_blob": "a56426e3341365d27b28fd7eac8a9d821692c8a0"
+    },
+    "ci/source-token-campaign/manifest_campaign.py": {
+      "sha256": "efbe57a5785715ff88db11230dab083ffb43cd6d522e9df785b9b5b64b6489f9",
+      "git_blob": "ce7f5b29e6c31781952abbb70d5ecc3fb62df501"
+    },
+    "ci/source-token-campaign/reconstruction_worker.py": {
+      "sha256": "d8f157d87c6a88008bcee8eecdb77bc23dd4b2885fea738a17595ab4ab3e4a3f",
+      "git_blob": "beaaed11cae326bc9ba080f94a33535d0faf126a"
+    },
+    "ci/source-token-campaign/source_reuse_experiment.py": {
+      "sha256": "1b5989d63b299de7d605b3cde95c9ee5f75bccc832b7a26844048d75bf34e0ba",
+      "git_blob": "73883b666c8a69eacf99e9ebb634afa43a342c7d"
+    },
+    "ci/source-token-campaign/source_token_arm.py": {
+      "sha256": "0df68e89b320f13191d1899f96179fd19b656a23d5d1c76b620a785085a7fd4e",
+      "git_blob": "4ff3f364b62d1c48067f8215655dc792fadab3bc"
+    },
+    "ci/source-token-campaign/source_token_campaign.py": {
+      "sha256": "cf3b2b93e8938843ad31fe155d06e727c1f6c714022c0fede30b40daa08b9049",
+      "git_blob": "b247c4b0707f48d60be8ef9f9abe0bc2967a5737"
+    },
+    "ci/source-token-campaign/manifest.json": {
+      "sha256": "b7cb26b6796258880b9eb999db2b8c858ce763804f7f42baff8b174b2b8f1a59",
+      "git_blob": "783c4a6d700fc884db4e6dc2446dac91e8870738"
+    },
+    ".github/workflows/source-token-v3.yml": {
+      "sha256": "3dac4638d06dbc30c13e47fcfe7bc3e281a711d3a190d9a2d940524372cb18ff",
+      "git_blob": "47a17bb4c37c5a61e41ee27858d08b4d0cfe0ab8"
+    }
+  },
+  "base": "22a12094cfe3839d8fe8c5296ec0a7e7d32abade",
+  "measured_head": "241f413ce9b83586d0aff4fd87ce50f8157c0163",
+  "micro_execution_seconds": 90,
+  "micro_envelope_seconds": 100,
+  "job_seconds": 3600,
+  "absolute_seconds": 3480,
+  "upload_reserve_seconds": 120,
+  "maximum_child_envelopes_seconds": 3330,
+  "event": {
+    "repository": "SobolGaming/Warhammer_40k_AI",
+    "pull_request": 587,
+    "branch": "codex/test-ci-restructure",
+    "label": "ci-source-token-v3",
+    "workflow": "source-token-v3-matched-validation",
+    "expected_head": "fe7566c89f6e170f493691430281847a547ae385",
+    "attempt": 1,
+    "retries": 0
+  },
+  "published": false,
+  "launched": false
+}

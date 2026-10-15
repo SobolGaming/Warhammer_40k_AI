@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "-o",
+    "/home/runner/work/_temp/manifest-output/original-0-base/resource.txt",
+    "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base/.venv/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+    "-q",
+    "-n",
+    "0",
+    "--no-cov",
+    "--durations=0",
+    "--durations-min=0",
+    "--basetemp=/home/runner/work/_temp/manifest-output/original-0-base/tmp",
+    "--junitxml=/home/runner/work/_temp/manifest-output/original-0-base/junit.xml"
+  ],
+  "envelope_seconds": 420,
+  "execution_seconds": 410
+}
