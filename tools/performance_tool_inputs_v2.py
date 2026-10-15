@@ -49,6 +49,8 @@ CONTROL = (
         "tests/code_quality/test_performance_tool_inputs_v2.py",
         "tests/code_quality/tool_input_history.py",
         "tests/code_quality/test_runtime_manifest_reuse.py",
+        "tools/performance_reconstruction_campaign.py",
+        "tests/code_quality/test_performance_reconstruction_campaign.py",
     }
 )
 SELECTED = TREATMENT | DERIVED | CONTROL | original.REQUIRED

@@ -495,6 +495,48 @@ def validate_comparison(
     expected_inputs: dict[str, str],
     expected_binding: dict[str, object] | None = None,
 ) -> list[dict[str, object]]:
+    from tools import performance_reconstruction_campaign as campaign
+
+    if campaign.required(base=base, runtime_id=runtime_id, family=family) or (
+        report.get("schema") == campaign.SCHEMA or "ordered_pairs" in report
+    ):
+        return campaign.validate_report(
+            report,
+            base=base,
+            runtime_id=runtime_id,
+            input_digest=input_digest,
+            family=family,
+            specification=specification,
+            base_runtime_id=base_runtime_id,
+            expected_inputs=expected_inputs,
+            expected_binding=expected_binding,
+            validate_single=_validate_single_comparison,
+        )
+    return _validate_single_comparison(
+        report,
+        base=base,
+        runtime_id=runtime_id,
+        input_digest=input_digest,
+        family=family,
+        specification=specification,
+        base_runtime_id=base_runtime_id,
+        expected_inputs=expected_inputs,
+        expected_binding=expected_binding,
+    )
+
+
+def _validate_single_comparison(
+    report: dict[str, object],
+    *,
+    base: str,
+    runtime_id: str,
+    input_digest: str,
+    family: str,
+    specification: dict[str, object],
+    base_runtime_id: str,
+    expected_inputs: dict[str, str],
+    expected_binding: dict[str, object] | None = None,
+) -> list[dict[str, object]]:
     tool_binding = binding_enabled(family, specification)
     from tools import performance_tool_inputs_v2 as fresh
 

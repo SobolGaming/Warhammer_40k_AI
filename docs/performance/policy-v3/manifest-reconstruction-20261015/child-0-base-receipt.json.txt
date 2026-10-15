@@ -1,0 +1,28 @@
+{
+  "name": "original-0-base",
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "-o",
+    "/home/runner/work/_temp/manifest-output/original-0-base/resource.txt",
+    "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation/.venv/bin/python",
+    "-B",
+    "/home/runner/work/_temp/manifest-harness/reconstruction_worker.py",
+    "--workload",
+    "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/implementation",
+    "--runtime",
+    "/home/runner/work/Warhammer_40k_AI/Warhammer_40k_AI/base",
+    "--revision",
+    "22a12094cfe3839d8fe8c5296ec0a7e7d32abade",
+    "--output",
+    "/home/runner/work/_temp/manifest-output/original-0-base"
+  ],
+  "cap": 300,
+  "exit_code": 0,
+  "timeout": false,
+  "cancel_signal": null,
+  "pid": 3154,
+  "seconds": 210.304354041,
+  "cleanup_complete": true,
+  "descendants_remained": false
+}

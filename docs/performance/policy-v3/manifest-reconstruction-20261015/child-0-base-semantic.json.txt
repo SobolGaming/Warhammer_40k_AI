@@ -1,0 +1,21 @@
+{
+  "complete": true,
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3dac52df9bba355343defa9547c58e6b1feb03f8b45e5d6d32031e611075d9bb",
+  "outcomes": {
+    "ingress": "f87e4a6e107cc81ae580ec38dd4a4714b1fb55e9273fa0ab25982eafc2078de2",
+    "rapid_disembark": "b34db82c108033de21d557325dade0487c694c73e6bda11c04c204896b5b906b",
+    "later_decision": "af4dddf392bfc35c1a08d3f52233446be18cbd3fe5f9cd0fb97b42ac754544a7"
+  },
+  "python": "3.14.5 (main, May 11 2026, 02:45:53) [GCC 13.3.0]",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "dependencies": {
+    "pytest": "9.0.3",
+    "shapely": "2.1.2",
+    "numpy": "2.4.6",
+    "orjson": "3.11.9",
+    "msgspec": "0.21.1",
+    "pydantic": "2.13.4",
+    "z3-solver": "4.15.4.0"
+  },
+  "qualification": "Original timed samples unchanged; preparation fingerprint and original separate profile excluded. Original fresh-state and full-payload checks retained. No extra alias/Fight diagnostic or full-game claim."
+}

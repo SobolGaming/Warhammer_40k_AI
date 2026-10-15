@@ -218,6 +218,15 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
             else:
                 # Fresh v2 records bind current inputs; no historical applicability bridge.
                 measured_inputs, applicability_sha = inputs, None
+        elif (
+            family == "reconstruction"
+            and comparison.get("schema") == "matched-reconstruction-abba-v1"
+        ):
+            from tools.performance_reconstruction_campaign import retained_inputs
+
+            measured_inputs, applicability_sha = retained_inputs(
+                root, current=inputs, report=comparison, base=base, runtime_id=runtime_id
+            )
         else:
             measured_inputs, applicability_sha = retained_comparison_inputs(
                 root, current=inputs, report=comparison, base=base, runtime_id=runtime_id

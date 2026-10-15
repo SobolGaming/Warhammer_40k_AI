@@ -11,9 +11,12 @@ from tools.performance_tool_inputs import (
     APPLICABILITY,
     MAP_PATH,
     REPORT_ARCHIVE,
+    REPORT_SHA256,
     SPEC_ARCHIVE,
     digest,
 )
+
+HISTORICAL_REPORT = "docs/performance/current/source-token-reuse-v1.json.txt"
 
 REVISION = "40a727563355ecd29cc981ad141dd194a5690a99"
 INPUT_DIGEST = "5bca782a3ad86167109e6b80f4f18619a7620e3a4383adee58efd557974e85a9"
@@ -36,7 +39,7 @@ def archival_fixture(root: Path, destination: Path) -> tuple[dict[str, str], dic
             "pyproject.toml",
             MAP_PATH,
             SPEC_ARCHIVE,
-            REPORT_ARCHIVE,
+            HISTORICAL_REPORT,
             APPLICABILITY,
         }:
             assert kind == "blob"
@@ -60,14 +63,15 @@ def archival_fixture(root: Path, destination: Path) -> tuple[dict[str, str], dic
         raw = payload[start:end]
         assert payload[end : end + 1] == b"\n"
         offset = end + 1
-        if name in {SPEC_ARCHIVE, REPORT_ARCHIVE, APPLICABILITY, MAP_PATH}:
-            documents[name] = raw
-        if name not in {SPEC_ARCHIVE, REPORT_ARCHIVE, APPLICABILITY}:
+        if name in {SPEC_ARCHIVE, HISTORICAL_REPORT, APPLICABILITY, MAP_PATH}:
+            documents[REPORT_ARCHIVE if name == HISTORICAL_REPORT else name] = raw
+        if name not in {SPEC_ARCHIVE, HISTORICAL_REPORT, APPLICABILITY}:
             inputs[name] = hashlib.sha256(raw).hexdigest()
     assert offset == len(payload)
     assert digest(inputs) == INPUT_DIGEST
     assert hashlib.sha256(documents[APPLICABILITY]).hexdigest() == PROOF_SHA256
     assert hashlib.sha256(documents[MAP_PATH]).hexdigest() == MAP_SHA256
+    assert hashlib.sha256(documents[REPORT_ARCHIVE]).hexdigest() == REPORT_SHA256
     for name, raw in documents.items():
         target = destination / name
         target.parent.mkdir(parents=True, exist_ok=True)

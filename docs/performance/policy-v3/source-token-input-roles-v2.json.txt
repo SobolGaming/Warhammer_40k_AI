@@ -35,7 +35,9 @@
     "tests/code_quality/test_performance_tool_inputs_v2.py": "Evidence admission or separate quality control, not loaded by the original write/independent-check workload; complete per-side bytes remain bound.",
     "tests/code_quality/test_runtime_manifest_reuse.py": "Evidence admission or separate quality control, not loaded by the original write/independent-check workload; complete per-side bytes remain bound.",
     "tests/code_quality/tool_input_history.py": "Evidence admission or separate quality control, not loaded by the original write/independent-check workload; complete per-side bytes remain bound.",
-    "tools/performance_tool_inputs_v2.py": "Evidence admission or separate quality control, not loaded by the original write/independent-check workload; complete per-side bytes remain bound."
+    "tools/performance_tool_inputs_v2.py": "Evidence admission or separate quality control, not loaded by the original write/independent-check workload; complete per-side bytes remain bound.",
+    "tools/performance_reconstruction_campaign.py": "Reconstruction evidence admission and its separate quality controls; not imported by the original write/independent-check source-token workload. Complete actual per-side bytes remain bound.",
+    "tests/code_quality/test_performance_reconstruction_campaign.py": "Reconstruction evidence admission and its separate quality controls; not imported by the original write/independent-check source-token workload. Complete actual per-side bytes remain bound."
   },
   "required_dependencies": [
     "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Abilities.json",
