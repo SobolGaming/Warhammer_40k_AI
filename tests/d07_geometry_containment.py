@@ -14,8 +14,10 @@ import stat
 from pathlib import Path
 from typing import TypedDict, cast
 
-RECIPE = "tests/data/d07_geometry_containment_v1.json"
-RECIPE_SHA256 = "9a48238773d43f9b0bca31a87921eea9854b71a242f0004ba98121f2b39dc676"
+HISTORICAL_RECIPE = "tests/data/d07_geometry_containment_v1.json"
+HISTORICAL_RECIPE_SHA256 = "9a48238773d43f9b0bca31a87921eea9854b71a242f0004ba98121f2b39dc676"
+RECIPE = "tests/data/d07_geometry_containment_v2.json"
+RECIPE_SHA256 = "f41c809e76eeec51ef4d2f723020c9035ef84bfbb42b0f109a09445ed3d87abe"
 LIVE = "src/warhammer40k_core/engine/phases/movement_resolution_flow.py"
 ARCHIVE = "data/source_audits/d07/baseline/" + LIVE + ".txt"
 
@@ -121,12 +123,15 @@ def verify_d07_geometry_containment(root: Path) -> None:
     if root.is_symlink() or root.is_junction():
         raise ValueError("D07 root must be an owned directory.")
     root = root.resolve(strict=True)
+    historical = read_owned_geometry_member(root, HISTORICAL_RECIPE)
+    if _sha256(historical) != HISTORICAL_RECIPE_SHA256:
+        raise ValueError("D07 historical recipe changed.")
     raw = read_owned_geometry_member(root, RECIPE)
     if _sha256(raw) != RECIPE_SHA256:
         raise ValueError("D07 containment recipe changed.")
     recipe = cast(GeometryRecipe, json.loads(raw))
     if (
-        recipe["version"] != "d07-geometry-containment-v1"
+        recipe["version"] != "d07-geometry-containment-v2-reviewed-fnp"
         or recipe["live"] != LIVE
         or recipe["archive"] != ARCHIVE
     ):

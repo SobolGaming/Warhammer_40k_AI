@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-
 from tests import d07_geometry_containment as geometry
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,7 +22,12 @@ def preserved_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
     root = tmp_path_factory.mktemp("d07-geometry")
     shutil.copytree(ROOT / "src", root / "src")
     recipe = cast(geometry.GeometryRecipe, json.loads((ROOT / geometry.RECIPE).read_bytes()))
-    for name in (geometry.RECIPE, geometry.ARCHIVE, *recipe["source_evidence"]):
+    for name in (
+        geometry.RECIPE,
+        geometry.HISTORICAL_RECIPE,
+        geometry.ARCHIVE,
+        *recipe["source_evidence"],
+    ):
         destination = root / name
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes((ROOT / name).read_bytes())
@@ -190,3 +194,143 @@ def test_d07_membership_recipe_and_archive_are_bound(preserved_root: Path, chang
             target.unlink()
         else:
             target.write_bytes(raw)
+
+
+def test_d07_reviewed_fnp_successor_is_exactly_five_digest_substitutions() -> None:
+    transition_raw = (ROOT / "tests/data/reviewed_fnp_record_transition.json").read_bytes()
+    assert (
+        hashlib.sha256(transition_raw).hexdigest()
+        == "a0a30709ad38cc2bf051877c1439b774325db745ae5871c4744c19db714071e9"
+    )
+    transition = json.loads(transition_raw)
+    historical = (ROOT / geometry.HISTORICAL_RECIPE).read_bytes()
+    successor = (ROOT / geometry.RECIPE).read_bytes()
+    assert hashlib.sha256(historical).hexdigest() == geometry.HISTORICAL_RECIPE_SHA256
+    assert hashlib.sha256(successor).hexdigest() == geometry.RECIPE_SHA256
+    expected = json.loads(historical)
+    current = json.loads(successor)
+    assert len(expected["source_files"]) == len(current["source_files"]) == 3104
+    assert expected["source_files"].keys() == current["source_files"].keys()
+    substitutions = transition["runtime_digest_substitutions"]
+    assert len(substitutions) == 5
+    assert {r["path"] for r in substitutions} == {
+        "src/warhammer40k_core/_engine_build_manifest.json",
+        "src/warhammer40k_core/engine/attack_sequence_destruction_authority.py",
+        "src/warhammer40k_core/engine/model_destruction_cause_attack_restore.py",
+        "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py",
+        "src/warhammer40k_core/engine/retained_demise_removal.py",
+    }
+    for row in substitutions:
+        assert expected["source_files"][row["path"]] == row["historical_sha"]
+        expected["source_files"][row["path"]] = row["candidate_sha"]
+        assert hashlib.sha256((ROOT / row["path"]).read_bytes()).hexdigest() == row["candidate_sha"]
+    expected["version"] = "d07-geometry-containment-v2-reviewed-fnp"
+    assert current == expected
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "src/warhammer40k_core/_engine_build_manifest.json",
+        "src/warhammer40k_core/engine/attack_sequence_destruction_authority.py",
+        "src/warhammer40k_core/engine/model_destruction_cause_attack_restore.py",
+        "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py",
+        "src/warhammer40k_core/engine/retained_demise_removal.py",
+        "src/warhammer40k_core/engine/psychic_ability_usage.py",
+    ],
+)
+def test_d07_reviewed_successor_runtime_drift_refuses_before_archive(
+    preserved_root: Path, monkeypatch: pytest.MonkeyPatch, path: str
+) -> None:
+    geometry.verify_d07_geometry_containment(preserved_root)
+    target = preserved_root / path
+    original = target.read_bytes()
+    target.write_bytes(original + b"\n ")
+    reads: list[str] = []
+    read = geometry.read_owned_geometry_member
+
+    def tracked(root: Path, name: str) -> bytes:
+        reads.append(name)
+        return read(root, name)
+
+    monkeypatch.setattr(geometry, "read_owned_geometry_member", tracked)
+    try:
+        with pytest.raises(ValueError, match="D07 live runtime input changed"):
+            geometry.verify_d07_geometry_containment(preserved_root)
+        assert geometry.ARCHIVE not in reads
+    finally:
+        target.write_bytes(original)
+
+
+def test_d07_arbitrary_live_repin_cannot_replace_reviewed_successor(
+    preserved_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path = preserved_root / RETRY_OWNER
+    recipe_path = preserved_root / geometry.RECIPE
+    original, frozen = path.read_bytes(), recipe_path.read_bytes()
+    changed = original + b"\n# arbitrary repin\n"
+    recipe = json.loads(frozen)
+    recipe["source_files"][RETRY_OWNER] = hashlib.sha256(changed).hexdigest()
+    path.write_bytes(changed)
+    recipe_path.write_bytes((json.dumps(recipe, indent=2) + "\n").encode())
+    reads: list[str] = []
+    read = geometry.read_owned_geometry_member
+
+    def tracked(root: Path, name: str) -> bytes:
+        reads.append(name)
+        return read(root, name)
+
+    monkeypatch.setattr(geometry, "read_owned_geometry_member", tracked)
+    try:
+        with pytest.raises(ValueError, match="D07 containment recipe changed"):
+            geometry.verify_d07_geometry_containment(preserved_root)
+        assert geometry.ARCHIVE not in reads
+    finally:
+        path.write_bytes(original)
+        recipe_path.write_bytes(frozen)
+
+
+def test_d07_historical_recipe_remains_authenticated(preserved_root: Path) -> None:
+    path = preserved_root / geometry.HISTORICAL_RECIPE
+    original = path.read_bytes()
+    path.write_bytes(original + b" ")
+    try:
+        with pytest.raises(ValueError, match="D07 historical recipe changed"):
+            geometry.verify_d07_geometry_containment(preserved_root)
+    finally:
+        path.write_bytes(original)
+
+
+def test_order135_reviewed_fnp_metadata_transition_preserves_all_obligations() -> None:
+    transition_raw = (ROOT / "tests/data/reviewed_fnp_record_transition.json").read_bytes()
+    assert (
+        hashlib.sha256(transition_raw).hexdigest()
+        == "a0a30709ad38cc2bf051877c1439b774325db745ae5871c4744c19db714071e9"
+    )
+    transition = json.loads(transition_raw)
+    historical = (ROOT / transition["order135_history"]).read_bytes()
+    assert hashlib.sha256(historical).hexdigest() == transition["order135_history_sha256"]
+    expected = json.loads(historical)
+    changes = transition["order135_leaf_deltas"]
+    assert len(changes) == 4
+    # Exact metadata paths are pinned; no requirement/owner/assertion substitution.
+    assert {row["path"] for row in changes} == {
+        "/current_files_observed/tests/integration/test_fight_on_death_presence.py/sha256",
+        "/current_files_observed/tests/integration/test_fight_on_death_presence.py/bytes",
+        "/tests/tests/integration/test_fight_on_death_presence.py::test_order_30_retained_model_fights_from_original_base_then_is_removed/file_sha256",
+        "/tests/tests/integration/test_fight_on_death_presence.py::test_order_30_other_destruction_triggers_wait_for_retained_model_completion/file_sha256",
+    }
+    # Keys contain slashes, so use their complete authenticated map keys.
+    filename = "tests/integration/test_fight_on_death_presence.py"
+    for row in changes:
+        if row["path"].startswith("/current_files_observed/"):
+            parent = expected["current_files_observed"][filename]
+        else:
+            node = row["path"][len("/tests/") : -len("/file_sha256")]
+            parent = expected["tests"][node]
+        key = row["path"].rsplit("/", 1)[1]
+        assert parent[key] == row["old"]
+        parent[key] = row["new"]
+    actual = (ROOT / transition["order135_output"]).read_bytes()
+    assert hashlib.sha256(actual).hexdigest() == transition["order135_output_sha256"]
+    assert json.loads(actual) == expected
