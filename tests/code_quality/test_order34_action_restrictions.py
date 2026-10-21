@@ -138,6 +138,31 @@ def test_r34_003_live_consumers_stay_within_versioned_work_budgets(case: str) ->
             assert cold[metric] <= maximum, (case, metric, cold)
 
 
+def test_r34_unrestricted_lookup_ceiling_is_inclusive_and_enforced(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from scripts import measure_action_restriction_live as live
+
+    budgets = json.loads((ROOT / "docs/performance/order34/budgets.json").read_text())
+    maximum = budgets["live_cases"]["unrestricted"]["work_limits"]["rules_unit_view_by_id"]
+    result = live.live_sample(profile=True, case="unrestricted")
+    counts = cast(dict[str, int], result["work_counts"])
+
+    def measured_result(*, profile: bool, case: str) -> dict[str, object]:
+        assert profile is True
+        assert case == "unrestricted"
+        return result
+
+    # Exercise the unchanged production budget assertion with a real workload
+    # result; inject only the lookup count at and immediately above the ceiling.
+    monkeypatch.setattr(live, "live_sample", measured_result)
+    counts["rules_unit_view_by_id"] = maximum
+    test_r34_003_live_consumers_stay_within_versioned_work_budgets("unrestricted")
+    counts["rules_unit_view_by_id"] = maximum + 1
+    with pytest.raises(AssertionError, match="rules_unit_view_by_id"):
+        test_r34_003_live_consumers_stay_within_versioned_work_budgets("unrestricted")
+
+
 def test_r34_cold_geometry_work_is_independent_of_repetition_and_case_order() -> None:
     from scripts.measure_action_restriction_live import live_sample
 
