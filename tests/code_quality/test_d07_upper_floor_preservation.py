@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from tests.category_migration_preservation import read_historical_test_bytes
+from tests.d07_geometry_containment import verify_d07_geometry_containment
 from tests.d09_test_preservation_helpers import preserved_d09_predecessor_test_bytes
 from tests.support.section13_preservation import pre_section13_descriptor_bytes
 
@@ -169,12 +170,7 @@ def test_d07_ruins_changes_only_the_monster_endpoint_token() -> None:
 
 
 def test_d07_native_geometry_rejection_owner_is_unchanged() -> None:
-    path = "src/warhammer40k_core/engine/phases/movement_resolution_flow.py"
-    old = (ARCHIVE / "baseline" / (path + ".txt")).read_text(encoding="utf-8")
-    current = (ROOT / path).read_text(encoding="utf-8")
-    assert ast.dump(ast.parse(current), include_attributes=False) == ast.dump(
-        ast.parse(old), include_attributes=False
-    )
+    verify_d07_geometry_containment(ROOT)
 
 
 def test_d07_upper_floor_owners_do_not_re_normalize_catalog_keyword_identity() -> None:
