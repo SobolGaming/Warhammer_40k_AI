@@ -31,6 +31,9 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.attack_sequence_state import AttackSequence
     from warhammer40k_core.engine.decision_controller import DecisionController
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.model_destruction_cause_authority import (
+        ModelDestructionCauseAuthority,
+    )
 
 FAQ20_SOURCE_ID = "faq:ab92e97b-be2b-4125-9ded-fcfa6abe092e"
 
@@ -50,6 +53,59 @@ def retained_fight_removed_event(*, state: GameState, model_instance_id: str) ->
     if len(causes) != 1 or causes[0].model_destroyed_event is None:
         raise GameLifecycleError("Retained Fight removal lacks its consumed cause.")
     return causes[0].model_destroyed_event
+
+
+def require_retained_attack_removed_cause(
+    *, state: GameState, attack_sequence: AttackSequence, damage: DamageApplication
+) -> ModelDestructionCauseAuthority:
+    """Reuse only the consumed source of the still-active retained attack cleanup."""
+    from warhammer40k_core.engine.model_destruction_cause_authority import (
+        model_destruction_cause_authority_by_id_or_none,
+    )
+    from warhammer40k_core.engine.model_destruction_cause_producers import (
+        attack_damage_model_destruction_cause_id,
+    )
+    from warhammer40k_core.engine.retained_destruction_state import DestructionOwnerKind
+
+    removed = retained_fight_removed_event(state=state, model_instance_id=damage.model_instance_id)
+    retained = retained_destruction_for_model(
+        state=state, model_instance_id=damage.model_instance_id
+    )
+    cause_id = attack_damage_model_destruction_cause_id(
+        state=state, attack_sequence=attack_sequence, model_instance_id=damage.model_instance_id
+    )
+    cause = model_destruction_cause_authority_by_id_or_none(state=state, cause_id=cause_id)
+    pending = attack_sequence.current_pending_attack_destruction
+    if (
+        removed is None
+        or retained is None
+        or retained.owner_kind is not DestructionOwnerKind.ATTACK
+        or retained.cause_id != cause_id
+        or cause is None
+        or not cause.source_authority_finalized
+        or cause.model_destroyed_event != removed
+        or pending is None
+        or pending.damage_application != damage
+        or pending.destroyed_model_placement != retained.placement.to_payload()
+        or cause.physical_unit_instance_id != retained.placement.unit_instance_id
+        or cause.rules_unit_instance_id != damage.target_unit_instance_id
+        or cause.producer_context.get("sequence_id") != attack_sequence.sequence_id
+        or cause.producer_context.get("attack_context_id") != attack_sequence.attack_context_id()
+        or cause.producer_context.get("damage_application") != damage.to_payload()
+        or cause.producer_context.get("source_phase") != attack_sequence.source_phase.value
+        or cause.producer_context.get("attacker_player_id") != attack_sequence.attacker_player_id
+        or cause.producer_context.get("attacking_unit_instance_id")
+        != attack_sequence.attacking_unit_instance_id
+        or not isinstance(removed.payload, dict)
+        or removed.payload.get("model_destruction_cause_id") != cause_id
+        or removed.payload.get("sequence_id") != attack_sequence.sequence_id
+        or removed.payload.get("attack_context_id") != attack_sequence.attack_context_id()
+        or removed.payload.get("model_instance_id") != damage.model_instance_id
+        or removed.payload.get("target_unit_instance_id") != damage.target_unit_instance_id
+        or removed.payload.get("removal_record") != cause.producer_context.get("removal_record")
+    ):
+        raise GameLifecycleError("Retained attack consumed cause continuation drift.")
+    return cause
 
 
 def retained_fight_is_completing(*, state: GameState, model_instance_id: str) -> bool:
@@ -93,6 +149,9 @@ def finalize_attack_casualty(
         if not isinstance(removal, dict) or not isinstance(damage_event_id, str):
             raise GameLifecycleError("Retained attack removal artifacts are missing.")
         record = ModelRemovalRecord.from_payload(cast(ModelRemovalRecordPayload, removal))
+        require_retained_attack_removed_cause(
+            state=state, attack_sequence=attack_sequence, damage=damage
+        )
         return DestroyedModelEmission(
             damage_event_id=damage_event_id,
             model_destroyed_event_id=removed.event_id,

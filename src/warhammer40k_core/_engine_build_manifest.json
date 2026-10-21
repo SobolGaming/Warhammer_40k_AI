@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a3474cb97235fcec7085f8a6b95501222c98fa85ff9083be7d03325b4070ae32",
-  "fingerprint": "a3474cb97235fcec7085f8a6b95501222c98fa85ff9083be7d03325b4070ae32",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+  "fingerprint": "0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
   "resource_count": 3130,
   "resources": [
     {
@@ -960,9 +960,9 @@
       "sha256": "9fdb3014981165703e81ca631e42aa608670bc962fb4efab59a67dc49914be15"
     },
     {
-      "byte_length": 5576,
+      "byte_length": 5850,
       "path": "warhammer40k_core/engine/attack_sequence_destruction_authority.py",
-      "sha256": "ed46e313880a89248868da33319d24174abb5309a9a3695ff7c185c395538c47"
+      "sha256": "cc2e021940bb911460e286e521ff23edf69cfff3975d7a76b48916262d649290"
     },
     {
       "byte_length": 13472,
@@ -10880,9 +10880,9 @@
       "sha256": "a8403755b9941d4cef8a5f8196eb1143f42c8e5489c282c1c94d633487152a52"
     },
     {
-      "byte_length": 14644,
+      "byte_length": 17362,
       "path": "warhammer40k_core/engine/model_destruction_cause_attack_restore.py",
-      "sha256": "46287a5b79b35bd2f4b1a696ce6965ac60a6699883a5ed69ed0cc407684a097c"
+      "sha256": "de57dbd7b804d8eeb020ae97d568fb1e9929688a75c056c7e1a6c2a8502c6cf1"
     },
     {
       "byte_length": 43769,
@@ -10890,9 +10890,9 @@
       "sha256": "b4ec2cf988ee099490d10bd80d15faa23956e6a66b596dc117c1a7ed2224d83d"
     },
     {
-      "byte_length": 60398,
+      "byte_length": 62165,
       "path": "warhammer40k_core/engine/model_destruction_cause_completion_restore.py",
-      "sha256": "f9f6b0cc8a54398b1d26e3d7362eb8cafad9a9a2b8c7e221c4b80ac5fc87c14b"
+      "sha256": "39e899cc655836022c77d81558470755f3a754f5a7847283f641b2f74fc48452"
     },
     {
       "byte_length": 6519,
@@ -12280,9 +12280,9 @@
       "sha256": "a535f1b7d68a8274e3de45151819c67926b9d9528070cd461625965d393a673f"
     },
     {
-      "byte_length": 5566,
+      "byte_length": 8816,
       "path": "warhammer40k_core/engine/retained_demise_removal.py",
-      "sha256": "1a05474b1e4d3ed70159435b41857783c3980a2c252762bbdc0103ec9de5d9b6"
+      "sha256": "c6d7a84a09b0c9fc4d15c86d03300485c8b466cc03ec810fc4cc37d29052222d"
     },
     {
       "byte_length": 6118,
