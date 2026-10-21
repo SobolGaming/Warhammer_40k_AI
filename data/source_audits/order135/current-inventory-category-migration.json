@@ -43209,8 +43209,8 @@
       "sha256": "ddaa4592ccc685fa6e75a41efd4414b2d57a6eabe551f08b79ddf1de88ce2234"
     },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py": {
-      "bytes": 39837,
-      "sha256": "252597486eb907fc2452c593bc181527a7c7e291c449581a34366c309d7036d2"
+      "bytes": 40901,
+      "sha256": "4f7f5558470c3feb0d7cd53bd3c02df3791c9f94970e6e8b682a1940022ebf0b"
     },
     "src/warhammer40k_core/engine/fight_activation_completion.py": {
       "bytes": 6009,
@@ -43249,8 +43249,8 @@
       "sha256": "c57d7a244451454a34c2075bbbba664b713950b079941415361bd39cbd75ac38"
     },
     "src/warhammer40k_core/engine/game_state.py": {
-      "bytes": 303185,
-      "sha256": "89e1aba32891c22853c36ccf1e27ab39d07130bbb055083920d2eaa7f0d7d364"
+      "bytes": 303166,
+      "sha256": "71d2ac2ac4f5accb0d7a2adeb2d8df2eef78dccffcb5e13bb48dc26d9464005d"
     },
     "src/warhammer40k_core/engine/gathered_attack_dice.py": {
       "bytes": 6067,
@@ -43317,8 +43317,8 @@
       "sha256": "31f2092d5d96a7b6bfd3639a7a398486dc6495fe0c98c485f52b162a37ba1084"
     },
     "src/warhammer40k_core/engine/movement_legality.py": {
-      "bytes": 57734,
-      "sha256": "82f09578fe17925a2a4a86994cac85031639ceac4b949605aab01cd65475c311"
+      "bytes": 58388,
+      "sha256": "081dd924dd3e56ff070d0f164e8dfa646dc1a1d65c7661eb0d2ac79eea2fdc7c"
     },
     "src/warhammer40k_core/engine/movement_proposals.py": {
       "bytes": 53615,
@@ -43385,8 +43385,8 @@
       "sha256": "2e604814a27ec5340ab7cc913d0284fc260aec5ea5b4dad1b96b476f2c8c8bb9"
     },
     "src/warhammer40k_core/engine/phases/shooting_firing_deck.py": {
-      "bytes": 32847,
-      "sha256": "2b11eb3682570dc4fdbb5189a23a77598590fc8412902bfdee17e7e5889e6724"
+      "bytes": 33867,
+      "sha256": "c396e65fb091618b31279eaa828624bf8a8d85611b81d773ae143fc866ae075d"
     },
     "src/warhammer40k_core/engine/phases/shooting_handler.py": {
       "bytes": 61094,
@@ -43497,8 +43497,8 @@
       "sha256": "82a6f81ae800c9eb3d2343351e4fbe17387f264b943795e8aaa6f0bf5a28f2ca"
     },
     "src/warhammer40k_core/engine/sequencing.py": {
-      "bytes": 34194,
-      "sha256": "8f72b4d64a2fb2eace52de73afbb26d936889cfa20f6b34ee87bc88c15ed2487"
+      "bytes": 34598,
+      "sha256": "c9a0e9e2cc205d99efa49cd60d52c2804b4dc6bd871ea0670a5a80542b7b17c6"
     },
     "src/warhammer40k_core/engine/shooting_targets.py": {
       "bytes": 60119,
@@ -43661,8 +43661,8 @@
       "sha256": "d5cc271ca313b553c56196610ea5184bdc4cad36c79a96c8aa71b4a090d2fd21"
     },
     "src/warhammer40k_core/geometry/pathing.py": {
-      "bytes": 96662,
-      "sha256": "794a352f2b8ab260d7a5287e951dbb204b5c29988c49a3a90728ad1b7e13699b"
+      "bytes": 97534,
+      "sha256": "6436354d70dad24441579347fba51751dff8159a6080259f0b6f63a85fd1bbd9"
     },
     "src/warhammer40k_core/geometry/physical_visibility.py": {
       "bytes": 12691,
@@ -43715,6 +43715,10 @@
     "tests/code_quality/test_order135_current_core_audit.py": {
       "bytes": 9657,
       "sha256": "aa58fe9be4e2f5abb53eb742979668db26eb69352ef5da326b06e58b8e52904f"
+    },
+    "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": {
+      "bytes": 44182,
+      "sha256": "9384e78c9d389dd77d57478c8aa2c56558c033e11767800afed20dd787690940"
     },
     "tests/integration/test_catalog_rule_ir_runtime.py": {
       "bytes": 80752,
@@ -44153,8 +44157,8 @@
       "sha256": "4fc138d49a37fafe9ce71e9c1da0b27168824862ea5b085ecb252ff9d8e91963"
     },
     "tests/unit/test_phase10i_terrain_movement.py": {
-      "bytes": 42077,
-      "sha256": "8241e768f434ab9e44412b73b5fc16a119012bd77969d959dc682b1e079434a5"
+      "bytes": 42323,
+      "sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38"
     },
     "tests/unit/test_phase10j1_numeric_rules.py": {
       "bytes": 10672,
@@ -44315,10 +44319,6 @@
     "tests/unit/test_phase17g_thousand_sons_army_rule.py": {
       "bytes": 40796,
       "sha256": "164b74babdb28ec0b67c821951c32821402e7caf9181e55669fcbccde44d9373"
-    },
-    "tests/unit/test_phase17g_world_eaters_army_rule.py": {
-      "bytes": 67882,
-      "sha256": "4d3760a26eb9bd163e5ac4a4beee4ff56279146fd2d3df14ad05a37f97035a80"
     },
     "tests/unit/test_phase17n_primary_scoring_boundary_lifecycle.py": {
       "bytes": 68335,
@@ -46411,7 +46411,7 @@
       "symbol_ast_sha256": "807225069acac7d7d8f74d0e8f866bce33c8cd9b6faa56cf28adae6912006fca"
     },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py:_matching_allocations": {
-      "file_sha256": "252597486eb907fc2452c593bc181527a7c7e291c449581a34366c309d7036d2",
+      "file_sha256": "4f7f5558470c3feb0d7cd53bd3c02df3791c9f94970e6e8b682a1940022ebf0b",
       "resolved_path": "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py",
       "symbol_ast_sha256": "1c07f9109275e3df8121915fb8d8a4adafe8fba25ddead9c83b350b76af81174"
     },
@@ -46491,54 +46491,54 @@
       "symbol_ast_sha256": "725ac7ec3e540d993efa142b0251cac198a34b01ec09f76567ea112a812db1f0"
     },
     "src/warhammer40k_core/engine/game_state.py:GameState": {
-      "file_sha256": "89e1aba32891c22853c36ccf1e27ab39d07130bbb055083920d2eaa7f0d7d364",
+      "file_sha256": "71d2ac2ac4f5accb0d7a2adeb2d8df2eef78dccffcb5e13bb48dc26d9464005d",
       "resolved_path": "src/warhammer40k_core/engine/game_state.py",
-      "symbol_ast_sha256": "8f84938aedb8b8463573d3ccd8bcd0f231d33c0176173526ea2a10ac502400ae"
+      "symbol_ast_sha256": "c12adef087213d92e639ed3192c638fe855348df63f901adbdc602dcc449ceca"
     },
     "src/warhammer40k_core/engine/game_state.py:GameState.effective_active_player_id": {
-      "file_sha256": "89e1aba32891c22853c36ccf1e27ab39d07130bbb055083920d2eaa7f0d7d364",
+      "file_sha256": "71d2ac2ac4f5accb0d7a2adeb2d8df2eef78dccffcb5e13bb48dc26d9464005d",
       "resolved_path": "src/warhammer40k_core/engine/game_state.py",
       "symbol_ast_sha256": "c7c4e58c5164370ce7438d8ac7c1db180c3773c966357b14c1a7e40f92f3aa07"
     },
     "src/warhammer40k_core/engine/game_state.py:GameState.expire_persisting_effects_at_boundary": {
-      "file_sha256": "89e1aba32891c22853c36ccf1e27ab39d07130bbb055083920d2eaa7f0d7d364",
+      "file_sha256": "71d2ac2ac4f5accb0d7a2adeb2d8df2eef78dccffcb5e13bb48dc26d9464005d",
       "resolved_path": "src/warhammer40k_core/engine/game_state.py",
       "symbol_ast_sha256": "6028bdec08d0d2b4b41a454f7a0abf8434a717eda57ceab3f56d34a478cd464b"
     },
     "src/warhammer40k_core/engine/game_state.py:GameState.record_battle_shock_result": {
-      "file_sha256": "89e1aba32891c22853c36ccf1e27ab39d07130bbb055083920d2eaa7f0d7d364",
+      "file_sha256": "71d2ac2ac4f5accb0d7a2adeb2d8df2eef78dccffcb5e13bb48dc26d9464005d",
       "resolved_path": "src/warhammer40k_core/engine/game_state.py",
       "symbol_ast_sha256": "5e292acc96c854c829f396c93f0dc36e08fd2c3320996378b159e9c19bd8b231"
     },
     "src/warhammer40k_core/engine/game_state.py:GameState.record_persisting_effect": {
-      "file_sha256": "89e1aba32891c22853c36ccf1e27ab39d07130bbb055083920d2eaa7f0d7d364",
+      "file_sha256": "71d2ac2ac4f5accb0d7a2adeb2d8df2eef78dccffcb5e13bb48dc26d9464005d",
       "resolved_path": "src/warhammer40k_core/engine/game_state.py",
       "symbol_ast_sha256": "30ee2e34edd43d186ceffa04de053a5c225934e3118af02a38e72509411bb770"
     },
     "src/warhammer40k_core/engine/game_state.py:GameState.replace_unit_resource_ledgers": {
-      "file_sha256": "89e1aba32891c22853c36ccf1e27ab39d07130bbb055083920d2eaa7f0d7d364",
+      "file_sha256": "71d2ac2ac4f5accb0d7a2adeb2d8df2eef78dccffcb5e13bb48dc26d9464005d",
       "resolved_path": "src/warhammer40k_core/engine/game_state.py",
       "symbol_ast_sha256": "510d59a1c173cb157a4df67d0466e6af656af7914e1e997c76b9e69852f9ac8c"
     },
     "src/warhammer40k_core/engine/game_state.py:GameState.reposition_unit_to_strategic_reserves": {
-      "file_sha256": "89e1aba32891c22853c36ccf1e27ab39d07130bbb055083920d2eaa7f0d7d364",
+      "file_sha256": "71d2ac2ac4f5accb0d7a2adeb2d8df2eef78dccffcb5e13bb48dc26d9464005d",
       "resolved_path": "src/warhammer40k_core/engine/game_state.py",
       "symbol_ast_sha256": "a1b71bfba8f315761759bd3614b5d59d7dc9619b48d5824f80677da3e71f8c82"
     },
     "src/warhammer40k_core/engine/game_state.py:GameState.resolve_end_turn_cleanup_boundary": {
-      "file_sha256": "89e1aba32891c22853c36ccf1e27ab39d07130bbb055083920d2eaa7f0d7d364",
+      "file_sha256": "71d2ac2ac4f5accb0d7a2adeb2d8df2eef78dccffcb5e13bb48dc26d9464005d",
       "resolved_path": "src/warhammer40k_core/engine/game_state.py",
       "symbol_ast_sha256": "7faeaee3ea73c64d710ef988f88cff4ddba96453efc4a74fce8c9dd00603aa04"
     },
     "src/warhammer40k_core/engine/game_state.py:GameState.starting_strength_record_for_unit": {
-      "file_sha256": "89e1aba32891c22853c36ccf1e27ab39d07130bbb055083920d2eaa7f0d7d364",
+      "file_sha256": "71d2ac2ac4f5accb0d7a2adeb2d8df2eef78dccffcb5e13bb48dc26d9464005d",
       "resolved_path": "src/warhammer40k_core/engine/game_state.py",
       "symbol_ast_sha256": "31b4ab808adbd0ccf280b6f525dc99bd39caf46511e7ec8dc54e2aed95a54614"
     },
     "src/warhammer40k_core/engine/game_state.py:OneShotWeaponUseRecord": {
-      "file_sha256": "89e1aba32891c22853c36ccf1e27ab39d07130bbb055083920d2eaa7f0d7d364",
+      "file_sha256": "71d2ac2ac4f5accb0d7a2adeb2d8df2eef78dccffcb5e13bb48dc26d9464005d",
       "resolved_path": "src/warhammer40k_core/engine/game_state.py",
-      "symbol_ast_sha256": "030db8864f6183d0acbbd20ff589ecf5e9386d6976bbcf0348c10c3c2a3c4ef3"
+      "symbol_ast_sha256": "3b2fe71d38bd11a85cffe4ae300275203e5d6bb090e3ec8df13ea82b7e053b1d"
     },
     "src/warhammer40k_core/engine/gathered_attack_dice.py:resolve_gathered_attack_dice": {
       "file_sha256": "9ddd68d856559fc2327cbd94d22b984a0db258404a6c935be327415b230e8241",
@@ -46661,14 +46661,14 @@
       "symbol_ast_sha256": "70106fcfcf31aa00b6dc56850201f32f7c8758d4708b79a2cc0b5eb267f59b31"
     },
     "src/warhammer40k_core/engine/movement_legality.py:MovementCapabilitySet": {
-      "file_sha256": "82f09578fe17925a2a4a86994cac85031639ceac4b949605aab01cd65475c311",
+      "file_sha256": "081dd924dd3e56ff070d0f164e8dfa646dc1a1d65c7661eb0d2ac79eea2fdc7c",
       "resolved_path": "src/warhammer40k_core/engine/movement_legality.py",
-      "symbol_ast_sha256": "1195879b26179b770c5695a725f3416fca1159c83458b2f2cd208c8375efea0c"
+      "symbol_ast_sha256": "77518df9b184822cab7e29df439c67ba28b08a1790ab01bccc97237b4601b8f3"
     },
     "src/warhammer40k_core/engine/movement_legality.py:MovementLegalityContext": {
-      "file_sha256": "82f09578fe17925a2a4a86994cac85031639ceac4b949605aab01cd65475c311",
+      "file_sha256": "081dd924dd3e56ff070d0f164e8dfa646dc1a1d65c7661eb0d2ac79eea2fdc7c",
       "resolved_path": "src/warhammer40k_core/engine/movement_legality.py",
-      "symbol_ast_sha256": "be20b8f98d4636f89edeb9548ba9b4eb07dbb57e05db901d862bb0fd7fed8f85"
+      "symbol_ast_sha256": "0afcaab6824db35c5b22e158fac448a59d186896b8fb3ef61ca67b6f9c1bb65b"
     },
     "src/warhammer40k_core/engine/movement_proposals.py:MovementProposalRequest": {
       "file_sha256": "b141dc90fb059cd29855493272d75b8782fc1625ad313d3e7466666f7c03a914",
@@ -46796,9 +46796,9 @@
       "symbol_ast_sha256": "f70b93c2c1f7d2e01e43d5980fbc4cf809d3522e9f6f315a2f4374de03e03a17"
     },
     "src/warhammer40k_core/engine/phases/shooting_firing_deck.py:_validate_firing_deck_selection": {
-      "file_sha256": "2b11eb3682570dc4fdbb5189a23a77598590fc8412902bfdee17e7e5889e6724",
+      "file_sha256": "c396e65fb091618b31279eaa828624bf8a8d85611b81d773ae143fc866ae075d",
       "resolved_path": "src/warhammer40k_core/engine/phases/shooting_firing_deck.py",
-      "symbol_ast_sha256": "77db9b728e2ac6138365ae90f87222e44e4acdeec70e52479b250fb56c262bca"
+      "symbol_ast_sha256": "5820845e9b14ecb23d77d512288f994e50e4c358abf039a5fe78ede5c9d70fba"
     },
     "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler": {
       "file_sha256": "72ea90baad2c2f0eb80ba88d6d3f74ae04a5882248e5551b18a72eabd0345f74",
@@ -46991,7 +46991,7 @@
       "symbol_ast_sha256": "7245ef0b2997e4575b86678468bd0b18d7e8f8af1a3772170a989dd40bf9c59d"
     },
     "src/warhammer40k_core/engine/sequencing.py:create_select_next_sequencing_participant_request": {
-      "file_sha256": "8f72b4d64a2fb2eace52de73afbb26d936889cfa20f6b34ee87bc88c15ed2487",
+      "file_sha256": "c9a0e9e2cc205d99efa49cd60d52c2804b4dc6bd871ea0670a5a80542b7b17c6",
       "resolved_path": "src/warhammer40k_core/engine/sequencing.py",
       "symbol_ast_sha256": "f3c554b7a3b5676ddf113b24c9c83f9da96fa446a267a4627395372ead9c5e98"
     },
@@ -47411,14 +47411,14 @@
       "symbol_ast_sha256": "16715d74de120fab98fb8437efdc934f536ac6d48abfd32a5a647c3d9ac063f2"
     },
     "src/warhammer40k_core/geometry/pathing.py:PathValidationContext.validate": {
-      "file_sha256": "794a352f2b8ab260d7a5287e951dbb204b5c29988c49a3a90728ad1b7e13699b",
+      "file_sha256": "6436354d70dad24441579347fba51751dff8159a6080259f0b6f63a85fd1bbd9",
       "resolved_path": "src/warhammer40k_core/geometry/pathing.py",
       "symbol_ast_sha256": "0801573a47dd8b1664e148f7fc06c00b0cd2f3e4979dd115596b35e0db6d6b51"
     },
     "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext": {
-      "file_sha256": "794a352f2b8ab260d7a5287e951dbb204b5c29988c49a3a90728ad1b7e13699b",
+      "file_sha256": "6436354d70dad24441579347fba51751dff8159a6080259f0b6f63a85fd1bbd9",
       "resolved_path": "src/warhammer40k_core/geometry/pathing.py",
-      "symbol_ast_sha256": "579e3de9497f56dc92a2d0042085fe767db7edcee8698a5dc192f2dd8623d818"
+      "symbol_ast_sha256": "d40f8825880072684d52d36a8909b66412a0cd3dba5432923831ad4b63011822"
     },
     "src/warhammer40k_core/geometry/physical_visibility.py:resolve_physical_visibility": {
       "file_sha256": "45fb0aac8f54b6613688e9724510ac4da618232f8a0b3428557fabdddf50ed41",
@@ -115312,7 +115312,7 @@
         "assert result.is_valid"
       ],
       "complete_current_body": "def test_eligible_keywords_can_end_on_upper_ruins_floor_without_overhang() -> None:\n    ruins = _ruins_feature(upper_width_inches=4.0, upper_depth_inches=4.0)\n    for keywords in (('INFANTRY',), ('BEAST',), ('FLY',)):\n        mover = _model(f'{keywords[0].lower()}-upper-ruins-mover', 1.0, 1.0)\n        result = _terrain_context(_normal_legality_context(keywords=keywords), moving_model=mover, terrain_features=(ruins,), middle_pose=Pose.at(2.0, 1.0, 3.0), end_pose=Pose.at(3.0, 1.0, 3.0)).validate()\n        assert result.is_valid",
-      "file_sha256": "8241e768f434ab9e44412b73b5fc16a119012bd77969d959dc682b1e079434a5",
+      "file_sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38",
       "resolved_path": "tests/unit/test_phase10i_terrain_movement.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "eea39b5933bc31706defb6284ede7f4bea33689e72fbf3345de67a820cd9efd4"
@@ -115325,13 +115325,14 @@
         "assert matching_segments",
         "assert any((segment.traversal_mode.value == 'climb' for segment in matching_segments))",
         "assert all((segment.traversal_mode.value in {'climb', 'freely_traversable'} for segment in matching_segments))",
-        "assert all((segment.vertical_distance_inches > 0.0 for segment in matching_segments))"
+        "assert all((segment.vertical_distance_inches > 0.0 for segment in matching_segments))",
+        "assert all((segment.counted_distance_inches == segment.horizontal_distance_inches + (segment.vertical_distance_inches if segment.traversal_mode.value == 'climb' else 0.0) for segment in matching_segments))"
       ],
-      "complete_current_body": "def test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_through() -> None:\n    mission_setup = _exact_event_companion_meatgrinder_setup()\n    ruins = next((feature for feature in mission_setup.terrain_features if feature.classification is TerrainAreaClassification.DENSE and feature.feature_kind is TerrainFeatureKind.RUINS and (len(feature.floors) == 3) and any((wall.wall_id == 'ground-long-solid-wall' for wall in feature.walls))))\n    wall = next((wall for wall in ruins.walls if wall.wall_id == 'ground-long-solid-wall'))\n    aligned_walls = tuple((candidate for candidate in ruins.walls if candidate.wall_id.endswith('long-solid-wall')))\n    wall_stack_top = max((candidate.bottom_z_inches + candidate.height_inches for candidate in aligned_walls))\n    assert wall_stack_top == 8.0\n    rotation_radians = math.radians(wall.rotation_degrees)\n    normal_x = math.cos(rotation_radians)\n    normal_y = math.sin(rotation_radians)\n    clearance_inches = wall.width_inches / 2 + 0.5\n    start_pose = Pose.at(wall.center_x_inches - normal_x * clearance_inches, wall.center_y_inches - normal_y * clearance_inches)\n    middle_pose = Pose.at(wall.center_x_inches, wall.center_y_inches, wall_stack_top)\n    end_pose = Pose.at(wall.center_x_inches + normal_x * clearance_inches, wall.center_y_inches + normal_y * clearance_inches)\n    mover = _model('dense-mobile-vertical-mover', start_pose.position.x, start_pose.position.y)\n    result = _terrain_context(_normal_legality_context(keywords=('MOBILE',)), moving_model=mover, terrain_features=(ruins,), middle_pose=middle_pose, end_pose=end_pose, path_poses=(start_pose, replace(start_pose, position=replace(start_pose.position, z=wall_stack_top)), middle_pose, replace(end_pose, position=replace(end_pose.position, z=wall_stack_top)), end_pose)).validate()\n    assert result.is_valid\n    matching_segments = tuple((segment for segment in result.segments if segment.terrain_id in {f'{ruins.feature_id}:{candidate.wall_id}' for candidate in aligned_walls}))\n    assert matching_segments\n    assert any((segment.traversal_mode.value == 'climb' for segment in matching_segments))\n    assert all((segment.traversal_mode.value in {'climb', 'freely_traversable'} for segment in matching_segments))\n    assert all((segment.vertical_distance_inches > 0.0 for segment in matching_segments))",
-      "file_sha256": "8241e768f434ab9e44412b73b5fc16a119012bd77969d959dc682b1e079434a5",
+      "complete_current_body": "def test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_through() -> None:\n    mission_setup = _exact_event_companion_meatgrinder_setup()\n    ruins = next((feature for feature in mission_setup.terrain_features if feature.classification is TerrainAreaClassification.DENSE and feature.feature_kind is TerrainFeatureKind.RUINS and (len(feature.floors) == 3) and any((wall.wall_id == 'ground-long-solid-wall' for wall in feature.walls))))\n    wall = next((wall for wall in ruins.walls if wall.wall_id == 'ground-long-solid-wall'))\n    aligned_walls = tuple((candidate for candidate in ruins.walls if candidate.wall_id.endswith('long-solid-wall')))\n    wall_stack_top = max((candidate.bottom_z_inches + candidate.height_inches for candidate in aligned_walls))\n    assert wall_stack_top == 8.0\n    rotation_radians = math.radians(wall.rotation_degrees)\n    normal_x = math.cos(rotation_radians)\n    normal_y = math.sin(rotation_radians)\n    clearance_inches = wall.width_inches / 2 + 0.5\n    start_pose = Pose.at(wall.center_x_inches - normal_x * clearance_inches, wall.center_y_inches - normal_y * clearance_inches)\n    middle_pose = Pose.at(wall.center_x_inches, wall.center_y_inches, wall_stack_top)\n    end_pose = Pose.at(wall.center_x_inches + normal_x * clearance_inches, wall.center_y_inches + normal_y * clearance_inches)\n    mover = _model('dense-mobile-vertical-mover', start_pose.position.x, start_pose.position.y)\n    result = _terrain_context(_normal_legality_context(keywords=('MOBILE',)), moving_model=mover, terrain_features=(ruins,), middle_pose=middle_pose, end_pose=end_pose, path_poses=(start_pose, replace(start_pose, position=replace(start_pose.position, z=wall_stack_top)), middle_pose, replace(end_pose, position=replace(end_pose.position, z=wall_stack_top)), end_pose)).validate()\n    assert result.is_valid\n    matching_segments = tuple((segment for segment in result.segments if segment.terrain_id in {f'{ruins.feature_id}:{candidate.wall_id}' for candidate in aligned_walls}))\n    assert matching_segments\n    assert any((segment.traversal_mode.value == 'climb' for segment in matching_segments))\n    assert all((segment.traversal_mode.value in {'climb', 'freely_traversable'} for segment in matching_segments))\n    assert all((segment.vertical_distance_inches > 0.0 for segment in matching_segments))\n    assert all((segment.counted_distance_inches == segment.horizontal_distance_inches + (segment.vertical_distance_inches if segment.traversal_mode.value == 'climb' else 0.0) for segment in matching_segments))",
+      "file_sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38",
       "resolved_path": "tests/unit/test_phase10i_terrain_movement.py",
       "runtime_pass_claimed": false,
-      "symbol_ast_sha256": "c519a11c4541116ef3ee53251186020a9117410663e0c4f5569ac3c1ddb50dd1"
+      "symbol_ast_sha256": "4161e9883a7c4f2f4a3860b8b353707b78a6bfb606ac4750f94becc41c98e58b"
     },
     "tests/unit/test_phase10i_terrain_movement.py::test_light_classification_allows_mounted_through_three_inch_feature": {
       "assertion_mode": "inline",
@@ -115340,7 +115341,7 @@
         "assert any((segment.terrain_id == f'{feature.feature_id}:{wall.wall_id}' and segment.traversal_mode.value == 'through_feature' and (segment.vertical_distance_inches > 0.0) for segment in result.segments))"
       ],
       "complete_current_body": "def test_light_classification_allows_mounted_through_three_inch_feature() -> None:\n    feature = replace(_ruins_blocking_wall_feature(), feature_id='tall-light-policy-feature', feature_kind=TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY, classification=TerrainAreaClassification.LIGHT)\n    wall = feature.walls[0]\n    start_pose = Pose.at(wall.center_x_inches - 4.0, wall.center_y_inches)\n    middle_pose = Pose.at(wall.center_x_inches, wall.center_y_inches, 1.5)\n    end_pose = Pose.at(wall.center_x_inches + 4.0, wall.center_y_inches)\n    mover = _model('tall-light-mounted-mover', start_pose.position.x, start_pose.position.y)\n    result = _terrain_context(_normal_legality_context(keywords=('MOUNTED',)), moving_model=mover, terrain_features=(feature,), middle_pose=middle_pose, end_pose=end_pose).validate()\n    assert result.is_valid\n    assert any((segment.terrain_id == f'{feature.feature_id}:{wall.wall_id}' and segment.traversal_mode.value == 'through_feature' and (segment.vertical_distance_inches > 0.0) for segment in result.segments))",
-      "file_sha256": "8241e768f434ab9e44412b73b5fc16a119012bd77969d959dc682b1e079434a5",
+      "file_sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38",
       "resolved_path": "tests/unit/test_phase10i_terrain_movement.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "858e664b5b9f73af4ab6759189cd00cdcd41fbb360e53ff97c3b50598bea0686"
@@ -115352,7 +115353,7 @@
         "assert result.segments[0].traversal_mode.value == 'freely_traversable'"
       ],
       "complete_current_body": "def test_low_wall_can_be_moved_over_as_if_not_there() -> None:\n    mover = _model('mover', 1.0, 1.0)\n    low_wall = ObstacleVolume(terrain_id='low-wall', bottom_center=Point3(3.0, 1.0, 0.0), width=1.0, depth=1.0, height=2.0)\n    result = _terrain_context(_normal_legality_context(keywords=('VEHICLE',)), moving_model=mover, terrain=(low_wall,), end_pose=Pose.at(5.0, 1.0)).validate()\n    assert result.is_valid\n    assert result.segments[0].traversal_mode.value == 'freely_traversable'",
-      "file_sha256": "8241e768f434ab9e44412b73b5fc16a119012bd77969d959dc682b1e079434a5",
+      "file_sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38",
       "resolved_path": "tests/unit/test_phase10i_terrain_movement.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "5b1da6e6e2eb5232dcc9de3b365a0fe2efff370c085f34ceb14fb4862f27b2c8"
@@ -115365,7 +115366,7 @@
         "assert result.violations[0].terrain_id == 'ruin-wall-test:center-wall'"
       ],
       "complete_current_body": "def test_model_cannot_pass_through_wall_without_traversal_permission() -> None:\n    mover = _model('vehicle-mover', 1.0, 1.0)\n    ruins = _ruins_blocking_wall_feature()\n    result = _terrain_context(_normal_legality_context(keywords=('VEHICLE',)), moving_model=mover, terrain_features=(ruins,), end_pose=Pose.at(5.0, 1.0)).validate()\n    assert not result.is_valid\n    assert result.violations[0].violation_code == 'terrain_feature_transit_forbidden'\n    assert result.violations[0].terrain_id == 'ruin-wall-test:center-wall'",
-      "file_sha256": "8241e768f434ab9e44412b73b5fc16a119012bd77969d959dc682b1e079434a5",
+      "file_sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38",
       "resolved_path": "tests/unit/test_phase10i_terrain_movement.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "df07984a15a34ddfc0e488556d4ac808e6b5b0f7a45fc33ef446800abeb30a48"
@@ -115377,7 +115378,7 @@
         "assert result.violations[0].violation_code == TerrainEndpointViolationCode.UPPER_FLOOR_KEYWORD_FORBIDDEN.value"
       ],
       "complete_current_body": "def test_non_eligible_model_cannot_end_on_upper_ruins_floor() -> None:\n    mover = _model('vehicle-upper-ruins-mover', 1.0, 1.0)\n    ruins = _ruins_feature(upper_width_inches=4.0, upper_depth_inches=4.0)\n    result = _terrain_context(_normal_legality_context(keywords=('VEHICLE',)), moving_model=mover, terrain_features=(ruins,), middle_pose=Pose.at(2.0, 1.0, 3.0), end_pose=Pose.at(3.0, 1.0, 3.0)).validate()\n    assert not result.is_valid\n    assert result.violations[0].violation_code == TerrainEndpointViolationCode.UPPER_FLOOR_KEYWORD_FORBIDDEN.value",
-      "file_sha256": "8241e768f434ab9e44412b73b5fc16a119012bd77969d959dc682b1e079434a5",
+      "file_sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38",
       "resolved_path": "tests/unit/test_phase10i_terrain_movement.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "9c394b2aef83222c8654f35e988312a22288b44d889f36cd511d7ca69ab47906"
@@ -115392,7 +115393,7 @@
         "assert violation.blocker_id == floor.floor_id"
       ],
       "complete_current_body": "def test_shared_endpoint_placement_rejects_rotated_floor_aabb_overhang() -> None:\n    mover, feature, floor, end_pose, _base_radius_inches = _rotated_floor_overhang_case()\n    unit = _endpoint_placement_unit(unit_instance_id='rotated-floor-endpoint-unit', model_instance_id=mover.model_id, keywords=('VEHICLE',))\n    violation = terrain_endpoint_placement_violation(model=replace(mover, pose=end_pose), unit=unit, ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(), terrain_features=(feature,), violation_code='rotated_floor_overhang', placement_label='Test placement')\n    assert violation is not None\n    assert violation.violation_code == 'rotated_floor_overhang'\n    assert violation.message == 'Test placement base overhangs support surface.'\n    assert violation.model_instance_id == mover.model_id\n    assert violation.blocker_id == floor.floor_id",
-      "file_sha256": "8241e768f434ab9e44412b73b5fc16a119012bd77969d959dc682b1e079434a5",
+      "file_sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38",
       "resolved_path": "tests/unit/test_phase10i_terrain_movement.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "23a35054e37b035a1449fda572abbbcc1bfa90c11e38c5cb38427bb0c580268f"
@@ -115404,7 +115405,7 @@
         "assert result.violations[0].violation_code == TerrainEndpointViolationCode.BASE_OVERHANGS_SUPPORT_SURFACE.value"
       ],
       "complete_current_body": "def test_upper_ruins_floor_endpoint_fails_when_base_overhangs() -> None:\n    mover = _model('infantry-upper-ruins-overhang', 1.0, 1.0)\n    ruins = _ruins_feature(upper_width_inches=0.75, upper_depth_inches=0.75)\n    result = _terrain_context(_normal_legality_context(keywords=('INFANTRY',)), moving_model=mover, terrain_features=(ruins,), middle_pose=Pose.at(2.0, 1.0, 3.0), end_pose=Pose.at(3.0, 1.0, 3.0)).validate()\n    assert not result.is_valid\n    assert result.violations[0].violation_code == TerrainEndpointViolationCode.BASE_OVERHANGS_SUPPORT_SURFACE.value",
-      "file_sha256": "8241e768f434ab9e44412b73b5fc16a119012bd77969d959dc682b1e079434a5",
+      "file_sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38",
       "resolved_path": "tests/unit/test_phase10i_terrain_movement.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "e8beab73ff10b1773fd197192fe255d3f7a181fc390ab4bc652348ea2ac4250a"
@@ -124274,8 +124275,8 @@
         "assert restored.to_payload() == lifecycle.state.to_payload()"
       ],
       "complete_current_body": "def test_lifecycle_requests_world_eaters_blessings_and_records_effect() -> None:\n    lifecycle = _battle_ready_lifecycle()\n    status = lifecycle.advance_until_decision_or_terminal()\n    request = status.decision_request\n    assert request is not None\n    assert request.decision_type == SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE\n    assert request.actor_id == 'player-a'\n    summary_payload = _runtime_content_bundle(lifecycle).to_summary_payload()\n    assert army_rule.HOOK_ID in summary_payload['battle_round_start_hook_ids']\n    assert army_rule.UNBRIDLED_BLOODLUST_CHARGE_MODIFIER_ID in summary_payload['charge_roll_modifier_ids']\n    assert army_rule.RAGE_FUELLED_INVIGORATION_HOOK_ID in summary_payload['fight_activation_ability_hook_ids']\n    assert f'{army_rule.HOOK_ID}:weapon-profile-keywords' in summary_payload['weapon_profile_modifier_ids']\n    selected = lifecycle.submit_decision(DecisionResult.for_request(result_id='phase17g-world-eaters-select-unbridled', request=request, selected_option_id='world_eaters:blessings:unbridled_bloodlust'))\n    assert selected.decision_request is not None\n    assert lifecycle.state is not None\n    assert army_rule.active_blessings_for_player(lifecycle.state, player_id='player-a') == (army_rule.BlessingOfKhorne.UNBRIDLED_BLOODLUST,)\n    restored = GameState.from_payload(cast(GameStatePayload, json.loads(json.dumps(lifecycle.state.to_payload()))))\n    assert restored.to_payload() == lifecycle.state.to_payload()",
-      "file_sha256": "4d3760a26eb9bd163e5ac4a4beee4ff56279146fd2d3df14ad05a37f97035a80",
-      "resolved_path": "tests/unit/test_phase17g_world_eaters_army_rule.py",
+      "file_sha256": "9384e78c9d389dd77d57478c8aa2c56558c033e11767800afed20dd787690940",
+      "resolved_path": "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py",
       "runtime_pass_claimed": false,
       "symbol_ast_sha256": "1aad6fb34888d7c919d6ce424dc3f87c78612f300a7decafae6555974ef9a1c1"
     },
