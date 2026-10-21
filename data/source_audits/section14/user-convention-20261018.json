@@ -1,0 +1,11 @@
+{
+  "id": "S18-USER-CONVENTION-20261018",
+  "authority": "Explicit human interpretation supplied by parent in trusted transcript evidence; not an assertion of new official GW text.",
+  "user": "Sentinel_9282bc095b5c8191b730a760b467ebf6",
+  "date": "2026-10-18",
+  "literal": "`Objective range is 3\u2033 horizontally and 5\u2033 vertically. For a model measured using its body, could one part meet the horizontal limit and a different part meet the vertical limit, even though neither meets both?` - since we are using event companion all the objectives in our games/training will be Terrain Objectives. For completeness though, use same physical point to satisfy both limits.",
+  "adopted_predicate": "exists one physical point p with H(p,marker)<=3 AND V(p,marker)<=5",
+  "not_adopted": "Independent axis witnesses, or selecting only the Euclidean-nearest point.",
+  "primary_scenario_policy": "Terrain Objectives are primary for Event Companion games/training. This change concerns fallback marker completeness; terrain occupancy remains unchanged.",
+  "scope_qualification": "Declared compound FRAME typed geometry is supported; native catalog/body admission, legal setup and prior history remain unproved."
+}

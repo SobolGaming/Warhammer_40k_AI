@@ -1,0 +1,1295 @@
+from __future__ import annotations
+
+from copy import deepcopy
+from dataclasses import replace
+from typing import cast
+
+import pytest
+
+from tests.unit_keyword_helpers import with_unit_keywords
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.datasheet import (
+    BaseSizeDefinition,
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+)
+from warhammer40k_core.core.model_keywords import ModelKeywordAssignment
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    RosterLegalityReport,
+)
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.attached_unit_reconciliation import (
+    validate_attached_rules_unit_identity_after_destruction,
+)
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
+    BattlefieldRemovalKind,
+    BattlefieldRuntimeState,
+    ModelPlacement,
+    PlacedArmy,
+    UnitPlacement,
+)
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.grey_knights import (
+    army_rule,
+)
+from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.list_validation import BattleSize, DetachmentSelection
+from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import (
+    MovementProposalRequest,
+    PlacementProposalPayload,
+)
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+)
+from warhammer40k_core.engine.phases.movement import (
+    MovementPhaseActionKind,
+    MovementPhaseHandler,
+    MovementPhaseState,
+)
+from warhammer40k_core.engine.primary_battlefield_departure import (
+    prepare_primary_battlefield_departure,
+    record_prepared_primary_battlefield_departure,
+)
+from warhammer40k_core.engine.reserves import (
+    ReserveKind,
+    ReserveOrigin,
+)
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_identities_share_lineage,
+    rules_unit_view_by_id,
+)
+from warhammer40k_core.engine.stratagems_generic_metadata import (
+    unit_arrived_from_reserves_this_turn,
+)
+from warhammer40k_core.engine.turn_end_hooks import (
+    SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
+    TurnEndHookRegistry,
+    TurnEndRequestContext,
+    TurnEndResultContext,
+)
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.geometry.model_geometry import ModelGeometry
+from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.mission_pack_import import (
+    warhammer_event_companion_2026_07_mission_pack,
+)
+
+
+def test_gate_of_infinity_runtime_contribution_registers_turn_end_hook() -> None:
+    contribution = army_rule.runtime_contribution()
+
+    assert contribution.contribution_id == army_rule.CONTRIBUTION_ID
+    assert contribution.contribution_id == army_rule.HOOK_ID
+    assert not contribution.contribution_id.endswith(":scaffold")
+    assert len(contribution.turn_end_hook_bindings) == 1
+    binding = contribution.turn_end_hook_bindings[0]
+    assert binding.hook_id == army_rule.HOOK_ID
+    assert binding.source_id == army_rule.SOURCE_RULE_ID
+    assert binding.candidate_handler is army_rule.turn_candidates
+    assert binding.result_handler is army_rule.apply_gate_of_infinity_turn_end_result
+
+
+@pytest.mark.parametrize(
+    ("battle_size", "expected"),
+    [
+        (BattleSize.INCURSION, 2),
+        (BattleSize.STRIKE_FORCE, 3),
+        (BattleSize.ONSLAUGHT, 4),
+    ],
+)
+def test_gate_of_infinity_battle_size_caps(
+    battle_size: BattleSize,
+    expected: int,
+) -> None:
+    assert army_rule.gate_of_infinity_max_units_for_battle_size(battle_size) == expected
+
+
+def test_gate_of_infinity_choice_moves_unit_to_required_strategic_reserves() -> None:
+    state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(
+            _unit("army-grey:terminators-1", "Brotherhood Terminators", has_gate=True),
+            _unit("army-grey:terminators-2", "Brotherhood Terminators", has_gate=True),
+        ),
+        active_player_id="player-opponent",
+        grey_xs=(12.0, 18.0),
+        opponent_xs=(42.0,),
+    )
+    decisions = DecisionController()
+    registry = TurnEndHookRegistry.from_bindings(
+        army_rule.runtime_contribution().turn_end_hook_bindings
+    )
+    request = _decision_request(
+        registry.next_request_for(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+    )
+
+    assert request.decision_type == SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE
+    assert request.actor_id == "player-grey"
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["source_rule_id"] == army_rule.SOURCE_RULE_ID
+    assert request_payload["hook_id"] == army_rule.HOOK_ID
+    assert request_payload["max_units"] == 3
+    assert request_payload["eligible_rules_unit_instance_ids"] == [
+        "army-grey:terminators-1",
+        "army-grey:terminators-2",
+    ]
+    assert {option.option_id for option in request.options} == {
+        "grey-knights:gate-of-infinity:army-grey:terminators-1:use",
+        "grey-knights:gate-of-infinity:army-grey:terminators-2:use",
+        "grey-knights:gate-of-infinity:complete",
+    }
+
+    result = DecisionResult.for_request(
+        result_id="result-gate-of-infinity-use",
+        request=request,
+        selected_option_id="grey-knights:gate-of-infinity:army-grey:terminators-1:use",
+    )
+    decisions.request_decision(request)
+    decisions.submit_result(result)
+    assert (
+        registry.apply_result(
+            TurnEndResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+            )
+        )
+        is True
+    )
+
+    reserve_state = state.reserve_state_for_unit("army-grey:terminators-1")
+    assert reserve_state is not None
+    assert reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
+    assert reserve_state.reserve_origin is ReserveOrigin.DURING_BATTLE_ABILITY
+    assert reserve_state.source_rule_ids == (army_rule.SOURCE_RULE_ID,)
+    assert reserve_state.required_arrival_battle_round == 2
+    assert reserve_state.required_arrival_phase == BattlePhase.MOVEMENT.value
+    assert reserve_state.required_arrival_source_rule_id == army_rule.SOURCE_RULE_ID
+    assert reserve_state.arrival_is_required_at(battle_round=2, phase=BattlePhase.MOVEMENT)
+    assert not reserve_state.arrival_is_eligible_at(
+        battle_round=1,
+        phase=BattlePhase.MOVEMENT,
+    )
+    assert state.battlefield_state is not None
+    assert all(
+        placement.unit_instance_id != "army-grey:terminators-1"
+        for placed_army in state.battlefield_state.placed_armies
+        for placement in placed_army.unit_placements
+    )
+    used_payload = _last_event_payload(decisions, army_rule.GATE_OF_INFINITY_USED_EVENT)
+    validate_json_value(used_payload)
+    assert used_payload["selected_count_after"] == 1
+    assert used_payload["max_units"] == 3
+    assert used_payload["component_unit_instance_ids"] == ["army-grey:terminators-1"]
+    reserve_payloads = cast(list[dict[str, JsonValue]], used_payload["reserve_states"])
+    assert reserve_payloads[0]["required_arrival_battle_round"] == 2
+
+    next_request = _decision_request(
+        registry.next_request_for(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+    )
+    assert {option.option_id for option in next_request.options} == {
+        "grey-knights:gate-of-infinity:army-grey:terminators-2:use",
+        "grey-knights:gate-of-infinity:complete",
+    }
+
+
+def test_gate_of_infinity_cap_blocks_additional_requests() -> None:
+    state = _grey_knights_state(
+        battle_size=BattleSize.INCURSION,
+        grey_knights_units=(
+            _unit("army-grey:terminators-1", "Brotherhood Terminators", has_gate=True),
+            _unit("army-grey:terminators-2", "Brotherhood Terminators", has_gate=True),
+            _unit("army-grey:terminators-3", "Brotherhood Terminators", has_gate=True),
+        ),
+        active_player_id="player-opponent",
+        grey_xs=(12.0, 18.0, 24.0),
+        opponent_xs=(42.0,),
+    )
+    decisions = DecisionController()
+
+    first_request = _request_for(state=state, decisions=decisions)
+    _apply_result(
+        state=state,
+        decisions=decisions,
+        request=first_request,
+        option_id="grey-knights:gate-of-infinity:army-grey:terminators-1:use",
+        result_id="result-gate-of-infinity-first",
+    )
+    second_request = _request_for(state=state, decisions=decisions)
+    _apply_result(
+        state=state,
+        decisions=decisions,
+        request=second_request,
+        option_id="grey-knights:gate-of-infinity:army-grey:terminators-2:use",
+        result_id="result-gate-of-infinity-second",
+    )
+
+    assert (
+        army_rule.gate_of_infinity_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+        is None
+    )
+    assert state.reserve_state_for_unit("army-grey:terminators-3") is None
+
+
+def test_gate_of_infinity_completion_records_no_reserve_mutation() -> None:
+    state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(
+            _unit("army-grey:terminators-1", "Brotherhood Terminators", has_gate=True),
+        ),
+        active_player_id="player-opponent",
+        grey_xs=(12.0,),
+        opponent_xs=(42.0,),
+    )
+    decisions = DecisionController()
+    request = _request_for(state=state, decisions=decisions)
+
+    _apply_result(
+        state=state,
+        decisions=decisions,
+        request=request,
+        option_id="grey-knights:gate-of-infinity:complete",
+        result_id="result-gate-of-infinity-complete",
+    )
+
+    assert state.reserve_state_for_unit("army-grey:terminators-1") is None
+    completed_payload = _last_event_payload(
+        decisions,
+        army_rule.GATE_OF_INFINITY_COMPLETED_EVENT,
+    )
+    assert completed_payload["use_ability"] is False
+    assert (
+        army_rule.gate_of_infinity_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+        is None
+    )
+
+
+def test_gate_of_infinity_excludes_engaged_or_missing_ability_units() -> None:
+    state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(
+            _unit("army-grey:eligible", "Brotherhood Terminators", has_gate=True),
+            _unit("army-grey:engaged", "Brotherhood Terminators", has_gate=True),
+            _unit("army-grey:no-gate", "Strike Squad", has_gate=False),
+        ),
+        active_player_id="player-opponent",
+        grey_xs=(12.0, 30.0, 36.0),
+        opponent_xs=(31.0,),
+    )
+    decisions = DecisionController()
+
+    request = _request_for(state=state, decisions=decisions)
+
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["eligible_rules_unit_instance_ids"] == ["army-grey:eligible"]
+    assert {option.option_id for option in request.options} == {
+        "grey-knights:gate-of-infinity:army-grey:eligible:use",
+        "grey-knights:gate-of-infinity:complete",
+    }
+
+
+def test_gate_of_infinity_attached_rules_unit_requires_all_components_and_moves_all() -> None:
+    bodyguard = _unit("army-grey:bodyguard", "Brotherhood Terminators", has_gate=True)
+    leader = _unit("army-grey:leader", "Brotherhood Captain", has_gate=True)
+    state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(bodyguard, leader),
+        active_player_id="player-opponent",
+        grey_xs=(12.0, 15.0),
+        opponent_xs=(42.0,),
+        attached_units=(
+            AttachedUnitFormation(
+                attached_unit_instance_id="attached-unit:army-grey:terminator-command",
+                bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+                leader_unit_instance_ids=(leader.unit_instance_id,),
+                component_unit_instance_ids=tuple(
+                    sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+                ),
+                source_id="phase17g:grey-knights:test-attached-unit",
+                attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
+            ),
+        ),
+    )
+    decisions = DecisionController()
+    request = _request_for(state=state, decisions=decisions)
+
+    assert {option.option_id for option in request.options} == {
+        "grey-knights:gate-of-infinity:attached-unit:army-grey:terminator-command:use",
+        "grey-knights:gate-of-infinity:complete",
+    }
+    _apply_result(
+        state=state,
+        decisions=decisions,
+        request=request,
+        option_id="grey-knights:gate-of-infinity:attached-unit:army-grey:terminator-command:use",
+        result_id="result-gate-of-infinity-attached",
+    )
+
+    assert state.reserve_state_for_unit(bodyguard.unit_instance_id) is not None
+    assert state.reserve_state_for_unit(leader.unit_instance_id) is not None
+    assert state.battlefield_state is not None
+    assert all(
+        placement.unit_instance_id not in {bodyguard.unit_instance_id, leader.unit_instance_id}
+        for placed_army in state.battlefield_state.placed_armies
+        for placement in placed_army.unit_placements
+    )
+    used_payload = _last_event_payload(decisions, army_rule.GATE_OF_INFINITY_USED_EVENT)
+    assert used_payload["target_rules_unit_instance_id"] == (
+        "attached-unit:army-grey:terminator-command"
+    )
+    assert used_payload["component_unit_instance_ids"] == [
+        "army-grey:bodyguard",
+        "army-grey:leader",
+    ]
+
+
+def test_gate_of_infinity_attached_rules_unit_missing_ability_is_not_eligible() -> None:
+    bodyguard = _unit("army-grey:bodyguard", "Brotherhood Terminators", has_gate=True)
+    leader = _unit("army-grey:leader", "Brotherhood Captain", has_gate=False)
+    state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(bodyguard, leader),
+        active_player_id="player-opponent",
+        grey_xs=(12.0, 15.0),
+        opponent_xs=(42.0,),
+        attached_units=(
+            AttachedUnitFormation(
+                attached_unit_instance_id="attached-unit:army-grey:terminator-command",
+                bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+                leader_unit_instance_ids=(leader.unit_instance_id,),
+                component_unit_instance_ids=tuple(
+                    sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+                ),
+                source_id="phase17g:grey-knights:test-attached-unit",
+                attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
+            ),
+        ),
+    )
+    decisions = DecisionController()
+
+    assert (
+        army_rule.gate_of_infinity_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+        is None
+    )
+
+
+@pytest.mark.parametrize("destroyed_role", ["bodyguard", "leader"])
+def test_gate_of_infinity_can_be_used_after_attached_component_loss(
+    destroyed_role: str,
+) -> None:
+    attached_id = "attached-unit:army-grey:terminator-command"
+    bodyguard = _unit(
+        "army-grey:bodyguard",
+        "Brotherhood Terminators",
+        has_gate=destroyed_role != "bodyguard",
+    )
+    leader = _unit(
+        "army-grey:leader",
+        "Brotherhood Captain",
+        has_gate=destroyed_role != "leader",
+    )
+    destroyed = bodyguard if destroyed_role == "bodyguard" else leader
+    living = leader if destroyed_role == "bodyguard" else bodyguard
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="phase17g:grey-knights:test-attached-unit",
+        attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
+    )
+    state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(bodyguard, leader),
+        active_player_id="player-opponent",
+        grey_xs=(12.0, 15.0),
+        opponent_xs=(42.0,),
+        attached_units=(formation,),
+    )
+    _configure_mission_state(state)
+    _destroy_test_unit_model(
+        state=state,
+        unit_instance_id=destroyed.unit_instance_id,
+    )
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_removed_models(
+        (destroyed.own_models[0].model_instance_id,)
+    )
+    validate_attached_rules_unit_identity_after_destruction(
+        state=state,
+        rules_unit_instance_id=attached_id,
+    )
+    decisions = DecisionController()
+
+    from tests.mission_action_history_helpers import prepare_retained_turn_end_for_fixture
+
+    prepare_retained_turn_end_for_fixture(state=state, decisions=decisions)
+    request = _request_for(state=state, decisions=decisions)
+    assert f"grey-knights:gate-of-infinity:{attached_id}:use" in {
+        option.option_id for option in request.options
+    }
+    _apply_result(
+        state=state,
+        decisions=decisions,
+        request=request,
+        option_id=f"grey-knights:gate-of-infinity:{attached_id}:use",
+        result_id=f"result-gate-of-infinity-after-{destroyed_role}-loss",
+    )
+    from tests.mission_action_history_helpers import finish_primary_turn_end_for_fixture
+
+    finish_primary_turn_end_for_fixture(state=state, decisions=decisions)
+
+    reserve_state = state.reserve_state_for_unit(attached_id)
+    assert reserve_state is not None
+    assert reserve_state.unit_instance_id == attached_id
+    assert state.battlefield_state.unit_placement_or_none(living.unit_instance_id) is None
+    assert len(state.primary_battlefield_departure_states) == 1
+    departure = state.primary_battlefield_departure_states[0]
+    assert departure.component_unit_instance_ids == formation.component_unit_instance_ids
+    assert departure.affected_component_unit_instance_ids == (living.unit_instance_id,)
+    assert departure.departed_component_unit_instance_ids == (living.unit_instance_id,)
+    assert departure.removed_model_instance_ids == (living.own_models[0].model_instance_id,)
+    used_payload = _last_event_payload(decisions, army_rule.GATE_OF_INFINITY_USED_EVENT)
+    assert used_payload["target_rules_unit_instance_id"] == attached_id
+    assert used_payload["component_unit_instance_ids"] == list(
+        formation.component_unit_instance_ids
+    )
+    _arrive_rules_unit_from_strategic_reserves(
+        state=state,
+        decisions=decisions,
+        rules_unit_instance_id=attached_id,
+        component_unit_placements=(
+            UnitPlacement(
+                army_id="army-grey",
+                player_id="player-grey",
+                unit_instance_id=living.unit_instance_id,
+                model_placements=(
+                    ModelPlacement(
+                        army_id="army-grey",
+                        player_id="player-grey",
+                        unit_instance_id=living.unit_instance_id,
+                        model_instance_id=living.own_models[0].model_instance_id,
+                        pose=Pose.at(15.0, 0.75),
+                    ),
+                ),
+            ),
+        ),
+        battle_round=2,
+        result_id_prefix=f"gate-after-{destroyed_role}-loss-arrival",
+    )
+
+    arrived_state = state.reserve_state_for_unit(attached_id)
+    assert arrived_state is not None
+    assert arrived_state.status.value == "arrived"
+    assert state.battlefield_state.unit_placement_by_id(living.unit_instance_id) is not None
+    assert state.battlefield_state.unit_placement_or_none(destroyed.unit_instance_id) is None
+    baseline_payload = GameLifecycle(
+        state=state,
+        decision_controller=decisions,
+    ).to_payload()
+    assert GameLifecycle.from_payload(deepcopy(baseline_payload)).to_payload() == baseline_payload
+
+
+def test_gate_of_infinity_departure_validation_failure_is_atomic_after_component_loss() -> None:
+    attached_id = "attached-unit:army-grey:terminator-command"
+    bodyguard = _unit(
+        "army-grey:bodyguard",
+        "Brotherhood Terminators",
+        has_gate=False,
+    )
+    leader = _unit("army-grey:leader", "Brotherhood Captain", has_gate=True)
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="phase17g:grey-knights:test-attached-unit",
+        attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
+    )
+    state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(bodyguard, leader),
+        active_player_id="player-opponent",
+        grey_xs=(12.0, 15.0),
+        opponent_xs=(42.0,),
+        attached_units=(formation,),
+    )
+    _configure_mission_state(state)
+    _destroy_test_unit_model(state=state, unit_instance_id=bodyguard.unit_instance_id)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_removed_models(
+        (bodyguard.own_models[0].model_instance_id,)
+    )
+    validate_attached_rules_unit_identity_after_destruction(
+        state=state,
+        rules_unit_instance_id=attached_id,
+    )
+    decisions = DecisionController()
+    request = _request_for(state=state, decisions=decisions)
+    result = DecisionResult.for_request(
+        result_id="result-gate-of-infinity-atomic-failure",
+        request=request,
+        selected_option_id=f"grey-knights:gate-of-infinity:{attached_id}:use",
+    )
+    decisions.request_decision(request)
+    decisions.submit_result(result)
+
+    physical_placement = RulesUnitPlacement.from_battlefield(
+        view=rules_unit_view_by_id(state=state, unit_instance_id=attached_id),
+        battlefield_state=state.battlefield_state,
+    )
+    occurrence_id = f"{result.result_id}:reserve-entry:{attached_id}"
+    duplicate_departure = prepare_primary_battlefield_departure(
+        state=state,
+        battlefield_state=physical_placement.without_from_battlefield(state.battlefield_state),
+        rules_unit_instance_id=attached_id,
+        affected_component_unit_instance_ids=(leader.unit_instance_id,),
+        departed_component_unit_instance_ids=(leader.unit_instance_id,),
+        removed_model_instance_ids=(leader.own_models[0].model_instance_id,),
+        removal_kind=BattlefieldRemovalKind.INTO_RESERVES,
+        occurrence_id=occurrence_id,
+        source_id=occurrence_id,
+    )
+    assert duplicate_departure is not None
+    record_prepared_primary_battlefield_departure(
+        state=state,
+        departure=duplicate_departure,
+    )
+    battlefield_before = state.battlefield_state
+    reserve_states_before = tuple(state.reserve_states)
+    departure_states_before = tuple(state.primary_battlefield_departure_states)
+    events_before = tuple(decisions.event_log.records)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Primary battlefield departure occurrence already exists",
+    ):
+        army_rule.apply_gate_of_infinity_turn_end_result(
+            TurnEndResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+            )
+        )
+
+    assert state.battlefield_state == battlefield_before
+    assert tuple(state.reserve_states) == reserve_states_before
+    assert tuple(state.primary_battlefield_departure_states) == departure_states_before
+    assert tuple(decisions.event_log.records) == events_before
+
+
+def test_gate_of_infinity_arrival_retains_attached_identity_and_replay() -> None:
+    attached_id = "attached-unit:army-grey:terminator-command"
+    bodyguard = _unit("army-grey:bodyguard", "Brotherhood Terminators", has_gate=True)
+    leader = _unit("army-grey:leader", "Brotherhood Captain", has_gate=True)
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="phase17g:grey-knights:test-attached-unit",
+        attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
+    )
+    state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(bodyguard, leader),
+        active_player_id="player-opponent",
+        grey_xs=(12.0, 15.0),
+        opponent_xs=(42.0,),
+        attached_units=(formation,),
+    )
+    _configure_mission_state(state)
+    decisions = DecisionController()
+    from tests.mission_action_history_helpers import prepare_retained_turn_end_for_fixture
+
+    prepare_retained_turn_end_for_fixture(state=state, decisions=decisions)
+    request = _request_for(state=state, decisions=decisions)
+    _apply_result(
+        state=state,
+        decisions=decisions,
+        request=request,
+        option_id=f"grey-knights:gate-of-infinity:{attached_id}:use",
+        result_id="result-gate-of-infinity-attached-retained",
+    )
+    from tests.mission_action_history_helpers import finish_primary_turn_end_for_fixture
+
+    finish_primary_turn_end_for_fixture(state=state, decisions=decisions)
+    _arrive_rules_unit_from_strategic_reserves(
+        state=state,
+        decisions=decisions,
+        rules_unit_instance_id=attached_id,
+        component_unit_placements=(
+            UnitPlacement(
+                army_id="army-grey",
+                player_id="player-grey",
+                unit_instance_id=bodyguard.unit_instance_id,
+                model_placements=(
+                    ModelPlacement(
+                        army_id="army-grey",
+                        player_id="player-grey",
+                        unit_instance_id=bodyguard.unit_instance_id,
+                        model_instance_id=bodyguard.own_models[0].model_instance_id,
+                        pose=Pose.at(15.0, 0.75),
+                    ),
+                ),
+            ),
+            UnitPlacement(
+                army_id="army-grey",
+                player_id="player-grey",
+                unit_instance_id=leader.unit_instance_id,
+                model_placements=(
+                    ModelPlacement(
+                        army_id="army-grey",
+                        player_id="player-grey",
+                        unit_instance_id=leader.unit_instance_id,
+                        model_instance_id=leader.own_models[0].model_instance_id,
+                        pose=Pose.at(16.5, 0.75),
+                    ),
+                ),
+            ),
+        ),
+        battle_round=2,
+        result_id_prefix="gate-attached-arrival",
+    )
+    state.movement_phase_state = None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    from tests.destruction_occurrence_fixture_helpers import (
+        destroy_rule_model_for_fixture,
+        finish_core_destructions_for_fixture,
+    )
+
+    enemy = state.army_definitions[1].units[0]
+    destroy_rule_model_for_fixture(
+        state=state,
+        decisions=decisions,
+        model_id=bodyguard.own_models[0].model_instance_id,
+        destroying_player_id="player-opponent",
+        source_unit_id=enemy.unit_instance_id,
+        source_model_id=enemy.own_models[0].model_instance_id,
+    )
+    finish_core_destructions_for_fixture(state=state, decisions=decisions)
+
+    validate_attached_rules_unit_identity_after_destruction(
+        state=state,
+        rules_unit_instance_id=attached_id,
+    )
+    assert state.army_definitions[0].attached_units == (formation,)
+    assert {reserve_state.unit_instance_id for reserve_state in state.reserve_states} == {
+        attached_id
+    }
+    retained_reserve_state = state.reserve_state_for_unit(attached_id)
+    assert retained_reserve_state is not None
+    assert retained_reserve_state.status.value == "arrived"
+    assert retained_reserve_state.arrived_battle_round == 2
+    assert unit_arrived_from_reserves_this_turn(
+        state=state,
+        unit_instance_id=leader.unit_instance_id,
+    )
+    assert rules_unit_identities_share_lineage(
+        state=state,
+        first_unit_instance_id=bodyguard.unit_instance_id,
+        second_unit_instance_id=leader.unit_instance_id,
+    )
+
+    baseline_payload = GameLifecycle(
+        state=state,
+        decision_controller=decisions,
+    ).to_payload()
+    assert GameLifecycle.from_payload(deepcopy(baseline_payload)).to_payload() == baseline_payload
+
+    split_shaped_payload = deepcopy(baseline_payload)
+    state_payload = cast(dict[str, object], split_shaped_payload["state"])
+    grey_army_payload = next(
+        army
+        for army in cast(list[dict[str, object]], state_payload["army_definitions"])
+        if army["player_id"] == "player-grey"
+    )
+    grey_army_payload["attached_units"] = []
+    with pytest.raises(
+        GameLifecycleError,
+        match="StartingStrengthRecord unit is unknown",
+    ):
+        GameLifecycle.from_payload(split_shaped_payload)
+
+
+def test_gate_of_infinity_rejects_stale_component_drift_before_mutation() -> None:
+    bodyguard = _unit("army-grey:bodyguard", "Brotherhood Terminators", has_gate=True)
+    leader = _unit("army-grey:leader", "Brotherhood Captain", has_gate=True)
+    replacement_leader = _unit(
+        "army-grey:replacement-leader",
+        "Brotherhood Librarian",
+        has_gate=True,
+    )
+    state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(bodyguard, leader, replacement_leader),
+        active_player_id="player-opponent",
+        grey_xs=(12.0, 15.0, 18.0),
+        opponent_xs=(42.0,),
+        attached_units=(
+            AttachedUnitFormation(
+                attached_unit_instance_id="attached-unit:army-grey:terminator-command",
+                bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+                leader_unit_instance_ids=(leader.unit_instance_id,),
+                component_unit_instance_ids=tuple(
+                    sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+                ),
+                source_id="phase17g:grey-knights:test-attached-unit",
+                attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
+            ),
+        ),
+    )
+    decisions = DecisionController()
+    request = _request_for(state=state, decisions=decisions)
+    state.army_definitions = [
+        replace(
+            army,
+            attached_units=(
+                AttachedUnitFormation(
+                    attached_unit_instance_id="attached-unit:army-grey:terminator-command",
+                    bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+                    leader_unit_instance_ids=(replacement_leader.unit_instance_id,),
+                    component_unit_instance_ids=tuple(
+                        sorted(
+                            (
+                                bodyguard.unit_instance_id,
+                                replacement_leader.unit_instance_id,
+                            )
+                        )
+                    ),
+                    source_id="phase17g:grey-knights:test-attached-unit",
+                    attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
+                ),
+            ),
+        )
+        if army.player_id == "player-grey"
+        else army
+        for army in state.army_definitions
+    ]
+    result = DecisionResult.for_request(
+        result_id="result-gate-of-infinity-stale",
+        request=request,
+        selected_option_id="grey-knights:gate-of-infinity:attached-unit:army-grey:terminator-command:use",
+    )
+
+    with pytest.raises(GameLifecycleError, match="component drift"):
+        army_rule.apply_gate_of_infinity_turn_end_result(
+            TurnEndResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+            )
+        )
+    assert state.reserve_state_for_unit(bodyguard.unit_instance_id) is None
+    assert state.reserve_state_for_unit(leader.unit_instance_id) is None
+    assert state.reserve_state_for_unit(replacement_leader.unit_instance_id) is None
+
+
+def test_gate_of_infinity_does_not_prompt_outside_opponent_fight_phase() -> None:
+    own_turn_state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(
+            _unit("army-grey:terminators-1", "Brotherhood Terminators", has_gate=True),
+        ),
+        active_player_id="player-grey",
+        phase=BattlePhase.FIGHT,
+        grey_xs=(12.0,),
+        opponent_xs=(42.0,),
+    )
+    shooting_state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(
+            _unit("army-grey:terminators-1", "Brotherhood Terminators", has_gate=True),
+        ),
+        active_player_id="player-opponent",
+        phase=BattlePhase.SHOOTING,
+        grey_xs=(12.0,),
+        opponent_xs=(42.0,),
+    )
+    decisions = DecisionController()
+
+    assert (
+        army_rule.gate_of_infinity_turn_end_request(
+            TurnEndRequestContext(
+                state=own_turn_state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+        is None
+    )
+    assert (
+        army_rule.gate_of_infinity_turn_end_request(
+            TurnEndRequestContext(
+                state=shooting_state,
+                decisions=decisions,
+                completed_phase=BattlePhase.SHOOTING,
+            )
+        )
+        is None
+    )
+
+
+def _request_for(*, state: GameState, decisions: DecisionController) -> DecisionRequest:
+    return _decision_request(
+        army_rule.gate_of_infinity_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+    )
+
+
+def _apply_result(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    option_id: str,
+    result_id: str,
+) -> None:
+    result = DecisionResult.for_request(
+        result_id=result_id,
+        request=request,
+        selected_option_id=option_id,
+    )
+    decisions.request_decision(request)
+    decisions.submit_result(result)
+    handled = army_rule.apply_gate_of_infinity_turn_end_result(
+        TurnEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+    assert handled is True
+
+
+def _grey_knights_state(
+    *,
+    battle_size: BattleSize,
+    grey_knights_units: tuple[UnitInstance, ...],
+    active_player_id: str,
+    grey_xs: tuple[float, ...],
+    opponent_xs: tuple[float, ...],
+    phase: BattlePhase = BattlePhase.FIGHT,
+    attached_units: tuple[AttachedUnitFormation, ...] = (),
+) -> GameState:
+    enemy_units = tuple(
+        _unit(f"army-opponent:enemy-{index + 1}", "Enemy Unit", has_gate=False)
+        for index in range(len(opponent_xs))
+    )
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    battle_phase_sequence = tuple(descriptor.battle_phase_sequence.phases)
+    grey_army = _army(
+        army_id="army-grey",
+        player_id="player-grey",
+        faction_id=army_rule.GREY_KNIGHTS_FACTION_ID,
+        battle_size=battle_size,
+        units=grey_knights_units,
+        attached_units=attached_units,
+    )
+    enemy_army = _army(
+        army_id="army-opponent",
+        player_id="player-opponent",
+        faction_id="adeptus-astartes",
+        battle_size=battle_size,
+        units=enemy_units,
+    )
+    state = GameState(
+        game_id="phase17g-grey-knights-game",
+        ruleset_descriptor_hash=descriptor.descriptor_hash,
+        stage=GameLifecycleStage.BATTLE,
+        setup_sequence=tuple(descriptor.setup_sequence.steps),
+        battle_phase_sequence=battle_phase_sequence,
+        player_ids=("player-grey", "player-opponent"),
+        turn_order=("player-grey", "player-opponent"),
+        tactical_secondary_draw_count=2,
+        setup_step_index=None,
+        battle_phase_index=battle_phase_sequence.index(phase),
+        battle_round=1,
+        active_player_id=active_player_id,
+    )
+    state.record_army_definition(grey_army)
+    state.record_army_definition(enemy_army)
+    state.battlefield_state = BattlefieldRuntimeState(
+        battlefield_id="phase17g-grey-knights-battlefield",
+        battlefield_width_inches=60.0,
+        battlefield_depth_inches=44.0,
+        placed_armies=(
+            _placed_army(army=grey_army, units=grey_knights_units, xs=grey_xs, y=12.0),
+            _placed_army(army=enemy_army, units=enemy_units, xs=opponent_xs, y=12.0),
+        ),
+    )
+    return state
+
+
+def _army(
+    *,
+    army_id: str,
+    player_id: str,
+    faction_id: str,
+    battle_size: BattleSize,
+    units: tuple[UnitInstance, ...],
+    attached_units: tuple[AttachedUnitFormation, ...] = (),
+) -> ArmyDefinition:
+    ruleset_id = _ruleset_descriptor().ruleset_id
+    return ArmyDefinition(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id=f"{army_id}-catalog",
+        source_package_id="phase17g-grey-knights-test-package",
+        ruleset_id=ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id=faction_id,
+            detachment_ids=("phase17g-test-detachment",),
+        ),
+        force_disposition_id="purge-the-foe",
+        units=units,
+        attached_units=attached_units,
+        roster_legality_report=RosterLegalityReport(battle_size=battle_size),
+        battle_size=battle_size,
+    )
+
+
+def _unit(unit_instance_id: str, name: str, *, has_gate: bool) -> UnitInstance:
+    datasheet_id = f"{unit_instance_id}:datasheet"
+    model = _model(
+        model_instance_id=f"{unit_instance_id}:model-1",
+        datasheet_id=datasheet_id,
+        model_profile_id=f"{unit_instance_id}:profile",
+        name=f"{name} model",
+    )
+    return with_unit_keywords(
+        UnitInstance(
+            unit_instance_id=unit_instance_id,
+            datasheet_id=datasheet_id,
+            name=name,
+            datasheet_abilities=(_gate_of_infinity_ability(),) if has_gate else (),
+            datasheet_source_ids=(f"source:{datasheet_id}",),
+            own_models=(model,),
+            wargear_selections=(),
+        ),
+        keywords=("INFANTRY",),
+        faction_keywords=("GREY KNIGHTS",) if has_gate else ("ADEPTUS ASTARTES",),
+    )
+
+
+def _model(
+    *,
+    model_instance_id: str,
+    datasheet_id: str,
+    model_profile_id: str,
+    name: str,
+) -> ModelInstance:
+    base_size = BaseSizeDefinition.circular(32.0)
+    return ModelInstance(
+        keyword_assignment=ModelKeywordAssignment(
+            datasheet_id=datasheet_id,
+            model_profile_id=model_profile_id,
+            keywords=(),
+            faction_keywords=(),
+            source_ids=(f"source:{model_profile_id}",),
+        ),
+        model_instance_id=model_instance_id,
+        datasheet_id=datasheet_id,
+        model_profile_id=model_profile_id,
+        name=name,
+        characteristics=(
+            CharacteristicValue.from_raw(Characteristic.WOUNDS, 2),
+            CharacteristicValue.from_raw(Characteristic.SAVE, 2),
+            CharacteristicValue.from_raw(Characteristic.OBJECTIVE_CONTROL, 1),
+        ),
+        base_size=base_size,
+        geometry=ModelGeometry.from_base_size(
+            base_size,
+            keywords=("INFANTRY",),
+            geometry_source_id=model_profile_id,
+        ),
+        starting_wounds=2,
+        wounds_remaining=2,
+        wargear_ids=(),
+        source_ids=(f"source:{model_profile_id}",),
+    )
+
+
+def _gate_of_infinity_ability() -> DatasheetAbilityDescriptor:
+    return DatasheetAbilityDescriptor(
+        ability_id=army_rule.GATE_OF_INFINITY_ABILITY_ID,
+        name=army_rule.GATE_OF_INFINITY_ABILITY_NAME,
+        source_id=army_rule.SOURCE_RULE_ID,
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="Select this unit for Gate of Infinity.",
+        timing_tags=("end_turn",),
+        parameter_tokens=("strategic_reserves",),
+    )
+
+
+def _placed_army(
+    *,
+    army: ArmyDefinition,
+    units: tuple[UnitInstance, ...],
+    xs: tuple[float, ...],
+    y: float,
+) -> PlacedArmy:
+    if len(units) != len(xs):
+        raise AssertionError("test fixture units and positions must match")
+    return PlacedArmy(
+        army_id=army.army_id,
+        player_id=army.player_id,
+        unit_placements=tuple(
+            _unit_placement(army=army, unit=unit, x=x, y=y)
+            for unit, x in zip(units, xs, strict=True)
+        ),
+    )
+
+
+def _unit_placement(
+    *,
+    army: ArmyDefinition,
+    unit: UnitInstance,
+    x: float,
+    y: float,
+) -> UnitPlacement:
+    return UnitPlacement(
+        army_id=army.army_id,
+        player_id=army.player_id,
+        unit_instance_id=unit.unit_instance_id,
+        model_placements=(
+            ModelPlacement(
+                army_id=army.army_id,
+                player_id=army.player_id,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=unit.own_models[0].model_instance_id,
+                pose=Pose.at(x=x, y=y, facing_degrees=0.0),
+            ),
+        ),
+    )
+
+
+def _ruleset_descriptor() -> RulesetDescriptor:
+    return RulesetDescriptor.warhammer_40000_eleventh()
+
+
+def _mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-grey",
+        attacker_force_disposition_id="purge-the-foe",
+        defender_player_id="player-opponent",
+        defender_force_disposition_id="purge-the-foe",
+    )
+
+
+def _configure_mission_state(state: GameState) -> None:
+    mission_setup = _mission_setup()
+    state.mission_setup = mission_setup
+    if state.battlefield_state is None:
+        raise AssertionError("Mission test fixture requires battlefield_state.")
+    state.battlefield_state = replace(
+        state.battlefield_state,
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+        terrain_features=mission_setup.terrain_features,
+    )
+
+
+def _destroy_test_unit_model(*, state: GameState, unit_instance_id: str) -> None:
+    state.army_definitions = [
+        replace(
+            army,
+            units=tuple(
+                replace(
+                    unit,
+                    own_models=tuple(
+                        replace(model, wounds_remaining=0) for model in unit.own_models
+                    ),
+                )
+                if unit.unit_instance_id == unit_instance_id
+                else unit
+                for unit in army.units
+            ),
+        )
+        if any(unit.unit_instance_id == unit_instance_id for unit in army.units)
+        else army
+        for army in state.army_definitions
+    ]
+
+
+def _arrive_rules_unit_from_strategic_reserves(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    rules_unit_instance_id: str,
+    component_unit_placements: tuple[UnitPlacement, ...],
+    battle_round: int,
+    result_id_prefix: str,
+) -> None:
+    state.battle_round = battle_round
+    state.fight_phase_state = None
+    state.active_player_id = "player-grey"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=battle_round,
+        active_player_id="player-grey",
+    )
+    handler = MovementPhaseHandler(ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh())
+    selection_status = handler.begin_phase(state=state, decisions=decisions)
+    assert selection_status is not None
+    assert selection_status.decision_request is not None
+    selection_request = selection_status.decision_request
+    selection_result = DecisionResult.for_request(
+        result_id=f"{result_id_prefix}-select",
+        request=selection_request,
+        selected_option_id=rules_unit_instance_id,
+    )
+    decisions.submit_result(selection_result)
+    selection_apply_status = handler.apply_decision(
+        state=state,
+        decisions=decisions,
+        result=selection_result,
+    )
+    assert selection_apply_status is None
+    action_status = handler.begin_phase(state=state, decisions=decisions)
+    assert action_status.decision_request is not None
+    action_result = DecisionResult.for_request(
+        result_id=f"{result_id_prefix}-ingress",
+        request=action_status.decision_request,
+        selected_option_id=MovementPhaseActionKind.INGRESS.value,
+    )
+    decisions.submit_result(action_result)
+    placement_status = handler.apply_decision(
+        state=state,
+        decisions=decisions,
+        result=action_result,
+    )
+    assert placement_status is not None
+    assert placement_status.decision_request is not None
+    placement_request = placement_status.decision_request
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        placement_request.payload
+    )
+    proposal_context = proposal_request.context
+    assert proposal_context is not None
+    assert proposal_context["component_unit_instance_ids"] == [
+        placement.unit_instance_id for placement in component_unit_placements
+    ]
+    placement_result = DecisionResult(
+        result_id=f"{result_id_prefix}-place",
+        request_id=placement_request.request_id,
+        decision_type=placement_request.decision_type,
+        actor_id=placement_request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=validate_json_value(
+            PlacementProposalPayload(
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+                unit_instance_id=rules_unit_instance_id,
+                placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+                attempted_rules_unit_placement=RulesUnitPlacement(
+                    rules_unit_instance_id=rules_unit_instance_id,
+                    component_unit_placements=component_unit_placements,
+                ),
+            ).to_payload()
+        ),
+    )
+    assert (
+        handler.invalid_proposal_submission_status(
+            state=state,
+            request=placement_request,
+            result=placement_result,
+            decisions=decisions,
+        )
+        is None
+    )
+    decisions.submit_result(placement_result)
+    assert (
+        handler.apply_decision(
+            state=state,
+            decisions=decisions,
+            result=placement_result,
+        )
+        is None
+    )
+    assert any(
+        event.event_type == "reinforcement_unit_arrived"
+        and cast(dict[str, JsonValue], event.payload).get("unit_instance_id")
+        == rules_unit_instance_id
+        for event in decisions.event_log.records
+    )
+
+
+def _decision_request(request: DecisionRequest | LifecycleStatus | None) -> DecisionRequest:
+    assert isinstance(request, DecisionRequest), "Expected Gate of Infinity request."
+    return request
+
+
+def _last_event_payload(
+    decisions: DecisionController,
+    event_type: str,
+) -> dict[str, JsonValue]:
+    for record in reversed(decisions.event_log.records):
+        if record.event_type == event_type:
+            return cast(dict[str, JsonValue], record.payload)
+    raise AssertionError(f"Missing event {event_type}.")

@@ -507,6 +507,12 @@ def test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_t
         for segment in matching_segments
     )
     assert all(segment.vertical_distance_inches > 0.0 for segment in matching_segments)
+    assert all(
+        segment.counted_distance_inches
+        == segment.horizontal_distance_inches
+        + (segment.vertical_distance_inches if segment.traversal_mode.value == "climb" else 0.0)
+        for segment in matching_segments
+    )
 
 
 def test_infantry_can_move_through_ruins_wall_but_cannot_end_inside_wall() -> None:

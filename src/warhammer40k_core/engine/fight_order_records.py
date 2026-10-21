@@ -738,11 +738,9 @@ class FightOrderState:
                 *self.selected_to_fight_unit_ids,
                 selection.unit_instance_id,
             ),
-            passed_player_ids=tuple(
-                player_id
-                for player_id in self.passed_player_ids
-                if player_id != selection.player_id
-            ),
+            # A combat breaks the sequence of passes (12.04.01). The other
+            # player may now have a target brought closer by that combat.
+            passed_player_ids=(),
             remaining_combats_activation_since_band_entry=(
                 self.remaining_combats_activation_since_band_entry
                 or selection.ordering_band is FightOrderingBandKind.REMAINING_COMBATS

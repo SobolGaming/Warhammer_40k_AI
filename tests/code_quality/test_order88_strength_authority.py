@@ -53,8 +53,8 @@ def test_strength_consumers_use_the_shared_interaction_query() -> None:
 
 def test_absent_strength_source_is_reproducible_and_authorized() -> None:
     artifact, audit = build_payloads()
-    assert json.loads(ARTIFACT_PATH.read_text()) == artifact
-    assert json.loads(AUDIT_PATH.read_text()) == audit
+    assert json.loads(ARTIFACT_PATH.read_text(encoding="utf-8")) == artifact
+    assert json.loads(AUDIT_PATH.read_text(encoding="utf-8")) == audit
     assert hashlib.sha256(ARTIFACT_PATH.read_bytes()).hexdigest() == source.EXPECTED_ARTIFACT_SHA256
     assert source.ABSENT_STRENGTH_SOURCE_ID in source.source_package().evidence_required_source_ids
     rule = next(

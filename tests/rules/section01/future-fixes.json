@@ -1,0 +1,97 @@
+{
+  "policy": {
+    "semantic_rule_errors": "Keep source-expected assertions visibly failing and register for a future fix PR. No semantic repair in this corpus milestone.",
+    "execution_crashes": "A narrowly scoped repair is authorized for supported engine paths that crash or cannot continue. Assertion failures and legitimate rejections do not qualify."
+  },
+  "open_semantic_defects": [
+    {
+      "id": "SF01-001",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "title": "Capitalized Stealth grant is applied but covers no models",
+      "source_obligations": [
+        "01.02-obligation-07",
+        "01.02.07-obligation-03",
+        "01.02.11-obligation-02"
+      ],
+      "source_authority": "coverage.json: hash-verified retained full Core body; unchanged adopted rows",
+      "constructed_rule": "This unit gains Stealth until the end of the phase.",
+      "expected": "A successfully applied unrestricted unit grant covers every model in the rules unit, for each permitted keyword class.",
+      "actual": "The compiler accepts the rule, execution reports APPLIED, but stealth_source_inventory returns an empty covered-model set for all four native definition controls.",
+      "native_datasheets": {
+        "000004080": "Infractors: 5 models",
+        "000004078": "Lord Exultant: 1 model",
+        "000004090": "Chaos Spawn: 2 models",
+        "000000968": "Maulerfiend: 1 model"
+      },
+      "cause_evidence": "The parsed GRANT_ABILITY parameter retains Stealth, while the Stealth consumer matches lowercase stealth. Lowercase controls cover all native models.",
+      "regression": "tests/rules/section01/test_01_02_unrestricted.py::test_01_02_07_11_grant_to_unit_is_grant_to_every_native_model",
+      "failed_nodes": [
+        "tests/rules/section01/test_01_02_unrestricted.py::test_01_02_07_11_grant_to_unit_is_grant_to_every_native_model[Stealth-000004080]",
+        "tests/rules/section01/test_01_02_unrestricted.py::test_01_02_07_11_grant_to_unit_is_grant_to_every_native_model[Stealth-000004078]",
+        "tests/rules/section01/test_01_02_unrestricted.py::test_01_02_07_11_grant_to_unit_is_grant_to_every_native_model[Stealth-000004090]",
+        "tests/rules/section01/test_01_02_unrestricted.py::test_01_02_07_11_grant_to_unit_is_grant_to_every_native_model[Stealth-000000968]"
+      ],
+      "reproduce": ".venv/Scripts/python.exe -m pytest tests/rules/section01/test_01_02_unrestricted.py -q --no-cov --selected-army-source-index=<existing-index>",
+      "observed": "4 failed, 4 lowercase controls passed; no skip/xfail and no semantic engine edit.",
+      "future_fix_scope": "Review canonical ability-token handling at parser/execution/consumer boundaries and retain case-variant integration controls. Do not fix as part of the remaining corpus sections.",
+      "pre_repair_observation": {
+        "id": "SF01-001",
+        "status": "OPEN_FUTURE_FIX_PR",
+        "title": "Capitalized Stealth grant is applied but covers no models",
+        "source_obligations": [
+          "01.02-obligation-07",
+          "01.02.07-obligation-03",
+          "01.02.11-obligation-02"
+        ],
+        "source_authority": "coverage.json: hash-verified retained full Core body; unchanged adopted rows",
+        "constructed_rule": "This unit gains Stealth until the end of the phase.",
+        "expected": "A successfully applied unrestricted unit grant covers every model in the rules unit, for each permitted keyword class.",
+        "actual": "The compiler accepts the rule, execution reports APPLIED, but stealth_source_inventory returns an empty covered-model set for all four native definition controls.",
+        "native_datasheets": {
+          "000004080": "Infractors: 5 models",
+          "000004078": "Lord Exultant: 1 model",
+          "000004090": "Chaos Spawn: 2 models",
+          "000000968": "Maulerfiend: 1 model"
+        },
+        "cause_evidence": "The parsed GRANT_ABILITY parameter retains Stealth, while the Stealth consumer matches lowercase stealth. Lowercase controls cover all native models.",
+        "regression": "tests/rules/section01/test_01_02_unrestricted.py::test_01_02_07_11_grant_to_unit_is_grant_to_every_native_model",
+        "failed_nodes": [
+          "tests/rules/section01/test_01_02_unrestricted.py::test_01_02_07_11_grant_to_unit_is_grant_to_every_native_model[Stealth-000004080]",
+          "tests/rules/section01/test_01_02_unrestricted.py::test_01_02_07_11_grant_to_unit_is_grant_to_every_native_model[Stealth-000004078]",
+          "tests/rules/section01/test_01_02_unrestricted.py::test_01_02_07_11_grant_to_unit_is_grant_to_every_native_model[Stealth-000004090]",
+          "tests/rules/section01/test_01_02_unrestricted.py::test_01_02_07_11_grant_to_unit_is_grant_to_every_native_model[Stealth-000000968]"
+        ],
+        "reproduce": ".venv/Scripts/python.exe -m pytest tests/rules/section01/test_01_02_unrestricted.py -q --no-cov --selected-army-source-index=<existing-index>",
+        "observed": "4 failed, 4 lowercase controls passed; no skip/xfail and no semantic engine edit.",
+        "future_fix_scope": "Review canonical ability-token handling at parser/execution/consumer boundaries and retain case-variant integration controls. Do not fix as part of the remaining corpus sections."
+      },
+      "repair_performed": true,
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": null
+      }
+    }
+  ],
+  "repaired_execution_crashes": [
+    {
+      "id": "CF01-001",
+      "status": "FIXED_NARROW_SUPPORTED_PATH_CRASH",
+      "file": "src/warhammer40k_core/engine/mission_action_battle_shock.py",
+      "trigger": "Checking Action eligibility or interrupting an Action for a real supported native Infractor unit containing unrelated GENERIC_RULE_IR abilities.",
+      "before": "GameLifecycleError: Action Battle-shock permission source drifted. Unrelated catalog descriptors legitimately use IDs different from embedded source IDs; the scanner checked them before finding an Action permission.",
+      "repair": "First determine whether a clause grants this exact unconditional permanent Action permission. Skip unrelated abilities. Retain strict source-ID equality for actual grants.",
+      "after": "Native Action eligibility and interruption continue; a matching explicit typed permission succeeds; a drifted actual permission still raises.",
+      "tests": [
+        "tests/rules/section01/test_01_06_07_morale.py",
+        "tests/rules/section01/test_01_07_actions.py"
+      ],
+      "before_receipt": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-9\\batch4b.txt",
+      "authorization": "User: execution crashes or supported paths failing to continue may be fixed as found. Wrong rule outcomes must wait for future PRs."
+    }
+  ],
+  "current_checkpoint_note": "User-approved focused repair checkpoint supersedes this file's historical no-repair milestone policy only for marked findings; original observations and source qualifications remain retained. Independent review pending."
+}

@@ -43,7 +43,7 @@ def test_surviving_unit_coherency_casualty_scores_per_model(
         0
     ]
     bridge, isolated = enemy.own_models[-2:]
-    finish_turn(session)
+    finish_turn(session, coherency_casualty_ids=(isolated.model_instance_id,))
     assert any(
         isolated.model_instance_id in cleanup.removed_model_instance_ids
         for cleanup in state.end_turn_cleanup_states

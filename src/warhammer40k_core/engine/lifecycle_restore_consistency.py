@@ -53,7 +53,7 @@ from warhammer40k_core.engine.phase_movement_history import (
 from warhammer40k_core.engine.prebattle_integrity import validate_prebattle_alternation_restore
 from warhammer40k_core.engine.revival_engagement_history import validate_revival_engagement_history
 from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
-from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
+from warhammer40k_core.engine.unit_coherency import assert_battlefield_rules_units_in_coherency
 
 
 def validate_payload_consistency(
@@ -241,7 +241,7 @@ def _validate_battlefield_state_consistency(
         if _state_requires_deployed_battlefield_state(state):
             scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
         if config is not None and _state_requires_deployed_battlefield_state(state):
-            assert_battlefield_units_in_coherency(
+            assert_battlefield_rules_units_in_coherency(
                 scenario=scenario_for_required_restore_coherency(
                     scenario=_fahi.battlefield_scenario_for_living_model_coherency(
                         scenario=scenario,

@@ -120,7 +120,9 @@ def _select(session: AdapterGameSession, unit_id: str) -> None:
 
 def _session(*, prior_shot: bool = True, game_id: str = "phase13b-game") -> LocalGameSession:
     lifecycle, _units = _shooting_lifecycle(
-        alpha_unit_ids=("prior", "passenger", "noncontributor", "transport-1"),
+        # A remaining selectable unit holds this live Shooting checkpoint. Without
+        # it, prior_shot=True can finish the turn and correctly expire Firing Deck.
+        alpha_unit_ids=("prior", "passenger", "noncontributor", "transport-1", "observer"),
         game_id=game_id,
         alpha_datasheets={
             "transport-1": ("core-transport", "core-transport", 1),

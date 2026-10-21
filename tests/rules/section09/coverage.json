@@ -1,0 +1,1996 @@
+{
+  "schema": "section09-clause-corpus-v1",
+  "source_authority": "Game Datamissions maintained mirror, non-affiliated; existing accepted hostname; live-body actual timestamp, not asserted App-data963",
+  "observed_at": "2026-10-01T12:04:31.127429+00:00",
+  "qualification": "Retained timestamped maintained-mirror body; no independent Games Workshop publication or App export certification; no new provider observation.",
+  "sources": [
+    {
+      "source_id": "rule:09:09.00:1",
+      "locator": "09.00",
+      "title": "Movement Phase",
+      "source_sha256": "0215e66855fcc6a42f9b530d8f93955c4058543c9921cd70da8f2584904db0b7",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "624b7799af569bdee66adef3b1401f9d1f79c66a049e0b44c93580a75533f227",
+          "value": "In the Movement phase, you will be able to move each of your units across the battlefield. Reinforcements can also arrive in this phase to bolster your forces."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "06c47bdf4dba442ec686e811ea5e5c3077148779be1b5a8e78e990304bd41ade",
+          "value": "The Movement phase is resolved by following these steps:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "dfa5f8f124294d65c5353243d2759410b03ef969e1e36f33fd22224ad44bd154",
+          "value": "1. START OF MOVEMENT PHASE"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "dfbeb45a4286315fa96f41c8647922f123f346948c3f517e860eb9bd916121b9",
+          "value": "2. MOVE UNITS"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "183b7d0a22c429d94f2ef3b590a8732e010d3de2465a0b0bb2bd75dd29dbeee9",
+          "value": "3. END OF MOVEMENT PHASE"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.00-obligation-01",
+          "source_blocks": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "obligation": "Move each active unit through start/body/end; arrivals are Movement work",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py",
+            "src/warhammer40k_core/engine/boundary_rule_flow.py",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_phase_flow.py::test_nonempty_start_and_end_rules_surround_all_active_units_exactly_once",
+              "function_ast_sha256": "b5c8a29e8b909e99c73a9f1454710d70f0a994c61483c7d830f0161f5eb88679",
+              "assertions": [
+                "assert observed_types == ['select_movement_unit', 'select_movement_action']",
+                "assert len(gains) == int(active == 'owner')",
+                "assert types.index('movement_phase_entered') < types.index('movement_unit_selected')",
+                "assert types.index('movement_activation_completed') < types.index('move_units_completed') < types.index('battle_phase_completed')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert len(events(session, 'move_units_completed')) == 1",
+                "assert request is not None",
+                "assert request.actor_id == active",
+                "assert gains[0]['passed'] is True",
+                "assert state.command_point_total('owner') == 1",
+                "assert len(request.options) == 1",
+                "assert request.decision_type == 'select_movement_action'",
+                "assert effect < types.index('movement_unit_selected')",
+                "assert types.index('move_units_completed') < effect < types.index('battle_phase_completed')"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_selection.py::test_reserve_ingress_is_offered_in_move_units_step_when_eligible",
+              "function_ast_sha256": "290140125a55a30897f21a67af3e7995d79f97032199a2cc6e2b8d75ed2551c1",
+              "assertions": [
+                "assert {o.option_id for o in request.options} == {'remain_stationary', 'ingress'}",
+                "assert state.movement_phase_state is not None",
+                "assert state.movement_phase_state.step.value == 'move_units'"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:09:09.01:1",
+      "locator": "09.01",
+      "title": "Start Of Movement Phase",
+      "source_sha256": "4174fb29f4c6469135d1e87b94f42701640efa6d4adab763e88ddd3f57da85a7",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "14b81fd7de513dc8294f71a666ba199c932e87b2d5b2d439fc7dfdd48fdedec4",
+          "value": "Rules that are triggered at the start of the Movement phase are resolved now."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.01-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Resolve nonempty start-of-phase rule before unit selection",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py",
+            "src/warhammer40k_core/engine/boundary_rule_flow.py",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_phase_flow.py::test_nonempty_start_and_end_rules_surround_all_active_units_exactly_once",
+              "function_ast_sha256": "b5c8a29e8b909e99c73a9f1454710d70f0a994c61483c7d830f0161f5eb88679",
+              "assertions": [
+                "assert observed_types == ['select_movement_unit', 'select_movement_action']",
+                "assert len(gains) == int(active == 'owner')",
+                "assert types.index('movement_phase_entered') < types.index('movement_unit_selected')",
+                "assert types.index('movement_activation_completed') < types.index('move_units_completed') < types.index('battle_phase_completed')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert len(events(session, 'move_units_completed')) == 1",
+                "assert request is not None",
+                "assert request.actor_id == active",
+                "assert gains[0]['passed'] is True",
+                "assert state.command_point_total('owner') == 1",
+                "assert len(request.options) == 1",
+                "assert request.decision_type == 'select_movement_action'",
+                "assert effect < types.index('movement_unit_selected')",
+                "assert types.index('move_units_completed') < effect < types.index('battle_phase_completed')"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:09:09.02:1",
+      "locator": "09.02",
+      "title": "Move Units Step",
+      "source_sha256": "5acf0ae8524e832f25b6b4631537b907892d7ea858356711629e0e62d25571e3",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "3be9cb91731cb8be793b2367400089313d23a6ef42e50661ce0da19097342e1e",
+          "value": "The active player moves their units one at a time, using the sequence below, until all of their units have been \u0005selected to move\u0006 and those moves have ended."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "e4a5a6878ba45597e536cc6ad8cc462e3a7c58059828e789dc9afcf5252d369e",
+          "value": "\u00051. Select Unit:\u0006 Select one friendly unit that has not been \u0005selected to move\u0006 this phase. You can select a unit on the battlefield, in \u0005strategic reserves\u0006, or embarked within a \u0003TRANSPORT\u0004. That unit is \u0005selected to move\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "958de5beda6f5bb9f0209327b10a42dce99beb4bbe4cf0adc8ae66a2f3968ed4",
+          "value": "\u00052. Select Move Type:\u0006 Select one \u0005move type\u0006 that unit is eligible to make, and resolve it with that unit. This can be one listed below, or one presented elsewhere:"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "7316d2780c510e4883cda91762d629ee2418281e00764b914ee5f5d5296eed0b",
+          "value": "▫ \u0005Remain stationary\u0006 (09.04)"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "8bbcfbc4b3ec17d3bac13296fa53f0c6b23881bcc7de20921c42fcec94478015",
+          "value": "▫ \u0005Normal move\u0006 (09.05)"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "dcffb8decc7a52a3c641368126c8f79f0e28b49df0952679e9265440fb330c72",
+          "value": "▫ \u0005Advance move\u0006 (09.06)"
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "642e04c46cd267bc18c967d70af1fd8a01c0a7d3dee11cf3e6130668f3bc6e74",
+          "value": "▫ \u0005Fall-back move\u0006 (09.07)"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "1d545cd6bfc39a19c913fd54195015a5b109629068b768f399508c70bf46a882",
+          "value": "▫ \u0005Disembark move\u0006 (18.04)"
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "3e352515b43aa5c5b769c6bf495f4e8c471a3515971f26318e74034dfdf928e4",
+          "value": "▫ \u0005Ingress move\u0006 (20.04)"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.02-obligation-01",
+          "source_blocks": [
+            1,
+            2
+          ],
+          "obligation": "Active player chooses a fresh friendly unit, one at a time, including off-board locations",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_selection.py::test_all_locations_can_be_selected_and_remain_stationary",
+              "function_ast_sha256": "9a79291f9a7b8c91dd1fcf1602490f345b12c3bec58b8e7f3f17ec8857e3a687",
+              "assertions": [
+                "assert 'remain_stationary' in {o.option_id for o in request.options}",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state == before",
+                "assert state.movement_phase_state is not None",
+                "assert unit.unit_instance_id in state.movement_phase_state.moved_unit_ids",
+                "assert following is not None",
+                "assert following.decision_type == 'select_movement_unit'",
+                "assert unit.unit_instance_id not in {o.option_id for o in following.options}",
+                "assert all(('enemy:' not in o.option_id for o in following.options))",
+                "assert not events(session, 'move_start_rules_completed')",
+                "assert not [e for e in events(session, 'rule_trigger_observed') if e.get('trigger_kind') == 'move_completion']",
+                "assert len(complete) == 1",
+                "assert complete[0]['witness'] is None",
+                "assert complete[0]['movement_phase_action'] == 'remain_stationary'"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_selection.py::test_selection_rejects_without_consumption_then_legal_choice_continues",
+              "function_ast_sha256": "a613f9d4c4906bbfa40b33886c9eb976dd16ca7400e4abe224c2f7c6b4d087bb",
+              "assertions": [
+                "assert (state.to_payload(), session.lifecycle.decision_controller.to_payload()) == before",
+                "assert status.decision_request is not None",
+                "assert status.decision_request.decision_type == 'select_movement_action'"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.02-obligation-02",
+          "source_blocks": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "obligation": "Only eligible move types and modes are offered",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_selection.py::test_battlefield_choices_apply_exclusive_eligibility_and_optional_retreat",
+              "function_ast_sha256": "ea738b461d8125c3c6615cd839025a0ce5386df8b55a434bb2becb9e1b1494d9",
+              "assertions": [
+                "assert actual == expected",
+                "assert state.movement_phase_state is not None",
+                "assert state.movement_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert state.movement_phase_state.moved_unit_ids == ()"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_selection.py::test_offboard_units_cannot_choose_normal_advance_or_fall_back",
+              "function_ast_sha256": "4f00e7c06123d2bbde7ca4208f3b03ad3257e239c6d27cc762a6e78a732814c5",
+              "assertions": [
+                "assert not {'normal_move', 'advance', 'fall_back:ordered_retreat', 'fall_back:desperate_escape'}.intersection((o.option_id for o in request.options))",
+                "assert {o.option_id for o in request.options}.issubset({'remain_stationary', 'ingress'})",
+                "assert 'disembark' in {o.option_id for o in request.options}"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.02-obligation-03",
+          "source_blocks": [
+            8,
+            9
+          ],
+          "obligation": "Disembark/Ingress are selectable here; placement semantics are Section18/20 owned",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_selection.py::test_offboard_units_cannot_choose_normal_advance_or_fall_back",
+              "function_ast_sha256": "4f00e7c06123d2bbde7ca4208f3b03ad3257e239c6d27cc762a6e78a732814c5",
+              "assertions": [
+                "assert not {'normal_move', 'advance', 'fall_back:ordered_retreat', 'fall_back:desperate_escape'}.intersection((o.option_id for o in request.options))",
+                "assert {o.option_id for o in request.options}.issubset({'remain_stationary', 'ingress'})",
+                "assert 'disembark' in {o.option_id for o in request.options}"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_selection.py::test_reserve_ingress_is_offered_in_move_units_step_when_eligible",
+              "function_ast_sha256": "290140125a55a30897f21a67af3e7995d79f97032199a2cc6e2b8d75ed2551c1",
+              "assertions": [
+                "assert {o.option_id for o in request.options} == {'remain_stationary', 'ingress'}",
+                "assert state.movement_phase_state is not None",
+                "assert state.movement_phase_state.step.value == 'move_units'"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:09:09.02.01:1",
+      "locator": "09.02.01",
+      "title": "Selecting Units To Move",
+      "source_sha256": "e8a02a4ffa7698fe1fd83d349617c7265c019597034e88a0a9f88fe77b68fe2b",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "1600988a8e60fc801edfbd0d0fc0dc774c9b949aa8ae4ef75be5bb9b1bc132a8",
+          "value": "When the Move Units step ends, the active player must have selected all of their units to make a move with, including those in \u0005strategic reserves\u0006. This means that before the phase ends, every unit in their army will have been selected to make a move, even if it is to \u0005remain stationary\u0006 (09.04). Any units the active player does not select a \u0005move type\u0006 for during this step will \u0005remain stationary\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.02.01-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Every unit must be selected and finish, including stationary reserves",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_selection.py::test_all_locations_can_be_selected_and_remain_stationary",
+              "function_ast_sha256": "9a79291f9a7b8c91dd1fcf1602490f345b12c3bec58b8e7f3f17ec8857e3a687",
+              "assertions": [
+                "assert 'remain_stationary' in {o.option_id for o in request.options}",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state == before",
+                "assert state.movement_phase_state is not None",
+                "assert unit.unit_instance_id in state.movement_phase_state.moved_unit_ids",
+                "assert following is not None",
+                "assert following.decision_type == 'select_movement_unit'",
+                "assert unit.unit_instance_id not in {o.option_id for o in following.options}",
+                "assert all(('enemy:' not in o.option_id for o in following.options))",
+                "assert not events(session, 'move_start_rules_completed')",
+                "assert not [e for e in events(session, 'rule_trigger_observed') if e.get('trigger_kind') == 'move_completion']",
+                "assert len(complete) == 1",
+                "assert complete[0]['witness'] is None",
+                "assert complete[0]['movement_phase_action'] == 'remain_stationary'"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_phase_flow.py::test_nonempty_start_and_end_rules_surround_all_active_units_exactly_once",
+              "function_ast_sha256": "b5c8a29e8b909e99c73a9f1454710d70f0a994c61483c7d830f0161f5eb88679",
+              "assertions": [
+                "assert observed_types == ['select_movement_unit', 'select_movement_action']",
+                "assert len(gains) == int(active == 'owner')",
+                "assert types.index('movement_phase_entered') < types.index('movement_unit_selected')",
+                "assert types.index('movement_activation_completed') < types.index('move_units_completed') < types.index('battle_phase_completed')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert len(events(session, 'move_units_completed')) == 1",
+                "assert request is not None",
+                "assert request.actor_id == active",
+                "assert gains[0]['passed'] is True",
+                "assert state.command_point_total('owner') == 1",
+                "assert len(request.options) == 1",
+                "assert request.decision_type == 'select_movement_action'",
+                "assert effect < types.index('movement_unit_selected')",
+                "assert types.index('move_units_completed') < effect < types.index('battle_phase_completed')"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:09:09.02.02:1",
+      "locator": "09.02.02",
+      "title": "Selecting Modes",
+      "source_sha256": "c84af3c22da733d65f1df12f4adb2dc9985b17b05e345eca6d2834007e0d4892",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "c96e56be4c3e4af7662c3d96a0a17ddea5db26b40cb5583d73f77464baa2d1ca",
+          "value": "Some rules instruct you to select a mode, such as \u0005fall-back moves\u0006 (09.07). Modes are mutually exclusive, and you must assess each one in the order presented. When making a move, if your unit does not meet the conditions of any of the modes, it cannot make that move."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "23820b4ce9e069675f16e5c0fdeb8c698993d53a3a2d59057b7d66b737433616",
+          "value": "Sometimes a mode will be mandatory if applicable (e.g. \u0005consolidation modes\u0006, 12.08), but in the case of \u0005fall-back moves\u0006, \u0005ordered retreat\u0006 is not mandatory, so you could select \u0005desperate escape\u0006 instead."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "af9469abd62042ad2431c47b0b4c86a4d232b8c537eb280673d2f5535904f320",
+          "value": "Many \u0005move types\u0006 state conditions you must meet while/after moving. Those that are labelled with a mode name only apply if you selected that mode; those not labelled with a mode name always apply."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.02.02-obligation-01",
+          "source_blocks": [
+            1,
+            2
+          ],
+          "obligation": "Modes are exclusive, unmet modes unavailable; Ordered Retreat is optional",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_selection.py::test_battlefield_choices_apply_exclusive_eligibility_and_optional_retreat",
+              "function_ast_sha256": "ea738b461d8125c3c6615cd839025a0ce5386df8b55a434bb2becb9e1b1494d9",
+              "assertions": [
+                "assert actual == expected",
+                "assert state.movement_phase_state is not None",
+                "assert state.movement_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert state.movement_phase_state.moved_unit_ids == ()"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.02.02-obligation-02",
+          "source_blocks": [
+            3
+          ],
+          "obligation": "Mode-specific transit permission and common unengaged endpoint",
+          "status": "enabled_source_correct_failures_with_controls",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_fall_back.py::test_only_desperate_escape_can_cross_enemy_models_but_both_must_end_unengaged",
+              "function_ast_sha256": "8e9d8cf9e48cd8a97f2240f1b5d23271f6a4939c1d729756d70852a0c02b46d7",
+              "assertions": [
+                "assert result.is_valid is (mode == 'desperate_escape')"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_fall_back.py::test_fall_back_cannot_finish_still_engaged",
+              "function_ast_sha256": "bb3c68ed10f51d1097115f4ab8cedca5df4997f8733d41478fcb8d58b930272a",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert any((v.violation_code == 'enemy_engagement_range_end_forbidden' for r in result.path_validation_results for v in r.violations))"
+              ]
+            }
+          ],
+          "findings": [
+            "SF09-001"
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:09:09.02.03:1",
+      "locator": "09.02.03",
+      "title": "Reinforcements Step",
+      "source_sha256": "e784370a3a850cea478ea1b77216be03b451c2cff66e49058b29ee47e40777e2",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "8361d3833fdf7e6c0859fe8ca6102ca3781e6588cf6bcf4ea16382e0efb6177a",
+          "value": "Rules that say they happen during the Reinforcements step happen during the Move Units step."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.02.03-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Ingress is Movement Move Units work, with no separate Reinforcements step",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_selection.py::test_reserve_ingress_is_offered_in_move_units_step_when_eligible",
+              "function_ast_sha256": "290140125a55a30897f21a67af3e7995d79f97032199a2cc6e2b8d75ed2551c1",
+              "assertions": [
+                "assert {o.option_id for o in request.options} == {'remain_stationary', 'ingress'}",
+                "assert state.movement_phase_state is not None",
+                "assert state.movement_phase_state.step.value == 'move_units'"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:09:09.03:1",
+      "locator": "09.03",
+      "title": "End Of Movement Phase",
+      "source_sha256": "971bd093f230e6c98495248062bf7a6e78e8bf1e787c2af5ccf18cdd879ed382",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "1f15d0741bcc741e72f5597aac8bd25f893c56f5a275dab86166887b60d769d9",
+          "value": "Rules that are triggered at the end of the Movement phase are resolved now."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.03-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Resolve nonempty end-of-phase rule after body before next phase",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py",
+            "src/warhammer40k_core/engine/boundary_rule_flow.py",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_phase_flow.py::test_nonempty_start_and_end_rules_surround_all_active_units_exactly_once",
+              "function_ast_sha256": "b5c8a29e8b909e99c73a9f1454710d70f0a994c61483c7d830f0161f5eb88679",
+              "assertions": [
+                "assert observed_types == ['select_movement_unit', 'select_movement_action']",
+                "assert len(gains) == int(active == 'owner')",
+                "assert types.index('movement_phase_entered') < types.index('movement_unit_selected')",
+                "assert types.index('movement_activation_completed') < types.index('move_units_completed') < types.index('battle_phase_completed')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert len(events(session, 'move_units_completed')) == 1",
+                "assert request is not None",
+                "assert request.actor_id == active",
+                "assert gains[0]['passed'] is True",
+                "assert state.command_point_total('owner') == 1",
+                "assert len(request.options) == 1",
+                "assert request.decision_type == 'select_movement_action'",
+                "assert effect < types.index('movement_unit_selected')",
+                "assert types.index('move_units_completed') < effect < types.index('battle_phase_completed')"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:09:09.04:1",
+      "locator": "09.04",
+      "title": "Remain Stationary",
+      "source_sha256": "2435148733854be607224bcecc897d01bd5f7d5377e56cce2db30e618db8c85a",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "73dd5e336ab412220a434b599e7e9e6949c0d98f34adc3c4d5aaaaa782dffa50",
+          "value": "Any unit."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "b2a60b57e1d989929d547eb5aaad88ebf2ad55b7381a355440f07385c090d3b9",
+          "value": "No models are moved (either in straight lines or rotated). Units that \u0005remain stationary\u0006 do \u0001not\u0002 trigger any rules that are triggered when a unit starts or ends a move."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4",
+          "value": "\u000eMaximum Distance"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "3e2e37b820aa71e7eb6860cedd29598f868ad9f5073c7ad641be68fffd2a8537",
+          "value": "'-'"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.04-obligation-01",
+          "source_blocks": [
+            2,
+            4,
+            6
+          ],
+          "obligation": "Any unit may remain stationary; no translation/rotation or move-start/completion triggers",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_selection.py::test_all_locations_can_be_selected_and_remain_stationary",
+              "function_ast_sha256": "9a79291f9a7b8c91dd1fcf1602490f345b12c3bec58b8e7f3f17ec8857e3a687",
+              "assertions": [
+                "assert 'remain_stationary' in {o.option_id for o in request.options}",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state == before",
+                "assert state.movement_phase_state is not None",
+                "assert unit.unit_instance_id in state.movement_phase_state.moved_unit_ids",
+                "assert following is not None",
+                "assert following.decision_type == 'select_movement_unit'",
+                "assert unit.unit_instance_id not in {o.option_id for o in following.options}",
+                "assert all(('enemy:' not in o.option_id for o in following.options))",
+                "assert not events(session, 'move_start_rules_completed')",
+                "assert not [e for e in events(session, 'rule_trigger_observed') if e.get('trigger_kind') == 'move_completion']",
+                "assert len(complete) == 1",
+                "assert complete[0]['witness'] is None",
+                "assert complete[0]['movement_phase_action'] == 'remain_stationary'"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_selection.py::test_pending_selected_unit_has_no_implicit_translation_or_rotation",
+              "function_ast_sha256": "cadc1dd776be440962db8f5146c6a4cd423ace6e6f49ec5495b0d262d2bb1cfb",
+              "assertions": [
+                "assert state.battlefield_state == original",
+                "assert not events(session, 'movement_activation_completed')"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            3
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            5
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:09:09.05:1",
+      "locator": "09.05",
+      "title": "Normal Move",
+      "source_sha256": "4b58b251b966abd83d1fba30f20eeccdca03536d70714bd39c55f34a14ca15d7",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "51c8711cdf10b02197b143fc1b78f0d6383d79a4be75a8dd5a464a95d138a1b8",
+          "value": "Your unit is on the battlefield and \u0005unengaged\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab",
+          "value": "Your unit moves as described in Moving (03)."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+          "value": "\u000eAfter Moving"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "b71e9142bcd52ebb6b57bfcb4221093d3fcd1dd418f217d18565d9de583c236d",
+          "value": "Your unit must be \u0005unengaged\u0006."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4",
+          "value": "\u000eMaximum Distance"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "275c4cb105da303b08d54b28d2f1ac19f037f195e5e5426f9bf646c66fb34699",
+          "value": "Your unit’s \u0005M\u0006 characteristic."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.05-obligation-01",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "Normal Move requires battlefield and unengaged unit",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_selection.py::test_battlefield_choices_apply_exclusive_eligibility_and_optional_retreat",
+              "function_ast_sha256": "ea738b461d8125c3c6615cd839025a0ce5386df8b55a434bb2becb9e1b1494d9",
+              "assertions": [
+                "assert actual == expected",
+                "assert state.movement_phase_state is not None",
+                "assert state.movement_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert state.movement_phase_state.moved_unit_ids == ()"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_selection.py::test_offboard_units_cannot_choose_normal_advance_or_fall_back",
+              "function_ast_sha256": "4f00e7c06123d2bbde7ca4208f3b03ad3257e239c6d27cc762a6e78a732814c5",
+              "assertions": [
+                "assert not {'normal_move', 'advance', 'fall_back:ordered_retreat', 'fall_back:desperate_escape'}.intersection((o.option_id for o in request.options))",
+                "assert {o.option_id for o in request.options}.issubset({'remain_stationary', 'ingress'})",
+                "assert 'disembark' in {o.option_id for o in request.options}"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.05-obligation-02",
+          "source_blocks": [
+            4,
+            8
+          ],
+          "obligation": "Witnessed physical movement bounded inclusively by native M",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_distances.py::test_each_native_model_uses_m_plus_only_its_advance_roll",
+              "function_ast_sha256": "d3de02bade609b39e54b4260eb30311a39b5fd5dbd25c9c7f85df255c3e95578",
+              "assertions": [
+                "assert isinstance(value, CharacteristicValue)",
+                "assert result.is_valid is (delta <= 0)",
+                "assert state.to_payload() == before",
+                "assert result.advance_roll.value == 4",
+                "assert any((v.violation_code == 'movement_distance_exceeded' for r in result.path_validation_results for v in r.violations))"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_distances.py::test_public_path_rejection_preserves_geometry_and_legal_retry_finishes",
+              "function_ast_sha256": "b640478005e1b24c1499d2a8feaec3c5f72b9bb890d09173f4a968d4a70f1988",
+              "assertions": [
+                "assert request.decision_type == 'submit_movement_proposal'",
+                "assert status.status_kind is LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state == original",
+                "assert state.movement_phase_state is not None",
+                "assert tuple(state.movement_phase_state.moved_unit_ids) == ()",
+                "assert legal.status_kind is not LifecycleStatusKind.INVALID",
+                "assert unit.unit_instance_id in state.movement_phase_state.moved_unit_ids",
+                "assert state.battlefield_state is not None",
+                "assert tuple((p.pose for p in state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements)) == ends",
+                "assert len(events(session, 'movement_activation_completed')) == 1"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.05-obligation-03",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "Must finish unengaged",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_distances.py::test_unengaged_start_does_not_allow_engaged_endpoint",
+              "function_ast_sha256": "bfbe4e20cfed7946e656243a1dbdba1957e12e6cf210398a23426de095f0e40a",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert not result.is_valid",
+                "assert any((v.violation_code == 'enemy_engagement_range_end_forbidden' for r in result.path_validation_results for v in r.violations))"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            3
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            5
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            7
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:09:09.05.01:1",
+      "locator": "09.05.01",
+      "title": "More Than One Normal Move in a Phase.",
+      "source_sha256": "746b927bbe362730cc9d9ff3590b8e65112e5a6b10d8dc508531273d68c7759a",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "c239ea0be79c8d834bd3f7cc10be12af94b284b157063ea89e431b3a93de56d1",
+          "value": "A unit cannot make more than one \u0005Normal Move\u0006 in a phase."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.05.01-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "At most one Normal Move per phase across source kinds",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/normal_move_history.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_restrictions.py::test_prior_normal_move_in_same_phase_blocks_another_normal_only",
+              "function_ast_sha256": "2dad05c5c82da68de2a5a20906e61b623bcd0620bdd91deb21919c6de8920cae",
+              "assertions": [
+                "assert ('normal_move' in {o.option_id for o in request.options}) is (phase is not BattlePhase.MOVEMENT)",
+                "assert {'advance', 'remain_stationary'}.issubset((o.option_id for o in request.options))"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_restrictions.py::test_normal_move_completion_records_actual_once_per_phase_history",
+              "function_ast_sha256": "a65649ed79e5f064231f6702c0029113485171aa992508fece7be654e511f2ff",
+              "assertions": [
+                "assert len(state.normal_move_states) == 1",
+                "assert record.unit_instance_id == unit.unit_instance_id",
+                "assert record.phase is BattlePhase.MOVEMENT",
+                "assert record.source_kind is NormalMoveSourceKind.MOVEMENT_PHASE_ACTION",
+                "assert tuple(state.normal_move_states) == before"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:09:09.06:1",
+      "locator": "09.06",
+      "title": "Advance Move",
+      "source_sha256": "fd8a01c12ea60d0492b3338384169d144a99cb3f5f9f91d50f6cfb029b5714d7",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "51c8711cdf10b02197b143fc1b78f0d6383d79a4be75a8dd5a464a95d138a1b8",
+          "value": "Your unit is on the battlefield and \u0005unengaged\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "71b6143d5f310205f6d72379853a67a7f27f18983ba7f07ef42b7255d7fca1ee",
+          "value": "\u000eBefore Moving"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "a63907a6feccf00dd8db11829c1405d9359defce68726ec69b0160eab6847289",
+          "value": "Make an \u0005advance roll\u0006 by rolling one D6."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab",
+          "value": "Your unit moves as described in Moving (03)."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+          "value": "\u000eAfter Moving"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "7ea44889c11182e5c1b5faa26f13f400d8ae6f5ea372a9efca05e54701bb363a",
+          "value": "• Your unit must be \u0005unengaged\u0006."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "5bfe1020a7dcb4edcf0922df26cee7fec567379f3156d32da4235e481336b672",
+          "value": "• Until the end of the turn, unless otherwise stated, your unit is \u0001not\u0002 \u0005eligible to declare a charge\u0006 or \u0005start an action\u0006."
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4",
+          "value": "\u000eMaximum Distance"
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "57fd50e215e6570855d0062b08033907d6482aa19f45219298d0e93fa1c765de",
+          "value": "Advance roll + your unit’s \u0005M\u0006 characteristic."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.06-obligation-01",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "Advance requires battlefield and unengaged unit",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/advance_roll.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_selection.py::test_battlefield_choices_apply_exclusive_eligibility_and_optional_retreat",
+              "function_ast_sha256": "ea738b461d8125c3c6615cd839025a0ce5386df8b55a434bb2becb9e1b1494d9",
+              "assertions": [
+                "assert actual == expected",
+                "assert state.movement_phase_state is not None",
+                "assert state.movement_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert state.movement_phase_state.moved_unit_ids == ()"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_selection.py::test_offboard_units_cannot_choose_normal_advance_or_fall_back",
+              "function_ast_sha256": "4f00e7c06123d2bbde7ca4208f3b03ad3257e239c6d27cc762a6e78a732814c5",
+              "assertions": [
+                "assert not {'normal_move', 'advance', 'fall_back:ordered_retreat', 'fall_back:desperate_escape'}.intersection((o.option_id for o in request.options))",
+                "assert {o.option_id for o in request.options}.issubset({'remain_stationary', 'ingress'})",
+                "assert 'disembark' in {o.option_id for o in request.options}"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.06-obligation-02",
+          "source_blocks": [
+            4
+          ],
+          "obligation": "One native D6 before movement; retry never rerolls",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/advance_roll.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_distances.py::test_native_advance_roll_is_one_d6_and_does_not_repeat_on_path_retry",
+              "function_ast_sha256": "7d34bed54a8fb239f22ca5a9c5ddef44d6eed4e338d1c6dfb99c623bc29d63e4",
+              "assertions": [
+                "assert len(rolls) == 1",
+                "assert isinstance(roll, dict)",
+                "assert parsed.request.spec.expression.quantity == 1",
+                "assert parsed.request.spec.expression.sides == 6",
+                "assert 1 <= parsed.value <= 6",
+                "assert events(session, 'advance_roll_resolved') == rolls",
+                "assert restriction.unit_instance_id == unit.unit_instance_id",
+                "assert not restriction.can_declare_charge",
+                "assert restriction.cleanup_point == 'end_of_turn'"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.06-obligation-03",
+          "source_blocks": [
+            6,
+            11
+          ],
+          "obligation": "Witnessed movement up to native M + that Advance die",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/advance_roll.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_distances.py::test_each_native_model_uses_m_plus_only_its_advance_roll",
+              "function_ast_sha256": "d3de02bade609b39e54b4260eb30311a39b5fd5dbd25c9c7f85df255c3e95578",
+              "assertions": [
+                "assert isinstance(value, CharacteristicValue)",
+                "assert result.is_valid is (delta <= 0)",
+                "assert state.to_payload() == before",
+                "assert result.advance_roll.value == 4",
+                "assert any((v.violation_code == 'movement_distance_exceeded' for r in result.path_validation_results for v in r.violations))"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_distances.py::test_public_path_rejection_preserves_geometry_and_legal_retry_finishes",
+              "function_ast_sha256": "b640478005e1b24c1499d2a8feaec3c5f72b9bb890d09173f4a968d4a70f1988",
+              "assertions": [
+                "assert request.decision_type == 'submit_movement_proposal'",
+                "assert status.status_kind is LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state == original",
+                "assert state.movement_phase_state is not None",
+                "assert tuple(state.movement_phase_state.moved_unit_ids) == ()",
+                "assert legal.status_kind is not LifecycleStatusKind.INVALID",
+                "assert unit.unit_instance_id in state.movement_phase_state.moved_unit_ids",
+                "assert state.battlefield_state is not None",
+                "assert tuple((p.pose for p in state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements)) == ends",
+                "assert len(events(session, 'movement_activation_completed')) == 1"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.06-obligation-04",
+          "source_blocks": [
+            8
+          ],
+          "obligation": "Must finish unengaged",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/advance_roll.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_distances.py::test_unengaged_start_does_not_allow_engaged_endpoint",
+              "function_ast_sha256": "bfbe4e20cfed7946e656243a1dbdba1957e12e6cf210398a23426de095f0e40a",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert not result.is_valid",
+                "assert any((v.violation_code == 'enemy_engagement_range_end_forbidden' for r in result.path_validation_results for v in r.violations))"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.06-obligation-05",
+          "source_blocks": [
+            9
+          ],
+          "obligation": "Charge and Action restrictions through turn; explicit charge permission exception",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/advance_roll.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_restrictions.py::test_completed_move_blocks_charge_and_actions_through_the_rest_of_turn",
+              "function_ast_sha256": "e6e76d866eac0616704f12ad655022ff0d12ae156b763ecd73888d48d6ec042b",
+              "assertions": [
+                "assert not state.advanced_unit_states",
+                "assert not state.fell_back_unit_states",
+                "assert mission_action_unit_ineligibility_reason(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) is None",
+                "assert charge_unit_ineligibility_reason(state=state, unit_instance_id=unit.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor(), charge_state=ChargePhaseState(1, 'owner'), ignore_already_selected=False) == f'charge_unit_{suffix}'",
+                "assert mission_action_unit_ineligibility_reason(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) == f'mission_action_unit_{suffix}'",
+                "assert shooting_state_restriction_reason(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner') == ('fell_back' if suffix == 'fell_back' else None)"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_restrictions.py::test_explicit_charge_permission_is_consumed_by_shared_charge_owner",
+              "function_ast_sha256": "73d1d09fb6498c1d09c1beb3e16b1778b15feb5d35ab41ed48137be1e9dc863d",
+              "assertions": [
+                "assert charge_unit_ineligibility_reason(state=state, unit_instance_id=unit.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor(), charge_state=ChargePhaseState(1, 'owner'), ignore_already_selected=False) not in {'charge_unit_advanced', 'charge_unit_fell_back'}",
+                "assert shooting_state_restriction_reason(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner') is None"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            3
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            5
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            7
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            10
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:09:09.07:1",
+      "locator": "09.07",
+      "title": "Fall-Back Move",
+      "source_sha256": "9a2e9017949710717bf19fcd85f7e4ed9c33a4a3972ee35ee3896b8f084dafd0",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "efaed1ce5917becb5a59a864b6f6f305dd37eb47d2d57217515cd8c168194fa2",
+          "value": "Your unit is \u0005engaged\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "71b6143d5f310205f6d72379853a67a7f27f18983ba7f07ef42b7255d7fca1ee",
+          "value": "\u000eBefore Moving"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "722c861a2cd0778868be8bdb9cd90031b5806a6b8b946d1c59a658ecd24b506b",
+          "value": "Select \u0005fall-back mode:\u0006"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "68e48f9b4b50181952471f0e79f47da75d03158f8c4a8896eb8f68cedc26240c",
+          "value": "• \u0005Ordered Retreat:\u0006 If your unit is not \u0005battle-shocked\u0006, you can select this mode."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "1637ad8e901a9990e52ecce687e39af56e3201c2039997ffb58140fafd5ddceb",
+          "value": "• \u0005Desperate Escape:\u0006 Otherwise, you must select this mode. Make a \u0005hazard roll\u0006 for each model in your unit (06.03)."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "e71c12176330a1cb6bd961af93620cfe60c68b59704dac7bff9b61bc09d3c041",
+          "value": "\u000eWhile Moving"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "e3b5a449861b5f4f87f60a8f39adefa149b4b3b5031e94b81656dba922688233",
+          "value": "• \u0005Desperate Escape:\u0006 Each model that is moved can be moved through enemy models."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab",
+          "value": "Your unit moves as described in Moving (03)."
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+          "value": "\u000eAfter Moving"
+        },
+        {
+          "ordinal": 12,
+          "kind": "text",
+          "sha256": "7ea44889c11182e5c1b5faa26f13f400d8ae6f5ea372a9efca05e54701bb363a",
+          "value": "• Your unit must be \u0005unengaged\u0006."
+        },
+        {
+          "ordinal": 13,
+          "kind": "text",
+          "sha256": "a820d406efe9a5fa6b1c2a824a32c801971c78ea004febf6d2460318c472ac71",
+          "value": "• Until the end of the turn, unless otherwise stated, your unit is \u0001not\u0002 \u0005eligible to shoot\u0006, \u0005declare a charge\u0006 or \u0005start an action\u0006."
+        },
+        {
+          "ordinal": 14,
+          "kind": "text",
+          "sha256": "fc57af5c41537c66c0fba008c2f3e38ff40e1bea3cd477f21503f57c5a2850d0",
+          "value": "• \u0005Desperate Escape:\u0006 If your unit is not \u0005battle-shocked\u0006, you must make a \u0005battle-shock roll\u0006 for your unit (01.07)."
+        },
+        {
+          "ordinal": 15,
+          "kind": "text",
+          "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4",
+          "value": "\u000eMaximum Distance"
+        },
+        {
+          "ordinal": 16,
+          "kind": "text",
+          "sha256": "275c4cb105da303b08d54b28d2f1ac19f037f195e5e5426f9bf646c66fb34699",
+          "value": "Your unit’s \u0005M\u0006 characteristic."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.07-obligation-01",
+          "source_blocks": [
+            2,
+            4,
+            5
+          ],
+          "obligation": "Fall Back only while engaged; unshocked may choose either mode",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py",
+            "src/warhammer40k_core/engine/shooting_eligibility_state.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_selection.py::test_battlefield_choices_apply_exclusive_eligibility_and_optional_retreat",
+              "function_ast_sha256": "ea738b461d8125c3c6615cd839025a0ce5386df8b55a434bb2becb9e1b1494d9",
+              "assertions": [
+                "assert actual == expected",
+                "assert state.movement_phase_state is not None",
+                "assert state.movement_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert state.movement_phase_state.moved_unit_ids == ()"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.07-obligation-02",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "Desperate Escape mandatory when shocked, one hazard per model with actual hazard consequences",
+          "status": "enabled_source_correct_failures_with_controls",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py",
+            "src/warhammer40k_core/engine/shooting_eligibility_state.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_fall_back.py::test_selected_desperate_mode_requests_exactly_one_hazard_per_model",
+              "function_ast_sha256": "3f9001b07318f92ed01bac03f21406a082ea5df414b34b2e651b00fbc4547975",
+              "assertions": [
+                "assert result.is_valid",
+                "assert len(result.desperate_escape_requirements) == expected",
+                "assert len({r.model_instance_id for r in result.desperate_escape_requirements}) == expected",
+                "assert requirement.roll_spec().expression.quantity == 1",
+                "assert requirement.roll_spec().expression.sides == 6"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_fall_back.py::test_failed_escape_hazards_inflict_mortals_instead_of_removing_native_multiwound_models",
+              "function_ast_sha256": "793cf03aeedc40b9be1bbb9b0a2c4b69685671b34af361906789795c035e8d68",
+              "assertions": [
+                "assert len(rolls) == 2",
+                "assert failed > 0, 'This retained seed must exercise a failed hazard.'",
+                "assert state.battlefield_state is not None",
+                "assert set(unit.own_model_ids()).issubset(state.battlefield_state.placed_model_ids())",
+                "assert sum((m.current_wounds for m in current.alive_models())) == sum((m.initial_wounds for m in unit.own_models)) - failed"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_fall_back.py::test_all_escape_hazards_are_rolled_as_one_simultaneous_batch",
+              "function_ast_sha256": "5e73987a7c4da8e3aa8bd44566d436d07aac50cd211660d5edde1a7163b31f9e",
+              "assertions": [
+                "assert indices",
+                "assert not any((e.event_type in {'decision_requested', 'model_destroyed', 'mortal_wound_applied', 'movement_activation_completed'} for e in records[indices[0] + 1:indices[-1]]))",
+                "assert len(events(session, 'desperate_escape_roll_resolved')) == 2"
+              ]
+            }
+          ],
+          "findings": [
+            "SF09-002"
+          ]
+        },
+        {
+          "id": "09.07-obligation-03",
+          "source_blocks": [
+            8
+          ],
+          "obligation": "Enemy-model transit belongs only to Desperate Escape mode",
+          "status": "enabled_source_correct_failures_with_controls",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py",
+            "src/warhammer40k_core/engine/shooting_eligibility_state.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_fall_back.py::test_only_desperate_escape_can_cross_enemy_models_but_both_must_end_unengaged",
+              "function_ast_sha256": "8e9d8cf9e48cd8a97f2240f1b5d23271f6a4939c1d729756d70852a0c02b46d7",
+              "assertions": [
+                "assert result.is_valid is (mode == 'desperate_escape')"
+              ]
+            }
+          ],
+          "findings": [
+            "SF09-001"
+          ]
+        },
+        {
+          "id": "09.07-obligation-04",
+          "source_blocks": [
+            10,
+            16
+          ],
+          "obligation": "Fall Back uses witnessed movement bounded by M",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py",
+            "src/warhammer40k_core/engine/shooting_eligibility_state.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_distances.py::test_each_native_model_uses_m_plus_only_its_advance_roll",
+              "function_ast_sha256": "d3de02bade609b39e54b4260eb30311a39b5fd5dbd25c9c7f85df255c3e95578",
+              "assertions": [
+                "assert isinstance(value, CharacteristicValue)",
+                "assert result.is_valid is (delta <= 0)",
+                "assert state.to_payload() == before",
+                "assert result.advance_roll.value == 4",
+                "assert any((v.violation_code == 'movement_distance_exceeded' for r in result.path_validation_results for v in r.violations))"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_distances.py::test_public_path_rejection_preserves_geometry_and_legal_retry_finishes",
+              "function_ast_sha256": "b640478005e1b24c1499d2a8feaec3c5f72b9bb890d09173f4a968d4a70f1988",
+              "assertions": [
+                "assert request.decision_type == 'submit_movement_proposal'",
+                "assert status.status_kind is LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state == original",
+                "assert state.movement_phase_state is not None",
+                "assert tuple(state.movement_phase_state.moved_unit_ids) == ()",
+                "assert legal.status_kind is not LifecycleStatusKind.INVALID",
+                "assert unit.unit_instance_id in state.movement_phase_state.moved_unit_ids",
+                "assert state.battlefield_state is not None",
+                "assert tuple((p.pose for p in state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements)) == ends",
+                "assert len(events(session, 'movement_activation_completed')) == 1"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.07-obligation-05",
+          "source_blocks": [
+            12
+          ],
+          "obligation": "Finish unengaged in either mode",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py",
+            "src/warhammer40k_core/engine/shooting_eligibility_state.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_fall_back.py::test_fall_back_cannot_finish_still_engaged",
+              "function_ast_sha256": "bb3c68ed10f51d1097115f4ab8cedca5df4997f8733d41478fcb8d58b930272a",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert any((v.violation_code == 'enemy_engagement_range_end_forbidden' for r in result.path_validation_results for v in r.violations))"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.07-obligation-06",
+          "source_blocks": [
+            13
+          ],
+          "obligation": "Shooting/charge/Action restrictions through turn with explicit charge/shoot exceptions",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py",
+            "src/warhammer40k_core/engine/shooting_eligibility_state.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_restrictions.py::test_completed_move_blocks_charge_and_actions_through_the_rest_of_turn",
+              "function_ast_sha256": "e6e76d866eac0616704f12ad655022ff0d12ae156b763ecd73888d48d6ec042b",
+              "assertions": [
+                "assert not state.advanced_unit_states",
+                "assert not state.fell_back_unit_states",
+                "assert mission_action_unit_ineligibility_reason(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) is None",
+                "assert charge_unit_ineligibility_reason(state=state, unit_instance_id=unit.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor(), charge_state=ChargePhaseState(1, 'owner'), ignore_already_selected=False) == f'charge_unit_{suffix}'",
+                "assert mission_action_unit_ineligibility_reason(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) == f'mission_action_unit_{suffix}'",
+                "assert shooting_state_restriction_reason(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner') == ('fell_back' if suffix == 'fell_back' else None)"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_restrictions.py::test_explicit_charge_permission_is_consumed_by_shared_charge_owner",
+              "function_ast_sha256": "73d1d09fb6498c1d09c1beb3e16b1778b15feb5d35ab41ed48137be1e9dc863d",
+              "assertions": [
+                "assert charge_unit_ineligibility_reason(state=state, unit_instance_id=unit.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor(), charge_state=ChargePhaseState(1, 'owner'), ignore_already_selected=False) not in {'charge_unit_advanced', 'charge_unit_fell_back'}",
+                "assert shooting_state_restriction_reason(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner') is None"
+              ]
+            }
+          ],
+          "findings": []
+        },
+        {
+          "id": "09.07-obligation-07",
+          "source_blocks": [
+            14
+          ],
+          "obligation": "After moving, voluntary Desperate Escape tests Battle-shock only if not already shocked",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py",
+            "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py",
+            "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
+            "src/warhammer40k_core/engine/charge_eligibility.py",
+            "src/warhammer40k_core/engine/mission_action_eligibility.py",
+            "src/warhammer40k_core/engine/shooting_eligibility_state.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_fall_back.py::test_voluntary_escape_tests_battle_shock_after_moving_only_if_not_already_shocked",
+              "function_ast_sha256": "7a6b82b90e2c20f2abd856b4fa7c2600ffeb82c630ed94dff4f9a95ecc8d630e",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert surviving, 'Retained deterministic scene must leave a unit for its after-move rule.'",
+                "assert len(events(session, 'desperate_escape_battle_shock_resolved')) == int(not shocked)",
+                "assert types.index('fall_back_move_applied') < types.index('desperate_escape_battle_shock_resolved') < types.index('movement_activation_completed')"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            3
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            7
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            9
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            11
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        },
+        {
+          "source_blocks": [
+            15
+          ],
+          "reason": "Presentation label; substantive behavior is in the adjacent mapped source clause."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:09:09.07.01:1",
+      "locator": "09.07.01",
+      "title": "Desperate Escape Test",
+      "source_sha256": "6bf4fd4f0ae498fff4f48cc0ded4d5c8e1d7651c66c00c3a81fbb0fe176a476d",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "8d4485ce2413aa0f1a453c412126c3a20ffc8a2a8f4e8469eb09c7fc77bb798e",
+          "value": "Some rules may reference the term 'Desperate Escape test'. In all instances this means the \u0005hazard rolls\u0006 made for the \u0005desperate escape\u0006 mode of a \u0005fall-back move\u0006."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "771f24067fac132c15f07e9afd2a089bb7f7ba7eebeada9129cbf01f4d6bf8ff",
+          "value": "Abilities that subtract from a unit's Desperate Escape test instead subtract from those \u0005hazard rolls\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "9fadfb98af9f0547923f55a7414050450435579941585b223d5df98cd7525b16",
+          "value": "\u0005Example:\u0006 \u0007A \u0005battle-shocked\u0006 unit makes a \u0005fall-back move\u0006 away from a unit of Bloodletters that have the Bane of Cowards ability. As a result of Bane of Cowards, because the unit making the \u0005fall-back move\u0006 is \u0005battle-shocked\u0006, the \u0005hazard rolls\u0006 they make as part of their \u0005desperate escape\u0006 will be at -1\b."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.07.01:1-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Desperate Escape test means hazards (not model removals)",
+          "status": "enabled_source_correct_failures_with_controls",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/catalog_desperate_escape.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_fall_back.py::test_failed_escape_hazards_inflict_mortals_instead_of_removing_native_multiwound_models",
+              "function_ast_sha256": "793cf03aeedc40b9be1bbb9b0a2c4b69685671b34af361906789795c035e8d68",
+              "assertions": [
+                "assert len(rolls) == 2",
+                "assert failed > 0, 'This retained seed must exercise a failed hazard.'",
+                "assert state.battlefield_state is not None",
+                "assert set(unit.own_model_ids()).issubset(state.battlefield_state.placed_model_ids())",
+                "assert sum((m.current_wounds for m in current.alive_models())) == sum((m.initial_wounds for m in unit.own_models)) - failed"
+              ]
+            }
+          ],
+          "findings": [
+            "SF09-002"
+          ]
+        },
+        {
+          "id": "09.07.01:1-obligation-02",
+          "source_blocks": [
+            2,
+            3
+          ],
+          "obligation": "Desperate Escape penalty modifies hazard; real Bane of Cowards example",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/catalog_desperate_escape.py",
+            "src/warhammer40k_core/engine/phases/movement_geometry.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_fall_back.py::test_desperate_escape_hazard_faces_use_the_modified_value",
+              "function_ast_sha256": "db8de319caae74c4aaed3063b04a67a59d62ed881ef09f971fd814cbeaef4c83",
+              "assertions": [
+                "assert roll.value == max(1, face + penalty)",
+                "assert roll.is_failed is (face + penalty <= 2)",
+                "assert DesperateEscapeRoll.from_payload(roll.to_payload()) == roll"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_fall_back.py::test_native_bane_of_cowards_penalty_applies_only_when_shocked",
+              "function_ast_sha256": "70bdc00f3c3cfdbb9c6cc43893a31de2d52dfbe00e9857c806b76f20f6c61a38",
+              "assertions": [
+                "assert len(modifiers) == int(shocked)",
+                "assert modifiers[0].operand == -1",
+                "assert modifiers[0].source_id == ability.source_id"
+              ]
+            },
+            {
+              "node": "tests/rules/section09/test_forced_escape.py::test_native_forced_test_rolls_for_every_model_and_tests_battle_shock",
+              "function_ast_sha256": "b7ad0e5b2c21412519ceb765bbe81962f2fdb4a3ca6064d26c75257b65d99111",
+              "assertions": [
+                "assert 'fall_back:desperate_escape' in {o.option_id for o in request.options}",
+                "assert len(rolls) == 2",
+                "assert len(forced) == 1",
+                "assert isinstance(source, str)",
+                "assert source.endswith('09.07.01-forced-desperate-escape')",
+                "assert isinstance(roll, dict)",
+                "assert isinstance(modifiers, list)",
+                "assert len(modifiers) == int(shocked)"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:09:09.07.01:2",
+      "locator": "09.07.01",
+      "title": "Desperate Escape",
+      "source_sha256": "a86cc93fd5d3a51bc7899c9111bc5b5384e318289083ae4af5a36b19a9a16678",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "8aa244e707952185838eea0a79acf6f2af67878f860b7e9b69dda4396b0a6f4f",
+          "value": "If a \u0005stratagem\u0006 or ability forces a unit to make a Desperate Escape test, that unit:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "b7cb1dc29cc1efed238e973a6a2b0089323a4028c41ee3763511144dc5049059",
+          "value": "- Must make one \u0005hazard roll\u0006 for each model in that unit."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "fbdb8f2fefacc41b344363aaa6d971682805dc3509d1bd9dd0c5ca92584612eb",
+          "value": "- Must make a \u0005battle-shock roll\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "09.07.01:2-obligation-01",
+          "source_blocks": [
+            1,
+            2,
+            3
+          ],
+          "obligation": "Forced tests require per-model hazards and a Battle-shock roll even when already shocked",
+          "status": "bounded_semantic_assertions",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_handler.py",
+            "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+            "src/warhammer40k_core/engine/phases/movement_options_dice.py",
+            "src/warhammer40k_core/engine/phases/movement_validation.py",
+            "src/warhammer40k_core/engine/catalog_desperate_escape.py",
+            "src/warhammer40k_core/engine/phases/movement_battle_shock_continuation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section09/test_forced_escape.py::test_native_forced_test_rolls_for_every_model_and_tests_battle_shock",
+              "function_ast_sha256": "b7ad0e5b2c21412519ceb765bbe81962f2fdb4a3ca6064d26c75257b65d99111",
+              "assertions": [
+                "assert 'fall_back:desperate_escape' in {o.option_id for o in request.options}",
+                "assert len(rolls) == 2",
+                "assert len(forced) == 1",
+                "assert isinstance(source, str)",
+                "assert source.endswith('09.07.01-forced-desperate-escape')",
+                "assert isinstance(roll, dict)",
+                "assert isinstance(modifiers, list)",
+                "assert len(modifiers) == int(shocked)"
+              ]
+            }
+          ],
+          "findings": []
+        }
+      ],
+      "context": []
+    }
+  ],
+  "authenticated_inputs": {
+    "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+    "data/source_audits/v963_shock/captures/core-page.js": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026"
+  },
+  "faq_ownership": {
+    "reviewed_current_faq_count": 64,
+    "locally_owned": [
+      {
+        "ordinal": 13,
+        "id": "4978f15f-2b4a-4805-aacd-db9b5cad71bd",
+        "question": "If a rule says a unit auto passes Desperate Escape tests does that mean it would auto pass the hazard rolls from a desperate escape move?",
+        "answer": "Yes",
+        "source_sha256": "418d349eaf7304a61d3dd28047950280deee139fe1a1f4a68b3c71f5414183a3",
+        "engine_owners": [
+          "src/warhammer40k_core/engine/phases/movement_geometry.py",
+          "src/warhammer40k_core/engine/movement_legality.py"
+        ],
+        "semantic_assertions": [
+          {
+            "node": "tests/rules/section09/test_fall_back.py::test_faq13_native_auto_pass_permission_covers_desperate_mode_hazards",
+            "function_ast_sha256": "fb432b765c0c209b021bde07033f854c104193b4eb36fabe36f72b28c5872f79",
+            "assertions": [
+              "assert result.is_valid, result.to_payload()",
+              "assert result.desperate_escape_requirements == ()"
+            ]
+          }
+        ],
+        "findings": [
+          "SF09-003"
+        ],
+        "status": "enabled_source_correct_failures_with_controls"
+      }
+    ],
+    "cross_references": [
+      {
+        "ordinal": 1,
+        "id": "c2df3e97-f21e-4fc9-943e-37072c08c10e",
+        "owner": "18",
+        "reason": "Aerialists embark"
+      },
+      {
+        "ordinal": 5,
+        "id": "e5941469-5653-49b2-919e-9c9246e811d4",
+        "owner": "03",
+        "reason": "Transient engagement during movement"
+      },
+      {
+        "ordinal": 19,
+        "id": "a89dddb3-7930-4704-9f7a-0a7664da4d84",
+        "owner": "14",
+        "reason": "Movement-end objective securing"
+      },
+      {
+        "ordinal": 26,
+        "id": "ba488672-92ec-443d-9087-85a999342589",
+        "owner": "03",
+        "reason": "Coherency limits on if-able moves"
+      },
+      {
+        "ordinal": 28,
+        "id": "a7ba0395-6635-45cd-aeec-1cc3c0607a0b",
+        "owner": "03",
+        "reason": "Single contiguous coherency group"
+      },
+      {
+        "ordinal": 39,
+        "id": "9b1c81f5-2ea0-40eb-9015-6a005367cd75",
+        "owner": "03",
+        "reason": "Friendly transit for other move types"
+      },
+      {
+        "ordinal": 57,
+        "id": "ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+        "owner": "19",
+        "reason": "Flying declaration before Advance roll"
+      },
+      {
+        "ordinal": 62,
+        "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+        "owner": "01",
+        "reason": "Effects remain during end boundary"
+      }
+    ]
+  },
+  "qualifications": [
+    "No live GW/App observation or newly asserted App version. Retained maintained mirror observed timestamp controls.",
+    "No unadopted hierarchy node. Both duplicate 09.07.01 nodes retained by occurrence IDs.",
+    "No separate user omission/abort-move-type API exists at this bounded facade. Stationary is explicit; external automatic omission fallback is not independently asserted.",
+    "Reinforcements-step alias is tested through actual Move Units ingress availability. Arbitrary legacy-worded named rule admission remains untested.",
+    "Disembark/Ingress selection rights are local; full placement/transport/reserve semantics remain owned by Sections18/20 and existing Section03 controls.",
+    "Generic consolidation mode example is cross-reference to Section12, not new Section09 certification.",
+    "Compiled phase CP effects are constructed contracts on native units; named faction provider admission and full game/startup are not certified.",
+    "Explicit charge/shoot permission checks start at an already-authorized typed grant boundary; no new provider coverage claim.",
+    "End-of-turn restriction expiry uses existing state cleanup owner; no new whole-turn replay or save/restore certification."
+  ],
+  "focused_repair_binding_maintenance": {
+    "checkpoint": "task11-focused-approved-defects",
+    "historical_source_blocks_unchanged": true,
+    "prior_bindings": "task11/coverage-binding-changes.json",
+    "new_regressions": "tests/rules/section09/test_focused_checkpoint.py",
+    "qualification": "Typed definition kernels remain constructed phase/permission boundaries; no roster, prior-phase, all-rules or full native kernel persistence certification."
+  }
+}

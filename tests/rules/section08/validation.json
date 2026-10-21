@@ -1,0 +1,1506 @@
+{
+  "scope": "Section08 Command Phase only",
+  "outcomes": {
+    "windows": {
+      "total": 73,
+      "counts": {
+        "passed": 69,
+        "failed": 4
+      },
+      "junit_sha256": "297c159e770e755ade1841ebb08981033bac6a769922f31e555b345f116bdcb1"
+    },
+    "metadata_cases": 9,
+    "semantic_cases": 64,
+    "dependency_controls": {
+      "total": 12,
+      "counts": {
+        "passed": 12
+      },
+      "junit_sha256": "500c795df4bb7bb2fd3aa54432cfae3c895651c241caa534db9c5b430c0f641e"
+    },
+    "windows_imported_project_modules": 1325,
+    "initial_linux_portability_attempt": {
+      "total": 73,
+      "counts": {
+        "passed": 68,
+        "failed": 5
+      },
+      "junit_sha256": "eaa6103eeb0f9fe55f88cdf11cab7918c3c22a6768f38208b08fc896da9ef0cc"
+    },
+    "metadata_portability_windows": {
+      "total": 9,
+      "counts": {
+        "passed": 9
+      },
+      "junit_sha256": "393c6964eb16f0e98581369bebf8e1232de0e892ea1831bb6af642e7ec079e5c"
+    },
+    "linux": {
+      "total": 73,
+      "counts": {
+        "passed": 69,
+        "failed": 4
+      },
+      "junit_sha256": "7634bb1e47d70c0aff19707fba771f6fe3f099a430401fa8a6979aa1e012e322"
+    },
+    "exact_node_order_and_phase_outcomes_match": true,
+    "differences": {
+      "node_order": [],
+      "phase_outcomes": []
+    },
+    "linux_imported_project_modules": 1325
+  },
+  "source_rows": 8,
+  "source_blocks": 24,
+  "obligations": 20,
+  "semantic_cases": 64,
+  "metadata_cases": 9,
+  "obligation_statuses": {
+    "obligations": [
+      {
+        "id": "08.00-step-3",
+        "source": "08.00",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 1.5100045000144746,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.13025829999241978,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.20850100001553074,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 0.1161079999874346,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.11556040000868961,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.11633859999710694,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+            "phase": "call",
+            "seconds": 1.2340901999850757,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.00-step-4",
+        "source": "08.00",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 1.5100045000144746,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.13025829999241978,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.20850100001553074,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 0.1161079999874346,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.11556040000868961,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.11633859999710694,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+            "phase": "call",
+            "seconds": 1.2340901999850757,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.00-step-5",
+        "source": "08.00",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 1.5100045000144746,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.13025829999241978,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.20850100001553074,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 0.1161079999874346,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.11556040000868961,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.11633859999710694,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+            "phase": "call",
+            "seconds": 1.2340901999850757,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.00-step-6",
+        "source": "08.00",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 1.5100045000144746,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.13025829999241978,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.20850100001553074,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 0.1161079999874346,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.11556040000868961,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.11633859999710694,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+            "phase": "call",
+            "seconds": 1.2340901999850757,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": [
+          "Gameplay gap: phase/battle-shock completion does not establish a Command-abilities consumer. The direct unqualified Command clause probe recorded for 08.04 shows that the facade skips the effect; C08-04/P08C owns the missing body step and its position after Battle-shock and before end-phase rules."
+        ]
+      },
+      {
+        "id": "08.00-step-7",
+        "source": "08.00",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 1.5100045000144746,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.13025829999241978,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.20850100001553074,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 0.1161079999874346,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.11556040000868961,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.11633859999710694,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+            "phase": "call",
+            "seconds": 1.2340901999850757,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.01-start-rules",
+        "source": "08.01",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 1.5100045000144746,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.13025829999241978,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.20850100001553074,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 0.1161079999874346,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.11556040000868961,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.11633859999710694,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.02-both-gain",
+        "source": "08.02",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry[1-owner]",
+            "phase": "call",
+            "seconds": 0.06164840000565164,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry[1-opponent]",
+            "phase": "call",
+            "seconds": 0.018147199996747077,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry[2-owner]",
+            "phase": "call",
+            "seconds": 0.01790950002032332,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry[2-opponent]",
+            "phase": "call",
+            "seconds": 0.018041800009086728,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 1.5100045000144746,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.13025829999241978,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.20850100001553074,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 0.1161079999874346,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.11556040000868961,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.11633859999710694,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.02.01-both-gain",
+        "source": "08.02.01",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry[1-owner]",
+            "phase": "call",
+            "seconds": 0.06164840000565164,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry[1-opponent]",
+            "phase": "call",
+            "seconds": 0.018147199996747077,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry[2-owner]",
+            "phase": "call",
+            "seconds": 0.01790950002032332,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry[2-opponent]",
+            "phase": "call",
+            "seconds": 0.018041800009086728,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.02.01-resource",
+        "source": "08.02.01",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_cp_resource.py::test_core_cp_can_be_spent_and_insufficient_spend_preserves_balance[owner]",
+            "phase": "call",
+            "seconds": 0.019710599997779354,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_cp_resource.py::test_core_cp_can_be_spent_and_insufficient_spend_preserves_balance[opponent]",
+            "phase": "call",
+            "seconds": 0.019495999993523583,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.03-shocked",
+        "source": "08.03",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-6-False]",
+            "phase": "call",
+            "seconds": 0.03579439999884926,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-5-True]",
+            "phase": "call",
+            "seconds": 0.020523999992292374,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-4-True]",
+            "phase": "call",
+            "seconds": 0.009162600006675348,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-3-False]",
+            "phase": "call",
+            "seconds": 0.006329700001515448,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-2-True]",
+            "phase": "call",
+            "seconds": 0.00678130000596866,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-1-True]",
+            "phase": "call",
+            "seconds": 0.00734280000324361,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-6-False]",
+            "phase": "call",
+            "seconds": 0.008710199996130541,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-5-True]",
+            "phase": "call",
+            "seconds": 0.009516499994788319,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-4-True]",
+            "phase": "call",
+            "seconds": 0.009407500008819625,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-3-False]",
+            "phase": "call",
+            "seconds": 0.00666280000586994,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-2-True]",
+            "phase": "call",
+            "seconds": 0.006974200019612908,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-1-True]",
+            "phase": "call",
+            "seconds": 0.007862300000851974,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[0-4]",
+            "phase": "call",
+            "seconds": 0.029177900025388226,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[0-5]",
+            "phase": "call",
+            "seconds": 0.028752999991411343,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[0-10]",
+            "phase": "call",
+            "seconds": 0.027466599975014105,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[1-4]",
+            "phase": "call",
+            "seconds": 0.029215500020654872,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[1-5]",
+            "phase": "call",
+            "seconds": 0.028964400000404567,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[1-10]",
+            "phase": "call",
+            "seconds": 0.02716229998623021,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[3-4]",
+            "phase": "call",
+            "seconds": 0.02939530002186075,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[3-5]",
+            "phase": "call",
+            "seconds": 0.029397400008747354,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[3-10]",
+            "phase": "call",
+            "seconds": 0.028882899991003796,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[4-4]",
+            "phase": "call",
+            "seconds": 0.02972969997790642,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[4-5]",
+            "phase": "call",
+            "seconds": 0.028644099977100268,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[4-10]",
+            "phase": "call",
+            "seconds": 0.027846199984196573,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.03-half",
+        "source": "08.03",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-6-False]",
+            "phase": "call",
+            "seconds": 0.03579439999884926,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-5-True]",
+            "phase": "call",
+            "seconds": 0.020523999992292374,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-4-True]",
+            "phase": "call",
+            "seconds": 0.009162600006675348,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-3-False]",
+            "phase": "call",
+            "seconds": 0.006329700001515448,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-2-True]",
+            "phase": "call",
+            "seconds": 0.00678130000596866,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-1-True]",
+            "phase": "call",
+            "seconds": 0.00734280000324361,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-6-False]",
+            "phase": "call",
+            "seconds": 0.008710199996130541,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-5-True]",
+            "phase": "call",
+            "seconds": 0.009516499994788319,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-4-True]",
+            "phase": "call",
+            "seconds": 0.009407500008819625,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-3-False]",
+            "phase": "call",
+            "seconds": 0.00666280000586994,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-2-True]",
+            "phase": "call",
+            "seconds": 0.006974200019612908,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-1-True]",
+            "phase": "call",
+            "seconds": 0.007862300000851974,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_single_vehicle_uses_wounds_at_the_inclusive_half_boundary[1-False]",
+            "phase": "call",
+            "seconds": 0.004843500006245449,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_single_vehicle_uses_wounds_at_the_inclusive_half_boundary[0-True]",
+            "phase": "call",
+            "seconds": 0.004730200016638264,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_single_vehicle_uses_wounds_at_the_inclusive_half_boundary[-1-True]",
+            "phase": "call",
+            "seconds": 0.00510120001854375,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.03-clear",
+        "source": "08.03",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[0-4]",
+            "phase": "call",
+            "seconds": 0.029177900025388226,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[0-5]",
+            "phase": "call",
+            "seconds": 0.028752999991411343,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[0-10]",
+            "phase": "call",
+            "seconds": 0.027466599975014105,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[1-4]",
+            "phase": "call",
+            "seconds": 0.029215500020654872,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[1-5]",
+            "phase": "call",
+            "seconds": 0.028964400000404567,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[1-10]",
+            "phase": "call",
+            "seconds": 0.02716229998623021,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[3-4]",
+            "phase": "call",
+            "seconds": 0.02939530002186075,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[3-5]",
+            "phase": "call",
+            "seconds": 0.029397400008747354,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[3-10]",
+            "phase": "call",
+            "seconds": 0.028882899991003796,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[4-4]",
+            "phase": "call",
+            "seconds": 0.02972969997790642,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[4-5]",
+            "phase": "call",
+            "seconds": 0.028644099977100268,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[4-10]",
+            "phase": "call",
+            "seconds": 0.027846199984196573,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.03-example-three",
+        "source": "08.03",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_examples.py::test_constructed_three_model_full_strength_shocked_example",
+            "phase": "call",
+            "seconds": 0.004462999990209937,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.03-example-ten",
+        "source": "08.03",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-6-False]",
+            "phase": "call",
+            "seconds": 0.03579439999884926,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-5-True]",
+            "phase": "call",
+            "seconds": 0.020523999992292374,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-4-True]",
+            "phase": "call",
+            "seconds": 0.009162600006675348,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-3-False]",
+            "phase": "call",
+            "seconds": 0.006329700001515448,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-2-True]",
+            "phase": "call",
+            "seconds": 0.00678130000596866,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-1-True]",
+            "phase": "call",
+            "seconds": 0.00734280000324361,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-6-False]",
+            "phase": "call",
+            "seconds": 0.008710199996130541,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-5-True]",
+            "phase": "call",
+            "seconds": 0.009516499994788319,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-4-True]",
+            "phase": "call",
+            "seconds": 0.009407500008819625,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-3-False]",
+            "phase": "call",
+            "seconds": 0.00666280000586994,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-2-True]",
+            "phase": "call",
+            "seconds": 0.006974200019612908,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-1-True]",
+            "phase": "call",
+            "seconds": 0.007862300000851974,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.03-example-five",
+        "source": "08.03",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-6-False]",
+            "phase": "call",
+            "seconds": 0.03579439999884926,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-5-True]",
+            "phase": "call",
+            "seconds": 0.020523999992292374,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000004080-4-True]",
+            "phase": "call",
+            "seconds": 0.009162600006675348,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-3-False]",
+            "phase": "call",
+            "seconds": 0.006329700001515448,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-2-True]",
+            "phase": "call",
+            "seconds": 0.00678130000596866,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[False-000000592-1-True]",
+            "phase": "call",
+            "seconds": 0.00734280000324361,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-6-False]",
+            "phase": "call",
+            "seconds": 0.008710199996130541,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-5-True]",
+            "phase": "call",
+            "seconds": 0.009516499994788319,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000004080-4-True]",
+            "phase": "call",
+            "seconds": 0.009407500008819625,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-3-False]",
+            "phase": "call",
+            "seconds": 0.00666280000586994,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-2-True]",
+            "phase": "call",
+            "seconds": 0.006974200019612908,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons[True-000000592-1-True]",
+            "phase": "call",
+            "seconds": 0.007862300000851974,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.03-example-eleven",
+        "source": "08.03",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_examples.py::test_constructed_eleven_wound_vehicle_at_three_wounds_example",
+            "phase": "call",
+            "seconds": 0.003549700020812452,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.03.01-one-per-step",
+        "source": "08.03.01",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_forced_test_suppresses_core_roll_unless_explicitly_overridden[4-False]",
+            "phase": "call",
+            "seconds": 0.008861000009346753,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_forced_test_suppresses_core_roll_unless_explicitly_overridden[4-True]",
+            "phase": "call",
+            "seconds": 0.009174900013022125,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_forced_test_suppresses_core_roll_unless_explicitly_overridden[5-False]",
+            "phase": "call",
+            "seconds": 0.008019800006877631,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_forced_test_suppresses_core_roll_unless_explicitly_overridden[5-True]",
+            "phase": "call",
+            "seconds": 0.008599399996455759,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_forced_test_suppresses_core_roll_unless_explicitly_overridden[6-False]",
+            "phase": "call",
+            "seconds": 0.007536400022218004,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_forced_test_suppresses_core_roll_unless_explicitly_overridden[6-True]",
+            "phase": "call",
+            "seconds": 0.007724899973254651,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_forced_test_suppresses_core_roll_unless_explicitly_overridden[10-False]",
+            "phase": "call",
+            "seconds": 0.005867400002898648,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_battle_shock.py::test_forced_test_suppresses_core_roll_unless_explicitly_overridden[10-True]",
+            "phase": "call",
+            "seconds": 0.0064996999863069504,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[0-4]",
+            "phase": "call",
+            "seconds": 0.029177900025388226,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[0-5]",
+            "phase": "call",
+            "seconds": 0.028752999991411343,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[0-10]",
+            "phase": "call",
+            "seconds": 0.027466599975014105,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[1-4]",
+            "phase": "call",
+            "seconds": 0.029215500020654872,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[1-5]",
+            "phase": "call",
+            "seconds": 0.028964400000404567,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[1-10]",
+            "phase": "call",
+            "seconds": 0.02716229998623021,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[3-4]",
+            "phase": "call",
+            "seconds": 0.02939530002186075,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[3-5]",
+            "phase": "call",
+            "seconds": 0.029397400008747354,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[3-10]",
+            "phase": "call",
+            "seconds": 0.028882899991003796,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[4-4]",
+            "phase": "call",
+            "seconds": 0.02972969997790642,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[4-5]",
+            "phase": "call",
+            "seconds": 0.028644099977100268,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated[4-10]",
+            "phase": "call",
+            "seconds": 0.027846199984196573,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": []
+      },
+      {
+        "id": "08.04-ability-window",
+        "source": "08.04",
+        "status": "bounded semantic assertions passed",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 1.5100045000144746,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.13025829999241978,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.20850100001553074,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 0.1161079999874346,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.11556040000868961,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.11633859999710694,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+            "phase": "call",
+            "seconds": 1.2340901999850757,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": [
+          "Gameplay gap: the supported unqualified Command-phase RuleIR fixture has no registered consumer and the real facade reaches Movement without executing its effect; the otherwise-identical explicit start-of-Command control executes once. The pinned gap_observations_timing.json and tests/order97_gap_probes_timing.py isolate the missing Command-body registration without claiming named faction support. Add the shared body-step consumer and verify its position after CP/Battle-shock and before end-phase effects."
+        ]
+      },
+      {
+        "id": "08.05-nonmission",
+        "source": "08.05",
+        "status": "enabled semantic finding SF08-001",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 1.5100045000144746,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.13025829999241978,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[owner-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.20850100001553074,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the start of your Command phase-start]",
+            "phase": "call",
+            "seconds": 0.1161079999874346,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-In your Command phase-body]",
+            "phase": "call",
+            "seconds": 0.11556040000868961,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window[opponent-At the end of your Command phase-end]",
+            "phase": "call",
+            "seconds": 0.11633859999710694,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission[False-owner]",
+            "phase": "call",
+            "seconds": 0.006577099993592128,
+            "outcome": "failed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission[False-opponent]",
+            "phase": "call",
+            "seconds": 0.006333099998300895,
+            "outcome": "failed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission[True-owner]",
+            "phase": "call",
+            "seconds": 0.006178099982207641,
+            "outcome": "failed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission[True-opponent]",
+            "phase": "call",
+            "seconds": 0.0059148999862372875,
+            "outcome": "failed"
+          }
+        ],
+        "qualifications": [
+          "This proves a non-empty source effect at the selected edge; relative mission precedence additionally uses ordering evidence."
+        ]
+      },
+      {
+        "id": "08.05-mission",
+        "source": "08.05",
+        "status": "enabled semantic finding SF08-001",
+        "tests": [
+          {
+            "nodeid": "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission[False-owner]",
+            "phase": "call",
+            "seconds": 0.006577099993592128,
+            "outcome": "failed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission[False-opponent]",
+            "phase": "call",
+            "seconds": 0.006333099998300895,
+            "outcome": "failed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission[True-owner]",
+            "phase": "call",
+            "seconds": 0.006178099982207641,
+            "outcome": "failed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission[True-opponent]",
+            "phase": "call",
+            "seconds": 0.0059148999862372875,
+            "outcome": "failed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_end_priority.py::test_both_mission_owners_can_continue_after_nonmission_occurrences_are_exhausted[owner]",
+            "phase": "call",
+            "seconds": 0.0063928000163286924,
+            "outcome": "passed"
+          },
+          {
+            "nodeid": "tests/rules/section08/test_end_priority.py::test_both_mission_owners_can_continue_after_nonmission_occurrences_are_exhausted[opponent]",
+            "phase": "call",
+            "seconds": 0.0068091999855823815,
+            "outcome": "passed"
+          }
+        ],
+        "qualifications": [
+          "This proves a non-empty source effect at the selected edge; relative mission precedence additionally uses ordering evidence."
+        ]
+      }
+    ],
+    "passed_obligations": 18,
+    "finding_obligations": 2,
+    "global_qualifications": [
+      "Retained timestamped maintained mirror, not independently authenticated official App/GW publication or a new live observation.",
+      "The old 08.00-step-6/08.04 gameplay-gap qualifications are historical. Current Command-body effect tests exercise the later production consumer; no source record is rewritten.",
+      "All timing effects use compiled constructed source text on supported native Lord Exultant bodies, with the real catalog CP runtime and production hook builders; they do not certify native named faction activation or every Command ability family.",
+      "CP spend starts at the ordinary ledger owner; Section15 owns complete stratagem targeting/cost/effect behavior.",
+      "Three-model and eleven-wound numerical examples are explicitly constructed boundary contracts on native models, not supported roster/datasheet admissions.",
+      "Attached boundary formation starts after attachment; no native roster/attachment admission claim.",
+      "Forced-test suppression and explicit duplicate permission are tested at the real request collector; native ability acquisition of an override is not established.",
+      "Mission priority begins at typed achieved occurrences and tests the default source-derived policy without an ordering override. It currently fails. A native end-of-Command mission achievement/discovery/score formula is not certified by these assertions.",
+      "Exact CP-triggered and Battle-shock-triggered ability execution is owned by those source-specific consumers; this corpus proves distinct start/body/end windows and required-roll effects, not every triggering ability.",
+      "The real immutable mission setup is loaded once only for adapter Command completion because phase-end objective-control preflight requires it. No full setup, prior phases, mission sequence, or replay is run.",
+      "Bounded fresh graph/catalog mutation checks and cross-platform matching do not establish universal order independence or full-game correctness."
+    ]
+  },
+  "locally_owned_faqs": [],
+  "faq_cross_references": [
+    {
+      "faq": 50,
+      "id": "421a6f30-63e2-4e1f-b352-99b643637c53",
+      "question": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+      "answer": "No, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+      "owner": "01",
+      "test": "tests/rules/section01/test_01_06_07_morale.py::test_01_06_07_inclusive_roll_and_failed_unit_model_restrictions",
+      "reason": "Battle-shocked friendly units cannot be targeted by their controller's Stratagems. Insane Bravery remains Section01-owned; Section08 cross-reference only."
+    },
+    {
+      "faq": 16,
+      "id": "bbe268a2-b1fd-43ab-8b24-fd4363730c3f",
+      "question": "If a unit becomes battle-shocked after starting an action does it stop performing that action?",
+      "answer": "Yes",
+      "owner": "01",
+      "reason": "Battle-shock interrupts Actions; existing Section01 action owner, linked from required-roll outcomes."
+    },
+    {
+      "faq": 17,
+      "id": "4c654d00-318d-4665-9e46-26cfab179a29",
+      "question": "If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action?",
+      "answer": "Yes",
+      "owner": "01",
+      "reason": "Explicit shocked-Action permission; existing Section01 action owner."
+    },
+    {
+      "faq": 36,
+      "id": "7a982686-03ff-4565-8d5a-2549e5650268",
+      "question": "After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available?",
+      "answer": "Yes.",
+      "owner": "15",
+      "reason": "Increased Stratagem costs require continuation when affordable; ordinary CP resource cross-reference only."
+    },
+    {
+      "faq": 42,
+      "id": "beaeca32-9701-45f7-9461-879d8ae3d78f",
+      "question": "After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens?",
+      "answer": "No CP are spent and that stratagem's effects are not resolved (but that stratagem still counts as having been used this phase).",
+      "owner": "15",
+      "reason": "Unaffordable increased Stratagem cost spends no CP; Section15 owns complete cost/effect behavior."
+    },
+    {
+      "faq": 45,
+      "id": "e43402db-7c49-4cd6-acf7-fa6cac83acb0",
+      "question": "If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier?",
+      "answer": "No, a stratagem that costs 1CP and is making use of an optional +1CP section has an original cost of 2CP.",
+      "owner": "15",
+      "reason": "Optional additional Stratagem costs are original costs; not a separate Core CP resource."
+    },
+    {
+      "faq": 52,
+      "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+      "question": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+      "answer": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead).",
+      "owner": "01",
+      "reason": "Embarked ability spatial restrictions remain owned by Section01; Section18 separately owns the Firing Deck sub-obligation."
+    }
+  ],
+  "quality": {
+    "ruff": true,
+    "format": true,
+    "mypy": true,
+    "pyright": true,
+    "scoped_python_files": 13,
+    "receipt": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-17\\task-2\\quality-final2\\receipts.json"
+  },
+  "direct_dependency_controls": {
+    "total": 12,
+    "counts": {
+      "passed": 12
+    },
+    "junit_sha256": "500c795df4bb7bb2fd3aa54432cfae3c895651c241caa534db9c5b430c0f641e"
+  },
+  "exact_required_shard_check": {
+    "command": [
+      "C:/Users/nostr/.local/bin/uv.exe",
+      "run",
+      "--no-sync",
+      "python",
+      "scripts/build_test_shards.py",
+      "--check",
+      "--shard-count",
+      "12"
+    ],
+    "cwd": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-15\\isolation\\head-checkout",
+    "exit_code": 0,
+    "wall_seconds": 0.6931321000156458,
+    "environment": {
+      "UV_PROJECT_ENVIRONMENT": "C:/Users/nostr/Documents/Codex/2026-10-15/task/behavior-rebuild/.venv",
+      "UV_CACHE_DIR": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-17\\task-2\\uv-cache",
+      "UV_PYTHON_DOWNLOADS": "never",
+      "UV_OFFLINE": "true"
+    },
+    "note": "Exact required uv no-sync check; existing environment reused, no install."
+  },
+  "runtime_identity_check": {
+    "command": [
+      "C:/Users/nostr/Documents/Codex/2026-10-15/task/behavior-rebuild/.venv/Scripts/python.exe",
+      "-B",
+      "scripts/build_engine_build_identity.py",
+      "--check"
+    ],
+    "cwd": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-15\\isolation\\head-checkout",
+    "exit_code": 0,
+    "wall_seconds": 2.2732673000136856,
+    "environment": {
+      "PYTHONPATH": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-17\\task-2;C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-15\\isolation\\head-checkout\\src;C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-15\\isolation\\head-checkout",
+      "TEST_TIMING_DIR": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-17\\task-2\\runs\\runtime-identity\\timing",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    }
+  },
+  "timings": {
+    "windows": {
+      "subprocess_wall_seconds": 23.75148520001676,
+      "pytest_controller_elapsed_seconds": 11.767923000006704,
+      "collection_seconds": 0.18575610002153553,
+      "phase_seconds": {
+        "setup": 5.885218100098427,
+        "call": 4.807482900068862,
+        "teardown": 0.010592000122414902
+      },
+      "session_fixture_preparation": [
+        {
+          "fixture": "section08_definitions",
+          "seconds": 1.886811000003945
+        },
+        {
+          "fixture": "section07_mission",
+          "seconds": 3.977060600009281
+        }
+      ],
+      "semantic_call_seconds": 4.398791400046321
+    },
+    "qualification": "Preparation is included in setup, not additive. Fresh processes; OS caches not flushed. Serial bounded correctness receipts, not hosted CI or controlled platform-performance comparisons.",
+    "linux": {
+      "subprocess_wall_seconds": 21.3875618,
+      "pytest_controller_elapsed_seconds": 10.2133936,
+      "collection_seconds": 0.1269014999999989,
+      "phase_seconds": {
+        "setup": 5.389913499999977,
+        "call": 4.509509199999986,
+        "teardown": 0.009038800000009672
+      },
+      "session_fixture_preparation": [
+        {
+          "fixture": "section08_definitions",
+          "seconds": 1.7371980999999987
+        },
+        {
+          "fixture": "section07_mission",
+          "seconds": 3.6346111000000008
+        }
+      ],
+      "semantic_call_seconds": 4.033980399999987
+    },
+    "linux_fresh_source_index_seconds": 21.8916379,
+    "linux_copy_and_verification_seconds": 10.555338599999999
+  },
+  "engine_edits": false,
+  "confirmed_new_semantic_groups": [
+    "SF08-001"
+  ],
+  "prior_six_groups": "Eleven enabled Section01-06 failures in six deferred semantic groups remain byte-preserved, including user-approved SF05-002 after-removal interpretation. Not re-executed by this task.",
+  "linux_execution": "Initial complete run retained: 68 pass, 5 fail, including one new coverage JSON path portability failure. After normalizing three path keys only, nine Windows metadata checks passed and a final full Linux correctness run recorded 69 pass/4 fail. No engine or test assertion changed.",
+  "linux_identity": "Corrected Linux run source exactly matches 6,648 current Windows files; includes incoming Section07 post-run validation document missing from its original sealed Linux copy. No earlier Linux source/index was modified.",
+  "post_run_documentation": "This validation.json is the sole final source addition after platform executions. Coverage.json path keys were normalized after the Windows complete run; all nine affected metadata checks subsequently passed on Windows. All semantic Python and engine/source-rule bytes are unchanged.",
+  "evidence_root": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-17\\task-2",
+  "independent_review": "Implementation and self-verification only; no separate reviewer and no nested agent.",
+  "qualifications": [
+    "Retained timestamped maintained mirror, not independently authenticated official App/GW publication or a new live observation.",
+    "The old 08.00-step-6/08.04 gameplay-gap qualifications are historical. Current Command-body effect tests exercise the later production consumer; no source record is rewritten.",
+    "All timing effects use compiled constructed source text on supported native Lord Exultant bodies, with the real catalog CP runtime and production hook builders; they do not certify native named faction activation or every Command ability family.",
+    "CP spend starts at the ordinary ledger owner; Section15 owns complete stratagem targeting/cost/effect behavior.",
+    "Three-model and eleven-wound numerical examples are explicitly constructed boundary contracts on native models, not supported roster/datasheet admissions.",
+    "Attached boundary formation starts after attachment; no native roster/attachment admission claim.",
+    "Forced-test suppression and explicit duplicate permission are tested at the real request collector; native ability acquisition of an override is not established.",
+    "Mission priority begins at typed achieved occurrences and tests the default source-derived policy without an ordering override. It currently fails. A native end-of-Command mission achievement/discovery/score formula is not certified by these assertions.",
+    "Exact CP-triggered and Battle-shock-triggered ability execution is owned by those source-specific consumers; this corpus proves distinct start/body/end windows and required-roll effects, not every triggering ability.",
+    "The real immutable mission setup is loaded once only for adapter Command completion because phase-end objective-control preflight requires it. No full setup, prior phases, mission sequence, or replay is run.",
+    "Bounded fresh graph/catalog mutation checks and cross-platform matching do not establish universal order independence or full-game correctness."
+  ],
+  "superseding_sf08_resolution": {
+    "historical_fields_above": "Original 2026-10-17 source/run/quality receipts retained; not a claim about the changed 2026-10-20 candidate.",
+    "status": "resolved in bounded candidate; fresh independent review required",
+    "date_utc": "2026-10-20",
+    "invariant": "At Command END_PHASE all non-mission rules of both players precede every mission rule. Other phase/start priorities retain their existing source policy.",
+    "before": "Exactly four original variants reproduce premature active mission offering at the shared builder. Native loaded Tormentors rules already finish before actual Command mission scoring; no premature native VP was observed.",
+    "native_reachability": "Chapter Approved 2026-27 Immovable Object/Unstoppable Force and loaded Tormentors Objective Defiled coexist at round-two Command end. Discovery emits two sticky player candidates and no mission candidate. Mission scoring commits later during phase advancement. The constructed four-participant overlap is not the shape of this selected native boundary.",
+    "repair": "SequencingConflictContext derives retained rule:08:08.05:1 only for Command END_PHASE. Native non-mission sequencing is additionally admitted to the existing Primary pending family; full batch/source/queue/event authority remains enforced.",
+    "native_recovery_defect": "Pre-fix save/restore of the engine-generated sticky ordering request rejected resolve_sequencing_order under turn_end_faction_rule_required. Missing family admission is repaired at the shared validator.",
+    "original_four_cases": "All remain enabled with the original first-offer assertion and complete four-participant continuation; both active players and input orders pass.",
+    "native_test": "tests/rules/section08/test_end_priority.py::test_native_command_end_finishes_loaded_rules_before_actual_mission_scoring",
+    "native_outcome": "Two loaded sticky mutations precede one actual active-player transaction: owner 5 VP, opponent 4 VP; other player 0 VP. Live/restored/fork/clean branches and 16 exact replays agree across four native variants.",
+    "negative_controls": "Wrong owner, stale request, malformed payload, invented early mission option and expired phase reject before whole-lifecycle mutation. Direct domain validation rejects wrong family and missing provenance. Legal continuation succeeds afterward.",
+    "qualification": "Retained adopted source evidence only; no fresh App/GW observation or source recertification. Native provider admission is selected component execution with non-strict small rosters, a post-setup round-two checkpoint and open fixture terrain; no complete army/setup/full-game certificate.",
+    "evidence": "task-20/checkpoint/REPORT.txt and task-20/evidence: baseline-four-relocated, native-maintained-before2, native-pending-before.json, repaired-focused, scoped-final",
+    "prior_corpus": "3495 pass/4 SF08 fail and 55.90998592% combined coverage remain historical complete-corpus measurements of cc06a27c...3115. This bounded repair neither replaces that run nor establishes the global 85% gate."
+  }
+}

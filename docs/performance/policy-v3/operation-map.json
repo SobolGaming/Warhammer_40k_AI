@@ -2283,11 +2283,13 @@
         "ci/test_shards/shard-8.txt",
         "ci/test_shards/shard-9.txt",
         "tests/code_quality/test_order97_inventory.py",
+        "tests/factions/aeldari/army_rule_helpers.py",
+        "tests/factions/aeldari/unit/test_aeldari_army_rule.py",
+        "tests/factions/aeldari/unit/test_aspect_shrine_tokens.py",
         "tests/fight_distance_helpers.py",
         "tests/unit/test_order107_fight_distance_window.py",
         "tests/unit/test_order97_secondary_clause_evidence.py",
-        "tests/unit/test_phase15d_fight_resolution.py",
-        "tests/unit/test_phase17g_aeldari_army_rule.py"
+        "tests/unit/test_phase15d_fight_resolution.py"
       ],
       "owners": [
         "@document",
@@ -5563,6 +5565,9 @@
         "tests/core_stratagem_helpers.py",
         "tests/critical_hit_helpers.py",
         "tests/disembark_eligibility_helpers.py",
+        "tests/factions/aeldari/army_rule_helpers.py",
+        "tests/factions/aeldari/unit/test_aeldari_army_rule.py",
+        "tests/factions/aeldari/unit/test_aspect_shrine_tokens.py",
         "tests/integration/test_order135_gathered_override.py",
         "tests/integration/test_order135_gathered_psychic_preparation.py",
         "tests/large_model_disembark_helpers.py",
@@ -5614,7 +5619,6 @@
         "tests/unit/test_phase15d_fight_resolution.py",
         "tests/unit/test_phase17_emperors_children_daemon_prince.py",
         "tests/unit/test_phase17_emperors_children_datasheet_overlay.py",
-        "tests/unit/test_phase17g_aeldari_army_rule.py",
         "tests/unit/test_phase17g_drukhari_army_rule.py",
         "tests/unit/test_precision_target_grouping.py",
         "tests/unit/test_unit_abilities.py"
@@ -5946,6 +5950,7 @@
         "tests/charge_reroll_helpers.py",
         "tests/d07_fixture_identity_helpers.py",
         "tests/d07_upper_floor_helpers.py",
+        "tests/factions/tyranids/unit/test_tyranids_army_rule.py",
         "tests/integration/test_d07_native_upper_floor.py",
         "tests/integration/test_fight_on_death_presence.py",
         "tests/integration/test_retained_shooting.py",
@@ -5976,7 +5981,6 @@
         "tests/unit/test_phase17_emperors_children_datasheet_overlay.py",
         "tests/unit/test_phase17g_chaos_space_marines_army_rule.py",
         "tests/unit/test_phase17g_thousand_sons_army_rule.py",
-        "tests/unit/test_phase17g_tyranids_army_rule.py",
         "tests/unit/test_ruleset_descriptor.py",
         "tests/unit/test_unit_abilities.py",
         "tests/unit/test_ws14_attack_sequence_runtime_hooks.py"

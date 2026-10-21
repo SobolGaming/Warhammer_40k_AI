@@ -7,6 +7,7 @@ from pathlib import Path
 
 from tests.category_migration_preservation import read_historical_test_bytes
 from tests.d09_test_preservation_helpers import preserved_d09_predecessor_test_bytes
+from tests.support.section13_preservation import pre_section13_descriptor_bytes
 
 ROOT = Path(__file__).resolve().parents[2]
 ARCHIVE = ROOT / "data/source_audits/d07"
@@ -143,7 +144,7 @@ def test_d07_all_movement_consumers_bind_physical_model_and_history() -> None:
 def test_d07_ruins_changes_only_the_monster_endpoint_token() -> None:
     path = "src/warhammer40k_core/core/ruleset_descriptor.py"
     old = ast.parse((ARCHIVE / "baseline" / (path + ".txt")).read_text(encoding="utf-8"))
-    new = ast.parse((ROOT / path).read_text(encoding="utf-8"))
+    new = ast.parse(pre_section13_descriptor_bytes(ROOT))
     owners = [
         node
         for node in new.body

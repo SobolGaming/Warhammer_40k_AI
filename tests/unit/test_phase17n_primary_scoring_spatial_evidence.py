@@ -368,6 +368,7 @@ def test_primary_spatial_evidence_counts_survivors_after_coherency_cleanup() -> 
         battle_round=state.battle_round,
         active_player_id="player-a",
         phase=BattlePhase.FIGHT,
+        chosen_model_instance_ids=(isolated.model_instance_id,),
     )
     state.battlefield_state = updated_battlefield
     state.end_turn_cleanup_states.append(cleanup)

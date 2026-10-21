@@ -204,7 +204,7 @@ def objective_approach_context(
 def objective_goal(objective: ObjectiveGeometry) -> MovementGoal:
     marker = objective.marker
     if marker is None:
-        return MovementGoal(polygons=objective.footprint_polygons, vertical_inches=5.0)
+        return MovementGoal(polygons=objective.footprint_polygons, ignore_polygon_height=True)
     return MovementGoal(
         disk=(
             Pose.at(marker.x_inches, marker.y_inches, marker.z_inches),
@@ -303,7 +303,9 @@ def objective_endpoint_evidence(
     budget = query.path_context.movement_distance_budget_inches
     if budget is None:
         raise GameLifecycleError("Objective approach requires a movement budget.")
-    physical_goal = replace(query.goal, horizontal_inches=0.0, vertical_inches=0.0)
+    physical_goal = replace(
+        query.goal, horizontal_inches=0.0, vertical_inches=0.0, ignore_polygon_height=False
+    )
     lower = (
         before.closest_distance_inches
         if query.path_context.pose_is_fixed

@@ -54,9 +54,24 @@ def secondary_scoring_condition_context_from_state(
         for authority in state.objective_control_record_authorities
         if authority.objective_control_record_id == record.record_id
     )
+    occupancy_state = state
+    if len(authorities) == 1 and any(
+        cleanup.removals
+        and cleanup.battle_round == record.battle_round
+        and cleanup.active_player_id == record.active_player_id
+        and cleanup.phase == record.phase
+        for cleanup in state.end_turn_cleanup_states
+    ):
+        from warhammer40k_core.engine.primary_mission_boundary_state import (
+            primary_mission_boundary_state_from_checkpoint,
+        )
+
+        occupancy_state = primary_mission_boundary_state_from_checkpoint(
+            state=state, checkpoint=authorities[0].boundary_checkpoint
+        )
     if state.battlefield_state is not None:
         occupancy = build_secondary_battlefield_occupancy(
-            state=state,
+            state=occupancy_state,
             player_id=player_id,
             record=record,
             selection=selection,

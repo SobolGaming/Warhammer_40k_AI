@@ -1059,10 +1059,18 @@ class TerrainMovementPolicy:
     def policy_for_feature_kind(
         self,
         feature_kind: object,
+        *,
+        endpoint_classification: object | None = None,
     ) -> TerrainFeatureMovementPolicy:
         kind = terrain_feature_kind_from_token(feature_kind)
         for policy in self.feature_policies:
             if policy.terrain_feature_kind is kind:
+                if endpoint_classification is not None:
+                    from warhammer40k_core.core.terrain_endpoint_policy import (
+                        classified_terrain_endpoint_policy,
+                    )
+
+                    return classified_terrain_endpoint_policy(policy, endpoint_classification)
                 return policy
         raise RulesetDescriptorError(
             f"TerrainMovementPolicy does not define {kind.value} terrain movement."
@@ -2356,6 +2364,11 @@ def _movement_policy_for_eleventh() -> MovementPolicyDescriptor:
 
 
 def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMovementPolicy, ...]:
+    from warhammer40k_core.core.terrain_endpoint_policy import (
+        RUINS_UPPER_FLOOR_KEYWORDS,
+        SURFACE_KEYWORDS,
+    )
+
     unrestricted_keywords: tuple[str, ...] = ()
     ruins_through_keywords = (
         "BEAST",
@@ -2363,14 +2376,6 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
         "IMPERIUM_PRIMARCH",
         "INFANTRY",
         "MOBILE",
-    )
-    ruins_upper_floor_keywords = (
-        "BEAST",
-        "BELISARIUS_CAWL",
-        "FLY",
-        "IMPERIUM_PRIMARCH",
-        "INFANTRY",
-        "MONSTER",
     )
     freely_moved_over_height_inches = 2.0
     return (
@@ -2381,7 +2386,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
             freely_moved_over_height_inches=freely_moved_over_height_inches,
             endpoint_support_policy=TerrainEndpointSupportPolicy.NOT_ALLOWED_ON_TOP,
             no_overhang_required=False,
-            upper_floor_allowed_keywords=unrestricted_keywords,
+            upper_floor_allowed_keywords=SURFACE_KEYWORDS,
             through_terrain_allowed_keywords=unrestricted_keywords,
             ground_floor_only_unless_keyword=False,
         ),
@@ -2392,7 +2397,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
             freely_moved_over_height_inches=freely_moved_over_height_inches,
             endpoint_support_policy=TerrainEndpointSupportPolicy.NOT_ALLOWED_ON_TOP,
             no_overhang_required=False,
-            upper_floor_allowed_keywords=unrestricted_keywords,
+            upper_floor_allowed_keywords=SURFACE_KEYWORDS,
             through_terrain_allowed_keywords=unrestricted_keywords,
             ground_floor_only_unless_keyword=False,
         ),
@@ -2403,7 +2408,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
             freely_moved_over_height_inches=freely_moved_over_height_inches,
             endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_GROUND_FLOOR_ONLY,
             no_overhang_required=False,
-            upper_floor_allowed_keywords=unrestricted_keywords,
+            upper_floor_allowed_keywords=SURFACE_KEYWORDS,
             through_terrain_allowed_keywords=unrestricted_keywords,
             ground_floor_only_unless_keyword=False,
         ),
@@ -2414,7 +2419,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
             freely_moved_over_height_inches=freely_moved_over_height_inches,
             endpoint_support_policy=TerrainEndpointSupportPolicy.NOT_ALLOWED_ON_TOP,
             no_overhang_required=False,
-            upper_floor_allowed_keywords=unrestricted_keywords,
+            upper_floor_allowed_keywords=SURFACE_KEYWORDS,
             through_terrain_allowed_keywords=unrestricted_keywords,
             ground_floor_only_unless_keyword=False,
         ),
@@ -2425,7 +2430,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
             freely_moved_over_height_inches=freely_moved_over_height_inches,
             endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
             no_overhang_required=True,
-            upper_floor_allowed_keywords=unrestricted_keywords,
+            upper_floor_allowed_keywords=SURFACE_KEYWORDS,
             through_terrain_allowed_keywords=unrestricted_keywords,
             ground_floor_only_unless_keyword=False,
         ),
@@ -2436,7 +2441,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
             freely_moved_over_height_inches=freely_moved_over_height_inches,
             endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
             no_overhang_required=True,
-            upper_floor_allowed_keywords=unrestricted_keywords,
+            upper_floor_allowed_keywords=SURFACE_KEYWORDS,
             through_terrain_allowed_keywords=unrestricted_keywords,
             ground_floor_only_unless_keyword=False,
         ),
@@ -2447,7 +2452,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
             freely_moved_over_height_inches=freely_moved_over_height_inches,
             endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
             no_overhang_required=True,
-            upper_floor_allowed_keywords=unrestricted_keywords,
+            upper_floor_allowed_keywords=SURFACE_KEYWORDS,
             through_terrain_allowed_keywords=unrestricted_keywords,
             ground_floor_only_unless_keyword=False,
         ),
@@ -2458,7 +2463,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
             freely_moved_over_height_inches=freely_moved_over_height_inches,
             endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
             no_overhang_required=True,
-            upper_floor_allowed_keywords=unrestricted_keywords,
+            upper_floor_allowed_keywords=SURFACE_KEYWORDS,
             through_terrain_allowed_keywords=unrestricted_keywords,
             ground_floor_only_unless_keyword=False,
         ),
@@ -2469,7 +2474,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
             freely_moved_over_height_inches=freely_moved_over_height_inches,
             endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
             no_overhang_required=True,
-            upper_floor_allowed_keywords=unrestricted_keywords,
+            upper_floor_allowed_keywords=SURFACE_KEYWORDS,
             through_terrain_allowed_keywords=unrestricted_keywords,
             ground_floor_only_unless_keyword=False,
         ),
@@ -2482,7 +2487,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
                 TerrainEndpointSupportPolicy.ALLOWED_ON_ANY_FLOOR_WITH_NO_OVERHANG
             ),
             no_overhang_required=True,
-            upper_floor_allowed_keywords=ruins_upper_floor_keywords,
+            upper_floor_allowed_keywords=RUINS_UPPER_FLOOR_KEYWORDS,
             through_terrain_allowed_keywords=ruins_through_keywords,
             ground_floor_only_unless_keyword=True,
         ),
@@ -2493,7 +2498,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
             freely_moved_over_height_inches=freely_moved_over_height_inches,
             endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_GROUND_FLOOR_ONLY,
             no_overhang_required=False,
-            upper_floor_allowed_keywords=unrestricted_keywords,
+            upper_floor_allowed_keywords=SURFACE_KEYWORDS,
             through_terrain_allowed_keywords=unrestricted_keywords,
             ground_floor_only_unless_keyword=False,
         ),

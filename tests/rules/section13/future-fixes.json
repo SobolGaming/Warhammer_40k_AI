@@ -1,0 +1,47 @@
+{
+  "schema": "section13-findings-v1",
+  "production_semantics_changed": true,
+  "findings": [
+    {
+      "id": "SF13-001",
+      "status": "repaired; original enabled source-correct regression retained",
+      "source": "rule:13:13.06:1",
+      "source_blocks": [
+        12,
+        13
+      ],
+      "invariant": "A stable, fully supported upper Ruins endpoint is legal for a SWARM model.",
+      "node": "tests/rules/section13/test_movement.py::test_upper_floor_endpoint_keyword_gate[SWARM-True]",
+      "expected": "is_valid=True",
+      "owner": "core.ruleset_descriptor default ruins_upper_floor_keywords / geometry.pathing endpoint consumer",
+      "qualification": "Constructed keyword/envelope checkpoint; native Ripper Swarms admission attempt lacked supported height override, no invented geometry.",
+      "observed_before": "upper_floor_keyword_forbidden",
+      "repair_owner": "core.terrain_endpoint_policy shared movement/setup policy; ruleset descriptor SWARM keyword",
+      "authorization": "User Oct18 02:37UTC: Fix both defects"
+    },
+    {
+      "id": "SF13-002",
+      "status": "repaired; original enabled source-correct regression retained",
+      "source": "rule:13:13.06:1",
+      "source_blocks": [
+        12,
+        13,
+        14
+      ],
+      "invariant": "An eligible INFANTRY model can occupy a stable, non-overhanging upper surface of a classified Dense feature; the rule is not restricted to Ruins feature kind.",
+      "node": "tests/rules/section13/test_movement.py::test_stable_upper_surface_of_classified_dense_nonruins_feature_is_legal",
+      "expected": "endpoint violation=None",
+      "owner": "core.ruleset_descriptor feature-kind endpoint policy / engine.endpoint_placement",
+      "qualification": "Unchanged native Lord Exultant model and physical owner; agreed Dense debris/statuary feature with complete stable floor and wall geometry. Constructed setup endpoint, no prior move/admission claim.",
+      "observed_before": "cannot end on this terrain feature",
+      "repair_owner": "core.terrain_endpoint_policy shared movement/setup policy; ruleset descriptor SWARM keyword",
+      "authorization": "User Oct18 02:37UTC: Fix both defects"
+    }
+  ],
+  "inherited": "Earlier ten repair groups and spatial repairs byte-preserved; SF08 four enabled qualified constructed overlap failures and all reviewed DD/geometry/performance qualifications retained.",
+  "missing_semantic_assertions": [],
+  "bounded_limitations": [
+    "Unresolved mixed-angle native LOS attempts are timeout receipts, not semantic classifications.",
+    "Full native SWARM admission not established; no geometry override invented."
+  ]
+}

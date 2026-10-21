@@ -878,8 +878,8 @@ export interface components {
         };
         "game-view--characteristic.schema": {
             applied_modifier_ids: string[]; display_value: string | null; final: number | null; label: string;
-            redaction: components["schemas"]["game-view--redaction.schema"];
             random_expression?: components["schemas"]["proposal-payload--dice_expression.schema"];
+            redaction: components["schemas"]["game-view--redaction.schema"];
         } & {
             [key: string]: unknown;
         };
@@ -894,10 +894,10 @@ export interface components {
             current_characteristics: {
                 [key: string]: components["schemas"]["game-view--characteristic.schema"];
             };
-            model_instance_id: string; model_profile_id: string | null;
-            redaction: components["schemas"]["game-view--redaction.schema"]; unit_instance_id: string;
-            visible_modifiers: components["schemas"]["game-view--json_value.schema"][]; wargear_ids: string[];
-            keywords: string[]; faction_keywords: string[]; keyword_source_ids: string[];
+            faction_keywords: string[]; keyword_source_ids: string[]; keywords: string[]; model_instance_id: string;
+            model_profile_id: string | null; redaction: components["schemas"]["game-view--redaction.schema"];
+            unit_instance_id: string; visible_modifiers: components["schemas"]["game-view--json_value.schema"][];
+            wargear_ids: string[];
         } & {
             [key: string]: unknown;
         };
@@ -936,20 +936,6 @@ export interface components {
             /** @enum {string} */
             submission_kind: "finite" | "parameterized";
         };
-        "decision-request-view--json_value.schema": null | boolean | number | string | components["schemas"]["decision-request-view--json_value.schema"][] | {
-            [key: string]: components["schemas"]["decision-request-view--json_value.schema"];
-        };
-        "decision-request-view--decision_option.schema": {
-            label: string; option_id: string; payload: components["schemas"]["decision-request-view--json_value.schema"];
-        };
-        /** CORE V2 DecisionRequestViewPayload */
-        "decision-request-view.schema": {
-            /** @constant */
-            schema_version: "decision-request-view-v5-phase17n-step4"; actor_id: string | null; decision_type: string;
-            is_parameterized: boolean; interaction: components["schemas"]["interaction-descriptor.schema"] | null;
-            options: components["schemas"]["decision-request-view--decision_option.schema"][];
-            payload: components["schemas"]["decision-request-view--json_value.schema"]; request_id: string;
-        };
         "annotated-decision-request--json_value.schema": null | boolean | number | string | components["schemas"]["annotated-decision-request--json_value.schema"][] | {
             [key: string]: components["schemas"]["annotated-decision-request--json_value.schema"];
         };
@@ -964,6 +950,83 @@ export interface components {
             /** @constant */
             schema_version: "annotated-decision-request-v2-primary-assignments";
         };
+        "decision-request-view--json_value.schema": null | boolean | number | string | components["schemas"]["decision-request-view--json_value.schema"][] | {
+            [key: string]: components["schemas"]["decision-request-view--json_value.schema"];
+        };
+        "decision-request-view--decision_option.schema": {
+            label: string; option_id: string; payload: components["schemas"]["decision-request-view--json_value.schema"];
+        };
+        /** CORE V2 DecisionRequestViewPayload */
+        "decision-request-view.schema": {
+            /** @constant */
+            schema_version: "decision-request-view-v5-phase17n-step4"; actor_id: string | null; decision_type: string;
+            is_parameterized: boolean; interaction: components["schemas"]["interaction-descriptor.schema"] | null;
+            options: components["schemas"]["decision-request-view--decision_option.schema"][];
+            payload: components["schemas"]["decision-request-view--json_value.schema"]; request_id: string;
+        };
+        "game-view--primary_identifier_array.schema": string[]; "game-view--primary_nullable_identifier.schema": string | null;
+        "game-view--primary_condemned_selection_state.schema": {
+            active_player_id: string; battle_round: number;
+            candidate_evidence_ids: components["schemas"]["game-view--primary_identifier_array.schema"];
+            candidate_policy_id: string;
+            candidate_rules_unit_instance_ids: components["schemas"]["game-view--primary_identifier_array.schema"];
+            game_id: string; maximum_selection_count: number; minimum_selection_count: number; mission_id: string;
+            owner_player_id: string;
+            selected_rules_unit_instance_ids: components["schemas"]["game-view--primary_identifier_array.schema"];
+            selection_id: string; selection_request_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            selection_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            source_descriptor_id: string; source_event_id: string; source_rule_id: string; used_fallback_candidates: boolean;
+        };
+        "game-view--primary_nullable_positive_integer.schema": number | null;
+        "game-view--primary_consecration_designation_state.schema": {
+            component_unit_instance_ids: components["schemas"]["game-view--primary_identifier_array.schema"];
+            consumed_active_player_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            consumed_battle_round: components["schemas"]["game-view--primary_nullable_positive_integer.schema"];
+            consumed_marker_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            consumed_phase: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            consumption_event_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            consumption_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            consumption_source_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            created_active_player_id: string; created_battle_round: number; created_phase: string; designation_id: string;
+            game_id: string; last_resolution_event_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            last_resolution_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            last_resolved_active_player_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            last_resolved_battle_round: components["schemas"]["game-view--primary_nullable_positive_integer.schema"];
+            mission_id: string; owner_player_id: string; rules_unit_instance_id: string; source_descriptor_id: string;
+            source_destruction_id: string; source_event_id: string; source_rule_id: string;
+            /** @enum {string} */
+            status: "active" | "consumed";
+        };
+        "game-view--primary_mission_marker_state.schema": {
+            /** @enum {string} */
+            anchor_kind: "objective" | "terrain_feature";
+            created_active_player_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            created_battle_round: components["schemas"]["game-view--primary_nullable_positive_integer.schema"];
+            created_phase: components["schemas"]["game-view--primary_nullable_identifier.schema"]; game_id: string;
+            marker_id: string; marker_kind: string; mission_id: string;
+            objective_marker_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            owner_player_id: string; removal_action_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            removal_event_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            removal_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            removal_source_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            removed_active_player_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            removed_battle_round: components["schemas"]["game-view--primary_nullable_positive_integer.schema"];
+            removed_phase: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            source_action_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            source_descriptor_id: string;
+            source_designation_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            source_destruction_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            source_event_id: string; source_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            source_rule_id: string;
+            /** @enum {string} */
+            status: "active" | "removed";
+            terrain_feature_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+        };
+        "game-view--primary_mission_progress_state.schema": {
+            condemned_selections: components["schemas"]["game-view--primary_condemned_selection_state.schema"][];
+            consecration_designations: components["schemas"]["game-view--primary_consecration_designation_state.schema"][];
+            markers: components["schemas"]["game-view--primary_mission_marker_state.schema"][];
+        };
         "game-view--primary_objective_marker_witness.schema": {
             model_instance_ids: string[]; objective_marker_id: string;
         };
@@ -977,71 +1040,9 @@ export interface components {
             rules_unit_instance_id: string;
         };
         "game-view--primary_rules_unit_turn_start_snapshot.schema": {
-            active_player_id: string; battle_round: number; game_id: string; snapshot_id: string; source_id: string;
+            active_player_id: string; battle_round: number; game_id: string;
             rules_unit_memberships: components["schemas"]["game-view--primary_rules_unit_turn_start_membership.schema"][];
-        };
-        "game-view--primary_nullable_identifier.schema": string | null;
-        "game-view--primary_nullable_positive_integer.schema": number | null;
-        "game-view--primary_mission_marker_state.schema": {
-            marker_id: string; game_id: string; owner_player_id: string; mission_id: string; source_rule_id: string;
-            source_descriptor_id: string; marker_kind: string;
-            /** @enum {string} */
-            anchor_kind: "objective" | "terrain_feature";
-            objective_marker_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            terrain_feature_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            created_battle_round: components["schemas"]["game-view--primary_nullable_positive_integer.schema"];
-            created_phase: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            created_active_player_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            source_event_id: string; source_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            source_action_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            source_destruction_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            source_designation_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            /** @enum {string} */
-            status: "active" | "removed";
-            removed_battle_round: components["schemas"]["game-view--primary_nullable_positive_integer.schema"];
-            removed_phase: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            removed_active_player_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            removal_source_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            removal_event_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            removal_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            removal_action_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-        };
-        "game-view--primary_identifier_array.schema": string[];
-        "game-view--primary_condemned_selection_state.schema": {
-            selection_id: string; game_id: string; owner_player_id: string; mission_id: string; source_rule_id: string;
-            source_descriptor_id: string; battle_round: number; active_player_id: string; candidate_policy_id: string;
-            candidate_rules_unit_instance_ids: components["schemas"]["game-view--primary_identifier_array.schema"];
-            candidate_evidence_ids: components["schemas"]["game-view--primary_identifier_array.schema"];
-            selected_rules_unit_instance_ids: components["schemas"]["game-view--primary_identifier_array.schema"];
-            minimum_selection_count: number; maximum_selection_count: number; used_fallback_candidates: boolean;
-            selection_request_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            selection_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            source_event_id: string;
-        };
-        "game-view--primary_consecration_designation_state.schema": {
-            designation_id: string; game_id: string; owner_player_id: string; mission_id: string; source_rule_id: string;
-            source_descriptor_id: string; rules_unit_instance_id: string;
-            component_unit_instance_ids: components["schemas"]["game-view--primary_identifier_array.schema"];
-            source_destruction_id: string; created_battle_round: number; created_phase: string;
-            created_active_player_id: string; source_event_id: string;
-            last_resolved_battle_round: components["schemas"]["game-view--primary_nullable_positive_integer.schema"];
-            last_resolved_active_player_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            last_resolution_event_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            last_resolution_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            /** @enum {string} */
-            status: "active" | "consumed";
-            consumed_marker_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            consumed_battle_round: components["schemas"]["game-view--primary_nullable_positive_integer.schema"];
-            consumed_phase: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            consumed_active_player_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            consumption_source_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            consumption_event_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            consumption_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-        };
-        "game-view--primary_mission_progress_state.schema": {
-            markers: components["schemas"]["game-view--primary_mission_marker_state.schema"][];
-            condemned_selections: components["schemas"]["game-view--primary_condemned_selection_state.schema"][];
-            consecration_designations: components["schemas"]["game-view--primary_consecration_designation_state.schema"][];
+            snapshot_id: string; source_id: string;
         };
         "game-view--rules_catalog_reference.schema": {
             catalog_id: string;
@@ -1064,16 +1065,34 @@ export interface components {
             model_display_by_id: {
                 [key: string]: components["schemas"]["game-view--model_display.schema"];
             };
+            nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][];
             pending_decision: components["schemas"]["decision-request-view.schema"] | null;
-            pending_proposal: components["schemas"]["game-view--json_value.schema"];
-            nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][]; player_ids: string[];
+            pending_proposal: components["schemas"]["game-view--json_value.schema"]; player_ids: string[];
+            primary_mission_progress_state: components["schemas"]["game-view--primary_mission_progress_state.schema"];
+            primary_rules_unit_turn_start_snapshots: components["schemas"]["game-view--primary_rules_unit_turn_start_snapshot.schema"][];
             /** @constant */
             projection_schema: "game-view-v13-random-profiles"; projection_state_hash: string;
+            public_army_rosters?: {
+                army_id: components["schemas"]["game-view--json_value.schema"];
+                attachment_declarations: components["schemas"]["game-view--json_value.schema"];
+                battle_size: components["schemas"]["game-view--json_value.schema"];
+                catalog_id: components["schemas"]["game-view--json_value.schema"];
+                dedicated_transport_manifests: components["schemas"]["game-view--json_value.schema"];
+                detachment_selection: components["schemas"]["game-view--json_value.schema"];
+                enhancement_assignments: components["schemas"]["game-view--json_value.schema"];
+                enhancement_point_values: components["schemas"]["game-view--json_value.schema"];
+                force_disposition_id: components["schemas"]["game-view--json_value.schema"];
+                player_id: components["schemas"]["game-view--json_value.schema"];
+                points_source_package_id: components["schemas"]["game-view--json_value.schema"];
+                ruleset_id: components["schemas"]["game-view--json_value.schema"];
+                source_package_id: components["schemas"]["game-view--json_value.schema"];
+                unit_points: components["schemas"]["game-view--json_value.schema"];
+                unit_selections: components["schemas"]["game-view--json_value.schema"];
+                warlord_selection: components["schemas"]["game-view--json_value.schema"];
+            }[];
             public_command_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_card_states: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_choices: components["schemas"]["game-view--json_value.schema"][];
-            primary_rules_unit_turn_start_snapshots: components["schemas"]["game-view--primary_rules_unit_turn_start_snapshot.schema"][];
-            primary_mission_progress_state: components["schemas"]["game-view--primary_mission_progress_state.schema"];
             public_stratagem_use_records: components["schemas"]["game-view--json_value.schema"][];
             public_victory_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             rules_catalog: components["schemas"]["game-view--rules_catalog_reference.schema"]; stage: string;

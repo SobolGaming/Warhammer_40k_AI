@@ -1,0 +1,55 @@
+{
+  "scope": "Completed adopted bounded Section01 corpus, Windows only; engine is not green.",
+  "tests": {
+    "total": 234,
+    "passed": 230,
+    "failed": 4,
+    "skipped": 0,
+    "xfail": 0,
+    "files": 30,
+    "inventory_checks": 3,
+    "isolation_check": 1,
+    "small_roundtrip_integration": 1
+  },
+  "obligations": {
+    "adopted": 143,
+    "rules": 140,
+    "faq": 3,
+    "locally_asserted": 142,
+    "passing_path_mapped": 139,
+    "visible_semantic_regression_mapped": 3,
+    "external_owner_only": 1,
+    "locally_unimplemented": 0
+  },
+  "source_rows": 38,
+  "subsections": 7,
+  "subsubsections": 30,
+  "unadopted_gap_rows": 2,
+  "junit": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-9\\section01-stable.xml",
+  "junit_sha256": "bd4f8e85dbe5612dcd1b53f9f077f872da44098ccc850fa77cbdcf4bdd96fa69",
+  "performance": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-9\\section01-complete-performance.json",
+  "quality": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-9\\quality-complete-receipt.json",
+  "dependencies": {
+    "passed": 24,
+    "failed": 0,
+    "junit": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-9\\dependencies.xml",
+    "receipt": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-9\\dependencies-receipt.json"
+  },
+  "shards": {
+    "count": 12,
+    "new_files": 30,
+    "other_file_timings_preserved": true,
+    "timing_includes_visible_failed_cases": true
+  },
+  "preservation_manifest": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-9\\section01-complete-manifest.json",
+  "future_fixes": "future-fixes.json",
+  "native_and_contract_scope": "prerequisites.json",
+  "remaining_gates": [
+    "Independent clause/assertion and predecessor-equivalence review",
+    "Broader integration and Linux CI",
+    "Future semantic fix SF01-001",
+    "Explicit source adoption decision for 01.02.12 and 01.04.06",
+    "Section18 rewrite owns FAQ52 obligation03"
+  ],
+  "next": "Fresh Section03 only. Then04/05/06. Section00 deferred. This task stops after Section01."
+}

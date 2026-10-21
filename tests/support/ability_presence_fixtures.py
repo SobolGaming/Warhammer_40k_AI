@@ -147,7 +147,15 @@ def ability_presence_fixture(
     if embarked or reserves:
         for component_id in view.component_unit_instance_ids:
             battlefield = battlefield.without_unit_placement(component_id)
-    state.record_battlefield_state(battlefield)
+    from tests.support.coherent_attached_fixture_placements import (
+        coherent_attached_fixture_battlefield,
+    )
+
+    state.record_battlefield_state(
+        coherent_attached_fixture_battlefield(
+            armies=tuple(state.army_definitions), battlefield=battlefield
+        )
+    )
     for player_id in state.player_ids:
         state.record_secondary_mission_choice(
             secondary_choice(player_id=player_id, mode=SecondaryMissionMode.FIXED)

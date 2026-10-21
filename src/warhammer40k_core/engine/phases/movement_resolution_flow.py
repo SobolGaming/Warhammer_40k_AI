@@ -474,6 +474,46 @@ def _apply_movement_proposal_decision(
                 ),
                 proposal_request=proposal_request,
             )
+        from warhammer40k_core.engine.phases.movement_escape_mortals import completed_escape_retry
+
+        completed_retry = completed_escape_retry(
+            state=state,
+            decisions=decisions,
+            proposal=proposal_request,
+            resolution=fall_back_resolution,
+        )
+        if completed_retry is not None:
+            retry_resolution, application = completed_retry
+            return _apply_fall_back_result(
+                state=state,
+                decisions=decisions,
+                result=_action_result_from_proposal_request(
+                    proposal_request=proposal_request,
+                    actor_id=active_player_id,
+                    selected_option_id=source_selected_option_id,
+                    payload={
+                        "movement_phase_action": action.value,
+                        "unit_instance_id": proposal_request.unit_instance_id,
+                        "witness": validate_json_value(submission.witness.to_payload()),
+                        **retry_resolution.movement_payload,
+                    },
+                ),
+                destruction_source_result_id=None,
+                unit_placement=rules_unit_placement,
+                fall_back_result=retry_resolution,
+                destroyed_model_ids=tuple(
+                    d.model_instance_id for d in application.applications if d.destroyed
+                ),
+                mortal_wound_application=application,
+                movement_proposal_request_id=proposal_request.request_id,
+                ruleset_descriptor=ruleset_descriptor,
+                reaction_queue=reaction_queue,
+                stratagem_index=stratagem_index,
+                fall_back_hooks=fall_back_hooks,
+                battle_shock_hooks=battle_shock_hooks,
+                ability_index=ability_index,
+                runtime_modifier_registry=runtime_modifier_registry,
+            )
         fall_back_result = fall_back_resolution
         if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
             from warhammer40k_core.engine.desperate_escape_modifier_evaluation import (
@@ -849,24 +889,14 @@ def _continue_desperate_escape_fall_back(
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     if fall_back_result.failed_desperate_escape_rolls:
-        request = _desperate_escape_model_selection_request(
+        from warhammer40k_core.engine.desperate_escape_mortal_wounds import begin_escape_mortals
+
+        return begin_escape_mortals(
             state=state,
+            decisions=decisions,
             fall_back_result=fall_back_result,
             action_result=action_result,
             movement_proposal_request_id=movement_proposal_request_id,
-        )
-        decisions.request_decision(request)
-        return LifecycleStatus.waiting_for_decision(
-            stage=GameLifecycleStage.BATTLE,
-            decision_request=request,
-            payload={
-                "phase": BattlePhase.MOVEMENT.value,
-                "phase_body_status": "desperate_escape_model_selection_pending",
-                "battle_round": state.battle_round,
-                "active_player_id": _active_player_id(state),
-                "unit_instance_id": fall_back_result.unit_instance_id,
-                "proposal_request_id": movement_proposal_request_id,
-            },
         )
     return _apply_fall_back_result(
         state=state,

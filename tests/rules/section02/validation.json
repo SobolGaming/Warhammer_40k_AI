@@ -1,0 +1,56 @@
+{
+  "scope": "Completed bounded Section02, Windows only",
+  "tests": {
+    "passed": 239,
+    "failed": 0,
+    "skipped": 0,
+    "rule_cases": 235,
+    "isolation_cases": 1,
+    "inventory_checks": 3,
+    "mapped_obligations": 100,
+    "constructed_contract_obligations": 8,
+    "unimplemented_obligations": 0
+  },
+  "direct_dependency_controls": {
+    "passed": 104,
+    "receipt": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-8\\dependency-controls.xml",
+    "production_unchanged_since_run": true
+  },
+  "performance_receipt": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-8\\section02-complete-performance.json",
+  "junit": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-8\\section02-complete-final.xml",
+  "junit_sha256": "b79f119277abc1f6fb7d0437521bf65a549ba0c58134835a873de7d96c4018f4",
+  "preparation": [
+    {
+      "preparation_seconds": 1.779291299986653,
+      "datasheet_ids": [
+        "000000592",
+        "000000593",
+        "000000968",
+        "000004078",
+        "000004080",
+        "000004090"
+      ]
+    }
+  ],
+  "objective_preparation": [
+    {
+      "seconds": 1.3454931999731343,
+      "objective_markers": 5,
+      "mission_pool_entry_id": "mission-take-and-hold-vs-purge-the-foe-layout-3"
+    }
+  ],
+  "first_nested_call_including_cold_validation_seconds": 4.120941800007131,
+  "other_238_call_seconds": 0.999080899899127,
+  "all_239_call_seconds": 5.120022699906258,
+  "pytest_wall_seconds": 13.454730900004506,
+  "scope_qualification": "Fresh process, filesystem caches not flushed. Preparation includes indexed source validation/loading and six-definition construction. Calls exclude pytest setup/teardown/import/collection; first nested case includes additional cold source validation and is reported separately. No benchmark comparison.",
+  "quality_receipt": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-8\\quality-complete-receipt.json",
+  "preservation_manifest": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-8\\section02-complete-manifest.json",
+  "pending_gates": [
+    "full integration",
+    "Linux CI",
+    "independent coverage/equivalence review",
+    "predecessor retirement decision after equivalence review"
+  ],
+  "next_section": "01; this task stops after02"
+}

@@ -93,7 +93,10 @@ def quantity_token(value: str) -> str:
 
 def ability_token(value: str) -> str:
     stripped = value.strip(" []().,;:")
-    return " ".join(stripped.split())
+    token = " ".join(stripped.split())
+    # RuleIR carries the same canonical Stealth token as the Core consumer.
+    # Normalize at parsing, retaining the original text in its source span.
+    return "stealth" if token.casefold() == "stealth" else token
 
 
 def is_weapon_keyword(value: str) -> bool:

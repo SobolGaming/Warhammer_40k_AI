@@ -1,6 +1,7 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.damage_allocation import MortalWoundApplication
 from warhammer40k_core.engine.transport_embark_context import NoMovementEmbarkContext
 
 
@@ -179,6 +180,7 @@ def _apply_fall_back_result(
     runtime_modifier_registry: RuntimeModifierRegistry,
     reaction_queue: ReactionQueue | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    mortal_wound_application: MortalWoundApplication | None = None,
 ) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
     scenario = _battlefield_scenario(state)
@@ -190,7 +192,12 @@ def _apply_fall_back_result(
     if movement_unit_id != fall_back_result.unit_instance_id:
         raise GameLifecycleError("Fall Back rules-unit identity drift.")
     destruction_source_payload: dict[str, JsonValue] = {}
-    if destroyed_model_ids:
+    if mortal_wound_application is not None:
+        if destruction_source_result_id is not None:
+            raise GameLifecycleError(
+                "Hazard mortal wounds cannot use whole-model removal authority."
+            )
+    elif destroyed_model_ids:
         if destruction_source_result_id is None:
             raise GameLifecycleError(
                 "Desperate Escape destruction requires its model-selection result ID."
@@ -236,6 +243,22 @@ def _apply_fall_back_result(
                 rollback_record=None,
             )
             decisions.event_log.append("movement_action_invalid", invalid_payload)
+            retry_request = None
+            if mortal_wound_application is not None:
+                from warhammer40k_core.engine.phases.movement_escape_mortals import (
+                    request_escape_survivor_retry,
+                )
+
+                retry_request = request_escape_survivor_retry(
+                    state=state,
+                    decisions=decisions,
+                    movement_proposal_request_id=movement_proposal_request_id,
+                    application=mortal_wound_application,
+                    packet_id=fall_back_result.movement_payload.get(
+                        "desperate_escape_mortal_application_id"
+                    ),
+                    result=result,
+                )
             return LifecycleStatus.invalid(
                 stage=GameLifecycleStage.BATTLE,
                 message="Fall Back surviving endpoint violates unit coherency.",
@@ -247,11 +270,17 @@ def _apply_fall_back_result(
                     "unit_instance_id": movement_unit_id,
                     "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
                     "violation_code": violation_code,
+                    **(
+                        {"next_request_id": retry_request.request_id}
+                        if retry_request is not None
+                        else {}
+                    ),
                 },
             )
     transition_batch = fall_back_result.transition_batch(
         before=unit_placement,
         destroyed_model_ids=destroyed_model_ids,
+        mortal_wound_application=mortal_wound_application,
     )
     engagement_placement = (
         unit_placement
@@ -266,15 +295,17 @@ def _apply_fall_back_result(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Fall Back requires battlefield_state.")
-    attempted = fall_back_result.attempted_placement
-    if isinstance(attempted, UnitPlacement):
+    attempted = surviving_placement
+    if attempted is None:
+        updated_battlefield = battlefield_state
+    elif isinstance(attempted, UnitPlacement):
         updated_battlefield = battlefield_state.with_unit_placement(attempted)
     else:
         updated_battlefield = battlefield_state
         for component in attempted.component_unit_placements:
             updated_battlefield = updated_battlefield.with_unit_placement(component)
-    state.replace_battlefield_state(updated_battlefield.with_removed_models(destroyed_model_ids))
-    if destroyed_model_ids:
+    state.replace_battlefield_state(updated_battlefield)
+    if destroyed_model_ids and mortal_wound_application is None:
         destruction_source_id = _payload_string(
             destruction_source_payload,
             key="desperate_escape_source_mutation_id",
@@ -533,6 +564,26 @@ def _request_embark_after_move_or_complete_activation(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Movement activation completion requires battlefield_state.")
+    if "desperate_escape_mortal_application_id" in movement_payload and witness is not None:
+        surviving_paths = tuple(
+            path
+            for path in witness.model_paths
+            if battlefield_state.model_placement_or_none(path[0]) is not None
+        )
+        witness = PathWitness.for_paths(surviving_paths) if surviving_paths else None
+        movements = movement_payload.get("model_movements")
+        if not isinstance(movements, list):
+            raise GameLifecycleError("Hazard continuation requires model movement evidence.")
+        movement_payload = {
+            **movement_payload,
+            "model_movements": [
+                item
+                for item in movements
+                if isinstance(item, dict)
+                and battlefield_state.model_placement_or_none(cast(str, item["model_instance_id"]))
+                is not None
+            ],
+        }
     if fall_back_applied_event_id is not None:
         movement_payload = {
             **movement_payload,

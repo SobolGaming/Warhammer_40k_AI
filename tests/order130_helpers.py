@@ -134,7 +134,7 @@ def destruction_session(*, scoring_player: str = "player-a", wounds: int = 10) -
     return session_from_casualty_checkpoint(lifecycle)
 
 
-def finish_turn(session: LocalGameSession) -> None:
+def finish_turn(session: LocalGameSession, *, coherency_casualty_ids: tuple[str, ...] = ()) -> None:
     state = session.lifecycle.state
     assert state is not None
     owner, round_number = state.active_player_id, state.battle_round
@@ -148,13 +148,22 @@ def finish_turn(session: LocalGameSession) -> None:
             status = session.advance_until_decision_or_terminal()
         else:
             assert pending.decision_type in {
+                "select_coherency_casualty",
                 "resolve_sequencing_order",
                 "select_primary_mission_choice",
                 "score_tactical_secondary_mission",
             }, pending.decision_type
+            if pending.decision_type == "select_coherency_casualty":
+                assert coherency_casualty_ids, (
+                    "Fixture must explicitly choose each coherency casualty"
+                )
+                option_id, *remaining = coherency_casualty_ids
+                coherency_casualty_ids = tuple(remaining)
+            else:
+                option_id = pending.options[0].option_id
             status = session.submit_option(
                 request_id=pending.request_id,
-                option_id=pending.options[0].option_id,
+                option_id=option_id,
                 result_id=f"order130-finish-{index}",
             )
         assert status.status_kind not in {

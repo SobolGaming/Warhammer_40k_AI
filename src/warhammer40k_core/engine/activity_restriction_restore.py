@@ -228,6 +228,8 @@ def activity_restrictions_from_history(
     # Control determination precedes turn rules; only completed cleanup expires
     # turn restrictions. Its typed records are also the live owner's once-only gate.
     for cleanup in state.end_turn_cleanup_states:
+        if not cleanup.completes_boundary:
+            continue
         boundary = EffectExpirationBoundary.turn_end(
             battle_round=cleanup.battle_round, player_id=cleanup.active_player_id
         )

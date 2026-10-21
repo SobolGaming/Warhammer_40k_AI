@@ -1117,28 +1117,17 @@ def _finish_resumed_deadly_demise_source_damage(
         attack_sequence=attack_sequence,
         damage=damage,
     )
-    destroyed_model_placement = _destroyed_model_placement_payload(
-        state=state,
-        model_instance_id=damage.model_instance_id,
-    )
-    remove_destroyed_model_from_battlefield(
-        state=state,
-        model_instance_id=damage.model_instance_id,
-    )
-    destroyed_emission = _emit_damage_event(
+    from warhammer40k_core.engine.retained_demise_removal import finalize_attack_casualty
+
+    destroyed_emission = finalize_attack_casualty(
         state=state,
         decisions=decisions,
-        hooks=hooks,
         attack_sequence=attack_sequence,
         damage=damage,
-        saving_throw=None,
         saving_throw_payload=saving_throw_payload,
         feel_no_pain=feel_no_pain,
-        destroyed_model_placement=destroyed_model_placement,
-        destruction_attribution=destruction_attribution,
+        hooks=hooks,
     )
-    if destroyed_emission is None:
-        raise GameLifecycleError("Resumed Deadly Demise destruction did not emit evidence.")
     continuation = (
         None
         if source_damage_completion is None

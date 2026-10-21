@@ -1107,7 +1107,9 @@ def _plunging_fire_applies(
         attacker_model=observer_model,
         terrain_features=terrain_features,
     ) or (
-        _unit_has_keyword(attacker_unit, "TOWERING")
+        _keywords_include(
+            attacker_unit.own_model_by_id(observer_model.model_id).keywords, "TOWERING"
+        )
         and _target_unit_within_towering_plunging_fire_range(
             attacker_model=observer_model,
             target_models=target_models,

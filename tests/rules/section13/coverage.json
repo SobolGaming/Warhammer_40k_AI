@@ -1,0 +1,2019 @@
+{
+  "schema": "section13-clause-corpus-v1",
+  "source_authority": "Previously adopted retained maintained mirror, not a fresh official GW observation",
+  "observed_at": "2026-10-01T12:04:31.127429+00:00",
+  "category_hierarchy": {
+    "number": "13",
+    "title": "Terrain",
+    "subsections": [
+      {
+        "ref": "13.01",
+        "title": "Placing Terrain",
+        "text": [
+          "Before the battle, place a selection of \u0005terrain features\u0006 on the battlefield using one or more of the following methods:",
+          "• Place a well‑defined boundary (such as a base or mat) in each location you want to furnish with terrain, then place one or more \u0005terrain features\u0006 wholly within that boundary.",
+          "• Place one \u0005terrain feature\u0006 directly on the battlefield.",
+          "• Place two or more \u0005terrain features\u0006 directly on the battlefield in such a way that together they define the boundary of an area.",
+          "In each case, the area of the battlefield occupied by that boundary or \u0005terrain feature\u0006 is known as a \u0005terrain area\u0006. A mission’s deployment map may define the location and dimensions of each \u0005terrain area\u0006. Otherwise, players must agree on this before the battle."
+        ]
+      },
+      {
+        "ref": "13.02",
+        "title": "Terrain Categories",
+        "text": [
+          "Each \u0005terrain feature\u0006 belongs to a \u0005terrain category\u0006, which can affect the movement and visibility of models. Below are some examples of which types of \u0005terrain features\u0006 fall under each category.",
+          "A mission’s deployment map may define which \u0005terrain categories\u0006 should be present within each terrain area. Meeting these requirements will create the best gaming experience. Note that \u0005terrain features\u0006 sharing the same \u0005terrain area\u0006 can belong to different \u0005terrain categories\u0006.",
+          "\u000eTerrain Placed on a Mat",
+          "Two \u0005\u0007terrain features\b\u0006 have been placed on a mat. The edges of this mat define the boundary of this \u0005\u0007terrain area (A)\b\u0006. Both \u0005\u0007terrain features (B)\b\u0006 are ruins, so use the rules for \u0005\u0007dense terrain features\b\u0006.",
+          "\u000eTerrain Placed on a Battlefield",
+          "Three \u0005\u0007terrain features\b\u0006 have been placed directly on the battlefield. The players have agreed on the boundary of the \u0005\u0007terrain area (A)\b\u0006 defined by these features (the shaded rectangle). The \u0005BLUE\u0006 features \u0005\u0007(B)\b\u0006 are \u0005\u0007dense terrain features\b\u0006 and the \u0005RED\u0006 feature \u0005\u0007(C)\b\u0006 is a \u0005\u0007light\b\u0006 \u0005\u0007terrain feature\b\u0006."
+        ],
+        "accordions": [
+          {
+            "ref": "13.02.01",
+            "title": "Creating Your Own Battlefield",
+            "text": [
+              "Don’t worry if your battlefield doesn’t match a mission’s \u0005terrain category\u0006 requirements; just do the best with the \u0005terrain features\u0006 you have. If a mission does not provide you with guidance, it will be up to the players to decide how to create their battlefield. When doing so, keep in mind that \u0005dense terrain features\u0006 have the greatest impact on visibility and movement. Battlefields with too few \u0005dense terrain features\u0006 can advantage armies that rely on shooting, or disadvantage armies that rely on melee. Also remember to leave sufficient room around \u0005dense terrain features\u0006 for larger models such as \u0003MONSTERS/VEHICLES\u0004 to manoeuvre, especially near the edges of the battlefield."
+            ]
+          }
+        ]
+      },
+      {
+        "ref": "13.03",
+        "title": "Exposed Terrain",
+        "text": [
+          "Exposed terrain offers only scant protection to the most desperate troops, and can be traversed without hindrance.",
+          "\u0005Examples\u0006: Craters, razorwire, scattered debris."
+        ]
+      },
+      {
+        "ref": "13.04",
+        "title": "Light Terrain",
+        "text": [
+          "Light terrain can provide cover from incoming attacks, but will not slow an enemy’s advance or offer lasting defence.",
+          "\u0005Examples\u0006: Barricades, low walls, statuary."
+        ]
+      },
+      {
+        "ref": "13.05",
+        "title": "Dense Terrain",
+        "text": [
+          "Dense terrain is an obstacle to even the largest war machines, and can shelter entire squads from enemy sight.",
+          "\u0005Examples\u0006: Buildings, ruins, armoured containers, woods."
+        ]
+      },
+      {
+        "ref": "13.06",
+        "title": "Terrain And Movement",
+        "text": [
+          "Models can move through different categories of \u0005terrain feature\u0006 as follows:",
+          "• \u0005Exposed/Light\u0006: All models can move horizontally and vertically through \u0005exposed\u0006 and \u0005light terrain features\u0006.",
+          "• \u0005Dense\u0006:",
+          "◦ \u0003INFANTRY/BEASTS/SWARM/MOBILE\u0004 models can move horizontally through \u0005dense terrain features\u0006.",
+          "◦ \u0003INFANTRY/BEASTS/SWARM\u0004 models can move vertically through \u0005dense terrain features\u0006.",
+          "◦ Other models can move horizontally through \u0005dense terrain features\u0006 provided that all sections of that \u0005terrain feature\u0006 that the moving model’s base would move through are 2\" or less in height. Otherwise, the moving model must move vertically to ascend or descend such sections. They cannot move through ceilings and floors while doing so, and they cannot end that move on any surface of that \u0005terrain feature\u0006 that is not on ground level (see below).",
+          "\u0005MOVING VERTICALLY\u0006",
+          "Models can move vertically to ascend or descend \u0005terrain features\u0006. While doing so:",
+          "• That model must remain within ½\" horizontally of that \u0005terrain feature\u0006.",
+          "• Add the distance moved vertically up, and the distance moved vertically down, to any other distance that model has moved since its unit began that move.",
+          "\u0005SETTING UP OR ENDING A MOVE\u0006",
+          "Models can be set up or end a move on the ground level of \u0005terrain features\u0006. Models can also be set up or end a move on any surface of a \u0005terrain feature\u0006that is not on ground level, if all of the following apply:",
+          "• That model has one or more of the following keywords: \u0003INFANTRY/BEASTS/SWARM/FLY/MONSTER\u0004.",
+          "• After ending that move, that model is stable and no part of its base overhangs the outer edge of that surface.",
+          "\u000eTerrain and Movement",
+          "All sections of the \u0005\u0007dense\b\u0006 \u0005\u0007terrain feature (A)\b\u0006 are more than 2\" in height, so the \u0003Monster\u0004 model \u0005\u0007(B)\b\u0006 cannot move through it and must move around it instead.",
+          "The \u0003Infantry\u0004 models \u0005\u0007(C)\b\u0006 can move through \u0005\u0007dense terrain features\b\u0006, such as the walls of this ruin.",
+          "1. This \u0003Infantry\u0004 model can move vertically and end its move on the top surface of the \u0005\u0007terrain feature (D)\b\u0006, as it is stable and no part of its base overhangs the outer edge of that surface.",
+          "2. This \u0003Vehicle\u0004 model cannot move through the \u0005\u0007dense\b\u0006 \u0005\u0007terrain feature (E)\b\u0006, but It can move vertically to ascend and descend sections that are more than 2\" in height (provided it does not end that move on top of such sections).",
+          "3. This \u0003INFANTRY\u0004 model is not being moved over or through any \u0005\u0007terrain features\b\u0006. Its move through the \u0005\u0007terrain area\b\u0006 shown is therefore unimpeded."
+        ],
+        "accordions": [
+          {
+            "ref": "13.06.01",
+            "title": "Solid Terrain and Movement",
+            "text": [
+              "If a \u0005terrain feature\u0006 has the \u0005Solid\u0006 rule (13.11), as \u0005dense terrain features\u0006 do, a model cannot end a move such that any part of it is through any enclosed part of that \u0005terrain feature\u0006 that is 3\" or less from ground level – not even through small openings such as doors and windows. This ensures that protruding elements of models cannot be used to circumvent the visibility restrictions of the Solid rule."
+            ]
+          }
+        ]
+      },
+      {
+        "ref": "13.07",
+        "title": "Terrain And Visibility",
+        "text": [
+          "Terrain can affect visibility, depending on whether the \u0005Benefit of Cover\u0006, \u0005Hidden\u0006, \u0005Obscuring\u0006 or \u0005Solid\u0006 rules apply."
+        ]
+      },
+      {
+        "ref": "13.08",
+        "title": "Benefit Of Cover",
+        "text": [
+          "Each time a ranged attack targets a unit, if \u0001every\u0002 model in that unit meets one or more of the following conditions, that unit has the \u0005benefit of cover\u0006 against that attack:",
+          "• That model has the \u0003INFANTRY/BEASTS/SWARM\u0004 keyword and is within a \u0005terrain area\u0006.",
+          "• That model is not \u0005fully visible\u0006 to the attacking model due to one or more intervening \u0005terrain features\u0006 and/or one or more intervening \u0005obscuring terrain areas\u0006 (13.10).",
+          "Each time a ranged attack targets a unit that has the \u0005benefit of cover\u0006against it, worsen the \u0005BS\u0006 characteristic of that attack by 1.",
+          "\u000eBenefit of Cover",
+          "When Unit \u0005\u0007E\b\u0006 makes ranged attacks:",
+          "• Unit \u0005\u0007A\b\u0006 is \u0005\u0007fully visible\b\u0006 to every model in Unit \u0005\u0007E\b\u0006, so does not have the \u0005\u0007benefit of cover\b\u0006.",
+          "• Not all of the models in unit \u0005\u0007B\b\u0006 are within a \u0005\u0007terrain area\b\u0006, so unit \u0005\u0007B\b\u0006 does not have the \u0005\u0007benefit of cover\b\u0006.",
+          "• All of the models in unit \u0005\u0007C\b\u0006 are within a \u0005\u0007terrain area\b\u0006, so unit \u0005\u0007C\b\u0006 has the \u0005\u0007benefit of cover\b\u0006 (-1 BS).",
+          "• Unit \u0005\u0007D\b\u0006 is not \u0005\u0007fully visible\b\u0006 to unit \u0005\u0007E\b\u0006 due to an intervening \u0005\u0007obscuring\b\u0006 \u0005\u0007terrain area\b\u0006, so unit \u0005\u0007D\b\u0006 has the \u0005\u0007benefit of cover\b\u0006 (-1 BS)."
+        ]
+      },
+      {
+        "ref": "13.09",
+        "title": "Hidden",
+        "text": [
+          "A model is \u0005hidden\u0006 while \u0001all\u0002 of the following apply to it:",
+          "• That model has the \u0003INFANTRY/BEASTS/SWARM\u0004 keyword and is within a \u0005terrain area\u0006 that contains one or more \u0005light/dense terrain features\u0006.",
+          "• That model’s unit did not make one or more ranged attacks during this turn or during the previous turn.",
+          "While a model is \u0005hidden\u0006, it can only be \u0005visible\u0006 to enemy models that are within its \u0005detection range\u0006. Unless otherwise stated, a model’s \u0005detection range\u0006 is 15\"."
+        ],
+        "accordions": [
+          {
+            "ref": "13.09.01",
+            "title": "Hidden and the First Turn",
+            "text": [
+              "During the first turn, conditions that require something not to have happened during the previous turn are true. For the \u0005Hidden\u0006 rule, this means that during the first turn a unit has not made ranged attacks during the previous turn."
+            ]
+          }
+        ]
+      },
+      {
+        "ref": "13.10",
+        "title": "Obscuring",
+        "text": [
+          "\u0005Terrain areas\u0006 containing one or more \u0005light\u0006 or \u0005dense terrain features\u0006 are \u0005obscuring terrain areas\u0006. If every \u0005line of sight\u0006 drawn between two models crosses one or more \u0005obscuring terrain areas\u0006 (excluding \u0005obscuring terrain areas\u0006 that one or both of those models are within), those two models are not \u0005visible\u0006 to each other.",
+          "\u000eHidden and Obscuring",
+          "• There is an \u0005\u0007obscuring\b\u0006 \u0005\u0007terrain area\b\u0006 between all models in units \u0005\u0007A\b\u0006 and \u0005\u0007D\b\u0006, so none of them are \u0005\u0007visible\b\u0006 to each other.",
+          "• All models in units \u0005\u0007B\b\u0006 and \u0005\u0007C\b\u0006 are within the \u0005\u0007terrain area\b\u0006 and are \u0003Infantry\u0004, so are \u0005\u0007hidden\b\u0006. However, unit \u0005\u0007D\b\u0006’s models are within the 15\" \u0005\u0007detection range\b\u0006 of unit \u0005\u0007B\b\u0006’s models (but not unit \u0005\u0007C\b\u0006’s), so unit \u0005\u0007B\b\u0006’s models are \u0005\u0007visible\b\u0006 to unit \u0005\u0007D\b\u0006’s. Unit \u0005\u0007D\b\u0006’s models are also \u0005\u0007visible\b\u0006 to the models in units \u0005\u0007B\b\u0006 and \u0005\u0007C\b\u0006, since they are not within a \u0005\u0007terrain area\b\u0006."
+        ]
+      },
+      {
+        "ref": "13.11",
+        "title": "Solid",
+        "text": [
+          "\u0005Dense terrain features\u0006 have the \u0005Solid\u0006 rule. \u0005Line of sight\u0006 cannot be drawn across any enclosed gap in the surface of such a \u0005terrain feature\u0006 that is 3\" or less from ground level.",
+          "\u0005Designer’s Note\u0006: \u0007This rule ensures that models are not \u0005visible\u0006 while sheltering in ground-level terrain, irrespective of small openings such as doors, windows or bullet holes, or because of small gaps between adjacent \u0005terrain features\u0006. 3\" is the height of the first floor of many \u0005terrain features\u0006, but some missions may adjust the height at which this rule takes effect.\b",
+          "\u000eSolid",
+          "Units \u0005\u0007A\b\u0006 and \u0005\u0007B\b\u0006 are not \u0005\u0007visible\b\u0006 to each other, because even though there is a window in this \u0005\u0007dense\b\u0006 \u0005\u0007terrain feature\b\u0006, it has the \u0005\u0007Solid\b\u0006 rule, so \u0005\u0007line of sight\b\u0006 cannot be drawn through such enclosed gaps that are 3\" or less from ground level.",
+          "Units \u0005\u0007A\b\u0006 and \u0005\u0007C\b\u0006 are \u0005\u0007visible\b\u0006 to each other, because even though this \u0005\u0007dense\b\u0006 \u0005\u0007terrain feature\b\u0006 has the \u0005\u0007Solid\b\u0006 rule, \u0005\u0007line of sight\b\u0006 can be drawn normally through enclosed gaps that are more than 3\" from ground level."
+        ],
+        "accordions": [
+          {
+            "ref": "13.11.01",
+            "title": "Gone to Ground",
+            "text": [
+              "\u0005Hidden\u0006 models that are concealed by \u0005dense terrain features\u0006 gain an extra benefit while they have \u0005gone to ground\u0006.",
+              "A model has \u0005gone to ground\u0006 while all of the following apply:",
+              "• That model is \u0005hidden\u0006.",
+              "• That model is not \u0005fully visible\u0006 to the attacking model due to one or more intervening \u0005dense terrain features\u0006.",
+              "• That model’s unit did not make one or more ranged attacks during this turn or during the previous turn.",
+              "While a model has \u0005gone to ground\u0006, subtract 3\" from that model’s \u0005detection range\u0006.",
+              "\u0005Designer’s Note:\u0006 \u0007Units that made ranged attacks in the current or previous turn cannot \u0005go to ground\u0006, regardless of any abilities that allow them to shoot and remain \u0005hidden\u0006."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "rule:13:13.01:1",
+      "locator": "13.01",
+      "title": "Placing Terrain",
+      "source_sha256": "7a5e5299822df4650f6b04cd00b92d65e3666820b911bbd798093419c60e4653",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "fca98ba010e9693b76b057a1c380606a245c55ecaf4bd61a70e5504509bb4fbb",
+          "value": "Before the battle, place a selection of \u0005terrain features\u0006 on the battlefield using one or more of the following methods:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "d5a314455eb066760fd883b48f374566a6141539a2f6448d89eb8b43386d00ce",
+          "value": "• Place a well‑defined boundary (such as a base or mat) in each location you want to furnish with terrain, then place one or more \u0005terrain features\u0006 wholly within that boundary."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "761eb1fd63a9f3af6a8ce03ce820eccf058c690b82a0bbce59aa97d7bc40b8eb",
+          "value": "• Place one \u0005terrain feature\u0006 directly on the battlefield."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "1f7ba64289cdd0e32a29bbff95930570266172b7a5b7bb35fb6b9489bbdf00b3",
+          "value": "• Place two or more \u0005terrain features\u0006 directly on the battlefield in such a way that together they define the boundary of an area."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "75f7c94e3f8e9ec5b4063db139da22af3b9619d4208478284f0a61af4bed732e",
+          "value": "In each case, the area of the battlefield occupied by that boundary or \u0005terrain feature\u0006 is known as a \u0005terrain area\u0006. A mission’s deployment map may define the location and dimensions of each \u0005terrain area\u0006. Otherwise, players must agree on this before the battle."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "13.01-area-construction",
+          "source_blocks": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "obligation": "Terrain areas use agreed or mission-defined boundaries containing one or more physical features.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_agreed_boundary_membership_projects_at_every_elevation",
+              "function_ast_sha256": "3a62e7d3c64ffa312f1130d7a3c894a35d211125e0d910a3088543fc15f23ccf",
+              "assertions": [
+                "assert model_intersects_terrain_area(tiny(x=14, z=z), logical)",
+                "assert model_intersects_terrain_area(tiny(x=16.24, z=z), logical)",
+                "assert not model_intersects_terrain_area(tiny(x=16.26, z=z), logical)",
+                "assert logical.footprint_polygons == (((12, 8), (16, 8), (16, 12), (12, 12)),)"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_multiple_declared_physical_members_keep_exact_boundary_and_mixed_categories",
+              "function_ast_sha256": "a8b1403897f92ceb39942d1287c7bc95413d8a594e1e3bd576641d88d77d14d1",
+              "assertions": [
+                "assert logical.member_terrain_area_ids == ('s13:left', 's13:right')",
+                "assert logical.classification is C.MIXED",
+                "assert model_intersects_terrain_area(tiny(x=12), logical)",
+                "assert not model_intersects_terrain_area(tiny(x=17), logical)",
+                "assert not context.resolve_line_of_sight().unit_visible",
+                "assert not visibility(observer, (target,), areas=(replace(left, logical_terrain_area_id=left.terrain_area_id),)).resolve_line_of_sight().unit_visible"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:13:13.02:1",
+      "locator": "13.02",
+      "title": "Terrain Categories",
+      "source_sha256": "3678162a686c3748a932d0f1083b6bd95e52ecb7eff28ba3f4b762b605a2e5ea",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "f9ce13cd211e4d45c6e85e6020ec456a6ea09ccb858eb56522468a9b87fe439a",
+          "value": "Each \u0005terrain feature\u0006 belongs to a \u0005terrain category\u0006, which can affect the movement and visibility of models. Below are some examples of which types of \u0005terrain features\u0006 fall under each category."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "57ce3a705f97dfc0f6d0538b044b964379db51d5249b87a2337d6a18be9677d8",
+          "value": "A mission’s deployment map may define which \u0005terrain categories\u0006 should be present within each terrain area. Meeting these requirements will create the best gaming experience. Note that \u0005terrain features\u0006 sharing the same \u0005terrain area\u0006 can belong to different \u0005terrain categories\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "fb1f79b664523f721aa5266c54c9324b45f622dcd71a40a75ae8e54fd7912f52",
+          "value": "\u000eTerrain Placed on a Mat"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "8a848557b45ae9d893fb6a26d2e93c9173370221c8118c139a1eb7f869554b85",
+          "value": "Two \u0005\u0007terrain features\b\u0006 have been placed on a mat. The edges of this mat define the boundary of this \u0005\u0007terrain area (A)\b\u0006. Both \u0005\u0007terrain features (B)\b\u0006 are ruins, so use the rules for \u0005\u0007dense terrain features\b\u0006."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "d3c6927acca14d939a20396e35ac015dc4dd1a3f30432577d979d8fd76ff67f3",
+          "value": "\u000eTerrain Placed on a Battlefield"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "49a3447eb36b898779fdf058e297df5f45ebb610d3b1e59f87f8b42f973fba7a",
+          "value": "Three \u0005\u0007terrain features\b\u0006 have been placed directly on the battlefield. The players have agreed on the boundary of the \u0005\u0007terrain area (A)\b\u0006 defined by these features (the shaded rectangle). The \u0005BLUE\u0006 features \u0005\u0007(B)\b\u0006 are \u0005\u0007dense terrain features\b\u0006 and the \u0005RED\u0006 feature \u0005\u0007(C)\b\u0006 is a \u0005\u0007light\b\u0006 \u0005\u0007terrain feature\b\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "13.02-feature-classification",
+          "source_blocks": [
+            1,
+            2
+          ],
+          "obligation": "Each feature has its own terrain category, including mixed categories in one area.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_multiple_declared_physical_members_keep_exact_boundary_and_mixed_categories",
+              "function_ast_sha256": "a8b1403897f92ceb39942d1287c7bc95413d8a594e1e3bd576641d88d77d14d1",
+              "assertions": [
+                "assert logical.member_terrain_area_ids == ('s13:left', 's13:right')",
+                "assert logical.classification is C.MIXED",
+                "assert model_intersects_terrain_area(tiny(x=12), logical)",
+                "assert not model_intersects_terrain_area(tiny(x=17), logical)",
+                "assert not context.resolve_line_of_sight().unit_visible",
+                "assert not visibility(observer, (target,), areas=(replace(left, logical_terrain_area_id=left.terrain_area_id),)).resolve_line_of_sight().unit_visible"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_one_agreed_area_can_contain_features_with_different_movement_categories",
+              "function_ast_sha256": "f7c0d2a9808ba6078aaa295833534eb495a66b9cd20949c62a1301cecc804fa5",
+              "assertions": [
+                "assert model_intersects_terrain_area(tiny(x=13, y=8), boundary)",
+                "assert model_intersects_terrain_area(tiny(x=17, y=12), boundary)",
+                "assert dense.classification is C.DENSE",
+                "assert light.classification is C.LIGHT",
+                "assert result.is_valid is accepted, result.to_payload()"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_movement.py::test_category_and_direction_permissions",
+              "function_ast_sha256": "b286961d24ca2d4196df4946de95164f199b0fd6c6507f52f1004a5e252e4984",
+              "assertions": [
+                "assert result.is_valid is permitted, result.to_payload()",
+                "assert result.segments",
+                "assert any((s.vertical_distance_inches > 0 for s in result.segments)) is vertical",
+                "assert result.violations"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_consumers.py::test_native_movement_category_gate_rejection_retry_and_owner_mutation",
+              "function_ast_sha256": "995247101c81c071bffc27c76fbec68309e19bed296823d5c725883ec85cc836",
+              "assertions": [
+                "assert state.mission_setup is not None",
+                "assert state.battlefield_state is not None",
+                "assert (result.status_kind is not LifecycleStatusKind.INVALID) is permitted, result.to_payload()",
+                "assert after is not None",
+                "assert after != before",
+                "assert after.unit_placement_by_id('section02:spare') == before.unit_placement_by_id('section02:spare')",
+                "assert after.unit_placement_by_id('enemy:enemy') == before.unit_placement_by_id('enemy:enemy')",
+                "assert len(complete) == 1",
+                "assert complete[0]['unit_instance_id'] == unit.unit_instance_id",
+                "assert pending(session).decision_type == 'select_movement_unit'",
+                "assert session.view(viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert state.battlefield_state == before",
+                "assert not events(session, 'movement_activation_completed')",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "role": "example",
+          "reason": "Diagrams illustrate mat boundaries and mixed physical features."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:13:13.02.01:1",
+      "locator": "13.02.01",
+      "title": "Creating Your Own Battlefield",
+      "source_sha256": "e0025df1012c50af868e8302f78ec33461b9a5c44e9bd6cbf538b302d0cc206f",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "e9de3dfa9fd1e5c23921845e27ad124a0511ec51c6d7f888efc6a2eb2e8bc04d",
+          "value": "Don’t worry if your battlefield doesn’t match a mission’s \u0005terrain category\u0006 requirements; just do the best with the \u0005terrain features\u0006 you have. If a mission does not provide you with guidance, it will be up to the players to decide how to create their battlefield. When doing so, keep in mind that \u0005dense terrain features\u0006 have the greatest impact on visibility and movement. Battlefields with too few \u0005dense terrain features\u0006 can advantage armies that rely on shooting, or disadvantage armies that rely on melee. Also remember to leave sufficient room around \u0005dense terrain features\u0006 for larger models such as \u0003MONSTERS/VEHICLES\u0004 to manoeuvre, especially near the edges of the battlefield."
+        }
+      ],
+      "requirements": [],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "context",
+          "reason": "Optional terrain-layout and balancing advice does not impose engine mutation."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:13:13.03:1",
+      "locator": "13.03",
+      "title": "Exposed Terrain",
+      "source_sha256": "9626fe51fdbac06a740b89b6be5c19b91c64720786bd5b10e19b432234759387",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "dfbe817fef5a5b68ec8d2b86a2f7b811b56df75b7a0d415c7544313a499e4830",
+          "value": "Exposed terrain offers only scant protection to the most desperate troops, and can be traversed without hindrance."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "585d9dee18c3b4e098ad68f1f714115ab7d9f0b97f9399bbb76686def6f12f40",
+          "value": "\u0005Examples\u0006: Craters, razorwire, scattered debris."
+        }
+      ],
+      "requirements": [],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "context",
+          "reason": "Qualitative category description; operative traversal and visibility appear in later rows."
+        },
+        {
+          "source_blocks": [
+            2
+          ],
+          "role": "example",
+          "reason": "Examples of physical terrain, not an additional rule."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:13:13.04:1",
+      "locator": "13.04",
+      "title": "Light Terrain",
+      "source_sha256": "0ed4de33dbcbac7215dc029dc1ffc7e6180cd485631ec5d4b712f32bf14d23c9",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "24cd8a013c904efb91019493ebe7e5cba2ddfa5bcddfa373ced461e6f3086f3d",
+          "value": "Light terrain can provide cover from incoming attacks, but will not slow an enemy’s advance or offer lasting defence."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "e89586c37e08b98fd89f4bdbd7663a34aec49f83a8d773c214bd76ac30bb7c09",
+          "value": "\u0005Examples\u0006: Barricades, low walls, statuary."
+        }
+      ],
+      "requirements": [],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "context",
+          "reason": "Qualitative category description; operative traversal and visibility appear in later rows."
+        },
+        {
+          "source_blocks": [
+            2
+          ],
+          "role": "example",
+          "reason": "Examples of physical terrain, not an additional rule."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:13:13.05:1",
+      "locator": "13.05",
+      "title": "Dense Terrain",
+      "source_sha256": "40f84f985977308d381a8a213a569681cc6d4677bf1a76dd1e751a2e7bf7e605",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "c09be1a53ecccd5dc25124b85e104dc83448f0cdd4d939790c5d064160b2a280",
+          "value": "Dense terrain is an obstacle to even the largest war machines, and can shelter entire squads from enemy sight."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "bf88f8c48be6dba8d8fe66d134fbce2f9e046b75634aab8dd66299126baaba08",
+          "value": "\u0005Examples\u0006: Buildings, ruins, armoured containers, woods."
+        }
+      ],
+      "requirements": [],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "context",
+          "reason": "Qualitative category description; operative traversal and visibility appear in later rows."
+        },
+        {
+          "source_blocks": [
+            2
+          ],
+          "role": "example",
+          "reason": "Examples of physical terrain, not an additional rule."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:13:13.06:1",
+      "locator": "13.06",
+      "title": "Terrain And Movement",
+      "source_sha256": "3dc8a7351ba5246eb1d88731dd743a87972d3a9aa85427564a778b4d6f34ea24",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "475afebaf44700ba895d86082155407d41f9f0f577d22400430cc6c5eba74f17",
+          "value": "Models can move through different categories of \u0005terrain feature\u0006 as follows:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "3a05d657473262c44cb4928487541377ccb99108ce87d8aaa078b0e67469ce82",
+          "value": "• \u0005Exposed/Light\u0006: All models can move horizontally and vertically through \u0005exposed\u0006 and \u0005light terrain features\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "7440db071742ffc77ef1c9ea6886c6cdf1c88078489c279538fec7a12d5c4e91",
+          "value": "• \u0005Dense\u0006:"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "853692df8e1517f141d91b32cd3e929d6b8310ecdb89f85871bc0f96029f3489",
+          "value": "◦ \u0003INFANTRY/BEASTS/SWARM/MOBILE\u0004 models can move horizontally through \u0005dense terrain features\u0006."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "42f516c9ca50471eccac322b27321d7b9fe023a6e1288d374e003c621680d53d",
+          "value": "◦ \u0003INFANTRY/BEASTS/SWARM\u0004 models can move vertically through \u0005dense terrain features\u0006."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "a4f44fbb0d2883262ff4480ad602ace641c0d5218a91b1504dadc27b40f17fd7",
+          "value": "◦ Other models can move horizontally through \u0005dense terrain features\u0006 provided that all sections of that \u0005terrain feature\u0006 that the moving model’s base would move through are 2\" or less in height. Otherwise, the moving model must move vertically to ascend or descend such sections. They cannot move through ceilings and floors while doing so, and they cannot end that move on any surface of that \u0005terrain feature\u0006 that is not on ground level (see below)."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "a619417d0852d07369ea597aa842a6c621162531c3e6232a92039a62fd5c1abe",
+          "value": "\u0005MOVING VERTICALLY\u0006"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "ab36dec3983ed08b9eb5e6d5e029dd7c06c7bda1ca88f9463211cd3b20756560",
+          "value": "Models can move vertically to ascend or descend \u0005terrain features\u0006. While doing so:"
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "1e582bb65828bbdc9069bab8404aa12eeba39755341bbcd295a967b20642fb7d",
+          "value": "• That model must remain within ½\" horizontally of that \u0005terrain feature\u0006."
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "327d7c038bf9c06eb9d577f8773299408f96508df82b8220efcc8dde262a08db",
+          "value": "• Add the distance moved vertically up, and the distance moved vertically down, to any other distance that model has moved since its unit began that move."
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "fda47469f3cef443a5be4d955e292e1aa3f602b1c99a2d98bd8f2263372d5423",
+          "value": "\u0005SETTING UP OR ENDING A MOVE\u0006"
+        },
+        {
+          "ordinal": 12,
+          "kind": "text",
+          "sha256": "fc0055b2303b1cdd5f93b986012118f8bf4f6d6c8b1d9af24f811d0a8a29fd2b",
+          "value": "Models can be set up or end a move on the ground level of \u0005terrain features\u0006. Models can also be set up or end a move on any surface of a \u0005terrain feature\u0006that is not on ground level, if all of the following apply:"
+        },
+        {
+          "ordinal": 13,
+          "kind": "text",
+          "sha256": "b450cfba1bfd206e034f24b04dfe08a9f602d7728278927917b17b8e5e9211bf",
+          "value": "• That model has one or more of the following keywords: \u0003INFANTRY/BEASTS/SWARM/FLY/MONSTER\u0004."
+        },
+        {
+          "ordinal": 14,
+          "kind": "text",
+          "sha256": "b42331d3bce969e5e888085d84868e801fef9fd07014e8ffc2e73366a68b0bed",
+          "value": "• After ending that move, that model is stable and no part of its base overhangs the outer edge of that surface."
+        },
+        {
+          "ordinal": 15,
+          "kind": "text",
+          "sha256": "0af31cc5da504faffc6160e2d5abffe0c7ee8d001c32293daa0cf838ec532f59",
+          "value": "\u000eTerrain and Movement"
+        },
+        {
+          "ordinal": 16,
+          "kind": "text",
+          "sha256": "a3f8cf122a3044ceb67573557a82a3392734253e322d1d642af3fa55bf507e89",
+          "value": "All sections of the \u0005\u0007dense\b\u0006 \u0005\u0007terrain feature (A)\b\u0006 are more than 2\" in height, so the \u0003Monster\u0004 model \u0005\u0007(B)\b\u0006 cannot move through it and must move around it instead."
+        },
+        {
+          "ordinal": 17,
+          "kind": "text",
+          "sha256": "48d741a3638a34b2cb4fed650bef5a81e125d86c9723e95ba75262e6d0b72e02",
+          "value": "The \u0003Infantry\u0004 models \u0005\u0007(C)\b\u0006 can move through \u0005\u0007dense terrain features\b\u0006, such as the walls of this ruin."
+        },
+        {
+          "ordinal": 18,
+          "kind": "text",
+          "sha256": "36a5fc66b8d9d6395f3e3d742c9ab572e95954c65affdb4230a7886c200873d6",
+          "value": "1. This \u0003Infantry\u0004 model can move vertically and end its move on the top surface of the \u0005\u0007terrain feature (D)\b\u0006, as it is stable and no part of its base overhangs the outer edge of that surface."
+        },
+        {
+          "ordinal": 19,
+          "kind": "text",
+          "sha256": "470dfc54651945389c639c1976355f9e4fd21f12f07cd4816c0ae5ec03ab0294",
+          "value": "2. This \u0003Vehicle\u0004 model cannot move through the \u0005\u0007dense\b\u0006 \u0005\u0007terrain feature (E)\b\u0006, but It can move vertically to ascend and descend sections that are more than 2\" in height (provided it does not end that move on top of such sections)."
+        },
+        {
+          "ordinal": 20,
+          "kind": "text",
+          "sha256": "8e4df7de73d08370df1b33ae4e7072d6180d568f23bbae5488ac42fd026d2ba7",
+          "value": "3. This \u0003INFANTRY\u0004 model is not being moved over or through any \u0005\u0007terrain features\b\u0006. Its move through the \u0005\u0007terrain area\b\u0006 shown is therefore unimpeded."
+        },
+        {
+          "ordinal": 21,
+          "kind": "callout",
+          "sha256": "7cbcc548494e1e5ef0d7fcc40581959e6db12dc2d620dd68803b0da03bffb88d",
+          "value": {
+            "title": "Plunging Fire",
+            "body": "As well as gaining superior lines of sight, models that ascend tall terrain features can benefit from the Plunging Fire rule (22.05)."
+          }
+        }
+      ],
+      "requirements": [
+        {
+          "id": "13.06-light-traversal",
+          "source_blocks": [
+            1,
+            2
+          ],
+          "obligation": "All models may traverse Light terrain horizontally and vertically.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_category_and_direction_permissions",
+              "function_ast_sha256": "b286961d24ca2d4196df4946de95164f199b0fd6c6507f52f1004a5e252e4984",
+              "assertions": [
+                "assert result.is_valid is permitted, result.to_payload()",
+                "assert result.segments",
+                "assert any((s.vertical_distance_inches > 0 for s in result.segments)) is vertical",
+                "assert result.violations"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_consumers.py::test_native_movement_category_gate_rejection_retry_and_owner_mutation",
+              "function_ast_sha256": "995247101c81c071bffc27c76fbec68309e19bed296823d5c725883ec85cc836",
+              "assertions": [
+                "assert state.mission_setup is not None",
+                "assert state.battlefield_state is not None",
+                "assert (result.status_kind is not LifecycleStatusKind.INVALID) is permitted, result.to_payload()",
+                "assert after is not None",
+                "assert after != before",
+                "assert after.unit_placement_by_id('section02:spare') == before.unit_placement_by_id('section02:spare')",
+                "assert after.unit_placement_by_id('enemy:enemy') == before.unit_placement_by_id('enemy:enemy')",
+                "assert len(complete) == 1",
+                "assert complete[0]['unit_instance_id'] == unit.unit_instance_id",
+                "assert pending(session).decision_type == 'select_movement_unit'",
+                "assert session.view(viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert state.battlefield_state == before",
+                "assert not events(session, 'movement_activation_completed')",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.06-exposed-traversal",
+          "source_blocks": [
+            1,
+            2
+          ],
+          "obligation": "All models may traverse Exposed terrain horizontally and vertically.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_category_and_direction_permissions",
+              "function_ast_sha256": "b286961d24ca2d4196df4946de95164f199b0fd6c6507f52f1004a5e252e4984",
+              "assertions": [
+                "assert result.is_valid is permitted, result.to_payload()",
+                "assert result.segments",
+                "assert any((s.vertical_distance_inches > 0 for s in result.segments)) is vertical",
+                "assert result.violations"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_consumers.py::test_native_movement_category_gate_rejection_retry_and_owner_mutation",
+              "function_ast_sha256": "995247101c81c071bffc27c76fbec68309e19bed296823d5c725883ec85cc836",
+              "assertions": [
+                "assert state.mission_setup is not None",
+                "assert state.battlefield_state is not None",
+                "assert (result.status_kind is not LifecycleStatusKind.INVALID) is permitted, result.to_payload()",
+                "assert after is not None",
+                "assert after != before",
+                "assert after.unit_placement_by_id('section02:spare') == before.unit_placement_by_id('section02:spare')",
+                "assert after.unit_placement_by_id('enemy:enemy') == before.unit_placement_by_id('enemy:enemy')",
+                "assert len(complete) == 1",
+                "assert complete[0]['unit_instance_id'] == unit.unit_instance_id",
+                "assert pending(session).decision_type == 'select_movement_unit'",
+                "assert session.view(viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert state.battlefield_state == before",
+                "assert not events(session, 'movement_activation_completed')",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.06-dense-horizontal",
+          "source_blocks": [
+            4
+          ],
+          "obligation": "Infantry, Beasts, Swarm and Mobile may pass horizontally through Dense features.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_category_and_direction_permissions",
+              "function_ast_sha256": "b286961d24ca2d4196df4946de95164f199b0fd6c6507f52f1004a5e252e4984",
+              "assertions": [
+                "assert result.is_valid is permitted, result.to_payload()",
+                "assert result.segments",
+                "assert any((s.vertical_distance_inches > 0 for s in result.segments)) is vertical",
+                "assert result.violations"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_consumers.py::test_native_movement_category_gate_rejection_retry_and_owner_mutation",
+              "function_ast_sha256": "995247101c81c071bffc27c76fbec68309e19bed296823d5c725883ec85cc836",
+              "assertions": [
+                "assert state.mission_setup is not None",
+                "assert state.battlefield_state is not None",
+                "assert (result.status_kind is not LifecycleStatusKind.INVALID) is permitted, result.to_payload()",
+                "assert after is not None",
+                "assert after != before",
+                "assert after.unit_placement_by_id('section02:spare') == before.unit_placement_by_id('section02:spare')",
+                "assert after.unit_placement_by_id('enemy:enemy') == before.unit_placement_by_id('enemy:enemy')",
+                "assert len(complete) == 1",
+                "assert complete[0]['unit_instance_id'] == unit.unit_instance_id",
+                "assert pending(session).decision_type == 'select_movement_unit'",
+                "assert session.view(viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert state.battlefield_state == before",
+                "assert not events(session, 'movement_activation_completed')",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.06-dense-vertical",
+          "source_blocks": [
+            5
+          ],
+          "obligation": "Infantry, Beasts and Swarm may pass vertically through Dense features.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_category_and_direction_permissions",
+              "function_ast_sha256": "b286961d24ca2d4196df4946de95164f199b0fd6c6507f52f1004a5e252e4984",
+              "assertions": [
+                "assert result.is_valid is permitted, result.to_payload()",
+                "assert result.segments",
+                "assert any((s.vertical_distance_inches > 0 for s in result.segments)) is vertical",
+                "assert result.violations"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.06-other-dense-low",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "Otherwise Dense horizontal traversal is allowed only through sections at most two inches high.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_other_models_dense_two_inch_threshold",
+              "function_ast_sha256": "b616bec60e698f490fd1680d842fa32b0ed84273342decf2c976a035c0e2ee46",
+              "assertions": [
+                "assert result.is_valid is accepted, result.to_payload()",
+                "assert all((s.vertical_distance_inches == 0 for s in result.segments))"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.06-other-dense-climb",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "Other models must ascend and descend taller Dense sections.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_climb_counts_ascent_and_descent_plus_horizontal_distance",
+              "function_ast_sha256": "fceab90bfe947b4d8b76341f2f4d438543f5bca53e97c01ae32730bbc4b27c93",
+              "assertions": [
+                "assert result.is_valid, result.to_payload()",
+                "assert sum((s.vertical_distance_inches for s in result.segments)) == 6",
+                "assert sum((s.counted_distance_inches - s.horizontal_distance_inches for s in result.segments)) == 6"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_consumers.py::test_native_movement_category_gate_rejection_retry_and_owner_mutation",
+              "function_ast_sha256": "995247101c81c071bffc27c76fbec68309e19bed296823d5c725883ec85cc836",
+              "assertions": [
+                "assert state.mission_setup is not None",
+                "assert state.battlefield_state is not None",
+                "assert (result.status_kind is not LifecycleStatusKind.INVALID) is permitted, result.to_payload()",
+                "assert after is not None",
+                "assert after != before",
+                "assert after.unit_placement_by_id('section02:spare') == before.unit_placement_by_id('section02:spare')",
+                "assert after.unit_placement_by_id('enemy:enemy') == before.unit_placement_by_id('enemy:enemy')",
+                "assert len(complete) == 1",
+                "assert complete[0]['unit_instance_id'] == unit.unit_instance_id",
+                "assert pending(session).decision_type == 'select_movement_unit'",
+                "assert session.view(viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert state.battlefield_state == before",
+                "assert not events(session, 'movement_activation_completed')",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.06-dense-floor-crossing",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "Models without vertical Dense transit permission cannot pass through ceilings or floors while climbing.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_dense_floor_cannot_be_crossed_without_vertical_permission",
+              "function_ast_sha256": "d7b4d1b7b48f6cb58c0b2e07877cc72b41abe0e3d0896c61289508e1f05f125a",
+              "assertions": [
+                "assert result.is_valid is (keyword == 'INFANTRY'), result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.06-other-dense-upper",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "An unqualified model cannot end its move on an elevated terrain surface.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_upper_floor_endpoint_keyword_gate",
+              "function_ast_sha256": "467e36a355a0e5f17fbd9007ae38b69fa3bdb769d20eb77d340792281222cf03",
+              "assertions": [
+                "assert result.is_valid is accepted, result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.06-vertical-contact",
+          "source_blocks": [
+            8,
+            9
+          ],
+          "obligation": "Ascending or descending models remain within half an inch horizontally of the feature.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_ascent_and_descent_remain_within_half_inch_of_feature",
+              "function_ast_sha256": "0b33e305909e9df9de5df16306fef45c936483a868892b5741081d614819984c",
+              "assertions": [
+                "assert result.is_valid is accepted, result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.06-vertical-distance",
+          "source_blocks": [
+            10
+          ],
+          "obligation": "Count both upward and downward travel in the total distance budget.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_climb_counts_ascent_and_descent_plus_horizontal_distance",
+              "function_ast_sha256": "fceab90bfe947b4d8b76341f2f4d438543f5bca53e97c01ae32730bbc4b27c93",
+              "assertions": [
+                "assert result.is_valid, result.to_payload()",
+                "assert sum((s.vertical_distance_inches for s in result.segments)) == 6",
+                "assert sum((s.counted_distance_inches - s.horizontal_distance_inches for s in result.segments)) == 6"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.06-upper-keywords",
+          "source_blocks": [
+            12,
+            13
+          ],
+          "obligation": "Ground-level endpoints are allowed; elevated surfaces require Infantry, Beasts, Swarm, Fly or Monster.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_upper_floor_endpoint_keyword_gate",
+              "function_ast_sha256": "467e36a355a0e5f17fbd9007ae38b69fa3bdb769d20eb77d340792281222cf03",
+              "assertions": [
+                "assert result.is_valid is accepted, result.to_payload()"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_movement.py::test_endpoint_uses_physical_owner_and_native_base_overhang",
+              "function_ast_sha256": "74a945a4563fb80bc98e6cb209aa7ca02c84043764ca30ba7869abf8f16dd568",
+              "assertions": [
+                "assert terrain_endpoint_placement_violation(model=m, unit=u, ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(), terrain_features=(f,), violation_code='s13:end', placement_label='s13') is None",
+                "assert result is not None",
+                "assert 'physical unit' in result.message",
+                "assert terrain_endpoint_placement_violation(model=overhang, unit=u, ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(), terrain_features=(f,), violation_code='s13:end', placement_label='s13') is not None"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_movement.py::test_stable_upper_surface_of_classified_dense_nonruins_feature_is_legal",
+              "function_ast_sha256": "df4a6be2c8c32b3799370e77a57c4eafbbbf8076cf5f86d91675bce4b08d7104",
+              "assertions": [
+                "assert result is None, result"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.06-support",
+          "source_blocks": [
+            14
+          ],
+          "obligation": "An elevated endpoint must be stable and its base must not overhang.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_upper_floor_stability_and_no_base_overhang",
+              "function_ast_sha256": "069ff97c225fce54cc373151deecbc8ceb4cc0aa7c248b8beb24633ca5616a05",
+              "assertions": [
+                "assert result.is_valid is accepted, result.to_payload()"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_movement.py::test_endpoint_uses_physical_owner_and_native_base_overhang",
+              "function_ast_sha256": "74a945a4563fb80bc98e6cb209aa7ca02c84043764ca30ba7869abf8f16dd568",
+              "assertions": [
+                "assert terrain_endpoint_placement_violation(model=m, unit=u, ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(), terrain_features=(f,), violation_code='s13:end', placement_label='s13') is None",
+                "assert result is not None",
+                "assert 'physical unit' in result.message",
+                "assert terrain_endpoint_placement_violation(model=overhang, unit=u, ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(), terrain_features=(f,), violation_code='s13:end', placement_label='s13') is not None"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            3,
+            7,
+            11,
+            15
+          ],
+          "role": "metadata",
+          "reason": "Traversal group labels and illustration title."
+        },
+        {
+          "source_blocks": [
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "role": "example",
+          "reason": "Examples illustrate the category, climbing and endpoint rules."
+        },
+        {
+          "source_blocks": [
+            21
+          ],
+          "role": "cross_reference",
+          "reason": "Plunging Fire callout points to 22.05 without modifying these movement rules."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:13:13.06.01:1",
+      "locator": "13.06.01",
+      "title": "Solid Terrain and Movement",
+      "source_sha256": "79a38af40707f2d30eaba4bd2526cdcd0dd52e0b3c31a0c98b296acd05e96b7a",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "b3aa44fb54c452b27116f97a08b00e9de9155c0160a5299cb3a0df82a4ae80dd",
+          "value": "If a \u0005terrain feature\u0006 has the \u0005Solid\u0006 rule (13.11), as \u0005dense terrain features\u0006 do, a model cannot end a move such that any part of it is through any enclosed part of that \u0005terrain feature\u0006 that is 3\" or less from ground level – not even through small openings such as doors and windows. This ensures that protruding elements of models cannot be used to circumvent the visibility restrictions of the Solid rule."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "13.06.01-solid-endpoint",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "No model part may finish penetrating an enclosed Solid feature at or below three inches, including openings.",
+          "engine_owners": [
+            "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_movement.py::test_solid_endpoint_enclosed_opening_and_high_control",
+              "function_ast_sha256": "26980e90312a3999310b40a63caa0146c8f03e224e09d6e8456a5adb4556ac46",
+              "assertions": [
+                "assert (result is None) is (accepted or classification is C.LIGHT), result",
+                "assert 'Solid' in result.message"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_movement.py::test_any_protruding_model_part_cannot_penetrate_low_solid_opening",
+              "function_ast_sha256": "71ad820e022463391e63fe361ed4c31a6df8c5a7486faa6c7f3e463e84fd895f",
+              "assertions": [
+                "assert result is not None",
+                "assert 'Solid' in result.message",
+                "assert clear is None"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:13:13.07:1",
+      "locator": "13.07",
+      "title": "Terrain And Visibility",
+      "source_sha256": "8b938bce0f28eaca861cac28558df2765ee8938d5850791755c8aa2141a4bb67",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "329a84f8482a7694f98fc7b58e67b35b028a5d951efc2d16da049695a253cc98",
+          "value": "Terrain can affect visibility, depending on whether the \u0005Benefit of Cover\u0006, \u0005Hidden\u0006, \u0005Obscuring\u0006 or \u0005Solid\u0006 rules apply."
+        }
+      ],
+      "requirements": [],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "cross_reference",
+          "reason": "Index of Cover, Hidden, Obscuring and Solid rules, each specified below."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:13:13.08:1",
+      "locator": "13.08",
+      "title": "Benefit Of Cover",
+      "source_sha256": "d180a0560b9dcee103a3cba6bd3e929086ff4a56f1b6ee4137ab292cdf646dc6",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "a6290cfe0ce2f12e7d42235a8f6d60241574517e5190b4265a9330c5591ce117",
+          "value": "Each time a ranged attack targets a unit, if \u0001every\u0002 model in that unit meets one or more of the following conditions, that unit has the \u0005benefit of cover\u0006 against that attack:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "95eef0cceda2fde90f076214127f96a106634855eb41de626970c2a1746b7692",
+          "value": "• That model has the \u0003INFANTRY/BEASTS/SWARM\u0004 keyword and is within a \u0005terrain area\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "a147adf5afbd57a1bd01c5b587867cab1b85990402842936aeaf1f3b51cc57a1",
+          "value": "• That model is not \u0005fully visible\u0006 to the attacking model due to one or more intervening \u0005terrain features\u0006 and/or one or more intervening \u0005obscuring terrain areas\u0006 (13.10)."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "9f64ecdbc59db7e5921f8ded826a7d107dc74ed35d401b929b46a27c9deaadba",
+          "value": "Each time a ranged attack targets a unit that has the \u0005benefit of cover\u0006against it, worsen the \u0005BS\u0006 characteristic of that attack by 1."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "26c98ad1b0dbfe0c9c50ce2e0f7a581405e441035ec09ba59187b2a067927464",
+          "value": "\u000eBenefit of Cover"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "f7838610723c70d43f4ed844a777042779a1f1a2a2eac0c9b513db5a004df24d",
+          "value": "When Unit \u0005\u0007E\b\u0006 makes ranged attacks:"
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "3941c122365a616c9465ab8a4e6971325c3249996b4912b8fa890fb67e16c6ec",
+          "value": "• Unit \u0005\u0007A\b\u0006 is \u0005\u0007fully visible\b\u0006 to every model in Unit \u0005\u0007E\b\u0006, so does not have the \u0005\u0007benefit of cover\b\u0006."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "9b45e9a81cf41af064e2ea236ad5c53fe7afc058a169bfe978be7b7530ec4208",
+          "value": "• Not all of the models in unit \u0005\u0007B\b\u0006 are within a \u0005\u0007terrain area\b\u0006, so unit \u0005\u0007B\b\u0006 does not have the \u0005\u0007benefit of cover\b\u0006."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "da9c02217e86d73c73076051646906202277d6cf915da6137fb8031cb2c3cbf8",
+          "value": "• All of the models in unit \u0005\u0007C\b\u0006 are within a \u0005\u0007terrain area\b\u0006, so unit \u0005\u0007C\b\u0006 has the \u0005\u0007benefit of cover\b\u0006 (-1 BS)."
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "2b779d0eb052bff8d6df5f69bfc8f3c15876c759743748e25ac5b9d38d161f56",
+          "value": "• Unit \u0005\u0007D\b\u0006 is not \u0005\u0007fully visible\b\u0006 to unit \u0005\u0007E\b\u0006 due to an intervening \u0005\u0007obscuring\b\u0006 \u0005\u0007terrain area\b\u0006, so unit \u0005\u0007D\b\u0006 has the \u0005\u0007benefit of cover\b\u0006 (-1 BS)."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "13.08-every-model",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Cover is evaluated for every model in the targeted unit against the individual attacker.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_cover_requires_every_target_model_to_have_its_own_source",
+              "function_ast_sha256": "9e58f966e6218a5bb0b086becf4182c1714dde4e365bf83835f94433e90c7e88",
+              "assertions": [
+                "assert cover.has_benefit is second_inside",
+                "assert witness.unit_visible"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_different_models_can_satisfy_different_cover_conditions",
+              "function_ast_sha256": "97295bbc5fed33422432bd7aa96230d697135789dc59aca11476e5fcee73f3e6",
+              "assertions": [
+                "assert witness.unit_visible",
+                "assert context.benefit_of_cover(witness).has_benefit"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_ownership.py::test_attached_terrain_hidden_and_cover_check_each_physical_owner",
+              "function_ast_sha256": "4b21b9e92f98af1af7807291a8b55fd869b81eeacd1e0efd22d33f64e9b24e3e",
+              "assertions": [
+                "assert s.battlefield_state is not None",
+                "assert s.mission_setup is not None",
+                "assert set(hidden) == set(body.own_model_ids() + (leader.own_model_ids() if leader_inside else ()))",
+                "assert rules_unit.model_by_id(body.own_model_ids()[0]) is body.own_models[0]",
+                "assert rules_unit.model_by_id(leader.own_model_ids()[0]) is leader.own_models[0]",
+                "assert result.is_legal",
+                "assert ('core-rules:benefit-of-cover' in result.targeting_rule_ids) is leader_inside",
+                "assert set(result.target_in_range_model_ids) == set(body.own_model_ids() + leader.own_model_ids())",
+                "assert body.own_model_ids() != leader.own_model_ids()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.08-area-cover",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "Infantry, Beasts and Swarm models within a terrain area qualify for cover.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_cover_occupancy_is_per_model_keyword_and_independent_of_category",
+              "function_ast_sha256": "8592a7d19bdd2bced1f77464ea2137e627050c5f2daf60295a0fc23ab07c0d88",
+              "assertions": [
+                "assert witness.unit_fully_visible",
+                "assert cover.has_benefit is (keyword in {'INFANTRY', 'BEAST', 'SWARM'})"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.08-obstruction-cover",
+          "source_blocks": [
+            3
+          ],
+          "obligation": "Incomplete full visibility due to intervening physical terrain or Obscuring areas qualifies a model for cover.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_partial_intervening_feature_grants_cover_to_vehicle_without_occupancy",
+              "function_ast_sha256": "3d2901b814282d9f8178694db67f3b3adbc56d82677e0ebc8a3a46a63e4016c9",
+              "assertions": [
+                "assert witness.unit_visible",
+                "assert not witness.unit_fully_visible",
+                "assert context.benefit_of_cover(witness).has_benefit",
+                "assert clear.resolve_line_of_sight().unit_fully_visible",
+                "assert not clear.benefit_of_cover(clear.resolve_line_of_sight()).has_benefit"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_one_open_sightline_prevents_obscuring_from_blocking_visibility",
+              "function_ast_sha256": "a0d2b39174f3f30d32afd656ed2491ac1656a59f1ae5de5d4853648694b94fe2",
+              "assertions": [
+                "assert witness.unit_visible",
+                "assert not witness.unit_fully_visible",
+                "assert context.benefit_of_cover(witness).has_benefit"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.08-skill",
+          "source_blocks": [
+            4
+          ],
+          "obligation": "Cover worsens the attack Ballistic Skill by one.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_consumers.py::test_native_cover_producer_changes_actual_hit_ballistic_skill_and_continues",
+              "function_ast_sha256": "d8676283a9eac324fb99bdc2792426bac719bf1509ec974fd05bac7cef541f5f",
+              "assertions": [
+                "assert len(rows) == 1",
+                "assert seq.is_complete",
+                "assert len(seq.attack_pools) == 1",
+                "assert hit_steps, [e.to_payload() for e in records if e.event_type == 'attack_sequence_step']",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert state.unit_made_ranged_attacks_current_or_previous_turn(unit_instance_id=attacker.unit_instance_id)",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert isinstance(step, dict)",
+                "assert cast(dict[str, JsonValue], step['payload'])['target_number'] == seq.attack_pools[0].weapon_profile.skill.final + int(cover)"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "role": "example",
+          "reason": "Cover diagrams instantiate the operative all-model qualification rule."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:13:13.09:1",
+      "locator": "13.09",
+      "title": "Hidden",
+      "source_sha256": "c4c518abae7636b67aa6957a071cc4f0d9e96f7cf6ffc1b5b69e3ce4500dfe1a",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "7af2793f3ed70faa9efce091fd87cbcad0e00f2f5779d3a99578ab2b75fa6584",
+          "value": "A model is \u0005hidden\u0006 while \u0001all\u0002 of the following apply to it:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "fb0a68a21cb6c1025f70d20e6f12cd4f1c544bb3b1264eb971a7b373425d0bab",
+          "value": "• That model has the \u0003INFANTRY/BEASTS/SWARM\u0004 keyword and is within a \u0005terrain area\u0006 that contains one or more \u0005light/dense terrain features\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "13d88df5ff03b77ac176df99ac3b013f1a7881d5facdea1f70e9017335144caf",
+          "value": "• That model’s unit did not make one or more ranged attacks during this turn or during the previous turn."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "424cd76a9acef1e2dc3504642646200a577e2c1f605de34f9b7916184cb11c7a",
+          "value": "While a model is \u0005hidden\u0006, it can only be \u0005visible\u0006 to enemy models that are within its \u0005detection range\u0006. Unless otherwise stated, a model’s \u0005detection range\u0006 is 15\"."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "13.09-keywords-area",
+          "source_blocks": [
+            1,
+            2
+          ],
+          "obligation": "Hidden requires an Infantry/Beasts/Swarm model in an area containing Light or Dense terrain.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_hidden.py::test_hidden_requires_eligible_physical_keyword_area_and_no_recent_shooting",
+              "function_ast_sha256": "5bbd94d303869b2f142dcb03e1243a5c58e908eadec6fb39d8db11d12084799d",
+              "assertions": [
+                "assert set(hidden) == set(expected)"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_ownership.py::test_attached_terrain_hidden_and_cover_check_each_physical_owner",
+              "function_ast_sha256": "4b21b9e92f98af1af7807291a8b55fd869b81eeacd1e0efd22d33f64e9b24e3e",
+              "assertions": [
+                "assert s.battlefield_state is not None",
+                "assert s.mission_setup is not None",
+                "assert set(hidden) == set(body.own_model_ids() + (leader.own_model_ids() if leader_inside else ()))",
+                "assert rules_unit.model_by_id(body.own_model_ids()[0]) is body.own_models[0]",
+                "assert rules_unit.model_by_id(leader.own_model_ids()[0]) is leader.own_models[0]",
+                "assert result.is_legal",
+                "assert ('core-rules:benefit-of-cover' in result.targeting_rule_ids) is leader_inside",
+                "assert set(result.target_in_range_model_ids) == set(body.own_model_ids() + leader.own_model_ids())",
+                "assert body.own_model_ids() != leader.own_model_ids()"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_hidden.py::test_hidden_uses_constructed_physical_keyword_not_the_unit_name",
+              "function_ast_sha256": "4d0527c5063d5fc790daab4d5d5ca596de9f128ce98f46d280bdf78fd2609663",
+              "assertions": [
+                "assert hidden == (target.own_model_ids() if keyword in {'INFANTRY', 'BEAST', 'SWARM'} else ())"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.09-shooting-history",
+          "source_blocks": [
+            3
+          ],
+          "obligation": "Hidden requires no ranged attack in the current or preceding player turn.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_hidden.py::test_hidden_requires_eligible_physical_keyword_area_and_no_recent_shooting",
+              "function_ast_sha256": "5bbd94d303869b2f142dcb03e1243a5c58e908eadec6fb39d8db11d12084799d",
+              "assertions": [
+                "assert set(hidden) == set(expected)"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.09-detection",
+          "source_blocks": [
+            4
+          ],
+          "obligation": "Enemy visibility of a Hidden model requires range within its detection distance, normally fifteen inches.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_hidden.py::test_native_detection_base_distance_inclusive_fifteen_or_twelve_inches",
+              "function_ast_sha256": "69a3753ad6bc5c1661a641bc38b53799b374704e839bb045df75b1f9eed5f7ef",
+              "assertions": [
+                "assert result.is_legal is legal, result.to_payload()",
+                "assert result.violation_code is (None if legal else ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE)",
+                "assert result.line_of_sight_witness is not None",
+                "assert not result.line_of_sight_witness.unit_fully_visible"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_consumers.py::test_forbidden_native_shooting_declaration_preserves_state_and_can_decline",
+              "function_ast_sha256": "95403ee62297d371eeb551e1b271d45e69baded05022ec921e670a4ceeb035dd",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID, invalid.to_payload()",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending(session) == request",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert not events(session, 'attack_sequence_step')"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:13:13.09.01:1",
+      "locator": "13.09.01",
+      "title": "Hidden and the First Turn",
+      "source_sha256": "135947760ca5563ddd996c2e5990ea7c7a3e6113986f1586bdfb51c131e60e34",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "459bdcb67ae73c71898afb8e903fac82b1d8a8514f83b64dac87ae9c399a9e1e",
+          "value": "During the first turn, conditions that require something not to have happened during the previous turn are true. For the \u0005Hidden\u0006 rule, this means that during the first turn a unit has not made ranged attacks during the previous turn."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "13.09.01-first-turn",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "On the first player turn, the no-prior-turn-shooting condition is true.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_hidden.py::test_hidden_requires_eligible_physical_keyword_area_and_no_recent_shooting",
+              "function_ast_sha256": "5bbd94d303869b2f142dcb03e1243a5c58e908eadec6fb39d8db11d12084799d",
+              "assertions": [
+                "assert set(hidden) == set(expected)"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:13:13.10:1",
+      "locator": "13.10",
+      "title": "Obscuring",
+      "source_sha256": "c0418d447e7342a020274119aee2953dc1bccf5779de2a4d4e71176aa5f79711",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "b7e5eaff05cc96d329035c4b8037e8dd95feee93037b47d82506c73fa2076a3a",
+          "value": "\u0005Terrain areas\u0006 containing one or more \u0005light\u0006 or \u0005dense terrain features\u0006 are \u0005obscuring terrain areas\u0006. If every \u0005line of sight\u0006 drawn between two models crosses one or more \u0005obscuring terrain areas\u0006 (excluding \u0005obscuring terrain areas\u0006 that one or both of those models are within), those two models are not \u0005visible\u0006 to each other."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "c6f5c875cf4fe95e5ba89339c854e7c739d41ece24267f0b2618bca91578d1c1",
+          "value": "\u000eHidden and Obscuring"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "802d4cab1c507b2dd3a14bfe8fdd461bd922e7c710f71986a7e9ce7e2b3fa062",
+          "value": "• There is an \u0005\u0007obscuring\b\u0006 \u0005\u0007terrain area\b\u0006 between all models in units \u0005\u0007A\b\u0006 and \u0005\u0007D\b\u0006, so none of them are \u0005\u0007visible\b\u0006 to each other."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "bcf78de9ecb75513a8d85197ba9398636f49a3055c24e9c1a580a428770948a3",
+          "value": "• All models in units \u0005\u0007B\b\u0006 and \u0005\u0007C\b\u0006 are within the \u0005\u0007terrain area\b\u0006 and are \u0003Infantry\u0004, so are \u0005\u0007hidden\b\u0006. However, unit \u0005\u0007D\b\u0006’s models are within the 15\" \u0005\u0007detection range\b\u0006 of unit \u0005\u0007B\b\u0006’s models (but not unit \u0005\u0007C\b\u0006’s), so unit \u0005\u0007B\b\u0006’s models are \u0005\u0007visible\b\u0006 to unit \u0005\u0007D\b\u0006’s. Unit \u0005\u0007D\b\u0006’s models are also \u0005\u0007visible\b\u0006 to the models in units \u0005\u0007B\b\u0006 and \u0005\u0007C\b\u0006, since they are not within a \u0005\u0007terrain area\b\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "13.10-area",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "An area containing Light or Dense features is Obscuring.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_obscuring_requires_crossing_and_excludes_either_occupied_area",
+              "function_ast_sha256": "32ba03454841b685fb86bf2ee117ba0024c35ad93d82bf8a17d806fadaa0692d",
+              "assertions": [
+                "assert witness.unit_visible is (not crossing or classification is C.EXPOSED)",
+                "assert context.resolve_line_of_sight_uncached() == witness"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.10-every-line",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Every sightline crossing Obscuring areas blocks mutual visibility except areas occupied by either model.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_obscuring_requires_crossing_and_excludes_either_occupied_area",
+              "function_ast_sha256": "32ba03454841b685fb86bf2ee117ba0024c35ad93d82bf8a17d806fadaa0692d",
+              "assertions": [
+                "assert witness.unit_visible is (not crossing or classification is C.EXPOSED)",
+                "assert context.resolve_line_of_sight_uncached() == witness"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_one_open_sightline_prevents_obscuring_from_blocking_visibility",
+              "function_ast_sha256": "a0d2b39174f3f30d32afd656ed2491ac1656a59f1ae5de5d4853648694b94fe2",
+              "assertions": [
+                "assert witness.unit_visible",
+                "assert not witness.unit_fully_visible",
+                "assert context.benefit_of_cover(witness).has_benefit"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_consumers.py::test_forbidden_native_shooting_declaration_preserves_state_and_can_decline",
+              "function_ast_sha256": "95403ee62297d371eeb551e1b271d45e69baded05022ec921e670a4ceeb035dd",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID, invalid.to_payload()",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending(session) == request",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert not events(session, 'attack_sequence_step')"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            2,
+            3,
+            4
+          ],
+          "role": "example",
+          "reason": "Hidden and Obscuring diagram illustrates the separately specified rules."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:13:13.11:1",
+      "locator": "13.11",
+      "title": "Solid",
+      "source_sha256": "ee4c9d34c130f0ef3d7ef10dc7f76b648af9736c0ded4cdb04fa3e6c7c9a258e",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "61440206742a89421152a91920ede252acc80902a13235af5f31f0fc5d485b26",
+          "value": "\u0005Dense terrain features\u0006 have the \u0005Solid\u0006 rule. \u0005Line of sight\u0006 cannot be drawn across any enclosed gap in the surface of such a \u0005terrain feature\u0006 that is 3\" or less from ground level."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "58564a1bf460c5583d993ea444857839c8f7b462c0dfc3260aa36714d77bb8e3",
+          "value": "\u0005Designer’s Note\u0006: \u0007This rule ensures that models are not \u0005visible\u0006 while sheltering in ground-level terrain, irrespective of small openings such as doors, windows or bullet holes, or because of small gaps between adjacent \u0005terrain features\u0006. 3\" is the height of the first floor of many \u0005terrain features\u0006, but some missions may adjust the height at which this rule takes effect.\b"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "a9e622eb1e17bd16486b6409d93b3d6ac1e0df19dcedbc64f30d97461dd49a17",
+          "value": "\u000eSolid"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "7996b2291443bc8c6dba6ffdc4bd6f62cb2d320392e8beb65e14de682889e08a",
+          "value": "Units \u0005\u0007A\b\u0006 and \u0005\u0007B\b\u0006 are not \u0005\u0007visible\b\u0006 to each other, because even though there is a window in this \u0005\u0007dense\b\u0006 \u0005\u0007terrain feature\b\u0006, it has the \u0005\u0007Solid\b\u0006 rule, so \u0005\u0007line of sight\b\u0006 cannot be drawn through such enclosed gaps that are 3\" or less from ground level."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "8a3a58d4fa47728deecf3f981db18eaaa1e875aac4f573846e7fea1124f2a56d",
+          "value": "Units \u0005\u0007A\b\u0006 and \u0005\u0007C\b\u0006 are \u0005\u0007visible\b\u0006 to each other, because even though this \u0005\u0007dense\b\u0006 \u0005\u0007terrain feature\b\u0006 has the \u0005\u0007Solid\b\u0006 rule, \u0005\u0007line of sight\b\u0006 can be drawn normally through enclosed gaps that are more than 3\" from ground level."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "13.11-solid",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Dense features block sight across enclosed gaps at or below three inches.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_solid_enclosed_window_has_three_inch_boundary",
+              "function_ast_sha256": "f546d5b33cf57b239a334b4d5d4c329de052671c39c08aeac5dc8799b5924fdc",
+              "assertions": [
+                "assert witness.unit_visible is (visible or classification is C.LIGHT)",
+                "assert context.resolve_line_of_sight_uncached() == witness"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_visibility.py::test_solid_does_not_fill_unenclosed_wall_end_or_area_interior",
+              "function_ast_sha256": "a0ff2745ce4f2c62ec46752853374bed186214fa9d3c7630e4f583f7de0e8471",
+              "assertions": [
+                "assert context.resolve_line_of_sight().unit_visible",
+                "assert interior.resolve_line_of_sight().unit_visible"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_consumers.py::test_forbidden_native_shooting_declaration_preserves_state_and_can_decline",
+              "function_ast_sha256": "95403ee62297d371eeb551e1b271d45e69baded05022ec921e670a4ceeb035dd",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID, invalid.to_payload()",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending(session) == request",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert not events(session, 'attack_sequence_step')"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            2
+          ],
+          "role": "context",
+          "reason": "Designer explanation and mission-height override guidance."
+        },
+        {
+          "source_blocks": [
+            3,
+            4,
+            5
+          ],
+          "role": "example",
+          "reason": "Solid diagrams illustrate the three-inch visibility boundary."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:13:13.11.01:1",
+      "locator": "13.11.01",
+      "title": "Gone to Ground",
+      "source_sha256": "ae2fcc18de8ccb79b867ac5e71c8bc34444746cfcbdb2ec3fd5ca0815bc0becc",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "9f692e27a7d917f65369d1a94680807df9d92598bff895ce314ad1b4b9b57fa2",
+          "value": "\u0005Hidden\u0006 models that are concealed by \u0005dense terrain features\u0006 gain an extra benefit while they have \u0005gone to ground\u0006."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "8bb221f0e731240cc80222d9ed3081bb06f1e217145107d245f184bcaf74d47a",
+          "value": "A model has \u0005gone to ground\u0006 while all of the following apply:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "52ea88de0986e35238a20d9d028af6e1acd61f56359e14476451edbecb0c618c",
+          "value": "• That model is \u0005hidden\u0006."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "0afd40747a85b4844a5195e67505b588b0a6472d25dd75f72ef7f0d3fff4fc86",
+          "value": "• That model is not \u0005fully visible\u0006 to the attacking model due to one or more intervening \u0005dense terrain features\u0006."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "13d88df5ff03b77ac176df99ac3b013f1a7881d5facdea1f70e9017335144caf",
+          "value": "• That model’s unit did not make one or more ranged attacks during this turn or during the previous turn."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "95a4eddcc552f720fe1e02c44acce3a343427db6326001f0f8def8c62b6470e0",
+          "value": "While a model has \u0005gone to ground\u0006, subtract 3\" from that model’s \u0005detection range\u0006."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "8c7ff22e0c33277ff372b23efd45cfc49d767cc9575037040589ea5aa474c42d",
+          "value": "\u0005Designer’s Note:\u0006 \u0007Units that made ranged attacks in the current or previous turn cannot \u0005go to ground\u0006, regardless of any abilities that allow them to shoot and remain \u0005hidden\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "13.11.01-hidden",
+          "source_blocks": [
+            1,
+            2,
+            3
+          ],
+          "obligation": "Gone to Ground first requires the model to be Hidden.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_hidden.py::test_gone_to_ground_requires_hidden_and_actual_intervening_dense_feature",
+              "function_ast_sha256": "74fdf1c22e2294e871333d47d7dec0be38fa4d0404779d7f80029094242c0d90",
+              "assertions": [
+                "assert result.is_legal is not protected, result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.11.01-dense-obstruction",
+          "source_blocks": [
+            4
+          ],
+          "obligation": "The attacker lacks full visibility because of an intervening Dense feature.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_hidden.py::test_gone_to_ground_requires_hidden_and_actual_intervening_dense_feature",
+              "function_ast_sha256": "74fdf1c22e2294e871333d47d7dec0be38fa4d0404779d7f80029094242c0d90",
+              "assertions": [
+                "assert result.is_legal is not protected, result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.11.01-shot-exclusion",
+          "source_blocks": [
+            5,
+            7
+          ],
+          "obligation": "Any current or preceding-turn ranged attack prevents Gone to Ground, even if Hidden is retained.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_hidden.py::test_recent_shooting_blocks_gone_to_ground_even_with_retained_hidden_permission",
+              "function_ast_sha256": "850aa5f78d2b2929450efb27c9f148f8f550a3d8106cec1f131da2414b80e6a3",
+              "assertions": [
+                "assert _hidden_target_model_ids(state=s, ruleset_descriptor=s.runtime_ruleset_descriptor(), target_unit_ids=(target.unit_instance_id,)) == target.own_model_ids()",
+                "assert result.is_legal is (when in {'current', 'previous'}), result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        },
+        {
+          "id": "13.11.01-reduction",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "Gone to Ground subtracts three inches from detection range.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/terrain_hidden.py:terrain_hidden_model_ids"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section13/test_hidden.py::test_native_detection_base_distance_inclusive_fifteen_or_twelve_inches",
+              "function_ast_sha256": "69a3753ad6bc5c1661a641bc38b53799b374704e839bb045df75b1f9eed5f7ef",
+              "assertions": [
+                "assert result.is_legal is legal, result.to_payload()",
+                "assert result.violation_code is (None if legal else ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE)",
+                "assert result.line_of_sight_witness is not None",
+                "assert not result.line_of_sight_witness.unit_fully_visible"
+              ]
+            },
+            {
+              "node": "tests/rules/section13/test_hidden.py::test_gone_to_ground_requires_hidden_and_actual_intervening_dense_feature",
+              "function_ast_sha256": "74fdf1c22e2294e871333d47d7dec0be38fa4d0404779d7f80029094242c0d90",
+              "assertions": [
+                "assert result.is_legal is not protected, result.to_payload()"
+              ]
+            }
+          ],
+          "status": "enabled assertion; outcome comes from stable raw run, not binding presence"
+        }
+      ],
+      "context": []
+    }
+  ],
+  "faq_ownership": {
+    "reviewed_current_faq_count": 64,
+    "locally_owned": [
+      {
+        "id": "603e9b2f-cc24-498c-ac2e-08ad3068f257",
+        "question": "Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area?",
+        "answer": "Yes",
+        "ordinal": 34,
+        "source_sha256": "f12df889b0db17cfacf6358aea3dcd1a3d2725660c8a159eabad35f6f6c9fef3",
+        "requirements": [
+          {
+            "id": "faq-603e9b2f-cc24-498c-ac2e-08ad3068f257-elevated-membership",
+            "obligation": "A model within a terrain boundary remains within that area when elevated.",
+            "source_blocks": [
+              2
+            ],
+            "engine_owners": [
+              "src/warhammer40k_core/geometry/pathing.py:TerrainPathLegalityContext"
+            ],
+            "semantic_assertions": [
+              {
+                "node": "tests/rules/section13/test_visibility.py::test_agreed_boundary_membership_projects_at_every_elevation",
+                "function_ast_sha256": "3a62e7d3c64ffa312f1130d7a3c894a35d211125e0d910a3088543fc15f23ccf",
+                "assertions": [
+                  "assert model_intersects_terrain_area(tiny(x=14, z=z), logical)",
+                  "assert model_intersects_terrain_area(tiny(x=16.24, z=z), logical)",
+                  "assert not model_intersects_terrain_area(tiny(x=16.26, z=z), logical)",
+                  "assert logical.footprint_polygons == (((12, 8), (16, 8), (16, 12), (12, 12)),)"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "faq-603e9b2f-cc24-498c-ac2e-08ad3068f257-frame-membership",
+            "obligation": "Frame body parts overhanging a terrain boundary place the model within that area.",
+            "source_blocks": [
+              2
+            ],
+            "engine_owners": [
+              "src/warhammer40k_core/geometry/terrain_area_visibility.py:model_intersects_terrain_area"
+            ],
+            "semantic_assertions": [
+              {
+                "node": "tests/rules/section13/test_visibility.py::test_faq34_constructed_frame_body_overhang_controls_area_membership",
+                "function_ast_sha256": "714b0c7a978a1d6e30a208fc82eaeffc62f780c750e92f85d64560c340a4118c",
+                "assertions": [
+                  "assert model_intersects_terrain_area(frame, a)",
+                  "assert not model_intersects_terrain_area(replace(frame, measures_every_part=False), a)"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "e01c8a02-7a36-4d3b-b168-976b11bd47e8",
+        "question": "When my unit shoots at another unit, how does it work if some models in the target unit are fully visible to some models in my unit, while others are within a terrain area/not fully visible?",
+        "answer": "For each attacking model in your unit, determine whether the target unit has the benefit of cover, as described in Terrain and Visibility. In this scenario, the target unit will likely have the benefit of cover against some of the attacking models, but not all. This means that, in an example unit where all attacking models are using the same weapon, when you get to the Resolve Attacks step of the Attack Sequence, you will collect dice for attacks made by models against which the target unit has the benefit of cover separately from the dice for attacks made by models against which the target unit does not have the benefit of cover.",
+        "ordinal": 44,
+        "source_sha256": "8c5268b2b6d5a355b36634065359e05eec587d8ad7541cfbe7a7ed5144c48031",
+        "requirements": [
+          {
+            "id": "faq-e01c8a02-7a36-4d3b-b168-976b11bd47e8-per-attacker-cover",
+            "obligation": "Assess cover for each attacking model and keep attacks with different cover provenance in separate groups.",
+            "source_blocks": [
+              2
+            ],
+            "engine_owners": [
+              "src/warhammer40k_core/engine/phases/shooting_handler.py:ShootingPhaseHandler"
+            ],
+            "semantic_assertions": [
+              {
+                "node": "tests/rules/section13/test_consumers.py::test_faq44_attacker_specific_cover_reaches_native_grouping_with_physical_provenance",
+                "function_ast_sha256": "27fa8857f6f2eed91aa89df36b205138d1b7764e7b566dc5786685d6a92e86fe",
+                "assertions": [
+                  "assert state.battlefield_state is not None",
+                  "assert len(rows) == 2",
+                  "assert rows[0]['model_instance_id'] != rows[1]['model_instance_id']",
+                  "assert len(accepted) == 1",
+                  "assert len(pools) == 2",
+                  "assert {p.attacker_model_instance_id for p in pools} == {cast(str, r['model_instance_id']) for r in rows}",
+                  "assert pools[0].targeting_rule_ids != pools[1].targeting_rule_ids",
+                  "assert thresholds == {0: {4}, 1: {3}}"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "cross_references": [
+      {
+        "ordinal": 3,
+        "id": "7f767dd0-3996-417e-bba2-b7a5828b2430",
+        "owner": "Section04",
+        "relation": "range does not imply visibility"
+      },
+      {
+        "ordinal": 26,
+        "id": "ba488672-92ec-443d-9087-85a999342589",
+        "owner": "Sections01/03",
+        "relation": "if-able and coherency"
+      },
+      {
+        "ordinal": 28,
+        "id": "a7ba0395-6635-45cd-aeec-1cc3c0607a0b",
+        "owner": "Sections01/03",
+        "relation": "attached coherent physical group"
+      },
+      {
+        "ordinal": 30,
+        "id": "5553f538-6182-4e72-905a-67855489bb1d",
+        "owner": "Section04",
+        "relation": "different range and visible models"
+      },
+      {
+        "ordinal": 43,
+        "id": "c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e",
+        "owner": "Section14 future only",
+        "relation": "terrain-objective terminology; no Section14 test introduced"
+      },
+      {
+        "ordinal": 49,
+        "id": "2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+        "owner": "Sections05/12",
+        "relation": "retained models remain present; existing dependency only"
+      },
+      {
+        "ordinal": 64,
+        "id": "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+        "owner": "Section01",
+        "relation": "physical model versus attached unit scope"
+      }
+    ]
+  },
+  "authenticated_inputs": {
+    "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+    "data/source_audits/v963_shock/captures/core-page.js": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
+    "data/source_audits/order97/categories/13.json": "b72b9409932bb7128627d8ef34a9a9ee0fc26d1bfd3b42e4692af39f79199fef"
+  },
+  "constructed_scenarios": [
+    "Keyword matrices and tiny geometric envelopes isolate source conditions; they are not supported native datasheet admissions.",
+    "Native definitions loaded once by selected-army loader; all unit/health/history/placement/decision graphs are fresh.",
+    "Native phases begin at Movement or Shooting; mission object supplies mandatory physical context only, no prior gameplay/mustering/mission scoring.",
+    "Attachment and retained-Hidden permissions/history are honest constructed checkpoints."
+  ],
+  "limitations": [
+    "Binding coverage is not compliance: stable enabled outcomes and findings register determine the verdict.",
+    "No full game, preceding gameplay, persistence/replay, arbitrary geometry, universal solver budget or formal Git-base performance certification.",
+    "Prior SF08 four enabled constructed Command-end overlap failures remain unchanged; accepted native CP-before-VP path remains distinct.",
+    "Prior DD relocated-position/full-native-lifecycle and geometry/performance qualifications remain inherited."
+  ],
+  "semantic_assertions_missing": []
+}

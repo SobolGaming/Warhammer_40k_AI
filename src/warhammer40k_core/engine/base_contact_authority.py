@@ -80,7 +80,9 @@ def current_deemed_base_contacts(state: GameState | None) -> tuple[DeemedBaseCon
     if state is None:
         return ()
     if any(
-        row.battle_round == state.battle_round and row.active_player_id == state.active_player_id
+        row.completes_boundary
+        and row.battle_round == state.battle_round
+        and row.active_player_id == state.active_player_id
         for row in state.end_turn_cleanup_states
     ):
         return ()

@@ -12,7 +12,7 @@ ATTACK_SEQUENCE_SPLIT_PATHS = tuple(sorted(ATTACK_SEQUENCE_PATH.parent.glob("att
 MODEL_DESTROYED_EMITTER_PATHS = {
     "src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
     "src/warhammer40k_core/engine/mortal_wound_destruction_evidence.py",
-    "src/warhammer40k_core/engine/rule_model_destruction.py",
+    "src/warhammer40k_core/engine/rule_model_destruction_removal.py",
 }
 DIRECT_MODEL_DESTROYED_EVENT_OWNERS = {
     "src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
@@ -159,7 +159,6 @@ DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS = {
     "with_removed_models": {
         "src/warhammer40k_core/engine/destruction_removal.py": 1,
         "src/warhammer40k_core/engine/fight_activation_history_integrity.py": 1,
-        "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": 1,
         "src/warhammer40k_core/engine/reserves.py": 1,
         "src/warhammer40k_core/engine/turn_cleanup.py": 1,
     },
@@ -248,7 +247,14 @@ def test_p05a_attack_destruction_reactions_share_one_end_of_attacks_boundary() -
     assert "if not attack_sequence.is_complete:" in restore_source
     assert "_validate_pending_attack_destruction_queue_order(" in restore_source
     assert "pending_order != expected_order" in restore_source
-    assert "remove_destroyed_model_from_battlefield(" in boundary_source
+    assert "finalize_attack_casualty(" in boundary_source
+    removal_source = source_for(SRC_ROOT / "engine" / "retained_demise_removal.py")
+    assert "remove_destroyed_model_from_battlefield(" in removal_source
+    assert "reserved_attack_damage_destruction_attribution(" in removal_source
+    assert (
+        "pending.damage_application.model_instance_id == damage.model_instance_id" in removal_source
+    )
+    assert "_emit_damage_event(" in removal_source
     assert "resolve_pending_attack_destruction_until_blocked(" in dispatch_source
     assert (
         dispatch_source.index("_apply_deferred_mortal_wounds(")
@@ -313,6 +319,7 @@ def test_model_destruction_emitters_register_and_consume_typed_cause_authority()
         MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH,
         ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH,
         ATTACK_DESTRUCTION_CAUSE_SHARED_OWNER_PATH,
+        "src/warhammer40k_core/engine/rule_model_destruction.py",
     ):
         calls_by_path[relative_path] = {
             (node.func.id if isinstance(node.func, ast.Name) else node.func.attr)
@@ -338,9 +345,19 @@ def test_model_destruction_emitters_register_and_consume_typed_cause_authority()
         "consume_mortal_wound_model_destruction_cause",
         "observe_model_destruction",
     } <= calls_by_path["src/warhammer40k_core/engine/mortal_wound_destruction_evidence.py"]
-    assert {"_reserve_destruction_cause", "_append_model_destroyed"} <= calls_by_path[
-        "src/warhammer40k_core/engine/rule_model_destruction.py"
-    ]
+    assert (
+        "_reserve_destruction_cause"
+        in calls_by_path["src/warhammer40k_core/engine/rule_model_destruction.py"]
+    )
+    assert (
+        "_append_model_destroyed"
+        in calls_by_path["src/warhammer40k_core/engine/rule_model_destruction_removal.py"]
+    )
+    rule_source = source_for(SRC_ROOT / "engine" / "rule_model_destruction.py")
+    assert "finalize_rule_casualty(" in rule_source
+    removal_source = source_for(SRC_ROOT / "engine" / "rule_model_destruction_removal.py")
+    assert "_validate_pre_removal_context_matches_state(" in removal_source
+    assert "validate_removed_rule_context(" in removal_source
     assert {
         "record_model_destruction_cause",
         "finalize_model_destruction_cause",
@@ -356,7 +373,7 @@ def test_model_destruction_emitters_register_and_consume_typed_cause_authority()
     producer_source = source_for(ROOT / MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH)
     assert "MODEL_DESTRUCTION_CAUSE_ID_FIELD" in attack_source
     assert "MODEL_DESTRUCTION_CAUSE_ID_FIELD" in mortal_source
-    assert "append_rule_effect_model_destroyed_event as _append_model_destroyed" in rule_source
+    assert "append_rule_effect_model_destroyed_event as _append_model_destroyed" in removal_source
     assert "MODEL_DESTRUCTION_CAUSE_ID_FIELD" in producer_source
     assert "-> ModelDestructionCauseAuthority" in producer_source
     flow_source = source_for(ROOT / "src/warhammer40k_core/engine/battle_round_flow.py")
@@ -517,6 +534,13 @@ def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative
                 calls_by_method[method_name][relative_path] = count
 
     assert calls_by_method == DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS
+    fall_back_source = source_for(SRC_ROOT / "engine/phases/movement_fall_back_embark.py")
+    assert "record_primary_unit_destructions_for_destroyed_models(" in fall_back_source
+    assert (
+        "unattributed_cause=PrimaryUnattributedDestructionCause.DESPERATE_ESCAPE"
+        in fall_back_source
+    )
+    assert "left_battlefield=True" in fall_back_source
 
     # Fight movement and restore validation construct temporary scenario views.
     # They never replace authoritative GameState battlefield state.
@@ -599,7 +623,7 @@ def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative
     assert "destroy_unplaced_model_without_reactions(" in reserve_boundary_source
     assert "PrimaryUnattributedDestructionCause.RESERVE_DEADLINE" in reserve_boundary_source
     assert "CoherencyCleanupRemoval(" in cleanup_source
-    assert "state.resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)" in source_for(
+    assert "pending = state.resolve_end_turn_cleanup_boundary(" in source_for(
         SRC_ROOT / "engine" / "turn_end_boundary.py"
     )
     assert "record_primary_unit_destructions_for_end_turn_cleanup(state=self, cleanup=cleanup)" in (

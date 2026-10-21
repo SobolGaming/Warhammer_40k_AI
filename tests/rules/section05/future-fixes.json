@@ -1,0 +1,229 @@
+{
+  "section": "05",
+  "policy": "Enabled source-correct failures retained. No engine outcome repair; no crash repair.",
+  "findings": [
+    {
+      "id": "SF05-001",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "title": "Epic Challenge rejects an authenticated Fight-on-Death retained CHARACTER",
+      "requirement_ids": [
+        "05.04.05-obligation-05",
+        "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-04"
+      ],
+      "source_clauses": [
+        "05.04.05 block3: unit-targeted Stratagems affect the destroyed model",
+        "FAQ49 block2: retained models can be targeted by Stratagems"
+      ],
+      "expected": "A retained native Lord Exultant is an eligible selected CHARACTER for the unit-targeted Epic Challenge proposal and receives Precision.",
+      "observed": "Real lethal attack plus accepted retention leaves native model physically present. Actual target-proposal validator returns INVALID epic_challenge_model_not_alive_and_placed. Identical alive control is accepted, spends1CP and gives Precision through the production profile consumer.",
+      "failed_nodes": [
+        "tests/rules/section05/test_retained_stratagem.py::test_faq49_retained_model_receives_unit_targeted_stratagem[True]"
+      ],
+      "production_path": [
+        "src/warhammer40k_core/engine/stratagems_geometry.py:_epic_challenge_context_error",
+        "src/warhammer40k_core/engine/stratagems_apply.py:invalid_stratagem_target_proposal_status"
+      ],
+      "impact": "Retained CHARACTER cannot obtain this otherwise available Stratagem effect. Valid rejection, not an execution crash.",
+      "qualifications": [
+        "Explicit actual proposal-owner timing context, not natural phase window discovery.",
+        "Existing D12 ordinary dead/unplaced rejection and membership/ownership gates remain untouched; this exception has separate FAQ49 authority.",
+        "Does not establish that all Stratagems reject retained models."
+      ],
+      "future_scope": "Consider authenticated retained battlefield presence for this exception without weakening ordinary dead/unplaced, CHARACTER, target, CP or ownership validation; future PR only.",
+      "pre_repair_observation": {
+        "id": "SF05-001",
+        "status": "OPEN_FUTURE_FIX_PR",
+        "title": "Epic Challenge rejects an authenticated Fight-on-Death retained CHARACTER",
+        "requirement_ids": [
+          "05.04.05-obligation-05",
+          "faq-2d91a89e-59f3-410f-84cb-16644d7ea4a4-obligation-04"
+        ],
+        "source_clauses": [
+          "05.04.05 block3: unit-targeted Stratagems affect the destroyed model",
+          "FAQ49 block2: retained models can be targeted by Stratagems"
+        ],
+        "expected": "A retained native Lord Exultant is an eligible selected CHARACTER for the unit-targeted Epic Challenge proposal and receives Precision.",
+        "observed": "Real lethal attack plus accepted retention leaves native model physically present. Actual target-proposal validator returns INVALID epic_challenge_model_not_alive_and_placed. Identical alive control is accepted, spends1CP and gives Precision through the production profile consumer.",
+        "failed_nodes": [
+          "tests/rules/section05/test_retained_stratagem.py::test_faq49_retained_model_receives_unit_targeted_stratagem[True]"
+        ],
+        "production_path": [
+          "src/warhammer40k_core/engine/stratagems_geometry.py:_epic_challenge_context_error",
+          "src/warhammer40k_core/engine/stratagems_apply.py:invalid_stratagem_target_proposal_status"
+        ],
+        "impact": "Retained CHARACTER cannot obtain this otherwise available Stratagem effect. Valid rejection, not an execution crash.",
+        "qualifications": [
+          "Explicit actual proposal-owner timing context, not natural phase window discovery.",
+          "Existing D12 ordinary dead/unplaced rejection and membership/ownership gates remain untouched; this exception has separate FAQ49 authority.",
+          "Does not establish that all Stratagems reject retained models."
+        ],
+        "future_scope": "Consider authenticated retained battlefield presence for this exception without weakening ordinary dead/unplaced, CHARACTER, target, CP or ownership validation; future PR only."
+      },
+      "repair_performed": true,
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": null
+      }
+    },
+    {
+      "id": "SF05-002",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "title": "Deadly Demise resolves before the retained Fight-on-Death model is removed",
+      "requirement_ids": [
+        "faq-ab92e97b-be2b-4125-9ded-fcfa6abe092e-obligation-02"
+      ],
+      "source_row": "faq:ab92e97b-be2b-4125-9ded-fcfa6abe092e",
+      "source_row_sha256": "6c0d66fac9785c64b585ccf535fece6c50738787459f61ccff18d7b4d54f22fc",
+      "answer_block_sha256": "43ed24dd1a6c03286c5c8661c341b329114af0552f5e4ffbc9bb9b8c15890355",
+      "retained_exact_answer": "Fight on Death rules are resolved before Deadly Demise abilities, meaning that your unit's Deadly Demise will resolve after your unit has fought/at the end of the phase and the relevant models have been removed from the battlefield.",
+      "source_capture": {
+        "retained_capture": "C:/Users/nostr/Documents/Codex/2026-10-15/task-2/audit-v981/sources/live-core-rows.json",
+        "sha256": "61c8b96565754220a7be60b350bb0f554cbee7356f072966c6a174a2131e2e64",
+        "observed_utc": "2026-10-15T15:36:12.248781+00:00",
+        "qualification": "Unversioned maintained Game Datamissions Core mirror; changelog981 is contextual, not a body version. All22 row fingerprints match retained current. No fresh network/version-supersession claim.",
+        "authority": [
+          "data/source_audits/order97/categories/05.json",
+          "data/source_audits/order135/retained-current-sources.json",
+          "data/source_audits/order135/current-bindings.json"
+        ]
+      },
+      "prior_owner_instruction": "Treat Deadly Demise as occur during the removal. That way when Fight on Death occurs the dead model is retained on the battlefield until it completes its fight, any enemy models have been removed as a result of its fight, and then it resolves as the last step before being removed.",
+      "approval_provenance": "Parent thread01a0efa7-1ce0-70b0-a637-75c1615f80ef relayed prior explicit user interpretation in this task. Independently retained docs/ORDER_135_FOLLOW_UP.md T26 and final paragraph preserve the pre-existing ambiguity; data/source_audits/order135/current-inventory-category-migration.json preserves 2026-10-08 assistant statement that code already follows ordinary ordering.",
+      "expected_by_literal_faq": "Deadly Demise resolves after fight/phase end and after relevant models have been removed.",
+      "observed": "The unchanged enabled observer sees the retained native casualty absent from battlefield.removed_model_ids at destruction_reaction_resolved; cleanup removes it afterward. This differs from the interpretation approved on 2026-10-17. Historical phase-end and retained-melee completion controls do not prove the additional requirements below.",
+      "failed_nodes": [
+        "tests/rules/section05/test_reaction_boundaries.py::test_faq20_deadly_demise_resolves_after_retained_model_removed"
+      ],
+      "production_path": [
+        "src/warhammer40k_core/engine/retained_destruction_cleanup.py:continue_retained_destruction_cleanup",
+        "src/warhammer40k_core/engine/attack_sequence_destruction_boundary.py:resolve_pending_attack_destruction_until_blocked",
+        "src/warhammer40k_core/engine/attack_destruction_reactions.py:resolve_mandatory_destruction_reactions_before_removal"
+      ],
+      "impact": "The observed physical-removal/reaction order violates the newly adopted interaction specification. No missed explosion, collateral effect, measurement-reference handling or independently retained enemy outcome is newly demonstrated.",
+      "supersession": "Resolved by the explicit user decision at 2026-10-17T12:06Z, not by a source publication/date claim. The previous before-removal interpretation is superseded only for this interaction; conflicting Core05.04.05 wording remains retained provenance.",
+      "future_scope": "Future semantic fix PR: enforce after-removal Deadly Demise for retained Fight-on-Death models without broadening the override to all destruction reactions. Add focused coverage for the explicitly untested measurement reference and independently retained casualties. No engine repair in this milestone.",
+      "prior_verdict": {
+        "status": "SOURCE_AUTHORITY_CONFLICT_NOT_CONFIRMED_ENGINE_DEFECT",
+        "title": "Literal FAQ20 after-removal timing conflicts with prior owner-approved during-removal interpretation",
+        "observed": "At destruction_reaction_resolved, the retained native casualty is not in battlefield.removed_model_ids; cleanup then removes it. This matches prior owner-approved last-step-before-removal order. Phase-end and real retained-melee completion controls pass.",
+        "impact": "Observable physical-removal order differs from literal FAQ20. No demonstrated missed explosion/collateral effect and no regression against the prior owner interpretation is claimed.",
+        "supersession": "Unresolved. Core body/FAQ have no independent version/date establishing supersession; retained capture2026-10-15 after prior conversation is an observation date, not evidence of a new rule. Same FAQ wording already appears in order135 historical inventory. No fresh network claim.",
+        "future_scope": "Reconcile authority before any repair. Keep enabled literal-source test; do not relabel failure as confirmed engine defect. Do not force-remove independently retained enemies or infer universal mutual-retention priority."
+      },
+      "user_decision": {
+        "id": "SF05-002-user-decision-2026-10-17",
+        "user_message_id": "Sentinel_dc71bb89df0c81919b2fa581fc5d346e",
+        "approved_utc": "2026-10-17T12:06:00Z",
+        "relayed_by_parent_thread": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+        "proposal": "Finish Fight on Death or reach its expiry, remove the retained model, then resolve Deadly Demise using the preserved measurement reference. Other casualties with their own Fight on Death must retain that protection. Adopt this interpretation for the corpus and record the engine correction as a future-fix finding, leaving the engine unchanged during this rebuild.",
+        "user_reply": "yes",
+        "supersedes": "Prior user-approved last-step-before-removal interpretation only for this Deadly Demise plus Fight on Death interaction.",
+        "source_authority": "Retained FAQ20 faq:ab92e97b-be2b-4125-9ded-fcfa6abe092e; not newly verified official App authority and not a claim of a newly published rule.",
+        "reasoning": "The FAQ end-of-phase alternative need not have enemy casualties, so the retained models are the stronger referent for the relevant models removed.",
+        "specification": "docs/SECTION05_DEADLY_DEMISE_DECISION.md"
+      },
+      "expected": "Finish the retained model's Fight on Death or reach its expiry; remove that retained model; then resolve Deadly Demise using the applicable pre-destruction measurement reference. Preserve independently retained casualties.",
+      "additional_requirements_not_yet_covered": [
+        "After removal, Deadly Demise measurement must use the applicable Core05.04.06 reference from before destruction, not silently the last position before removal. Add a distinguishing retained-model movement/reference control; the existing removal observer does not prove this interaction.",
+        "Enemy casualties with independent Fight on Death retention must preserve their own retention until its own completion/expiry. Add a combined retained-casualty interaction control; the existing removal observer does not prove this protection or universal mutual-retention priority."
+      ],
+      "historical_core_conflict": {
+        "source_row": "rule:05:05.04.05:1",
+        "source_row_sha256": "35c651d4f6a14010b1818be0d94b55ecfe4949b08b92afa3d56793a8fe89f21d",
+        "block": 2,
+        "block_sha256": "f9202c2f99ed760cbc4ce3afd0f0bb17c3183c599506ae07396bf50f34f798d2",
+        "qualification": "Retained Core wording resolves destruction-triggered rules before removing destroyed models. Preserve it; apply the user-approved FAQ-specific interpretation only to this interaction."
+      },
+      "pre_repair_observation": {
+        "id": "SF05-002",
+        "status": "OPEN_FUTURE_FIX_PR",
+        "title": "Deadly Demise resolves before the retained Fight-on-Death model is removed",
+        "requirement_ids": [
+          "faq-ab92e97b-be2b-4125-9ded-fcfa6abe092e-obligation-02"
+        ],
+        "source_row": "faq:ab92e97b-be2b-4125-9ded-fcfa6abe092e",
+        "source_row_sha256": "6c0d66fac9785c64b585ccf535fece6c50738787459f61ccff18d7b4d54f22fc",
+        "answer_block_sha256": "43ed24dd1a6c03286c5c8661c341b329114af0552f5e4ffbc9bb9b8c15890355",
+        "retained_exact_answer": "Fight on Death rules are resolved before Deadly Demise abilities, meaning that your unit's Deadly Demise will resolve after your unit has fought/at the end of the phase and the relevant models have been removed from the battlefield.",
+        "source_capture": {
+          "retained_capture": "C:/Users/nostr/Documents/Codex/2026-10-15/task-2/audit-v981/sources/live-core-rows.json",
+          "sha256": "61c8b96565754220a7be60b350bb0f554cbee7356f072966c6a174a2131e2e64",
+          "observed_utc": "2026-10-15T15:36:12.248781+00:00",
+          "qualification": "Unversioned maintained Game Datamissions Core mirror; changelog981 is contextual, not a body version. All22 row fingerprints match retained current. No fresh network/version-supersession claim.",
+          "authority": [
+            "data/source_audits/order97/categories/05.json",
+            "data/source_audits/order135/retained-current-sources.json",
+            "data/source_audits/order135/current-bindings.json"
+          ]
+        },
+        "prior_owner_instruction": "Treat Deadly Demise as occur during the removal. That way when Fight on Death occurs the dead model is retained on the battlefield until it completes its fight, any enemy models have been removed as a result of its fight, and then it resolves as the last step before being removed.",
+        "approval_provenance": "Parent thread01a0efa7-1ce0-70b0-a637-75c1615f80ef relayed prior explicit user interpretation in this task. Independently retained docs/ORDER_135_FOLLOW_UP.md T26 and final paragraph preserve the pre-existing ambiguity; data/source_audits/order135/current-inventory-category-migration.json preserves 2026-10-08 assistant statement that code already follows ordinary ordering.",
+        "expected_by_literal_faq": "Deadly Demise resolves after fight/phase end and after relevant models have been removed.",
+        "observed": "The unchanged enabled observer sees the retained native casualty absent from battlefield.removed_model_ids at destruction_reaction_resolved; cleanup removes it afterward. This differs from the interpretation approved on 2026-10-17. Historical phase-end and retained-melee completion controls do not prove the additional requirements below.",
+        "failed_nodes": [
+          "tests/rules/section05/test_reaction_boundaries.py::test_faq20_deadly_demise_resolves_after_retained_model_removed"
+        ],
+        "production_path": [
+          "src/warhammer40k_core/engine/retained_destruction_cleanup.py:continue_retained_destruction_cleanup",
+          "src/warhammer40k_core/engine/attack_sequence_destruction_boundary.py:resolve_pending_attack_destruction_until_blocked",
+          "src/warhammer40k_core/engine/attack_destruction_reactions.py:resolve_mandatory_destruction_reactions_before_removal"
+        ],
+        "impact": "The observed physical-removal/reaction order violates the newly adopted interaction specification. No missed explosion, collateral effect, measurement-reference handling or independently retained enemy outcome is newly demonstrated.",
+        "supersession": "Resolved by the explicit user decision at 2026-10-17T12:06Z, not by a source publication/date claim. The previous before-removal interpretation is superseded only for this interaction; conflicting Core05.04.05 wording remains retained provenance.",
+        "future_scope": "Future semantic fix PR: enforce after-removal Deadly Demise for retained Fight-on-Death models without broadening the override to all destruction reactions. Add focused coverage for the explicitly untested measurement reference and independently retained casualties. No engine repair in this milestone.",
+        "prior_verdict": {
+          "status": "SOURCE_AUTHORITY_CONFLICT_NOT_CONFIRMED_ENGINE_DEFECT",
+          "title": "Literal FAQ20 after-removal timing conflicts with prior owner-approved during-removal interpretation",
+          "observed": "At destruction_reaction_resolved, the retained native casualty is not in battlefield.removed_model_ids; cleanup then removes it. This matches prior owner-approved last-step-before-removal order. Phase-end and real retained-melee completion controls pass.",
+          "impact": "Observable physical-removal order differs from literal FAQ20. No demonstrated missed explosion/collateral effect and no regression against the prior owner interpretation is claimed.",
+          "supersession": "Unresolved. Core body/FAQ have no independent version/date establishing supersession; retained capture2026-10-15 after prior conversation is an observation date, not evidence of a new rule. Same FAQ wording already appears in order135 historical inventory. No fresh network claim.",
+          "future_scope": "Reconcile authority before any repair. Keep enabled literal-source test; do not relabel failure as confirmed engine defect. Do not force-remove independently retained enemies or infer universal mutual-retention priority."
+        },
+        "user_decision": {
+          "id": "SF05-002-user-decision-2026-10-17",
+          "user_message_id": "Sentinel_dc71bb89df0c81919b2fa581fc5d346e",
+          "approved_utc": "2026-10-17T12:06:00Z",
+          "relayed_by_parent_thread": "01a0efa7-1ce0-70b0-a637-75c1615f80ef",
+          "proposal": "Finish Fight on Death or reach its expiry, remove the retained model, then resolve Deadly Demise using the preserved measurement reference. Other casualties with their own Fight on Death must retain that protection. Adopt this interpretation for the corpus and record the engine correction as a future-fix finding, leaving the engine unchanged during this rebuild.",
+          "user_reply": "yes",
+          "supersedes": "Prior user-approved last-step-before-removal interpretation only for this Deadly Demise plus Fight on Death interaction.",
+          "source_authority": "Retained FAQ20 faq:ab92e97b-be2b-4125-9ded-fcfa6abe092e; not newly verified official App authority and not a claim of a newly published rule.",
+          "reasoning": "The FAQ end-of-phase alternative need not have enemy casualties, so the retained models are the stronger referent for the relevant models removed.",
+          "specification": "docs/SECTION05_DEADLY_DEMISE_DECISION.md"
+        },
+        "expected": "Finish the retained model's Fight on Death or reach its expiry; remove that retained model; then resolve Deadly Demise using the applicable pre-destruction measurement reference. Preserve independently retained casualties.",
+        "additional_requirements_not_yet_covered": [
+          "After removal, Deadly Demise measurement must use the applicable Core05.04.06 reference from before destruction, not silently the last position before removal. Add a distinguishing retained-model movement/reference control; the existing removal observer does not prove this interaction.",
+          "Enemy casualties with independent Fight on Death retention must preserve their own retention until its own completion/expiry. Add a combined retained-casualty interaction control; the existing removal observer does not prove this protection or universal mutual-retention priority."
+        ],
+        "historical_core_conflict": {
+          "source_row": "rule:05:05.04.05:1",
+          "source_row_sha256": "35c651d4f6a14010b1818be0d94b55ecfe4949b08b92afa3d56793a8fe89f21d",
+          "block": 2,
+          "block_sha256": "f9202c2f99ed760cbc4ce3afd0f0bb17c3183c599506ae07396bf50f34f798d2",
+          "qualification": "Retained Core wording resolves destruction-triggered rules before removing destroyed models. Preserve it; apply the user-approved FAQ-specific interpretation only to this interaction."
+        }
+      },
+      "repair_performed": true,
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": null
+      }
+    }
+  ],
+  "predecessor_findings_preserved": [
+    "SF01-001",
+    "SF03-001",
+    "SF04-002"
+  ],
+  "execution_repairs": [],
+  "current_checkpoint_note": "User-approved focused repair checkpoint supersedes this file's historical no-repair milestone policy only for marked findings; original observations and source qualifications remain retained. Independent review pending."
+}

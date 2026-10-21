@@ -1,0 +1,30 @@
+{
+  "native_definition_ids": [
+    "000004080",
+    "000004078",
+    "000000968",
+    "000000599"
+  ],
+  "native_names": [
+    "Infractors",
+    "Lord Exultant",
+    "Maulerfiend",
+    "Wave Serpent"
+  ],
+  "loader": "Integrated selected-army loader, one immutable definition catalog per process; digest equality at teardown. Section02Definitions instantiates and deep-copies fresh models/ability payloads.",
+  "source_index": "C:/Users/nostr/Documents/Codex/2026-10-16/task-7/integration-source-index-v2",
+  "mutable_state": "Fresh GameState, native physical units/placements, decisions/event logs, effects, injected dice managers and attack sequences per case. Explicit snapshot and wounded-state isolation regression.",
+  "state_scope": "Starts at real roll/save, allocation, sequence, retention, rule-destruction, geometry or Stratagem proposal owner. No full-game construction, mission authority, mustering execution, earlier phases or persistence/replay.",
+  "contracts_and_qualifications": [
+    "Four native supported definitions through the integrated selected-army loader: Infractors, Lord Exultant, Maulerfiend, Wave Serpent. Physical profile IDs, base/hull extents and ownership remain real. No roster legality certification.",
+    "Explicit constructed Core contracts supply absent boundaries: Toughness1/2/3/4/5/7/8/9, W3/Sv2/4/6/InSv4 defensive splits, two-character attachment permission, pooled count, AP-2/-4/-10, Lethal/Devastating keywords, critical damage2, failed-save damage0, FNP5, FOD and Deadly Demise descriptors, generic rule liability and unattributed scoring evidence.",
+    "Ability permission uses the existing immutable typed RuleIR contract only, not its legacy game/test body. Native mutable units/decisions/geometry are recreated each case.",
+    "Fight-on-death input is the normalized typed Core destruction reaction. Unit-fight completion and phase-end owners are exercised explicitly; these do not certify every faction text producer, natural phase discovery, or D12 no-usable-melee/replay branches.",
+    "Epic Challenge is invoked at its actual authenticated target-proposal boundary with explicit selected-to-fight timing context and real CP debit/control. Retained branch fails validation. No claim of natural window discovery.",
+    "Destruction credit proves actual attack/rule attribution and a constructed unattributed input at the production scoring-evidence validator. It does not execute mission scoring or claim every unattributed producer.",
+    "Grouped dice chronology is newly asserted for this bounded native pool. Original D02 grouped-save/identical-pool qualifications are preserved and not globally closed.",
+    "SF05-002 retains literal FAQ20 expectation but engine matches prior owner-approved during-removal interpretation. No evidence the unversioned FAQ supersedes that approval. T26 and independently retained enemy/mutual-retention qualifications remain unresolved.",
+    "No full-game creation, unrelated mission, mustering execution, prior phase traversal, persistence or replay. Direct production rule boundaries plus explicit typed contexts; not Linux validation or independent legacy equivalence."
+  ],
+  "randomness": "Hit/wound/save/FNP tests inject exact dice using production specs. Mandatory Deadly Demise outcome is immaterial to tested timing at out-of-range or nonlethal native scenes; no outcome-dependent assertion or random test-order reliance."
+}

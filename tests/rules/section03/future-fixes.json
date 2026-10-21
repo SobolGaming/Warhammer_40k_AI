@@ -1,0 +1,40 @@
+{
+  "policy": "Bounded SF03-001 repair relative to independently reviewed SF04 revision2; unrelated and qualified findings remain deferred. Historical source/correction qualifications are retained.",
+  "open_semantic_defects": [],
+  "predecessor_defects_preserved": [
+    "SF01-001: four capitalized-Stealth failures, untouched"
+  ],
+  "execution_repairs": [],
+  "generated_identity_maintenance": {
+    "file": "src/warhammer40k_core/_engine_build_manifest.json",
+    "reason": "Incoming manifest was stale for preserved Action crash repair and selected-source loader integration. Adapter import correctly rejected stale runtime identity. Regenerated identity without editing runtime behavior.",
+    "incoming_copy": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-10\\incoming-engine-build-manifest.json"
+  },
+  "resolved_semantic_defects": [
+    {
+      "id": "SF03-001",
+      "status": "REPAIRED_AWAITING_SAME_INDEPENDENT_REVIEW",
+      "title": "Coherency cleanup commits casualties without controlling-player choice",
+      "source_obligations": [
+        "03.03-obligation-04"
+      ],
+      "expected": "At either player turn end, the controlling player chooses each model to remove until coherency is restored. With two valid alternatives and no choice submitted, no casualty may be committed.",
+      "actual": "Native finite controlling-player casualties, one at a time through lifecycle dispatch; grouped coherency is rechecked after each accepted choice. Physical ownership, no-reaction destruction, mission evidence and valid pending save/fork/replay remain required.",
+      "entry_path": [
+        "GameState.resolve_end_turn_cleanup_boundary",
+        "mission_cleanup_boundary.resolve_mission_cleanup_boundary",
+        "turn_cleanup.resolve_end_turn_cleanup",
+        "turn_cleanup._next_cleanup_model_id"
+      ],
+      "native_datasheet": "000004090 Chaos Spawn, two real models; both possible single survivors coherent.",
+      "failed_nodes": [
+        "tests/rules/section03/test_cleanup.py::test_owner_must_choose_before_coherency_casualty_is_committed[owner]",
+        "tests/rules/section03/test_cleanup.py::test_owner_must_choose_before_coherency_casualty_is_committed[opponent]"
+      ],
+      "reproduce": ".venv/Scripts/python.exe -m pytest tests/rules/section03/test_cleanup.py --no-cov --selected-army-source-index=<existing-index> -q",
+      "controls": "Other cleanup checks verify destruction, no destroyed-rule triggers, restoration to coherency and mission physical casualty inventory. Those passing side effects do not excuse missing owner choice.",
+      "future_fix_scope": "Introduce source-authoritative owner casualty decisions at the turn-end cleanup boundary, one model at a time, before mutation. Recheck grouped rules-unit authority and downstream mission/replay consumers in the future fix PR.",
+      "previous_observation": "resolve_end_turn_cleanup_boundary immediately destroys the lexically first native Chaos Spawn and leaves its sibling alive, for either active player. No casualty DecisionRequest/DecisionResult is offered."
+    }
+  ]
+}

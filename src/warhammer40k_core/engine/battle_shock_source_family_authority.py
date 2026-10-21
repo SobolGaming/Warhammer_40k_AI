@@ -981,6 +981,14 @@ def _validate_desperate_escape_source(
     roll_model_ids = tuple(
         sorted(roll.requirement.model_instance_id for roll in fall_back.desperate_escape_rolls)
     )
+    auto_pass_ids = fall_back.movement_payload.get("desperate_escape_auto_pass_model_ids", [])
+    if (
+        not isinstance(auto_pass_ids, list)
+        or any(type(mid) is not str for mid in auto_pass_ids)
+        or len(set(cast(list[str], auto_pass_ids))) != len(auto_pass_ids)
+        or set(cast(list[str], auto_pass_ids)).intersection(requirement_model_ids)
+    ):
+        raise GameLifecycleError("Desperate Escape auto-pass inventory drifted.")
     expected_action_payload = {
         "movement_phase_action": "fall_back",
         "unit_instance_id": fall_back.unit_instance_id,
@@ -1022,7 +1030,8 @@ def _validate_desperate_escape_source(
         or request.reason is not BattleShockTestReason.DESPERATE_ESCAPE
         or fall_back_mode != FallBackModeKind.DESPERATE_ESCAPE.value
         or battle_shocked_after_move is not False
-        or requirement_model_ids != tuple(sorted(fall_back.witness.model_ids()))
+        or tuple(sorted((*requirement_model_ids, *cast(list[str], auto_pass_ids))))
+        != tuple(sorted(fall_back.witness.model_ids()))
         or selected_mode_model_ids != requirement_model_ids
         or roll_model_ids != requirement_model_ids
         or proposal.game_id != request.game_id

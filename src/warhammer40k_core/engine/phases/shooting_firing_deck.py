@@ -65,13 +65,23 @@ def _declaration_source_model_id(declaration: WeaponDeclaration) -> str:
     return declaration.attacker_model_instance_id
 
 
+def _firing_deck_phase_available(*, state: GameState, unit_instance_id: str) -> bool:
+    """24.14 is phase-locked; reaction shooting never borrows cargo weapons."""
+    return (
+        state.out_of_phase_shooting_state is None
+        and state.current_battle_phase is BattlePhase.SHOOTING
+        and rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id).owner_player_id
+        == state.active_player_id
+    )
+
+
 def firing_deck_cargo_snapshot(
     *,
     state: GameState,
     unit_instance_id: str,
     army_catalog: ArmyCatalog,
 ) -> tuple[str, ...]:
-    if state.out_of_phase_shooting_state is not None:
+    if not _firing_deck_phase_available(state=state, unit_instance_id=unit_instance_id):
         return ()
     cargo = state.transport_cargo_state_for_transport(unit_instance_id)
     if cargo is None:
@@ -108,6 +118,13 @@ def _validate_firing_deck_selection(
     if not firing_deck_declarations and proposal.firing_deck_selection is None:
         return firing_deck_cargo_snapshot(
             state=state, unit_instance_id=proposal.unit_instance_id, army_catalog=army_catalog
+        )
+    if not _firing_deck_phase_available(state=state, unit_instance_id=proposal.unit_instance_id):
+        return ShootingProposalValidationResult.invalid(
+            proposal_request_id=proposal.proposal_request_id,
+            violation_code="firing_deck_out_of_phase",
+            message="Firing Deck is only available in the transport's own Shooting phase.",
+            field="firing_deck_selection",
         )
     if (
         not firing_deck_declarations
@@ -629,6 +646,10 @@ def _available_firing_deck_weapons(
     transport_unit: UnitInstance,
     army_catalog: ArmyCatalog,
 ) -> tuple[_AvailableWeapon, ...]:
+    if not _firing_deck_phase_available(
+        state=state, unit_instance_id=transport_unit.unit_instance_id
+    ):
+        return ()
     cargo_state = state.transport_cargo_state_for_transport(transport_unit.unit_instance_id)
     if cargo_state is None or not cargo_state.embarked_unit_instance_ids:
         return ()

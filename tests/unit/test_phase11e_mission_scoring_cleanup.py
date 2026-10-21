@@ -9485,6 +9485,21 @@ def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() 
         LifecycleStatusKind.WAITING_FOR_DECISION,
         LifecycleStatusKind.TERMINAL,
     }
+    request = lifecycle.pending_decision_request()
+    assert request is not None
+    assert request.decision_type == "select_coherency_casualty"
+    assert request.actor_id == "player-a"
+    assert {option.option_id for option in request.options} == {
+        row.model_instance_id for row in broken.model_placements
+    }
+    assert removed_model_id not in state.battlefield_state.removed_model_ids
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            request=request,
+            result_id="explicit-coherency-choice",
+            selected_option_id=removed_model_id,
+        )
+    )
     assert state.current_battle_phase is not BattlePhase.FIGHT
     cleanup = state.end_turn_cleanup_states[-1]
 
@@ -9551,13 +9566,32 @@ def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() 
             event["event_type"] = "battle_phase_boundary_tampered"
     with pytest.raises(
         GameLifecycleError,
-        match="Unit Coherency departure requires an authoritative phase-boundary event",
+        match=(
+            "ObjectiveControlRecord phase-start history lacks exactly one prior "
+            "completed phase event"
+        ),
+    ):
+        GameLifecycle.from_payload(forged_payload)
+
+    forged_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    forged_events = forged_payload["decisions"]["event_log"]
+    for event in forged_events:
+        if event["event_type"] == "coherency_cleanup_model_removed":
+            event["event_type"] = "battle_phase_boundary_tampered"
+    with pytest.raises(
+        GameLifecycleError,
+        match="Coherency casualty requires one preceding owner decision",
     ):
         GameLifecycle.from_payload(forged_payload)
 
 
 def test_turn_end_control_and_primary_scoring_use_pre_cleanup_battlefield() -> None:
-    state = _battle_state_for_primary("primary-immovable-object")
+    lifecycle = _battle_lifecycle_for_primary("primary-immovable-object")
+    state = lifecycle.state
+    assert state is not None
     assert state.battlefield_state is not None
     marker = _center_marker_definition(state)
     unit_placement = state.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
@@ -9571,7 +9605,19 @@ def test_turn_end_control_and_primary_scoring_use_pre_cleanup_battlefield() -> N
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     seed_completed_fight_phase(state)
 
-    state.advance_to_next_battle_phase()
+    status = lifecycle.advance_until_decision_or_terminal()
+    status = _decline_stratagem_window_if_pending(lifecycle, status, result_id="control-decline")
+    request = lifecycle.pending_decision_request()
+    assert request is not None
+    assert request.decision_type == "select_coherency_casualty"
+    assert isolated_objective_model_id not in state.battlefield_state.removed_model_ids
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            request=request,
+            result_id="control-chosen",
+            selected_option_id=isolated_objective_model_id,
+        )
+    )
 
     assert isolated_objective_model_id in state.battlefield_state.removed_model_ids
     turn_end_record = next(

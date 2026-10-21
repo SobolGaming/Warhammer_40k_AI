@@ -1,0 +1,1568 @@
+{
+  "schema": "section08-clause-corpus-v1",
+  "source_authority": "Game Datamissions maintained mirror, non-affiliated; existing accepted hostname; live-body actual timestamp, not asserted App-data963",
+  "observed_at": "2026-10-01T12:04:31.127429+00:00",
+  "source_qualification": "Retained timestamped maintained-mirror body; no independent Games Workshop publication or App export certification; no new provider observation.",
+  "sources": [
+    {
+      "source_id": "rule:08:08.00:1",
+      "locator": "08.00",
+      "title": "Command Phase",
+      "source_sha256": "ab35da8e04cf531bd84f14b996916652032e39ec06d97f116d21103c5880f7f9",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "c3262c3724d9041ccd2aa56040494cae995f7a93759eedbbf1d7aba24b06b2a6",
+          "value": "In the Command phase, both players gain Core CP, then you check the combat readiness of your forces and use any strategic-level abilities you may have."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "7227559cf3f81a1e6f252b325b1a4618e93434d852907ec82de665ce929a4d7c",
+          "value": "The Command phase is resolved by following these steps:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "7348bd432ae4311f4087b2fe4029a42e561de9f165d30883a51f8c07232db7e5",
+          "value": "1. START OF COMMAND PHASE"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "e8b4ce73ddec54e0c36eb20cbdc994521b5f3bfadd34b3a806c49693af239b24",
+          "value": "2. GAIN CORE CP"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "88ab0d752c40fd3e958dfa7627873d29c5d6e8b4625f91a9ab880e5f0c14d9ef",
+          "value": "3. BATTLE-SHOCK"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "b127709cf891f9fb76dd1f3e68d412acc12985d0c43bf708fca6a7a832050135",
+          "value": "4. COMMAND ABILITIES"
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "f13ef0bf3f4bcb371a608872b5beb86db3f3130f50be46fb82c9c1d54ea2ee8b",
+          "value": "5. END OF COMMAND PHASE"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "08.00-step-3",
+          "summary": "Resolve the start step at its prescribed Command phase position.",
+          "source_blocks": [
+            3
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+              "role": "semantic",
+              "assertion": "assert battle_shock_step_resolved",
+              "proves": "The Command handler progresses through CP and battle-shock before completion."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            },
+            {
+              "nodeid": "tests/unit/test_phase17g_space_marines_army_rule.py::test_lifecycle_requests_oath_target_and_records_effects",
+              "role": "facade",
+              "assertion": "assert 'command_points_gained' not in event_types",
+              "proves": "Pending Command-start Oath blocks Core CP gain."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py:CatalogCommandPointRuntime",
+            "src/warhammer40k_core/engine/lifecycle.py:GameLifecycle.submit_decision",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+            "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+              "function_ast_sha256": "c9da1d64268960dcce197302416a449bfbeb6c865fc27bcc7ae36f4dc5d605b1",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert state.command_point_total('owner') == (2 if active == 'owner' else 1)",
+                "assert state.command_point_total('opponent') == 1",
+                "assert core < shock < types.index('battle_phase_completed')",
+                "assert payloads(session, 'catalog_ir_command_point_phase_gain_resolved') == gains",
+                "assert request is not None",
+                "assert request.decision_type == 'submit_stratagem_target_proposal'",
+                "assert gains[0]['source_rule_id'] == 'constructed:section08:timing:0'",
+                "assert gains[0]['passed'] is True",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert effect < core",
+                "assert shock < effect < types.index('battle_phase_completed')",
+                "assert isinstance(event.payload, dict)",
+                "assert isinstance(window, dict)",
+                "assert isinstance(descriptor, dict)",
+                "assert shock < body < effect < end",
+                "assert body < end < effect"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+              "function_ast_sha256": "6a7a29372d61ef195383813b11258a08c75d8dba5243bc35eb7cffe63b67e370",
+              "assertions": [
+                "assert request is not None",
+                "assert request.decision_type == SEQUENCING_DECISION_TYPE",
+                "assert not payloads(session, 'catalog_ir_command_point_phase_gain_resolved')",
+                "assert state.command_step_state is not None",
+                "assert state.command_step_state.battle_shock_step_resolved",
+                "assert (state.to_payload(), session.lifecycle.decision_controller.to_payload()) == before",
+                "assert [g['source_rule_id'] for g in gains] == ['constructed:section08:timing:1', 'constructed:section08:timing:0', 'constructed:section08:timing:2']",
+                "assert state.current_battle_phase is BattlePhase.MOVEMENT",
+                "assert request is not None"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.00-step-4",
+          "summary": "Resolve the Core CP step at its prescribed Command phase position.",
+          "source_blocks": [
+            4
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+              "role": "semantic",
+              "assertion": "assert battle_shock_step_resolved",
+              "proves": "The Command handler progresses through CP and battle-shock before completion."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            },
+            {
+              "nodeid": "tests/unit/test_phase17g_space_marines_army_rule.py::test_lifecycle_requests_oath_target_and_records_effects",
+              "role": "facade",
+              "assertion": "assert max((index for index, event_type in enumerate(event_types) if event_type == 'command_points_gained')) < event_types.index('command_step_started')",
+              "proves": "Both Core CP gain events precede Command body start."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py:CatalogCommandPointRuntime",
+            "src/warhammer40k_core/engine/lifecycle.py:GameLifecycle.submit_decision",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+            "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+              "function_ast_sha256": "c9da1d64268960dcce197302416a449bfbeb6c865fc27bcc7ae36f4dc5d605b1",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert state.command_point_total('owner') == (2 if active == 'owner' else 1)",
+                "assert state.command_point_total('opponent') == 1",
+                "assert core < shock < types.index('battle_phase_completed')",
+                "assert payloads(session, 'catalog_ir_command_point_phase_gain_resolved') == gains",
+                "assert request is not None",
+                "assert request.decision_type == 'submit_stratagem_target_proposal'",
+                "assert gains[0]['source_rule_id'] == 'constructed:section08:timing:0'",
+                "assert gains[0]['passed'] is True",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert effect < core",
+                "assert shock < effect < types.index('battle_phase_completed')",
+                "assert isinstance(event.payload, dict)",
+                "assert isinstance(window, dict)",
+                "assert isinstance(descriptor, dict)",
+                "assert shock < body < effect < end",
+                "assert body < end < effect"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+              "function_ast_sha256": "6a7a29372d61ef195383813b11258a08c75d8dba5243bc35eb7cffe63b67e370",
+              "assertions": [
+                "assert request is not None",
+                "assert request.decision_type == SEQUENCING_DECISION_TYPE",
+                "assert not payloads(session, 'catalog_ir_command_point_phase_gain_resolved')",
+                "assert state.command_step_state is not None",
+                "assert state.command_step_state.battle_shock_step_resolved",
+                "assert (state.to_payload(), session.lifecycle.decision_controller.to_payload()) == before",
+                "assert [g['source_rule_id'] for g in gains] == ['constructed:section08:timing:1', 'constructed:section08:timing:0', 'constructed:section08:timing:2']",
+                "assert state.current_battle_phase is BattlePhase.MOVEMENT",
+                "assert request is not None"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.00-step-5",
+          "summary": "Resolve the battle-shock step at its prescribed Command phase position.",
+          "source_blocks": [
+            5
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+              "role": "semantic",
+              "assertion": "assert battle_shock_step_resolved",
+              "proves": "The Command handler progresses through CP and battle-shock before completion."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py:CatalogCommandPointRuntime",
+            "src/warhammer40k_core/engine/lifecycle.py:GameLifecycle.submit_decision",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+            "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+              "function_ast_sha256": "c9da1d64268960dcce197302416a449bfbeb6c865fc27bcc7ae36f4dc5d605b1",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert state.command_point_total('owner') == (2 if active == 'owner' else 1)",
+                "assert state.command_point_total('opponent') == 1",
+                "assert core < shock < types.index('battle_phase_completed')",
+                "assert payloads(session, 'catalog_ir_command_point_phase_gain_resolved') == gains",
+                "assert request is not None",
+                "assert request.decision_type == 'submit_stratagem_target_proposal'",
+                "assert gains[0]['source_rule_id'] == 'constructed:section08:timing:0'",
+                "assert gains[0]['passed'] is True",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert effect < core",
+                "assert shock < effect < types.index('battle_phase_completed')",
+                "assert isinstance(event.payload, dict)",
+                "assert isinstance(window, dict)",
+                "assert isinstance(descriptor, dict)",
+                "assert shock < body < effect < end",
+                "assert body < end < effect"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+              "function_ast_sha256": "6a7a29372d61ef195383813b11258a08c75d8dba5243bc35eb7cffe63b67e370",
+              "assertions": [
+                "assert request is not None",
+                "assert request.decision_type == SEQUENCING_DECISION_TYPE",
+                "assert not payloads(session, 'catalog_ir_command_point_phase_gain_resolved')",
+                "assert state.command_step_state is not None",
+                "assert state.command_step_state.battle_shock_step_resolved",
+                "assert (state.to_payload(), session.lifecycle.decision_controller.to_payload()) == before",
+                "assert [g['source_rule_id'] for g in gains] == ['constructed:section08:timing:1', 'constructed:section08:timing:0', 'constructed:section08:timing:2']",
+                "assert state.current_battle_phase is BattlePhase.MOVEMENT",
+                "assert request is not None"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.00-step-6",
+          "summary": "Resolve the Command abilities step at its prescribed Command phase position.",
+          "source_blocks": [
+            6
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [
+            "Gameplay gap: phase/battle-shock completion does not establish a Command-abilities consumer. The direct unqualified Command clause probe recorded for 08.04 shows that the facade skips the effect; C08-04/P08C owns the missing body step and its position after Battle-shock and before end-phase rules."
+          ],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+              "role": "semantic",
+              "assertion": "assert battle_shock_step_resolved",
+              "proves": "The Command handler progresses through CP and battle-shock before completion."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py:CatalogCommandPointRuntime",
+            "src/warhammer40k_core/engine/lifecycle.py:GameLifecycle.submit_decision",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+            "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+              "function_ast_sha256": "c9da1d64268960dcce197302416a449bfbeb6c865fc27bcc7ae36f4dc5d605b1",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert state.command_point_total('owner') == (2 if active == 'owner' else 1)",
+                "assert state.command_point_total('opponent') == 1",
+                "assert core < shock < types.index('battle_phase_completed')",
+                "assert payloads(session, 'catalog_ir_command_point_phase_gain_resolved') == gains",
+                "assert request is not None",
+                "assert request.decision_type == 'submit_stratagem_target_proposal'",
+                "assert gains[0]['source_rule_id'] == 'constructed:section08:timing:0'",
+                "assert gains[0]['passed'] is True",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert effect < core",
+                "assert shock < effect < types.index('battle_phase_completed')",
+                "assert isinstance(event.payload, dict)",
+                "assert isinstance(window, dict)",
+                "assert isinstance(descriptor, dict)",
+                "assert shock < body < effect < end",
+                "assert body < end < effect"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+              "function_ast_sha256": "6a7a29372d61ef195383813b11258a08c75d8dba5243bc35eb7cffe63b67e370",
+              "assertions": [
+                "assert request is not None",
+                "assert request.decision_type == SEQUENCING_DECISION_TYPE",
+                "assert not payloads(session, 'catalog_ir_command_point_phase_gain_resolved')",
+                "assert state.command_step_state is not None",
+                "assert state.command_step_state.battle_shock_step_resolved",
+                "assert (state.to_payload(), session.lifecycle.decision_controller.to_payload()) == before",
+                "assert [g['source_rule_id'] for g in gains] == ['constructed:section08:timing:1', 'constructed:section08:timing:0', 'constructed:section08:timing:2']",
+                "assert state.current_battle_phase is BattlePhase.MOVEMENT",
+                "assert request is not None"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.00-step-7",
+          "summary": "Resolve the end step at its prescribed Command phase position.",
+          "source_blocks": [
+            7
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+              "role": "semantic",
+              "assertion": "assert battle_shock_step_resolved",
+              "proves": "The Command handler progresses through CP and battle-shock before completion."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py:CatalogCommandPointRuntime",
+            "src/warhammer40k_core/engine/lifecycle.py:GameLifecycle.submit_decision",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+            "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+              "function_ast_sha256": "c9da1d64268960dcce197302416a449bfbeb6c865fc27bcc7ae36f4dc5d605b1",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert state.command_point_total('owner') == (2 if active == 'owner' else 1)",
+                "assert state.command_point_total('opponent') == 1",
+                "assert core < shock < types.index('battle_phase_completed')",
+                "assert payloads(session, 'catalog_ir_command_point_phase_gain_resolved') == gains",
+                "assert request is not None",
+                "assert request.decision_type == 'submit_stratagem_target_proposal'",
+                "assert gains[0]['source_rule_id'] == 'constructed:section08:timing:0'",
+                "assert gains[0]['passed'] is True",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert effect < core",
+                "assert shock < effect < types.index('battle_phase_completed')",
+                "assert isinstance(event.payload, dict)",
+                "assert isinstance(window, dict)",
+                "assert isinstance(descriptor, dict)",
+                "assert shock < body < effect < end",
+                "assert body < end < effect"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+              "function_ast_sha256": "6a7a29372d61ef195383813b11258a08c75d8dba5243bc35eb7cffe63b67e370",
+              "assertions": [
+                "assert request is not None",
+                "assert request.decision_type == SEQUENCING_DECISION_TYPE",
+                "assert not payloads(session, 'catalog_ir_command_point_phase_gain_resolved')",
+                "assert state.command_step_state is not None",
+                "assert state.command_step_state.battle_shock_step_resolved",
+                "assert (state.to_payload(), session.lifecycle.decision_controller.to_payload()) == before",
+                "assert [g['source_rule_id'] for g in gains] == ['constructed:section08:timing:1', 'constructed:section08:timing:0', 'constructed:section08:timing:2']",
+                "assert state.current_battle_phase is BattlePhase.MOVEMENT",
+                "assert request is not None"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1,
+            2
+          ],
+          "classification": "context",
+          "reason": "Overview; individual ordered steps below carry the operative requirements."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:08:08.01:1",
+      "locator": "08.01",
+      "title": "Start of Command Phase",
+      "source_sha256": "ee77f9084278b0d6c3adf16c823096e9e72f4cbc382691d1398ab1cb25762924",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "105ba5bb42d1fb21c59200e335ee6389d7f00cc1a43dc811b50472457b31e481",
+          "value": "Rules that are triggered at the start of the Command phase are resolved now."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "08.01-start-rules",
+          "summary": "Resolve start-of-Command-phase rules in the start window.",
+          "source_blocks": [
+            1
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            },
+            {
+              "nodeid": "tests/unit/test_phase17g_space_marines_army_rule.py::test_lifecycle_requests_oath_target_and_records_effects",
+              "role": "facade",
+              "assertion": "assert event_types.index('space_marines_oath_of_moment_target_selected') < event_types.index('command_points_gained')",
+              "proves": "The loaded Oath choice executes through the session before either player gains Core CP."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_timing_evidence.py::test_loaded_command_boundary_rule_repeats_on_its_owners_turn_each_round",
+              "role": "facade",
+              "assertion": "assert len(resolved) == 3, resolved",
+              "proves": "A source-loaded CP rule executes at its Command start/end window in three successive own turns through the facade."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py:CatalogCommandPointRuntime",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+              "function_ast_sha256": "c9da1d64268960dcce197302416a449bfbeb6c865fc27bcc7ae36f4dc5d605b1",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert state.command_point_total('owner') == (2 if active == 'owner' else 1)",
+                "assert state.command_point_total('opponent') == 1",
+                "assert core < shock < types.index('battle_phase_completed')",
+                "assert payloads(session, 'catalog_ir_command_point_phase_gain_resolved') == gains",
+                "assert request is not None",
+                "assert request.decision_type == 'submit_stratagem_target_proposal'",
+                "assert gains[0]['source_rule_id'] == 'constructed:section08:timing:0'",
+                "assert gains[0]['passed'] is True",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert effect < core",
+                "assert shock < effect < types.index('battle_phase_completed')",
+                "assert isinstance(event.payload, dict)",
+                "assert isinstance(window, dict)",
+                "assert isinstance(descriptor, dict)",
+                "assert shock < body < effect < end",
+                "assert body < end < effect"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:08:08.02:1",
+      "locator": "08.02",
+      "title": "Gain Core CP",
+      "source_sha256": "39052a60ec6b18c0e5b2d7ad87f1ae74fc09c0a60e1843cbb38ede3b883586d5",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "d478e3e36b16057be8707339390c7e677ff387924a484181aa22f9a8b429de77",
+          "value": "Both players gain 1 Command Point (CP)."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "08.02-both-gain",
+          "summary": "Both players gain one Core CP each Command phase.",
+          "source_blocks": [
+            1
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+              "role": "semantic",
+              "assertion": "assert state.command_point_total('player-a') == 1",
+              "proves": "The active player gains one CP."
+            },
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+              "role": "semantic",
+              "assertion": "assert state.command_point_total('player-b') == 1",
+              "proves": "The opposing player also gains one CP."
+            },
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+              "role": "semantic",
+              "assertion": "assert state.command_point_total('player-a') == 2",
+              "proves": "The following player turn grants the next Core CP to both players."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py:CatalogCommandPointRuntime",
+            "src/warhammer40k_core/engine/game_state.py:GameState.gain_command_points",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry",
+            "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry",
+              "function_ast_sha256": "7918fab8912d96b75ab5eb80341207480192e69def28ea84e2c3f6f2d6ce2693",
+              "assertions": [
+                "assert [state.command_point_total(p) for p in state.player_ids] == [1, 1]",
+                "assert len(gains) == 2",
+                "assert {str(g['player_id']) for g in gains} == set(state.player_ids)",
+                "assert all((g['applied_amount'] == 1 for g in gains))"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+              "function_ast_sha256": "c9da1d64268960dcce197302416a449bfbeb6c865fc27bcc7ae36f4dc5d605b1",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert state.command_point_total('owner') == (2 if active == 'owner' else 1)",
+                "assert state.command_point_total('opponent') == 1",
+                "assert core < shock < types.index('battle_phase_completed')",
+                "assert payloads(session, 'catalog_ir_command_point_phase_gain_resolved') == gains",
+                "assert request is not None",
+                "assert request.decision_type == 'submit_stratagem_target_proposal'",
+                "assert gains[0]['source_rule_id'] == 'constructed:section08:timing:0'",
+                "assert gains[0]['passed'] is True",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert effect < core",
+                "assert shock < effect < types.index('battle_phase_completed')",
+                "assert isinstance(event.payload, dict)",
+                "assert isinstance(window, dict)",
+                "assert isinstance(descriptor, dict)",
+                "assert shock < body < effect < end",
+                "assert body < end < effect"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:08:08.02.01:1",
+      "locator": "08.02.01",
+      "title": "Command Points",
+      "source_sha256": "f468940d4c3ac928c0c788a97bba7c31e367b4fbf8331d1e7d687b4446953f7f",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "c9520ce3e7d60bba82b86477787b3a7ca8f6ec1ae8019c35514fe52526a98a34",
+          "value": "Command Points are a valuable resource you can spend to use \u0005stratagems\u0006 (15). The Gain Core CP step ensures that both players gain 1CP each turn. While these are termed Core CP here, they are Command Points like any other. Other rules sometimes mention \u2018Core CP\u2019 when referring to these Command Points"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "08.02.01-both-gain",
+          "summary": "Both players gain one Core CP each Command phase.",
+          "source_blocks": [
+            1
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+              "role": "semantic",
+              "assertion": "assert state.command_point_total('player-a') == 1",
+              "proves": "The active player gains one CP."
+            },
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+              "role": "semantic",
+              "assertion": "assert state.command_point_total('player-b') == 1",
+              "proves": "The opposing player also gains one CP."
+            },
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_step_grants_both_players_cp_once_before_tactical_draw",
+              "role": "semantic",
+              "assertion": "assert state.command_point_total('player-a') == 2",
+              "proves": "The following player turn grants the next Core CP to both players."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/game_state.py:GameState.gain_command_points",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_both_players_receive_one_core_cp_with_idempotent_reentry",
+              "function_ast_sha256": "7918fab8912d96b75ab5eb80341207480192e69def28ea84e2c3f6f2d6ce2693",
+              "assertions": [
+                "assert [state.command_point_total(p) for p in state.player_ids] == [1, 1]",
+                "assert len(gains) == 2",
+                "assert {str(g['player_id']) for g in gains} == set(state.player_ids)",
+                "assert all((g['applied_amount'] == 1 for g in gains))"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.02.01-resource",
+          "summary": "Core CP are ordinary spendable Command Points.",
+          "source_blocks": [
+            1
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/game_state.py:GameState.spend_command_points"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_cp_resource.py::test_core_cp_can_be_spent_and_insufficient_spend_preserves_balance"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_cp_resource.py::test_core_cp_can_be_spent_and_insufficient_spend_preserves_balance",
+              "function_ast_sha256": "708e92c036abc45ee02d4c47cdbff85fb6b38a747e72ae5b8e387c7e3fa6966b",
+              "assertions": [
+                "assert rejected.status is CommandPointSpendStatus.INSUFFICIENT",
+                "assert state.to_payload() == before",
+                "assert accepted.status is CommandPointSpendStatus.APPLIED",
+                "assert state.command_point_total(player) == 0",
+                "assert state.command_point_total('opponent' if player == 'owner' else 'owner') == 1"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:08:08.03:1",
+      "locator": "08.03",
+      "title": "Battle-Shock Step",
+      "source_sha256": "a4cf92589862882bc5f598df82d8f95264d139bb19c21b429449f0240b436aa1",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "a442fcdef5bdf19b0867259b381d2497df1205f7f04c708aef808cebaa6f1d0d",
+          "value": "The active player must now make one \u0005battle-shock roll\u0006 (01.07) for each unit in their army that fulfils one or both of the following conditions:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "30be06afbfad567fd77bdb627f7850287d4a7ac12c2562579f5807c691c6a029",
+          "value": "\u2022 That unit is currently \u0005battle-shocked\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "a1e5b8557240274883b0d0151e79390854a49743bc5c8ea25bbddc88c79273d8",
+          "value": "\u2022 That unit is at, or below, \u0005half\u2011strength\u0006."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "036b78a628367695ae7d86f60fc2fb3930ae62ec80aefbc4cd7956069fdd9a1d",
+          "value": "If a unit was \u0005battle-shocked\u0006 at the start of this step and its \u0005battle-shock roll\u0006 during this step succeeds, it is no longer \u0005battle-shocked\u0006."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "3ae9d363940e1c2877473c22cb3b022ad125a6752b86cbda553726a3c9da73a1",
+          "value": "\u000eBattle-shock Examples"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "044a4120c008fb8acbeb4c465c625a0073a753818ea7eeb7e7e150d62198598b",
+          "value": "This unit has a \u0005\u0007starting strength\b\u0006 of 3 so is not at or \u0005\u0007below\b\u0006 \u0005\u0007half-strength\b\u0006, but it is currently \u0005\u0007battle-shocked\b\u0006, so a \u0005\u0007battle-shock roll\b\u0006 must be made for it. If that roll succeeds, the unit will no longer be \u0005\u0007battle-shocked\b\u0006."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "dfc6bec35f81bb599b226da4777fc78a50ed33672e490b957695838f9582c4b4",
+          "value": "This unit has a \u0005\u0007starting strength\b\u0006 of 10. It has five models remaining, so it is \u0005\u0007at half-strength\b\u0006 and a \u0005\u0007battle-shock roll\b\u0006 must be made for it."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "bfc730fbbaa892e7c53e3e53e04241bd7239ef2f0de404e5f177aa4cf0350574",
+          "value": "This unit has a \u0005\u0007starting strength\b\u0006 of 5. It has two models remaining, so it is \u0005\u0007below half-strength\b\u0006 and a \u0005\u0007battle-shock roll\b\u0006 must be made for it."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "7923c712d5c1b33ce41e65bd3bbaa380d47150a6eba90d7760d196e22a2bacf3",
+          "value": "This \u0003Vehicle\u0004 has a \u0005\u0007starting strength\b\u0006 of 1 and a \u0005\u0007W\b\u0006 characteristic of 11. It has 3 wounds remaining, so it is \u0005\u0007below half-strength\b\u0006 and a \u0005\u0007battle-shock roll\b\u0006 must be made for it."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "08.03-shocked",
+          "summary": "Each currently battle-shocked active-player unit requires one Command battle-shock roll.",
+          "source_blocks": [
+            1,
+            2
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_currently_shocked_unit_requires_one_command_test_even_above_or_below_half",
+              "role": "semantic",
+              "assertion": "assert len(above_half_requests) == 1",
+              "proves": "A shocked above-half unit still receives exactly one test."
+            },
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_battle_shock_public_event_chain_is_identical_for_both_viewers",
+              "role": "viewer",
+              "assertion": "assert player_a_events == player_b_events",
+              "proves": "The full public Command shock event chain is identical for both viewers."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests",
+            "src/warhammer40k_core/engine/battle_shock_resolution.py:record_precomputed_battle_shock_result_events",
+            "src/warhammer40k_core/engine/command_battle_shock_candidates.py:command_battle_shock_candidate_inventory",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons",
+            "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons",
+              "function_ast_sha256": "b72fae2b945141ee135a123d9aa748a6ef240bae46d9b6c83df58e7e0778376a",
+              "assertions": [
+                "assert len(actual) == int(required or shocked)",
+                "assert len(inventory) == 1",
+                "assert inventory[0].is_battle_shocked is shocked",
+                "assert inventory[0].below_half_strength_context.is_at_or_below_half_strength is required",
+                "assert state.to_payload() == before",
+                "assert actual[0].reason is BattleShockTestReason.COMMAND_PHASE_REQUIRED",
+                "assert actual[0].unit_instance_id == next((a for a in state.army_definitions if a.player_id == 'owner')).units[0].unit_instance_id"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated",
+              "function_ast_sha256": "bf8011bc40f19d552d5ebdb4f1aa0571c50856a0457b89acb7998c8fdc553a25",
+              "assertions": [
+                "assert len(results) == 1",
+                "assert isinstance(result, dict)",
+                "assert isinstance(modified, dict)",
+                "assert isinstance(total, int)",
+                "assert isinstance(target, int)",
+                "assert result['passed'] is passed",
+                "assert (unit_id in state.battle_shocked_unit_ids) is (not passed)",
+                "assert state.command_step_state is not None",
+                "assert len(state.command_step_state.completed_battle_shock_test_request_ids) == 1",
+                "assert payloads(session, 'battle_shock_test_resolved') == results"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.03-half",
+          "summary": "Each active-player unit at or below half-strength requires one Command battle-shock roll.",
+          "source_blocks": [
+            1,
+            3
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_exactly_half_strength_requires_command_test_for_multi_and_single_model_units",
+              "role": "semantic",
+              "assertion": "assert single_request.below_half_strength_context.is_at_half_strength",
+              "proves": "Exactly half wounds on a single model requires the test."
+            },
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_battle_shock_public_event_chain_is_identical_for_both_viewers",
+              "role": "viewer",
+              "assertion": "assert player_a_events == player_b_events",
+              "proves": "The full public Command shock event chain is identical for both viewers."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests",
+            "src/warhammer40k_core/engine/command_battle_shock_candidates.py:command_battle_shock_candidate_inventory"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons",
+            "tests/rules/section08/test_battle_shock.py::test_native_single_vehicle_uses_wounds_at_the_inclusive_half_boundary"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons",
+              "function_ast_sha256": "b72fae2b945141ee135a123d9aa748a6ef240bae46d9b6c83df58e7e0778376a",
+              "assertions": [
+                "assert len(actual) == int(required or shocked)",
+                "assert len(inventory) == 1",
+                "assert inventory[0].is_battle_shocked is shocked",
+                "assert inventory[0].below_half_strength_context.is_at_or_below_half_strength is required",
+                "assert state.to_payload() == before",
+                "assert actual[0].reason is BattleShockTestReason.COMMAND_PHASE_REQUIRED",
+                "assert actual[0].unit_instance_id == next((a for a in state.army_definitions if a.player_id == 'owner')).units[0].unit_instance_id"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_battle_shock.py::test_native_single_vehicle_uses_wounds_at_the_inclusive_half_boundary",
+              "function_ast_sha256": "900508c4e95045ea83b20d4d51dcdf51ef0fd18927f312772f5fc697b417813e",
+              "assertions": [
+                "assert len(unit.own_models) == 1",
+                "assert model.current_wounds % 2 == 0",
+                "assert len(actual) == int(required)",
+                "assert actual[0].below_half_strength_context.single_model_wounds_remaining == wounds"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.03-clear",
+          "summary": "A successful required roll clears shock present at the start of this battle-shock step.",
+          "source_blocks": [
+            4
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_success_clears_step_start_shock_but_failure_and_forced_success_preserve",
+              "role": "semantic",
+              "assertion": "assert passed_payload['state_update'] == 'cleared_battle_shocked'",
+              "proves": "Success records the explicit cleared-shock update."
+            },
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_command_battle_shock_public_event_chain_is_identical_for_both_viewers",
+              "role": "viewer",
+              "assertion": "assert player_a_events == player_b_events",
+              "proves": "The full public Command shock event chain is identical for both viewers."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_shock_resolution.py:record_precomputed_battle_shock_result_events",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated",
+              "function_ast_sha256": "bf8011bc40f19d552d5ebdb4f1aa0571c50856a0457b89acb7998c8fdc553a25",
+              "assertions": [
+                "assert len(results) == 1",
+                "assert isinstance(result, dict)",
+                "assert isinstance(modified, dict)",
+                "assert isinstance(total, int)",
+                "assert isinstance(target, int)",
+                "assert result['passed'] is passed",
+                "assert (unit_id in state.battle_shocked_unit_ids) is (not passed)",
+                "assert state.command_step_state is not None",
+                "assert len(state.command_step_state.completed_battle_shock_test_request_ids) == 1",
+                "assert payloads(session, 'battle_shock_test_resolved') == results"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.03-example-three",
+          "summary": "Three-model full-strength but shocked example requires a roll.",
+          "source_blocks": [
+            6
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_examples.py::test_constructed_three_model_full_strength_shocked_example"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_examples.py::test_constructed_three_model_full_strength_shocked_example",
+              "function_ast_sha256": "4c7c86b3870d349948f2baf602a6339fa04183184e2db243334b8022d161b673",
+              "assertions": [
+                "assert requests(state) == ()",
+                "assert request.below_half_strength_context.starting_model_count == 3",
+                "assert request.below_half_strength_context.current_model_count == 3",
+                "assert not request.below_half_strength_context.is_at_or_below_half_strength"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.03-example-ten",
+          "summary": "Ten models reduced to five require a roll.",
+          "source_blocks": [
+            7
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons",
+              "function_ast_sha256": "b72fae2b945141ee135a123d9aa748a6ef240bae46d9b6c83df58e7e0778376a",
+              "assertions": [
+                "assert len(actual) == int(required or shocked)",
+                "assert len(inventory) == 1",
+                "assert inventory[0].is_battle_shocked is shocked",
+                "assert inventory[0].below_half_strength_context.is_at_or_below_half_strength is required",
+                "assert state.to_payload() == before",
+                "assert actual[0].reason is BattleShockTestReason.COMMAND_PHASE_REQUIRED",
+                "assert actual[0].unit_instance_id == next((a for a in state.army_definitions if a.player_id == 'owner')).units[0].unit_instance_id"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.03-example-five",
+          "summary": "Five models reduced to two require a roll.",
+          "source_blocks": [
+            8
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_battle_shock.py::test_native_model_strength_and_existing_shock_are_independent_eligibility_reasons",
+              "function_ast_sha256": "b72fae2b945141ee135a123d9aa748a6ef240bae46d9b6c83df58e7e0778376a",
+              "assertions": [
+                "assert len(actual) == int(required or shocked)",
+                "assert len(inventory) == 1",
+                "assert inventory[0].is_battle_shocked is shocked",
+                "assert inventory[0].below_half_strength_context.is_at_or_below_half_strength is required",
+                "assert state.to_payload() == before",
+                "assert actual[0].reason is BattleShockTestReason.COMMAND_PHASE_REQUIRED",
+                "assert actual[0].unit_instance_id == next((a for a in state.army_definitions if a.player_id == 'owner')).units[0].unit_instance_id"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.03-example-eleven",
+          "summary": "Eleven-wound single Vehicle at three wounds requires a roll.",
+          "source_blocks": [
+            9
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_examples.py::test_constructed_eleven_wound_vehicle_at_three_wounds_example"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_examples.py::test_constructed_eleven_wound_vehicle_at_three_wounds_example",
+              "function_ast_sha256": "d96ffee8f4645881c780cd93e7bcd969a13d81545402c355f900afb88399461d",
+              "assertions": [
+                "assert context.starting_model_count == 1",
+                "assert context.single_model_starting_wounds == 11",
+                "assert context.single_model_wounds_remaining == 3",
+                "assert context.is_below_half_strength"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "classification": "example",
+          "reason": "Illustrated strength and current-shock examples restate the preceding eligibility rules."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:08:08.03.01:1",
+      "locator": "08.03.01",
+      "title": "Multiple Battle-shock Rolls",
+      "source_sha256": "7ecffe0dd59daf922baabed6c01a06ad8045680068e1675c5e446cb4d2347c98",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "acd8e602e7cb5702f1f7fdf48718393c4ca374287d19d5ad15caf56a9f132042",
+          "value": "In the Battle-shock step (08.03), unless otherwise stated, no more than one \u0005battle-shock roll\u0006 can be made by each unit. If for any reason a unit must make a \u0005battle-shock roll\u0006 in this step before one it is required to make for being battle-shocked or at or below \u0005half-strength\u0006, that unit does not also have to make the \u0005battle-shock roll\u0006 for being battle-shocked or at or below \u0005half-strength\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "08.03.01-one-per-step",
+          "summary": "A forced battle-shock test suppresses the otherwise required test for the same unit in that step unless explicitly overridden.",
+          "source_blocks": [
+            1
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase11c_command_phase.py::test_below_starting_strength_forced_test_suppresses_duplicate_below_half",
+              "role": "semantic",
+              "assertion": "assert [request.reason for request in suppressed] == [BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED]",
+              "proves": "The forced candidate is the sole default test."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_shock.py:collect_battle_shock_test_requests",
+            "src/warhammer40k_core/engine/battle_shock_resolution.py:record_precomputed_battle_shock_result_events",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_battle_shock.py::test_forced_test_suppresses_core_roll_unless_explicitly_overridden",
+            "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_battle_shock.py::test_forced_test_suppresses_core_roll_unless_explicitly_overridden",
+              "function_ast_sha256": "58978d66c037ae5b382add70ff55ef0aa0d7a499b70f4a3658f79f38bec9a7db",
+              "assertions": [
+                "assert sorted((r.reason for r in actual)) == sorted(expected)",
+                "assert len({r.request_id for r in actual}) == len(actual)"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_shock_completion.py::test_required_roll_clears_start_shock_only_on_success_and_is_not_repeated",
+              "function_ast_sha256": "bf8011bc40f19d552d5ebdb4f1aa0571c50856a0457b89acb7998c8fdc553a25",
+              "assertions": [
+                "assert len(results) == 1",
+                "assert isinstance(result, dict)",
+                "assert isinstance(modified, dict)",
+                "assert isinstance(total, int)",
+                "assert isinstance(target, int)",
+                "assert result['passed'] is passed",
+                "assert (unit_id in state.battle_shocked_unit_ids) is (not passed)",
+                "assert state.command_step_state is not None",
+                "assert len(state.command_step_state.completed_battle_shock_test_request_ids) == 1",
+                "assert payloads(session, 'battle_shock_test_resolved') == results"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:08:08.04:1",
+      "locator": "08.04",
+      "title": "Command Abilities",
+      "source_sha256": "25170c06b4590dca580a82ac677a82d9d1f47a31480692db67138540a12b212a",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "2acea44182950f156926183480a98cda0d66a7d0391b7b6d164b84495398779c",
+          "value": "Rules that are triggered in the Command phase (excluding those that are triggered at the start or end of this phase, when gaining Core CP, or by \u0005battle-shock rolls\u0006) are resolved now."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "08.04-ability-window",
+          "summary": "Resolve unqualified Command-phase abilities in the Command-abilities step, excluding distinct start/end/CP/battle-shock timings.",
+          "source_blocks": [
+            1
+          ],
+          "status": "semantic assertions; outcomes in validation.json",
+          "retained_prior_qualifications": [
+            "Gameplay gap: the supported unqualified Command-phase RuleIR fixture has no registered consumer and the real facade reaches Movement without executing its effect; the otherwise-identical explicit start-of-Command control executes once. The pinned gap_observations_timing.json and tests/order97_gap_probes_timing.py isolate the missing Command-body registration without claiming named faction support. Add the shared body-step consumer and verify its position after CP/Battle-shock and before end-phase effects."
+          ],
+          "prior_evidence": [],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py:CatalogCommandPointRuntime",
+            "src/warhammer40k_core/engine/lifecycle.py:GameLifecycle.submit_decision",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+            "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+              "function_ast_sha256": "c9da1d64268960dcce197302416a449bfbeb6c865fc27bcc7ae36f4dc5d605b1",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert state.command_point_total('owner') == (2 if active == 'owner' else 1)",
+                "assert state.command_point_total('opponent') == 1",
+                "assert core < shock < types.index('battle_phase_completed')",
+                "assert payloads(session, 'catalog_ir_command_point_phase_gain_resolved') == gains",
+                "assert request is not None",
+                "assert request.decision_type == 'submit_stratagem_target_proposal'",
+                "assert gains[0]['source_rule_id'] == 'constructed:section08:timing:0'",
+                "assert gains[0]['passed'] is True",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert effect < core",
+                "assert shock < effect < types.index('battle_phase_completed')",
+                "assert isinstance(event.payload, dict)",
+                "assert isinstance(window, dict)",
+                "assert isinstance(descriptor, dict)",
+                "assert shock < body < effect < end",
+                "assert body < end < effect"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_pending_body_order_rejects_stale_wrong_actor_and_then_continues",
+              "function_ast_sha256": "6a7a29372d61ef195383813b11258a08c75d8dba5243bc35eb7cffe63b67e370",
+              "assertions": [
+                "assert request is not None",
+                "assert request.decision_type == SEQUENCING_DECISION_TYPE",
+                "assert not payloads(session, 'catalog_ir_command_point_phase_gain_resolved')",
+                "assert state.command_step_state is not None",
+                "assert state.command_step_state.battle_shock_step_resolved",
+                "assert (state.to_payload(), session.lifecycle.decision_controller.to_payload()) == before",
+                "assert [g['source_rule_id'] for g in gains] == ['constructed:section08:timing:1', 'constructed:section08:timing:0', 'constructed:section08:timing:2']",
+                "assert state.current_battle_phase is BattlePhase.MOVEMENT",
+                "assert request is not None"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:08:08.05:1",
+      "locator": "08.05",
+      "title": "End of Command Phase",
+      "source_sha256": "db92b5126df30b1378ae6be554d47cacee95a1960bd0b6bf8619decf6ef304dc",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "11e600ccdf406b6fe3eab995c7249b39228ad0663b38750474f31fd70d1a4405",
+          "value": "Rules that are triggered at the end of the Command phase are resolved now, in the following order:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "4daa9aaf753cfe6b251b75f939e286d4a3e64b631ac0b592a47c360741fbcd16",
+          "value": "\u00051\u0006. First resolve rules triggered at this point other than mission rules."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "abe8a15b9c744964daf9326485ef2f7b0cc7c892966b16ef7f30e6f47a210193",
+          "value": "\u00052\u0006. Both players then consult their mission; if one or both players have achieved any aspects of their mission that are triggered at this point, resolve them now."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "08.05-nonmission",
+          "summary": "Resolve non-mission end-of-Command-phase rules first.",
+          "source_blocks": [
+            2
+          ],
+          "status": "resolved SF08-001; component continuation and selected native mission scoring/recovery",
+          "retained_prior_qualifications": [
+            "This proves a non-empty source effect at the selected edge; relative mission precedence additionally uses ordering evidence."
+          ],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase14b_timing_cutover.py::test_phase14b_end_phase_effects_expire_before_mission_objective_scoring",
+              "role": "semantic",
+              "assertion": "assert state.persisting_effects == []",
+              "proves": "The non-mission expiration executes before the recorded mission control boundary."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_timing_evidence.py::test_loaded_command_boundary_rule_repeats_on_its_owners_turn_each_round",
+              "role": "facade",
+              "assertion": "assert len(resolved) == 3, resolved",
+              "proves": "A source-loaded CP rule executes at its Command start/end window in three successive own turns through the facade."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow",
+            "src/warhammer40k_core/engine/boundary_sequencing.py:boundary_context",
+            "src/warhammer40k_core/engine/catalog_command_point_runtime.py:CatalogCommandPointRuntime",
+            "src/warhammer40k_core/engine/phases/command.py:CommandPhaseHandler",
+            "src/warhammer40k_core/engine/sequencing.py:eligible_sequencing_participants",
+            "src/warhammer40k_core/engine/primary_scoring_boundary_lifecycle.py:_pending_window_decision_types",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+            "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission",
+            "tests/rules/section08/test_end_priority.py::test_native_command_end_finishes_loaded_rules_before_actual_mission_scoring",
+            "tests/rules/section08/test_end_priority.py::test_command_mission_exception_is_confined_to_its_source_boundary"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_command_flow.py::test_source_compiled_effect_runs_only_in_its_own_command_window",
+              "function_ast_sha256": "c9da1d64268960dcce197302416a449bfbeb6c865fc27bcc7ae36f4dc5d605b1",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert state.command_point_total('owner') == (2 if active == 'owner' else 1)",
+                "assert state.command_point_total('opponent') == 1",
+                "assert core < shock < types.index('battle_phase_completed')",
+                "assert payloads(session, 'catalog_ir_command_point_phase_gain_resolved') == gains",
+                "assert request is not None",
+                "assert request.decision_type == 'submit_stratagem_target_proposal'",
+                "assert gains[0]['source_rule_id'] == 'constructed:section08:timing:0'",
+                "assert gains[0]['passed'] is True",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert effect < core",
+                "assert shock < effect < types.index('battle_phase_completed')",
+                "assert isinstance(event.payload, dict)",
+                "assert isinstance(window, dict)",
+                "assert isinstance(descriptor, dict)",
+                "assert shock < body < effect < end",
+                "assert body < end < effect"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission",
+              "function_ast_sha256": "aeae381fe9ede25acea8c376bcda7b9c74c19729686725e98a41e75740c869bd",
+              "assertions": [
+                "assert offered == {f'next:player:{active}'}",
+                "assert observed == [f'player:{active}', f'player:{other}', f'mission:{active}', f'mission:{other}']",
+                "assert len(request.options) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_end_priority.py::test_native_command_end_finishes_loaded_rules_before_actual_mission_scoring",
+              "function_ast_sha256": "4a50c79e48448eb73929c75019c4aad0005fe8d675b06afdf9afdb6686346929",
+              "assertions": [
+                "assert request is not None",
+                "assert request.decision_type == 'resolve_sequencing_order'",
+                "assert request.actor_id == active",
+                "assert len(request.options) == 2",
+                "assert not s.state.sticky_objective_control_states",
+                "assert all((s.state.victory_point_ledger_for_player(p).victory_points == 0 for p in s.state.player_ids))",
+                "assert isinstance(request.payload, dict)",
+                "assert isinstance(participants, list)",
+                "assert len(participants) == 2",
+                "assert session.lifecycle.to_payload() == before_authority",
+                "assert session.lifecycle.to_payload() == before",
+                "assert session.to_persistence_payload() == checkpoint",
+                "assert session.lifecycle.to_payload() == restored.lifecycle.to_payload()",
+                "assert session.lifecycle.to_payload() == fork.lifecycle.to_payload() == clean.lifecycle.to_payload()",
+                "assert isinstance(participant, dict)",
+                "assert participant['origin'] == 'player'",
+                "assert participant['source_rule_id'] == STICKY_SOURCE_ID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending == request",
+                "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+                "assert session.view(viewer_player_id=viewer) == restored.view(viewer_player_id=viewer)",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer) == restored.events_since(EventStreamCursor(), viewer_player_id=viewer)"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_end_priority.py::test_command_mission_exception_is_confined_to_its_source_boundary",
+              "function_ast_sha256": "0dbe7421b58bfd4d3b7ac4e4ec232c028d623012aa068ee6795892b49a7bcc1f",
+              "assertions": [
+                "assert context.sequence_exception_source_id == expected",
+                "assert SequencingConflictContext.from_payload(context.to_payload()) == context",
+                "assert [option.option_id for option in request.options] == (['next:opposing-optional'] if expected is not None else ['next:automatic-mission'])"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "08.05-mission",
+          "summary": "Resolve both players' achieved end-of-Command-phase mission rules after non-mission rules.",
+          "source_blocks": [
+            3
+          ],
+          "status": "resolved SF08-001; component continuation and selected native mission scoring/recovery",
+          "retained_prior_qualifications": [
+            "This proves a non-empty source effect at the selected edge; relative mission precedence additionally uses ordering evidence."
+          ],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase14b_timing_cutover.py::test_phase14b_end_phase_effects_expire_before_mission_objective_scoring",
+              "role": "semantic",
+              "assertion": "assert state.objective_control_records[-1].timing.value == 'phase_end'",
+              "proves": "Mission objective control is determined at the phase-end boundary after expiration."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_timing_evidence.py::test_loaded_command_boundary_rule_repeats_on_its_owners_turn_each_round",
+              "role": "facade",
+              "assertion": "assert len(resolved) == 3, resolved",
+              "proves": "A source-loaded CP rule executes at its Command start/end window in three successive own turns through the facade."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/boundary_sequencing.py:boundary_context",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request",
+            "src/warhammer40k_core/engine/sequencing.py:eligible_sequencing_participants",
+            "src/warhammer40k_core/engine/primary_scoring_boundary_lifecycle.py:_pending_window_decision_types",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission",
+            "tests/rules/section08/test_end_priority.py::test_both_mission_owners_can_continue_after_nonmission_occurrences_are_exhausted",
+            "tests/rules/section08/test_end_priority.py::test_native_command_end_finishes_loaded_rules_before_actual_mission_scoring",
+            "tests/rules/section08/test_end_priority.py::test_command_mission_exception_is_confined_to_its_source_boundary"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission",
+              "function_ast_sha256": "aeae381fe9ede25acea8c376bcda7b9c74c19729686725e98a41e75740c869bd",
+              "assertions": [
+                "assert offered == {f'next:player:{active}'}",
+                "assert observed == [f'player:{active}', f'player:{other}', f'mission:{active}', f'mission:{other}']",
+                "assert len(request.options) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_end_priority.py::test_both_mission_owners_can_continue_after_nonmission_occurrences_are_exhausted",
+              "function_ast_sha256": "3b6d177b43c087516d24cd63acded536954707e896fe7cfbb788c2524d0bef3d",
+              "assertions": [
+                "assert observed == [f'mission:{active}', f'mission:{other}']",
+                "assert len(request.options) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_end_priority.py::test_native_command_end_finishes_loaded_rules_before_actual_mission_scoring",
+              "function_ast_sha256": "4a50c79e48448eb73929c75019c4aad0005fe8d675b06afdf9afdb6686346929",
+              "assertions": [
+                "assert request is not None",
+                "assert request.decision_type == 'resolve_sequencing_order'",
+                "assert request.actor_id == active",
+                "assert len(request.options) == 2",
+                "assert not s.state.sticky_objective_control_states",
+                "assert all((s.state.victory_point_ledger_for_player(p).victory_points == 0 for p in s.state.player_ids))",
+                "assert isinstance(request.payload, dict)",
+                "assert isinstance(participants, list)",
+                "assert len(participants) == 2",
+                "assert session.lifecycle.to_payload() == before_authority",
+                "assert session.lifecycle.to_payload() == before",
+                "assert session.to_persistence_payload() == checkpoint",
+                "assert session.lifecycle.to_payload() == restored.lifecycle.to_payload()",
+                "assert session.lifecycle.to_payload() == fork.lifecycle.to_payload() == clean.lifecycle.to_payload()",
+                "assert isinstance(participant, dict)",
+                "assert participant['origin'] == 'player'",
+                "assert participant['source_rule_id'] == STICKY_SOURCE_ID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending == request",
+                "assert replay.status is ReplayRunStatus.REPRODUCED, replay",
+                "assert session.view(viewer_player_id=viewer) == restored.view(viewer_player_id=viewer)",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer) == restored.events_since(EventStreamCursor(), viewer_player_id=viewer)"
+              ]
+            },
+            {
+              "node": "tests/rules/section08/test_end_priority.py::test_command_mission_exception_is_confined_to_its_source_boundary",
+              "function_ast_sha256": "0dbe7421b58bfd4d3b7ac4e4ec232c028d623012aa068ee6795892b49a7bcc1f",
+              "assertions": [
+                "assert context.sequence_exception_source_id == expected",
+                "assert SequencingConflictContext.from_payload(context.to_payload()) == context",
+                "assert [option.option_id for option in request.options] == (['next:opposing-optional'] if expected is not None else ['next:automatic-mission'])"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "context",
+          "reason": "Introduces the ordered end-of-Command-phase rule groups."
+        }
+      ]
+    }
+  ],
+  "authenticated_inputs": {
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/08.json": "d1673f3d7881ac6d9c4286f927dcd0a47b7ceaf092e92f76b8032c6283675a9c",
+    "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+    "data/source_audits/v963_shock/captures/core-page.js": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026"
+  },
+  "unadopted_gaps": [],
+  "qualifications": [
+    "Retained timestamped maintained mirror, not independently authenticated official App/GW publication or a new live observation.",
+    "The old 08.00-step-6/08.04 gameplay-gap qualifications are historical. Current Command-body effect tests exercise the later production consumer; no source record is rewritten.",
+    "All timing effects use compiled constructed source text on supported native Lord Exultant bodies, with the real catalog CP runtime and production hook builders; they do not certify native named faction activation or every Command ability family.",
+    "CP spend starts at the ordinary ledger owner; Section15 owns complete stratagem targeting/cost/effect behavior.",
+    "Three-model and eleven-wound numerical examples are explicitly constructed boundary contracts on native models, not supported roster/datasheet admissions.",
+    "Attached boundary formation starts after attachment; no native roster/attachment admission claim.",
+    "Forced-test suppression and explicit duplicate permission are tested at the real request collector; native ability acquisition of an override is not established.",
+    "Retained adopted source evidence only; no fresh App/GW observation or source recertification. Native provider admission is selected component execution with non-strict small rosters, a post-setup round-two checkpoint and open fixture terrain; no complete army/setup/full-game certificate.",
+    "Exact CP-triggered and Battle-shock-triggered ability execution is owned by those source-specific consumers; this corpus proves distinct start/body/end windows and required-roll effects, not every triggering ability.",
+    "Original facade completion tests use an immutable mission for objective-control preflight. Added native Command-end cases explicitly cover actual selected mission scoring, loaded sticky rules, recovery and bounded exact replay from a post-setup component checkpoint.",
+    "Bounded fresh graph/catalog mutation checks and cross-platform matching do not establish universal order independence or full-game correctness."
+  ],
+  "faq_ownership": {
+    "reviewed_current_faq_count": 64,
+    "locally_owned": [],
+    "cross_references": [
+      {
+        "faq": 50,
+        "id": "421a6f30-63e2-4e1f-b352-99b643637c53",
+        "question": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+        "answer": "No, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+        "owner": "01",
+        "test": "tests/rules/section01/test_01_06_07_morale.py::test_01_06_07_inclusive_roll_and_failed_unit_model_restrictions",
+        "reason": "Battle-shocked friendly units cannot be targeted by their controller's Stratagems. Insane Bravery remains Section01-owned; Section08 cross-reference only."
+      },
+      {
+        "faq": 16,
+        "id": "bbe268a2-b1fd-43ab-8b24-fd4363730c3f",
+        "question": "If a unit becomes battle-shocked after starting an action does it stop performing that action?",
+        "answer": "Yes",
+        "owner": "01",
+        "reason": "Battle-shock interrupts Actions; existing Section01 action owner, linked from required-roll outcomes."
+      },
+      {
+        "faq": 17,
+        "id": "4c654d00-318d-4665-9e46-26cfab179a29",
+        "question": "If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action?",
+        "answer": "Yes",
+        "owner": "01",
+        "reason": "Explicit shocked-Action permission; existing Section01 action owner."
+      },
+      {
+        "faq": 36,
+        "id": "7a982686-03ff-4565-8d5a-2549e5650268",
+        "question": "After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available?",
+        "answer": "Yes.",
+        "owner": "15",
+        "reason": "Increased Stratagem costs require continuation when affordable; ordinary CP resource cross-reference only."
+      },
+      {
+        "faq": 42,
+        "id": "beaeca32-9701-45f7-9461-879d8ae3d78f",
+        "question": "After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens?",
+        "answer": "No CP are spent and that stratagem's effects are not resolved (but that stratagem still counts as having been used this phase).",
+        "owner": "15",
+        "reason": "Unaffordable increased Stratagem cost spends no CP; Section15 owns complete cost/effect behavior."
+      },
+      {
+        "faq": 45,
+        "id": "e43402db-7c49-4cd6-acf7-fa6cac83acb0",
+        "question": "If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier?",
+        "answer": "No, a stratagem that costs 1CP and is making use of an optional +1CP section has an original cost of 2CP.",
+        "owner": "15",
+        "reason": "Optional additional Stratagem costs are original costs; not a separate Core CP resource."
+      },
+      {
+        "faq": 52,
+        "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+        "question": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+        "answer": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead).",
+        "owner": "01",
+        "reason": "Embarked ability spatial restrictions remain owned by Section01; Section18 separately owns the Firing Deck sub-obligation."
+      }
+    ]
+  },
+  "sf08_resolution": {
+    "status": "resolved in bounded candidate; fresh independent review required",
+    "date_utc": "2026-10-20",
+    "invariant": "At Command END_PHASE all non-mission rules of both players precede every mission rule. Other phase/start priorities retain their existing source policy.",
+    "before": "Exactly four original variants reproduce premature active mission offering at the shared builder. Native loaded Tormentors rules already finish before actual Command mission scoring; no premature native VP was observed.",
+    "native_reachability": "Chapter Approved 2026-27 Immovable Object/Unstoppable Force and loaded Tormentors Objective Defiled coexist at round-two Command end. Discovery emits two sticky player candidates and no mission candidate. Mission scoring commits later during phase advancement. The constructed four-participant overlap is not the shape of this selected native boundary.",
+    "repair": "SequencingConflictContext derives retained rule:08:08.05:1 only for Command END_PHASE. Native non-mission sequencing is additionally admitted to the existing Primary pending family; full batch/source/queue/event authority remains enforced.",
+    "native_recovery_defect": "Pre-fix save/restore of the engine-generated sticky ordering request rejected resolve_sequencing_order under turn_end_faction_rule_required. Missing family admission is repaired at the shared validator.",
+    "original_four_cases": "All remain enabled with the original first-offer assertion and complete four-participant continuation; both active players and input orders pass.",
+    "native_test": "tests/rules/section08/test_end_priority.py::test_native_command_end_finishes_loaded_rules_before_actual_mission_scoring",
+    "native_outcome": "Two loaded sticky mutations precede one actual active-player transaction: owner 5 VP, opponent 4 VP; other player 0 VP. Live/restored/fork/clean branches and 16 exact replays agree across four native variants.",
+    "negative_controls": "Wrong owner, stale request, malformed payload, invented early mission option and expired phase reject before whole-lifecycle mutation. Direct domain validation rejects wrong family and missing provenance. Legal continuation succeeds afterward.",
+    "qualification": "Retained adopted source evidence only; no fresh App/GW observation or source recertification. Native provider admission is selected component execution with non-strict small rosters, a post-setup round-two checkpoint and open fixture terrain; no complete army/setup/full-game certificate.",
+    "evidence": "task-20/checkpoint/REPORT.txt and task-20/evidence: baseline-four-relocated, native-maintained-before2, native-pending-before.json, repaired-focused, scoped-final",
+    "prior_corpus": "3495 pass/4 SF08 fail and 55.90998592% combined coverage remain historical complete-corpus measurements of cc06a27c...3115. This bounded repair neither replaces that run nor establishes the global 85% gate."
+  }
+}

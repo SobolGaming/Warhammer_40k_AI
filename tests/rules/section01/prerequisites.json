@@ -1,0 +1,48 @@
+{
+  "native_definitions": [
+    {
+      "datasheet_id": "000004080",
+      "name": "Infractors"
+    },
+    {
+      "datasheet_id": "000004078",
+      "name": "Lord Exultant"
+    },
+    {
+      "datasheet_id": "000004090",
+      "name": "Chaos Spawn"
+    },
+    {
+      "datasheet_id": "000000593",
+      "name": "Dire Avengers"
+    },
+    {
+      "datasheet_id": "000000968",
+      "name": "Maulerfiend"
+    },
+    {
+      "datasheet_id": "000000599",
+      "name": "Wave Serpent"
+    }
+  ],
+  "fixture_limitations": [
+    {
+      "datasheet_id": "000004093",
+      "name": "Emperor's Children Rhino",
+      "observation": "Selected catalog preparation rejects missing representative-height override.",
+      "disposition": "No geometry/provider expansion. Use the already supported native Wave Serpent definition with explicitly labelled Core cargo contracts; no native faction embark permission certification."
+    }
+  ],
+  "constructed_contracts": [
+    "Parsed Core text for effect lifetimes, target allegiance/other/indefinite scope, optional frequency, and Stealth grants.",
+    "Explicit Core attached formations over unchanged native bodies, including Leader and Support return roles; no native attachment legality claim.",
+    "Explicit Core capacity/embark records over native Wave Serpent and native bodies; not faction-specific Transport permission integration.",
+    "Typed presence restriction and unconditional Action permission contracts; parser support for their prose is not claimed.",
+    "Faction/detachment/enhancement/datasheet source-category contracts to the real player-owned catalog index and executor.",
+    "Pure Core geometry contracts for circle, FRAME, overhang, objective goals and path evidence; no native model geometry altered.",
+    "Core timing scopes, sequencing participants, trigger batches and zero-VP Action identity; no full mission setup.",
+    "Explicit automatic-hit weapon contract at the production hit-to-wound owner; native weapon remains unchanged.",
+    "Dice/value boundary examples passed to real owners, including assigned values beyond a physical D6."
+  ],
+  "scope": "These categories are explicit test inputs, not a count of native source-backed integrations. No source catalog or geometry support changed."
+}

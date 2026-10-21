@@ -1,17 +1,39 @@
 {
   "files": {
+    "tests/factions/adeptus_custodes/unit/test_adeptus_custodes_army_rule.py": 7.399,
+    "tests/factions/aeldari/unit/test_aeldari_army_rule.py": 23.481,
+    "tests/factions/aeldari/unit/test_aspect_shrine_tokens.py": 24.349,
+    "tests/factions/aeldari/unit/test_battle_focus_consumers.py": 32.612,
     "tests/factions/aeldari/unit/test_generic_rule_ability_registry.py": 0.93,
+    "tests/factions/aeldari/unit/test_unit_abilities.py": 43.362,
     "tests/factions/black_templars/unit/test_black_templars_army_rule.py": 3.701,
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py": 29.832,
+    "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py": 23.91,
+    "tests/factions/chaos_daemons/unit/test_bloodcrushers_reserves.py": 1.513,
+    "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py": 48.53,
     "tests/factions/chaos_daemons/unit/test_generic_ir_support_validation.py": 0.001,
     "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py": 2.334,
     "tests/factions/chaos_daemons/unit/test_source_overlays.py": 1.198,
     "tests/factions/chaos_space_marines/unit/test_source_overlays.py": 0.051,
+    "tests/factions/death_guard/unit/test_death_guard_army_rule.py": 7.943,
     "tests/factions/emperors_children/integration/test_ws14_generic_ir_lifecycle.py": 11.42,
+    "tests/factions/emperors_children/test_selected_consumers.py": 117.772,
+    "tests/factions/emperors_children/test_shared_attack_consumers.py": 197.285,
     "tests/factions/emperors_children/unit/test_generic_rule_ability_registry.py": 0.239,
     "tests/factions/emperors_children/unit/test_runtime_consumer_evidence.py": 46.725,
+    "tests/factions/grey_knights/unit/test_grey_knights_army_rule.py": 7.701,
+    "tests/factions/leagues_of_votann/unit/test_leagues_of_votann_army_rule.py": 7.881,
+    "tests/factions/necrons/unit/test_necrons_army_rule.py": 18.914,
     "tests/factions/orks/integration/test_ws14_generic_ir_lifecycle.py": 43.216,
+    "tests/factions/orks/unit/test_orks_army_rule.py": 6.537,
+    "tests/factions/tau_empire/unit/test_tau_empire_army_rule.py": 14.844,
     "tests/factions/thousand_sons/unit/test_source_overlays.py": 0.286,
+    "tests/factions/tyranids/unit/test_tyranids_army_rule.py": 33.967,
+    "tests/factions/world_eaters/unit/test_blessings_gameplay.py": 10.414,
+    "tests/factions/world_eaters/unit/test_icon_gameplay.py": 2.268,
+    "tests/factions/world_eaters/unit/test_icon_of_khorne.py": 2.509,
+    "tests/factions/world_eaters/unit/test_total_carnage_gameplay.py": 5.243,
+    "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": 15.339,
     "tests/infrastructure/adapters/unit/test_session_commands.py": 210.338,
     "tests/infrastructure/decisions/unit/test_opportunity_windows.py": 0.664,
     "tests/infrastructure/decisions/unit/test_physical_proposal_prevalidation.py": 271.198,
@@ -110,6 +132,293 @@
     "tests/rules/rules24/unit/test_prebattle.py": 5.845,
     "tests/rules/rules24/unit/test_return_on_death.py": 0.74,
     "tests/rules/rules24/unit/test_tracked_targets.py": 1.43,
+    "tests/rules/section00/test_conversion.py": 29.35,
+    "tests/rules/section00/test_facade.py": 7.135,
+    "tests/rules/section00/test_inventory.py": 0.141,
+    "tests/rules/section01/test_01_02_attached.py": 1.677,
+    "tests/rules/section01/test_01_02_attached_return.py": 0.015,
+    "tests/rules/section01/test_01_02_aura.py": 0.037,
+    "tests/rules/section01/test_01_02_cargo_return.py": 0.018,
+    "tests/rules/section01/test_01_02_effects.py": 0.085,
+    "tests/rules/section01/test_01_02_group.py": 0.013,
+    "tests/rules/section01/test_01_02_presence.py": 0.131,
+    "tests/rules/section01/test_01_02_revival.py": 0.043,
+    "tests/rules/section01/test_01_02_revival_geometry.py": 0.004,
+    "tests/rules/section01/test_01_02_split.py": 0.034,
+    "tests/rules/section01/test_01_02_strength.py": 0.037,
+    "tests/rules/section01/test_01_02_tokens.py": 0.007,
+    "tests/rules/section01/test_01_02_unrestricted.py": 0.042,
+    "tests/rules/section01/test_01_03_batches.py": 0.004,
+    "tests/rules/section01/test_01_03_ownership.py": 0.03,
+    "tests/rules/section01/test_01_03_stratagem_ownership.py": 0.01,
+    "tests/rules/section01/test_01_03_timing.py": 0.051,
+    "tests/rules/section01/test_01_04_contact_lifetime.py": 0.146,
+    "tests/rules/section01/test_01_04_contact_movement.py": 0.017,
+    "tests/rules/section01/test_01_04_measurement.py": 0.008,
+    "tests/rules/section01/test_01_04_movement.py": 0.154,
+    "tests/rules/section01/test_01_04_units.py": 0.034,
+    "tests/rules/section01/test_01_05_choice.py": 0.02,
+    "tests/rules/section01/test_01_05_dice.py": 0.018,
+    "tests/rules/section01/test_01_05_results.py": 0.018,
+    "tests/rules/section01/test_01_06_07_morale.py": 0.023,
+    "tests/rules/section01/test_01_06_leadership.py": 0.009,
+    "tests/rules/section01/test_01_07_actions.py": 0.013,
+    "tests/rules/section01/test_coverage_map.py": 0.121,
+    "tests/rules/section01/test_integration_roundtrip.py": 0.007,
+    "tests/rules/section02/test_02_01_identity.py": 1.82,
+    "tests/rules/section02/test_02_02_01_modifiers.py": 0.084,
+    "tests/rules/section02/test_02_02_01_weapon_scope.py": 0.005,
+    "tests/rules/section02/test_02_02_02_ignore_modifiers.py": 0.014,
+    "tests/rules/section02/test_02_02_02_native_permission.py": 0.061,
+    "tests/rules/section02/test_02_02_03_attack_generation.py": 0.047,
+    "tests/rules/section02/test_02_02_03_damage_timing.py": 0.172,
+    "tests/rules/section02/test_02_02_03_random_characteristics.py": 0.002,
+    "tests/rules/section02/test_02_02_04_healing.py": 0.023,
+    "tests/rules/section02/test_02_02_04_revival.py": 0.02,
+    "tests/rules/section02/test_02_02_constructed_contracts.py": 0.429,
+    "tests/rules/section02/test_02_02_profiles.py": 0.037,
+    "tests/rules/section02/test_02_03_01_nested.py": 5.555,
+    "tests/rules/section02/test_02_04_01_constructed_contract.py": 0.0,
+    "tests/rules/section02/test_02_04_live_consumers.py": 0.108,
+    "tests/rules/section02/test_02_04_weapons.py": 0.018,
+    "tests/rules/section02/test_02_05_keyword_consumers.py": 0.092,
+    "tests/rules/section02/test_02_05_keywords.py": 0.024,
+    "tests/rules/section02/test_02_06_equipment.py": 0.017,
+    "tests/rules/section02/test_coverage_map.py": 0.224,
+    "tests/rules/section03/test_cleanup.py": 1.802,
+    "tests/rules/section03/test_cleanup_mission.py": 0.15,
+    "tests/rules/section03/test_coherency.py": 0.013,
+    "tests/rules/section03/test_coverage_map.py": 0.086,
+    "tests/rules/section03/test_disembark_contracts.py": 0.027,
+    "tests/rules/section03/test_distance_rotation.py": 0.014,
+    "tests/rules/section03/test_engagement.py": 0.027,
+    "tests/rules/section03/test_facade.py": 1.185,
+    "tests/rules/section03/test_failed_setup_rights.py": 0.007,
+    "tests/rules/section03/test_if_able.py": 0.017,
+    "tests/rules/section03/test_isolation.py": 0.007,
+    "tests/rules/section03/test_large_deployment.py": 0.076,
+    "tests/rules/section03/test_large_reserve.py": 0.027,
+    "tests/rules/section03/test_movement_paths.py": 0.109,
+    "tests/rules/section03/test_overhang.py": 0.039,
+    "tests/rules/section03/test_redeploy.py": 0.06,
+    "tests/rules/section03/test_setup.py": 0.067,
+    "tests/rules/section03/test_terrain_and_budgets.py": 0.031,
+    "tests/rules/section04/test_allocation_and_effects.py": 1.785,
+    "tests/rules/section04/test_completion_boundaries.py": 0.393,
+    "tests/rules/section04/test_coverage_map.py": 0.144,
+    "tests/rules/section04/test_critical_faq.py": 0.207,
+    "tests/rules/section04/test_facade.py": 1.345,
+    "tests/rules/section04/test_fight_facade.py": 0.129,
+    "tests/rules/section04/test_grouping.py": 0.122,
+    "tests/rules/section04/test_isolation.py": 0.007,
+    "tests/rules/section04/test_melee.py": 0.11,
+    "tests/rules/section04/test_profiles_and_triggers.py": 0.699,
+    "tests/rules/section04/test_resolution_order.py": 1.793,
+    "tests/rules/section04/test_selection_contracts.py": 0.04,
+    "tests/rules/section04/test_targets.py": 0.06,
+    "tests/rules/section04/test_visibility.py": 0.066,
+    "tests/rules/section05/test_allocation_choices.py": 1.847,
+    "tests/rules/section05/test_coverage_map.py": 0.126,
+    "tests/rules/section05/test_critical_consumers.py": 0.031,
+    "tests/rules/section05/test_damage_timing.py": 0.062,
+    "tests/rules/section05/test_destroyed_measurement.py": 0.056,
+    "tests/rules/section05/test_destruction_credit.py": 0.039,
+    "tests/rules/section05/test_groups.py": 0.031,
+    "tests/rules/section05/test_isolation.py": 0.025,
+    "tests/rules/section05/test_post_roll.py": 0.092,
+    "tests/rules/section05/test_reaction_boundaries.py": 0.11,
+    "tests/rules/section05/test_retained_completion.py": 0.187,
+    "tests/rules/section05/test_retained_consumers.py": 0.093,
+    "tests/rules/section05/test_retained_stratagem.py": 0.039,
+    "tests/rules/section05/test_retention.py": 0.119,
+    "tests/rules/section05/test_rolls.py": 0.56,
+    "tests/rules/section05/test_saves.py": 0.095,
+    "tests/rules/section05/test_sequence.py": 0.185,
+    "tests/rules/section05/test_toughness.py": 0.013,
+    "tests/rules/section06/test_coverage_map.py": 0.084,
+    "tests/rules/section06/test_hazard.py": 1.744,
+    "tests/rules/section06/test_isolation_and_guards.py": 0.022,
+    "tests/rules/section06/test_mixed_damage.py": 0.117,
+    "tests/rules/section06/test_mortals.py": 0.121,
+    "tests/rules/section06/test_visibility.py": 3.909,
+    "tests/rules/section06/test_visibility_ownership.py": 0.204,
+    "tests/rules/section07/test_coverage_map.py": 0.148,
+    "tests/rules/section07/test_facade.py": 26.368,
+    "tests/rules/section07/test_isolation.py": 0.014,
+    "tests/rules/section07/test_mission_boundary.py": 2.391,
+    "tests/rules/section07/test_mission_order.py": 0.02,
+    "tests/rules/section07/test_out_of_phase.py": 0.043,
+    "tests/rules/section07/test_progression.py": 5.875,
+    "tests/rules/section07/test_round_effect.py": 0.055,
+    "tests/rules/section07/test_trigger_effects.py": 0.069,
+    "tests/rules/section08/test_battle_shock.py": 2.121,
+    "tests/rules/section08/test_command_flow.py": 7.565,
+    "tests/rules/section08/test_coverage_map.py": 0.411,
+    "tests/rules/section08/test_cp_resource.py": 0.04,
+    "tests/rules/section08/test_end_priority.py": 0.04,
+    "tests/rules/section08/test_examples.py": 0.009,
+    "tests/rules/section08/test_isolation.py": 0.136,
+    "tests/rules/section08/test_rules_units.py": 0.028,
+    "tests/rules/section08/test_shock_completion.py": 0.353,
+    "tests/rules/section09/test_coverage_map.py": 0.753,
+    "tests/rules/section09/test_distances.py": 13.363,
+    "tests/rules/section09/test_fall_back.py": 5.488,
+    "tests/rules/section09/test_focused_checkpoint.py": 29.268,
+    "tests/rules/section09/test_forced_escape.py": 2.039,
+    "tests/rules/section09/test_isolation.py": 0.126,
+    "tests/rules/section09/test_phase_flow.py": 3.476,
+    "tests/rules/section09/test_restrictions.py": 8.97,
+    "tests/rules/section09/test_selection.py": 11.972,
+    "tests/rules/section10/test_boundaries.py": 9.436,
+    "tests/rules/section10/test_coverage_map.py": 0.585,
+    "tests/rules/section10/test_indirect.py": 2.375,
+    "tests/rules/section10/test_isolation.py": 0.119,
+    "tests/rules/section10/test_mixed_integration.py": 0.647,
+    "tests/rules/section10/test_phase_flow.py": 0.385,
+    "tests/rules/section10/test_selection.py": 1.65,
+    "tests/rules/section10/test_shooting_types.py": 7.467,
+    "tests/rules/section11/test_boundaries.py": 14.181,
+    "tests/rules/section11/test_coverage_map.py": 0.412,
+    "tests/rules/section11/test_moves.py": 9.91,
+    "tests/rules/section11/test_phase_flow.py": 1.629,
+    "tests/rules/section11/test_physical.py": 5.611,
+    "tests/rules/section11/test_reactive.py": 2.046,
+    "tests/rules/section11/test_rolls.py": 6.453,
+    "tests/rules/section11/test_selection.py": 17.279,
+    "tests/rules/section12/test_attacks.py": 21.871,
+    "tests/rules/section12/test_consolidation.py": 18.286,
+    "tests/rules/section12/test_continuations.py": 6.114,
+    "tests/rules/section12/test_coverage_map.py": 1.227,
+    "tests/rules/section12/test_distance.py": 7.733,
+    "tests/rules/section12/test_movement.py": 37.561,
+    "tests/rules/section12/test_ownership.py": 19.314,
+    "tests/rules/section12/test_phase.py": 24.499,
+    "tests/rules/section12/test_retained_interactions.py": 0.074,
+    "tests/rules/section12/test_retained_presence.py": 2.273,
+    "tests/rules/section12/test_timing.py": 1.808,
+    "tests/rules/section13/test_consumers.py": 16.191,
+    "tests/rules/section13/test_coverage_map.py": 0.941,
+    "tests/rules/section13/test_hidden.py": 2.834,
+    "tests/rules/section13/test_movement.py": 0.478,
+    "tests/rules/section13/test_ownership.py": 0.095,
+    "tests/rules/section13/test_visibility.py": 0.377,
+    "tests/rules/section14/test_boundaries.py": 14.242,
+    "tests/rules/section14/test_control.py": 0.077,
+    "tests/rules/section14/test_coverage_map.py": 0.394,
+    "tests/rules/section14/test_faqs.py": 0.596,
+    "tests/rules/section14/test_goals.py": 0.015,
+    "tests/rules/section14/test_marker_axes.py": 2.051,
+    "tests/rules/section14/test_physical.py": 0.015,
+    "tests/rules/section14/test_range.py": 0.101,
+    "tests/rules/section14/test_scalar.py": 0.01,
+    "tests/rules/section14/test_secured.py": 1.069,
+    "tests/rules/section15/test_bravery_faq50.py": 10.899,
+    "tests/rules/section15/test_costs_faqs.py": 1.711,
+    "tests/rules/section15/test_coverage_map.py": 1.938,
+    "tests/rules/section15/test_epic.py": 7.008,
+    "tests/rules/section15/test_heroic_move.py": 1.05,
+    "tests/rules/section15/test_mortals.py": 10.882,
+    "tests/rules/section15/test_reactions.py": 9.464,
+    "tests/rules/section15/test_reroll.py": 12.123,
+    "tests/rules/section15/test_retained_faq49.py": 0.084,
+    "tests/rules/section15/test_smoke.py": 1.987,
+    "tests/rules/section15/test_snap_faqs.py": 1.236,
+    "tests/rules/section15/test_snap_range.py": 0.025,
+    "tests/rules/section15/test_static_refresh.py": 3.786,
+    "tests/rules/section15/test_target_guards.py": 11.241,
+    "tests/rules/section15/test_use.py": 0.09,
+    "tests/rules/section16/test_completion.py": 8.551,
+    "tests/rules/section16/test_coverage_map.py": 0.221,
+    "tests/rules/section16/test_eligibility.py": 0.249,
+    "tests/rules/section16/test_facade.py": 12.152,
+    "tests/rules/section16/test_faqs.py": 2.927,
+    "tests/rules/section16/test_movement.py": 14.059,
+    "tests/rules/section16/test_restrictions.py": 0.068,
+    "tests/rules/section16/test_source_limits_review.py": 5.145,
+    "tests/rules/section16/test_turn_end_review.py": 31.208,
+    "tests/rules/section17/test_blocker_ownership.py": 39.045,
+    "tests/rules/section17/test_coverage_map.py": 0.638,
+    "tests/rules/section17/test_frame.py": 10.864,
+    "tests/rules/section17/test_isolation.py": 2.53,
+    "tests/rules/section17/test_movement.py": 16.638,
+    "tests/rules/section17/test_shooting.py": 8.251,
+    "tests/rules/section18/test_attached.py": 8.893,
+    "tests/rules/section18/test_combat.py": 1.076,
+    "tests/rules/section18/test_coverage_map.py": 3.189,
+    "tests/rules/section18/test_disembark.py": 2.682,
+    "tests/rules/section18/test_embark.py": 1.361,
+    "tests/rules/section18/test_emergency.py": 1.365,
+    "tests/rules/section18/test_emergency_status.py": 1.7,
+    "tests/rules/section18/test_facade.py": 6.481,
+    "tests/rules/section18/test_faqs.py": 0.073,
+    "tests/rules/section18/test_formations.py": 0.032,
+    "tests/rules/section18/test_isolation.py": 0.169,
+    "tests/rules/section19/test_abilities.py": 2.328,
+    "tests/rules/section19/test_catalog_membership.py": 2.111,
+    "tests/rules/section19/test_coverage.py": 0.08,
+    "tests/rules/section19/test_destruction.py": 0.182,
+    "tests/rules/section19/test_facade.py": 8.487,
+    "tests/rules/section19/test_formation.py": 0.071,
+    "tests/rules/section19/test_identity.py": 0.089,
+    "tests/rules/section19/test_keywords.py": 0.031,
+    "tests/rules/section19/test_model_scope.py": 0.138,
+    "tests/rules/section19/test_retained_scope.py": 2.854,
+    "tests/rules/section19/test_scope_controls.py": 0.17,
+    "tests/rules/section19/test_table.py": 0.512,
+    "tests/rules/section19/test_toughness.py": 0.211,
+    "tests/rules/section20/test_cargo_attached.py": 9.079,
+    "tests/rules/section20/test_deadlines.py": 0.085,
+    "tests/rules/section20/test_declarations.py": 0.472,
+    "tests/rules/section20/test_facade.py": 12.981,
+    "tests/rules/section20/test_geometry.py": 0.211,
+    "tests/rules/section20/test_inventory.py": 0.078,
+    "tests/rules/section20/test_reposition.py": 4.685,
+    "tests/rules/section21/test_boundaries.py": 13.333,
+    "tests/rules/section21/test_clarifications.py": 8.637,
+    "tests/rules/section21/test_facade.py": 9.343,
+    "tests/rules/section21/test_flight.py": 0.688,
+    "tests/rules/section21/test_inventory.py": 0.167,
+    "tests/rules/section21/test_persistence.py": 28.689,
+    "tests/rules/section21/test_surge.py": 0.662,
+    "tests/rules/section21/test_terrain_facade.py": 21.892,
+    "tests/rules/section21/test_witness_admission.py": 5.335,
+    "tests/rules/section22/test_auras.py": 2.182,
+    "tests/rules/section22/test_catalog.py": 0.029,
+    "tests/rules/section22/test_damage.py": 0.04,
+    "tests/rules/section22/test_facade.py": 7.809,
+    "tests/rules/section22/test_inventory.py": 1.516,
+    "tests/rules/section22/test_plunging.py": 2.33,
+    "tests/rules/section22/test_psychic.py": 0.162,
+    "tests/rules/section22/test_wargear.py": 0.091,
+    "tests/rules/section23/test_combat.py": 2.059,
+    "tests/rules/section23/test_deployment_return.py": 5.718,
+    "tests/rules/section23/test_facade.py": 13.44,
+    "tests/rules/section23/test_inventory.py": 0.111,
+    "tests/rules/section23/test_movement.py": 1.635,
+    "tests/rules/section23/test_other_moves.py": 0.021,
+    "tests/rules/section23/test_shooting.py": 0.146,
+    "tests/rules/section23/test_transit.py": 0.076,
+    "tests/rules/section24/test_attachment_boundary.py": 2.11,
+    "tests/rules/section24/test_core_instances.py": 0.016,
+    "tests/rules/section24/test_damaged.py": 0.07,
+    "tests/rules/section24/test_facade.py": 7.96,
+    "tests/rules/section24/test_heavy.py": 7.71,
+    "tests/rules/section24/test_hit_wound_consumers.py": 0.197,
+    "tests/rules/section24/test_inventory.py": 3.833,
+    "tests/rules/section24/test_movement.py": 0.07,
+    "tests/rules/section24/test_native_core.py": 0.037,
+    "tests/rules/section24/test_one_shot.py": 0.005,
+    "tests/rules/section24/test_scout_boundary.py": 0.065,
+    "tests/rules/section24/test_targeting.py": 0.13,
+    "tests/rules/section24/test_weapon_instances.py": 0.045,
+    "tests/rules/section25/test_budgets.py": 0.436,
+    "tests/rules/section25/test_detachments.py": 0.025,
+    "tests/rules/section25/test_enhancements.py": 0.08,
+    "tests/rules/section25/test_facade.py": 73.877,
+    "tests/rules/section25/test_inventory.py": 0.927,
+    "tests/rules/section25/test_mfm.py": 0.014,
+    "tests/rules/section25/test_native.py": 16.424,
+    "tests/rules/section25/test_warlord_attachment.py": 0.029,
     "tests/unit/engine/test_catalog_post_shoot_runtime_validation.py": 3.843,
     "tests/unit/engine/test_catalog_rule_ir_classification.py": 16.786,
     "tests/unit/engine/test_catalog_weapon_ability_runtime_helpers.py": 2.114,
@@ -314,9 +623,7 @@
     "tests/unit/test_phase17e_faction_coverage.py": 6.703,
     "tests/unit/test_phase17f_faction_execution.py": 15.362,
     "tests/unit/test_phase17g_adepta_sororitas_army_rule.py": 10.984,
-    "tests/unit/test_phase17g_adeptus_custodes_army_rule.py": 0.883,
     "tests/unit/test_phase17g_adeptus_mechanicus_army_rule.py": 3.947,
-    "tests/unit/test_phase17g_aeldari_army_rule.py": 178.315,
     "tests/unit/test_phase17g_aeldari_corsair_coterie.py": 51.859,
     "tests/unit/test_phase17g_aeldari_path_of_the_outcast.py": 5.571,
     "tests/unit/test_phase17g_astra_militarum_army_rule.py": 27.505,
@@ -331,22 +638,14 @@
     "tests/unit/test_phase17g_chaos_daemons_warptide.py": 3.799,
     "tests/unit/test_phase17g_chaos_knights_army_rule.py": 43.878,
     "tests/unit/test_phase17g_chaos_space_marines_army_rule.py": 68.037,
-    "tests/unit/test_phase17g_death_guard_army_rule.py": 9.834,
     "tests/unit/test_phase17g_drukhari_army_rule.py": 43.035,
     "tests/unit/test_phase17g_emperors_children_army_rule.py": 77.733,
     "tests/unit/test_phase17g_fight_phase_start_hooks.py": 0.322,
     "tests/unit/test_phase17g_genestealer_cults_army_rule.py": 11.858,
-    "tests/unit/test_phase17g_grey_knights_army_rule.py": 8.445,
     "tests/unit/test_phase17g_imperial_knights_army_rule.py": 19.645,
-    "tests/unit/test_phase17g_leagues_of_votann_army_rule.py": 8.901,
-    "tests/unit/test_phase17g_necrons_army_rule.py": 15.679,
-    "tests/unit/test_phase17g_orks_army_rule.py": 5.896,
-    "tests/unit/test_phase17g_runtime_content.py": 1.322,
+    "tests/unit/test_phase17g_runtime_content.py": 0.521,
     "tests/unit/test_phase17g_space_marines_army_rule.py": 116.178,
-    "tests/unit/test_phase17g_tau_empire_army_rule.py": 11.065,
     "tests/unit/test_phase17g_thousand_sons_army_rule.py": 43.516,
-    "tests/unit/test_phase17g_tyranids_army_rule.py": 61.781,
-    "tests/unit/test_phase17g_world_eaters_army_rule.py": 66.717,
     "tests/unit/test_phase17i_blocked_row_classification.py": 52.147,
     "tests/unit/test_phase17i_named_handler_budget.py": 0.504,
     "tests/unit/test_phase17j_event_companion.py": 11.37,
@@ -449,6 +748,345 @@
       "source": "Historical Linux PR586 run38585633354 baseline22a12094 tree6ed90ab9; exact11531case rekey via reviewed migration bijection; scheduling seed only, not current timings; raw/derived XML and ledger retained in category-integration-4/linux-baseline-shard-seed",
       "test_cases": 11531,
       "test_files": 429
+    },
+    {
+      "junit_sha256": [
+        "98a1620b79d0ddc8ca21ee3f1243e0e24b239ad5f95e947dc4a5323c13ca726d"
+      ],
+      "source": "Sections01-06 supplemental historical serial Windows checkpoint: 1075 cases,1064 pass,11 fail; failures retained. Measured on shared runtime85812634a732ca7d4efdcb81f4f029cc682ad92b1e7a2d8cdcd2107153510cdd before HEAD isolation. Registration weights only, not an exact-isolated-runtime or successful complete-suite/Linux performance profile. All429 HEAD file durations and profiles preserved.",
+      "test_cases": 1075,
+      "test_files": 107
+    },
+    {
+      "junit_sha256": [
+        "5c1aa41acc2b58b48549448787904e2b60b01e5e58ca3158f16e1288bdff2235"
+      ],
+      "source": "Section07 supplemental serial Windows correctness checkpoint on reviewed isolated HEAD+199-path milestone; 44 passing cases, zero skips/xfails/errors. Only new file registration weights; preserves all 536 incoming file durations/profiles. Not a representative full-suite, hosted-CI or Linux performance profile.",
+      "test_cases": 44,
+      "test_files": 9
+    },
+    {
+      "junit_sha256": [
+        "297c159e770e755ade1841ebb08981033bac6a769922f31e555b345f116bdcb1"
+      ],
+      "source": "Section08 supplemental serial Windows correctness checkpoint on reviewed isolated milestone plus Section07: 73 cases, 69 passed, four enabled SF08-001 semantic failures, zero skips/xfails/errors. New-file registration weights only; all 545 incoming durations/profiles preserved. Not a representative successful full-suite, hosted-CI or Linux timing profile.",
+      "test_cases": 73,
+      "test_files": 9
+    },
+    {
+      "junit_sha256": [
+        "df91eff4215fa219c22af71fb95031f17082b31eb3772ba016d0fa3e61ca9191"
+      ],
+      "source": "Section09 bounded development profile only, task7/runs/development-profile; prior complete-profile durations inherited unchanged for other files. No fresh full legacy execution.",
+      "test_cases": 105,
+      "test_files": 8
+    },
+    {
+      "junit_sha256": [
+        "b0021533d532def1bca72905872f6a083fbab0ba28035ce8c5d093e7e5a0b3cb"
+      ],
+      "source": "Section10 bounded development profile only, task8/runs/profile-stable-input. Other-file historical durations preserved; no fresh legacy aggregate profile.",
+      "test_cases": 131,
+      "test_files": 7
+    },
+    {
+      "junit_sha256": [
+        "e86be9dd4f07568c2bf1ab85bba05543b44017dc388df745c5925904a47c5b74"
+      ],
+      "source": "Section10 bounded development profile only, task8/revision-2/runs/profile-stable-input. Other-file historical durations preserved; no fresh legacy aggregate profile.",
+      "test_cases": 136,
+      "test_files": 8
+    },
+    {
+      "junit_sha256": [
+        "43f2babaa98032b09870f14785763706186fb0252c461bfe79040566e49d2019"
+      ],
+      "source": "Section11 bounded development profile, task9/runs/profile; other-file historical durations preserved. No legacy aggregate or CI timing claim.",
+      "test_cases": 108,
+      "test_files": 8
+    },
+    {
+      "junit_sha256": [
+        "4911256e866b55e5a686d0770fe94f17047c5b0efe2780377f3cee8cec346e79",
+        "98b8864213c58362b94073f0b7203a2f9d36b87a1dd2da816abd7457392f3a6f",
+        "cadb47af022728fbf06f4aa324ce4a9033e169284cf053ffe7eeb59b61fe4626"
+      ],
+      "source": "Section12 bounded development profile plus latest targeted/metadata node timings, task10/runs; latest per node/phase replaces repeated pilots. Other-file historical durations preserved. Not a CI or controlled benchmark.",
+      "test_cases": 143,
+      "test_files": 9
+    },
+    {
+      "junit_sha256": [
+        "8339f71758443a54b499d5e81d9a9c1a25d58d7635c82a1c2eea538309c78953"
+      ],
+      "source": "Section12 revision2 complete bounded development profile, task10/revision-2/runs/profile. Other-file historical durations preserved. Not a CI or controlled benchmark.",
+      "test_cases": 151,
+      "test_files": 11
+    },
+    {
+      "junit_sha256": [
+        "f97b8b2eaed29e2c7aec2cdb54bafe2815daf3e52efe2ff89439bc9e9856127f",
+        "166b8c8935dca9007db2add68bf2450a4e1ebae35645e2a1c9d0cc0115994f3e"
+      ],
+      "source": "Focused task11 new-file composite bounded development profile: retry-focused2 and packet-contract-corrected3, selected29 rows only. Iterative source inputs are retained per receipt; unaffected historical durations preserved. Not CI or a controlled performance benchmark.",
+      "test_cases": 29,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "02944a9d2643c6034ae3c800a3f79b61f1d0e0de0153d2a1b65d50de797fc112"
+      ],
+      "source": "Section13 representative229-case bounded development profile; two enabled semantic failures and one Python3.12-vs3.14 AST metadata mismatch (regenerated under3.14.5 before stable validation). Other-file historical durations preserved. Not CI or a matched benchmark.",
+      "test_cases": 229,
+      "test_files": 6
+    },
+    {
+      "junit_sha256": [
+        "6d3e64a847e94da758af1ac50d0bdf3f44d80c22859a9a0980261da06bd87667"
+      ],
+      "source": "Section14 bounded complete74case Windows officialCPython3.14.5 profile; prior complete file timings retained. No aggregate rerun claimed.",
+      "test_cases": 74,
+      "test_files": 8
+    },
+    {
+      "junit_sha256": [
+        "057b7ded2d7ad2de035cff717ac9d83d6cd243da33725aebd28e696bdeca8a38"
+      ],
+      "source": "SF14-004 scalar eight-case Windows official CPython3.14.5 profile; all R1 and original timings retained.",
+      "test_cases": 8,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "796032fdfe9ea4eb1988e8d314ab3ebec493382e5500fed9b24423706e3edd7b"
+      ],
+      "source": "R3 thirteen-case user-adopted marker convention profile; all prior file timings retained.",
+      "test_cases": 13,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "9fd78d6144b39ae4e447e9932da62c4a6015d3d46f6178d7c145d0febca95364"
+      ],
+      "source": "Complete successful Section15 Windows official CPython3.14.5 bounded profile. Existing unchanged-file historical durations retained; no fresh full-suite profile claim.",
+      "test_cases": 123,
+      "test_files": 15
+    },
+    {
+      "junit_sha256": [
+        "fbe8c939a8ded35679f28b38e4af0b5f38aef1e9b353c5c800d60857f95bb14f"
+      ],
+      "source": "Section16 bounded Windows CPython 3.14.5 native suite; previous file durations and profiles preserved, seven new module measurements only.",
+      "test_cases": 72,
+      "test_files": 7
+    },
+    {
+      "junit_sha256": [
+        "d0799be903e48404a03c604358c9c19db3e19335dbf9fe2825730aadbc665da7"
+      ],
+      "source": "Section16 bounded Windows CPython 3.14.5 native suite; previous file durations and profiles preserved, two additional native review control modules measured; original Section16 durations preserved.",
+      "test_cases": 14,
+      "test_files": 2
+    },
+    {
+      "junit_sha256": [
+        "dd3fb2a2ca2e253e23258af914a661e9ea4bdcb002fd664bdddfeaeda0154496"
+      ],
+      "source": "Section17 bounded Windows official CPython 3.14.5, 131 passed cases in five new files; supplemental local profile only, not a complete CI recalibration. Existing durations and profiles preserved exactly.",
+      "test_cases": 131,
+      "test_files": 5
+    },
+    {
+      "junit_sha256": [
+        "821741a2c22029d5da62c69a4df3cca5deae18bce0a2769024a831abd75a55a5"
+      ],
+      "source": "Section17 R003 supplemental bounded Windows official CPython3.14.5 profile:67 passed cases in one additional file. Existing635 file durations and19 profiles preserved byte-for-value. This is not a complete CI recalibration.",
+      "test_cases": 67,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "d00fd5b5ad9cafd5b05bfd9472e7f3d15ea64f646f69dfa8aa15d44305cd6f16"
+      ],
+      "source": "Section18 bounded Windows official CPython3.14.5, 121 passed cases in eleven new files. Supplemental representative local profile, not full CI recalibration. Prior durations/profiles remain byte-value exact. Later unused-loop-variable spelling correction preserves ordered case inventory and behavior.",
+      "test_cases": 121,
+      "test_files": 11
+    },
+    {
+      "junit_sha256": [
+        "f8d877c7e8b936096c8b1b1f1102a0ae11b0916f6b64427d5070e6546d6215fe"
+      ],
+      "source": "Section19 bounded Windows official CPython3.14.5, 63 passing cases in eleven new modules; supplemental local profile, not full CI recalibration. Later equivalent split assertions, tuple annotations, formatting and coverage-map bindings preserve ordered cases and semantics.",
+      "test_cases": 63,
+      "test_files": 11
+    },
+    {
+      "junit_sha256": [
+        "f19f270a7b83746aa4d33ad5b04e1dd0c247bda8479e32e72b44f68bb992ce27"
+      ],
+      "source": "Section19 SF19-R002 four passing native casualty/admission controls. Supplemental local profile; all older durations and profiles retained.",
+      "test_cases": 4,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "873235f33228a7d9f61685af3fe947e9a876418bffc8f2f3c32e5dcb2fbcb3ea"
+      ],
+      "source": "Section19 SF19-IR001 nine physical-retention/casualty/range/duplicate-selection controls. Supplemental local profile; all older durations and profiles retained.",
+      "test_cases": 9,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "9c5d562ab4b64555bc68476c3b9d17c41cdc91bad9053b13a4498192118371d7"
+      ],
+      "source": "Section20 complete focused native/Core corpus supplemental local profile. Prior durations/profiles retained; not full legacy-suite evidence.",
+      "test_cases": 74,
+      "test_files": 7
+    },
+    {
+      "junit_sha256": [
+        "9927f76aa732a44f72f4c5dc7fc26dfa77c9e9eaee1b21a01f854ab8807d8764"
+      ],
+      "source": "Section20 complete focused native/Core corpus supplemental local profile. Prior durations/profiles retained; not full legacy-suite evidence.",
+      "test_cases": 135,
+      "test_files": 9
+    },
+    {
+      "junit_sha256": [
+        "916fbdfb297b472235ff8397e12b0712b5d996d1ba0a4f06fdd0be82e25c33c9"
+      ],
+      "source": "Section21 IR1 complete changed-file native facade profile; all other inherited file durations/profiles retained. Bounded evidence, not full-suite measurement.",
+      "test_cases": 16,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "4ccb4551c05a685d19122cb239dd87633337a5a82688c2a718073524e9476ecd"
+      ],
+      "source": "Section22 complete recreated-file Windows native profile. All inherited durations/profiles retained. Bounded evidence, not a full-suite measurement.",
+      "test_cases": 56,
+      "test_files": 8
+    },
+    {
+      "junit_sha256": [
+        "a695e6b5d8809ea0568c044a2dafa1ff59915199003516b4157fce4387baff87"
+      ],
+      "source": "Section22 SF22-R001 complete65case native corpus Windows profile. Earlier56case profile and all inherited profiles/durations remain historical; no full-suite measurement or budget change.",
+      "test_cases": 65,
+      "test_files": 8
+    },
+    {
+      "junit_sha256": [
+        "e9255af4c2748022162e4a8056315be69c3c5fe08f85b8e393dfab82e32a6f3e"
+      ],
+      "source": "Section22 SF22-IR001 Windows complete changed existing Plunging file19cases; all earlier profiles retained; no aggregate full-suite profile claim.",
+      "test_cases": 19,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "6922f9e63472386975c55dbfc1194fc77d6934c4072773049e343c5c39bf6dbc"
+      ],
+      "source": "Complete Section23 Windows profile, all inherited durations/profiles retained; bounded corpus, no full-suite measurement.",
+      "test_cases": 53,
+      "test_files": 8
+    },
+    {
+      "junit_sha256": [
+        "9aeee2018b3fe25bb60ed847a495c3b7e513428168ca8547152e6f32cba5e59f"
+      ],
+      "source": "Section24 complete revised bounded native profile. Predecessor durations/profiles preserved; superseded first Section24 profile remains separately retained.",
+      "test_cases": 117,
+      "test_files": 13
+    },
+    {
+      "junit_sha256": [
+        "c663d402b6bfff9fe40fc754cbbac52c2a9009f692ae644569149518506c73c6"
+      ],
+      "source": "Section25 complete bounded Windows CPython3.14.5 local covered corpus. Supplemental representative profile only; all predecessor file durations and profiles retained; no Linux-CI performance or full-suite claim.",
+      "test_cases": 51,
+      "test_files": 8
+    },
+    {
+      "junit_sha256": [
+        "bdbe8d9afb5374e06059f1742df4f43dfd36e70b6dda50526f858d4a60250c7f"
+      ],
+      "source": "Section25 R1 complete changed existing facade file: four passing native Core consumer cases, original assertions retained. Prior file duration and full profile retained in immutable initial packet; supplemental Windows profile only, no CI performance claim.",
+      "test_cases": 4,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "8985c367091fc15431c578df1996895c6b31070469029999e7e20aaa354a0cd9"
+      ],
+      "source": "Section00 complete bounded Windows CPython3.14.5 local covered corpus. Supplemental representative profile only; all predecessor file durations and profiles retained; no Linux-CI performance or full-suite claim.",
+      "test_cases": 36,
+      "test_files": 3
+    },
+    {
+      "junit_sha256": [
+        "26d54231daf7f05a0e9a022e2009cb756de2833cc9d611ac6477d585b4385d82"
+      ],
+      "source": "Supplemental bounded faction batch01, local Ubuntu WSL1 Python3.14.5 eight-worker worksteal28cases/4newfiles; per-file JUnit sums include concurrent case intervals and per-worker preparation. Inherited complete-profile weights retained verbatim for other files. This is duration-only supplementation, NOT a refreshed full representative Linux profile or replacement-only CI throughput claim.",
+      "test_cases": 28,
+      "test_files": 4
+    },
+    {
+      "junit_sha256": [
+        "cca23fbe177299de9d5eb5840e47740d2ca0707eaa9f106259d20432584c3aac"
+      ],
+      "source": "Supplemental bounded EC batch02, local Windows Python 3.14.5 four-worker worksteal, eight successful cases in one new file. JUnit sums include concurrent case intervals and per-worker immutable preparation. Linux coverage/static work overlapped on this host. Inherited weights/profiles retained. This is not a refreshed full representative profile, a CI throughput forecast, or a matched speed comparison.",
+      "test_cases": 8,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "227a5d5e60a7246c238218f8405dbd9d287b406d2caba8383b145407b99ee182"
+      ],
+      "source": "Task29 structural correction: complete affected-file bounded WSL2 Python3.14.5 eight-worker worksteal profile, 158 cases/13 files. 157 pass and one unchanged legacy Shadow helper assertion failure independently reproduced on authenticated task26 baseline. Duration-only registration/remapping; NOT a successful complete-suite profile or budget qualification. Other historical durations/profiles unchanged. Failure and baseline receipts retained.",
+      "test_cases": 158,
+      "test_files": 13
+    },
+    {
+      "junit_sha256": [
+        "bdcff8ebb77c82b56d30a599f4580377789d8b817dc1a7b07a82a4323f5a8be1"
+      ],
+      "source": "Task33 Death Guard module relocation: complete affected-file bounded serial WSL2 Python3.14 profile,23 passing cases/1file. Supplemental measured weight only; not a complete representative suite or hosted CI qualification. All historical profiles and unrelated weights unchanged.",
+      "test_cases": 23,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "69ce210314df8c391b650c6daabc7000433f6e43bcb3d577a61b4054755fc3dc"
+      ],
+      "source": "Grey Knights exact army-rule relocation: complete affected-file bounded serial WSL2 Python3.14 profile. Supplemental measured weight only; not a representative full-suite/hosted CI qualification. Historical profiles and unrelated weights unchanged.",
+      "test_cases": 16,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "021ec19fbc5db4b02ecb891b53db81bc2865746501cfc232e84d171462a86e4b"
+      ],
+      "source": "Votann exact army-rule relocation: complete affected-file bounded serial WSL2 Python3.14 profile. Supplemental measured weight only; not a representative full-suite/hosted CI qualification. Historical profiles and unrelated weights unchanged.",
+      "test_cases": 25,
+      "test_files": 1
+    },
+    {
+      "junit_sha256": [
+        "b35f5c5ae2cb4386aa7e03bd28a4d8578a22cb41ee14fcdb018aaa0e3a0b16ca"
+      ],
+      "source": "World Eaters19case relocation, with appended native consumer assertions: complete affected2file bounded serial WSL2 Python3.14 profile. Supplemental measured weights only; NOT a fresh complete behavioral/representative CI profile. Full-JUnit release gate UNFULFILLED. Historical profiles/unrelated weights unchanged.",
+      "test_cases": 19,
+      "test_files": 2
+    },
+    {
+      "junit_sha256": [
+        "80995f7a433e50a97fa6059d1c5a9127e6e1095e864308937af6051b86bea39b"
+      ],
+      "source": "World Eaters14new outcome cases within complete affected33case serial WSL2 Python3.14 profile. Supplemental measured new-file weights only; NOT a fresh complete behavioral/representative CI profile. Full-JUnit release gate UNFULFILLED. All accepted weights/profiles unchanged.",
+      "test_cases": 14,
+      "test_files": 3
     }
   ],
   "shard_count": 12,
@@ -459,61 +1097,61 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 6699.116,
+      "duration_seconds": 6814.908,
       "shard_id": 2,
-      "test_file_count": 34
+      "test_file_count": 63
     },
     {
-      "duration_seconds": 6699.094,
+      "duration_seconds": 6814.909,
       "shard_id": 3,
-      "test_file_count": 40
+      "test_file_count": 65
     },
     {
-      "duration_seconds": 6699.111,
+      "duration_seconds": 6814.91,
       "shard_id": 4,
-      "test_file_count": 37
+      "test_file_count": 66
     },
     {
-      "duration_seconds": 6699.102,
+      "duration_seconds": 6814.91,
       "shard_id": 5,
-      "test_file_count": 37
+      "test_file_count": 66
     },
     {
-      "duration_seconds": 6699.097,
+      "duration_seconds": 6814.908,
       "shard_id": 6,
-      "test_file_count": 39
+      "test_file_count": 66
     },
     {
-      "duration_seconds": 6699.094,
+      "duration_seconds": 6814.909,
       "shard_id": 7,
-      "test_file_count": 41
+      "test_file_count": 67
     },
     {
-      "duration_seconds": 6699.094,
+      "duration_seconds": 6814.908,
       "shard_id": 8,
-      "test_file_count": 41
+      "test_file_count": 67
     },
     {
-      "duration_seconds": 6699.094,
+      "duration_seconds": 6814.909,
       "shard_id": 9,
-      "test_file_count": 40
+      "test_file_count": 67
     },
     {
-      "duration_seconds": 6699.096,
+      "duration_seconds": 6814.908,
       "shard_id": 10,
-      "test_file_count": 40
+      "test_file_count": 66
     },
     {
-      "duration_seconds": 6699.101,
+      "duration_seconds": 6814.909,
       "shard_id": 11,
-      "test_file_count": 38
+      "test_file_count": 67
     },
     {
-      "duration_seconds": 6699.094,
+      "duration_seconds": 6814.909,
       "shard_id": 12,
-      "test_file_count": 41
+      "test_file_count": 67
     }
   ],
   "strategy": "largest-processing-time-by-median-file-duration",
-  "total_test_duration_seconds": 81437.605
+  "total_test_duration_seconds": 82711.509
 }

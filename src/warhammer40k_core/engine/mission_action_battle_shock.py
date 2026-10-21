@@ -83,10 +83,11 @@ def action_battle_shock_permission_sources(
                 ):
                     continue
                 rule = RuleIR.from_payload(cast(RuleIRPayload, ability.rule_ir_payload))
+                if not any(clause_grants_action_battle_shock_permission(c) for c in rule.clauses):
+                    continue
                 if rule.source_id != ability.source_id:
                     raise GameLifecycleError("Action Battle-shock permission source drifted.")
-                if any(clause_grants_action_battle_shock_permission(c) for c in rule.clauses):
-                    sources.add(rule.source_id)
+                sources.add(rule.source_id)
     return tuple(sorted(sources))
 
 

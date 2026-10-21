@@ -138,6 +138,36 @@ def _mutated_current(path: str, kind: str) -> bytes:
     elif kind in {"pause_false", "pause_one"}:
         keyword = next(item for item in call.keywords if item.arg == "pause_at_first_hit")
         keyword.value = ast.Constant(value=False if kind == "pause_false" else 1)
+    elif kind in {"fixed_identity", "random_identity", "fixed_predicate", "cleave_identity"}:
+        fixture_name = (
+            "test_random_cleave_is_a_single_target_bonus_never_a_splittable_budget"
+            if kind == "cleave_identity"
+            else "_lethal_extra_session"
+        )
+        fixture = next(
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == fixture_name
+        )
+        call_name = "random_melee_session" if kind == "cleave_identity" else "fight_lifecycle"
+        fixture_call = next(
+            node
+            for node in ast.walk(fixture)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == call_name
+        )
+        identity = next(keyword for keyword in fixture_call.keywords if keyword.arg == "game_id")
+        if kind == "cleave_identity":
+            identity.value = ast.Constant(value="unapproved-cleave-identity")
+        else:
+            assert isinstance(identity.value, ast.IfExp)
+            if kind == "fixed_identity":
+                identity.value.orelse = ast.Constant(value="unapproved-fixed-identity")
+            elif kind == "random_identity":
+                identity.value.body = ast.Constant(value="unapproved-random-identity")
+            else:
+                identity.value.test = ast.Constant(value=False)
     elif kind == "leader_literal":
         keyword = next(item for item in call.keywords if item.arg == "enemy_unit_specs")
         assert isinstance(keyword.value, ast.IfExp)
@@ -197,6 +227,10 @@ AST_CONTROLS = (
     *[(path, kind) for path in PATHS for kind in COMMON_MUTATIONS],
     (RANDOM, "pause_false"),
     (RANDOM, "pause_one"),
+    *[
+        (RANDOM, kind)
+        for kind in ("fixed_identity", "random_identity", "fixed_predicate", "cleave_identity")
+    ],
     *[
         (RETAINED, kind)
         for kind in (
@@ -271,7 +305,8 @@ def test_actual_manifest_layout_guard_rejects_drift_independently_of_byte_pin(ki
 
 
 @pytest.mark.parametrize(
-    "tamper", ["current", "retained_helper", "random_helper", "archive", "manifest"]
+    "tamper",
+    ["current", "retained_helper", "random_helper", "archive", "manifest", "integration_archive"],
 )
 def test_actual_projection_rejects_complete_byte_tamper_before_returning_history(
     tamper: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -279,6 +314,7 @@ def test_actual_projection_rejects_complete_byte_tamper_before_returning_history
     files = {
         *PATHS,
         *preservation.HELPER_PINS,
+        preservation.INTEGRATION_RANDOM_PREIMAGE,
         *(cast(str, row["baseline_archive"]) for row in preservation.FILE_PINS.values()),
         preservation.ARCHIVE_DIRECTORY + "/test-preservation.json",
     }
@@ -288,6 +324,7 @@ def test_actual_projection_rejects_complete_byte_tamper_before_returning_history
         shutil.copyfile(ROOT / relative, target)
     target_path = {
         "current": RANDOM,
+        "integration_archive": preservation.INTEGRATION_RANDOM_PREIMAGE,
         "retained_helper": "tests/s25_original_fixture_controls.py",
         "random_helper": "tests/random_melee_helpers.py",
         "archive": cast(str, preservation.FILE_PINS[RANDOM]["baseline_archive"]),

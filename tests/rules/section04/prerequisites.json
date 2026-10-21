@@ -1,0 +1,32 @@
+{
+  "native_definition_ids": [
+    "000004080",
+    "000004078",
+    "000004090",
+    "000000593",
+    "000000592",
+    "000004088"
+  ],
+  "native_names": [
+    "Infractors",
+    "Lord Exultant",
+    "Chaos Spawn",
+    "Dire Avengers",
+    "Rangers",
+    "Noise Marines"
+  ],
+  "loader": "Existing selected-army source index; one immutable catalog per process. Native units instantiated fresh and deep-copied by Section02Definitions. Definition digest unchanged at teardown.",
+  "source_index": "C:/Users/nostr/Documents/Codex/2026-10-16/task-7/integration-source-index-v2",
+  "constructed_contracts": [
+    "Core single-target coverage proves the complete declared target inventory; individual faction single-target abilities remain their content owners.",
+    "Current Core contracts absent from supported native content are labeled explicitly: CLOSE-QUARTERS, Hunter, critical4/BS5, characteristics/rules contrasts, record-only against trigger, allocated Damage-1, attack-specific Hazardous, zero-equipment melee body.",
+    "Real supported Noise Marines provide two native physical Blastmasters with different selected profiles. Unsupported Hellblasters and Dark Reapers were rejected by geometry validation and are not used.",
+    "Replacement starts with accepted declarations and an explicitly supplied post-declaration geometry change; it does not certify the separate granting move rule.",
+    "Native definitions have retained bridge source provenance; these tests do not claim competitive legal roster certification or original paper datasheet conformance beyond loader-supported content."
+  ],
+  "mission_dependency": "Actual cached Warhammer Event Companion mission authority is required by the facade shooting Action gate. Terrain is removed for clear-line combat; authentic objectives and matching force-disposition metadata remain. No mission playthrough. This one cold dependency is timed separately.",
+  "state_scope": "Fresh combat GameState/placement/decision graphs at SHOOTING or FIGHT boundary. Fight state starts at relevant Fight step, without simulating Charge/Pile In. Minimal non-strict roster/config identity metadata is not execution of mustering and not a legal army certification.",
+  "isolation": "Fresh mutable graphs and casualty/condition isolation control, per-session catalog digest, cached mission payload equality. Physical weapon IDs from supported rows, correct ownership and native model geometry retained.",
+  "unavailable_native_attempts": "Hellblasters and Dark Reapers lack required retained representative height data. The loader correctly rejected them. No geometry override or bypass was added; supported Noise Marines solve the multi-bearer profile case.",
+  "unused_definitions_removed": "Maulerfiend and Wave Serpent were exploratory only and are absent from the final six-definition fixture."
+}

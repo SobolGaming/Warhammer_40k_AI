@@ -2707,7 +2707,7 @@ def _paused_optional_fnp_lifecycle() -> tuple[GameLifecycle, DecisionRequest]:
         battle_round=state.battle_round,
         active_player_id="player-a",
         selected_unit_ids=(attacker.unit_instance_id,),
-        shot_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(),
         attack_pools=sequence.attack_pools,
         attack_sequence=sequence,
     )

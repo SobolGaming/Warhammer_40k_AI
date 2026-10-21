@@ -259,7 +259,9 @@ def test_multiple_profiles_commit_exactly_one_without_exposing_another_profile()
 
 @pytest.mark.parametrize("split", [False, True])
 def test_random_cleave_is_a_single_target_bonus_never_a_splittable_budget(split: bool) -> None:
-    session = random_melee_session(cleave=True, game_id="order92-cleave-name-2")
+    session = random_melee_session(
+        cleave=True, game_id="order92-cleave-name-3", pause_at_first_hit=True
+    )
     request, budgets = _all_committed(session)
     budget = budgets[0]
     count = cast(int, budget["base_attacks"])
@@ -905,7 +907,9 @@ def _lethal_extra_session(*, random: bool) -> tuple[LocalGameSession, str]:
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_ids=("enemy",),
         origins={"intercessor-1": Pose.at(10, 10), "enemy": Pose.at(12, 10)},
-        game_id="order56-retained-fight-0",
+        # Fixed-A must reach the primary-kill/extra-pool branch: the inherited
+        # order56 seed rolls two wound ones and never enters retained destruction.
+        game_id="order56-retained-fight-0" if random else "order112-lethal-extra-fixed",
         model_count=1,
         datasheet_id="core-character-leader",
         model_profile_id="core-character-leader",

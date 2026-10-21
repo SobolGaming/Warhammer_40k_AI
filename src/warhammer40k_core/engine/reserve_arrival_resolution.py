@@ -17,6 +17,9 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     battlefield_placement_kind_from_token,
 )
+from warhammer40k_core.engine.ingress_placement_restrictions import (
+    strategic_reserves_exclude_enemy_deployment_zone,
+)
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,
 )
@@ -188,7 +191,7 @@ def resolve_reserve_arrival(
             qualifying_edges=qualifying_edges,
             large_model_exceptions=exceptions,
         )
-        if requested_round == 2:
+        if strategic_reserves_exclude_enemy_deployment_zone(requested_round):
             append_enemy_deployment_zone_violations(
                 violations=violations,
                 models=models,

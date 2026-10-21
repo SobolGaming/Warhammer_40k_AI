@@ -43,7 +43,10 @@ def test_all_cargo_is_restricted_even_with_zero_contributors(contribute: bool) -
     assert effect.target_unit_instance_ids == PASSENGERS
     assert state.shooting_phase_state is not None
     assert not set(PASSENGERS).intersection(state.shooting_phase_state.shot_unit_ids)
-    assert TRANSPORT in state.shooting_phase_state.shot_unit_ids
+    # SF04 completion authority: declaration consumes selection; all physical
+    # attacks must resolve before the transport has shot. Cargo is restricted now.
+    assert TRANSPORT in state.shooting_phase_state.selected_unit_ids
+    assert TRANSPORT not in state.shooting_phase_state.shot_unit_ids
     restored = GameLifecycle.from_payload(copy.deepcopy(session.lifecycle.to_payload()))
     assert restored.to_payload() == session.lifecycle.to_payload()
     persisted = session.to_persistence_payload()

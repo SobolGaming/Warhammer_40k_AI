@@ -731,7 +731,13 @@ def _physical_authority_before_event(
     no_trigger_destroyed_departure_ids: frozenset[str],
     embark_movement_completions: tuple[EmbarkMovementCompletion, ...],
 ) -> dict[str, _PhysicalAuthority]:
-    authority: dict[str, _PhysicalAuthority] = {}
+    from warhammer40k_core.engine.starting_transport_physical_authority import (
+        starting_transport_physical_authority,
+    )
+
+    authority = starting_transport_physical_authority(
+        state=state, event_records=event_records[:event_index]
+    )
     segment_start = 0
     for prior_index, event in enumerate(event_records[:event_index]):
         if event.event_type == PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT:

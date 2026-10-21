@@ -21,7 +21,7 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
     model_displacement_kind_from_token,
 )
-from warhammer40k_core.engine.rules_units import RulesUnitView
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
 from warhammer40k_core.geometry.volume import Model
 
 
@@ -598,6 +598,41 @@ def assert_battlefield_units_in_coherency(
             )
             if not result.is_coherent:
                 broken_results.append(result)
+    if not broken_results:
+        return
+    offending_model_ids = tuple(
+        model_id for result in broken_results for model_id in result.offending_model_instance_ids
+    )
+    raise PlacementError(
+        f"Units must be set up in coherency; offending model IDs: {', '.join(offending_model_ids)}"
+    )
+
+
+def assert_battlefield_rules_units_in_coherency(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+) -> None:
+    if type(scenario) is not BattlefieldScenario:
+        raise UnitCoherencyError(
+            "assert_battlefield_rules_units_in_coherency scenario must be a scenario."
+        )
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise UnitCoherencyError(
+            "assert_battlefield_rules_units_in_coherency requires an explicit RulesetDescriptor."
+        )
+    broken_results: list[UnitCoherencyResult] = []
+    for view in rules_unit_views_from_armies(armies=scenario.armies):
+        if not any(
+            scenario.battlefield_state.unit_placement_or_none(component_id) is not None
+            for component_id in view.component_unit_instance_ids
+        ):
+            continue
+        result = rules_unit_coherency_result(
+            scenario=scenario, ruleset_descriptor=ruleset_descriptor, rules_unit=view
+        )
+        if not result.is_coherent:
+            broken_results.append(result)
     if not broken_results:
         return
     offending_model_ids = tuple(

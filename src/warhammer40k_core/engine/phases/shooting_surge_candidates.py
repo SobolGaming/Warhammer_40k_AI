@@ -8,7 +8,12 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, LifecycleStatus
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+)
 from warhammer40k_core.engine.phases import shooting_reactions as reactions
 from warhammer40k_core.engine.reaction_windows import (
     ReactionWindow as TriggeredReactionWindow,
@@ -25,7 +30,6 @@ from warhammer40k_core.engine.shooting_end_surge_hooks import (
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
-    TriggeredMovementKind,
 )
 from warhammer40k_core.engine.triggered_movement_selection import (
     triggered_movement_unit_selection_request,
@@ -102,6 +106,8 @@ def _activate(
     grants: tuple[ShootingEndSurgeGrant, ...],
     hit_target_ids: tuple[str, ...],
 ) -> LifecycleStatus:
+    if len({grant.movement_kind for grant in grants}) != 1:
+        raise GameLifecycleError("Shooting-end grants must share one movement kind.")
     shooting_player_id = completed_sequence.attacker_player_id
     max_distance_bonus_inches = reactions._shooting_end_surge_grant_distance_bonus(grants)
     roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
@@ -113,7 +119,7 @@ def _activate(
         )
     )
     descriptor = TriggeredMovementDescriptor(
-        movement_kind=TriggeredMovementKind.SURGE,
+        movement_kind=grants[0].movement_kind,
         source_rule_id=grants[0].source_id,
         trigger_timing=TriggeredReactionWindow(
             phase=BattlePhase.SHOOTING,

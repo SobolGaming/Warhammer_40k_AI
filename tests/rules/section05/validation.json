@@ -1,0 +1,66 @@
+{
+  "scope": "Section05 adopted corpus complete; no global engine compliance claim.",
+  "source_rows": 22,
+  "rule_rows": 15,
+  "faq_rows": 7,
+  "obligations": 82,
+  "obligation_statuses": {
+    "asserted": 79,
+    "visible_semantic_failure": 2,
+    "source_authority_conflict": 1
+  },
+  "unimplemented_adopted_obligations": 0,
+  "unadopted_rows": 0,
+  "tests": {
+    "total": 274,
+    "passed": 272,
+    "failed": 2,
+    "skip": 0,
+    "xfail": 0,
+    "inventory_checks": 3,
+    "isolation_checks": 1,
+    "behavioral_cases": 270
+  },
+  "stable_junit": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-12\\section05-stable.xml",
+  "performance": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-12\\section05-complete-performance.json",
+  "quality": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-12\\quality-complete-receipt.json",
+  "direct_dependencies": {
+    "command": [
+      "C:\\Users\\nostr\\Documents\\Codex\\2026-10-15\\task\\behavior-rebuild\\.venv\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "tests/rules/section02/test_02_02_04_healing.py",
+      "tests/rules/section01/test_01_07_actions.py",
+      "tests/rules/section03/test_facade.py",
+      "tests/rules/section04/test_grouping.py",
+      "--selected-army-source-index",
+      "C:/Users/nostr/Documents/Codex/2026-10-16/task-7/integration-source-index-v2",
+      "--no-cov",
+      "-q",
+      "-o",
+      "cache_dir=C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-12\\pytest-cache",
+      "--junitxml",
+      "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-12\\dependencies.xml"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 22.061450899986085,
+    "log": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-12\\dependencies-final.txt"
+  },
+  "runtime_identity": {
+    "command": [
+      "C:\\Users\\nostr\\Documents\\Codex\\2026-10-15\\task\\behavior-rebuild\\.venv\\Scripts\\python.exe",
+      "scripts/build_engine_build_identity.py",
+      "--check"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.8186685000255238,
+    "log": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-12\\identity-final.txt"
+  },
+  "remaining_gates": [
+    "SF05-001 future repair only",
+    "SF05-002 authority reconciliation; not confirmed defect",
+    "Prior SF01-001/SF03-001/SF04-002 untouched",
+    "Independent equivalence and broader Linux integration before retiring old corpora"
+  ],
+  "next": "Fresh Section06 only;00 deferred."
+}

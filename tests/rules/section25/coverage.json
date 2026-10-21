@@ -1,0 +1,2575 @@
+{
+  "schema": "section25-complete-literal-and-behavior-inventory-v1",
+  "capture_path": "data/source_audits/v963_shock/captures/core-page.js",
+  "capture_sha256": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
+  "source_authority": "Authenticated retained adopted capture; no fresh external App/version/visual claim.",
+  "category_hierarchy": {
+    "number": "25",
+    "title": "Muster Armies",
+    "subsections": [
+      {
+        "ref": "25.01",
+        "title": "Start Your Army Roster",
+        "text": [
+          "The details of your army must be recorded on an army roster. You can either write this down or use the Warhammer 40,000 app. Players should show their finished army roster to their opponent before battle commences."
+        ]
+      },
+      {
+        "ref": "25.02",
+        "title": "Select Army Faction",
+        "text": [
+          "Note on your army roster one faction keyword to be your \u0005army faction\u0006."
+        ]
+      },
+      {
+        "ref": "25.03",
+        "title": "Select Battle Size",
+        "text": [
+          "With your opponent, select one of the battle sizes below. This will determine the total number of points (also known as the points total) each player can spend to build their army. The points values for units can be found in the Warhammer 40,000 app. You will need to refer to these when building your army.",
+          "The battle size will also determine the total number of Detachment Points (DP) players will have to unlock \u0005detachments\u0006 with, the number of units with the same datasheet name that they can include in their army, and the number of \u0005enhancements\u0006 that they can include in their army.",
+          "These are summarised below.",
+          "* The unit limit for \u0003BATTLELINE\u0004 and \u0003DEDICATED TRANSPORT\u0004 units is double the relevant amount shown above, and every \u0003EPIC HERO\u0004 has a unit limit of 1, regardless of the battle size."
+        ],
+        "tables": [
+          {
+            "rows": [
+              [
+                "BATTLE SIZE",
+                "Points Total",
+                "Detachment Points (DP)",
+                "Enhancement Limit",
+                "Unit Limit*"
+              ],
+              [
+                "INCURSION",
+                "1000",
+                "2",
+                "2",
+                "2"
+              ],
+              [
+                "STRIKE FORCE",
+                "2000",
+                "3",
+                "4",
+                "3"
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "ref": "25.04",
+        "title": "Fill Your Army Roster",
+        "text": [
+          "You will now select your \u0005detachments\u0006, units, \u0003warlord\u0004 and \u0005enhancements\u0006 that will be in your army. You will also attach your \u0005leader\u0006 and \u0005support\u0006 units to other units.",
+          "When doing so:",
+          "\u2022 You cannot exceed any of the values presented in the Select Battle Size table (25.03). For example, in an Incursion battle, you cannot select \u0005detachments\u0006 with a combined value of more than 2 DP.",
+          "\u2022 No unit (including \u0005attached\u0006 units) can have more than one \u0005enhancement\u0006.",
+          "\u2022 Your army roster must follow all restrictions placed on it by the rules and units being included in it.",
+          "\u0005SELECT DETACHMENTS\u0006",
+          "You can now use your DP to select \u0005detachments\u0006 for your army. You can only select from those available to your \u0005army faction\u0006. Each one will give you access to different \u0005force dispositions\u0006, \u0005detachment rules\u0006, \u0005enhancements\u0006 and/or \u0005stratagems\u0006 to use in the coming battle. You cannot select the same \u0005detachment\u0006 more than once. Record your selected \u0005detachments\u0006 on your army roster.",
+          "Note that some \u0005detachment rules\u0006 list units and other \u0005detachments\u0006 that your army either must include or cannot include; you must follow all such rules when building your army for the \u0005detachments\u0006 you have selected.",
+          "\u0005SELECT UNITS\u0006",
+          "Select all the units you want to include in your army. You can only select units with your faction keyword and units available to your \u0005army faction\u0006. Each time you include a unit in your army, it can take any wargear or options it has access to. Note on your army roster the number of models in the unit, any wargear and upgrades it has, and its points value.",
+          "Select one \u0003CHARACTER\u0004 unit to be your Warlord\u2019s unit. This must be a unit that has the faction keyword you chose as your \u0005army faction\u0006. Then select one \u0003CHARACTER\u0004 model in that unit to be your Warlord \u2013 the supreme leader of your army \u2013 and make a note of this on your army roster. That model gains the \u0003WARLORD\u0004 keyword. Some units have a rule on their datasheet stating that they must be your \u0003WARLORD\u0004. If you want to include one or more of these units in your army, you must select one of them to be your \u0003WARLORD\u0004. Rules that state that a model cannot be your \u0003WARLORD\u0004 take precedence over ones that require it to be your \u0003WARLORD\u0004.",
+          "\u0005ATTACH LEADERS AND SUPPORT UNITS\u0006",
+          "For each \u0005leader\u0006 and \u0005support\u0006 unit in your roster, you can attach them to a \u0005bodyguard\u0006 unit that they can join, following the rules for Forming Attached Units (19.01). Each \u0005support\u0006 unit in your roster must be attached to a \u0005bodyguard\u0006 unit.",
+          "\u0005SELECT ENHANCEMENTS\u0006",
+          "Select all of the \u0005enhancements\u0006 you want to include from the \u0005detachments\u0006 you selected and give each one to a different unit in your army. When you do, increase those units\u2019 points values accordingly. The points values for \u0005enhancements\u0006 can be found in the Warhammer 40,000 app.",
+          "Unless otherwise stated:",
+          "\u2022 Only \u0003CHARACTER\u0004 units can be given \u0005enhancements\u0006. If such a unit contains more than one model, select one \u0003CHARACTER\u0004 model in that unit to have that \u0005enhancement\u0006.",
+          "\u2022 \u0003EPIC HEROES\u0004 models cannot be given \u0005enhancements\u0006.",
+          "\u2022 Your army cannot include more than one of the same \u0005enhancement\u0006.",
+          "\u0005Upgrades:\u0006 Some \u0005enhancements\u0006 are tagged with \u2018Upgrade'. Unlike other \u0005enhancements\u0006:",
+          "\u2022 These can be given to non-\u0003Character\u0004 units.",
+          "\u2022 You can include up to three of the same Upgrade in your army (the second and third instances of the same Upgrade do not count towards the total number of \u0005enhancements\u0006 in your army, but you must still spend the stated points cost each time).",
+          "** If you are playing an Incursion battle, you can select a 3DP \u0005detachment\u0006 as your only \u0005detachment\u0006."
+        ]
+      }
+    ]
+  },
+  "source_rows": 4,
+  "literal_blocks": 30,
+  "sources": [
+    {
+      "row_id": "rule:25:25.01:1",
+      "category": "25",
+      "locator": "25.01",
+      "title": "Start Your Army Roster",
+      "occurrence": 1,
+      "source_sha256": "d00e408ce4ac12ac6658f909e25a85c18549f390a4cd3c59d17e3bf444879b07",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "eaeea833836cf8e67a9f51aa7b506a342345140109262c20f4c2137a08f628d5"
+        }
+      ],
+      "obligations": [
+        {
+          "id": "25.01-record-roster",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Army details are recorded in a complete army roster.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:ArmyMusterRequest",
+            "src/warhammer40k_core/adapters/redaction.py:public_army_roster_payload",
+            "src/warhammer40k_core/adapters/projection.py:project_game_view"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_warlord_attachment.py::test_exact_selected_character_gets_warlord_and_bearer_record",
+              "function_ast_sha256": "0d6bc01d92c4c443cbfe440c9fdf93a44c4db9de379f64ca4ba0c37c844e1873",
+              "assertions": [
+                "assert r.warlord_selection is not None",
+                "assert ['WARLORD' in m.keywords for m in army.units[0].own_models] == [index == 1, index == 2]",
+                "assert army.enhancement_assignments[0].model_index == index",
+                "assert ArmyMusterRequest.from_payload(r.to_payload()) == r",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert r.warlord_selection is not None",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {'warlord_invalid_model_selection'}",
+                "assert all(('WARLORD' not in m.keywords for u in diagnostic.units for m in u.own_models))"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_facade.py::test_prebattle_public_roster_submission_and_json_restoration",
+              "function_ast_sha256": "0383ec149354ad02d4d0fcb1eba1e81aec4f65d91382598b8da913b950657972",
+              "assertions": [
+                "assert pending is not None",
+                "assert state is not None",
+                "assert all((a.roster_legality_report.is_legal for a in state.army_definitions))",
+                "assert all((len(a.enhancement_assignments) == 1 and a.warlord_selection is not None for a in state.army_definitions))",
+                "assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()",
+                "assert result == restored_result",
+                "assert session.lifecycle.to_payload() == restored.lifecycle.to_payload()",
+                "assert unit['datasheet_id'] == BODY",
+                "assert len(unit['model_instance_ids']) == 5",
+                "assert unit['selected_wargear_ids'] == ['core-bolt-rifle']",
+                "assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)",
+                "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='muster|roster'):\n    rejected.advance_until_decision_or_terminal()"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_facade.py::test_native_roster_disclosure_distinguishes_physical_upgrade_bearers",
+              "function_ast_sha256": "36e5b79b11e3905f9f00c2a23e77a26ae8961dbcacad1a41e9d9e3d9e7a313dc",
+              "assertions": [
+                "assert views[0] != views[1]",
+                "assert views[0]['projection_state_hash'] != views[1]['projection_state_hash']",
+                "assert {k: v for k, v in views[0].items() if k not in excluded} == {k: v for k, v in views[1].items() if k not in excluded}",
+                "assert session.advance_until_decision_or_terminal().decision_request is not None",
+                "assert 'public_army_rosters' in view",
+                "assert public['attachment_declarations'] is None",
+                "assert public['dedicated_transport_manifests'] is None",
+                "assert view['model_display_by_id'][physical]['unit_instance_id'] == target_id",
+                "assert 'public_army_rosters' in owner",
+                "assert next((r for r in owner['public_army_rosters'] if r['player_id'] == 'owner'))['attachment_declarations'] == recorded['attachment_declarations']",
+                "assert restored.view(viewer_player_id='opponent') == view",
+                "assert fork.view(viewer_player_id='opponent') == view",
+                "assert fork.lifecycle.state is not session.lifecycle.state",
+                "assert replay.status is ReplayRunStatus.REPRODUCED",
+                "assert session.lifecycle.to_payload() == before",
+                "assert public[key] == recorded[key]",
+                "assert 'public_army_rosters' in projected",
+                "assert row['enhancement_assignments'] == recorded['enhancement_assignments']",
+                "assert row['attachment_declarations'] == (recorded['attachment_declarations'] if context.policy.omniscient else None)"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "normal_engine_generated_public_roster_disclosure",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.01-show-opponent-before-battle",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Players show their completed roster to the opponent before battle.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:ArmyDefinition",
+            "src/warhammer40k_core/adapters/redaction.py:public_army_roster_payload",
+            "src/warhammer40k_core/adapters/projection.py:project_game_view"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_facade.py::test_prebattle_public_roster_submission_and_json_restoration",
+              "function_ast_sha256": "0383ec149354ad02d4d0fcb1eba1e81aec4f65d91382598b8da913b950657972",
+              "assertions": [
+                "assert pending is not None",
+                "assert state is not None",
+                "assert all((a.roster_legality_report.is_legal for a in state.army_definitions))",
+                "assert all((len(a.enhancement_assignments) == 1 and a.warlord_selection is not None for a in state.army_definitions))",
+                "assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()",
+                "assert result == restored_result",
+                "assert session.lifecycle.to_payload() == restored.lifecycle.to_payload()",
+                "assert unit['datasheet_id'] == BODY",
+                "assert len(unit['model_instance_ids']) == 5",
+                "assert unit['selected_wargear_ids'] == ['core-bolt-rifle']",
+                "assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)",
+                "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='muster|roster'):\n    rejected.advance_until_decision_or_terminal()"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_facade.py::test_native_roster_disclosure_distinguishes_physical_upgrade_bearers",
+              "function_ast_sha256": "36e5b79b11e3905f9f00c2a23e77a26ae8961dbcacad1a41e9d9e3d9e7a313dc",
+              "assertions": [
+                "assert views[0] != views[1]",
+                "assert views[0]['projection_state_hash'] != views[1]['projection_state_hash']",
+                "assert {k: v for k, v in views[0].items() if k not in excluded} == {k: v for k, v in views[1].items() if k not in excluded}",
+                "assert session.advance_until_decision_or_terminal().decision_request is not None",
+                "assert 'public_army_rosters' in view",
+                "assert public['attachment_declarations'] is None",
+                "assert public['dedicated_transport_manifests'] is None",
+                "assert view['model_display_by_id'][physical]['unit_instance_id'] == target_id",
+                "assert 'public_army_rosters' in owner",
+                "assert next((r for r in owner['public_army_rosters'] if r['player_id'] == 'owner'))['attachment_declarations'] == recorded['attachment_declarations']",
+                "assert restored.view(viewer_player_id='opponent') == view",
+                "assert fork.view(viewer_player_id='opponent') == view",
+                "assert fork.lifecycle.state is not session.lifecycle.state",
+                "assert replay.status is ReplayRunStatus.REPRODUCED",
+                "assert session.lifecycle.to_payload() == before",
+                "assert public[key] == recorded[key]",
+                "assert 'public_army_rosters' in projected",
+                "assert row['enhancement_assignments'] == recorded['enhancement_assignments']",
+                "assert row['attachment_declarations'] == (recorded['attachment_declarations'] if context.policy.omniscient else None)"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "normal_engine_generated_public_roster_disclosure",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        }
+      ],
+      "colocated_faq_clarifications": []
+    },
+    {
+      "row_id": "rule:25:25.02:1",
+      "category": "25",
+      "locator": "25.02",
+      "title": "Select Army Faction",
+      "occurrence": 1,
+      "source_sha256": "67111de15a00f5efe5b128329ec4d284b5c5d3421346c5d6b9694de745874b7b",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "94ac02dd03da2dc2a8afa6a5575c8cc3dea5fbd3a6a0794b50e8a865289a239e"
+        }
+      ],
+      "obligations": [
+        {
+          "id": "25.02-select-one-faction",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "The army roster names one faction keyword as its army faction.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:ArmyMusterRequest"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_detachments.py::test_alias_faction_and_selected_inventory_boundaries",
+              "function_ast_sha256": "101e8d91328ea4cf3fc206db46b3b80f1c4095646d5682c8f02ff8ce81893db6",
+              "assertions": [
+                "assert faction.faction_id == owner.faction_id",
+                "assert grants[0].force_disposition_ids == owner.force_disposition_ids",
+                "assert ORDINARY[0] in grants[0].enhancement_ids",
+                "assert grants[0].stratagem_ids == owner.stratagem_ids"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ListValidationError, match='same detachment'):\n    validate_detachment_selection(catalog=c, selection=DetachmentSelection(owner.faction_id, (owner.detachment_id, alias.detachment_id)))",
+                "with pytest.raises(ListValidationError, match='does not belong'):\n    validate_detachment_selection(catalog=c, selection=DetachmentSelection(owner.faction_id, (foreign.detachment_id,)))",
+                "with pytest.raises(ListValidationError, match='not allowed'):\n    validate_detachment_selection(catalog=stripped, selection=selected)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_native.py::test_real_faction_composition_and_equipment_reach_physical_models",
+              "function_ast_sha256": "2d7cdfb297d3cba4ddf31d7ae3b87681d7755d6337bd3e8b8c140bfea878c1cf",
+              "assertions": [
+                "assert validate_unit_selection_for_faction(catalog=c, selection=selected, faction=faction) is sheet",
+                "assert len(unit.own_models) == sum((p.min_models for p in sheet.composition))",
+                "assert all((m.wargear_ids for m in unit.own_models))",
+                "assert set(unit.faction_keywords) & set(faction.faction_keywords)",
+                "assert UnitInstance.from_payload(unit.to_payload()).to_payload() == unit.to_payload()"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ListValidationError, match='not legal for faction'):\n    validate_unit_selection_for_faction(catalog=c, selection=selected, faction=other)",
+                "with pytest.raises(ListValidationError, match='not legal for faction'):\n    validate_unit_selection_for_faction(catalog=c, selection=selected, faction=partial)",
+                "with pytest.raises(ListValidationError):\n    resolve_model_profile_selections(datasheet=sheet, selections=invalid_count)",
+                "with pytest.raises(UnitFactoryError):\n    d.unit(datasheet_id, wargear=(WargearSelection('not-advertised', sheet.composition[0].model_profile_id, ('not-equipped',)),))"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        }
+      ],
+      "colocated_faq_clarifications": []
+    },
+    {
+      "row_id": "rule:25:25.03:1",
+      "category": "25",
+      "locator": "25.03",
+      "title": "Select Battle Size",
+      "occurrence": 1,
+      "source_sha256": "52621814552a14ee907dcf424d44a55e7edfe6da6695806410dd64c12c2e13f9",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "7a0bbe20fc2dab788f083c312526617c9f41c52e24ddac334217005297fef734"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "c77a389fa7aaca8412ce26d31437b25604c041b64d7d7dcd5d2bc54ec29df03b"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "243d89a7db78e2aa6eba3deeeba0c78eb4fb504bd9fa216d98ad301d5bb60997"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "7e831af4767fa25e75ba44e15cddf842d3be70a1f888289a483825e8d2fd5bbe"
+        },
+        {
+          "ordinal": 5,
+          "kind": "table",
+          "sha256": "43f39a39cb29c231983a2f3c9110b14db2d946f6b233b7ae7d951d7b4ea56144"
+        }
+      ],
+      "obligations": [
+        {
+          "id": "25.03-select-battle-size",
+          "source_blocks": [
+            1,
+            2
+          ],
+          "acceptance": "The selected battle size determines points, Detachment Points, Enhancement and datasheet-copy limits.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_points_exact_cap_and_one_over_includes_each_enhancement",
+              "function_ast_sha256": "3432496343e3b15e8de07bfe144615e021140e56f48752ea2cf935d676644648",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert {v.violation_code for v in report.violations} == {'points_limit_exceeded'}",
+                "assert r.to_payload() == before"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='RosterLegalityReport'):\n    muster_army(catalog=c, request=bad)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_datasheet_limit_counts_physical_units_and_category_exception_once",
+              "function_ast_sha256": "f997972845c6bb3615fd03dd98f94d37e59be50566d167e18d1a0017c2758d93",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in violations} == {'unit_limit_exceeded'}",
+                "assert violations[0].source_id is not None",
+                "assert violations[0].source_id.endswith(BODY)"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_enhancement_budget_counts_distinct_ordinary_and_one_upgrade_kind",
+              "function_ast_sha256": "b5f3958b4e9857c3a6e0d180ecd2ec532a837ba70a2192fc6c36535ad4cf31f6",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {'enhancement_limit_exceeded'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_detachments.py::test_incursion_three_dp_exception_requires_sole_detachment",
+              "function_ast_sha256": "b9de63b5dee8e34d019e6e18713412d040e2d1d675866cba710f39827f72fcf6",
+              "assertions": [
+                "assert {d.detachment_id for d in resolved} == set(selected.detachment_ids)"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(DetachmentCatalogError, match='between 1 and 3'):\n    replace(c.detachments[0], detachment_point_cost=next((cost for cost in costs if cost < 1 or cost > 3)))",
+                "with pytest.raises(ListValidationError, match='Detachment Points'):\n    validate_detachment_selection(catalog=c, selection=selected, battle_size=BattleSize.INCURSION)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.03-incursion-limits",
+          "source_blocks": [
+            5
+          ],
+          "acceptance": "Incursion permits 1000 points, two Detachment Points, two Enhancements and two ordinary copies per datasheet.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_points_exact_cap_and_one_over_includes_each_enhancement",
+              "function_ast_sha256": "3432496343e3b15e8de07bfe144615e021140e56f48752ea2cf935d676644648",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert {v.violation_code for v in report.violations} == {'points_limit_exceeded'}",
+                "assert r.to_payload() == before"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='RosterLegalityReport'):\n    muster_army(catalog=c, request=bad)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_datasheet_limit_counts_physical_units_and_category_exception_once",
+              "function_ast_sha256": "f997972845c6bb3615fd03dd98f94d37e59be50566d167e18d1a0017c2758d93",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in violations} == {'unit_limit_exceeded'}",
+                "assert violations[0].source_id is not None",
+                "assert violations[0].source_id.endswith(BODY)"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_enhancement_budget_counts_distinct_ordinary_and_one_upgrade_kind",
+              "function_ast_sha256": "b5f3958b4e9857c3a6e0d180ecd2ec532a837ba70a2192fc6c36535ad4cf31f6",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {'enhancement_limit_exceeded'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_detachments.py::test_incursion_three_dp_exception_requires_sole_detachment",
+              "function_ast_sha256": "b9de63b5dee8e34d019e6e18713412d040e2d1d675866cba710f39827f72fcf6",
+              "assertions": [
+                "assert {d.detachment_id for d in resolved} == set(selected.detachment_ids)"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(DetachmentCatalogError, match='between 1 and 3'):\n    replace(c.detachments[0], detachment_point_cost=next((cost for cost in costs if cost < 1 or cost > 3)))",
+                "with pytest.raises(ListValidationError, match='Detachment Points'):\n    validate_detachment_selection(catalog=c, selection=selected, battle_size=BattleSize.INCURSION)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.03-strike-force-limits",
+          "source_blocks": [
+            5
+          ],
+          "acceptance": "Strike Force permits 2000 points, three Detachment Points, four Enhancements and three ordinary copies per datasheet.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_points_exact_cap_and_one_over_includes_each_enhancement",
+              "function_ast_sha256": "3432496343e3b15e8de07bfe144615e021140e56f48752ea2cf935d676644648",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert {v.violation_code for v in report.violations} == {'points_limit_exceeded'}",
+                "assert r.to_payload() == before"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='RosterLegalityReport'):\n    muster_army(catalog=c, request=bad)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_datasheet_limit_counts_physical_units_and_category_exception_once",
+              "function_ast_sha256": "f997972845c6bb3615fd03dd98f94d37e59be50566d167e18d1a0017c2758d93",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in violations} == {'unit_limit_exceeded'}",
+                "assert violations[0].source_id is not None",
+                "assert violations[0].source_id.endswith(BODY)"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_enhancement_budget_counts_distinct_ordinary_and_one_upgrade_kind",
+              "function_ast_sha256": "b5f3958b4e9857c3a6e0d180ecd2ec532a837ba70a2192fc6c36535ad4cf31f6",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {'enhancement_limit_exceeded'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase9c_mustering.py::test_strike_force_detachment_points_force_dispositions_and_unit_grants",
+              "function_ast_sha256": "5f84357e907b9607a96f9b597c34104505b9a089fe1b2c093f84afefbb2a4e35",
+              "assertions": [
+                "assert faction.faction_id == 'core-marine-force'",
+                "assert tuple((detachment.detachment_id for detachment in detachments)) == ('core-support', 'core-vanguard')",
+                "assert army.detachment_selection.detachment_ids == ('core-support', 'core-vanguard')",
+                "assert selected_force_disposition_ids(catalog=multi_detachment_catalog, selection=legal_selection) == ('reconnaissance', 'take-and-hold')",
+                "assert faction_army.units[0].datasheet_id == 'core-transport'"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ListValidationError, match='Detachment Points'):\n    validate_detachment_selection(catalog=multi_detachment_catalog, selection=over_limit_selection)"
+              ],
+              "execution_role": "unchanged_original_dependency_current_execution",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.03-battleline-transport-double",
+          "source_blocks": [
+            4
+          ],
+          "acceptance": "Battleline and Dedicated Transport datasheet-copy limits are twice the ordinary cap, without stacking both exceptions.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_datasheet_limit_counts_physical_units_and_category_exception_once",
+              "function_ast_sha256": "f997972845c6bb3615fd03dd98f94d37e59be50566d167e18d1a0017c2758d93",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in violations} == {'unit_limit_exceeded'}",
+                "assert violations[0].source_id is not None",
+                "assert violations[0].source_id.endswith(BODY)"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.03-epic-hero-one",
+          "source_blocks": [
+            4
+          ],
+          "acceptance": "Each Epic Hero has a one-unit limit regardless of battle size.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_epic_hero_cap_overrides_even_battleline_exception",
+              "function_ast_sha256": "6a807e760d5ebd4027e3697c964b9dffcb216f705c386dd84bb2f3c641f4ec0e",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=two).violations} == {'epic_hero_not_unique'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.03-context-0",
+          "source_blocks": [
+            3
+          ],
+          "classification": "context",
+          "reason": "Introduces the numerical battle-size table.",
+          "kind": "nonoperative",
+          "semantic_assertions": []
+        }
+      ],
+      "colocated_faq_clarifications": []
+    },
+    {
+      "row_id": "rule:25:25.04:1",
+      "category": "25",
+      "locator": "25.04",
+      "title": "Fill Your Army Roster",
+      "occurrence": 1,
+      "source_sha256": "d6d4610284b7cdc978b9d85e912d438816bb84d8ff86f758c10e1ac8df51519e",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "df1fa213c2528af7cc2727ba0d6e00436014c337035f2c08d509fd611c1a5659"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "585d5e2fcdc59281d377cf59203027b304048e93f235bc3853c95f0cf054df45"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "0521b27796800c0b74f8993d570c374e5332dfd02ef0c1b86b75c215627e1e68"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "d21fa8c79f9e5d2784e140ca00dc15dc5abe4e0b4626f19f34d576dfeac45714"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "9d668bc549669822f93b60a0d4b41524f63db466d37a1282f07bb5ce93baba33"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "d0ca1af4d57218b3e9f09af605454cea90233db83a4cb00406a25f4037284c66"
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "57ff450905f593058c16c31fa7639a76895da47292cdfcb1aae80d46edeaaebd"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "9b78f2be389edde444749ccbdf78966e9701cc628ec12e3a9e402b057e27ee29"
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "ed40d8e82be970ffce7791d046896f2d37ec323cb926d3c2994272b1ceeeeef0"
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "90ab6530d2f8d06b66c28982a58b0470c65f9eac9711b65b1e375cf10ffdd310"
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "06cc21214eb1dfcbc8b92f98ecba482189b897b00a25a5c9a06ee94bd24ab956"
+        },
+        {
+          "ordinal": 12,
+          "kind": "text",
+          "sha256": "2751a9bbbd79dbe4f5f809606272dd2f72d4fd7c5076d3973684d03fae0d05d3"
+        },
+        {
+          "ordinal": 13,
+          "kind": "text",
+          "sha256": "58aa5d8f9f5cc3a261c77d96072dc4bc3329d3320454acc7e27cd41a9b83a349"
+        },
+        {
+          "ordinal": 14,
+          "kind": "text",
+          "sha256": "7d3528e2c2daf392baa0e6398a965df44dab93307daf0a0f5da19f84c377e762"
+        },
+        {
+          "ordinal": 15,
+          "kind": "text",
+          "sha256": "9e90cccd1e3e190291b2859572a8a32368096f3f980f131b3c9bc61dd3f7f2bf"
+        },
+        {
+          "ordinal": 16,
+          "kind": "text",
+          "sha256": "3d715a663060598a63decc7c997c2e20e6fbb49600703170788746e655e0b093"
+        },
+        {
+          "ordinal": 17,
+          "kind": "text",
+          "sha256": "de63d84d411500320501c371c027fb644a8fd2a98473a93a0b5dfdbb744e1b47"
+        },
+        {
+          "ordinal": 18,
+          "kind": "text",
+          "sha256": "c53b5f4edfe6aaca9578379d7e1208b1496793e29afcd4187b4acdb45667c695"
+        },
+        {
+          "ordinal": 19,
+          "kind": "text",
+          "sha256": "abb13baa61631c4e4546cf3dfc6ac7baaebf70a6584f41ef5c74e4e6aac3424a"
+        },
+        {
+          "ordinal": 20,
+          "kind": "text",
+          "sha256": "af5d2a73a2b7a587264b12ff7359f6e3b7b81496e17491268acb499ce1d277c0"
+        },
+        {
+          "ordinal": 21,
+          "kind": "text",
+          "sha256": "db4fc96d9d9ce01ffd340dd583e64527792751a0f32e278248c66066526bbc25"
+        },
+        {
+          "ordinal": 22,
+          "kind": "text",
+          "sha256": "e65a76789463c45692a784440588d0151426f738a0421b3521714a7d8e1d7459"
+        },
+        {
+          "ordinal": 23,
+          "kind": "text",
+          "sha256": "910f35158ebb6cd18cdb6b806bbddf12dad1a6a278d8e90971d30f0cc27f9bc1"
+        }
+      ],
+      "obligations": [
+        {
+          "id": "25.04-record-all-selections",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Roster construction records detachments, units, Warlord, Enhancements and attached-unit selections.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:muster_army",
+            "src/warhammer40k_core/adapters/redaction.py:public_army_roster_payload",
+            "src/warhammer40k_core/adapters/projection.py:project_game_view"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_warlord_attachment.py::test_exact_selected_character_gets_warlord_and_bearer_record",
+              "function_ast_sha256": "0d6bc01d92c4c443cbfe440c9fdf93a44c4db9de379f64ca4ba0c37c844e1873",
+              "assertions": [
+                "assert r.warlord_selection is not None",
+                "assert ['WARLORD' in m.keywords for m in army.units[0].own_models] == [index == 1, index == 2]",
+                "assert army.enhancement_assignments[0].model_index == index",
+                "assert ArmyMusterRequest.from_payload(r.to_payload()) == r",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert r.warlord_selection is not None",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {'warlord_invalid_model_selection'}",
+                "assert all(('WARLORD' not in m.keywords for u in diagnostic.units for m in u.own_models))"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_attached_upgrade_belongs_to_bodyguard_and_cannot_stack_on_leader",
+              "function_ast_sha256": "4794815c053b2820a99ad9006e149d8297827ac799839366702ba8adcca28d9c",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert len(army.attached_units) == 1",
+                "assert army.enhancement_assignments[0].target_unit_selection_id == 'body'",
+                "assert enhancement_bearer_unit(army, assignment=army.enhancement_assignments[0]).unit_instance_id == 's25-army:body'",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert 'attached_squad_enhancement_limit_exceeded' in {v.violation_code for v in validate_roster_legality(catalog=c, request=both).violations}",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=direct).violations} == {'epic_hero_enhancement_forbidden'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_warlord_attachment.py::test_support_requires_permitted_bodyguard_and_leader_can_stand_alone",
+              "function_ast_sha256": "cb7850404e0a6018e9e490977a6be36f90f3d011b8891bd676257dfcc2174ab9",
+              "assertions": [
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=r).violations} == {'attachment_declaration_invalid'}",
+                "assert army.attached_units[0].support_unit_instance_ids == ('s25-army:support',)",
+                "assert army.attached_units[0].leader_unit_instance_ids == ()",
+                "assert 'ATTACHED_UNIT' not in army.unit_by_id('s25-army:commander').keywords",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=wrong).violations} == {'attachment_declaration_invalid'}"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='Support units must be declared'):\n    muster_army(catalog=c, request=r)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_facade.py::test_prebattle_public_roster_submission_and_json_restoration",
+              "function_ast_sha256": "0383ec149354ad02d4d0fcb1eba1e81aec4f65d91382598b8da913b950657972",
+              "assertions": [
+                "assert pending is not None",
+                "assert state is not None",
+                "assert all((a.roster_legality_report.is_legal for a in state.army_definitions))",
+                "assert all((len(a.enhancement_assignments) == 1 and a.warlord_selection is not None for a in state.army_definitions))",
+                "assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()",
+                "assert result == restored_result",
+                "assert session.lifecycle.to_payload() == restored.lifecycle.to_payload()",
+                "assert unit['datasheet_id'] == BODY",
+                "assert len(unit['model_instance_ids']) == 5",
+                "assert unit['selected_wargear_ids'] == ['core-bolt-rifle']",
+                "assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)",
+                "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='muster|roster'):\n    rejected.advance_until_decision_or_terminal()"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_facade.py::test_native_roster_disclosure_distinguishes_physical_upgrade_bearers",
+              "function_ast_sha256": "36e5b79b11e3905f9f00c2a23e77a26ae8961dbcacad1a41e9d9e3d9e7a313dc",
+              "assertions": [
+                "assert views[0] != views[1]",
+                "assert views[0]['projection_state_hash'] != views[1]['projection_state_hash']",
+                "assert {k: v for k, v in views[0].items() if k not in excluded} == {k: v for k, v in views[1].items() if k not in excluded}",
+                "assert session.advance_until_decision_or_terminal().decision_request is not None",
+                "assert 'public_army_rosters' in view",
+                "assert public['attachment_declarations'] is None",
+                "assert public['dedicated_transport_manifests'] is None",
+                "assert view['model_display_by_id'][physical]['unit_instance_id'] == target_id",
+                "assert 'public_army_rosters' in owner",
+                "assert next((r for r in owner['public_army_rosters'] if r['player_id'] == 'owner'))['attachment_declarations'] == recorded['attachment_declarations']",
+                "assert restored.view(viewer_player_id='opponent') == view",
+                "assert fork.view(viewer_player_id='opponent') == view",
+                "assert fork.lifecycle.state is not session.lifecycle.state",
+                "assert replay.status is ReplayRunStatus.REPRODUCED",
+                "assert session.lifecycle.to_payload() == before",
+                "assert public[key] == recorded[key]",
+                "assert 'public_army_rosters' in projected",
+                "assert row['enhancement_assignments'] == recorded['enhancement_assignments']",
+                "assert row['attachment_declarations'] == (recorded['attachment_declarations'] if context.policy.omniscient else None)"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "normal_engine_generated_public_roster_disclosure",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-obey-size-budgets",
+          "source_blocks": [
+            3
+          ],
+          "acceptance": "Roster totals must obey all limits for the selected battle size.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_points_exact_cap_and_one_over_includes_each_enhancement",
+              "function_ast_sha256": "3432496343e3b15e8de07bfe144615e021140e56f48752ea2cf935d676644648",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert {v.violation_code for v in report.violations} == {'points_limit_exceeded'}",
+                "assert r.to_payload() == before"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='RosterLegalityReport'):\n    muster_army(catalog=c, request=bad)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_datasheet_limit_counts_physical_units_and_category_exception_once",
+              "function_ast_sha256": "f997972845c6bb3615fd03dd98f94d37e59be50566d167e18d1a0017c2758d93",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in violations} == {'unit_limit_exceeded'}",
+                "assert violations[0].source_id is not None",
+                "assert violations[0].source_id.endswith(BODY)"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_enhancement_budget_counts_distinct_ordinary_and_one_upgrade_kind",
+              "function_ast_sha256": "b5f3958b4e9857c3a6e0d180ecd2ec532a837ba70a2192fc6c36535ad4cf31f6",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {'enhancement_limit_exceeded'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_detachments.py::test_incursion_three_dp_exception_requires_sole_detachment",
+              "function_ast_sha256": "b9de63b5dee8e34d019e6e18713412d040e2d1d675866cba710f39827f72fcf6",
+              "assertions": [
+                "assert {d.detachment_id for d in resolved} == set(selected.detachment_ids)"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(DetachmentCatalogError, match='between 1 and 3'):\n    replace(c.detachments[0], detachment_point_cost=next((cost for cost in costs if cost < 1 or cost > 3)))",
+                "with pytest.raises(ListValidationError, match='Detachment Points'):\n    validate_detachment_selection(catalog=c, selection=selected, battle_size=BattleSize.INCURSION)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-one-enhancement-per-unit",
+          "source_blocks": [
+            4
+          ],
+          "acceptance": "No unit, including an attached rules unit, can have more than one Enhancement.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_ordinary_duplicate_and_two_different_enhancements_on_one_unit_are_rejected",
+              "function_ast_sha256": "b1f783c5465480eda591c370e99bacb15c5a3f95495cce200351247c16d5e522",
+              "assertions": [
+                "assert muster_army(catalog=c, request=valid).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=repeated).violations} == {'enhancement_repeated_assignment_forbidden'}"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='multiple Enhancements'):\n    replace(valid, enhancement_assignments=(assignment(units[0]), assignment(units[0], ORDINARY[1])))"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_attached_upgrade_belongs_to_bodyguard_and_cannot_stack_on_leader",
+              "function_ast_sha256": "4794815c053b2820a99ad9006e149d8297827ac799839366702ba8adcca28d9c",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert len(army.attached_units) == 1",
+                "assert army.enhancement_assignments[0].target_unit_selection_id == 'body'",
+                "assert enhancement_bearer_unit(army, assignment=army.enhancement_assignments[0]).unit_instance_id == 's25-army:body'",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert 'attached_squad_enhancement_limit_exceeded' in {v.violation_code for v in validate_roster_legality(catalog=c, request=both).violations}",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=direct).violations} == {'epic_hero_enhancement_forbidden'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-obey-content-restrictions",
+          "source_blocks": [
+            5,
+            8
+          ],
+          "acceptance": "Every selected unit and detachment\u00e2\u20ac\u2122s source-backed roster restrictions must hold.",
+          "owners": [
+            "src/warhammer40k_core/engine/roster_construction_validation.py:append_construction_violations"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_detachments.py::test_required_and_prohibited_units_enforced_by_report_and_muster",
+              "function_ast_sha256": "c9309e817760d42e31fa61ac09c784c2016ec6b45edb53dc8df863c7af8e2559",
+              "assertions": [
+                "assert muster_army(catalog=c, request=good).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in violations} == {kind.value}",
+                "assert violations[0].source_id == rule.source_id"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='construction'):\n    muster_army(catalog=c, request=bad)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_detachments.py::test_required_and_prohibited_other_detachments_use_canonical_owner",
+              "function_ast_sha256": "5138fdcb7ad49f641d2fe568c1a3f0866b8c142acd1795cb1443d1a8eccd0a0d",
+              "assertions": [
+                "assert muster_army(catalog=c, request=good).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {kind.value}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-available-faction-detachments",
+          "source_blocks": [
+            7
+          ],
+          "acceptance": "Selected detachments must be available to the army faction.",
+          "owners": [
+            "src/warhammer40k_core/engine/list_validation.py:validate_detachment_selection"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_detachments.py::test_alias_faction_and_selected_inventory_boundaries",
+              "function_ast_sha256": "101e8d91328ea4cf3fc206db46b3b80f1c4095646d5682c8f02ff8ce81893db6",
+              "assertions": [
+                "assert faction.faction_id == owner.faction_id",
+                "assert grants[0].force_disposition_ids == owner.force_disposition_ids",
+                "assert ORDINARY[0] in grants[0].enhancement_ids",
+                "assert grants[0].stratagem_ids == owner.stratagem_ids"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ListValidationError, match='same detachment'):\n    validate_detachment_selection(catalog=c, selection=DetachmentSelection(owner.faction_id, (owner.detachment_id, alias.detachment_id)))",
+                "with pytest.raises(ListValidationError, match='does not belong'):\n    validate_detachment_selection(catalog=c, selection=DetachmentSelection(owner.faction_id, (foreign.detachment_id,)))",
+                "with pytest.raises(ListValidationError, match='not allowed'):\n    validate_detachment_selection(catalog=stripped, selection=selected)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-unique-detachments",
+          "source_blocks": [
+            7
+          ],
+          "acceptance": "A detachment cannot be selected more than once, including aliases of the same source identity.",
+          "owners": [
+            "src/warhammer40k_core/engine/list_validation.py:validate_detachment_selection"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_detachments.py::test_alias_faction_and_selected_inventory_boundaries",
+              "function_ast_sha256": "101e8d91328ea4cf3fc206db46b3b80f1c4095646d5682c8f02ff8ce81893db6",
+              "assertions": [
+                "assert faction.faction_id == owner.faction_id",
+                "assert grants[0].force_disposition_ids == owner.force_disposition_ids",
+                "assert ORDINARY[0] in grants[0].enhancement_ids",
+                "assert grants[0].stratagem_ids == owner.stratagem_ids"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ListValidationError, match='same detachment'):\n    validate_detachment_selection(catalog=c, selection=DetachmentSelection(owner.faction_id, (owner.detachment_id, alias.detachment_id)))",
+                "with pytest.raises(ListValidationError, match='does not belong'):\n    validate_detachment_selection(catalog=c, selection=DetachmentSelection(owner.faction_id, (foreign.detachment_id,)))",
+                "with pytest.raises(ListValidationError, match='not allowed'):\n    validate_detachment_selection(catalog=stripped, selection=selected)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-detachment-unlocks",
+          "source_blocks": [
+            7
+          ],
+          "acceptance": "Selecting a detachment grants its recorded rules, dispositions, Enhancements and Stratagem inventory.",
+          "owners": [
+            "src/warhammer40k_core/engine/list_validation.py:validate_detachment_selection"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_detachments.py::test_alias_faction_and_selected_inventory_boundaries",
+              "function_ast_sha256": "101e8d91328ea4cf3fc206db46b3b80f1c4095646d5682c8f02ff8ce81893db6",
+              "assertions": [
+                "assert faction.faction_id == owner.faction_id",
+                "assert grants[0].force_disposition_ids == owner.force_disposition_ids",
+                "assert ORDINARY[0] in grants[0].enhancement_ids",
+                "assert grants[0].stratagem_ids == owner.stratagem_ids"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ListValidationError, match='same detachment'):\n    validate_detachment_selection(catalog=c, selection=DetachmentSelection(owner.faction_id, (owner.detachment_id, alias.detachment_id)))",
+                "with pytest.raises(ListValidationError, match='does not belong'):\n    validate_detachment_selection(catalog=c, selection=DetachmentSelection(owner.faction_id, (foreign.detachment_id,)))",
+                "with pytest.raises(ListValidationError, match='not allowed'):\n    validate_detachment_selection(catalog=stripped, selection=selected)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-eligible-faction-units",
+          "source_blocks": [
+            10
+          ],
+          "acceptance": "Roster units must carry the army faction keyword or be explicitly available to that army faction.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_native.py::test_real_faction_composition_and_equipment_reach_physical_models",
+              "function_ast_sha256": "2d7cdfb297d3cba4ddf31d7ae3b87681d7755d6337bd3e8b8c140bfea878c1cf",
+              "assertions": [
+                "assert validate_unit_selection_for_faction(catalog=c, selection=selected, faction=faction) is sheet",
+                "assert len(unit.own_models) == sum((p.min_models for p in sheet.composition))",
+                "assert all((m.wargear_ids for m in unit.own_models))",
+                "assert set(unit.faction_keywords) & set(faction.faction_keywords)",
+                "assert UnitInstance.from_payload(unit.to_payload()).to_payload() == unit.to_payload()"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ListValidationError, match='not legal for faction'):\n    validate_unit_selection_for_faction(catalog=c, selection=selected, faction=other)",
+                "with pytest.raises(ListValidationError, match='not legal for faction'):\n    validate_unit_selection_for_faction(catalog=c, selection=selected, faction=partial)",
+                "with pytest.raises(ListValidationError):\n    resolve_model_profile_selections(datasheet=sheet, selections=invalid_count)",
+                "with pytest.raises(UnitFactoryError):\n    d.unit(datasheet_id, wargear=(WargearSelection('not-advertised', sheet.composition[0].model_profile_id, ('not-equipped',)),))"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-record-unit-loadouts",
+          "source_blocks": [
+            10
+          ],
+          "acceptance": "Unit roster entries record model count, allowed wargear/upgrades and points.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_native.py::test_real_faction_composition_and_equipment_reach_physical_models",
+              "function_ast_sha256": "2d7cdfb297d3cba4ddf31d7ae3b87681d7755d6337bd3e8b8c140bfea878c1cf",
+              "assertions": [
+                "assert validate_unit_selection_for_faction(catalog=c, selection=selected, faction=faction) is sheet",
+                "assert len(unit.own_models) == sum((p.min_models for p in sheet.composition))",
+                "assert all((m.wargear_ids for m in unit.own_models))",
+                "assert set(unit.faction_keywords) & set(faction.faction_keywords)",
+                "assert UnitInstance.from_payload(unit.to_payload()).to_payload() == unit.to_payload()"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ListValidationError, match='not legal for faction'):\n    validate_unit_selection_for_faction(catalog=c, selection=selected, faction=other)",
+                "with pytest.raises(ListValidationError, match='not legal for faction'):\n    validate_unit_selection_for_faction(catalog=c, selection=selected, faction=partial)",
+                "with pytest.raises(ListValidationError):\n    resolve_model_profile_selections(datasheet=sheet, selections=invalid_count)",
+                "with pytest.raises(UnitFactoryError):\n    d.unit(datasheet_id, wargear=(WargearSelection('not-advertised', sheet.composition[0].model_profile_id, ('not-equipped',)),))"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_facade.py::test_prebattle_public_roster_submission_and_json_restoration",
+              "function_ast_sha256": "0383ec149354ad02d4d0fcb1eba1e81aec4f65d91382598b8da913b950657972",
+              "assertions": [
+                "assert pending is not None",
+                "assert state is not None",
+                "assert all((a.roster_legality_report.is_legal for a in state.army_definitions))",
+                "assert all((len(a.enhancement_assignments) == 1 and a.warlord_selection is not None for a in state.army_definitions))",
+                "assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()",
+                "assert result == restored_result",
+                "assert session.lifecycle.to_payload() == restored.lifecycle.to_payload()",
+                "assert unit['datasheet_id'] == BODY",
+                "assert len(unit['model_instance_ids']) == 5",
+                "assert unit['selected_wargear_ids'] == ['core-bolt-rifle']",
+                "assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)",
+                "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='muster|roster'):\n    rejected.advance_until_decision_or_terminal()"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_army_points_mfm.py::test_catalog_with_mfm_points_feeds_roster_legality_enhancement_prices",
+              "function_ast_sha256": "452bd821f3c48c429db44f78ea53b91e301bb92fc0081fe0eb923b9c5bf5ce4e",
+              "assertions": [
+                "assert 'points_limit_exceeded' in stale_codes",
+                "assert 'points_limit_exceeded' not in overlay_codes",
+                "assert 'source_awaiting_enhancement_points' not in overlay_codes"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "unchanged_original_dependency_current_execution",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-character-faction-warlord",
+          "source_blocks": [
+            11
+          ],
+          "acceptance": "Select a Character unit of the army faction and one Character model in it as Warlord.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_warlord_attachment.py::test_exact_selected_character_gets_warlord_and_bearer_record",
+              "function_ast_sha256": "0d6bc01d92c4c443cbfe440c9fdf93a44c4db9de379f64ca4ba0c37c844e1873",
+              "assertions": [
+                "assert r.warlord_selection is not None",
+                "assert ['WARLORD' in m.keywords for m in army.units[0].own_models] == [index == 1, index == 2]",
+                "assert army.enhancement_assignments[0].model_index == index",
+                "assert ArmyMusterRequest.from_payload(r.to_payload()) == r",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert r.warlord_selection is not None",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {'warlord_invalid_model_selection'}",
+                "assert all(('WARLORD' not in m.keywords for u in diagnostic.units for m in u.own_models))"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase9c_mustering.py::test_order68_mixed_unit_checks_selected_model_keywords",
+              "function_ast_sha256": "3efc6f0290393feec32d0710ec0e2c1311edfce4603398f19116526536593913",
+              "assertions": [
+                "assert muster_army(catalog=catalog, request=request).roster_legality_report.is_legal",
+                "assert request.warlord_selection is not None",
+                "assert {'warlord_character_required', 'enhancement_character_required'} <= codes",
+                "assert ('epic_hero_enhancement_forbidden' in codes) == other_epic"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "unchanged_original_dependency_current_execution",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase9c_mustering.py::test_phase17g_daemonic_pact_reports_roster_violations",
+              "function_ast_sha256": "73539040b0de780a9e82f54f492705c1b0712bc889f303c0ed46d5d6b340afde",
+              "assertions": [
+                "assert {violation.violation_code for violation in report.violations} >= {'daemonic_pact_enhancement_forbidden', 'daemonic_pact_god_ratio_exceeded', 'daemonic_pact_points_limit_exceeded', 'daemonic_pact_warlord_forbidden'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "unchanged_original_dependency_current_execution",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-warlord-model-keyword",
+          "source_blocks": [
+            11
+          ],
+          "acceptance": "Only the selected model receives WARLORD and the roster records its identity.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_warlord_attachment.py::test_exact_selected_character_gets_warlord_and_bearer_record",
+              "function_ast_sha256": "0d6bc01d92c4c443cbfe440c9fdf93a44c4db9de379f64ca4ba0c37c844e1873",
+              "assertions": [
+                "assert r.warlord_selection is not None",
+                "assert ['WARLORD' in m.keywords for m in army.units[0].own_models] == [index == 1, index == 2]",
+                "assert army.enhancement_assignments[0].model_index == index",
+                "assert ArmyMusterRequest.from_payload(r.to_payload()) == r",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert r.warlord_selection is not None",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {'warlord_invalid_model_selection'}",
+                "assert all(('WARLORD' not in m.keywords for u in diagnostic.units for m in u.own_models))"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-mandatory-warlord-choice",
+          "source_blocks": [
+            11
+          ],
+          "acceptance": "If mandatory Warlord units are included, select one eligible mandatory candidate.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_warlord_attachment.py::test_mandatory_candidates_and_prohibition_precedence",
+              "function_ast_sha256": "018a8ca445b29322756fd424c346a987704a338bcd5ebdd69dcd40caffc22ebb",
+              "assertions": [
+                "assert codes == ({'warlord_forbidden'} if forbid_selected else set())",
+                "assert r.warlord_selection is not None",
+                "assert other_codes == (set() if forbid_selected else {'supreme_commander_warlord_required'})",
+                "assert muster_army(catalog=c, request=legal).roster_legality_report.is_legal"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase9c_mustering.py::test_mustering_allows_multiple_supreme_commanders_when_one_is_warlord",
+              "function_ast_sha256": "0a8c1ff41c2f54cb81d62f8df82c9f0bb2d45ad5f1e7a84c0ed2e4c83c8e76ae",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert 'WARLORD' not in keywords_by_unit_id['army-alpha:leader-one']",
+                "assert 'WARLORD' in keywords_by_unit_id['army-alpha:leader-two']"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "unchanged_original_dependency_current_execution",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-warlord-prohibition-prevails",
+          "source_blocks": [
+            11
+          ],
+          "acceptance": "A prohibition on being Warlord overrides a requirement to be Warlord.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_warlord_attachment.py::test_mandatory_candidates_and_prohibition_precedence",
+              "function_ast_sha256": "018a8ca445b29322756fd424c346a987704a338bcd5ebdd69dcd40caffc22ebb",
+              "assertions": [
+                "assert codes == ({'warlord_forbidden'} if forbid_selected else set())",
+                "assert r.warlord_selection is not None",
+                "assert other_codes == (set() if forbid_selected else {'supreme_commander_warlord_required'})",
+                "assert muster_army(catalog=c, request=legal).roster_legality_report.is_legal"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-support-must-attach",
+          "source_blocks": [
+            13
+          ],
+          "acceptance": "Every Support unit must attach to a permitted Bodyguard; a Leader may remain unattached.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:muster_army"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_warlord_attachment.py::test_support_requires_permitted_bodyguard_and_leader_can_stand_alone",
+              "function_ast_sha256": "cb7850404e0a6018e9e490977a6be36f90f3d011b8891bd676257dfcc2174ab9",
+              "assertions": [
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=r).violations} == {'attachment_declaration_invalid'}",
+                "assert army.attached_units[0].support_unit_instance_ids == ('s25-army:support',)",
+                "assert army.attached_units[0].leader_unit_instance_ids == ()",
+                "assert 'ATTACHED_UNIT' not in army.unit_by_id('s25-army:commander').keywords",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=wrong).violations} == {'attachment_declaration_invalid'}"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='Support units must be declared'):\n    muster_army(catalog=c, request=r)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_mfm.py::test_mfm_replaces_stale_datasheet_target_in_physical_mustering",
+              "function_ast_sha256": "482a983a47e4b8d25d38146217e1d63351d2a57468e909323dfce861d60e94af",
+              "assertions": [
+                "assert army.attached_units[0].bodyguard_unit_instance_id == 's25-army:body'",
+                "assert actual == (f's25-army:{source_unit}',)",
+                "assert c.datasheet_by_id(LEADER).attachment_eligibilities != overlaid.datasheet_by_id(LEADER).attachment_eligibilities"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='bodyguard datasheet is not allowed'):\n    muster_army(catalog=c, request=r)",
+                "with pytest.raises(ArmyMusteringError, match='bodyguard datasheet is not allowed'):\n    muster_army(catalog=overlaid, request=stale)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-selected-detachment-enhancements",
+          "source_blocks": [
+            15
+          ],
+          "acceptance": "Enhancements must come from selected detachments and be assigned to distinct eligible units.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_detachments.py::test_alias_faction_and_selected_inventory_boundaries",
+              "function_ast_sha256": "101e8d91328ea4cf3fc206db46b3b80f1c4095646d5682c8f02ff8ce81893db6",
+              "assertions": [
+                "assert faction.faction_id == owner.faction_id",
+                "assert grants[0].force_disposition_ids == owner.force_disposition_ids",
+                "assert ORDINARY[0] in grants[0].enhancement_ids",
+                "assert grants[0].stratagem_ids == owner.stratagem_ids"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ListValidationError, match='same detachment'):\n    validate_detachment_selection(catalog=c, selection=DetachmentSelection(owner.faction_id, (owner.detachment_id, alias.detachment_id)))",
+                "with pytest.raises(ListValidationError, match='does not belong'):\n    validate_detachment_selection(catalog=c, selection=DetachmentSelection(owner.faction_id, (foreign.detachment_id,)))",
+                "with pytest.raises(ListValidationError, match='not allowed'):\n    validate_detachment_selection(catalog=stripped, selection=selected)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_ordinary_duplicate_and_two_different_enhancements_on_one_unit_are_rejected",
+              "function_ast_sha256": "b1f783c5465480eda591c370e99bacb15c5a3f95495cce200351247c16d5e522",
+              "assertions": [
+                "assert muster_army(catalog=c, request=valid).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=repeated).violations} == {'enhancement_repeated_assignment_forbidden'}"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='multiple Enhancements'):\n    replace(valid, enhancement_assignments=(assignment(units[0]), assignment(units[0], ORDINARY[1])))"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-enhancement-points",
+          "source_blocks": [
+            15
+          ],
+          "acceptance": "Every Enhancement adds its points cost to the assigned unit\u00e2\u20ac\u2122s army contribution.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_points_exact_cap_and_one_over_includes_each_enhancement",
+              "function_ast_sha256": "3432496343e3b15e8de07bfe144615e021140e56f48752ea2cf935d676644648",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert {v.violation_code for v in report.violations} == {'points_limit_exceeded'}",
+                "assert r.to_payload() == before"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='RosterLegalityReport'):\n    muster_army(catalog=c, request=bad)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_upgrade_copies_pay_each_count_once_and_stop_at_three",
+              "function_ast_sha256": "0a088228078108c0ea1827fa077eaeb128965912d9552a926d874908d6ae6d5e",
+              "assertions": [
+                "assert codes == ({'upgrade_assignment_limit_exceeded'} if copies == 4 else set())",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=too_many_points).violations} == codes | {'points_limit_exceeded'}",
+                "assert len(army.enhancement_assignments) == copies + 1",
+                "assert army.detachment_selection.enhancement_ids == (ORDINARY[0], UPGRADE)",
+                "assert {enhancement_bearer_unit(army, assignment=a).unit_instance_id for a in army.enhancement_assignments} == {u.unit_instance_id for u in army.units}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_army_points_mfm.py::test_catalog_with_mfm_points_feeds_roster_legality_enhancement_prices",
+              "function_ast_sha256": "452bd821f3c48c429db44f78ea53b91e301bb92fc0081fe0eb923b9c5bf5ce4e",
+              "assertions": [
+                "assert 'points_limit_exceeded' in stale_codes",
+                "assert 'points_limit_exceeded' not in overlay_codes",
+                "assert 'source_awaiting_enhancement_points' not in overlay_codes"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "unchanged_original_dependency_current_execution",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-character-model-bearer",
+          "source_blocks": [
+            17
+          ],
+          "acceptance": "Ordinary Enhancements require a Character unit and an explicitly selected Character model when the unit has several models.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_warlord_attachment.py::test_exact_selected_character_gets_warlord_and_bearer_record",
+              "function_ast_sha256": "0d6bc01d92c4c443cbfe440c9fdf93a44c4db9de379f64ca4ba0c37c844e1873",
+              "assertions": [
+                "assert r.warlord_selection is not None",
+                "assert ['WARLORD' in m.keywords for m in army.units[0].own_models] == [index == 1, index == 2]",
+                "assert army.enhancement_assignments[0].model_index == index",
+                "assert ArmyMusterRequest.from_payload(r.to_payload()) == r",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert r.warlord_selection is not None",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {'warlord_invalid_model_selection'}",
+                "assert all(('WARLORD' not in m.keywords for u in diagnostic.units for m in u.own_models))"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_noncharacter_and_exact_model_bearer_boundary",
+              "function_ast_sha256": "e738295d4802c0647a3716df34ea5af1447675e3c8dc32ed604585bee6dcbabe",
+              "assertions": [
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=r).violations} == (set() if upgrade else {'enhancement_character_required'})",
+                "assert 'enhancement_invalid_model_selection' in {v.violation_code for v in validate_roster_legality(catalog=c, request=invalid).violations}"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError):\n    muster_army(catalog=c, request=invalid)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase9c_mustering.py::test_order68_mixed_unit_checks_selected_model_keywords",
+              "function_ast_sha256": "3efc6f0290393feec32d0710ec0e2c1311edfce4603398f19116526536593913",
+              "assertions": [
+                "assert muster_army(catalog=catalog, request=request).roster_legality_report.is_legal",
+                "assert request.warlord_selection is not None",
+                "assert {'warlord_character_required', 'enhancement_character_required'} <= codes",
+                "assert ('epic_hero_enhancement_forbidden' in codes) == other_epic"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "unchanged_original_dependency_current_execution",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-epic-model-no-enhancement",
+          "source_blocks": [
+            18
+          ],
+          "acceptance": "An Epic Hero model cannot receive an Enhancement.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_attached_upgrade_belongs_to_bodyguard_and_cannot_stack_on_leader",
+              "function_ast_sha256": "4794815c053b2820a99ad9006e149d8297827ac799839366702ba8adcca28d9c",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert len(army.attached_units) == 1",
+                "assert army.enhancement_assignments[0].target_unit_selection_id == 'body'",
+                "assert enhancement_bearer_unit(army, assignment=army.enhancement_assignments[0]).unit_instance_id == 's25-army:body'",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert 'attached_squad_enhancement_limit_exceeded' in {v.violation_code for v in validate_roster_legality(catalog=c, request=both).violations}",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=direct).violations} == {'epic_hero_enhancement_forbidden'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase9c_mustering.py::test_order68_mixed_unit_checks_selected_model_keywords",
+              "function_ast_sha256": "3efc6f0290393feec32d0710ec0e2c1311edfce4603398f19116526536593913",
+              "assertions": [
+                "assert muster_army(catalog=catalog, request=request).roster_legality_report.is_legal",
+                "assert request.warlord_selection is not None",
+                "assert {'warlord_character_required', 'enhancement_character_required'} <= codes",
+                "assert ('epic_hero_enhancement_forbidden' in codes) == other_epic"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "unchanged_original_dependency_current_execution",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-standard-enhancement-unique",
+          "source_blocks": [
+            19
+          ],
+          "acceptance": "The army cannot repeat an ordinary Enhancement.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_ordinary_duplicate_and_two_different_enhancements_on_one_unit_are_rejected",
+              "function_ast_sha256": "b1f783c5465480eda591c370e99bacb15c5a3f95495cce200351247c16d5e522",
+              "assertions": [
+                "assert muster_army(catalog=c, request=valid).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=repeated).violations} == {'enhancement_repeated_assignment_forbidden'}"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='multiple Enhancements'):\n    replace(valid, enhancement_assignments=(assignment(units[0]), assignment(units[0], ORDINARY[1])))"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-upgrade-noncharacter",
+          "source_blocks": [
+            21
+          ],
+          "acceptance": "Upgrade Enhancements can be assigned to non-Character units.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_noncharacter_and_exact_model_bearer_boundary",
+              "function_ast_sha256": "e738295d4802c0647a3716df34ea5af1447675e3c8dc32ed604585bee6dcbabe",
+              "assertions": [
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=r).violations} == (set() if upgrade else {'enhancement_character_required'})",
+                "assert 'enhancement_invalid_model_selection' in {v.violation_code for v in validate_roster_legality(catalog=c, request=invalid).violations}"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError):\n    muster_army(catalog=c, request=invalid)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_attached_upgrade_belongs_to_bodyguard_and_cannot_stack_on_leader",
+              "function_ast_sha256": "4794815c053b2820a99ad9006e149d8297827ac799839366702ba8adcca28d9c",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert len(army.attached_units) == 1",
+                "assert army.enhancement_assignments[0].target_unit_selection_id == 'body'",
+                "assert enhancement_bearer_unit(army, assignment=army.enhancement_assignments[0]).unit_instance_id == 's25-army:body'",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert 'attached_squad_enhancement_limit_exceeded' in {v.violation_code for v in validate_roster_legality(catalog=c, request=both).violations}",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=direct).violations} == {'epic_hero_enhancement_forbidden'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-upgrade-max-three",
+          "source_blocks": [
+            22
+          ],
+          "acceptance": "The army may include up to three copies of one Upgrade.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_upgrade_copies_pay_each_count_once_and_stop_at_three",
+              "function_ast_sha256": "0a088228078108c0ea1827fa077eaeb128965912d9552a926d874908d6ae6d5e",
+              "assertions": [
+                "assert codes == ({'upgrade_assignment_limit_exceeded'} if copies == 4 else set())",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=too_many_points).violations} == codes | {'points_limit_exceeded'}",
+                "assert len(army.enhancement_assignments) == copies + 1",
+                "assert army.detachment_selection.enhancement_ids == (ORDINARY[0], UPGRADE)",
+                "assert {enhancement_bearer_unit(army, assignment=a).unit_instance_id for a in army.enhancement_assignments} == {u.unit_instance_id for u in army.units}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-upgrade-count-once",
+          "source_blocks": [
+            22
+          ],
+          "acceptance": "The second and third copies of the same Upgrade do not increase the army Enhancement count.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_upgrade_copies_pay_each_count_once_and_stop_at_three",
+              "function_ast_sha256": "0a088228078108c0ea1827fa077eaeb128965912d9552a926d874908d6ae6d5e",
+              "assertions": [
+                "assert codes == ({'upgrade_assignment_limit_exceeded'} if copies == 4 else set())",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=too_many_points).violations} == codes | {'points_limit_exceeded'}",
+                "assert len(army.enhancement_assignments) == copies + 1",
+                "assert army.detachment_selection.enhancement_ids == (ORDINARY[0], UPGRADE)",
+                "assert {enhancement_bearer_unit(army, assignment=a).unit_instance_id for a in army.enhancement_assignments} == {u.unit_instance_id for u in army.units}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_enhancement_budget_counts_distinct_ordinary_and_one_upgrade_kind",
+              "function_ast_sha256": "b5f3958b4e9857c3a6e0d180ecd2ec532a837ba70a2192fc6c36535ad4cf31f6",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {'enhancement_limit_exceeded'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-upgrade-pay-each",
+          "source_blocks": [
+            22
+          ],
+          "acceptance": "Every Upgrade copy still costs its full points value.",
+          "owners": [
+            "src/warhammer40k_core/engine/army_mustering.py:validate_roster_legality"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_upgrade_copies_pay_each_count_once_and_stop_at_three",
+              "function_ast_sha256": "0a088228078108c0ea1827fa077eaeb128965912d9552a926d874908d6ae6d5e",
+              "assertions": [
+                "assert codes == ({'upgrade_assignment_limit_exceeded'} if copies == 4 else set())",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=too_many_points).violations} == codes | {'points_limit_exceeded'}",
+                "assert len(army.enhancement_assignments) == copies + 1",
+                "assert army.detachment_selection.enhancement_ids == (ORDINARY[0], UPGRADE)",
+                "assert {enhancement_bearer_unit(army, assignment=a).unit_instance_id for a in army.enhancement_assignments} == {u.unit_instance_id for u in army.units}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-incursion-single-three-dp",
+          "source_blocks": [
+            23
+          ],
+          "acceptance": "Incursion may select one three-DP detachment as its only detachment.",
+          "owners": [
+            "src/warhammer40k_core/engine/list_validation.py:validate_detachment_selection"
+          ],
+          "kind": "operative",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_detachments.py::test_incursion_three_dp_exception_requires_sole_detachment",
+              "function_ast_sha256": "b9de63b5dee8e34d019e6e18713412d040e2d1d675866cba710f39827f72fcf6",
+              "assertions": [
+                "assert {d.detachment_id for d in resolved} == set(selected.detachment_ids)"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(DetachmentCatalogError, match='between 1 and 3'):\n    replace(c.detachments[0], detachment_point_cost=next((cost for cost in costs if cost < 1 or cost > 3)))",
+                "with pytest.raises(ListValidationError, match='Detachment Points'):\n    validate_detachment_selection(catalog=c, selection=selected, battle_size=BattleSize.INCURSION)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "id": "25.04-context-0",
+          "source_blocks": [
+            6,
+            9,
+            12,
+            14
+          ],
+          "classification": "metadata",
+          "reason": "Section labels only; operative eligibility, distance and consequences are enumerated separately.",
+          "kind": "nonoperative",
+          "semantic_assertions": []
+        },
+        {
+          "id": "25.04-context-1",
+          "source_blocks": [
+            2,
+            16,
+            20
+          ],
+          "classification": "context",
+          "reason": "Introduces the roster restrictions and the Upgrade exception list.",
+          "kind": "nonoperative",
+          "semantic_assertions": []
+        }
+      ],
+      "colocated_faq_clarifications": [
+        {
+          "faq_number": 24,
+          "id": "c7a83b0a-e8c3-44b5-a3ca-bb3dfba98c2d",
+          "question": "The Munitorium Field Manual shows my unit can attach to different units then are on it's datasheet, which do I use?",
+          "answer": "Use the Munitorium Field Manual.",
+          "source_sha256": "e1ebb8a68e7f4c31e1672e4801af152cb6355b84d975b7329c57de930f5a61c1",
+          "owners": [
+            "src/warhammer40k_core/engine/army_points.py:catalog_with_mfm_attachment_allowances",
+            "src/warhammer40k_core/engine/roster_attachment_validation.py:resolve_attached_unit_formations"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_mfm.py::test_mfm_replaces_stale_datasheet_target_in_physical_mustering",
+              "function_ast_sha256": "482a983a47e4b8d25d38146217e1d63351d2a57468e909323dfce861d60e94af",
+              "assertions": [
+                "assert army.attached_units[0].bodyguard_unit_instance_id == 's25-army:body'",
+                "assert actual == (f's25-army:{source_unit}',)",
+                "assert c.datasheet_by_id(LEADER).attachment_eligibilities != overlaid.datasheet_by_id(LEADER).attachment_eligibilities"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='bodyguard datasheet is not allowed'):\n    muster_army(catalog=c, request=r)",
+                "with pytest.raises(ArmyMusteringError, match='bodyguard datasheet is not allowed'):\n    muster_army(catalog=overlaid, request=stale)"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 31,
+          "id": "019feac1-cd25-4644-b855-2ce3fa048fee",
+          "question": "Can an attached unit be given an Upgrade?",
+          "answer": "Yes.",
+          "source_sha256": "0726dff38f240002912d8730e11af4be7e4f1c14c17d67b797855e597dd88a42",
+          "owners": [
+            "src/warhammer40k_core/engine/roster_bearer_validation.py:append_enhancement_violations"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_attached_upgrade_belongs_to_bodyguard_and_cannot_stack_on_leader",
+              "function_ast_sha256": "4794815c053b2820a99ad9006e149d8297827ac799839366702ba8adcca28d9c",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert len(army.attached_units) == 1",
+                "assert army.enhancement_assignments[0].target_unit_selection_id == 'body'",
+                "assert enhancement_bearer_unit(army, assignment=army.enhancement_assignments[0]).unit_instance_id == 's25-army:body'",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert 'attached_squad_enhancement_limit_exceeded' in {v.violation_code for v in validate_roster_legality(catalog=c, request=both).violations}",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=direct).violations} == {'epic_hero_enhancement_forbidden'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 32,
+          "id": "38785a5c-16ba-41c5-b936-723a385f57aa",
+          "question": "Can a unit have both an Upgrade and an enhancement?",
+          "answer": "No, units are prevented from having two enhancements, and Upgrades are enhancements.",
+          "source_sha256": "7ee44f5393615f9102f2df97ea71badbd468f7b02b9f968aa1ec0c30da3ce524",
+          "owners": [
+            "src/warhammer40k_core/engine/roster_bearer_validation.py:append_enhancement_violations"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_attached_upgrade_belongs_to_bodyguard_and_cannot_stack_on_leader",
+              "function_ast_sha256": "4794815c053b2820a99ad9006e149d8297827ac799839366702ba8adcca28d9c",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert len(army.attached_units) == 1",
+                "assert army.enhancement_assignments[0].target_unit_selection_id == 'body'",
+                "assert enhancement_bearer_unit(army, assignment=army.enhancement_assignments[0]).unit_instance_id == 's25-army:body'",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert 'attached_squad_enhancement_limit_exceeded' in {v.violation_code for v in validate_roster_legality(catalog=c, request=both).violations}",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=direct).violations} == {'epic_hero_enhancement_forbidden'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_ordinary_duplicate_and_two_different_enhancements_on_one_unit_are_rejected",
+              "function_ast_sha256": "b1f783c5465480eda591c370e99bacb15c5a3f95495cce200351247c16d5e522",
+              "assertions": [
+                "assert muster_army(catalog=c, request=valid).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=repeated).violations} == {'enhancement_repeated_assignment_forbidden'}"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='multiple Enhancements'):\n    replace(valid, enhancement_assignments=(assignment(units[0]), assignment(units[0], ORDINARY[1])))"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 33,
+          "id": "3de45ba4-435e-4f58-a50c-fbda3f71bdc5",
+          "question": "Are Upgrades enhancements?",
+          "answer": "Yes, Upgrades are a type of enhancement (but not all enhancements are Upgrades).",
+          "source_sha256": "00e5a5e21fcdab4cfe98c30af6341386425851e952d8b85aa2febc27b4d2104e",
+          "owners": [
+            "src/warhammer40k_core/engine/roster_bearer_validation.py:append_enhancement_violations"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_upgrade_copies_pay_each_count_once_and_stop_at_three",
+              "function_ast_sha256": "0a088228078108c0ea1827fa077eaeb128965912d9552a926d874908d6ae6d5e",
+              "assertions": [
+                "assert codes == ({'upgrade_assignment_limit_exceeded'} if copies == 4 else set())",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=too_many_points).violations} == codes | {'points_limit_exceeded'}",
+                "assert len(army.enhancement_assignments) == copies + 1",
+                "assert army.detachment_selection.enhancement_ids == (ORDINARY[0], UPGRADE)",
+                "assert {enhancement_bearer_unit(army, assignment=a).unit_instance_id for a in army.enhancement_assignments} == {u.unit_instance_id for u in army.units}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            },
+            {
+              "node": "tests/rules/section25/test_budgets.py::test_enhancement_budget_counts_distinct_ordinary_and_one_upgrade_kind",
+              "function_ast_sha256": "b5f3958b4e9857c3a6e0d180ecd2ec532a837ba70a2192fc6c36535ad4cf31f6",
+              "assertions": [
+                "assert muster_army(catalog=c, request=r).roster_legality_report.is_legal",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=bad).violations} == {'enhancement_limit_exceeded'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 35,
+          "id": "6575ee89-b92a-456d-8e59-4ee513df8f4e",
+          "question": "Do rules that affect a keyword include multi-word keywords that contain that keyword? For example, would rules that affect Commissar units affect a unit that has the Commissar Graves keyword?",
+          "answer": "No.",
+          "source_sha256": "4246aa2cdf23333e8213aeef87c4224f0f2ff31b5f8c80229f9c9f3b7c648fa4",
+          "owners": [
+            "src/warhammer40k_core/engine/list_validation.py:validate_unit_selection_for_faction"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_native.py::test_real_faction_composition_and_equipment_reach_physical_models",
+              "function_ast_sha256": "2d7cdfb297d3cba4ddf31d7ae3b87681d7755d6337bd3e8b8c140bfea878c1cf",
+              "assertions": [
+                "assert validate_unit_selection_for_faction(catalog=c, selection=selected, faction=faction) is sheet",
+                "assert len(unit.own_models) == sum((p.min_models for p in sheet.composition))",
+                "assert all((m.wargear_ids for m in unit.own_models))",
+                "assert set(unit.faction_keywords) & set(faction.faction_keywords)",
+                "assert UnitInstance.from_payload(unit.to_payload()).to_payload() == unit.to_payload()"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ListValidationError, match='not legal for faction'):\n    validate_unit_selection_for_faction(catalog=c, selection=selected, faction=other)",
+                "with pytest.raises(ListValidationError, match='not legal for faction'):\n    validate_unit_selection_for_faction(catalog=c, selection=selected, faction=partial)",
+                "with pytest.raises(ListValidationError):\n    resolve_model_profile_selections(datasheet=sheet, selections=invalid_count)",
+                "with pytest.raises(UnitFactoryError):\n    d.unit(datasheet_id, wargear=(WargearSelection('not-advertised', sheet.composition[0].model_profile_id, ('not-equipped',)),))"
+              ],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 38,
+          "id": "9aea2cef-c9db-4a30-bbfb-6b07c1f148a2",
+          "question": "Can an Epic Hero unit form an attached unit with a unit that has an enhancement?",
+          "answer": "Yes.",
+          "source_sha256": "d4d4f6a90669f72253ba254163280068e061623dfd51e1989df9d53a3797f45d",
+          "owners": [
+            "src/warhammer40k_core/engine/roster_bearer_validation.py:append_enhancement_violations"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section25/test_enhancements.py::test_attached_upgrade_belongs_to_bodyguard_and_cannot_stack_on_leader",
+              "function_ast_sha256": "4794815c053b2820a99ad9006e149d8297827ac799839366702ba8adcca28d9c",
+              "assertions": [
+                "assert army.roster_legality_report.is_legal",
+                "assert len(army.attached_units) == 1",
+                "assert army.enhancement_assignments[0].target_unit_selection_id == 'body'",
+                "assert enhancement_bearer_unit(army, assignment=army.enhancement_assignments[0]).unit_instance_id == 's25-army:body'",
+                "assert ArmyDefinition.from_payload(army.to_payload()).to_payload() == army.to_payload()",
+                "assert 'attached_squad_enhancement_limit_exceeded' in {v.violation_code for v in validate_roster_legality(catalog=c, request=both).violations}",
+                "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=direct).violations} == {'epic_hero_enhancement_forbidden'}"
+              ],
+              "expected_exceptions": [],
+              "execution_role": "new_rewritten_kernel_or_facade",
+              "native_provider_or_roster_admission": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "faq_screen": [
+    {
+      "ordinal": 1,
+      "id": "c2df3e97-f21e-4fc9-943e-37072c08c10e",
+      "question": "Aerialists ability allows you to get into a transport even though they disembarked a transport this turn?",
+      "answer": "Yes, as the unit embarking is not making a normal, advance or fall-back move as part of this embarkation.",
+      "source_sha256": "5dde776b1cf69f6b47b71219938b51665eb2d8a42e8392befa07e5afdea855e2",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 2,
+      "id": "9bfa47ed-be8d-4e11-80de-f3832d507ca1",
+      "question": "Can I select a unit to shoot or fight if it doesn't have melee or ranged weapons?",
+      "answer": "Yes, it just makes no attacks and then the fight type or shoot type is resolved.",
+      "source_sha256": "8d4f6b7b01b92637f2848b261fe07f970ef819f1ee867b889e885d1bdcbb1ada",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 3,
+      "id": "7f767dd0-3996-417e-bba2-b7a5828b2430",
+      "question": "Can a model be within range of a weapon if it is not visible",
+      "answer": "Yes",
+      "source_sha256": "4cfeea846d7a2e135d7eb728147265987cc1adf54ca93657427474d44fe9ce56",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 4,
+      "id": "904b8b36-09f0-4449-a9c3-45892664ef60",
+      "question": "Do models destroyed when a unit is out of coherency count for mission objectives?",
+      "answer": "Yes.",
+      "source_sha256": "4d6f85a577496676241ac385c0cb4fa2e672c8c679d56ff363d7344279670845",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 5,
+      "id": "e5941469-5653-49b2-919e-9c9246e811d4",
+      "question": "Does my model or unit become engaged while moving through a enemy units engagement range during a move?",
+      "answer": "No",
+      "source_sha256": "819dd65da567f7dae1c13e61e2e2a43c02b1188d605f1458b3c5778eefe50b36",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 6,
+      "id": "5928ab6e-7113-42c8-9085-4291faddae09",
+      "question": "How many mortals do you take from Hazardous tests for a combined vehicle/monster and Infantry unit",
+      "answer": "The roll would be all at once and it would be 1 MW per fail",
+      "source_sha256": "3baf6215041a9e32c26f4544ae11dc0907a480bc3e2b1f3b30f0dfd8a8f53efe",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 7,
+      "id": "6b074ac1-8a03-43ac-8669-3bac17d372ab",
+      "question": "I failed hazard rolls from [Hazardous] weapons, do those mortal wounds have to be allocated to the models with the [Hazardous] weapons?",
+      "answer": "No, you allocate the mortal wounds to the unit as per Mortal Wounds(06.02). (This represents Bob the guardsmen picking up his fallen squad mates plasma gun or that the twisting power of James the Chaos Sorcerer pulling his followers into the warp.)",
+      "source_sha256": "ce792ca90e1fcdfb597549aaba5c9c7fa227850068b1581a6b00492e993aafb7",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 8,
+      "id": "e58d31bc-b6eb-4db1-b319-dc27dd60154f",
+      "question": "I have a rule that triggers when a mortal wound is allocated to a model, when does this happen?",
+      "answer": "When you select a model in the Select Model step of Mortal Wounds (06.02).",
+      "source_sha256": "6cb474a554ba766f84b3bf678656f25876bec6fb41905666e7e3a0697b89e3fb",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 9,
+      "id": "814f382c-d6b7-4a30-a78b-1247b57ac133",
+      "question": "I have a unit being attacked with weapons that will modify some of their save rolls to be worse then 6 should I make those save rolls?",
+      "answer": "Yes, because other models in your unit may have Sv's that are better those models you've mentioned, this means that enough save rolls could be allocated to the those models that the rest of the results are not greater then the Sv's of the other models in your unit.",
+      "source_sha256": "0c6ab46362def6aac110116ddd1f38ac0efee475fdefeeeac74b6291198e1f87",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 10,
+      "id": "acdcfb0c-5b84-4b41-b271-751c4204bf56",
+      "question": "If I have a rule that says my unit can move up to 6\" when it makes a pile-in move or consolidation move, does this also mean it changes the maximum distance of those moves to 6\"?",
+      "answer": "Yes",
+      "source_sha256": "e8193326f2f9d7e3fb0a5d65ea64a96b7d6d2d5a3051487cc84a7c94bbef51d1",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 11,
+      "id": "9657bb5d-72da-4d42-9927-731c9fc0e315",
+      "question": "If a rule allows my unit to pile-in or consolidate an extra distance in the Fight phase, when can I use that rule?",
+      "answer": "For pile-in moves, during the Pile-in step(12.02), and for consolidation moves, during the Consolidate step(12.07) of the Fight phase.",
+      "source_sha256": "cade2b4fcf8c180e7fccd7db3cda6b1d9af1dcf01e2d728abbb3011d7bc286f2",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 12,
+      "id": "55ea7d23-2f9e-45bf-bf6c-d98bf682549f",
+      "question": "If a rule modifies how far a unit or model can move during a pile-in move or consolidation move does it also change the distance of the target units?",
+      "answer": "No",
+      "source_sha256": "5b0a2ff2b97ec653c19ef9a0b2b903cefe44903aae6ce26174360afd342a5b16",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 13,
+      "id": "4978f15f-2b4a-4805-aacd-db9b5cad71bd",
+      "question": "If a rule says a unit auto passes Desperate Escape tests does that mean it would auto pass the hazard rolls from a desperate escape move?",
+      "answer": "Yes",
+      "source_sha256": "418d349eaf7304a61d3dd28047950280deee139fe1a1f4a68b3c71f5414183a3",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 14,
+      "id": "fae8a959-9cbe-46e3-a721-029b23b24e24",
+      "question": "If a rule says a unit can embark into a Transport in a turn that unit disembarked, does this ignore the core rules restriction on embarking in a turn that unit made a set up move (see 18.02)?",
+      "answer": "Yes",
+      "source_sha256": "203efbd7887644a4d4a986b7b38ecf618e7a775677f1b61a1726ae0954da4f17",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 15,
+      "id": "81bf7082-3ef5-47b9-bfc4-f2021fff1d4f",
+      "question": "If a rule says my unit must make a hazard roll does every model in the unit make a hazard roll?",
+      "answer": "No, the unit would make 1 single hazard roll.",
+      "source_sha256": "63e2958a2a4ffb22895f940904bf6956f11e89ba2717bab129d341a8b6f60e6c",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 16,
+      "id": "bbe268a2-b1fd-43ab-8b24-fd4363730c3f",
+      "question": "If a unit becomes battle-shocked after starting an action does it stop performing that action?",
+      "answer": "Yes",
+      "source_sha256": "1912cbae65dddd8e8799e7e7a82a5ec5984533152aae9239745831f9dfed89ae",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 17,
+      "id": "4c654d00-318d-4665-9e46-26cfab179a29",
+      "question": "If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action?",
+      "answer": "Yes",
+      "source_sha256": "fef99387330cc3df5d34f0f94c59f49ddd403bffc2bb46936e4b80d8214f46bb",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 18,
+      "id": "b49d0004-1dd8-4746-a971-0b6656719dd3",
+      "question": "If a unit makes any disembark move in a turn (i.e. Disembark move, Emergency Disembark move etc.) has it disembarked that turn?",
+      "answer": "Yes.",
+      "source_sha256": "1eb39b2856a8e102482e905b7bc7fb8392e71ad6d043627414f7a7c4a69fcc21",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 19,
+      "id": "a89dddb3-7930-4704-9f7a-0a7664da4d84",
+      "question": "If my unit has taken control of an objective at the end of my movement phase and that unit has as an ability that secures an objective they control, can they secure that objective?",
+      "answer": "Yes",
+      "source_sha256": "5ec36166d98fd4e9d6031f8f85a631801253c6a65f26008c6e58d8cec6e72b1c",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 20,
+      "id": "ab92e97b-be2b-4125-9ded-fcfa6abe092e",
+      "question": "If my unit has the Deadly Demise ability and has an ability that allows it to Fight on Death, how do I resolve this?",
+      "answer": "Fight on Death rules are resolved before Deadly Demise abilities, meaning that your unit's Deadly Demise will resolve after your unit has fought/at the end of the phase and the relevant models have been removed from the battlefield.",
+      "source_sha256": "6c0d66fac9785c64b585ccf535fece6c50738787459f61ccff18d7b4d54f22fc",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 21,
+      "id": "ee9a398d-3acb-4440-b63a-68bed3e6e217",
+      "question": "If my unit has weapons that are identical in characteristics, but some of those weapons have [PRECISION] and those weapons targeted a unit without the character keyword, do I roll all of those weapons together?",
+      "answer": "Yes, the [PRECISION] ability is not an applicable ability for those attacks as there is no CHARACTER in the target unit for the ability to trigger its rule.",
+      "source_sha256": "a46aec7c497acd207755a6a220760722b4b41ab05aa0b4936cd98911abbdb641",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 22,
+      "id": "bb42e060-31e1-46bc-ba52-85cd5ea8c6cf",
+      "question": "If the [ANTI] ability on my unit is ANTI-non-Monster/Vehicle does it mean the [ANTI] rule triggers when targeting units that do not have the Monster or Vehicle keyword?",
+      "answer": "Yes, ANTI-non-(any keyword) will trigger on any unit that does not have the specified keyword.",
+      "source_sha256": "2c17122ffb565c8449dcae5b2f4ca29654cb327c39f61e112cadfb49b73f0993",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 23,
+      "id": "66be2ad9-24af-4edf-890a-c0e55004bf76",
+      "question": "My rule says that \"this units ranged attacks have +1 A\", do each of my attacks get an extra attack dice?",
+      "answer": "No, it increases the A characteristics of the unit's ranged weapons by 1.",
+      "source_sha256": "9377700d849a18e73f6f58830a215dfe1b122e65b7e115d5ceecd9ca34a46feb",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 24,
+      "id": "c7a83b0a-e8c3-44b5-a3ca-bb3dfba98c2d",
+      "question": "The Munitorium Field Manual shows my unit can attach to different units then are on it's datasheet, which do I use?",
+      "answer": "Use the Munitorium Field Manual.",
+      "source_sha256": "e1ebb8a68e7f4c31e1672e4801af152cb6355b84d975b7329c57de930f5a61c1",
+      "disposition": "colocated_25.04",
+      "rationale": "MFM precedence in the explicit 19.01 attachment reference: replacement owner then actual physical formation, stale target negative."
+    },
+    {
+      "ordinal": 25,
+      "id": "3103e536-8fb8-4fa3-800c-c0d159115bba",
+      "question": "What does the X\" in Lone Operative X\" mean?",
+      "answer": "The X is a placeholder for a number of inches that the ability might appear in a rule with, like Lone Operative 15\" where the X has been replaced with 15\"",
+      "source_sha256": "5b6592050979bbcee593897a953177ea6ff01143998be6aaa82d94cec6e0e28f",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 26,
+      "id": "ba488672-92ec-443d-9087-85a999342589",
+      "question": "When a move says that a model or unit must move in a way if it is able, can that requirement force the unit to end their move not in coherency?",
+      "answer": "No, when a model or unit is making a move it must follow requirements while ending that move in coherency",
+      "source_sha256": "0f27aa55b21c0ddb344b8c753eda2ed864b0618ef79c02ce24ac11d7a0cc9213",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 27,
+      "id": "fdefb262-1eb9-43fd-a2c8-70cf3bd2a621",
+      "question": "When a rule instructs you to perform a charge outside of the charge phase, do I resolve step 2 and 3 of the Charge step(11.02)?",
+      "answer": "Yes",
+      "source_sha256": "08639241469c28315db54217af96362204e61b52d0bd272d16a40bab54e25fe8",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 28,
+      "id": "a7ba0395-6635-45cd-aeec-1cc3c0607a0b",
+      "question": "When checking coherency for my unit can my unit be in multiple groups?",
+      "answer": "No, it must be in a single contiguous group as per Units and Models (01.02) and What is Coherency in the core rules.",
+      "source_sha256": "4eff6df1baf7b221cf03ed213f78a6cd38284f178f611bd883e448388f12eb9d",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 29,
+      "id": "06c896b8-bf06-40bd-a892-b56cb3cde9d3",
+      "question": "When declaring the allocation order of groups in my unit I have more than one non-CHARACTER groups that contain a model with a missing wound, how must I select the order?",
+      "answer": "Those groups can be selected in an order of your choosing but must be in an order that makes them come before any non-CHARACTER groups that do not contain a model with a missing wound.",
+      "source_sha256": "e8c435f8a7716a35d41f4a7522b6d87d156c108f9ba88195bdab4b27d00897c1",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 30,
+      "id": "5553f538-6182-4e72-905a-67855489bb1d",
+      "question": "When selecting a target unit can the enemy model that is visible to my model and the enemy model that is in range of my model's weapon be different enemy models in the same unit?",
+      "answer": "Yes",
+      "source_sha256": "5c88c04e13b99a324290f8726e470f1e4fb93152c890c597b9b16906cdd4e3e4",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 31,
+      "id": "019feac1-cd25-4644-b855-2ce3fa048fee",
+      "question": "Can an attached unit be given an Upgrade?",
+      "answer": "Yes.",
+      "source_sha256": "0726dff38f240002912d8730e11af4be7e4f1c14c17d67b797855e597dd88a42",
+      "disposition": "colocated_25.04",
+      "rationale": "Direct Upgrade/Enhancement/attached Epic Hero clarification, exercised at the roster owner."
+    },
+    {
+      "ordinal": 32,
+      "id": "38785a5c-16ba-41c5-b936-723a385f57aa",
+      "question": "Can a unit have both an Upgrade and an enhancement?",
+      "answer": "No, units are prevented from having two enhancements, and Upgrades are enhancements.",
+      "source_sha256": "7ee44f5393615f9102f2df97ea71badbd468f7b02b9f968aa1ec0c30da3ce524",
+      "disposition": "colocated_25.04",
+      "rationale": "Direct Upgrade/Enhancement/attached Epic Hero clarification, exercised at the roster owner."
+    },
+    {
+      "ordinal": 33,
+      "id": "3de45ba4-435e-4f58-a50c-fbda3f71bdc5",
+      "question": "Are Upgrades enhancements?",
+      "answer": "Yes, Upgrades are a type of enhancement (but not all enhancements are Upgrades).",
+      "source_sha256": "00e5a5e21fcdab4cfe98c30af6341386425851e952d8b85aa2febc27b4d2104e",
+      "disposition": "colocated_25.04",
+      "rationale": "Direct Upgrade/Enhancement/attached Epic Hero clarification, exercised at the roster owner."
+    },
+    {
+      "ordinal": 34,
+      "id": "603e9b2f-cc24-498c-ac2e-08ad3068f257",
+      "question": "Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area?",
+      "answer": "Yes",
+      "source_sha256": "f12df889b0db17cfacf6358aea3dcd1a3d2725660c8a159eabad35f6f6c9fef3",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 35,
+      "id": "6575ee89-b92a-456d-8e59-4ee513df8f4e",
+      "question": "Do rules that affect a keyword include multi-word keywords that contain that keyword? For example, would rules that affect Commissar units affect a unit that has the Commissar Graves keyword?",
+      "answer": "No.",
+      "source_sha256": "4246aa2cdf23333e8213aeef87c4224f0f2ff31b5f8c80229f9c9f3b7c648fa4",
+      "disposition": "colocated_25.04",
+      "rationale": "Exact faction keyword membership, including substring negative controls."
+    },
+    {
+      "ordinal": 36,
+      "id": "7a982686-03ff-4565-8d5a-2549e5650268",
+      "question": "After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available?",
+      "answer": "Yes.",
+      "source_sha256": "83a20d1e25f2befd445e81a037eddc1fbae6799e634efe2a95b7b1724d5de541",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 37,
+      "id": "88fc6c54-a3a6-4757-947b-b2dab8b7f3bf",
+      "question": "In what step during the attack sequence do I roll for Feel No Pain?",
+      "answer": "In the Resolve Damage step of the Inflict Damage step (05.04).",
+      "source_sha256": "f76c805bcfca3c48fd1702c593c0b7ae45b19cb075e805878fa90d19c9fbf2c3",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 38,
+      "id": "9aea2cef-c9db-4a30-bbfb-6b07c1f148a2",
+      "question": "Can an Epic Hero unit form an attached unit with a unit that has an enhancement?",
+      "answer": "Yes.",
+      "source_sha256": "d4d4f6a90669f72253ba254163280068e061623dfd51e1989df9d53a3797f45d",
+      "disposition": "colocated_25.04",
+      "rationale": "Direct Upgrade/Enhancement/attached Epic Hero clarification, exercised at the roster owner."
+    },
+    {
+      "ordinal": 39,
+      "id": "9b1c81f5-2ea0-40eb-9015-6a005367cd75",
+      "question": "While making a move type other than a normal/advance move, can my MONSTER/VEHICLE unit move through friendly units?",
+      "answer": "Yes.",
+      "source_sha256": "f3c9e8b3182c4e2071fac4e28a5f24038296b51c1e9815e075078612dfa184ee",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 40,
+      "id": "9e243f82-42e9-4f0d-9e4b-3f5b74cd68bc",
+      "question": "If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)?",
+      "answer": "Yes. That restriction is applicable before the battle, in the Declare Battle Formations step.",
+      "source_sha256": "4a48d283634e5425caf54f2f8426b8c64351a15d8772e58a6c3ee0cff47b7031",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 41,
+      "id": "adf7c2cd-b765-4e84-abb7-f0ed45d52841",
+      "question": "Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round?",
+      "answer": "Yes.",
+      "source_sha256": "fcbf7560ed5887e51b590721ed9949d9d631d5f5c22e4bd49886aba684e0dbfa",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 42,
+      "id": "beaeca32-9701-45f7-9461-879d8ae3d78f",
+      "question": "After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens?",
+      "answer": "No CP are spent and that stratagem's effects are not resolved (but that stratagem still counts as having been used this phase).",
+      "source_sha256": "e5ea7a06664adae76ec6f30368df75c64a03655b158375bbea49637e51d3c53a",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 43,
+      "id": "c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e",
+      "question": "Is being within range of a terrain objective the same as being within range of an objective marker?",
+      "answer": "Yes.",
+      "source_sha256": "b071da95e8e4f7b784d6b56260bc20d1f99d1dee892c93e49694be55146a9f6e",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 44,
+      "id": "e01c8a02-7a36-4d3b-b168-976b11bd47e8",
+      "question": "When my unit shoots at another unit, how does it work if some models in the target unit are fully visible to some models in my unit, while others are within a terrain area/not fully visible?",
+      "answer": "For each attacking model in your unit, determine whether the target unit has the benefit of cover, as described in Terrain and Visibility. In this scenario, the target unit will likely have the benefit of cover against some of the attacking models, but not all. This means that, in an example unit where all attacking models are using the same weapon, when you get to the Resolve Attacks step of the Attack Sequence, you will collect dice for attacks made by models against which the target unit has the benefit of cover separately from the dice for attacks made by models against which the target unit does not have the benefit of cover.",
+      "source_sha256": "8c5268b2b6d5a355b36634065359e05eec587d8ad7541cfbe7a7ed5144c48031",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 45,
+      "id": "e43402db-7c49-4cd6-acf7-fa6cac83acb0",
+      "question": "If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier?",
+      "answer": "No, a stratagem that costs 1CP and is making use of an optional +1CP section has an original cost of 2CP.",
+      "source_sha256": "82f9c28b646f5734f69e5e94c22a2a9a1df8761eaf463c1510f301294963c5f0",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 46,
+      "id": "e846db5e-3138-4ac6-b7ee-ca2ff7fe303e",
+      "question": "Does vertical movement in a unit that has taken to the skies count towards the distance a model has used for the purposes of [Heavy]?",
+      "answer": "No.",
+      "source_sha256": "5fc6e6bf0de94e1cd61c8e9c98f520b0c863d4b728c5e4c19654f1b8c4a61368",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 47,
+      "id": "fc49644c-cc46-47a0-892b-284a4c4ec018",
+      "question": "Can I group or allocate a wound to a destroyed model?",
+      "answer": "No.",
+      "source_sha256": "6c644170715564c73a7148e873c64fb055afa4031065a1027f319016ba4b6bee",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 48,
+      "id": "04f15433-3ee1-4c6d-8546-29e4247dee5b",
+      "question": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?",
+      "answer": "After.",
+      "source_sha256": "13028847f833da09851ea0172c574d87efff63f06d924d31f67bf2fb42574b60",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 49,
+      "id": "2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+      "question": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?",
+      "answer": "Models awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models: They can be measured to by friendly/enemy abilities. They can be considered visible to friendly/enemy models where relevant. They can use their datasheet abilities. They can be targeted by stratagems. Enemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight).",
+      "source_sha256": "47c3d8041c00d1755fd01c8fc8149fccadfbd89cb238fa5d8184cadaeaaea455",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 50,
+      "id": "421a6f30-63e2-4e1f-b352-99b643637c53",
+      "question": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+      "answer": "No, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+      "source_sha256": "c5ad1503a94c734aa9f1d0dadca11d1daa19dc63928131659eb8214c5f4c7724",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 51,
+      "id": "60232b79-7a10-44a0-ac68-e27312c7ba60",
+      "question": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+      "answer": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit.",
+      "source_sha256": "a4fb6955c73cae19a4d09415f8b77188b6fd8542fbb0448084db0db2c56c392f",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 52,
+      "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+      "question": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+      "answer": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead).",
+      "source_sha256": "736b6d704a27951f968fbcc84f7b0eca6840b08a451d353390367442244b1766",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 53,
+      "id": "7f238e23-cd3f-40ad-aa91-c75274cc655e",
+      "question": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?",
+      "answer": "Line of sight is drawn from any part of the observing model to any part of the model being observed.",
+      "source_sha256": "cf0fd95bcbcfb3ff78f04318e141c735309cc69f5f3815ab946d5a4245563333",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 54,
+      "id": "80182be3-1a44-464b-9ef6-cd9212429603",
+      "question": "If both players have units with the Scouts ability, do they alternate resolving scout moves?",
+      "answer": "Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn.",
+      "source_sha256": "5d5056a4966de981a21706e962e5c9ea70f05377ff20fd4962f7cc7a01d5290b",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 55,
+      "id": "aab10e23-6433-42ca-86e7-ddc829f16c47",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting?",
+      "answer": "Unless otherwise stated, no: when snap shooting, each attack only hits on a roll of 6.",
+      "source_sha256": "b26dfcd0cc3f76a41e680b3bedaf3ba6a299fa135400cea6cbd42e493ea2e057",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 56,
+      "id": "b7d3d760-a167-44b2-9c91-32ce86684225",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit?",
+      "answer": "Yes, except when snap shooting: when snap shooting, each attack only hits on a roll of 6.",
+      "source_sha256": "9bfda5c1d2a514b705e9feeec17efef3325815360389fe267537521350a557ac",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 57,
+      "id": "ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+      "question": "When do the effects of a FLYING unit taking to the skies apply?",
+      "answer": "When that unit is selected to make a normal/advance/fall-back/charge move. Note that for an advance/charge move, this means you must declare that a unit will take to the skies before rolling for that advance/charge move.",
+      "source_sha256": "2202a3d04b20b42997b9a0e9a19177697bf42ee7b2b1923c4674b43faa676e9b",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 58,
+      "id": "dc9911da-e156-4b48-bf9b-18f9d96d037e",
+      "question": "If a rule refers to an 'objective marker', does this mean an 'objective'?",
+      "answer": "Yes (excluding rules in the Core Rules)'.",
+      "source_sha256": "f084d1e31353f70020957e67d0ad8821f406be29c8251048d27bf81e6664f4b3",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 59,
+      "id": "fb3b2776-c954-471b-b448-b70caa91929d",
+      "question": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?",
+      "answer": "A charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03). Example: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\". Example: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\".",
+      "source_sha256": "18f33a49e6d2f3f401aefb615c84a2d4d373c9b382b5bb38252504d517bc8662",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 60,
+      "id": "db020803-7564-45c9-a6d4-e4cdf463da32",
+      "question": "Can a unit be controlling more than one objective at once?",
+      "answer": "Yes.",
+      "source_sha256": "8352b49b9fbfaceb630ac21dc45eac4d9fdf112bd15de3e50ec2f0fbd30ca36e",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 61,
+      "id": "8c51d370-70b2-46c7-abaa-228b55c830c3",
+      "question": "When determining control over an objective, can the same model's OC count towards more than one objective that model is within range of?",
+      "answer": "Yes.",
+      "source_sha256": "cda9f83e49d0006eef29aeb0e17f388472db9fa391be2ea4a96e6ce4850e80a6",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 62,
+      "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+      "question": "If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle?",
+      "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn.",
+      "source_sha256": "f1569a6a16420f52ff3a4cc89c61762db7467cba6bdc320c8a4e3fa8ceec239f",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 63,
+      "id": "9638115f-b94b-4d05-ba62-df9fba2805ac",
+      "question": "When a model overhangs the edge of the battlefield, how does that affect its visibility?",
+      "answer": "That model's controlling player can draw line of sight from any part of that model that is not overhanging the edge of the battlefield. Their opponent can draw line of sight to any part of that model.",
+      "source_sha256": "1c43f713b930f8f51c7d429991f40174c22eb30bbf4bd56773993b4a8e319cd8",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    },
+    {
+      "ordinal": 64,
+      "id": "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+      "question": "When does a model's or unit's ability in an attached unit apply to all models in that unit?",
+      "answer": "A rule that applies to 'this/that unit' or 'models in this/that unit' applies to all models in an attached unit. Rules that just apply to one model in an attached unit (for example, a rule that grants a model Feel No Pain or Lone Operative) only apply to that model, not to all models in the attached unit.",
+      "source_sha256": "cbf7e42f41f0d4cce05a0f084c6982e8899da06ac0a71c7339ad6845ef0acc47",
+      "disposition": "outside_mustering",
+      "rationale": "Gameplay after mustering; Section25 does not perform movement, attacks, objectives, wounds, destruction, active abilities or prebattle phase resolution. This FAQ remains owned by its relevant earlier section."
+    }
+  ],
+  "qualifications": [
+    "Analytical Core catalogs and points inputs are explicit premises, not native provider/roster admission.",
+    "Unmodified five-datasheet package has no admitted detachments; physical definitions/faction/equipment boundaries only.",
+    "No runtime changes; original tests/assertions/ceilings and archives preserved.",
+    "Nonoperative blocks and isolation/inventory checks receive no gameplay credit."
+  ]
+}

@@ -1,0 +1,2363 @@
+{
+  "schema": "section21-source-behavior-inventory-v1",
+  "source_authority": "Accepted retained adopted literal JS only; no fresh App/version verification.",
+  "category_hierarchy": {
+    "number": "21",
+    "title": "Flying and Surging",
+    "subsections": [
+      {
+        "ref": "21.01",
+        "title": "Surge Moves",
+        "text": [
+          "Some rules allow a unit to make a \u0005surge move\u0006 (21.02).",
+          "\u000eMaking a Surge Move",
+          "\u2022 Unit \u0005\u0007A\b\u0006 shoots, and \u0005\u0007destroys\b\u0006 two models from unit \u0005\u0007B\b\u0006.",
+          "\u2022 Unit \u0005\u0007B\b\u0006 has an ability that allows it to make a \u0005\u0007surge move\b\u0006 of D6\" after an enemy unit has shot, if one or more of its models were \u0005\u0007destroyed\b\u0006 by those attacks. The active player rolls one D6, resulting in a 4.",
+          "\u2022 Unit \u0005\u0007B\b\u0006 makes a \u0005\u0007surge move\b\u0006, each of its surviving models moving up to 4\" towards the closest enemy unit (unit \u0005\u0007C\b\u0006). It ends this move \u0005\u0007engaged\b\u0006 with that unit."
+        ]
+      },
+      {
+        "ref": "21.02",
+        "title": "Surge Move",
+        "text": [
+          "\u000eEligible If",
+          "\u0001All\u0002 of the following apply:",
+          "\u2022 The rule allowing this \u0005move type\u0006 has been triggered.",
+          "\u2022 Your unit is not \u0005battle-shocked\u0006.",
+          "\u2022 Your unit is \u0005unengaged\u0006.",
+          "\u2022 Your unit has not moved this phase.",
+          "\u000eBefore Moving",
+          "Select the closest enemy unit to be the \u0005surge target\u0006.",
+          "\u000eWhile Moving",
+          "\u2022 Each model must end its move \u0005engaged\u0006 with the \u0005surge target\u0006 if possible.",
+          "\u2022 Each model that cannot end its move \u0005engaged\u0006 with the \u0005surge target\u0006 must end its move as close as possible to the \u0005surge target\u0006.",
+          "\u000eEffect",
+          "Your unit moves as described in Moving (03).",
+          "\u000eAfter Moving",
+          "\u2022 Your unit cannot be \u0005engaged\u0006 with one or more enemy units that were not the \u0005surge target\u0006.",
+          "\u2022 Your unit cannot move again this phase.",
+          "\u000eMaximum Distance",
+          "As stated in the rule allowing this \u0005move type\u0006."
+        ]
+      },
+      {
+        "ref": "21.03",
+        "title": "Flying Models",
+        "text": [
+          "Models with the \u0003FLY\u0004 keyword, and units such models are part of, are said to be able to \u0003FLY\u0004. Some rules also refer to such models/units as \u0003FLYING\u0004 models/\u0003FLYING\u0004 units.",
+          "Each time a \u0003FLYING\u0004 unit is selected to make a \u0005normal\u0006, \u0005advance\u0006, \u0005fall-back\u0006 or \u0005charge move\u0006, before moving any models in that unit, the active player can declare that it will \u0003take to the skies\u0004. If it does, while resolving that move:",
+          "\u2022 Subtract 2\" from the \u0005maximum distance\u0006.",
+          "\u2022 Each time a \u0003FLYING\u0004 model moves:",
+          "\u25e6 Ignore all vertical distance for the purposes of how far it has moved.",
+          "\u25e6 It can move through all types of model (including enemy models and \u0003MONSTER/VEHICLE\u0004 models).",
+          "\u25e6 It can move horizontally and vertically through all categories of \u0005terrain feature\u0006.",
+          "\u000eTaking to the Skies",
+          "\u2022 This Riptide Battlesuit can \u0003Fly\u0004. It makes an \u0005\u0007advance move\b\u0006 with a \u0005\u0007maximum distance\b\u0006 of 16\".",
+          "\u2022 Before moving the unit, the active player declares that it will \u0005\u0007take to the skies\b\u0006. That move\u2019s \u0005\u0007maximum distance\b\u0006 is reduced to 14\", but while making that move, the Riptide Battlesuit can move through all enemy units (including \u0003Vehicles\u0004) and all \u0005\u0007terrain features\b\u0006, ignoring any vertical distance that would normally be counted to ascend and descend \u0005\u0007terrain features\b\u0006."
+        ]
+      }
+    ]
+  },
+  "source_rows": 3,
+  "literal_blocks": 33,
+  "text_blocks": 33,
+  "table_count": 0,
+  "diagram_count": 0,
+  "diagram_disposition": "Two worked examples are retained as literal text, not omitted diagrams. No image/diagram/table fields or reference-specific supplemental blocks exist for Section21 in retained JS.",
+  "semantic_obligations": 22,
+  "all_current_faqs_screened": 64,
+  "sources": [
+    {
+      "row_id": "rule:21:21.01:1",
+      "category": "21",
+      "locator": "21.01",
+      "title": "Surge Moves",
+      "occurrence": 1,
+      "source_sha256": "052b4cc2625e93531128fb8c5ea3736dc0fd3c70a4ce7d089c8fa4cbe7c34f52",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "1b6ea0a2ec0c76448643de9d11da9e2de8b300f7e4ec6260f482f205b242bce8",
+          "value": "Some rules allow a unit to make a \u0005surge move\u0006 (21.02)."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "9700df601d540560bf3a1b37e9a442c133d4c54d8f066540fcd1c770cb8ef4c5",
+          "value": "\u000eMaking a Surge Move"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "32fc2313713c78ead6150fedf1de4a37067e35dd02c05d0a21a9ece0b0b4fe87",
+          "value": "\u2022 Unit \u0005\u0007A\b\u0006 shoots, and \u0005\u0007destroys\b\u0006 two models from unit \u0005\u0007B\b\u0006."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "c3502624cfbc0175b71a6f4b146ba6f9533e16e7ab8628776875d76109af03dc",
+          "value": "\u2022 Unit \u0005\u0007B\b\u0006 has an ability that allows it to make a \u0005\u0007surge move\b\u0006 of D6\" after an enemy unit has shot, if one or more of its models were \u0005\u0007destroyed\b\u0006 by those attacks. The active player rolls one D6, resulting in a 4."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "15d8f4ebedf0a84de5be33d906c8debaf87dc9cc4aa6650dfe6ef85341c69c9b",
+          "value": "\u2022 Unit \u0005\u0007B\b\u0006 makes a \u0005\u0007surge move\b\u0006, each of its surviving models moving up to 4\" towards the closest enemy unit (unit \u0005\u0007C\b\u0006). It ends this move \u0005\u0007engaged\b\u0006 with that unit."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "S21-001",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Only a source-granted triggered rule creates a Surge opportunity; optional decline makes no move.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_recorded_trigger_is_required_before_offering_surge",
+              "function_ast_sha256": "32792d2386fc201715dfc638f0abd3b2cf70674d7b9df98f18168e72300a0da2",
+              "assertions": [
+                "assert not session.lifecycle.decision_controller.queue.pending_requests",
+                "assert len(offer_surge(session, s).options) == 2"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='recorded granting trigger'):\n    triggered_movement_unit_selection_request(state=s.state, decisions=session.lifecycle.decision_controller, player_id='owner', descriptor=d, eligible_units=(TriggeredMovementEligibleUnit(s.unit.unit_instance_id, 's21:hook', d.source_rule_id),))"
+              ]
+            },
+            {
+              "node": "tests/rules/section21/test_clarifications.py::test_optional_surge_can_be_declined_without_moving",
+              "function_ast_sha256": "aef594fce044d66467cda251328e8b97b11de5ef2fbcbc300c2f8d48c78538f8",
+              "assertions": [
+                "assert status.status_kind is not LifecycleStatusKind.INVALID",
+                "assert s.state.battlefield_state == before",
+                "assert not s.state.phase_movement_history"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-002",
+          "source_blocks": [
+            2,
+            3,
+            4
+          ],
+          "acceptance": "Worked example: two casualties are removed and only living survivors move under an explicit Core after-shooting grant. Native provider/actual shooting activation remains a premise.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_boundaries.py::test_worked_surge_example_uses_survivors_and_active_players_real_d6",
+              "function_ast_sha256": "5483ca18fac428430d54e21ccd59e0aa89aa8f32a1b0f8e78552f39fc3624e4b",
+              "assertions": [
+                "assert isinstance(own.base, CircularBase)",
+                "assert rolled.original_result.spec.actor_id == state.active_player_id",
+                "assert rolled.original_result.spec.actor_id == 'opponent'",
+                "assert 1 <= rolled.current_total <= 6",
+                "assert request.actor_id == 'owner'",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert len(alive) == 3",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert state.phase_movement_history[-1].model_instance_ids == tuple(sorted((m.model_instance_id for m in alive)))"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-003",
+          "source_blocks": [
+            4
+          ],
+          "acceptance": "Active player rolls actual D6; the reacting owner makes finite selection using its result as the source maximum.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_boundaries.py::test_worked_surge_example_uses_survivors_and_active_players_real_d6",
+              "function_ast_sha256": "5483ca18fac428430d54e21ccd59e0aa89aa8f32a1b0f8e78552f39fc3624e4b",
+              "assertions": [
+                "assert isinstance(own.base, CircularBase)",
+                "assert rolled.original_result.spec.actor_id == state.active_player_id",
+                "assert rolled.original_result.spec.actor_id == 'opponent'",
+                "assert 1 <= rolled.current_total <= 6",
+                "assert request.actor_id == 'owner'",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert len(alive) == 3",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert state.phase_movement_history[-1].model_instance_ids == tuple(sorted((m.model_instance_id for m in alive)))"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-004",
+          "source_blocks": [
+            5
+          ],
+          "acceptance": "Closest enemy, not a designated shooter identity, determines movement; surviving models engage if reachable.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_closest_enemy_is_selected_before_path_and_ties_are_finite",
+              "function_ast_sha256": "0c15f1633234c5a1dc5c5377b0375fe0c08a016afc25d402cc6fc7019d9190d3",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert closest_surge_targets(scenario=scenario(s.state), unit_instance_id=s.unit.unit_instance_id) == expected",
+                "assert tuple(sorted((cast(str, o.payload['surge_target_unit_instance_id']) for o in request.options if isinstance(o.payload, dict) and (not o.payload.get('declined'))))) == expected"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='committed closest'):\n    surge_result(s, surge_path(s, (4,)), target_id=second.unit_instance_id)"
+              ]
+            },
+            {
+              "node": "tests/rules/section21/test_surge.py::test_each_survivor_must_engage_or_reach_certified_maximum_approach",
+              "function_ast_sha256": "d0249caf372457b26d12d60e940853b5ca5aecc0c7cedb0905c92a41344d2feb",
+              "assertions": [
+                "assert result.is_valid is valid",
+                "assert s.state.to_payload() == before",
+                "assert code in str(result.to_payload())",
+                "assert isinstance(endpoints, list)",
+                "assert len(endpoints) == len(s.unit.own_models)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_boundaries.py::test_worked_surge_example_uses_survivors_and_active_players_real_d6",
+              "function_ast_sha256": "5483ca18fac428430d54e21ccd59e0aa89aa8f32a1b0f8e78552f39fc3624e4b",
+              "assertions": [
+                "assert isinstance(own.base, CircularBase)",
+                "assert rolled.original_result.spec.actor_id == state.active_player_id",
+                "assert rolled.original_result.spec.actor_id == 'opponent'",
+                "assert 1 <= rolled.current_total <= 6",
+                "assert request.actor_id == 'owner'",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert len(alive) == 3",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert state.phase_movement_history[-1].model_instance_ids == tuple(sorted((m.model_instance_id for m in alive)))"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:21:21.02:1",
+      "category": "21",
+      "locator": "21.02",
+      "title": "Surge Move",
+      "occurrence": 1,
+      "source_sha256": "720dd07d6f7dea22c4a369f78850bde1fae000e51acf283fded300eb1527578c",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "3d345e009f672faef4a78e5ff6df79ae658d01e56c8b3a2e0b611272e2ad70c8",
+          "value": "\u0001All\u0002 of the following apply:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "206cc7ae26738c9830a11045c763349be65500f996288cf031f50db54d0f81e1",
+          "value": "\u2022 The rule allowing this \u0005move type\u0006 has been triggered."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "5b578cee52b9b4a413befe5bfc6c971eaa7f60622d47bcad6280ffeb7801a110",
+          "value": "\u2022 Your unit is not \u0005battle-shocked\u0006."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "1739014220ac918e4381d45686c73c109607897ce90a3373ef40bc9f10f66487",
+          "value": "\u2022 Your unit is \u0005unengaged\u0006."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "7ba1714f4de46036797582a9c9088492c3a6bb582255bbf3e36989c81d10f3de",
+          "value": "\u2022 Your unit has not moved this phase."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "71b6143d5f310205f6d72379853a67a7f27f18983ba7f07ef42b7255d7fca1ee",
+          "value": "\u000eBefore Moving"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "6823ee1cd1df7fd12e1f355e77e0507689e57d38a2ed1891cd09736d2277eac3",
+          "value": "Select the closest enemy unit to be the \u0005surge target\u0006."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "e71c12176330a1cb6bd961af93620cfe60c68b59704dac7bff9b61bc09d3c041",
+          "value": "\u000eWhile Moving"
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "7369539cbb54c91e4638757ccc86e6cce64242048b64bf364a8ed8f8c1cee956",
+          "value": "\u2022 Each model must end its move \u0005engaged\u0006 with the \u0005surge target\u0006 if possible."
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "01fba66767abcbfcb7bb87692d33ec07461f3a162f3ed8fcfc02e0aeeb7a3ca6",
+          "value": "\u2022 Each model that cannot end its move \u0005engaged\u0006 with the \u0005surge target\u0006 must end its move as close as possible to the \u0005surge target\u0006."
+        },
+        {
+          "ordinal": 12,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 13,
+          "kind": "text",
+          "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab",
+          "value": "Your unit moves as described in Moving (03)."
+        },
+        {
+          "ordinal": 14,
+          "kind": "text",
+          "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+          "value": "\u000eAfter Moving"
+        },
+        {
+          "ordinal": 15,
+          "kind": "text",
+          "sha256": "8f746db0d20bf4d8eb7c87593802aa2302cf623e55b8604f0fe1833fcc9e2d90",
+          "value": "\u2022 Your unit cannot be \u0005engaged\u0006 with one or more enemy units that were not the \u0005surge target\u0006."
+        },
+        {
+          "ordinal": 16,
+          "kind": "text",
+          "sha256": "ae6a34ff1d9a390048794a560e1597c0bc4b5e655ea31333e9911aa15761574a",
+          "value": "\u2022 Your unit cannot move again this phase."
+        },
+        {
+          "ordinal": 17,
+          "kind": "text",
+          "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4",
+          "value": "\u000eMaximum Distance"
+        },
+        {
+          "ordinal": 18,
+          "kind": "text",
+          "sha256": "81964bfd649cda8109ed89f87e794eab80b8ea764fb0a332ccb6648e7f88de37",
+          "value": "As stated in the rule allowing this \u0005move type\u0006."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "S21-005",
+          "source_blocks": [
+            1,
+            2,
+            3
+          ],
+          "acceptance": "All eligibility requirements include a recorded granting trigger.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_recorded_trigger_is_required_before_offering_surge",
+              "function_ast_sha256": "32792d2386fc201715dfc638f0abd3b2cf70674d7b9df98f18168e72300a0da2",
+              "assertions": [
+                "assert not session.lifecycle.decision_controller.queue.pending_requests",
+                "assert len(offer_surge(session, s).options) == 2"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='recorded granting trigger'):\n    triggered_movement_unit_selection_request(state=s.state, decisions=session.lifecycle.decision_controller, player_id='owner', descriptor=d, eligible_units=(TriggeredMovementEligibleUnit(s.unit.unit_instance_id, 's21:hook', d.source_rule_id),))"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-006",
+          "source_blocks": [
+            1,
+            2,
+            4
+          ],
+          "acceptance": "Battle-shocked units are not offered Surge.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_all_surge_eligibility_conditions_are_conjunctive",
+              "function_ast_sha256": "deae8c9795243d12a77e82c32dc2ddf271d97f510699877d9bbf4c98cc2fed08",
+              "assertions": [
+                "assert surge_ineligibility(s.state, s.unit.unit_instance_id) == reason",
+                "assert len([o for o in request.options if o.option_id.startswith('surge:')]) == (1 if reason is None else 0)"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-007",
+          "source_blocks": [
+            1,
+            2,
+            5
+          ],
+          "acceptance": "Engaged units are not offered Surge.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_all_surge_eligibility_conditions_are_conjunctive",
+              "function_ast_sha256": "deae8c9795243d12a77e82c32dc2ddf271d97f510699877d9bbf4c98cc2fed08",
+              "assertions": [
+                "assert surge_ineligibility(s.state, s.unit.unit_instance_id) == reason",
+                "assert len([o for o in request.options if o.option_id.startswith('surge:')]) == (1 if reason is None else 0)"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-008",
+          "source_blocks": [
+            1,
+            2,
+            6
+          ],
+          "acceptance": "Any actual prior movement this phase prevents Surge; round, turn and phase occurrences stay distinct.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_all_surge_eligibility_conditions_are_conjunctive",
+              "function_ast_sha256": "deae8c9795243d12a77e82c32dc2ddf271d97f510699877d9bbf4c98cc2fed08",
+              "assertions": [
+                "assert surge_ineligibility(s.state, s.unit.unit_instance_id) == reason",
+                "assert len([o for o in request.options if o.option_id.startswith('surge:')]) == (1 if reason is None else 0)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_surge.py::test_prior_move_is_scoped_to_actual_phase_occurrence",
+              "function_ast_sha256": "2c74b2bccd74e0fdf4d87aea7ba9c87caecbbbff92cccb6bcadd7f8617980c44",
+              "assertions": [
+                "assert surge_ineligibility(s.state, s.unit.unit_instance_id) == ('surge_prior_move_this_phase' if prior_occurrence == 'same' else None)"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-009",
+          "source_blocks": [
+            7,
+            8
+          ],
+          "acceptance": "Finite closest-enemy target selection precedes path submission; all ties are explicit and a farther unit is rejected.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_closest_enemy_is_selected_before_path_and_ties_are_finite",
+              "function_ast_sha256": "0c15f1633234c5a1dc5c5377b0375fe0c08a016afc25d402cc6fc7019d9190d3",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert closest_surge_targets(scenario=scenario(s.state), unit_instance_id=s.unit.unit_instance_id) == expected",
+                "assert tuple(sorted((cast(str, o.payload['surge_target_unit_instance_id']) for o in request.options if isinstance(o.payload, dict) and (not o.payload.get('declined'))))) == expected"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='committed closest'):\n    surge_result(s, surge_path(s, (4,)), target_id=second.unit_instance_id)"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-010",
+          "source_blocks": [
+            9,
+            10
+          ],
+          "acceptance": "Each model must engage the selected target when a legal witnessed endpoint can do so.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_each_survivor_must_engage_or_reach_certified_maximum_approach",
+              "function_ast_sha256": "d0249caf372457b26d12d60e940853b5ca5aecc0c7cedb0905c92a41344d2feb",
+              "assertions": [
+                "assert result.is_valid is valid",
+                "assert s.state.to_payload() == before",
+                "assert code in str(result.to_payload())",
+                "assert isinstance(endpoints, list)",
+                "assert len(endpoints) == len(s.unit.own_models)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_surge.py::test_one_models_approach_cannot_satisfy_another_model",
+              "function_ast_sha256": "5930e8564e93e5145a67ad6f39c74054a52144accf5527d760d718bb98fb79e0",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert 'surge_maximum_approach_not_reached' in str(result.to_payload())",
+                "assert result.coherency_result.is_coherent"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-011",
+          "source_blocks": [
+            9,
+            11
+          ],
+          "acceptance": "Otherwise each model must reach certified maximum approach; a sibling cannot discharge its requirement.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_each_survivor_must_engage_or_reach_certified_maximum_approach",
+              "function_ast_sha256": "d0249caf372457b26d12d60e940853b5ca5aecc0c7cedb0905c92a41344d2feb",
+              "assertions": [
+                "assert result.is_valid is valid",
+                "assert s.state.to_payload() == before",
+                "assert code in str(result.to_payload())",
+                "assert isinstance(endpoints, list)",
+                "assert len(endpoints) == len(s.unit.own_models)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_surge.py::test_one_models_approach_cannot_satisfy_another_model",
+              "function_ast_sha256": "5930e8564e93e5145a67ad6f39c74054a52144accf5527d760d718bb98fb79e0",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert 'surge_maximum_approach_not_reached' in str(result.to_payload())",
+                "assert result.coherency_result.is_coherent"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-012",
+          "source_blocks": [
+            12,
+            13
+          ],
+          "acceptance": "Shared Moving rules require exact living physical inventory, paths, ordinary constraints and coherent endpoints, including attached units.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_approach_never_waives_endpoint_coherency",
+              "function_ast_sha256": "f043526c8faa3a05ec5aca7d944d1bc85956c559219dbbe999719bd75dd65d5a",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert not result.coherency_result.is_coherent",
+                "assert result.rollback_record is not None"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_boundaries.py::test_native_components_surge_as_one_attached_rules_unit",
+              "function_ast_sha256": "5ff6fb77e0425b4f04334d38c4078bf728d6b88ec5a6705861e362ae7e6ef4a4",
+              "assertions": [
+                "assert isinstance(first.base, CircularBase)",
+                "assert isinstance(other.base, CircularBase)",
+                "assert {o.option_id for o in request.options if o.option_id.startswith('surge:')} == {f'surge:{canonical}:target:{enemy.unit_instance_id}'}",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == records",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert set(state.phase_movement_history[-1].model_instance_ids) == {*body.own_model_ids(), *leader.own_model_ids()}",
+                "assert surge_locked(state, body.unit_instance_id)",
+                "assert surge_locked(state, leader.unit_instance_id)",
+                "assert rules_unit_view_by_id(state=state, unit_instance_id=leader.unit_instance_id).unit_instance_id == canonical",
+                "assert json.loads(json.dumps(session.lifecycle.decision_controller.to_payload())) == session.lifecycle.decision_controller.to_payload()"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_witness_admission.py::test_public_reactive_witness_wrong_inventory_is_atomic_and_retriable",
+              "function_ast_sha256": "a470bc700f287ffafbc08dfef51c1f88140f24b570891f23200cad902bca3e82",
+              "assertions": [
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert 'movement_witness_model_inventory_mismatch' in str(invalid.to_payload())",
+                "assert s.state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == decisions",
+                "assert session.lifecycle.pending_decision_request() == request",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert len(s.state.phase_movement_history) == 1",
+                "assert s.state.phase_movement_history[0].is_surge is (kind is TriggeredMovementKind.SURGE)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_facade.py::test_surge_public_reject_retry_commits_all_survivors_and_phase_lock",
+              "function_ast_sha256": "08348642ce20270fd0e7acf436d5d33e1a2a9da8c3c0eb42ff2cee655aa0e4f0",
+              "assertions": [
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == decisions",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.battlefield_state is not None",
+                "assert not s.state.phase_movement_history",
+                "assert pending_request is not None",
+                "assert request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert len(s.state.phase_movement_history) == 1",
+                "assert record.is_surge",
+                "assert record.model_instance_ids == s.unit.own_model_ids()",
+                "assert surge_locked(s.state, s.unit.unit_instance_id)",
+                "assert not [o for o in offer_surge(session, s).options if o.option_id.startswith('surge:')]",
+                "assert events(session, 'triggered_movement_resolved')",
+                "assert surge_locked(s.state, s.unit.unit_instance_id) is locked",
+                "assert json.loads(json.dumps(session.view(viewer_player_id=viewer))) == session.view(viewer_player_id=viewer)"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='surge_movement_locked_this_phase'):\n    s.state.replace_battlefield_state(s.state.battlefield_state.with_unit_placement(moved))"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-013",
+          "source_blocks": [
+            14,
+            15
+          ],
+          "acceptance": "Final Engagement may include only the chosen Surge target; transient Engagement during the path is distinct.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_surge_cannot_end_engaged_with_a_non_target",
+              "function_ast_sha256": "bfccaf836294ce955d2437ed02d16b2cd59d95d4b03159112edcf3a88dddbe60",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert 'surge_non_target_engagement' in str(result.to_payload())"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_clarifications.py::test_transient_enemy_engagement_during_surge_is_not_endpoint_engagement",
+              "function_ast_sha256": "d11dc8355075d49434d85bacf493cde37767d4ede6a5486145b70b044c93e126",
+              "assertions": [
+                "assert result.is_valid, result.to_payload()",
+                "assert result.movement_payload['surge_target_unit_instance_id'] != other.unit_instance_id"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-014",
+          "source_blocks": [
+            14,
+            16
+          ],
+          "acceptance": "An accepted Surge locks every physical component against all later movement in the actual phase; later phase/turn is separate.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_facade.py::test_surge_public_reject_retry_commits_all_survivors_and_phase_lock",
+              "function_ast_sha256": "08348642ce20270fd0e7acf436d5d33e1a2a9da8c3c0eb42ff2cee655aa0e4f0",
+              "assertions": [
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == decisions",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.battlefield_state is not None",
+                "assert not s.state.phase_movement_history",
+                "assert pending_request is not None",
+                "assert request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert len(s.state.phase_movement_history) == 1",
+                "assert record.is_surge",
+                "assert record.model_instance_ids == s.unit.own_model_ids()",
+                "assert surge_locked(s.state, s.unit.unit_instance_id)",
+                "assert not [o for o in offer_surge(session, s).options if o.option_id.startswith('surge:')]",
+                "assert events(session, 'triggered_movement_resolved')",
+                "assert surge_locked(s.state, s.unit.unit_instance_id) is locked",
+                "assert json.loads(json.dumps(session.view(viewer_player_id=viewer))) == session.view(viewer_player_id=viewer)"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='surge_movement_locked_this_phase'):\n    s.state.replace_battlefield_state(s.state.battlefield_state.with_unit_placement(moved))"
+              ]
+            },
+            {
+              "node": "tests/rules/section21/test_boundaries.py::test_native_components_surge_as_one_attached_rules_unit",
+              "function_ast_sha256": "5ff6fb77e0425b4f04334d38c4078bf728d6b88ec5a6705861e362ae7e6ef4a4",
+              "assertions": [
+                "assert isinstance(first.base, CircularBase)",
+                "assert isinstance(other.base, CircularBase)",
+                "assert {o.option_id for o in request.options if o.option_id.startswith('surge:')} == {f'surge:{canonical}:target:{enemy.unit_instance_id}'}",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == records",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert set(state.phase_movement_history[-1].model_instance_ids) == {*body.own_model_ids(), *leader.own_model_ids()}",
+                "assert surge_locked(state, body.unit_instance_id)",
+                "assert surge_locked(state, leader.unit_instance_id)",
+                "assert rules_unit_view_by_id(state=state, unit_instance_id=leader.unit_instance_id).unit_instance_id == canonical",
+                "assert json.loads(json.dumps(session.lifecycle.decision_controller.to_payload())) == session.lifecycle.decision_controller.to_payload()"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_persistence.py::test_supported_core_surge_wrong_inventory_retry_restore_and_exact_replay",
+              "function_ast_sha256": "6298e13a3a1f325c4a7f9849946d5e9d3ce56051748b5c5085288b22aef7e831",
+              "assertions": [
+                "assert state is not None",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert restored.lifecycle.to_payload() == final",
+                "assert ReplayRunner.from_payload(json.loads(json.dumps(artifact))).run().status is ReplayRunStatus.REPRODUCED",
+                "assert status.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.to_persistence_payload() == before",
+                "assert LocalGameSession.from_persistence_payload(json.loads(json.dumps(before))).to_persistence_payload() == before",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-015",
+          "source_blocks": [
+            17,
+            18
+          ],
+          "acceptance": "Source maximum bounds every surviving physical path, including actual dice-defined distance. Surge cannot select flight.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_surge.py::test_each_survivor_must_engage_or_reach_certified_maximum_approach",
+              "function_ast_sha256": "d0249caf372457b26d12d60e940853b5ca5aecc0c7cedb0905c92a41344d2feb",
+              "assertions": [
+                "assert result.is_valid is valid",
+                "assert s.state.to_payload() == before",
+                "assert code in str(result.to_payload())",
+                "assert isinstance(endpoints, list)",
+                "assert len(endpoints) == len(s.unit.own_models)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_boundaries.py::test_worked_surge_example_uses_survivors_and_active_players_real_d6",
+              "function_ast_sha256": "5483ca18fac428430d54e21ccd59e0aa89aa8f32a1b0f8e78552f39fc3624e4b",
+              "assertions": [
+                "assert isinstance(own.base, CircularBase)",
+                "assert rolled.original_result.spec.actor_id == state.active_player_id",
+                "assert rolled.original_result.spec.actor_id == 'opponent'",
+                "assert 1 <= rolled.current_total <= 6",
+                "assert request.actor_id == 'owner'",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert len(alive) == 3",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert state.phase_movement_history[-1].model_instance_ids == tuple(sorted((m.model_instance_id for m in alive)))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_boundaries.py::test_surge_does_not_offer_take_to_the_skies",
+              "function_ast_sha256": "63af0bf36e8a7d8715ac09a65745908d50dfe1a8a9848c4aaf60d2fb6f34c40d",
+              "assertions": [],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='Surge cannot take to the skies'):\n    resolve_triggered_movement(scenario=board, ruleset_descriptor=s.state.runtime_ruleset_descriptor(), unit_placement=board.battlefield_state.unit_placement_by_id(s.unit.unit_instance_id), descriptor=descriptor(s), path_witness=surge_path(s, (4,)), battle_round=1, turn_player_id='owner', take_to_the_skies=True)"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:21:21.03:1",
+      "category": "21",
+      "locator": "21.03",
+      "title": "Flying Models",
+      "occurrence": 1,
+      "source_sha256": "96173c1ad24fc99e30f8110bd96364fa6c62d01bfc2ad98acefa5e7f66b32514",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "321cca3ab06e96fe470eb3a05fa55526bf8c9576d89ce048c906c688cbdffa51",
+          "value": "Models with the \u0003FLY\u0004 keyword, and units such models are part of, are said to be able to \u0003FLY\u0004. Some rules also refer to such models/units as \u0003FLYING\u0004 models/\u0003FLYING\u0004 units."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "6454371758bbf53eea82202564867323f1e7129f8cd0b564f2e0abdb47296ddf",
+          "value": "Each time a \u0003FLYING\u0004 unit is selected to make a \u0005normal\u0006, \u0005advance\u0006, \u0005fall-back\u0006 or \u0005charge move\u0006, before moving any models in that unit, the active player can declare that it will \u0003take to the skies\u0004. If it does, while resolving that move:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "b3b43f889f0558189b1f55582e38fccc89c1874b65b430b691423cb437ad05f8",
+          "value": "\u2022 Subtract 2\" from the \u0005maximum distance\u0006."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "1fb0726d4d2d5479568d381d243597b0b8de8a29cebe46fdad1d983a945b73e2",
+          "value": "\u2022 Each time a \u0003FLYING\u0004 model moves:"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "4057db7bb4caf9da00cd54534e6eb7b83af8bb56838143c65ea66b20b7f88246",
+          "value": "\u25e6 Ignore all vertical distance for the purposes of how far it has moved."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "d097789b550fed5aa40b2d42d7b46465a02ba33e6bc523f61502fcd070e304f3",
+          "value": "\u25e6 It can move through all types of model (including enemy models and \u0003MONSTER/VEHICLE\u0004 models)."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "a0aa81a9ccf32928519f927e53a0dc3d6d4f90bd34061507abc988467c6887d8",
+          "value": "\u25e6 It can move horizontally and vertically through all categories of \u0005terrain feature\u0006."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "1764b8ea4c1ce881ecd42b7517e6c9bd55ceb5264695b20e25310a332083dc69",
+          "value": "\u000eTaking to the Skies"
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "b82112cf241825541e1b6c692688af8eccf38d16af2dafed5a266d2688faac39",
+          "value": "\u2022 This Riptide Battlesuit can \u0003Fly\u0004. It makes an \u0005\u0007advance move\b\u0006 with a \u0005\u0007maximum distance\b\u0006 of 16\"."
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "f7263f95ca2dc65d6f9a3d33965f26524e8afc2f5c33b2bdc5674c1a374490f5",
+          "value": "\u2022 Before moving the unit, the active player declares that it will \u0005\u0007take to the skies\b\u0006. That move\u2019s \u0005\u0007maximum distance\b\u0006 is reduced to 14\", but while making that move, the Riptide Battlesuit can move through all enemy units (including \u0003Vehicles\u0004) and all \u0005\u0007terrain features\b\u0006, ignoring any vertical distance that would normally be counted to ascend and descend \u0005\u0007terrain features\b\u0006."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "S21-016",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Native FLY model and its rules unit are flying; physical benefits belong only to models possessing FLY.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_flight.py::test_physical_flight_benefits_are_limited_to_flying_members",
+              "function_ast_sha256": "1b84f24f0c41292869bede86eccba83c554e445ecd2a9234ef2d2e2fe6eec96c",
+              "assertions": [
+                "assert context['flight_penalty_inches'] == (2 if skies else 0)",
+                "assert context['flying_model_instance_ids'] == list(flyer.own_model_ids())",
+                "assert cap.has_fly is (unit is flyer)",
+                "assert cap.ignores_vertical_distance is expected",
+                "assert cap.can_transit_all_terrain is expected",
+                "assert cap.can_move_through_terrain is expected",
+                "assert cap.can_move_through_enemy_models is expected",
+                "assert cap.can_traverse_ruins_walls"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_boundaries.py::test_one_flying_component_makes_unit_flying_without_granting_sibling_transit",
+              "function_ast_sha256": "f62fa5b2367e72c5bb1bf90b30d20ad9d19b85227834e7dd27785468aebc6de6",
+              "assertions": [
+                "assert 'FLY' in view.keywords",
+                "assert 'FLY' not in leader.keywords",
+                "assert choice['flying_model_instance_ids'] == list(body.own_model_ids())",
+                "assert choice['flight_penalty_inches'] == 2",
+                "assert cap.can_transit_all_terrain is expected",
+                "assert cap.ignores_vertical_distance is expected"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-017",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "Finite Take to the Skies declaration occurs before moving, and before Advance/Charge dice; Normal/Advance/Fall Back/Charge consumers share it.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_facade.py::test_native_flight_choice_commits_before_roll_and_records_accepted_distance",
+              "function_ast_sha256": "86e673804a929513c5d0da8a3e6f16f108df51e9d76b491761ea0e72b7655434",
+              "assertions": [
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert len(choices) == 2",
+                "assert not events(session, 'advance_roll_resolved')",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert len(state.model_movement_history) == 1",
+                "assert state.model_movement_history[0].distance_inches == 2",
+                "assert models_within_turn_distance(state=state, model_ids=unit.own_model_ids(), maximum_inches=3)",
+                "assert isinstance(model_movements, list)",
+                "assert isinstance(model_movement, dict)",
+                "assert model_movement['movement_distance_modifier_inches'] == (-2 if skies else 0)",
+                "assert len(events(session, 'advance_roll_resolved')) == 1",
+                "assert recorded[1].result.selected_option_id == option.option_id",
+                "assert isinstance(recorded[1].result.payload, dict)",
+                "assert recorded[1].result.payload['movement_mode'] == ('fly_take_to_skies' if skies else 'advance')",
+                "assert json.loads(json.dumps(view)) == view",
+                "assert 'model_movement_history' not in view"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_facade.py::test_charge_flight_is_selected_before_dice_and_filters_targets_after_penalty",
+              "function_ast_sha256": "6ba7a96d9b725e1ab7260fc63367fbfb5c3dbf8cb4c72b861d131441c15c06e0",
+              "assertions": [
+                "assert request.decision_type == 'select_charge_targets'",
+                "assert rolled.request.take_to_the_skies is skies",
+                "assert rolled.movement_budget.maximum_distance_inches == rolled.value - (2 if skies else 0)",
+                "assert next((i for i, e in enumerate(events_) if e.event_type == 'charging_unit_selected')) < next((i for i, e in enumerate(events_) if e.event_type == 'charge_roll_started'))",
+                "assert enemy.unit_instance_id in rolled.reachable_target_distances_inches"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_persistence.py::test_supported_core_flight_checkpoint_restores_and_replays",
+              "function_ast_sha256": "b8d3be77682e0bb35f6a78629c56462e12933f519c948a21f6ccc0c73c0a97bc",
+              "assertions": [
+                "assert restored.lifecycle.to_payload() == final",
+                "assert restored.view(viewer_player_id='player-a') == session.view(viewer_player_id='player-a')",
+                "assert restored.view(viewer_player_id='player-b') == session.view(viewer_player_id='player-b')",
+                "assert ReplayRunner.from_payload(json.loads(json.dumps(artifact))).run().status is ReplayRunStatus.REPRODUCED"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-018",
+          "source_blocks": [
+            3
+          ],
+          "acceptance": "Declared flight subtracts two from the movement maximum, including live Charge target eligibility.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_flight.py::test_declared_flight_subtracts_two_from_native_maximum",
+              "function_ast_sha256": "30fb27ab4c9c385047dd8e90f308deee366ff8e51f436c4b8071c9a66a34266c",
+              "assertions": [
+                "assert result.is_valid is (valid_air if skies else valid_ground)",
+                "assert budget is not None",
+                "assert budget.budget is not None",
+                "assert budget.budget.max_distance_inches == (12 if skies else 14)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_clarifications.py::test_flight_charge_penalty_limits_current_finite_target_options",
+              "function_ast_sha256": "786bff764aabfcdf6b855e38d5498f95124ebd7df17f7a3c413abab3b08132d9",
+              "assertions": [
+                "assert result.value == 12",
+                "assert result.movement_budget.maximum_distance_inches == (10 if skies else 12)",
+                "assert (enemy.unit_instance_id in result.reachable_target_distances_inches) is (gap <= (10 if skies else 12))",
+                "assert request.decision_type == 'select_charge_targets'",
+                "assert any((isinstance(o.payload, dict) and isinstance(o.payload['target_ids'], list) and (enemy.unit_instance_id in o.payload['target_ids']) for o in request.options))",
+                "assert request.decision_type == 'select_charging_unit'",
+                "assert not result.move_available"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-019",
+          "source_blocks": [
+            4,
+            5
+          ],
+          "acceptance": "Only the flying physical model ignores all vertical distance; horizontal legs and Heavy use accepted actual distance.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_flight.py::test_flight_ignores_vertical_distance_but_keeps_every_horizontal_leg",
+              "function_ast_sha256": "4c546124ef42fd1d06097a51c1b33966fefaa2da91b07a648a7f15ef3c1a19cf",
+              "assertions": [
+                "assert result.is_valid is skies",
+                "assert distance is not None",
+                "assert isclose(distance.total_distance_inches, 2 if skies else 18)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_flight.py::test_physical_flight_benefits_are_limited_to_flying_members",
+              "function_ast_sha256": "1b84f24f0c41292869bede86eccba83c554e445ecd2a9234ef2d2e2fe6eec96c",
+              "assertions": [
+                "assert context['flight_penalty_inches'] == (2 if skies else 0)",
+                "assert context['flying_model_instance_ids'] == list(flyer.own_model_ids())",
+                "assert cap.has_fly is (unit is flyer)",
+                "assert cap.ignores_vertical_distance is expected",
+                "assert cap.can_transit_all_terrain is expected",
+                "assert cap.can_move_through_terrain is expected",
+                "assert cap.can_move_through_enemy_models is expected",
+                "assert cap.can_traverse_ruins_walls"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_clarifications.py::test_flying_vertical_legs_are_excluded_from_actual_heavy_hit_permission",
+              "function_ast_sha256": "6e3f32932d23b124c3861cfb476eaf6d712ec6863c16758d818e45ec2f451311",
+              "assertions": [
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert len(state.model_movement_history) == 1",
+                "assert isclose(state.model_movement_history[0].distance_inches, horizontal)",
+                "assert _heavy_hit_roll_modifier_applies(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner', out_of_phase_state=None) is heavy"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-020",
+          "source_blocks": [
+            4,
+            6
+          ],
+          "acceptance": "Declared physical flight permits transit through infantry and MONSTER/VEHICLE models; endpoint restrictions and FAQ friendly transit remain.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_flight.py::test_flight_crosses_actual_models_and_solid_volume_only_when_declared",
+              "function_ast_sha256": "2d55371f436705ac30a092a952fbf910401b68b65b0d56403c709be46f1b8428",
+              "assertions": [
+                "assert result.is_valid is (skies or blocker == 'infantry'), result.movement_payload",
+                "assert result.attempted_placement.model_placements[0].pose == Pose.at(22, 10)",
+                "assert state.battlefield_state == board.battlefield_state"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_clarifications.py::test_friendly_vehicle_transit_preserves_faq_other_move_types",
+              "function_ast_sha256": "ff4df72f5ec7d2c07c135b155d742865184e81f464a6526ae641af67f339c823",
+              "assertions": [
+                "assert result.is_valid is (skies or mode in (MovementMode.FALL_BACK, MovementMode.CHARGE))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_flight.py::test_flight_transit_permission_never_waives_endpoint_restrictions",
+              "function_ast_sha256": "fb4740754580204c598e9d322722f32489d1e64455839481df32d5c78240cd9f",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert code in str(result.movement_payload)"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-021",
+          "source_blocks": [
+            4,
+            7
+          ],
+          "acceptance": "Selected physical flight crosses every terrain category and raw volumes, with endpoint intersection/support checks retained.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_flight.py::test_committed_flight_transits_walls_in_every_terrain_category",
+              "function_ast_sha256": "c7138efa29aa862118db82fe712ca40b07100652977bff27db7fcba3ef3d148a",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert result.is_valid, result.movement_payload",
+                "assert all((r.is_valid for r in result.terrain_path_legality_results))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_terrain_facade.py::test_native_public_flight_crosses_dense_wall_after_explicit_declaration",
+              "function_ast_sha256": "e948f29bb8f89c1810d8f3d1be568c8f9fe6976dae9052734a64148e49e9200e",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert state.mission_setup is not None",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert (status.status_kind is not LifecycleStatusKind.INVALID) is skies, status.to_payload()",
+                "assert state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements[0].pose == Pose.at(22, 10)",
+                "assert len(events(session, 'movement_activation_completed')) == 1",
+                "assert state.battlefield_state == before",
+                "assert not events(session, 'movement_activation_completed')"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_terrain_facade.py::test_native_selected_flight_crosses_floor_in_both_vertical_directions",
+              "function_ast_sha256": "f0084f338fb385f08f446a60832501a0df2313a8ec94295ff572f216655c6776",
+              "assertions": [
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements[0].pose == Pose.at(22, 10)",
+                "assert len(state.model_movement_history) == 1",
+                "assert state.model_movement_history[0].distance_inches == 12",
+                "assert len(events(session, 'movement_activation_completed')) == 1"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_terrain_facade.py::test_intrinsic_fly_without_selection_keeps_dense_floor_restriction",
+              "function_ast_sha256": "78a74d7af8b51c6ec172357f51acb5e9ef07b5685d7fe56ef90ec1162010e014",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert 'dense_floor_transit_forbidden' in str(status.to_payload())",
+                "assert state.battlefield_state == before",
+                "assert not state.model_movement_history",
+                "assert not events(session, 'movement_activation_completed')"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_terrain_facade.py::test_selected_vertical_floor_transit_keeps_body_and_support_endpoint_checks",
+              "function_ast_sha256": "3f9f3b575ae838a4afee5743f99f257035e6adfda89c5f8669ad3fe1be757ee8",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert 'model_cannot_be_placed_at_endpoint' in str(status.to_payload())",
+                "assert state.battlefield_state == before",
+                "assert not state.model_movement_history",
+                "assert not events(session, 'movement_activation_completed')"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_flight.py::test_flight_retains_terrain_endpoint_intersection_and_support_checks",
+              "function_ast_sha256": "d07e5c7e2cdc4583e5bf4b4340a16f2fe32b7c4e324df6e84e1dcaee229f9c2b",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert 'model_cannot_be_placed_at_endpoint' in str(result.movement_payload)",
+                "assert state.battlefield_state is not None"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_clarifications.py::test_internal_flight_terrain_capability_round_trips_without_inference",
+              "function_ast_sha256": "55b708364fdb871c0842e0d0f695ede984992aaf6e4ccf327ec75bfeca5ba901",
+              "assertions": [
+                "assert restored == context",
+                "assert MovementCapabilitySet.from_payload(context.capabilities.to_payload()) == context.capabilities",
+                "assert restored.capabilities.can_transit_all_terrain is skies",
+                "assert TerrainPathLegalityContext.from_payload(terrain.to_payload()) == terrain",
+                "assert terrain.can_transit_all_terrain is skies"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "S21-022",
+          "source_blocks": [
+            8,
+            9,
+            10
+          ],
+          "acceptance": "Worked flight example combines Advance declaration, minus-two maximum, model/terrain transit and ignored vertical distance; native Wave Serpent substitutes for illustrative Riptide without claiming its roster/provider.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section21/test_facade.py::test_native_flight_choice_commits_before_roll_and_records_accepted_distance",
+              "function_ast_sha256": "86e673804a929513c5d0da8a3e6f16f108df51e9d76b491761ea0e72b7655434",
+              "assertions": [
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert len(choices) == 2",
+                "assert not events(session, 'advance_roll_resolved')",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert len(state.model_movement_history) == 1",
+                "assert state.model_movement_history[0].distance_inches == 2",
+                "assert models_within_turn_distance(state=state, model_ids=unit.own_model_ids(), maximum_inches=3)",
+                "assert isinstance(model_movements, list)",
+                "assert isinstance(model_movement, dict)",
+                "assert model_movement['movement_distance_modifier_inches'] == (-2 if skies else 0)",
+                "assert len(events(session, 'advance_roll_resolved')) == 1",
+                "assert recorded[1].result.selected_option_id == option.option_id",
+                "assert isinstance(recorded[1].result.payload, dict)",
+                "assert recorded[1].result.payload['movement_mode'] == ('fly_take_to_skies' if skies else 'advance')",
+                "assert json.loads(json.dumps(view)) == view",
+                "assert 'model_movement_history' not in view"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_flight.py::test_declared_flight_subtracts_two_from_native_maximum",
+              "function_ast_sha256": "30fb27ab4c9c385047dd8e90f308deee366ff8e51f436c4b8071c9a66a34266c",
+              "assertions": [
+                "assert result.is_valid is (valid_air if skies else valid_ground)",
+                "assert budget is not None",
+                "assert budget.budget is not None",
+                "assert budget.budget.max_distance_inches == (12 if skies else 14)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_flight.py::test_flight_crosses_actual_models_and_solid_volume_only_when_declared",
+              "function_ast_sha256": "2d55371f436705ac30a092a952fbf910401b68b65b0d56403c709be46f1b8428",
+              "assertions": [
+                "assert result.is_valid is (skies or blocker == 'infantry'), result.movement_payload",
+                "assert result.attempted_placement.model_placements[0].pose == Pose.at(22, 10)",
+                "assert state.battlefield_state == board.battlefield_state"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_flight.py::test_committed_flight_transits_walls_in_every_terrain_category",
+              "function_ast_sha256": "c7138efa29aa862118db82fe712ca40b07100652977bff27db7fcba3ef3d148a",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert result.is_valid, result.movement_payload",
+                "assert all((r.is_valid for r in result.terrain_path_legality_results))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_terrain_facade.py::test_native_selected_flight_crosses_floor_in_both_vertical_directions",
+              "function_ast_sha256": "f0084f338fb385f08f446a60832501a0df2313a8ec94295ff572f216655c6776",
+              "assertions": [
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements[0].pose == Pose.at(22, 10)",
+                "assert len(state.model_movement_history) == 1",
+                "assert state.model_movement_history[0].distance_inches == 12",
+                "assert len(events(session, 'movement_activation_completed')) == 1"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section21/test_flight.py::test_flight_ignores_vertical_distance_but_keeps_every_horizontal_leg",
+              "function_ast_sha256": "4c546124ef42fd1d06097a51c1b33966fefaa2da91b07a648a7f15ef3c1a19cf",
+              "assertions": [
+                "assert result.is_valid is skies",
+                "assert distance is not None",
+                "assert isclose(distance.total_distance_inches, 2 if skies else 18)"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "faq_screen": [
+    {
+      "ordinal": 1,
+      "id": "c2df3e97-f21e-4fc9-943e-37072c08c10e",
+      "question": "Aerialists ability allows you to get into a transport even though they disembarked a transport this turn?",
+      "answer": "Yes, as the unit embarking is not making a normal, advance or fall-back move as part of this embarkation.",
+      "source_sha256": "5dde776b1cf69f6b47b71219938b51665eb2d8a42e8392befa07e5afdea855e2",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Aerialists ability allows you to get into a transport even though they disembarked a transport this turn? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section18; no new Strategic Reserves exception. Transport embark occasion belongs to Section18; attachment does not grant a new embark occasion.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 2,
+      "id": "9bfa47ed-be8d-4e11-80de-f3832d507ca1",
+      "question": "Can I select a unit to shoot or fight if it doesn't have melee or ranged weapons?",
+      "answer": "Yes, it just makes no attacks and then the fight type or shoot type is resolved.",
+      "source_sha256": "8d4f6b7b01b92637f2848b261fe07f970ef819f1ee867b889e885d1bdcbb1ada",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Can I select a unit to shoot or fight if it doesn't have melee or ranged weapons? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section10/12; no new Strategic Reserves exception. Weaponless activation is owned by Sections10/12; public attached activation is tested without inventing attacks.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 3,
+      "id": "7f767dd0-3996-417e-bba2-b7a5828b2430",
+      "question": "Can a model be within range of a weapon if it is not visible",
+      "answer": "Yes",
+      "source_sha256": "4cfeea846d7a2e135d7eb728147265987cc1adf54ca93657427474d44fe9ce56",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Can a model be within range of a weapon if it is not visible \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section04; no new Strategic Reserves exception. Visibility/range independence is Section04; no attached-only exception.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 4,
+      "id": "904b8b36-09f0-4449-a9c3-45892664ef60",
+      "question": "Do models destroyed when a unit is out of coherency count for mission objectives?",
+      "answer": "Yes.",
+      "source_sha256": "4d6f85a577496676241ac385c0cb4fa2e672c8c679d56ff363d7344279670845",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Do models destroyed when a unit is out of coherency count for mission objectives? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section01/03; no new Strategic Reserves exception. Mission credit for coherency casualties is Section01/mission scope; frozen attached destruction boundary is local.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 5,
+      "id": "e5941469-5653-49b2-919e-9c9246e811d4",
+      "question": "Does my model or unit become engaged while moving through a enemy units engagement range during a move?",
+      "answer": "No",
+      "source_sha256": "819dd65da567f7dae1c13e61e2e2a43c02b1188d605f1458b3c5778eefe50b36",
+      "disposition": "locally_owned",
+      "reason": "Transient enemy Engagement during a move is not endpoint Engagement.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_clarifications.py::test_transient_enemy_engagement_during_surge_is_not_endpoint_engagement",
+          "function_ast_sha256": "d11dc8355075d49434d85bacf493cde37767d4ede6a5486145b70b044c93e126",
+          "assertions": [
+            "assert result.is_valid, result.to_payload()",
+            "assert result.movement_payload['surge_target_unit_instance_id'] != other.unit_instance_id"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section21/test_flight.py::test_flight_crosses_actual_models_and_solid_volume_only_when_declared",
+          "function_ast_sha256": "2d55371f436705ac30a092a952fbf910401b68b65b0d56403c709be46f1b8428",
+          "assertions": [
+            "assert result.is_valid is (skies or blocker == 'infantry'), result.movement_payload",
+            "assert result.attempted_placement.model_placements[0].pose == Pose.at(22, 10)",
+            "assert state.battlefield_state == board.battlefield_state"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 6,
+      "id": "5928ab6e-7113-42c8-9085-4291faddae09",
+      "question": "How many mortals do you take from Hazardous tests for a combined vehicle/monster and Infantry unit",
+      "answer": "The roll would be all at once and it would be 1 MW per fail",
+      "source_sha256": "3baf6215041a9e32c26f4544ae11dc0907a480bc3e2b1f3b30f0dfd8a8f53efe",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: How many mortals do you take from Hazardous tests for a combined vehicle/monster and Infantry unit \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section06; no new Strategic Reserves exception. Mixed-unit Hazard amount is Section06; components do not change the owning hazard rule.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 7,
+      "id": "6b074ac1-8a03-43ac-8669-3bac17d372ab",
+      "question": "I failed hazard rolls from [Hazardous] weapons, do those mortal wounds have to be allocated to the models with the [Hazardous] weapons?",
+      "answer": "No, you allocate the mortal wounds to the unit as per Mortal Wounds(06.02). (This represents Bob the guardsmen picking up his fallen squad mates plasma gun or that the twisting power of James the Chaos Sorcerer pulling his followers into the warp.)",
+      "source_sha256": "ce792ca90e1fcdfb597549aaba5c9c7fa227850068b1581a6b00492e993aafb7",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: I failed hazard rolls from [Hazardous] weapons, do those mortal wounds have to be allocated to the models with the [Hazardous] weapons? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section06; no new Strategic Reserves exception. Mortal allocation/weapon ownership is Section06; attachment introduces no Hazardous bearer lock.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 8,
+      "id": "e58d31bc-b6eb-4db1-b319-dc27dd60154f",
+      "question": "I have a rule that triggers when a mortal wound is allocated to a model, when does this happen?",
+      "answer": "When you select a model in the Select Model step of Mortal Wounds (06.02).",
+      "source_sha256": "6cb474a554ba766f84b3bf678656f25876bec6fb41905666e7e3a0697b89e3fb",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: I have a rule that triggers when a mortal wound is allocated to a model, when does this happen? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section06; no new Strategic Reserves exception. Mortal Select Model timing is Section06; no new Section19 timing rule.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 9,
+      "id": "814f382c-d6b7-4a30-a78b-1247b57ac133",
+      "question": "I have a unit being attacked with weapons that will modify some of their save rolls to be worse then 6 should I make those save rolls?",
+      "answer": "Yes, because other models in your unit may have Sv's that are better those models you've mentioned, this means that enough save rolls could be allocated to the those models that the rest of the results are not greater then the Sv's of the other models in your unit.",
+      "source_sha256": "0c6ab46362def6aac110116ddd1f38ac0efee475fdefeeeac74b6291198e1f87",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: I have a unit being attacked with weapons that will modify some of their save rolls to be worse then 6 should I make those save rolls? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Heterogeneous Save allocation is shared Section05; highest-T distinction is locally asserted.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 10,
+      "id": "acdcfb0c-5b84-4b41-b271-751c4204bf56",
+      "question": "If I have a rule that says my unit can move up to 6\" when it makes a pile-in move or consolidation move, does this also mean it changes the maximum distance of those moves to 6\"?",
+      "answer": "Yes",
+      "source_sha256": "e8193326f2f9d7e3fb0a5d65ea64a96b7d6d2d5a3051487cc84a7c94bbef51d1",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If I have a rule that says my unit can move up to 6\" when it makes a pile-in move or consolidation move, does this also mean it changes the maximum distance of those moves to 6\"? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section12; no new Strategic Reserves exception. Pile-in/consolidation maximum is Section12, not changed by attachment.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 11,
+      "id": "9657bb5d-72da-4d42-9927-731c9fc0e315",
+      "question": "If a rule allows my unit to pile-in or consolidate an extra distance in the Fight phase, when can I use that rule?",
+      "answer": "For pile-in moves, during the Pile-in step(12.02), and for consolidation moves, during the Consolidate step(12.07) of the Fight phase.",
+      "source_sha256": "cade2b4fcf8c180e7fccd7db3cda6b1d9af1dcf01e2d728abbb3011d7bc286f2",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If a rule allows my unit to pile-in or consolidate an extra distance in the Fight phase, when can I use that rule? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section12; no new Strategic Reserves exception. Fight step-specific movement grant remains Section12.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 12,
+      "id": "55ea7d23-2f9e-45bf-bf6c-d98bf682549f",
+      "question": "If a rule modifies how far a unit or model can move during a pile-in move or consolidation move does it also change the distance of the target units?",
+      "answer": "No",
+      "source_sha256": "5b0a2ff2b97ec653c19ef9a0b2b903cefe44903aae6ce26174360afd342a5b16",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If a rule modifies how far a unit or model can move during a pile-in move or consolidation move does it also change the distance of the target units? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section12; no new Strategic Reserves exception. Target distances for movement grants remain Section12.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 13,
+      "id": "4978f15f-2b4a-4805-aacd-db9b5cad71bd",
+      "question": "If a rule says a unit auto passes Desperate Escape tests does that mean it would auto pass the hazard rolls from a desperate escape move?",
+      "answer": "Yes",
+      "source_sha256": "418d349eaf7304a61d3dd28047950280deee139fe1a1f4a68b3c71f5414183a3",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If a rule says a unit auto passes Desperate Escape tests does that mean it would auto pass the hazard rolls from a desperate escape move? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section03; no new Strategic Reserves exception. Desperate Escape Hazard equivalence remains Section03.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 14,
+      "id": "fae8a959-9cbe-46e3-a721-029b23b24e24",
+      "question": "If a rule says a unit can embark into a Transport in a turn that unit disembarked, does this ignore the core rules restriction on embarking in a turn that unit made a set up move (see 18.02)?",
+      "answer": "Yes",
+      "source_sha256": "203efbd7887644a4d4a986b7b38ecf618e7a775677f1b61a1726ae0954da4f17",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If a rule says a unit can embark into a Transport in a turn that unit disembarked, does this ignore the core rules restriction on embarking in a turn that unit made a set up move (see 18.02)? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section18; no new Strategic Reserves exception. Embark exception remains Section18.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 15,
+      "id": "81bf7082-3ef5-47b9-bfc4-f2021fff1d4f",
+      "question": "If a rule says my unit must make a hazard roll does every model in the unit make a hazard roll?",
+      "answer": "No, the unit would make 1 single hazard roll.",
+      "source_sha256": "63e2958a2a4ffb22895f940904bf6956f11e89ba2717bab129d341a8b6f60e6c",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If a rule says my unit must make a hazard roll does every model in the unit make a hazard roll? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section18; no new Strategic Reserves exception. One unit hazard versus explicit each-model roll remains Section06/18.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 16,
+      "id": "bbe268a2-b1fd-43ab-8b24-fd4363730c3f",
+      "question": "If a unit becomes battle-shocked after starting an action does it stop performing that action?",
+      "answer": "Yes",
+      "source_sha256": "1912cbae65dddd8e8799e7e7a82a5ec5984533152aae9239745831f9dfed89ae",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If a unit becomes battle-shocked after starting an action does it stop performing that action? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section16; no new Strategic Reserves exception. Battle-shock Action interruption remains Section16.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 17,
+      "id": "4c654d00-318d-4665-9e46-26cfab179a29",
+      "question": "If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action?",
+      "answer": "Yes",
+      "source_sha256": "fef99387330cc3df5d34f0f94c59f49ddd403bffc2bb46936e4b80d8214f46bb",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section16; no new Strategic Reserves exception. Battle-shocked Action permission remains Section16.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 18,
+      "id": "b49d0004-1dd8-4746-a971-0b6656719dd3",
+      "question": "If a unit makes any disembark move in a turn (i.e. Disembark move, Emergency Disembark move etc.) has it disembarked that turn?",
+      "answer": "Yes.",
+      "source_sha256": "1eb39b2856a8e102482e905b7bc7fb8392e71ad6d043627414f7a7c4a69fcc21",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If a unit makes any disembark move in a turn (i.e. Disembark move, Emergency Disembark move etc.) has it disembarked that turn? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: every actual disembark mode marks disembarked this turn; local Tactical producer/return preserves receipt; other modes retained Section18.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 19,
+      "id": "a89dddb3-7930-4704-9f7a-0a7664da4d84",
+      "question": "If my unit has taken control of an objective at the end of my movement phase and that unit has as an ability that secures an objective they control, can they secure that objective?",
+      "answer": "Yes",
+      "source_sha256": "5ec36166d98fd4e9d6031f8f85a631801253c6a65f26008c6e58d8cec6e72b1c",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If my unit has taken control of an objective at the end of my movement phase and that unit has as an ability that secures an objective they control, can they secure that objective? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section17; no new Strategic Reserves exception. Objective securing timing remains Section17.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 20,
+      "id": "ab92e97b-be2b-4125-9ded-fcfa6abe092e",
+      "question": "If my unit has the Deadly Demise ability and has an ability that allows it to Fight on Death, how do I resolve this?",
+      "answer": "Fight on Death rules are resolved before Deadly Demise abilities, meaning that your unit's Deadly Demise will resolve after your unit has fought/at the end of the phase and the relevant models have been removed from the battlefield.",
+      "source_sha256": "6c0d66fac9785c64b585ccf535fece6c50738787459f61ccff18d7b4d54f22fc",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If my unit has the Deadly Demise ability and has an ability that allows it to Fight on Death, how do I resolve this? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05/DD-FoD decision; no new Strategic Reserves exception. Current adopted DD/FoD decision preserved unchanged; attachment creates no new removal ordering.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 21,
+      "id": "ee9a398d-3acb-4440-b63a-68bed3e6e217",
+      "question": "If my unit has weapons that are identical in characteristics, but some of those weapons have [PRECISION] and those weapons targeted a unit without the character keyword, do I roll all of those weapons together?",
+      "answer": "Yes, the [PRECISION] ability is not an applicable ability for those attacks as there is no CHARACTER in the target unit for the ability to trigger its rule.",
+      "source_sha256": "a46aec7c497acd207755a6a220760722b4b41ab05aa0b4936cd98911abbdb641",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If my unit has weapons that are identical in characteristics, but some of those weapons have [PRECISION] and those weapons targeted a unit without the character keyword, do I roll all of those weapons together? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Precision applicability remains Section05; actual attached model Precision dependency executes.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 22,
+      "id": "bb42e060-31e1-46bc-ba52-85cd5ea8c6cf",
+      "question": "If the [ANTI] ability on my unit is ANTI-non-Monster/Vehicle does it mean the [ANTI] rule triggers when targeting units that do not have the Monster or Vehicle keyword?",
+      "answer": "Yes, ANTI-non-(any keyword) will trigger on any unit that does not have the specified keyword.",
+      "source_sha256": "2c17122ffb565c8449dcae5b2f4ca29654cb327c39f61e112cadfb49b73f0993",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If the [ANTI] ability on my unit is ANTI-non-Monster/Vehicle does it mean the [ANTI] rule triggers when targeting units that do not have the Monster or Vehicle keyword? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section24; no new Strategic Reserves exception. Anti negative keyword semantics belong to weapon ability authority; local exact Anti-Psyker example binds live union.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 23,
+      "id": "66be2ad9-24af-4edf-890a-c0e55004bf76",
+      "question": "My rule says that \"this units ranged attacks have +1 A\", do each of my attacks get an extra attack dice?",
+      "answer": "No, it increases the A characteristics of the unit's ranged weapons by 1.",
+      "source_sha256": "9377700d849a18e73f6f58830a215dfe1b122e65b7e115d5ceecd9ca34a46feb",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: My rule says that \"this units ranged attacks have +1 A\", do each of my attacks get an extra attack dice? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section02; no new Strategic Reserves exception. Weapon A modifier remains Section02.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 24,
+      "id": "c7a83b0a-e8c3-44b5-a3ca-bb3dfba98c2d",
+      "question": "The Munitorium Field Manual shows my unit can attach to different units then are on it's datasheet, which do I use?",
+      "answer": "Use the Munitorium Field Manual.",
+      "source_sha256": "e1ebb8a68e7f4c31e1672e4801af152cb6355b84d975b7329c57de930f5a61c1",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: The Munitorium Field Manual shows my unit can attach to different units then are on it's datasheet, which do I use? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct attachment source-precedence rule: execute actual MFM replacement owner for both Leader and Support.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 25,
+      "id": "3103e536-8fb8-4fa3-800c-c0d159115bba",
+      "question": "What does the X\" in Lone Operative X\" mean?",
+      "answer": "The X is a placeholder for a number of inches that the ability might appear in a rule with, like Lone Operative 15\" where the X has been replaced with 15\"",
+      "source_sha256": "5b6592050979bbcee593897a953177ea6ff01143998be6aaa82d94cec6e0e28f",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: What does the X\" in Lone Operative X\" mean? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section24; no new Strategic Reserves exception. Lone Operative numeric placeholder is Section24; bounded consumer uses native12 and explicit native15 controls.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 26,
+      "id": "ba488672-92ec-443d-9087-85a999342589",
+      "question": "When a move says that a model or unit must move in a way if it is able, can that requirement force the unit to end their move not in coherency?",
+      "answer": "No, when a model or unit is making a move it must follow requirements while ending that move in coherency",
+      "source_sha256": "0f27aa55b21c0ddb344b8c753eda2ed864b0618ef79c02ce24ac11d7a0cc9213",
+      "disposition": "locally_owned",
+      "reason": "If-able approach must retain coherency.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_surge.py::test_approach_never_waives_endpoint_coherency",
+          "function_ast_sha256": "f043526c8faa3a05ec5aca7d944d1bc85956c559219dbbe999719bd75dd65d5a",
+          "assertions": [
+            "assert not result.is_valid",
+            "assert not result.coherency_result.is_coherent",
+            "assert result.rollback_record is not None"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section21/test_boundaries.py::test_native_components_surge_as_one_attached_rules_unit",
+          "function_ast_sha256": "5ff6fb77e0425b4f04334d38c4078bf728d6b88ec5a6705861e362ae7e6ef4a4",
+          "assertions": [
+            "assert isinstance(first.base, CircularBase)",
+            "assert isinstance(other.base, CircularBase)",
+            "assert {o.option_id for o in request.options if o.option_id.startswith('surge:')} == {f'surge:{canonical}:target:{enemy.unit_instance_id}'}",
+            "assert status.decision_request is not None",
+            "assert request is not None",
+            "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+            "assert state.to_payload() == before",
+            "assert session.lifecycle.decision_controller.to_payload() == records",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert set(state.phase_movement_history[-1].model_instance_ids) == {*body.own_model_ids(), *leader.own_model_ids()}",
+            "assert surge_locked(state, body.unit_instance_id)",
+            "assert surge_locked(state, leader.unit_instance_id)",
+            "assert rules_unit_view_by_id(state=state, unit_instance_id=leader.unit_instance_id).unit_instance_id == canonical",
+            "assert json.loads(json.dumps(session.lifecycle.decision_controller.to_payload())) == session.lifecycle.decision_controller.to_payload()"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 27,
+      "id": "fdefb262-1eb9-43fd-a2c8-70cf3bd2a621",
+      "question": "When a rule instructs you to perform a charge outside of the charge phase, do I resolve step 2 and 3 of the Charge step(11.02)?",
+      "answer": "Yes",
+      "source_sha256": "08639241469c28315db54217af96362204e61b52d0bd272d16a40bab54e25fe8",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: When a rule instructs you to perform a charge outside of the charge phase, do I resolve step 2 and 3 of the Charge step(11.02)? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section11; no new Strategic Reserves exception. Out-of-phase charge sequencing remains Section11.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 28,
+      "id": "a7ba0395-6635-45cd-aeec-1cc3c0607a0b",
+      "question": "When checking coherency for my unit can my unit be in multiple groups?",
+      "answer": "No, it must be in a single contiguous group as per Units and Models (01.02) and What is Coherency in the core rules.",
+      "source_sha256": "4eff6df1baf7b221cf03ed213f78a6cd38284f178f611bd883e448388f12eb9d",
+      "disposition": "bounded_dependency",
+      "reason": "Single contiguous group requirement is a shared Moving prerequisite; exact positive/negative controls run as a bounded Section03 dependency.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section03/test_coherency.py::test_constructed_span_and_contiguous_group_contract",
+          "function_ast_sha256": "fbd4dfde46829b7964f26dedd5833c23a033c6c3072302cb61fae6273e9b6cd8",
+          "assertions": [
+            "assert result.is_coherent is valid",
+            "assert code in {v.violation_code for v in result.violations}"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 29,
+      "id": "06c896b8-bf06-40bd-a892-b56cb3cde9d3",
+      "question": "When declaring the allocation order of groups in my unit I have more than one non-CHARACTER groups that contain a model with a missing wound, how must I select the order?",
+      "answer": "Those groups can be selected in an order of your choosing but must be in an order that makes them come before any non-CHARACTER groups that do not contain a model with a missing wound.",
+      "source_sha256": "e8c435f8a7716a35d41f4a7522b6d87d156c108f9ba88195bdab4b27d00897c1",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: When declaring the allocation order of groups in my unit I have more than one non-CHARACTER groups that contain a model with a missing wound, how must I select the order? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Wounded allocation-group priority remains Section05; no Section19 exception.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 30,
+      "id": "5553f538-6182-4e72-905a-67855489bb1d",
+      "question": "When selecting a target unit can the enemy model that is visible to my model and the enemy model that is in range of my model's weapon be different enemy models in the same unit?",
+      "answer": "Yes",
+      "source_sha256": "5c88c04e13b99a324290f8726e470f1e4fb93152c890c597b9b16906cdd4e3e4",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: When selecting a target unit can the enemy model that is visible to my model and the enemy model that is in range of my model's weapon be different enemy models in the same unit? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section04; no new Strategic Reserves exception. Different visible/range models remain Section04; attacks target canonical units.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 31,
+      "id": "019feac1-cd25-4644-b855-2ce3fa048fee",
+      "question": "Can an attached unit be given an Upgrade?",
+      "answer": "Yes.",
+      "source_sha256": "0726dff38f240002912d8730e11af4be7e4f1c14c17d67b797855e597dd88a42",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Can an attached unit be given an Upgrade? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: actual attached unit accepts one Upgrade in executed roster validator.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 32,
+      "id": "38785a5c-16ba-41c5-b936-723a385f57aa",
+      "question": "Can a unit have both an Upgrade and an enhancement?",
+      "answer": "No, units are prevented from having two enhancements, and Upgrades are enhancements.",
+      "source_sha256": "7ee44f5393615f9102f2df97ea71badbd468f7b02b9f968aa1ec0c30da3ce524",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Can a unit have both an Upgrade and an enhancement? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: shared attached squad enhancement cap forbids Upgrade plus leader Enhancement.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 33,
+      "id": "3de45ba4-435e-4f58-a50c-fbda3f71bdc5",
+      "question": "Are Upgrades enhancements?",
+      "answer": "Yes, Upgrades are a type of enhancement (but not all enhancements are Upgrades).",
+      "source_sha256": "00e5a5e21fcdab4cfe98c30af6341386425851e952d8b85aa2febc27b4d2104e",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Are Upgrades enhancements? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: Upgrade is Enhancement; shared validation executes the same cap.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 34,
+      "id": "603e9b2f-cc24-498c-ac2e-08ad3068f257",
+      "question": "Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area?",
+      "answer": "Yes",
+      "source_sha256": "f12df889b0db17cfacf6358aea3dcd1a3d2725660c8a159eabad35f6f6c9fef3",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Terrain area vertical membership remains Section14.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 35,
+      "id": "6575ee89-b92a-456d-8e59-4ee513df8f4e",
+      "question": "Do rules that affect a keyword include multi-word keywords that contain that keyword? For example, would rules that affect Commissar units affect a unit that has the Commissar Graves keyword?",
+      "answer": "No.",
+      "source_sha256": "4246aa2cdf23333e8213aeef87c4224f0f2ff31b5f8c80229f9c9f3b7c648fa4",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Do rules that affect a keyword include multi-word keywords that contain that keyword? For example, would rules that affect Commissar units affect a unit that has the Commissar Graves keyword? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section02; no new Strategic Reserves exception. Direct exact keyword matching; no partial multiword Anti match.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 36,
+      "id": "7a982686-03ff-4565-8d5a-2549e5650268",
+      "question": "After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available?",
+      "answer": "Yes.",
+      "source_sha256": "83a20d1e25f2befd445e81a037eddc1fbae6799e634efe2a95b7b1724d5de541",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Increased CP cost payment remains Section15.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 37,
+      "id": "88fc6c54-a3a6-4757-947b-b2dab8b7f3bf",
+      "question": "In what step during the attack sequence do I roll for Feel No Pain?",
+      "answer": "In the Resolve Damage step of the Inflict Damage step (05.04).",
+      "source_sha256": "f76c805bcfca3c48fd1702c593c0b7ae45b19cb075e805878fa90d19c9fbf2c3",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: In what step during the attack sequence do I roll for Feel No Pain? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Feel No Pain damage timing remains Section05; no attachment-specific timing.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 38,
+      "id": "9aea2cef-c9db-4a30-bbfb-6b07c1f148a2",
+      "question": "Can an Epic Hero unit form an attached unit with a unit that has an enhancement?",
+      "answer": "Yes.",
+      "source_sha256": "d4d4f6a90669f72253ba254163280068e061623dfd51e1989df9d53a3797f45d",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Can an Epic Hero unit form an attached unit with a unit that has an enhancement? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: Epic Hero may attach to bodyguard with Upgrade; executed canonical roster control.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 39,
+      "id": "9b1c81f5-2ea0-40eb-9015-6a005367cd75",
+      "question": "While making a move type other than a normal/advance move, can my MONSTER/VEHICLE unit move through friendly units?",
+      "answer": "Yes.",
+      "source_sha256": "f3c9e8b3182c4e2071fac4e28a5f24038296b51c1e9815e075078612dfa184ee",
+      "disposition": "locally_owned",
+      "reason": "Friendly MONSTER/VEHICLE transit outside Normal/Advance retains ordinary permission.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_clarifications.py::test_friendly_vehicle_transit_preserves_faq_other_move_types",
+          "function_ast_sha256": "ff4df72f5ec7d2c07c135b155d742865184e81f464a6526ae641af67f339c823",
+          "assertions": [
+            "assert result.is_valid is (skies or mode in (MovementMode.FALL_BACK, MovementMode.CHARGE))"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 40,
+      "id": "9e243f82-42e9-4f0d-9e4b-3f5b74cd68bc",
+      "question": "If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)?",
+      "answer": "Yes. That restriction is applicable before the battle, in the Declare Battle Formations step.",
+      "source_sha256": "4a48d283634e5425caf54f2f8426b8c64351a15d8772e58a6c3ee0cff47b7031",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: existing accepted prebattle cap is not reapplied to actual during-battle source removal. Local source consumer and explicit Core price premises; named native provider admission remains unproven.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 41,
+      "id": "adf7c2cd-b765-4e84-abb7-f0ed45d52841",
+      "question": "Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round?",
+      "answer": "Yes.",
+      "source_sha256": "fcbf7560ed5887e51b590721ed9949d9d631d5f5c22e4bd49886aba684e0dbfa",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: half-points restriction is prebattle; actual during-battle source reposition bypasses prebattle declaration admission while preserving route.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 42,
+      "id": "beaeca32-9701-45f7-9461-879d8ae3d78f",
+      "question": "After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens?",
+      "answer": "No CP are spent and that stratagem's effects are not resolved (but that stratagem still counts as having been used this phase).",
+      "source_sha256": "e5ea7a06664adae76ec6f30368df75c64a03655b158375bbea49637e51d3c53a",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Insufficient increased CP remains Section15.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 43,
+      "id": "c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e",
+      "question": "Is being within range of a terrain objective the same as being within range of an objective marker?",
+      "answer": "Yes.",
+      "source_sha256": "b071da95e8e4f7b784d6b56260bc20d1f99d1dee892c93e49694be55146a9f6e",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Is being within range of a terrain objective the same as being within range of an objective marker? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Terrain Objective/marker equivalence remains primary adopted Companion convention.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 44,
+      "id": "e01c8a02-7a36-4d3b-b168-976b11bd47e8",
+      "question": "When my unit shoots at another unit, how does it work if some models in the target unit are fully visible to some models in my unit, while others are within a terrain area/not fully visible?",
+      "answer": "For each attacking model in your unit, determine whether the target unit has the benefit of cover, as described in Terrain and Visibility. In this scenario, the target unit will likely have the benefit of cover against some of the attacking models, but not all. This means that, in an example unit where all attacking models are using the same weapon, when you get to the Resolve Attacks step of the Attack Sequence, you will collect dice for attacks made by models against which the target unit has the benefit of cover separately from the dice for attacks made by models against which the target unit does not have the benefit of cover.",
+      "source_sha256": "8c5268b2b6d5a355b36634065359e05eec587d8ad7541cfbe7a7ed5144c48031",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: When my unit shoots at another unit, how does it work if some models in the target unit are fully visible to some models in my unit, while others are within a terrain area/not fully visible? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Cover is per attacking model in Section14; native geometry ownership is retained.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 45,
+      "id": "e43402db-7c49-4cd6-acf7-fa6cac83acb0",
+      "question": "If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier?",
+      "answer": "No, a stratagem that costs 1CP and is making use of an optional +1CP section has an original cost of 2CP.",
+      "source_sha256": "82f9c28b646f5734f69e5e94c22a2a9a1df8761eaf463c1510f301294963c5f0",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Optional Stratagem base cost remains Section15.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 46,
+      "id": "e846db5e-3138-4ac6-b7ee-ca2ff7fe303e",
+      "question": "Does vertical movement in a unit that has taken to the skies count towards the distance a model has used for the purposes of [Heavy]?",
+      "answer": "No.",
+      "source_sha256": "5fc6e6bf0de94e1cd61c8e9c98f520b0c863d4b728c5e4c19654f1b8c4a61368",
+      "disposition": "locally_owned",
+      "reason": "Heavy excludes vertical legs when Take to the Skies is selected; actual accepted-distance consumer tested.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_clarifications.py::test_flying_vertical_legs_are_excluded_from_actual_heavy_hit_permission",
+          "function_ast_sha256": "6e3f32932d23b124c3861cfb476eaf6d712ec6863c16758d818e45ec2f451311",
+          "assertions": [
+            "assert status.decision_request is not None",
+            "assert request is not None",
+            "assert status.decision_request is not None",
+            "assert request is not None",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert len(state.model_movement_history) == 1",
+            "assert isclose(state.model_movement_history[0].distance_inches, horizontal)",
+            "assert _heavy_hit_roll_modifier_applies(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner', out_of_phase_state=None) is heavy"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 47,
+      "id": "fc49644c-cc46-47a0-892b-284a4c4ec018",
+      "question": "Can I group or allocate a wound to a destroyed model?",
+      "answer": "No.",
+      "source_sha256": "6c644170715564c73a7148e873c64fb055afa4031065a1027f319016ba4b6bee",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Can I group or allocate a wound to a destroyed model? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Direct living-model membership: dead models cannot supply attack toughness/allocation; casualty producer and presence consumers are local.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 48,
+      "id": "04f15433-3ee1-4c6d-8546-29e4247dee5b",
+      "question": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?",
+      "answer": "After.",
+      "source_sha256": "13028847f833da09851ea0172c574d87efff63f06d924d31f67bf2fb42574b60",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Post-save Damage-to-zero remains Section05.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 49,
+      "id": "2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+      "question": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?",
+      "answer": "Models awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models: They can be measured to by friendly/enemy abilities. They can be considered visible to friendly/enemy models where relevant. They can use their datasheet abilities. They can be targeted by stratagems. Enemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight).",
+      "source_sha256": "47c3d8041c00d1755fd01c8fc8149fccadfbd89cb238fa5d8184cadaeaaea455",
+      "disposition": "bounded_dependency",
+      "reason": "Unit keyword identity uses current physical membership: ordinary removed casualties cease contributing, while the adopted retained-death physical-presence exception retains contribution until removal. This is relevant to the FLYING-unit definition; native attachment/casualty/retained keyword controls run at the unchanged shared Section02 owner. It grants no movement to destroyed models or native mixed-FLY attachment admission.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution",
+          "function_ast_sha256": "ac8b1edd74909c6ef13157300290fa664a0d967667190f44e278a7c6f671061b",
+          "assertions": [
+            "assert target.required_wargear_ids == ()",
+            "assert 'CHARACTER' in view.keywords",
+            "assert 'CHARACTER' not in bodyguard.own_models[0].keywords",
+            "assert 'CHARACTER' in leader.own_models[0].keywords",
+            "assert set(view.keywords) == set(bodyguard.keywords) | set(leader.keywords)",
+            "assert 'CHARACTER' not in after.keywords",
+            "assert 'LORD EXULTANT' not in after.keywords",
+            "assert \"EMPEROR'S CHILDREN\" in after.faction_keywords",
+            "assert 'CHARACTER' in retained.keywords",
+            "assert 'CHARACTER' not in after.keywords"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 50,
+      "id": "421a6f30-63e2-4e1f-b352-99b643637c53",
+      "question": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+      "answer": "No, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+      "source_sha256": "c5ad1503a94c734aa9f1d0dadca11d1daa19dc63928131659eb8214c5f4c7724",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Can I use the Insane Bravery stratagem on a battle-shocked unit? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Friendly battle-shocked Stratagem denial remains Section01/15.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 51,
+      "id": "60232b79-7a10-44a0-ac68-e27312c7ba60",
+      "question": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+      "answer": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit.",
+      "source_sha256": "a4fb6955c73cae19a4d09415f8b77188b6fd8542fbb0448084db0db2c56c392f",
+      "disposition": "bounded_dependency",
+      "reason": "Unit keyword identity uses current physical membership: ordinary removed casualties cease contributing, while the adopted retained-death physical-presence exception retains contribution until removal. This is relevant to the FLYING-unit definition; native attachment/casualty/retained keyword controls run at the unchanged shared Section02 owner. It grants no movement to destroyed models or native mixed-FLY attachment admission.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution",
+          "function_ast_sha256": "ac8b1edd74909c6ef13157300290fa664a0d967667190f44e278a7c6f671061b",
+          "assertions": [
+            "assert target.required_wargear_ids == ()",
+            "assert 'CHARACTER' in view.keywords",
+            "assert 'CHARACTER' not in bodyguard.own_models[0].keywords",
+            "assert 'CHARACTER' in leader.own_models[0].keywords",
+            "assert set(view.keywords) == set(bodyguard.keywords) | set(leader.keywords)",
+            "assert 'CHARACTER' not in after.keywords",
+            "assert 'LORD EXULTANT' not in after.keywords",
+            "assert \"EMPEROR'S CHILDREN\" in after.faction_keywords",
+            "assert 'CHARACTER' in retained.keywords",
+            "assert 'CHARACTER' not in after.keywords"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 52,
+      "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+      "question": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+      "answer": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead).",
+      "source_sha256": "736b6d704a27951f968fbcc84f7b0eca6840b08a451d353390367442244b1766",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Do a unit's abilities continue to function while they are embarked within a TRANSPORT? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section18; no new Strategic Reserves exception. Direct inherited boundary: embarked abilities and borrowed weapons preserve physical ownership; execute shared Firing Deck consumer.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 53,
+      "id": "7f238e23-cd3f-40ad-aa91-c75274cc655e",
+      "question": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?",
+      "answer": "Line of sight is drawn from any part of the observing model to any part of the model being observed.",
+      "source_sha256": "cf0fd95bcbcfb3ff78f04318e141c735309cc69f5f3815ab946d5a4245563333",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Physical line of sight remains Section14.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 54,
+      "id": "80182be3-1a44-464b-9ef6-cd9212429603",
+      "question": "If both players have units with the Scouts ability, do they alternate resolving scout moves?",
+      "answer": "Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn.",
+      "source_sha256": "5d5056a4966de981a21706e962e5c9ea70f05377ff20fd4962f7cc7a01d5290b",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If both players have units with the Scouts ability, do they alternate resolving scout moves? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section01/03; no new Strategic Reserves exception. Scouts alternation remains Section03/prebattle.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 55,
+      "id": "aab10e23-6433-42ca-86e7-ddc829f16c47",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting?",
+      "answer": "Unless otherwise stated, no: when snap shooting, each attack only hits on a roll of 6.",
+      "source_sha256": "b26dfcd0cc3f76a41e680b3bedaf3ba6a299fa135400cea6cbd42e493ea2e057",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Snap shooting threshold remains Section05/10.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 56,
+      "id": "b7d3d760-a167-44b2-9c91-32ce86684225",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit?",
+      "answer": "Yes, except when snap shooting: when snap shooting, each attack only hits on a roll of 6.",
+      "source_sha256": "9bfda5c1d2a514b705e9feeec17efef3325815360389fe267537521350a557ac",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Critical hit thresholds remain Section05.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 57,
+      "id": "ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+      "question": "When do the effects of a FLYING unit taking to the skies apply?",
+      "answer": "When that unit is selected to make a normal/advance/fall-back/charge move. Note that for an advance/charge move, this means you must declare that a unit will take to the skies before rolling for that advance/charge move.",
+      "source_sha256": "2202a3d04b20b42997b9a0e9a19177697bf42ee7b2b1923c4674b43faa676e9b",
+      "disposition": "locally_owned",
+      "reason": "Take to the Skies is committed before Advance/Charge dice.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_facade.py::test_native_flight_choice_commits_before_roll_and_records_accepted_distance",
+          "function_ast_sha256": "86e673804a929513c5d0da8a3e6f16f108df51e9d76b491761ea0e72b7655434",
+          "assertions": [
+            "assert status.decision_request is not None",
+            "assert request is not None",
+            "assert len(choices) == 2",
+            "assert not events(session, 'advance_roll_resolved')",
+            "assert status.decision_request is not None",
+            "assert request is not None",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert len(state.model_movement_history) == 1",
+            "assert state.model_movement_history[0].distance_inches == 2",
+            "assert models_within_turn_distance(state=state, model_ids=unit.own_model_ids(), maximum_inches=3)",
+            "assert isinstance(model_movements, list)",
+            "assert isinstance(model_movement, dict)",
+            "assert model_movement['movement_distance_modifier_inches'] == (-2 if skies else 0)",
+            "assert len(events(session, 'advance_roll_resolved')) == 1",
+            "assert recorded[1].result.selected_option_id == option.option_id",
+            "assert isinstance(recorded[1].result.payload, dict)",
+            "assert recorded[1].result.payload['movement_mode'] == ('fly_take_to_skies' if skies else 'advance')",
+            "assert json.loads(json.dumps(view)) == view",
+            "assert 'model_movement_history' not in view"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section21/test_facade.py::test_charge_flight_is_selected_before_dice_and_filters_targets_after_penalty",
+          "function_ast_sha256": "6ba7a96d9b725e1ab7260fc63367fbfb5c3dbf8cb4c72b861d131441c15c06e0",
+          "assertions": [
+            "assert request.decision_type == 'select_charge_targets'",
+            "assert rolled.request.take_to_the_skies is skies",
+            "assert rolled.movement_budget.maximum_distance_inches == rolled.value - (2 if skies else 0)",
+            "assert next((i for i, e in enumerate(events_) if e.event_type == 'charging_unit_selected')) < next((i for i, e in enumerate(events_) if e.event_type == 'charge_roll_started'))",
+            "assert enemy.unit_instance_id in rolled.reachable_target_distances_inches"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 58,
+      "id": "dc9911da-e156-4b48-bf9b-18f9d96d037e",
+      "question": "If a rule refers to an 'objective marker', does this mean an 'objective'?",
+      "answer": "Yes (excluding rules in the Core Rules)'.",
+      "source_sha256": "f084d1e31353f70020957e67d0ad8821f406be29c8251048d27bf81e6664f4b3",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If a rule refers to an 'objective marker', does this mean an 'objective'? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Non-Core objective terminology and current Companion policy remain unchanged.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 59,
+      "id": "fb3b2776-c954-471b-b448-b70caa91929d",
+      "question": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?",
+      "answer": "A charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03). Example: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\". Example: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\".",
+      "source_sha256": "18f33a49e6d2f3f401aefb615c84a2d4d373c9b382b5bb38252504d517bc8662",
+      "disposition": "locally_owned",
+      "reason": "Modified Charge maximum, including flight minus two, filters targets. Later replacement is bounded inherited dependency.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_clarifications.py::test_flight_charge_penalty_limits_current_finite_target_options",
+          "function_ast_sha256": "786bff764aabfcdf6b855e38d5498f95124ebd7df17f7a3c413abab3b08132d9",
+          "assertions": [
+            "assert result.value == 12",
+            "assert result.movement_budget.maximum_distance_inches == (10 if skies else 12)",
+            "assert (enemy.unit_instance_id in result.reachable_target_distances_inches) is (gap <= (10 if skies else 12))",
+            "assert request.decision_type == 'select_charge_targets'",
+            "assert any((isinstance(o.payload, dict) and isinstance(o.payload['target_ids'], list) and (enemy.unit_instance_id in o.payload['target_ids']) for o in request.options))",
+            "assert request.decision_type == 'select_charging_unit'",
+            "assert not result.move_available"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 60,
+      "id": "db020803-7564-45c9-a6d4-e4cdf463da32",
+      "question": "Can a unit be controlling more than one objective at once?",
+      "answer": "Yes.",
+      "source_sha256": "8352b49b9fbfaceb630ac21dc45eac4d9fdf112bd15de3e50ec2f0fbd30ca36e",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: Can a unit be controlling more than one objective at once? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section17; no new Strategic Reserves exception. Multiple-objective control remains Section17.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 61,
+      "id": "8c51d370-70b2-46c7-abaa-228b55c830c3",
+      "question": "When determining control over an objective, can the same model's OC count towards more than one objective that model is within range of?",
+      "answer": "Yes.",
+      "source_sha256": "cda9f83e49d0006eef29aeb0e17f388472db9fa391be2ea4a96e6ce4850e80a6",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: When determining control over an objective, can the same model's OC count towards more than one objective that model is within range of? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section17; no new Strategic Reserves exception. OC may count for multiple in-range objectives remains Section17.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 62,
+      "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+      "question": "If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle?",
+      "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn.",
+      "source_sha256": "f1569a6a16420f52ff3a4cc89c61762db7467cba6bdc320c8a4e3fa8ceec239f",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: original lasting effect survives removal/return and exists through end-turn query until shared expiry boundary; no renewed lifetime.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 63,
+      "id": "9638115f-b94b-4d05-ba62-df9fba2805ac",
+      "question": "When a model overhangs the edge of the battlefield, how does that affect its visibility?",
+      "answer": "That model's controlling player can draw line of sight from any part of that model that is not overhanging the edge of the battlefield. Their opponent can draw line of sight to any part of that model.",
+      "source_sha256": "1c43f713b930f8f51c7d429991f40174c22eb30bbf4bd56773993b4a8e319cd8",
+      "disposition": "other_section_no_new_obligation",
+      "reason": "Screened for Section21: When a model overhangs the edge of the battlefield, how does that affect its visibility? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Overhanging visibility remains Section14.",
+      "semantic_assertions": []
+    },
+    {
+      "ordinal": 64,
+      "id": "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+      "question": "When does a model's or unit's ability in an attached unit apply to all models in that unit?",
+      "answer": "A rule that applies to 'this/that unit' or 'models in this/that unit' applies to all models in an attached unit. Rules that just apply to one model in an attached unit (for example, a rule that grants a model Feel No Pain or Lone Operative) only apply to that model, not to all models in the attached unit.",
+      "source_sha256": "cbf7e42f41f0d4cce05a0f084c6982e8899da06ac0a71c7339ad6845ef0acc47",
+      "disposition": "locally_owned",
+      "reason": "Attached unit-wide identity does not give every sibling a model-specific benefit; native physical components retain individual flight transit scope under an explicit Core attachment premise.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_boundaries.py::test_one_flying_component_makes_unit_flying_without_granting_sibling_transit",
+          "function_ast_sha256": "f62fa5b2367e72c5bb1bf90b30d20ad9d19b85227834e7dd27785468aebc6de6",
+          "assertions": [
+            "assert 'FLY' in view.keywords",
+            "assert 'FLY' not in leader.keywords",
+            "assert choice['flying_model_instance_ids'] == list(body.own_model_ids())",
+            "assert choice['flight_penalty_inches'] == 2",
+            "assert cap.can_transit_all_terrain is expected",
+            "assert cap.ignores_vertical_distance is expected"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section21/test_flight.py::test_physical_flight_benefits_are_limited_to_flying_members",
+          "function_ast_sha256": "1b84f24f0c41292869bede86eccba83c554e445ecd2a9234ef2d2e2fe6eec96c",
+          "assertions": [
+            "assert context['flight_penalty_inches'] == (2 if skies else 0)",
+            "assert context['flying_model_instance_ids'] == list(flyer.own_model_ids())",
+            "assert cap.has_fly is (unit is flyer)",
+            "assert cap.ignores_vertical_distance is expected",
+            "assert cap.can_transit_all_terrain is expected",
+            "assert cap.can_move_through_terrain is expected",
+            "assert cap.can_move_through_enemy_models is expected",
+            "assert cap.can_traverse_ruins_walls"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    }
+  ],
+  "locally_owned_faqs": [
+    {
+      "clause_id": "S21-FAQ-05",
+      "acceptance": "Transient enemy Engagement during a move is not endpoint Engagement.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_clarifications.py::test_transient_enemy_engagement_during_surge_is_not_endpoint_engagement",
+          "function_ast_sha256": "d11dc8355075d49434d85bacf493cde37767d4ede6a5486145b70b044c93e126",
+          "assertions": [
+            "assert result.is_valid, result.to_payload()",
+            "assert result.movement_payload['surge_target_unit_instance_id'] != other.unit_instance_id"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section21/test_flight.py::test_flight_crosses_actual_models_and_solid_volume_only_when_declared",
+          "function_ast_sha256": "2d55371f436705ac30a092a952fbf910401b68b65b0d56403c709be46f1b8428",
+          "assertions": [
+            "assert result.is_valid is (skies or blocker == 'infantry'), result.movement_payload",
+            "assert result.attempted_placement.model_placements[0].pose == Pose.at(22, 10)",
+            "assert state.battlefield_state == board.battlefield_state"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "clause_id": "S21-FAQ-26",
+      "acceptance": "If-able approach must retain coherency.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_surge.py::test_approach_never_waives_endpoint_coherency",
+          "function_ast_sha256": "f043526c8faa3a05ec5aca7d944d1bc85956c559219dbbe999719bd75dd65d5a",
+          "assertions": [
+            "assert not result.is_valid",
+            "assert not result.coherency_result.is_coherent",
+            "assert result.rollback_record is not None"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section21/test_boundaries.py::test_native_components_surge_as_one_attached_rules_unit",
+          "function_ast_sha256": "5ff6fb77e0425b4f04334d38c4078bf728d6b88ec5a6705861e362ae7e6ef4a4",
+          "assertions": [
+            "assert isinstance(first.base, CircularBase)",
+            "assert isinstance(other.base, CircularBase)",
+            "assert {o.option_id for o in request.options if o.option_id.startswith('surge:')} == {f'surge:{canonical}:target:{enemy.unit_instance_id}'}",
+            "assert status.decision_request is not None",
+            "assert request is not None",
+            "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+            "assert state.to_payload() == before",
+            "assert session.lifecycle.decision_controller.to_payload() == records",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert set(state.phase_movement_history[-1].model_instance_ids) == {*body.own_model_ids(), *leader.own_model_ids()}",
+            "assert surge_locked(state, body.unit_instance_id)",
+            "assert surge_locked(state, leader.unit_instance_id)",
+            "assert rules_unit_view_by_id(state=state, unit_instance_id=leader.unit_instance_id).unit_instance_id == canonical",
+            "assert json.loads(json.dumps(session.lifecycle.decision_controller.to_payload())) == session.lifecycle.decision_controller.to_payload()"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "clause_id": "S21-FAQ-28",
+      "acceptance": "Single contiguous group requirement is a shared Moving prerequisite; exact positive/negative controls run as a bounded Section03 dependency.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section03/test_coherency.py::test_constructed_span_and_contiguous_group_contract",
+          "function_ast_sha256": "fbd4dfde46829b7964f26dedd5833c23a033c6c3072302cb61fae6273e9b6cd8",
+          "assertions": [
+            "assert result.is_coherent is valid",
+            "assert code in {v.violation_code for v in result.violations}"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "clause_id": "S21-FAQ-39",
+      "acceptance": "Friendly MONSTER/VEHICLE transit outside Normal/Advance retains ordinary permission.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_clarifications.py::test_friendly_vehicle_transit_preserves_faq_other_move_types",
+          "function_ast_sha256": "ff4df72f5ec7d2c07c135b155d742865184e81f464a6526ae641af67f339c823",
+          "assertions": [
+            "assert result.is_valid is (skies or mode in (MovementMode.FALL_BACK, MovementMode.CHARGE))"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "clause_id": "S21-FAQ-46",
+      "acceptance": "Heavy excludes vertical legs when Take to the Skies is selected; actual accepted-distance consumer tested.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_clarifications.py::test_flying_vertical_legs_are_excluded_from_actual_heavy_hit_permission",
+          "function_ast_sha256": "6e3f32932d23b124c3861cfb476eaf6d712ec6863c16758d818e45ec2f451311",
+          "assertions": [
+            "assert status.decision_request is not None",
+            "assert request is not None",
+            "assert status.decision_request is not None",
+            "assert request is not None",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert len(state.model_movement_history) == 1",
+            "assert isclose(state.model_movement_history[0].distance_inches, horizontal)",
+            "assert _heavy_hit_roll_modifier_applies(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner', out_of_phase_state=None) is heavy"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "clause_id": "S21-FAQ-49",
+      "acceptance": "Unit keyword identity uses current physical membership: ordinary removed casualties cease contributing, while the adopted retained-death physical-presence exception retains contribution until removal. This is relevant to the FLYING-unit definition; native attachment/casualty/retained keyword controls run at the unchanged shared Section02 owner. It grants no movement to destroyed models or native mixed-FLY attachment admission.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution",
+          "function_ast_sha256": "ac8b1edd74909c6ef13157300290fa664a0d967667190f44e278a7c6f671061b",
+          "assertions": [
+            "assert target.required_wargear_ids == ()",
+            "assert 'CHARACTER' in view.keywords",
+            "assert 'CHARACTER' not in bodyguard.own_models[0].keywords",
+            "assert 'CHARACTER' in leader.own_models[0].keywords",
+            "assert set(view.keywords) == set(bodyguard.keywords) | set(leader.keywords)",
+            "assert 'CHARACTER' not in after.keywords",
+            "assert 'LORD EXULTANT' not in after.keywords",
+            "assert \"EMPEROR'S CHILDREN\" in after.faction_keywords",
+            "assert 'CHARACTER' in retained.keywords",
+            "assert 'CHARACTER' not in after.keywords"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "clause_id": "S21-FAQ-51",
+      "acceptance": "Unit keyword identity uses current physical membership: ordinary removed casualties cease contributing, while the adopted retained-death physical-presence exception retains contribution until removal. This is relevant to the FLYING-unit definition; native attachment/casualty/retained keyword controls run at the unchanged shared Section02 owner. It grants no movement to destroyed models or native mixed-FLY attachment admission.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution",
+          "function_ast_sha256": "ac8b1edd74909c6ef13157300290fa664a0d967667190f44e278a7c6f671061b",
+          "assertions": [
+            "assert target.required_wargear_ids == ()",
+            "assert 'CHARACTER' in view.keywords",
+            "assert 'CHARACTER' not in bodyguard.own_models[0].keywords",
+            "assert 'CHARACTER' in leader.own_models[0].keywords",
+            "assert set(view.keywords) == set(bodyguard.keywords) | set(leader.keywords)",
+            "assert 'CHARACTER' not in after.keywords",
+            "assert 'LORD EXULTANT' not in after.keywords",
+            "assert \"EMPEROR'S CHILDREN\" in after.faction_keywords",
+            "assert 'CHARACTER' in retained.keywords",
+            "assert 'CHARACTER' not in after.keywords"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "clause_id": "S21-FAQ-57",
+      "acceptance": "Take to the Skies is committed before Advance/Charge dice.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_facade.py::test_native_flight_choice_commits_before_roll_and_records_accepted_distance",
+          "function_ast_sha256": "86e673804a929513c5d0da8a3e6f16f108df51e9d76b491761ea0e72b7655434",
+          "assertions": [
+            "assert status.decision_request is not None",
+            "assert request is not None",
+            "assert len(choices) == 2",
+            "assert not events(session, 'advance_roll_resolved')",
+            "assert status.decision_request is not None",
+            "assert request is not None",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert len(state.model_movement_history) == 1",
+            "assert state.model_movement_history[0].distance_inches == 2",
+            "assert models_within_turn_distance(state=state, model_ids=unit.own_model_ids(), maximum_inches=3)",
+            "assert isinstance(model_movements, list)",
+            "assert isinstance(model_movement, dict)",
+            "assert model_movement['movement_distance_modifier_inches'] == (-2 if skies else 0)",
+            "assert len(events(session, 'advance_roll_resolved')) == 1",
+            "assert recorded[1].result.selected_option_id == option.option_id",
+            "assert isinstance(recorded[1].result.payload, dict)",
+            "assert recorded[1].result.payload['movement_mode'] == ('fly_take_to_skies' if skies else 'advance')",
+            "assert json.loads(json.dumps(view)) == view",
+            "assert 'model_movement_history' not in view"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section21/test_facade.py::test_charge_flight_is_selected_before_dice_and_filters_targets_after_penalty",
+          "function_ast_sha256": "6ba7a96d9b725e1ab7260fc63367fbfb5c3dbf8cb4c72b861d131441c15c06e0",
+          "assertions": [
+            "assert request.decision_type == 'select_charge_targets'",
+            "assert rolled.request.take_to_the_skies is skies",
+            "assert rolled.movement_budget.maximum_distance_inches == rolled.value - (2 if skies else 0)",
+            "assert next((i for i, e in enumerate(events_) if e.event_type == 'charging_unit_selected')) < next((i for i, e in enumerate(events_) if e.event_type == 'charge_roll_started'))",
+            "assert enemy.unit_instance_id in rolled.reachable_target_distances_inches"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "clause_id": "S21-FAQ-59",
+      "acceptance": "Modified Charge maximum, including flight minus two, filters targets. Later replacement is bounded inherited dependency.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_clarifications.py::test_flight_charge_penalty_limits_current_finite_target_options",
+          "function_ast_sha256": "786bff764aabfcdf6b855e38d5498f95124ebd7df17f7a3c413abab3b08132d9",
+          "assertions": [
+            "assert result.value == 12",
+            "assert result.movement_budget.maximum_distance_inches == (10 if skies else 12)",
+            "assert (enemy.unit_instance_id in result.reachable_target_distances_inches) is (gap <= (10 if skies else 12))",
+            "assert request.decision_type == 'select_charge_targets'",
+            "assert any((isinstance(o.payload, dict) and isinstance(o.payload['target_ids'], list) and (enemy.unit_instance_id in o.payload['target_ids']) for o in request.options))",
+            "assert request.decision_type == 'select_charging_unit'",
+            "assert not result.move_available"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "clause_id": "S21-FAQ-64",
+      "acceptance": "Attached unit-wide identity does not give every sibling a model-specific benefit; native physical components retain individual flight transit scope under an explicit Core attachment premise.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section21/test_boundaries.py::test_one_flying_component_makes_unit_flying_without_granting_sibling_transit",
+          "function_ast_sha256": "f62fa5b2367e72c5bb1bf90b30d20ad9d19b85227834e7dd27785468aebc6de6",
+          "assertions": [
+            "assert 'FLY' in view.keywords",
+            "assert 'FLY' not in leader.keywords",
+            "assert choice['flying_model_instance_ids'] == list(body.own_model_ids())",
+            "assert choice['flight_penalty_inches'] == 2",
+            "assert cap.can_transit_all_terrain is expected",
+            "assert cap.ignores_vertical_distance is expected"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section21/test_flight.py::test_physical_flight_benefits_are_limited_to_flying_members",
+          "function_ast_sha256": "1b84f24f0c41292869bede86eccba83c554e445ecd2a9234ef2d2e2fe6eec96c",
+          "assertions": [
+            "assert context['flight_penalty_inches'] == (2 if skies else 0)",
+            "assert context['flying_model_instance_ids'] == list(flyer.own_model_ids())",
+            "assert cap.has_fly is (unit is flyer)",
+            "assert cap.ignores_vertical_distance is expected",
+            "assert cap.can_transit_all_terrain is expected",
+            "assert cap.can_move_through_terrain is expected",
+            "assert cap.can_move_through_enemy_models is expected",
+            "assert cap.can_traverse_ruins_walls"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    }
+  ],
+  "metadata_gameplay_credit": false,
+  "qualification": "Constructed Core source grants/attachment/initial states are explicit premises, not native roster/provider certification. Persistence credit belongs to the separate supported Core checkpoints."
+}

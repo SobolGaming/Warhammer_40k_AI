@@ -159,7 +159,10 @@ def _setup_terrain(
     model: ModelInstance,
     ruleset: RulesetDescriptor,
 ) -> SetupTerrain:
-    policy = ruleset.terrain_movement_policy.policy_for_feature_kind(feature.feature_kind)
+    policy = ruleset.terrain_movement_policy.policy_for_feature_kind(
+        feature.feature_kind,
+        endpoint_classification=feature.classification if feature.floors else None,
+    )
     allowed = policy.endpoint_support_policy is not TerrainEndpointSupportPolicy.NOT_ALLOWED_ON_TOP
     return SetupTerrain(
         feature=feature,
