@@ -22,9 +22,11 @@ def test_order97_resolves_authenticated_faction_archive_before_historical_eviden
     _, record = verify_layout_original(ROOT, ORIGINAL)
     historical = historical_evidence_path(ORIGINAL, root=ROOT)
     expected = ROOT / record["archive"] if historical is None else historical
-    assert audit._path(ORIGINAL, ROOT) == expected
+    assert audit._path(ORIGINAL, ROOT) == expected  # pyright: ignore[reportPrivateUsage]
     symbol = "test_lifecycle_requests_world_eaters_blessings_and_records_effect"
-    node = audit._symbol(ORIGINAL + "::" + symbol, {}, ROOT)
+    node = audit._symbol(  # pyright: ignore[reportPrivateUsage]
+        ORIGINAL + "::" + symbol, {}, ROOT
+    )
     assert isinstance(node, ast.FunctionDef)
     assert node.name == symbol
 
@@ -42,7 +44,7 @@ def test_order97_relocated_archive_rejects_live_or_historical_drift(
     if corruption == "missing":
         (tmp_path / SUCCESSOR).unlink()
         with pytest.raises(FileNotFoundError):
-            audit._path(ORIGINAL, tmp_path)
+            audit._path(ORIGINAL, tmp_path)  # pyright: ignore[reportPrivateUsage]
         return
     target = {
         "manifest": MANIFEST,
@@ -58,9 +60,9 @@ def test_order97_relocated_archive_rejects_live_or_historical_drift(
     else:
         path.write_bytes(path.read_bytes() + b"\n")
     with pytest.raises(ValueError, match=r"Faction layout .* drifted"):
-        audit._path(ORIGINAL, tmp_path)
+        audit._path(ORIGINAL, tmp_path)  # pyright: ignore[reportPrivateUsage]
 
 
 def test_order97_unregistered_missing_evidence_still_fails(tmp_path: Path) -> None:
     with pytest.raises(audit.InventoryError, match="Evidence file is absent"):
-        audit._path("tests/unit/test_unregistered_missing_evidence.py", tmp_path)
+        audit._path("tests/unit/test_unregistered_missing_evidence.py", tmp_path)  # pyright: ignore[reportPrivateUsage]
