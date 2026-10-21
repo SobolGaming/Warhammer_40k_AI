@@ -61,3 +61,24 @@ inventory. This candidate adds no runtime, source, import selection, gameplay or
 behavioral-test change. Existing gameplay evidence keeps its original scope and
 limitations; no new coverage or complete behavioral run is claimed. Independent
 review of this separate cumulative candidate remains pending.
+
+The historical inventory also pins the original budget JSON itself. The only
+historical-reader change routes that exact path through the existing
+`historical_input_bytes` resolver at unchanged revision
+`7f45d87d3094c76beb1be58e0cabb721dec21053`. Its unchanged inventory SHA and budget
+SHA `5178d85cec2077035e405a95ba59fa7f68d377bbcdd51a2cb1fef3a475ac06cc`
+still authenticate original240. Every other report continues checking its live
+pinned bytes. The current270 report is rejected as historical; corrupted old
+budget bytes and an unrelated report's live corruption are both rejected.
+No historical inventory, revision, measurement, source input or general proof
+activation changes. This single-path historical boundary is necessary to let an
+approved current budget coexist with immutable historical claims.
+
+Concurrency audit: B2 pytest ran20:10:27.953–20:12:15.994UTC, after the
+measurement outer interval20:08:03.129–20:08:51.871UTC and before the first full
+quality launch20:15:11.639UTC. Its interruption receipt is retained separately.
+A0.2008-second B2 static-binding step ended around20:08:08UTC and overlaps the
+outer measurement harness interval. Per-sample wall-clock timestamps were not
+logged, so these timings carry possible brief static contention and make no
+exclusive-host claim. Counts remain deterministic; no timing regression ratio or
+automatic timing rerun is justified by this overlap.

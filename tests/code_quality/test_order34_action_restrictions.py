@@ -163,6 +163,40 @@ def test_r34_unrestricted_lookup_ceiling_is_inclusive_and_enforced(
         test_r34_003_live_consumers_stay_within_versioned_work_budgets("unrestricted")
 
 
+def test_r34_lookup_recalibration_preserves_authenticated_history(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from tests import performance_evidence_helpers as historical
+
+    name = "docs/performance/order34/budgets.json"
+    original_bytes = historical.historical_input_bytes(name)
+    original = json.loads(original_bytes)
+    current = json.loads((ROOT / name).read_bytes())
+    assert original["live_cases"]["unrestricted"]["work_limits"]["rules_unit_view_by_id"] == 240
+    assert current["live_cases"]["unrestricted"]["work_limits"]["rules_unit_view_by_id"] == 270
+    historical.assert_historical_report(original)
+    with pytest.raises(ValueError, match="Unregistered or modified historical"):
+        historical.assert_historical_report(current)
+
+    # A corrupted historical budget cannot inherit the immutable inventory pin.
+    with monkeypatch.context() as control:
+        control.setattr(historical, "historical_input_bytes", lambda _name: original_bytes + b"\n")
+        with pytest.raises(ValueError, match="Historical performance report bytes drifted"):
+            historical.assert_historical_report(original)
+
+    # The one-path recalibration cannot hide edits to other historical reports.
+    other = "docs/performance/order101/head.json"
+    raw = (ROOT / other).read_bytes()
+    target = tmp_path / other
+    target.parent.mkdir(parents=True)
+    target.write_bytes(raw + b"\n")
+    with monkeypatch.context() as control:
+        control.setattr(historical, "ROOT", tmp_path)
+        with pytest.raises(ValueError, match="Historical performance report bytes drifted"):
+            historical.assert_historical_report(json.loads(raw))
+
+
 def test_r34_cold_geometry_work_is_independent_of_repetition_and_case_order() -> None:
     from scripts.measure_action_restriction_live import live_sample
 
