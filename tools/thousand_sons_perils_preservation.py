@@ -20,7 +20,7 @@ AFTER = "75105d6dc3eba760dce048c4a158b574bec2e9dd414ecc610349109d5d60914b"
 BLOCK = "99277c8bc089d9f4ea9e2c2c54e8f3e9560e8ec84c740dee5625a9b72e3d2f32"
 OFFSET, LENGTH = 7812, 1510
 # Activation changes only this literal after the genuine local five-path freeze.
-FREEZE_COMMIT: str | None = None
+FREEZE_COMMIT: str | None = "c48ed1a67780f22772a229788117ad5ed89d84c6"
 
 
 def _sha(raw: bytes) -> str:
