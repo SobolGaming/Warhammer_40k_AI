@@ -294,6 +294,43 @@ def test_generated_inventory_changes_only_reviewed_perils_metadata() -> None:
     assert hashlib.sha256(actual).hexdigest() == successor.PINS[successor.INVENTORY]
 
 
+@preflight.invocation
+def test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelated_input(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tools import performance_preflight_successor as successor
+
+    root = Path(__file__).resolve().parents[2]
+    direct_git = successor._git
+    current = (root / successor.INVENTORY).read_bytes()
+    old = direct_git(root, "show", successor.BASE + ":" + successor.INVENTORY)
+    assert current != old
+    target = tmp_path / successor.INVENTORY
+    target.parent.mkdir(parents=True)
+    target.write_bytes(current)
+
+    def original_git(_root: Path, *args: str) -> bytes:
+        return direct_git(root, *args)
+
+    monkeypatch.setattr(successor, "_git", original_git)
+    for supplied in (current, old):
+        assert successor.preceding_control(tmp_path, successor.INVENTORY, supplied) == old
+    with pytest.raises(ValueError, match="caller supplied unrelated bytes"):
+        successor.preceding_control(tmp_path, successor.INVENTORY, current + b" ")
+
+    # Neither a warm invocation nor authenticated historical caller bytes may
+    # hide subsequent live drift, even when the file's timestamps are restored.
+    metadata = target.stat()
+    changed = current.replace(b'"runtime_pass_claimed": false', b'"runtime_pass_claimed": true ')
+    assert changed != current
+    assert len(changed) == len(current)
+    target.write_bytes(changed)
+    os.utime(target, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+    for supplied in (current, old):
+        with pytest.raises(ValueError, match="Preflight source"):
+            successor.preceding_control(tmp_path, successor.INVENTORY, supplied)
+
+
 @pytest.mark.parametrize("coordinated_pin", [False, True])
 def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, coordinated_pin: bool

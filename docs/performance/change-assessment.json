@@ -4774,7 +4774,7 @@
     },
     "tests/code_quality/test_d07_geometry_containment.py": {
       "before_sha256": null,
-      "after_sha256": "38697612ee57e65c26bf1dd87347531657e98e74e8fa9927b2ffa468171bc369",
+      "after_sha256": "241b0a96741494bb06ef77613a2cf4a1fcc4c60d12cb41bde1589efb491a91b0",
       "owners": {
         "@module": {
           "before": null,
@@ -4826,7 +4826,7 @@
         },
         "test_order135_reviewed_fnp_metadata_transition_preserves_all_obligations": {
           "before": null,
-          "after": "911f32c77d6ed98a5ba6faa465b0b10f35709ce7e9383b5f08b1178d68963999"
+          "after": "cf5110313639aa09b2a3fe8805c50a3f00caad5637adc8f108a0d35edb9fe68f"
         }
       }
     },
@@ -5026,7 +5026,7 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "ea8d411dd7c028244cd67851d7ce4f080371c1461556feb23717b45c4738c236",
+      "after_sha256": "6a61c82df9d1a60b9dcc54ce25e254a56fa896436dd6abe354911320e44c6c1b",
       "owners": {
         "@module": {
           "before": null,
@@ -5039,6 +5039,10 @@
         "test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin": {
           "before": null,
           "after": "98dbb9b2d3e0b166a02effd692600bec122975a181c8586cd908fe5f9c650170"
+        },
+        "test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelated_input": {
+          "before": null,
+          "after": "361c665fe9182636e312adb5c96923c427d7ab11319ff21eb067e314e92bcfc6"
         },
         "test_native_discovery_matches_original_ignored_and_symlink_membership": {
           "before": null,
@@ -18064,11 +18068,11 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "e88fa2bd942b4d3372d8292754d2b438470dac9e8aadfd3c39d7c8f219a987c1",
+      "after_sha256": "6a4564932ab00b808156cf8fd30250b01884c8954c288f9729a4a902cb0ef73d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "05a0af595aa8cec6faca2c16fb56a4d92bd6baa1abb85a5c0a8880e7cd9b20f4"
+          "after": "dcb3e5ca4a83ce06b20ec6d9be9843a8e7e83c852c3f8d9815c8f5b6dfcdbd72"
         },
         "_assessment": {
           "before": null,

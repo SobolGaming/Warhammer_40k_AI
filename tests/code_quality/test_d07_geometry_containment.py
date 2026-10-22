@@ -332,5 +332,11 @@ def test_order135_reviewed_fnp_metadata_transition_preserves_all_obligations() -
         assert parent[key] == row["old"]
         parent[key] = row["new"]
     actual = (ROOT / transition["order135_output"]).read_bytes()
+    # Authenticate the complete current tooling successor before comparing this
+    # historical FNP transition with its exact accepted predecessor bytes.
+    from tools import performance_preflight_successor as successor
+
+    successor._freeze(ROOT)
+    actual = successor.preceding_control(ROOT, transition["order135_output"], actual)
     assert hashlib.sha256(actual).hexdigest() == transition["order135_output_sha256"]
     assert json.loads(actual) == expected
