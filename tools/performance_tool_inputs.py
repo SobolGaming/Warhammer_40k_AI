@@ -147,11 +147,13 @@ def validate_spec(spec: dict[str, object]) -> None:
 
 def binding_enabled(family: str, specification: dict[str, object]) -> bool:
     from tools import performance_tool_inputs_v2 as fresh
+    from tools import performance_tool_inputs_v3 as current
 
     declaration = specification.get("input_binding")
     supported = (
         {"schema": SCHEMA, "role_specification": SPEC_PATH},
         {"schema": fresh.SCHEMA, "role_specification": fresh.SPEC_PATH},
+        {"schema": current.SCHEMA, "role_specification": current.SPEC_PATH},
     )
     if family == FAMILY:
         if (

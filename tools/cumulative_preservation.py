@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from tools import performance_category_migration as legacy
+from tools import performance_qualification_successor as successor
 from tools import performance_reconstruction_campaign as reconstruction
 from tools import performance_tool_inputs as original
 
@@ -124,6 +125,7 @@ def reviewed_control_hashes(root: Path) -> dict[str, str]:
         raise ValueError("Reviewed compatibility archive membership changed.")
     marker = b"\nSOURCE_COMMIT: str | None = None"
     bound = f'\nSOURCE_COMMIT: str | None = "{SOURCE_COMMIT}"'.encode()
+    projection = successor.control_projection(root) if successor.enabled(root) else {}
     result = {}
     for name in sorted(CONTROLS | SOURCE_ARCHIVES):
         raw = _git(root, "show", SOURCE_COMMIT + ":" + name)
@@ -131,12 +133,14 @@ def reviewed_control_hashes(root: Path) -> dict[str, str]:
             if raw.count(marker) != 1:
                 raise ValueError("Source freeze must contain the unactivated cumulative adapter.")
             raw = raw.replace(marker, bound, 1)
-        if _read(root, name) != raw:
+        current = _read(root, name)
+        preceding = projection.get(name, current)
+        if preceding != raw:
             raise ValueError(
                 "Reviewed migration source/data changed; control bytes changed: " + name
             )
         if name in CONTROLS:
-            result[name] = _sha(raw)
+            result[name] = _sha(current)
     return result
 
 
@@ -151,7 +155,11 @@ def expected_source(root: Path) -> dict[str, str]:
     for name in record["integration_members"]:
         raw = _git(root, "show", str(SOURCE_COMMIT) + ":" + name)
         source[name] = controls.get(name, _sha(raw))
-    return cast(dict[str, str], source)
+    return (
+        successor.expected_source(root, cast(dict[str, str], source))
+        if successor.enabled(root)
+        else cast(dict[str, str], source)
+    )
 
 
 def expected_inputs(root: Path) -> tuple[dict[str, str], dict[str, str]]:
@@ -291,6 +299,7 @@ def verify_control_transformations(root: Path) -> None:
     rows = _json(root, NAMESPACE + "/control-transformations.json")
     if {row["path"] for row in rows} != legacy.CONTROLS or len(rows) != len(legacy.CONTROLS):
         raise ValueError("Cumulative control admission membership changed.")
+    projection = successor.control_projection(root) if successor.enabled(root) else {}
     for row in rows:
         name = row["path"]
         historical = _git(root, "show", str(legacy.SOURCE_COMMIT) + ":" + name)
@@ -304,6 +313,7 @@ def verify_control_transformations(root: Path) -> None:
         baseline = _git(root, "show", CONTENT_BASE + ":" + name)
         accepted = _git(root, "show", ACCEPTED + ":" + name)
         current = _read(root, name)
+        current = projection.get(name, current)
         for raw, key in (
             (historical, "legacy_sha256"),
             (baseline, "pr587_sha256"),
@@ -382,6 +392,16 @@ def assessment_map_inputs(
     proof = _json(root, ASSESSMENT_MAP + "/assessment-map-additions.json.txt")
     old_raw = _read(root, ASSESSMENT_MAP + "/original-operation-map.json.txt")
     live = _read(root, original.MAP_PATH)
+    if successor.enabled(root):
+        actual_sha = _sha(live)
+        if (
+            current.get(original.MAP_PATH) != actual_sha
+            or tools.get(original.MAP_PATH) != actual_sha
+        ):
+            raise ValueError("Actual operation map input identities disagree.")
+        live = successor.prior_operation_map_bytes(root)
+        current = current | {original.MAP_PATH: _sha(live)}
+        tools = tools | {original.MAP_PATH: _sha(live)}
     old_sha = cast(dict[str, str], archive["POLICY_CURRENT_INPUTS.json.txt"])[original.MAP_PATH]
     if proof["original_sha256"] != old_sha or _sha(old_raw) != old_sha:
         raise ValueError("Original operation map changed.")

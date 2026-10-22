@@ -13,6 +13,7 @@ from typing import cast
 import pytest
 from tools import cumulative_preservation as migration
 from tools import performance_policy as policy
+from tools import performance_qualification_successor as successor
 from tools import performance_reconstruction_campaign as reconstruction
 from tools import performance_tool_inputs as original
 from tools import performance_tool_inputs_v2 as fresh
@@ -482,7 +483,8 @@ def assessment_map_root(tmp_path: Path) -> Path:
     shutil.copytree(ROOT / migration.NAMESPACE, tmp_path / migration.NAMESPACE)
     target = tmp_path / original.MAP_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(ROOT / original.MAP_PATH, target)
+    # This fixture tests the preceding finite map proof after current extension admission.
+    target.write_bytes(successor.prior_operation_map_bytes(ROOT))
     return tmp_path
 
 

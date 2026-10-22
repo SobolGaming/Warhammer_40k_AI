@@ -14,6 +14,7 @@ import pytest
 from tools import cumulative_preservation as cumulative
 from tools import performance_category_migration as legacy
 from tools import performance_policy as policy
+from tools import performance_qualification_successor as successor
 from tools import performance_reconstruction_campaign as reconstruction
 from tools import performance_tool_inputs as original
 
@@ -42,7 +43,8 @@ def test_finite_owner_and_operation_union_preserves_all_prior_obligations() -> N
         ["git", "show", cumulative.ACCEPTED + ":" + original.MAP_PATH], cwd=ROOT
     )
     old = json.loads(accepted)
-    new = json.loads((ROOT / original.MAP_PATH).read_bytes())
+    # Preserve the original integration assertions after authenticating the new full map.
+    new = successor.accepted_operation_map(ROOT)
     assert {k: v for k, v in new.items() if k != "operations"} == {
         k: v for k, v in old.items() if k != "operations"
     }

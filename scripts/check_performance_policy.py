@@ -216,7 +216,15 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
             migration_applies(base=base, runtime_id=runtime_id, family=family)
             and (root / "docs/performance/policy-v3/category-migration-20261015").exists()
         )
-        if migration:
+        from tools import performance_qualification_measurements as qualification
+
+        qualified_current = qualification.applies(base=base, path=path)
+        current_binding: dict[str, object] | None = None
+        if qualified_current:
+            measured_inputs, current_binding, applicability_sha = qualification.retained_inputs(
+                root, current=inputs, report=comparison, family=family
+            )
+        elif migration:
             from tools.performance_category_migration import retained_inputs as migration_inputs
 
             measured_inputs, migration_binding, applicability_sha = migration_inputs(
@@ -247,7 +255,9 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
         if applicability_sha is not None:
             retained_applicability[family] = applicability_sha
         tool_inputs = (
-            migration_binding
+            current_binding
+            if qualified_current
+            else migration_binding
             if migration
             else (
                 comparison_inputs(

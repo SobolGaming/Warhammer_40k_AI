@@ -7,17 +7,20 @@ No mission occurrence or ordering answer is injected into the sequencer.
 
 from tests.support.faction_batch01 import TORMENTORS, Scene, anchor, locate, scene, selection
 from tests.support.section02_fixtures import Section02Definitions
+from tests.support.section08_native_mission_source import (
+    SOURCE_ID as STICKY_SOURCE_ID,
+)
+from tests.support.section08_native_mission_source import (
+    source_backed_command_definitions,
+)
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.geometry.pose import Pose
 
-STICKY_SOURCE_ID = (
-    "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000004079:3"
-)
-
 
 def native_command_scene(definitions: Section02Definitions, *, active: str, reverse: bool) -> Scene:
+    definitions = source_backed_command_definitions(definitions)
     own: tuple[str, ...] = ("a", "b")
     enemy: tuple[str, ...] = ("c", "d")
     if reverse:
