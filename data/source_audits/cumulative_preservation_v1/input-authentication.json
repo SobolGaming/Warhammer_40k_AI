@@ -1,0 +1,37 @@
+{
+  "task-32": {
+    "archive": "record-repair-rebind-review-packet.zip",
+    "zip_sha256": "aa4a1d90f12b6c5b0b21596df5b4185f37d540872895e9c340345c4ca5dc0c34",
+    "seal_sha256": "2ae2ebf05d632a13565df50d0d70b566a9459ae38aff624ba859f43659a8ff86",
+    "members": 273,
+    "payloads": 271
+  },
+  "task-33": {
+    "archive": "independent-record-repair-rebind-review.zip",
+    "zip_sha256": "a1c33d82976541d6d96884188746233fadb0d863ce9e047db9205c4eedcd47d1",
+    "seal_sha256": "56cfed6f9c950510ee1d9f0aa1bf2b2395cab93b56013073e36861e4d4be1626",
+    "members": 47,
+    "payloads": 45
+  },
+  "task-35": {
+    "archive": "independent-preservation-review.zip",
+    "zip_sha256": "36b366d8aed77e1b6467b21586d6baa61c31c864ebcd02e3399a88e612f99f34",
+    "seal_sha256": "1ed126d48b0ceb7b2db2039453d3b3e21c60187c9cd6c5738c712161aa90c161",
+    "members": 465,
+    "payloads": 463
+  },
+  "task-36": {
+    "archive": "semantic-preservation-review.zip",
+    "zip_sha256": "fdf70ddb84b1853f21e7af396fed975d0ee9693b52116258241a501980215e49",
+    "seal_sha256": "0f73f1a36577d7a843829985f0914fca025f5ee850016d51ab5cc9474cb3e1ad",
+    "members": 322,
+    "payloads": 320
+  },
+  "task-37": {
+    "archive": "independent-semantic-review37.zip",
+    "zip_sha256": "af702dcbc9a5654a4bcd9c1646c27981818ccd68c3bbfa9661ee8f2f81790953",
+    "seal_sha256": "ee8253cf4628f9dba15fd823c8b8a54bf5e007bda6120675936c97e3859c03ac",
+    "members": 184,
+    "payloads": 182
+  }
+}

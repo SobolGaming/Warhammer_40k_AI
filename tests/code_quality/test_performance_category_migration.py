@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from tools import performance_category_migration as migration
+from tools import cumulative_preservation as migration
 from tools import performance_policy as policy
 from tools import performance_reconstruction_campaign as reconstruction
 from tools import performance_tool_inputs as original
@@ -33,36 +33,27 @@ def _controls() -> dict[str, str]:
 
 
 def _current(archive: dict[str, object]) -> tuple[dict[str, str], dict[str, str]]:
-    controls = _controls()
-    return (
-        _inputs(archive, "POLICY_CURRENT_INPUTS.json.txt") | controls,
-        _inputs(archive, "TOOL_CURRENT_INPUTS.json.txt") | controls,
-    )
+    return migration.expected_inputs(ROOT)
 
 
 @pytest.fixture(scope="module")
 def copied_migration(tmp_path_factory: pytest.TempPathFactory) -> Path:
     root = tmp_path_factory.mktemp("category-applicability")
-    archive = read_archive()
-    names = set(_inputs(archive, "MIGRATION_FILES.json.txt"))
-    preservation = policy.read_object(
-        ROOT / "data/source_audits/category_migration/preservation.json"
+    # Copy exact live inputs, including transitive fixtures and the new evidence
+    # namespace. A read-only Git pointer retains authenticated object identity.
+    shutil.copytree(
+        ROOT,
+        root,
+        dirs_exist_ok=True,
+        ignore=shutil.ignore_patterns(
+            ".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"
+        ),
     )
-    for record in policy.object_value(preservation["originals"]).values():
-        names.update(policy.object_value(policy.object_value(record)["successors"]))
-    external = policy.object_value(archive[migration.EXTERNAL])
-    names.update(policy.object_value(external["measured"]))
-    for name in sorted(names):
-        target = root / name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / name, target)
-    shutil.copytree(ROOT / migration.ARCHIVE, root / migration.ARCHIVE)
     git_dir = (
         subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=ROOT)
         .decode()
         .strip()
     )
-    # Only read-only Git inventory/show commands use this pointer; no fixture Git mutations.
     (root / ".git").write_text("gitdir: " + git_dir + "\n", encoding="utf-8")
     return root
 
@@ -468,7 +459,7 @@ def test_external_proof_is_separately_pinned_without_repinning_old_measurement_m
 
 @pytest.fixture
 def assessment_map_root(tmp_path: Path) -> Path:
-    shutil.copytree(ROOT / migration.ASSESSMENT_MAP, tmp_path / migration.ASSESSMENT_MAP)
+    shutil.copytree(ROOT / migration.NAMESPACE, tmp_path / migration.NAMESPACE)
     target = tmp_path / original.MAP_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(ROOT / original.MAP_PATH, target)

@@ -1,0 +1,112 @@
+{
+  "source_commit": "b75bfcf352e3e8bb5346e210a6b427a7af3a4242",
+  "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+  "source_files": 7048,
+  "source_drift": [],
+  "author_source_also_unchanged": true,
+  "dependency_files": 2784,
+  "dependency_drift": [],
+  "python": "3.14.5 (main, Oct 17 2026, 07:45:17) [GCC 9.4.0]",
+  "executable": "/home/nostrademous/.local/opt/cpython-3.14.5/bin/python3.14",
+  "executable_sha256": "b3580c21d9f19c7dbbb7b110d5de23b91fe608f5e49f4983ec9354f6cfadda31",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+  "fresh_unmutated_unique_cases": 61,
+  "fresh_author_cases_reused": 55,
+  "fresh_additional_review_controls": 6,
+  "intended_mutations_rejected": 7,
+  "native_command_insensitive_to_generic_exception_reversion": true,
+  "qualifying_runs_serial_against_all_attempts": true,
+  "runs": [
+    {
+      "name": "positive-controls",
+      "cases": 37,
+      "failures": 0,
+      "seconds": 84.514265101,
+      "mode": "none",
+      "serial_against_all_attempts": true
+    },
+    {
+      "name": "final-native-positives-clean",
+      "cases": 22,
+      "failures": 0,
+      "seconds": 192.34840495000014,
+      "mode": "none",
+      "serial_against_all_attempts": true
+    },
+    {
+      "name": "final-pending-positives",
+      "cases": 2,
+      "failures": 0,
+      "seconds": 62.083815648000154,
+      "mode": "none",
+      "serial_against_all_attempts": true
+    },
+    {
+      "name": "final-terrain",
+      "cases": 2,
+      "failures": 1,
+      "seconds": 24.934258311999884,
+      "mode": "terrain",
+      "serial_against_all_attempts": true
+    },
+    {
+      "name": "final-charge",
+      "cases": 1,
+      "failures": 1,
+      "seconds": 24.534334123999997,
+      "mode": "charge",
+      "serial_against_all_attempts": true
+    },
+    {
+      "name": "final-mortal",
+      "cases": 1,
+      "failures": 1,
+      "seconds": 30.939761739000005,
+      "mode": "mortal",
+      "serial_against_all_attempts": true
+    },
+    {
+      "name": "final-runtime",
+      "cases": 1,
+      "failures": 1,
+      "seconds": 31.040633657999933,
+      "mode": "runtime",
+      "serial_against_all_attempts": true
+    },
+    {
+      "name": "final-pending-sequencing",
+      "cases": 1,
+      "failures": 1,
+      "seconds": 32.042079005000005,
+      "mode": "pending-sequencing",
+      "serial_against_all_attempts": true
+    },
+    {
+      "name": "final-pending-coherency",
+      "cases": 1,
+      "failures": 1,
+      "seconds": 33.64747477099991,
+      "mode": "pending-coherency",
+      "serial_against_all_attempts": true
+    },
+    {
+      "name": "final-sequencing",
+      "cases": 1,
+      "failures": 1,
+      "seconds": 24.53332572799991,
+      "mode": "sequencing",
+      "serial_against_all_attempts": true
+    },
+    {
+      "name": "final-sequencing-native-insensitivity",
+      "cases": 1,
+      "failures": 0,
+      "seconds": 50.56573079300006,
+      "mode": "sequencing",
+      "serial_against_all_attempts": true
+    }
+  ],
+  "full_aggregate_rerun": false,
+  "cumulative_activation": false,
+  "publication": false
+}

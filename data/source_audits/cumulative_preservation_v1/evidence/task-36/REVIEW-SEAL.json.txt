@@ -1,0 +1,1299 @@
+{
+  "schema": "finite-semantic-preservation-adjudication-v1",
+  "status": "TEN_ADJUDICATED_PENDING_INDEPENDENT_REVIEW",
+  "baseline_commit": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "baseline_tree": "1fa709a167abb369932e651f89babbd0034941c5",
+  "source_commit": "b75bfcf352e3e8bb5346e210a6b427a7af3a4242",
+  "source_tree": "b7ddfc490c12f86244f55ba606770cfdc8ce5d20",
+  "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+  "semantic_rows": 10,
+  "successful_unique_cases": 333,
+  "preservation_acceptance_inherited": 97,
+  "source_payload_drift": false,
+  "production_changes": false,
+  "independent_acceptance": false,
+  "cumulative_activation": false,
+  "publication": false,
+  "files": {
+    "adjudicate36.py": {
+      "sha256": "f6b68f819be884cc9eff14bdc2b63e967f6785ff8bb9ffb1f2adcef940791f91",
+      "bytes": 15441
+    },
+    "AELDARI-NATIVE-HELPER-ASSERTIONS.json": {
+      "sha256": "717d38c41c7d9503cabc99ac39496d766cb08414467812dbfd18f7406f378c1e",
+      "bytes": 9040
+    },
+    "AELDARI-SOURCE-CHECK.json": {
+      "sha256": "8ada5c075dee7e08a3629bf859660e9ef147d072e860b852cee962238112d9fe",
+      "bytes": 4476
+    },
+    "aeldari36.py": {
+      "sha256": "2ec1e25b87df1301a15086661eddd2bfa64adb4c405b9b82754593eb52f2a308",
+      "bytes": 1992
+    },
+    "audit36.py": {
+      "sha256": "d5a0f8d0393d9301b21c39748ab07a2392f832d297e03cbe3bcb36c8bded947a",
+      "bytes": 9129
+    },
+    "baseline/data/source_audits/order135/retained-current-sources.json": {
+      "sha256": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+      "bytes": 661472
+    },
+    "baseline/data/source_audits/order97/categories/01.json": {
+      "sha256": "b988ad059b69a868ed48e6d6462dac701fe3daf9cb5be85e0f060ed365a53c52",
+      "bytes": 148549
+    },
+    "baseline/data/source_audits/order97/categories/03.json": {
+      "sha256": "1e5f98b23d3e0dbad9cfcff967c54b02aae899c93cfa500528d6c65b6d7d3cbe",
+      "bytes": 72820
+    },
+    "baseline/data/source_audits/order97/categories/06.json": {
+      "sha256": "33257973905de440532ec945c51d9d3562468765ce5c2794f510d37d6cd4b572",
+      "bytes": 38627
+    },
+    "baseline/data/source_audits/order97/categories/08.json": {
+      "sha256": "d1673f3d7881ac6d9c4286f927dcd0a47b7ceaf092e92f76b8032c6283675a9c",
+      "bytes": 20359
+    },
+    "baseline/data/source_audits/order97/categories/13.json": {
+      "sha256": "b72b9409932bb7128627d8ef34a9a9ee0fc26d1bfd3b42e4692af39f79199fef",
+      "bytes": 35871
+    },
+    "baseline/data/source_audits/order97/categories/17.json": {
+      "sha256": "7c8e9f54a2f41313cd8f748b874d7871f920d3c7c0036cb758701bc24fd06b25",
+      "bytes": 12523
+    },
+    "baseline/data/source_audits/order97/categories/19.json": {
+      "sha256": "797d14d485373a43d20c93c3be4fae3180a70477e60aa652ea9afb71e646f5d9",
+      "bytes": 21662
+    },
+    "baseline/data/source_audits/order97/categories/24.json": {
+      "sha256": "a2275f25ad1b1db93a820e51c15aea9ed50753d3abea878c5ec7c467066e3015",
+      "bytes": 125579
+    },
+    "baseline/data/source_audits/v963_shock/captures/core-page.js": {
+      "sha256": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
+      "bytes": 216294
+    },
+    "baseline/data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Abilities.json": {
+      "sha256": "ad836ea16f2e2e1b5ab64a03e6731ad99a2d27994ab01c0df01ec267c71ea39c",
+      "bytes": 1117046
+    },
+    "baseline/src/warhammer40k_core/core/ruleset_descriptor.py": {
+      "sha256": "40eb947f9582890a4c4daf117a776d02e29fa299d74a2aebb89783e9ca863b4c",
+      "bytes": 118456
+    },
+    "baseline/src/warhammer40k_core/engine/ability_catalog.py": {
+      "sha256": "ddc49a4577dca35bb89a4a4c3dace2c2a472b78daa2fe06b1c96f179f5bcc793",
+      "bytes": 32110
+    },
+    "baseline/src/warhammer40k_core/engine/charge_move_geometry.py": {
+      "sha256": "0c7e142e9ff51d82cc0a55d74d308dcb8c58147b7d3f8725aa8a873e4f03924c",
+      "bytes": 10145
+    },
+    "baseline/src/warhammer40k_core/engine/charge_move_resolution.py": {
+      "sha256": "4c4618b195289e917ee8abeb410e2827851e6e5cd13f5c12050ab42ed4e75be4",
+      "bytes": 18101
+    },
+    "baseline/src/warhammer40k_core/engine/faction_content/bundle.py": {
+      "sha256": "2f30bcf286a7d12532a5b7c7b4a216f2eb3044512d3d7838ac85dc04fbc444e0",
+      "bytes": 83599
+    },
+    "baseline/src/warhammer40k_core/engine/faction_content/bundle_catalog_indexes.py": {
+      "sha256": "1ebf4bf307db7990ceedeec4f75bebd0f199406b88f22b8ec66398a22c0e363c",
+      "bytes": 2024
+    },
+    "baseline/src/warhammer40k_core/engine/faction_content/catalog_generic_hooks.py": {
+      "sha256": "f58b88beccf3fecddb577a386a44059c7d5096eb14b6459716037666b36f5ebf",
+      "bytes": 3790
+    },
+    "baseline/src/warhammer40k_core/engine/faction_content/runtime.py": {
+      "sha256": "e416b3d1fd30878972dea5a056518638c63765573287d0627aa23bdfe7ec7347",
+      "bytes": 5315
+    },
+    "baseline/src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/aeldari/army_rule.py": {
+      "sha256": "7cf22ac2d2e453fa89e90a8977ac9a4be4e45d1fcdfe6ded1ac0fe467ee8a746",
+      "bytes": 36998
+    },
+    "baseline/src/warhammer40k_core/engine/mission_timing_candidates.py": {
+      "sha256": "e0c0b1fc5fa2f77cf1d510dd16548b3c5e7632af9255ab7086c0e3453a75564c",
+      "bytes": 868
+    },
+    "baseline/src/warhammer40k_core/engine/phases/charge.py": {
+      "sha256": "49fba06a442abb0971fd89e75015b57a1dabd3ee7699050937f58a46401b594f",
+      "bytes": 78291
+    },
+    "baseline/src/warhammer40k_core/engine/phases/movement_options_dice.py": {
+      "sha256": "25adaee0827a7cb3c54213890558f006a9fc664aca83e68db4a23d66c23f4c57",
+      "bytes": 40683
+    },
+    "baseline/src/warhammer40k_core/engine/phases/movement_resolution_flow.py": {
+      "sha256": "0c3df639487fc7eeef3a5be961107fcf65b49476704ed0541a754257cbfb067a",
+      "bytes": 58032
+    },
+    "baseline/src/warhammer40k_core/engine/phases/shooting_surge_candidates.py": {
+      "sha256": "19b8acc17ad57a478e8860676cc74356eec3c3304d29fcee1aac6b67ee475c8a",
+      "bytes": 8126
+    },
+    "baseline/src/warhammer40k_core/engine/primary_mission_choices.py": {
+      "sha256": "fb44dcceca51620db217b1f3aa297f59394449cd362931b54aa439e4fd7c68b4",
+      "bytes": 51655
+    },
+    "baseline/src/warhammer40k_core/engine/primary_scoring_boundary_lifecycle.py": {
+      "sha256": "f707a9c39168a89274c8ab0905711a7547b9b94a3f5f0d592f147e0ac2bea485",
+      "bytes": 40913
+    },
+    "baseline/src/warhammer40k_core/engine/sequencing.py": {
+      "sha256": "8f72b4d64a2fb2eace52de73afbb26d936889cfa20f6b34ee87bc88c15ed2487",
+      "bytes": 34194
+    },
+    "baseline/src/warhammer40k_core/engine/shooting_end_surge_hooks.py": {
+      "sha256": "2ba4fc2651e45d8fc09740368e154605448ed5985fab62fd175f43a7427e1e51",
+      "bytes": 8941
+    },
+    "baseline/src/warhammer40k_core/engine/turn_end_hooks.py": {
+      "sha256": "9f5ae7c0cb044c5e87c1557da7f673626b08a3345c3a03cb4641fa76afd6d308",
+      "bytes": 9614
+    },
+    "BASELINE-BLOB-AUDIT.json": {
+      "sha256": "64d9684adc940fccefeec8628d4ad53e050ee87f41f1c1465ec577e3fe520316",
+      "bytes": 1879442
+    },
+    "BASELINE-MISSING-BLOBS.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    "bootstrap36.py": {
+      "sha256": "6dab689065f92f6176eb095c615b3141d98170bf87d2cbd0e784220940206886",
+      "bytes": 3039
+    },
+    "capture36.calltrace.py.txt": {
+      "sha256": "c8628242f81d4937e2e0d7c54222e1b18f3e5b24173fc053722f973f06d9f9f0",
+      "bytes": 3042
+    },
+    "capture36.initial.py.txt": {
+      "sha256": "142c28d4d6fd38d680cb310c772c5d727308abe3d7bd7b6d5203f975d9fc12ed",
+      "bytes": 2833
+    },
+    "capture36.py": {
+      "sha256": "8db1b9772d89a78865fd3a2ff71e98e3eb0fa6a2a32d46525db39aea4cb5a0c0",
+      "bytes": 3279
+    },
+    "CHECKPOINT.txt": {
+      "sha256": "3276d25a83729387c72615cc955c28041f874394b70aca2e618405b69ec58cf7",
+      "bytes": 2206
+    },
+    "CONSUMER-CONTEXT-PINS.json": {
+      "sha256": "49c50d0030569b82888537c8f7e6062268f8313a45a64a2041b0385543b95449",
+      "bytes": 1018
+    },
+    "consumer_context36.py": {
+      "sha256": "0789d778fc12e679235506795c24051fa70be589af1847f3c06d586e2df5ca05",
+      "bytes": 1174
+    },
+    "current/AGENTS.md": {
+      "sha256": "76801ae91602ab66a164e7d4500294977bd92725ca78026472ddfcd23f20e309",
+      "bytes": 23981
+    },
+    "current/data/source_audits/order135/retained-current-sources.json": {
+      "sha256": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+      "bytes": 661472
+    },
+    "current/data/source_audits/order97/categories/01.json": {
+      "sha256": "b988ad059b69a868ed48e6d6462dac701fe3daf9cb5be85e0f060ed365a53c52",
+      "bytes": 148549
+    },
+    "current/data/source_audits/order97/categories/03.json": {
+      "sha256": "1e5f98b23d3e0dbad9cfcff967c54b02aae899c93cfa500528d6c65b6d7d3cbe",
+      "bytes": 72820
+    },
+    "current/data/source_audits/order97/categories/06.json": {
+      "sha256": "33257973905de440532ec945c51d9d3562468765ce5c2794f510d37d6cd4b572",
+      "bytes": 38627
+    },
+    "current/data/source_audits/order97/categories/08.json": {
+      "sha256": "d1673f3d7881ac6d9c4286f927dcd0a47b7ceaf092e92f76b8032c6283675a9c",
+      "bytes": 20359
+    },
+    "current/data/source_audits/order97/categories/13.json": {
+      "sha256": "b72b9409932bb7128627d8ef34a9a9ee0fc26d1bfd3b42e4692af39f79199fef",
+      "bytes": 35871
+    },
+    "current/data/source_audits/order97/categories/17.json": {
+      "sha256": "7c8e9f54a2f41313cd8f748b874d7871f920d3c7c0036cb758701bc24fd06b25",
+      "bytes": 12523
+    },
+    "current/data/source_audits/order97/categories/19.json": {
+      "sha256": "797d14d485373a43d20c93c3be4fae3180a70477e60aa652ea9afb71e646f5d9",
+      "bytes": 21662
+    },
+    "current/data/source_audits/order97/categories/24.json": {
+      "sha256": "a2275f25ad1b1db93a820e51c15aea9ed50753d3abea878c5ec7c467066e3015",
+      "bytes": 125579
+    },
+    "current/data/source_audits/v963_shock/captures/core-page.js": {
+      "sha256": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
+      "bytes": 216294
+    },
+    "current/data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Abilities.json": {
+      "sha256": "ad836ea16f2e2e1b5ab64a03e6731ad99a2d27994ab01c0df01ec267c71ea39c",
+      "bytes": 1117046
+    },
+    "current/docs/ADAPTER_DECISION_CONTRACT.md": {
+      "sha256": "6b00f9836dc6ae22f2939fb16e76bc0a963c76e293d151f9bbb331d6e06224a7",
+      "bytes": 692789
+    },
+    "current/docs/FOCUSED_DEFECT_CHECKPOINT.md": {
+      "sha256": "3cf550cdf491777a61bc77502d773cdb40472c0a644bd2b96ddc65c227092de0",
+      "bytes": 10852
+    },
+    "current/docs/SECTION19_CONTENT_ADMISSION_SCOPE.md": {
+      "sha256": "67b0b7050ed9fd14ab907619000279c1e7996963a6c78c4c8106bb3d2db91ba2",
+      "bytes": 2345
+    },
+    "current/docs/SF03_001_COHERENCY_CHOICE_SCOPE.md": {
+      "sha256": "8a94b3272a4b9ac9541b83e53953a9a99c6318a829a937a34bb4f151f54e504a",
+      "bytes": 3562
+    },
+    "current/pyproject.toml": {
+      "sha256": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192",
+      "bytes": 6046
+    },
+    "current/README.md": {
+      "sha256": "ad52bc7e7e40aa9a7e2296f20c8726fcf63a5b92bd087100e09238572901a583",
+      "bytes": 69584
+    },
+    "current/src/warhammer40k_core/core/ruleset_descriptor.py": {
+      "sha256": "d4d30951aa60f5c7ef10941f609ee76abb3400945cba928a69f5321a14cbb7b8",
+      "bytes": 118753
+    },
+    "current/src/warhammer40k_core/core/terrain_endpoint_policy.py": {
+      "sha256": "6934b29fb50eb563adaee857477cc062f0f945c7bee97097d0e9e7a71a16572f",
+      "bytes": 1520
+    },
+    "current/src/warhammer40k_core/engine/abilities.py": {
+      "sha256": "d65667efa58c3878114d96a8d89e42758164c0ae96081aeea35e41712ecea2d6",
+      "bytes": 53855
+    },
+    "current/src/warhammer40k_core/engine/ability_catalog.py": {
+      "sha256": "e7e4ccb2dcaeed4475585c31b4ea399a4b3867eee730bb840c531dc3dd725464",
+      "bytes": 32693
+    },
+    "current/src/warhammer40k_core/engine/boundary_rule_authority.py": {
+      "sha256": "dae0c3dc76343202ec85b95a1430728555cdaae399490e765b8171a3c282fb2f",
+      "bytes": 8884
+    },
+    "current/src/warhammer40k_core/engine/charge_move_geometry.py": {
+      "sha256": "9cc5a473094d49926ca94df9c1c33c8b4deb6fe8a6bd69dbccc339f5933dfc55",
+      "bytes": 9776
+    },
+    "current/src/warhammer40k_core/engine/charge_move_resolution.py": {
+      "sha256": "4c4618b195289e917ee8abeb410e2827851e6e5cd13f5c12050ab42ed4e75be4",
+      "bytes": 18101
+    },
+    "current/src/warhammer40k_core/engine/core_ability_materialization.py": {
+      "sha256": "a6802004511973bd00ecbfaee2a3c0128b789ae2b62eb492bf7023624856a4db",
+      "bytes": 9230
+    },
+    "current/src/warhammer40k_core/engine/desperate_escape_mortal_wounds.py": {
+      "sha256": "4957adcfaa38ccfc6dbf955444bdd2919b094f42c4307ba15d1dd853dd7ab4d7",
+      "bytes": 8522
+    },
+    "current/src/warhammer40k_core/engine/faction_content/bundle.py": {
+      "sha256": "2f30bcf286a7d12532a5b7c7b4a216f2eb3044512d3d7838ac85dc04fbc444e0",
+      "bytes": 83599
+    },
+    "current/src/warhammer40k_core/engine/faction_content/bundle_catalog_indexes.py": {
+      "sha256": "1ebf4bf307db7990ceedeec4f75bebd0f199406b88f22b8ec66398a22c0e363c",
+      "bytes": 2024
+    },
+    "current/src/warhammer40k_core/engine/faction_content/catalog_generic_hooks.py": {
+      "sha256": "3354d1982e47ad62ac0352f03ee5c723eb52c9da029e186d8794cb043cde9139",
+      "bytes": 3954
+    },
+    "current/src/warhammer40k_core/engine/faction_content/runtime.py": {
+      "sha256": "e796e8dc53713223030ff6cf690897f2dcb730e629be4a1aec011921a7142cc7",
+      "bytes": 5463
+    },
+    "current/src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/aeldari/army_rule.py": {
+      "sha256": "db939a91df670e66000fad415551810ef16a5f6eb64686889d5fbba1561db010",
+      "bytes": 37509
+    },
+    "current/src/warhammer40k_core/engine/mission_timing_candidates.py": {
+      "sha256": "e0c0b1fc5fa2f77cf1d510dd16548b3c5e7632af9255ab7086c0e3453a75564c",
+      "bytes": 868
+    },
+    "current/src/warhammer40k_core/engine/mission_turn_end_sequencing.py": {
+      "sha256": "efa4010cc1cf2d32a9f962b78f3546215d9e9e7e3f721bc8d2bd45518bfd3f0b",
+      "bytes": 15977
+    },
+    "current/src/warhammer40k_core/engine/mortal_wound_feel_no_pain_hooks.py": {
+      "sha256": "6e3630ff166c5096146fc1cdb8a99b78dd8a502128feb84f941beee5af3beeba",
+      "bytes": 13108
+    },
+    "current/src/warhammer40k_core/engine/mortal_wound_model_allocation.py": {
+      "sha256": "31f2092d5d96a7b6bfd3639a7a398486dc6495fe0c98c485f52b162a37ba1084",
+      "bytes": 53762
+    },
+    "current/src/warhammer40k_core/engine/movement_model_blockers.py": {
+      "sha256": "83cf635385c7a54721ad878ec9e2f931c9f01b39c5dc8add946d8ca74e61cc6a",
+      "bytes": 1769
+    },
+    "current/src/warhammer40k_core/engine/phases/charge.py": {
+      "sha256": "a9e13ef62e723169a67103d07e59f6531f4bd598003b023be7a70bf3f2ccef13",
+      "bytes": 77844
+    },
+    "current/src/warhammer40k_core/engine/phases/movement_options_dice.py": {
+      "sha256": "25adaee0827a7cb3c54213890558f006a9fc664aca83e68db4a23d66c23f4c57",
+      "bytes": 40683
+    },
+    "current/src/warhammer40k_core/engine/phases/movement_resolution_flow.py": {
+      "sha256": "8a1ea6668fd135bbb053189ad65868cb86bd4c460aa0ff666c0874840092806b",
+      "bytes": 59446
+    },
+    "current/src/warhammer40k_core/engine/phases/shooting_surge_candidates.py": {
+      "sha256": "9805a469e32d72ae44a20eeddc147bf5f79d86ae1abce30a5ccffa93a8215b36",
+      "bytes": 8282
+    },
+    "current/src/warhammer40k_core/engine/primary_mission_choices.py": {
+      "sha256": "fb44dcceca51620db217b1f3aa297f59394449cd362931b54aa439e4fd7c68b4",
+      "bytes": 51655
+    },
+    "current/src/warhammer40k_core/engine/primary_mission_state_runtime.py": {
+      "sha256": "fe54006150fbde95623ff02e376c9069d5721f0479dc996f38cf4c7c1e7b2ea5",
+      "bytes": 17003
+    },
+    "current/src/warhammer40k_core/engine/primary_scoring_boundary_lifecycle.py": {
+      "sha256": "cfa1e61880a767ff76dbab73cb84448a8591beac1a420c0e03740f63ea308d85",
+      "bytes": 41475
+    },
+    "current/src/warhammer40k_core/engine/runtime_timing_sequencing.py": {
+      "sha256": "cac6facb18714a77a05f01e117298f0cb4b3a7fb59ed4830b613879125d3db23",
+      "bytes": 5201
+    },
+    "current/src/warhammer40k_core/engine/sequencing.py": {
+      "sha256": "c9a0e9e2cc205d99efa49cd60d52c2804b4dc6bd871ea0670a5a80542b7b17c6",
+      "bytes": 34598
+    },
+    "current/src/warhammer40k_core/engine/shooting_end_surge_hooks.py": {
+      "sha256": "6a990fe51b9d1fdd5fb25dab87b6d407e0d022ba99f1e0bef8595591727e90da",
+      "bytes": 9447
+    },
+    "current/src/warhammer40k_core/engine/surveil_move_capture.py": {
+      "sha256": "f3a41d67b587304e3945ab31154f4e501e00ba3a566c7183c26362b4cd70478e",
+      "bytes": 4058
+    },
+    "current/src/warhammer40k_core/engine/turn_end_hooks.py": {
+      "sha256": "9f5ae7c0cb044c5e87c1557da7f673626b08a3345c3a03cb4641fa76afd6d308",
+      "bytes": 9614
+    },
+    "current/src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_abilities.py": {
+      "sha256": "882d932eb9967309eb6775f2541fd574c400c9feb80435c0be28a77257514858",
+      "bytes": 16441
+    },
+    "current/tests/factions/aeldari/consumer_helpers.py": {
+      "sha256": "b29854ca15f92e736a087d852342e7e662ba647b044a9cea8aa55043ccaf4428",
+      "bytes": 8879
+    },
+    "current/tests/factions/aeldari/unit/test_battle_focus_consumers.py": {
+      "sha256": "ce19c10f87d7c041e113294d7394211bec0331e35de9abac4ab7d3f8ce02e33e",
+      "bytes": 9225
+    },
+    "current/tests/rules/section03/test_cleanup.py": {
+      "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a",
+      "bytes": 25991
+    },
+    "current/tests/rules/section03/test_cleanup_mission.py": {
+      "sha256": "4588f032f718740f792b3f2b6306a6050dec40167923bf50cd1a59164d269107",
+      "bytes": 3180
+    },
+    "current/tests/rules/section08/test_end_priority.py": {
+      "sha256": "70de686b11d136f5b4596a028c70afc966d0ba728ff4f31000dc4ca365c3595a",
+      "bytes": 13401
+    },
+    "current/tests/rules/section09/test_focused_checkpoint.py": {
+      "sha256": "6514b37b3b1e3ef6cd57dcd79b226f6709cd57565dde58a6ad4a2d691bf6821e",
+      "bytes": 27558
+    },
+    "current/tests/rules/section13/test_movement.py": {
+      "sha256": "c3fe93a240b6067d7293e22d7f6fe0f9182ba1886dc6c4297e620632c74d2c39",
+      "bytes": 20125
+    },
+    "current/tests/rules/section13/test_ownership.py": {
+      "sha256": "76f3375eb7bbef1ec08563fdd53b8495610afd4a53a714a9fd3db6ef1b4ca480",
+      "bytes": 4214
+    },
+    "current/tests/rules/section17/test_blocker_ownership.py": {
+      "sha256": "3a62fdb25a1766487eedb79806fc752da45c73642da16b4186216da530dec7be",
+      "bytes": 11029
+    },
+    "current/tests/rules/section19/test_catalog_membership.py": {
+      "sha256": "14e24c26ef6330758d29fb730cd75311f698b1da15296ee5854c33690981d2c9",
+      "bytes": 3223
+    },
+    "current/tests/support/section03_coherency_choices.py": {
+      "sha256": "90a39955f28b9ad9d611bce455f9f8793f7f5ffe66149e02b5753866ec130479",
+      "bytes": 12117
+    },
+    "current/tests/support/section08_native_mission.py": {
+      "sha256": "c974916b449de5f561d889459ae429ac2be1065cc36fdec461615908a6841926",
+      "bytes": 4762
+    },
+    "current/tests/support/section09_fixtures.py": {
+      "sha256": "3f70045d6330c8903c8da55a0ffc9d26aba14276874c0cf17665aa5c9988f61b",
+      "bytes": 12502
+    },
+    "current/tests/support/section13_fixtures.py": {
+      "sha256": "6998ebfeac536563a58dd019db953b37ee7973da84d167426fdb27f12f38c244",
+      "bytes": 11780
+    },
+    "current/tests/support/section17_fixtures.py": {
+      "sha256": "93faed6b456f22b8c009e75572b9b8fd8443725858df57687ec28bae9c6e9101",
+      "bytes": 6838
+    },
+    "current/tests/support/section19_fixtures.py": {
+      "sha256": "c3870b5b091a31cc56015d17b813ca31f8ac9d7b4cb84c43c8c4a66eda0ba8d5",
+      "bytes": 11132
+    },
+    "ENVIRONMENT-FILES.json": {
+      "sha256": "b398c4838c6d768d53c4c9585c615f0564eede958b3ae5dfb5450bc2266aed70",
+      "bytes": 381624
+    },
+    "ENVIRONMENT-IDENTITY.json": {
+      "sha256": "3811b51d8b1b896a7b71b8f7c39c026fa1e6f75cb9087d7798c78c0ad7efb169",
+      "bytes": 2848
+    },
+    "environment36.py": {
+      "sha256": "214d20cf7957724557eb83174c1ba8a20ff7ab7e74a836adebcd30ff685b906f",
+      "bytes": 1223
+    },
+    "EXACT-PREIMAGES.json": {
+      "sha256": "e61745434fc32fc13b1982e40cb33b351574cd3fea203ff1632ca94facdee6c0",
+      "bytes": 12773
+    },
+    "EXACT-TEN-OWNER-AUDIT.json": {
+      "sha256": "94441c9fbeb1635d0b7db27ebfe9f93f1a652263617d2a52d013e1fdfeeb8cb0",
+      "bytes": 35319
+    },
+    "external-native/capture/collection.json": {
+      "sha256": "4f539e678c7a6ef7ad1ee67b2559d79eabab89d5f027f7a5ced6a03fb3131d84",
+      "bytes": 4075
+    },
+    "external-native/capture/exceptions.json": {
+      "sha256": "2240ed16a6efac01eb8a689bce58df21fff0e60f965c37f66c790a84da6435c8",
+      "bytes": 29049
+    },
+    "external-native/capture/executed-lines.json": {
+      "sha256": "b74fc4940c23d943cdc4696e375bc51d81ccedd10a670ddb10b4966c988b80fa",
+      "bytes": 1776381
+    },
+    "external-native/capture/imports.json": {
+      "sha256": "40d0555300e5117165c1382821e2afc39682aa8311e96f24b56406c69539bc4d",
+      "bytes": 324863
+    },
+    "external-native/capture/owner-calls.json": {
+      "sha256": "387ea7808226e4da6edba6fa47696cb2bc94d8b9f89e19df589bac414208521a",
+      "bytes": 1272671
+    },
+    "external-native/capture/package-import-locations.json": {
+      "sha256": "d41136ee066f01c9708ea740f473cd58209572402e2bfb69056c4e96cb3a374a",
+      "bytes": 310581
+    },
+    "external-native/capture/phases.jsonl": {
+      "sha256": "d3ee557a8cf8baed261e7bca6382252fd99b3e1bba8911e8c52c61596d5759b3",
+      "bytes": 22145
+    },
+    "external-native/capture/reads.json": {
+      "sha256": "e6941d4977ab428d3a6f09252a1411e308ba1dea8dea6b96f0f9e8f633e231f5",
+      "bytes": 623989
+    },
+    "external-native/capture36.py": {
+      "sha256": "8db1b9772d89a78865fd3a2ff71e98e3eb0fa6a2a32d46525db39aea4cb5a0c0",
+      "bytes": 3279
+    },
+    "external-native/junit.xml": {
+      "sha256": "b117984b14f4bd44aae919f0f9f869e8a9fe7297d96518576b7e1785ab022884",
+      "bytes": 5486
+    },
+    "external-native/LAUNCH.json": {
+      "sha256": "31e6b5ad01cc75e28d8039f7a108deb06d6566de85c90e47848b2c542cc71eff",
+      "bytes": 838
+    },
+    "external-native/native-hazard-events.json": {
+      "sha256": "7ab7ad9f11ea9a28ddab837cc038937f70fcf0a0bc2e74998ada5c3a160918d7",
+      "bytes": 788292
+    },
+    "external-native/RECEIPT.json": {
+      "sha256": "69862b657a3eba64d0cb0fd5b5eab8152bd48e4a3632a0b03a35ced1117c0f1a",
+      "bytes": 1053
+    },
+    "external-native/STDOUT.txt": {
+      "sha256": "b0adc95e8cae128676a72d77ab501f050f6ebd7423a1e53da8720f298520d422",
+      "bytes": 111
+    },
+    "FINAL-SOURCE-AND-DEPENDENCY-ATTESTATION.json": {
+      "sha256": "c43d91b656414612e09234da99e1350dc923b0b3673a42d86d6a09a453a82e1c",
+      "bytes": 1404
+    },
+    "finish36.py": {
+      "sha256": "2605af2140a38c2ed14ef5cd48f2408f4bc0383026b6bdc3c69d76f5855db713",
+      "bytes": 3769
+    },
+    "FROZEN-MANIFEST.json": {
+      "sha256": "ffa786eec2580e33e0e175447241b22d58bf99ea000d33a926d55b80ab37517f",
+      "bytes": 1009435
+    },
+    "hazards-coherency/capture/collection.json": {
+      "sha256": "a3209c5b80a9240a0286a4c2f8591d4846a94c5bdf527c0b8c4f8da78d66a305",
+      "bytes": 4991
+    },
+    "hazards-coherency/capture/exceptions.json": {
+      "sha256": "6a616315d59e5ec9b6ef2fcbd0930719754153eed42e17204d15c72887caef8b",
+      "bytes": 858028
+    },
+    "hazards-coherency/capture/executed-lines.json": {
+      "sha256": "053c4b0d8535e8ca5ebc68f4a7fd0a99ca5a5ae2936b92861c2ab115cd91ddc3",
+      "bytes": 2833977
+    },
+    "hazards-coherency/capture/imports.json": {
+      "sha256": "7b5902ccb9bf041398dfc56210eca67a74827c41bf3decae3b8c89988f48d690",
+      "bytes": 342276
+    },
+    "hazards-coherency/capture/owner-calls.json": {
+      "sha256": "0e6b16233e5ba918c735b3aa703f65f7a1e77c07c0c3839e3ee9eb5b63f118f4",
+      "bytes": 2041076
+    },
+    "hazards-coherency/capture/phases.jsonl": {
+      "sha256": "eee0aba6762e3e8ee72a03c3c0c28c136e566cf138d139327723cab79eb2d533",
+      "bytes": 26945
+    },
+    "hazards-coherency/capture/reads.json": {
+      "sha256": "d5e68b0c5c80487eb23c3e913f3ab1ea2f98d2fc78df627674fdb43c90d44bd2",
+      "bytes": 626603
+    },
+    "hazards-coherency/capture36.py": {
+      "sha256": "c8628242f81d4937e2e0d7c54222e1b18f3e5b24173fc053722f973f06d9f9f0",
+      "bytes": 3042
+    },
+    "hazards-coherency/junit.xml": {
+      "sha256": "e37862b0a0e95cd5a89d9d937e0f8f154de3a0cf33d09c9fae364fc65d8efe69",
+      "bytes": 6650
+    },
+    "hazards-coherency/LAUNCH.json": {
+      "sha256": "80a6c0231156d65d191470deeaa66e19ee5aab85409d88a83b2d63705a9d327b",
+      "bytes": 1362
+    },
+    "hazards-coherency/RECEIPT.json": {
+      "sha256": "f4ca7248aa292989d4064842eabbf7525e1735b8e74f8cdd018c4d753a54609b",
+      "bytes": 1577
+    },
+    "hazards-coherency/STDOUT.txt": {
+      "sha256": "eeb0335fb189c00135b8c1b22a7fcfaf42106bf9123eda38fc4bd9e696a1e21b",
+      "bytes": 111
+    },
+    "INDEPENDENT-REVIEW-HANDOFF.md": {
+      "sha256": "19f965c82db98bf8ec1ee4e641434b944123b8d89c7943a11264d41c96ee9e96",
+      "bytes": 3996
+    },
+    "input-semantic-handoff/CURRENT-IDENTITY-CHECK.json": {
+      "sha256": "f3226289e1c6d0fd7b56000075aecbf6b9d54c533f6c47bad1207ccb876feeae",
+      "bytes": 4195
+    },
+    "input-semantic-handoff/current-source/src/warhammer40k_core/core/ruleset_descriptor.py": {
+      "sha256": "d4d30951aa60f5c7ef10941f609ee76abb3400945cba928a69f5321a14cbb7b8",
+      "bytes": 118753
+    },
+    "input-semantic-handoff/current-source/src/warhammer40k_core/core/terrain_endpoint_policy.py": {
+      "sha256": "6934b29fb50eb563adaee857477cc062f0f945c7bee97097d0e9e7a71a16572f",
+      "bytes": 1520
+    },
+    "input-semantic-handoff/current-source/src/warhammer40k_core/engine/charge_move_geometry.py": {
+      "sha256": "9cc5a473094d49926ca94df9c1c33c8b4deb6fe8a6bd69dbccc339f5933dfc55",
+      "bytes": 9776
+    },
+    "input-semantic-handoff/current-source/src/warhammer40k_core/engine/faction_content/catalog_generic_hooks.py": {
+      "sha256": "3354d1982e47ad62ac0352f03ee5c723eb52c9da029e186d8794cb043cde9139",
+      "bytes": 3954
+    },
+    "input-semantic-handoff/current-source/src/warhammer40k_core/engine/faction_content/runtime.py": {
+      "sha256": "e796e8dc53713223030ff6cf690897f2dcb730e629be4a1aec011921a7142cc7",
+      "bytes": 5463
+    },
+    "input-semantic-handoff/current-source/src/warhammer40k_core/engine/primary_scoring_boundary_lifecycle.py": {
+      "sha256": "cfa1e61880a767ff76dbab73cb84448a8591beac1a420c0e03740f63ea308d85",
+      "bytes": 41475
+    },
+    "input-semantic-handoff/current-source/src/warhammer40k_core/engine/sequencing.py": {
+      "sha256": "c9a0e9e2cc205d99efa49cd60d52c2804b4dc6bd871ea0670a5a80542b7b17c6",
+      "bytes": 34598
+    },
+    "input-semantic-handoff/DESIGN-SEAL.json": {
+      "sha256": "4c4396fc22e69db8906d5ab6a32df6cac23568535c4219f153f42dab17e00e7d",
+      "bytes": 12209
+    },
+    "input-semantic-handoff/DESIGN-SEAL.sha256": {
+      "sha256": "ba6ccfa22bcb91cc72801162534044303ea7682e045f56d0e9f31c4bc4ad4033",
+      "bytes": 84
+    },
+    "input-semantic-handoff/EXACT-TEN-SEMANTIC-ROWS.json": {
+      "sha256": "6836ab963213e31cdcf75de727ff57fef7c008f099300976fbb5fb58c753f1ba",
+      "bytes": 17243
+    },
+    "input-semantic-handoff/EXISTING-EVIDENCE-INDEX.json": {
+      "sha256": "690e4a99740bebfdb2bd5ed3fa0fc0a058832f6def89322ad2f16086593a9334",
+      "bytes": 1120116
+    },
+    "input-semantic-handoff/existing-test-source/tests/integration/test_embarked_ability_authority.py": {
+      "sha256": "a3eff20d6782f3ec0b792880c7ccac73d4018e5e8ee1ee4e8dce034f293309cf",
+      "bytes": 25881
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section02/test_02_05_keywords.py": {
+      "sha256": "f940274df3afc423a9a4a271665c2ac37885945559ab2a2fa9fea9c5936002e3",
+      "bytes": 4756
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_cleanup.py": {
+      "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a",
+      "bytes": 25991
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_cleanup_mission.py": {
+      "sha256": "4588f032f718740f792b3f2b6306a6050dec40167923bf50cd1a59164d269107",
+      "bytes": 3180
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_coherency.py": {
+      "sha256": "100e7b571278dad83bd29863a9b584cfc3121d0b1daa2ed2caa1773353372aed",
+      "bytes": 2626
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_disembark_contracts.py": {
+      "sha256": "ab718687c80789e4c680a32b13407268b5e072eb199db5da0747ec9125d100d3",
+      "bytes": 2882
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_distance_rotation.py": {
+      "sha256": "c5abdc666d8f09afa25f29fe47955589f45bb6b65807ebdfbc6653ad5dd1ab89",
+      "bytes": 3117
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_engagement.py": {
+      "sha256": "f110c6ef44ee0257840c9997554d34d5d2da0029a2cb3705998676352e53dbb8",
+      "bytes": 3278
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_facade.py": {
+      "sha256": "4611c884ea70ac251cb04b896915ef908eb03674c24b9ff04defb8e1814a7b31",
+      "bytes": 5798
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_failed_setup_rights.py": {
+      "sha256": "28d92faa3021e2fa572c71ad93234537a8ca347cc6a2afe5c76c02c455e77383",
+      "bytes": 2807
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_if_able.py": {
+      "sha256": "839863a418321653d35bcedadbb8fcb1720327e4aed95e7700f9ccff71243d7f",
+      "bytes": 2067
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_large_deployment.py": {
+      "sha256": "3b5f2cb08d7abfee56c6e3a57caf539243ceccd3edf47833019752c89a760f79",
+      "bytes": 3861
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_large_reserve.py": {
+      "sha256": "9e3d82e2a41efb263d37679f139c89307031adf2a7d7318e2c49a8706ecec1e6",
+      "bytes": 3578
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_movement_paths.py": {
+      "sha256": "898a7a36abed3e4c19d8cd7f045feef4b4df1223fb4ac4f337803b3858a7c058",
+      "bytes": 6608
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_overhang.py": {
+      "sha256": "af5f6fcd2655bbb43e4f9b0815ba33ed751c9fdab3ac4c6ec4204c73891aaae4",
+      "bytes": 3455
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_redeploy.py": {
+      "sha256": "087d05de7b747b75da2c16b8630298d97cb0aab06c4888f31fb901289be721ba",
+      "bytes": 4336
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_setup.py": {
+      "sha256": "50fe31ed0e18070ddc386f2e6e24b898d3d2b066c158d3b854b6c19988924304",
+      "bytes": 4169
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section03/test_terrain_and_budgets.py": {
+      "sha256": "fbd733274e65387c61d56b791fe7defe2ecbb87d845fba52319e6ff36ac90552",
+      "bytes": 4977
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section04/test_allocation_and_effects.py": {
+      "sha256": "2c199077d997c58e9344b86cf7baab8de7c8e7cf9ee82ed8f1abf6a2f54756d4",
+      "bytes": 9009
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section04/test_critical_faq.py": {
+      "sha256": "3039098ca5a331dc9db2d50b6a4034efd47d57c0ccd68ad141513a694606a7f6",
+      "bytes": 3486
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section04/test_grouping.py": {
+      "sha256": "2eedb29a341902b53db6d54f270758fdc70147f8d0fc86ceae5897405fb32ed3",
+      "bytes": 8994
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section04/test_selection_contracts.py": {
+      "sha256": "a5f92de62d3740ddbb3a4c221964813abf56d95c6b9e61bd00d282f1b0c114d2",
+      "bytes": 4434
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section05/test_damage_timing.py": {
+      "sha256": "5e18a35952dd38ed8d755dd0063d7b676df6481bac16e6f2121fca3f17e336ba",
+      "bytes": 4207
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section05/test_groups.py": {
+      "sha256": "a5c7fcb879af8a2947f9bfe738e8f6ca8aff8552c89d45febd609f2c6151a76e",
+      "bytes": 6670
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section05/test_reaction_boundaries.py": {
+      "sha256": "855c78fc599e25a1d9e8f3c4a12f7a8c8bc4e0870cace00ccb043fa1c9e98a8d",
+      "bytes": 4513
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section06/test_hazard.py": {
+      "sha256": "2097415c689c27ee430b7a62283563f30371ad468587c97ea931ed8951c59ebd",
+      "bytes": 7362
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section08/test_battle_shock.py": {
+      "sha256": "2955b327e501b738dd07f8c4cdaaedadfd85d2e02dff3cc9eab7472528f2d2a2",
+      "bytes": 4274
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section08/test_command_flow.py": {
+      "sha256": "a67327723cad6a50818c23cdd6b5ee68dd1bf8bdf03ff659e8f0663bee09e46d",
+      "bytes": 8862
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section08/test_cp_resource.py": {
+      "sha256": "ecd63e745adc8e5467cfc1cb9ff1e7e23e361f8b9a3b09a7ac5fd62601e5771d",
+      "bytes": 1465
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section08/test_end_priority.py": {
+      "sha256": "70de686b11d136f5b4596a028c70afc966d0ba728ff4f31000dc4ca365c3595a",
+      "bytes": 13401
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section08/test_examples.py": {
+      "sha256": "8b885c617f63518cf728e1fa96e466e628bc4d9a109bfe8b27ac489b02a50947",
+      "bytes": 2064
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section08/test_shock_completion.py": {
+      "sha256": "6a9011ca8745925cb8633eb8b07ab95c44b61eac14c4cd2ec89d1097c9408a15",
+      "bytes": 2070
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section10/test_indirect.py": {
+      "sha256": "66d36672bdacf0f365480f0641c30bba4da1f24696933e1d37c74e1b5526e119",
+      "bytes": 11340
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section10/test_shooting_types.py": {
+      "sha256": "8f7f2cfdccee7b688671fa6f6ec099402824b2c6dd67c13eade64482a840d773",
+      "bytes": 8148
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section12/test_phase.py": {
+      "sha256": "c6be529fbb48e47f1da76c7bc54e85da4728610171db84a586c0288cdb33ea93",
+      "bytes": 17646
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section12/test_retained_presence.py": {
+      "sha256": "a39c6f0bb5e91caab9171fdc7dc8c20f60e68a38a02b533ed17cf1e8e69e21ca",
+      "bytes": 5619
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section13/test_consumers.py": {
+      "sha256": "ee038d8a524f5dfc893640b06811d3415e2068f13580b5715e0fbc9658accbba",
+      "bytes": 22863
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section13/test_hidden.py": {
+      "sha256": "a03572ae9f20bb987f716dc79ca7b9799e6aad9872a5e77018860f2b0a8efc22",
+      "bytes": 7275
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section13/test_movement.py": {
+      "sha256": "c3fe93a240b6067d7293e22d7f6fe0f9182ba1886dc6c4297e620632c74d2c39",
+      "bytes": 20125
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section13/test_ownership.py": {
+      "sha256": "76f3375eb7bbef1ec08563fdd53b8495610afd4a53a714a9fd3db6ef1b4ca480",
+      "bytes": 4214
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section13/test_visibility.py": {
+      "sha256": "f7ccae3061610652c20cc906678b92f2f9911863748f91594cae7c674c8d5eae",
+      "bytes": 8788
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section18/test_emergency.py": {
+      "sha256": "dd10071fe5d07adf4d5960320ce0dba5bda9f58187e5d52df08f1ef2e0871416",
+      "bytes": 11017
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_abilities.py": {
+      "sha256": "272346c4c62a902d8bd257f433c2cf25a34d854e6566f64f6600fe6ef1292367",
+      "bytes": 1259
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_catalog_membership.py": {
+      "sha256": "14e24c26ef6330758d29fb730cd75311f698b1da15296ee5854c33690981d2c9",
+      "bytes": 3223
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_destruction.py": {
+      "sha256": "8446574f78ee0b7e66c7c91740b69b39fc99e87d677e43786ae626afb2620602",
+      "bytes": 1986
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_facade.py": {
+      "sha256": "ae517198a6ccb8ce9babc59c72b0a7daee4571d8459fb71ad44542a25eedbe17",
+      "bytes": 4556
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_formation.py": {
+      "sha256": "eb8a0c123e556a7460cf653d4197e2e50ec0f3fd7ed25491a15f2b79bc7bc4ad",
+      "bytes": 4147
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_identity.py": {
+      "sha256": "1aeef046f6366ac70fc3bcf835c15416f9b86f9b6170159175e355c5e6476905",
+      "bytes": 2550
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_keywords.py": {
+      "sha256": "0585fb670845bf6f08ebd75a2d9a2872b921833b2c2b1723b273db2c0cd87e13",
+      "bytes": 1721
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_model_scope.py": {
+      "sha256": "bba97fdc2a0c48325ee368bf01dfb7a4b0043155e428633a813ccc23771adb96",
+      "bytes": 5536
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_retained_scope.py": {
+      "sha256": "297c924c85b2ea6625c81d767438dcd924f47744e553c4cfe863522b8519a4dc",
+      "bytes": 7239
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_scope_controls.py": {
+      "sha256": "f6bd352a10cb5d6ca50993b8db8e18df2717a77f7f925b4dd377f33c3b404ab5",
+      "bytes": 5846
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_table.py": {
+      "sha256": "9fb093b9e03257732b8882ed11722484a922d6013eb38157f2198604463561e6",
+      "bytes": 3828
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section19/test_toughness.py": {
+      "sha256": "ff717223607b0289b0a465787230cc94078fce0d6c3fe215e39e2b3b8af2d572",
+      "bytes": 2104
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section21/test_clarifications.py": {
+      "sha256": "bbeec626ea2338b6f30cb25e87d52e3ae321fa69eda3747ce3248a92c62d4e49",
+      "bytes": 10005
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_attachment_boundary.py": {
+      "sha256": "37ad6063ec6fb18552a256c926e3429b5c1c10956c09e7712ea334b39219f7c5",
+      "bytes": 3225
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_core_instances.py": {
+      "sha256": "258e6b7edf7b5fc8e6503c0b6e7b59803dceeeccfa1d48017d4a46a5c9ae2c35",
+      "bytes": 3315
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_damaged.py": {
+      "sha256": "0129c193a194c6ac943699970de0ca07d06660afab28f26dfc383d5a73f874bc",
+      "bytes": 2282
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_facade.py": {
+      "sha256": "9a7af92db0688c87f6867efeded2405e049a3a74013861a186c474cba2b85fd4",
+      "bytes": 13437
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_heavy.py": {
+      "sha256": "2247280f14ff18617f4f9ae37793dc8b61bb1ed424d12c9445f6d1b0c8539937",
+      "bytes": 8166
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_hit_wound_consumers.py": {
+      "sha256": "d46ea0005063643502c30d44147fbfe0560efaa67bbfeaa2dc9b848afac716dc",
+      "bytes": 7505
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_movement.py": {
+      "sha256": "d3be66ccac03b0a553387321bd17115c9ad523edc0b419b172c8a29507e03cc2",
+      "bytes": 1870
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_native_core.py": {
+      "sha256": "d454c9ee43a25e7d5f85df631a3415cc6b877a25f3f2a532f3d212254792fbe6",
+      "bytes": 6132
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_one_shot.py": {
+      "sha256": "a01d350ae2480dd10a036499422ec022cba69bc42d6be4d3ab1fee606b0750b1",
+      "bytes": 14623
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_scout_boundary.py": {
+      "sha256": "3b74a2d078860a03beda17623901b8ddd119683bca04e7400daa5845a9cf0b4c",
+      "bytes": 3760
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_targeting.py": {
+      "sha256": "3a1f1d0af6df85408c99a6ad2fa30dc6d675a8479d5bf16c29e0fe04b9e75eaa",
+      "bytes": 4607
+    },
+    "input-semantic-handoff/existing-test-source/tests/rules/section24/test_weapon_instances.py": {
+      "sha256": "f0dd69e5e6a60fc9eae1530333915ca8f02049cb59a271eae534f12acc5f29f4",
+      "bytes": 6414
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_army_points_mfm.py": {
+      "sha256": "cb2cd67119873a9f3f91af9e9c263cfaff2cb573d6a11aae7734b0c6fd0bb40d",
+      "bytes": 36289
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_d12_epic_challenge.py": {
+      "sha256": "85ac9e44ee2c1ce449a6f8a0b4335da21663c0d075dca984b5d177c36d879314",
+      "bytes": 17003
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_lethal_hits.py": {
+      "sha256": "75ecd186872a58cf5ae8728b1631d98eecaea6b76edb52a49e04bb70805b53e9",
+      "bytes": 23477
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_order53_movement_abilities.py": {
+      "sha256": "90688a7151aefd40e951fc286d11ca45b63d40992c1580c86c8667fea576c7eb",
+      "bytes": 39903
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_order65_firing_deck.py": {
+      "sha256": "e10105dab65fc4c52a948be5fd536f5b7e5bddf2df27889526621710ccca8092",
+      "bytes": 13379
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_order92_random_melee.py": {
+      "sha256": "d66808312139f8931f3476fe076293ad78e94ec3a27965f8442d9c788df52164",
+      "bytes": 49370
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_order96_twin_linked.py": {
+      "sha256": "6457ff943506b21912a679386c7614a800a972545ab7ead751c32439f400dd41",
+      "bytes": 24804
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_order97_semantic_evidence_18_25.py": {
+      "sha256": "1a05ad0be9bbd580a6ec77f45a9c633bfb0767761be8403ce664bb40cd64e251",
+      "bytes": 58181
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_phase10q_transports.py": {
+      "sha256": "69392d9013a45e174a674d624925550150a40f5b993eda25c3da152e518c56a5",
+      "bytes": 385402
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_phase13b_shooting_declarations.py": {
+      "sha256": "6d009e0edd18ae45e003daa0a8a1a7a2c1ae242349eaf764d6f8fff01d87f991",
+      "bytes": 829838
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_phase13b_shooting_phase_declarations.py": {
+      "sha256": "aea8f8dee74128202460a31ac9ade8b707f938d2570b272fef1fe4e27353705b",
+      "bytes": 196754
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_phase13d_weapon_ability_helpers.py": {
+      "sha256": "97dd7ee99d21726d6b1f21f74ff5369f76c4c19278b8af6f9b20d994149b026d",
+      "bytes": 36622
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_phase15d_fight_resolution.py": {
+      "sha256": "58dfbd58a89e864a9daa16b45f93048cb084cf4f1c045d663189911d1eb17482",
+      "bytes": 320839
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_phase16b_prebattle.py": {
+      "sha256": "6f0c78337a4bf39ee28cea58606913ee0f4247ccf0ce25686f2455409867dcea",
+      "bytes": 67441
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_phase9c_mustering.py": {
+      "sha256": "10f72ca7de64c857fe33fffbb5fd0a72693600e6430de4fdbb30b40cf34eb09a",
+      "bytes": 246542
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_public_firing_deck_history.py": {
+      "sha256": "e8c130ebb90b3867e7b496096d47b35e49e4523fbbc8e17948ef2aa5040b8180",
+      "bytes": 14595
+    },
+    "input-semantic-handoff/existing-test-source/tests/unit/test_unit_abilities.py": {
+      "sha256": "1f669994bca96fdb210b39702c28a48d42a24133afbd3e16c0ed81dfe234461d",
+      "bytes": 40979
+    },
+    "input-semantic-handoff/HANDOFF-PINS.json": {
+      "sha256": "b0821edf79318144a2b917c0e4fddddd803d59ff59c9e18925efd9d666789b5f",
+      "bytes": 15313
+    },
+    "input-semantic-handoff/HANDOFF.md": {
+      "sha256": "d6a4ad0c74b7b900b6f8745686d7a8a1e9e6f9878471f1fbfb454d83ec82aca3",
+      "bytes": 5658
+    },
+    "input-semantic-handoff/historical-owner-deltas/owner-deltas--core__ruleset_descriptor.py.json": {
+      "sha256": "5181e8428df93ee0e1490d4814a05ecaea25be2f30375ea662e83e566ca3e343",
+      "bytes": 1194
+    },
+    "input-semantic-handoff/historical-owner-deltas/owner-deltas--core__terrain_endpoint_policy.py.json": {
+      "sha256": "a81d4e8676dfb589f8dcd398d88425f12f29edbf6627184b3d1905ca9b614bce",
+      "bytes": 1980
+    },
+    "input-semantic-handoff/historical-owner-deltas/owner-deltas--engine__charge_move_geometry.py.json": {
+      "sha256": "896aa4db0a17e92d7d4dea28906b4e7d372b755fae0e47609f312636ad1453f4",
+      "bytes": 1474
+    },
+    "input-semantic-handoff/historical-owner-deltas/owner-deltas--engine__faction_content__catalog_generic_hooks.py.json": {
+      "sha256": "588975c2261345ea251b88119b5bd970bc08fe060d629e272127d47d26e7dbfe",
+      "bytes": 2225
+    },
+    "input-semantic-handoff/historical-owner-deltas/owner-deltas--engine__faction_content__runtime.py.json": {
+      "sha256": "26186ca8be1fcf70aa9a013c401b9b00258e4b14a18d2408567ec322116681b6",
+      "bytes": 961
+    },
+    "input-semantic-handoff/historical-owner-deltas/owner-deltas--engine__primary_scoring_boundary_lifecycle.py.json": {
+      "sha256": "99ee49d5713fb65073d8c6290ae4226aa64007442c7630f5e8dc5368d9a0c407",
+      "bytes": 6962
+    },
+    "input-semantic-handoff/historical-owner-deltas/owner-deltas--engine__sequencing.py.json": {
+      "sha256": "bd6e92f86c52efbc82f0f1cf9a049ec1bd7efb79b3c31bf3c892430c80e82ccf",
+      "bytes": 1576
+    },
+    "input-semantic-handoff/SOURCE-RECORD-INDEX.json": {
+      "sha256": "c7f19bf49505bc2a468552e7f48c00b83ba2d7973f585df0e12fce60e596ff98",
+      "bytes": 6495
+    },
+    "input-semantic-handoff/source-records/docs/FOCUSED_DEFECT_CHECKPOINT.md": {
+      "sha256": "3cf550cdf491777a61bc77502d773cdb40472c0a644bd2b96ddc65c227092de0",
+      "bytes": 10852
+    },
+    "input-semantic-handoff/source-records/docs/SECTION19_CONTENT_ADMISSION_SCOPE.md": {
+      "sha256": "67b0b7050ed9fd14ab907619000279c1e7996963a6c78c4c8106bb3d2db91ba2",
+      "bytes": 2345
+    },
+    "input-semantic-handoff/source-records/docs/SF03_001_COHERENCY_CHOICE_SCOPE.md": {
+      "sha256": "8a94b3272a4b9ac9541b83e53953a9a99c6318a829a937a34bb4f151f54e504a",
+      "bytes": 3562
+    },
+    "input-semantic-handoff/source-records/tests/rules/section03/coverage.json": {
+      "sha256": "8e858a6d462bd7ea3a52ae2d4e14993f219f3197c0dae6ea37c782d6153858eb",
+      "bytes": 161280
+    },
+    "input-semantic-handoff/source-records/tests/rules/section08/coverage.json": {
+      "sha256": "0eba9216ef7cd58623d9dbd1092fdd045bbfac15d73e2347edb0efbb3236c6a7",
+      "bytes": 92279
+    },
+    "input-semantic-handoff/source-records/tests/rules/section13/coverage.json": {
+      "sha256": "7d3e20703846afd0e813ce1a470e470c8d6e4f742a2217cb3e048762e2855184",
+      "bytes": 107600
+    },
+    "input-semantic-handoff/source-records/tests/rules/section19/coverage.json": {
+      "sha256": "a39f25f296d26cce763d8d99defb734d94ca1ce47b63e11493507da85be469b8",
+      "bytes": 136674
+    },
+    "input-semantic-handoff/source-records/tests/rules/section24/coverage.json": {
+      "sha256": "b34c8a7bbf55611112630fc05d9b75430689e08ad790392ba06b975970982588",
+      "bytes": 449527
+    },
+    "inspect36.py": {
+      "sha256": "58bdb220f6a55252a0959056752d4ca4169f556afc5d2316515a259c0163dda2",
+      "bytes": 1356
+    },
+    "NATIVE-HAZARD-RECEIPT-AUDIT.json": {
+      "sha256": "b10e52e22cc877d94446325bcebe8b73436441e0e6f59b6928111ddc0f3cb3ba",
+      "bytes": 632
+    },
+    "native-sequencing-admission/capture/collection.json": {
+      "sha256": "fcf4b4dff16fd10bd284a14bf66d2bab6196cb6fa27d8d60457c65af5f0a0c77",
+      "bytes": 5532
+    },
+    "native-sequencing-admission/capture/exceptions.json": {
+      "sha256": "d965ef4f3e667f944dbfd9ba207e895767295b7cdec5a97c36e71e086a52fd43",
+      "bytes": 1190793
+    },
+    "native-sequencing-admission/capture/executed-lines.json": {
+      "sha256": "263a72716e520310881b7309a6a6660ec8904ebb4d7b6154e6ebf488489798cd",
+      "bytes": 3209842
+    },
+    "native-sequencing-admission/capture/imports.json": {
+      "sha256": "432a51b8cdd1db01e556f3a11e396846cdad676a04a0be7f66b0222374e00b9b",
+      "bytes": 347336
+    },
+    "native-sequencing-admission/capture/owner-calls.json": {
+      "sha256": "a55cf1dce11d0d256f3ac8357e7dc913ed906f94d4e8ac92eafd857b096d15d0",
+      "bytes": 2362881
+    },
+    "native-sequencing-admission/capture/phases.jsonl": {
+      "sha256": "4c6f46db4f2ada4052d400388df57a238407b55960d7f8cf020e8c581b13dde2",
+      "bytes": 28272
+    },
+    "native-sequencing-admission/capture/reads.json": {
+      "sha256": "20c5f5e3301da4454fe25eecff5afae6450a6564a5d478b8f944faa3b9fd2d4d",
+      "bytes": 626265
+    },
+    "native-sequencing-admission/capture36.py": {
+      "sha256": "c8628242f81d4937e2e0d7c54222e1b18f3e5b24173fc053722f973f06d9f9f0",
+      "bytes": 3042
+    },
+    "native-sequencing-admission/junit.xml": {
+      "sha256": "d7bc0d2e9cccc427858b80009aa6bff628b8a2abd11a127f1dd7ce94acf58908",
+      "bytes": 7157
+    },
+    "native-sequencing-admission/LAUNCH.json": {
+      "sha256": "d71cd728085d827aa57e3b0fdc08a54031fee686e7c41b3c21aa21aa45b4d778",
+      "bytes": 944
+    },
+    "native-sequencing-admission/RECEIPT.json": {
+      "sha256": "cebf870340cc341b16e20533d125945644c9ff31fc878fd43c1a61b8bf95eb8d",
+      "bytes": 1159
+    },
+    "native-sequencing-admission/STDOUT.txt": {
+      "sha256": "8371010cb2bb1e2093eaeb252e1520ee4a4646a76b24329f6fe350babacce22b",
+      "bytes": 111
+    },
+    "OWNER-EVIDENCE.json": {
+      "sha256": "0eb4f288983dbd87f035406326bcc6113f3318151264e95eca364769b8fe6f36",
+      "bytes": 867167
+    },
+    "PR587-COMMIT.txt": {
+      "sha256": "e9f5b4ccfdcad4aec4b5f2bf2d040cc78bf8811f1a5630d09289c67fd9fe824b",
+      "bytes": 2637
+    },
+    "quarantine_cache36.py": {
+      "sha256": "d7deb7673a5f73b8f468745992a9a07637e866695ad19e5ea1630084108265ef",
+      "bytes": 1342
+    },
+    "RAW-EXECUTION-AUDIT.json": {
+      "sha256": "0a4c31e06190127fe3c7c428d1b5e72b7e203f46300473e0b89d4cb87165edd1",
+      "bytes": 8994
+    },
+    "REACHABILITY-AUDIT.json": {
+      "sha256": "a8141aa9ec257efc75ee637ed1ff51073b86a231bacb9932bae2f6ab09f2d75e",
+      "bytes": 3942
+    },
+    "reachability36.py": {
+      "sha256": "54616cfeddea37c7f71dc8dbd55ebb66129d2ce7c6e4a4515c050ea2d47d3e04",
+      "bytes": 3248
+    },
+    "recover36.py": {
+      "sha256": "9e745d3ab8147136bde02ed5ad714d18c6ac59071a848891d4bae5939787345a",
+      "bytes": 4155
+    },
+    "report36.py": {
+      "sha256": "2ef1d18a5620af8a6ac53d6087758e6f6cf194a2bb55a7778f53c1319b3cffa8",
+      "bytes": 18063
+    },
+    "RESULT.json": {
+      "sha256": "cb8029e5e3c01ad3f03ef6796bffebd766b2cf9a203c4536120b57283e6ca7fc",
+      "bytes": 1188
+    },
+    "REVIEW.md": {
+      "sha256": "dea79db63bcfd6844018f706e663db6857e2fbd7a8b9c1b08956ce0c77171ee9",
+      "bytes": 12563
+    },
+    "run36.py": {
+      "sha256": "af2b54b2cd1de354ce15fa045701548cfb9377e6dbe3f307ba86f5cad6a5052f",
+      "bytes": 2721
+    },
+    "seal36.py": {
+      "sha256": "fbe1b16eec0eec57ec2587d82fe0da08914a3dcc263dd62b51441496385b2cc0",
+      "bytes": 6023
+    },
+    "SELECTIONS.json": {
+      "sha256": "75e77e311306c1e2f70772b02e99b120266250a20acfe8bcf3d757e2cced90fc",
+      "bytes": 1256
+    },
+    "SETUP-AUTHENTICATION.json": {
+      "sha256": "9df8ab8d1da54ac588867918a8ef5b9077a20ccc7556187d91ebe5348024ec13",
+      "bytes": 574
+    },
+    "source-records/tests/rules/section03/coverage.json": {
+      "sha256": "8e858a6d462bd7ea3a52ae2d4e14993f219f3197c0dae6ea37c782d6153858eb",
+      "bytes": 161280
+    },
+    "source-records/tests/rules/section08/coverage.json": {
+      "sha256": "0eba9216ef7cd58623d9dbd1092fdd045bbfac15d73e2347edb0efbb3236c6a7",
+      "bytes": 92279
+    },
+    "source-records/tests/rules/section09/coverage.json": {
+      "sha256": "96ffab4c5ebf752dda25328bb249dc0e8e3198d6fa52179716243c8ad2e59053",
+      "bytes": 99376
+    },
+    "source-records/tests/rules/section13/coverage.json": {
+      "sha256": "7d3e20703846afd0e813ce1a470e470c8d6e4f742a2217cb3e048762e2855184",
+      "bytes": 107600
+    },
+    "source-records/tests/rules/section17/coverage.json": {
+      "sha256": "92fdf4e56746fe0784be8d7ab708d97636336893cbdaed970e85e5222c10c8b3",
+      "bytes": 95960
+    },
+    "source-records/tests/rules/section19/coverage.json": {
+      "sha256": "a39f25f296d26cce763d8d99defb734d94ca1ce47b63e11493507da85be469b8",
+      "bytes": 136674
+    },
+    "source-records/tests/rules/section24/coverage.json": {
+      "sha256": "b34c8a7bbf55611112630fc05d9b75430689e08ad790392ba06b975970982588",
+      "bytes": 449527
+    },
+    "SOURCE-RULES.json": {
+      "sha256": "03800c2c7ddecc5276b09ad0abce68273a0a864e9234f3445ae756b2748397f0",
+      "bytes": 58301
+    },
+    "SOURCE-TRANSCRIPTION-AUDIT.json": {
+      "sha256": "7c5d983ab1323e827c1858aa89ab34630a78647d4556079a2de974d5e786df83",
+      "bytes": 24909
+    },
+    "sources36.py": {
+      "sha256": "484789fff1319a6e6be2c0c52d2a0659e8427aefe6b333795b0b85a088c4dd09",
+      "bytes": 4039
+    },
+    "static_audit36.py": {
+      "sha256": "84b7be89b0219bfb7a78b4cb80c265d87fa563e4c6401933ed3c2b6e44d8ab38",
+      "bytes": 1457
+    },
+    "TEN-ROW-ADJUDICATION.json": {
+      "sha256": "5a1272a27d6715f051396141144ed5ddc7a20f04db06eec29468d5b0880be24f",
+      "bytes": 45214
+    },
+    "terrain-blockers/capture/collection.json": {
+      "sha256": "15e3c0b2a811def5ed4a8a799b459c4f4e5382614107a924b688f8064e5e6d3d",
+      "bytes": 27812
+    },
+    "terrain-blockers/capture/phases.jsonl": {
+      "sha256": "e717d0af93b9acf1b723add7aab0a2e7e0d004a6c8d231d1ea79dfb37e6f722e",
+      "bytes": 100915
+    },
+    "terrain-blockers/LAUNCH.json": {
+      "sha256": "dacbe5fdac34fcc07c89ae88cdc0d5c11c4ef002015e88e06c8a8f2cca93980a",
+      "bytes": 799
+    },
+    "terrain-blockers/RECEIPT.json": {
+      "sha256": "9d84f330a0500a01fd7d7b9b910d39dc27abaa84923fed9e79f2d4d6625ad390",
+      "bytes": 1009
+    },
+    "terrain-blockers/STDOUT.txt": {
+      "sha256": "cc9f185f7e01d9b6b007fedcdee439047ce242f546763a940c47d659c5a82327",
+      "bytes": 170
+    },
+    "terrain-blockers-retry/capture/collection.json": {
+      "sha256": "15e3c0b2a811def5ed4a8a799b459c4f4e5382614107a924b688f8064e5e6d3d",
+      "bytes": 27812
+    },
+    "terrain-blockers-retry/capture/exceptions.json": {
+      "sha256": "b1c86271d421db0e8017dd3a999a035404c398aee16261dbf0fd02720b2eb13e",
+      "bytes": 89106
+    },
+    "terrain-blockers-retry/capture/executed-lines.json": {
+      "sha256": "dd823d082b4bb1eff44b4ca8bbe04ff2a14f754ef74936265a8dcf174b2cd473",
+      "bytes": 12792966
+    },
+    "terrain-blockers-retry/capture/imports.json": {
+      "sha256": "d001b73212054f67bee5e24de5e5c3fb1c0fa6c1d5cd41be4b02ec86352544f8",
+      "bytes": 319957
+    },
+    "terrain-blockers-retry/capture/owner-calls.json": {
+      "sha256": "f099f5b0024bd4d7aba638a3b296df052d2a3d56b1fb3abbef7cb89972d7a4cb",
+      "bytes": 9207797
+    },
+    "terrain-blockers-retry/capture/phases.jsonl": {
+      "sha256": "03086c19e3fac298642aec832ff6bed8efbfe7de7c522ce601fca39b0224bcbd",
+      "bytes": 149962
+    },
+    "terrain-blockers-retry/capture/reads.json": {
+      "sha256": "0972bde2100c7c9bb3b8244e850205585e0d666b05cd40971af9b43185348ef4",
+      "bytes": 624551
+    },
+    "terrain-blockers-retry/capture36.py": {
+      "sha256": "c8628242f81d4937e2e0d7c54222e1b18f3e5b24173fc053722f973f06d9f9f0",
+      "bytes": 3042
+    },
+    "terrain-blockers-retry/junit.xml": {
+      "sha256": "21df722c18ccb895a5955e6404fcaba667e3e812415ddd6bac8724de26ec07bd",
+      "bytes": 35803
+    },
+    "terrain-blockers-retry/LAUNCH.json": {
+      "sha256": "c19ca40caa71dfe3db60352e36235b6b64b0fd1d36c8f6f09ffcc47cef58ebbd",
+      "bytes": 905
+    },
+    "terrain-blockers-retry/RECEIPT.json": {
+      "sha256": "593a2569fe3490aa165545a966d68687c58501241bbe0b76943bc3aad038eb19",
+      "bytes": 1120
+    },
+    "terrain-blockers-retry/STDOUT.txt": {
+      "sha256": "5e875b09dee35f414e041da65beb34c61a22854a58df629d0bc5da89b568d060",
+      "bytes": 352
+    },
+    "TEST-ASSERTIONS.json": {
+      "sha256": "c09166714ff7c538fe1ec60c2ac18937ed6de7159005ceac69798dcd5bb75e41",
+      "bytes": 123583
+    },
+    "test_semantic36.py": {
+      "sha256": "78b724a509d178b83b245dd726bd3953072fac3421cf4b60d63044249b6d65ce",
+      "bytes": 11107
+    },
+    "TOOLING-AND-FAILED-ATTEMPTS.json": {
+      "sha256": "4ccde57ed75281518264603644f7686b1bea498deca9bd680257faa5a0797117",
+      "bytes": 3608
+    },
+    "TOOLING-CACHE-QUARANTINE.json": {
+      "sha256": "ec5a56a4440d4e342702ee9bbc42d99f1e99f1fde2a99186ee4e3be3bfa93074",
+      "bytes": 940
+    }
+  }
+}

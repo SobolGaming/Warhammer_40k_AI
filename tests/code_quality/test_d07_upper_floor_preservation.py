@@ -5,10 +5,9 @@ import hashlib
 import json
 from pathlib import Path
 
-from tests.category_migration_preservation import read_historical_test_bytes
 from tests.d07_geometry_containment import verify_d07_geometry_containment
-from tests.d09_test_preservation_helpers import preserved_d09_predecessor_test_bytes
 from tests.support.section13_preservation import pre_section13_descriptor_bytes
+from tools.cumulative_preservation import d07_predecessors
 
 ROOT = Path(__file__).resolve().parents[2]
 ARCHIVE = ROOT / "data/source_audits/d07"
@@ -65,9 +64,9 @@ def test_d07_complete_sources_archives_and_original_tests_remain_pinned() -> Non
     assert hashlib.sha256(original_raw).hexdigest() == provenance["original_tests_sha256"]
     originals = json.loads(original_raw)
     assert approved.keys() <= originals.keys()
+    predecessors = d07_predecessors(ROOT)
     for path, digest in originals.items():
-        raw = read_historical_test_bytes(ROOT, path).replace(b"\r\n", b"\n")
-        raw = preserved_d09_predecessor_test_bytes(path, raw)
+        raw = predecessors[path]
         current = hashlib.sha256(raw).hexdigest()
         if path in approved:
             pin = approved[path]
