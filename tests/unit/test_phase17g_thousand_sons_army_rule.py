@@ -187,6 +187,37 @@ def test_twist_of_fate_modifies_ap_and_rejects_drift_or_closed_window() -> None:
 
     assert status.status_kind is not LifecycleStatusKind.INVALID
     state = _require_state(lifecycle)
+    # Channel the Warp resolves its native perils choice before manifestation.
+    perils_request = status.decision_request
+    assert perils_request is not None
+    assert perils_request.decision_type == "select_mortal_wound_model"
+    perils_payload = cast(dict[str, JsonValue], perils_request.payload)
+    assert perils_payload["remaining_mortal_wounds"] == 2
+    ritual_payload = cast(dict[str, JsonValue], option.payload)
+    manifesting_model_id = ritual_payload["manifesting_model_instance_id"]
+    perils_option = next(
+        candidate
+        for candidate in perils_request.options
+        if candidate.option_id != manifesting_model_id
+    )
+    wounds_before_perils = sum(
+        model.current_wounds for model in _unit_by_id(state, unit_instance_id=MANIFESTER_ID).own_models
+    )
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-thousand-sons-twist-perils-result",
+            request=perils_request,
+            selected_option_id=perils_option.option_id,
+        )
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert sum(
+        model.current_wounds for model in _unit_by_id(state, unit_instance_id=MANIFESTER_ID).own_models
+    ) == wounds_before_perils - 2
+    assert any(
+        model.model_instance_id == manifesting_model_id and model.current_wounds > 0
+        for model in _unit_by_id(state, unit_instance_id=MANIFESTER_ID).own_models
+    )
     assert any(
         event.event_type == "thousand_sons_twist_of_fate_manifested"
         for event in lifecycle.decision_controller.event_log.records
