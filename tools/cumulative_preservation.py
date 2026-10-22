@@ -28,7 +28,7 @@ CONTENT_BASE = "5f509724da25a2f6ded0c2739a8e7c84bdf59c91"
 CONTENT_TREE = "1fa709a167abb369932e651f89babbd0034941c5"
 SOURCE_ID = "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb"
 # The only permitted post-freeze edit is the None-to-commit literal below.
-SOURCE_COMMIT: str | None = None
+SOURCE_COMMIT: str | None = "2de13f43770c0bd4f29d3b3152771ba287780b04"
 SELF = "tools/cumulative_preservation.py"
 BASE, MEASURED, TREE = legacy.BASE, legacy.MEASURED, legacy.TREE
 ARCHIVE, EXTERNAL = legacy.ARCHIVE, legacy.EXTERNAL
