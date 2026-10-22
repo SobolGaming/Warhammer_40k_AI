@@ -1,7 +1,8 @@
 """Invocation-local pure proof reuse and fresh, owned source scans.
 
 No filesystem or Git result is cached. Each scan reads every byte again and checks
-ownership afresh. Only the already checked ancestors within that scan are shared.
+ownership afresh. Pure hashes may reuse identical complete bytes within one bounded
+invocation; only checked ancestors within the current scan share ownership checks.
 """
 
 from __future__ import annotations
@@ -16,6 +17,40 @@ from contextvars import ContextVar
 from functools import wraps
 from pathlib import Path
 from typing import Any, cast
+
+# Bound retained raw payload independently of the complete source/input corpus.
+_DIGEST_LIMIT = 512 * 1024 * 1024
+
+
+class _Digests:
+    def __init__(self, limit: int = _DIGEST_LIMIT) -> None:
+        self.limit = limit
+        self.retained = 0
+        self.entries: dict[tuple[Callable[..., Any], str], tuple[bytes, str]] = {}
+
+    def digest(self, path: str, raw: bytes) -> str:
+        function = hashlib.sha256
+        key = (function, path)
+        previous = self.entries.get(key)
+        if previous is not None and previous[0] == raw:
+            return previous[1]
+        result = function(raw).hexdigest()
+        if previous is not None:
+            self.retained -= len(previous[0])
+            del self.entries[key]
+        if len(raw) <= self.limit - self.retained:
+            self.entries[key] = (raw, result)
+            self.retained += len(raw)
+        return result
+
+
+_DIGESTS: ContextVar[_Digests | None] = ContextVar("digests", default=None)
+
+
+def _source_digest(path: str, raw: bytes) -> str:
+    digests = _DIGESTS.get()
+    return hashlib.sha256(raw).hexdigest() if digests is None else digests.digest(path, raw)
+
 
 _PROOFS: ContextVar[set[tuple[Callable[..., None], bytes, bytes, str]] | None] = ContextVar(
     "proofs", default=None
@@ -33,9 +68,14 @@ def invocation[F: Callable[..., Any]](function: F) -> F:
     def wrapped(*args: Any, **kwargs: Any) -> Any:
         token = _PROOFS.set(set())
         owners_token = _OWNERS.set({})
+        digests = _Digests()
+        digests_token = _DIGESTS.set(digests)
         try:
             return function(*args, **kwargs)
         finally:
+            digests.entries.clear()
+            digests.retained = 0
+            _DIGESTS.reset(digests_token)
             _OWNERS.reset(owners_token)
             _PROOFS.reset(token)
 
@@ -150,7 +190,7 @@ def source_hashes(root: Path, names: set[str]) -> dict[str, str]:
             or not _same_file(closed, after)
         ):
             raise ValueError("Cumulative source changed during owned read: " + name)
-        result[name] = hashlib.sha256(raw).hexdigest()
+        result[name] = _source_digest(name, raw)
     for path, before in directories.items():
         after = os.lstat(path)
         if (before.st_dev, before.st_ino, before.st_mode) != (

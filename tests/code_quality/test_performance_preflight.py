@@ -8,6 +8,7 @@ import json
 import os
 import subprocess
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -48,6 +49,7 @@ def test_recipe_cache_is_local_exact_and_validator_specific() -> None:
     assert calls[-2:] == ["first", "first"]
 
 
+@preflight.invocation
 def test_owned_scan_reads_new_bytes_even_with_restored_mtime(tmp_path: Path) -> None:
     path = tmp_path / "source.py"
     path.write_bytes(b"before")
@@ -88,6 +90,7 @@ def test_owned_scan_rejects_aliases(tmp_path: Path, kind: str) -> None:
         preflight.source_hashes(root, {"nested/source.py"})
 
 
+@preflight.invocation
 def test_owned_scan_rejects_midread_change(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     path = tmp_path / "source.py"
     path.write_bytes(b"before")
@@ -101,6 +104,9 @@ def test_owned_scan_rejects_midread_change(tmp_path: Path, monkeypatch: pytest.M
             path.write_bytes(b"edited")
         return original(fd)
 
+    assert preflight.source_hashes(tmp_path, {"source.py"}) == {
+        "source.py": hashlib.sha256(b"before").hexdigest()
+    }
     monkeypatch.setattr(os, "fstat", mutate)
     with pytest.raises(ValueError, match="changed during owned read"):
         preflight.source_hashes(tmp_path, {"source.py"})
@@ -170,6 +176,7 @@ def test_owner_cache_uses_exact_inputs_defensive_copies_and_exception_cleanup() 
     assert len(calls) == 6
 
 
+@preflight.invocation
 def test_owned_scan_matches_independent_original_reader(tmp_path: Path) -> None:
     from tests.d07_geometry_containment import read_owned_geometry_member
 
@@ -182,10 +189,12 @@ def test_owned_scan_matches_independent_original_reader(tmp_path: Path) -> None:
         path = tmp_path / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(raw)
-    assert preflight.source_hashes(tmp_path, set(contents)) == {
+    expected = {
         name: hashlib.sha256(read_owned_geometry_member(tmp_path, name)).hexdigest()
         for name in contents
     }
+    assert preflight.source_hashes(tmp_path, set(contents)) == expected
+    assert preflight.source_hashes(tmp_path, set(contents)) == expected
 
 
 def test_native_discovery_matches_original_ignored_and_symlink_membership(tmp_path: Path) -> None:
@@ -319,3 +328,78 @@ def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
         control.write_bytes(raw.replace(old_pin.encode(), new_pin.encode(), 1))
     with pytest.raises(ValueError, match=r"Preflight successor activation|Preflight source"):
         successor._freeze(tmp_path)
+
+
+def test_pure_source_hash_memo_is_exact_bounded_and_validator_specific(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    assert preflight._DIGEST_LIMIT == 512 * 1024 * 1024
+    calls: list[str] = []
+    sha = hashlib.sha256
+
+    def first(raw: bytes) -> Any:
+        calls.append("first")
+        return sha(raw)
+
+    def second(raw: bytes) -> Any:
+        calls.append("second")
+        return sha(raw)
+
+    monkeypatch.setattr(preflight, "hashlib", SimpleNamespace(sha256=first))
+    memo = preflight._Digests(8)
+    assert memo.digest("a", b"1234") == sha(b"1234").hexdigest()
+    assert memo.digest("a", b"1234") == sha(b"1234").hexdigest()
+    assert calls == ["first"]
+    assert memo.digest("b", b"1234") == sha(b"1234").hexdigest()
+    assert len(calls) == 2
+    assert memo.retained == 8
+    assert memo.digest("a", b"5678") == sha(b"5678").hexdigest()
+    assert len(calls) == 3
+    assert memo.retained == 8
+    assert memo.digest("overflow", b"more") == sha(b"more").hexdigest()
+    assert len(memo.entries) == 2
+    assert memo.retained == 8
+    assert memo.digest("a", b"larger-than-cap") == sha(b"larger-than-cap").hexdigest()
+    assert memo.retained == 4
+    assert (first, "a") not in memo.entries
+    monkeypatch.setattr(preflight, "hashlib", SimpleNamespace(sha256=second))
+    assert memo.digest("b", b"1234") == sha(b"1234").hexdigest()
+    assert calls[-1] == "second"
+    assert memo.retained == 8
+    assert sum(len(raw) for raw, _ in memo.entries.values()) == memo.retained <= memo.limit
+
+
+def test_pure_source_hash_memo_resets_after_nested_exceptions_and_new_invocations() -> None:
+    assert preflight._DIGESTS.get() is None
+    scopes: list[preflight._Digests] = []
+
+    @preflight.invocation
+    def outer() -> None:
+        current = preflight._DIGESTS.get()
+        assert current is not None
+        assert current.retained == 0
+        scopes.append(current)
+        preflight._source_digest("a", b"original")
+        assert current.retained == len(b"original")
+
+        @preflight.invocation
+        def inner() -> None:
+            nested = preflight._DIGESTS.get()
+            assert nested is not None
+            assert nested is not current
+            assert nested.retained == 0
+            preflight._source_digest("a", b"changed")
+            raise ValueError("nested failure")
+
+        with pytest.raises(ValueError, match="nested failure"):
+            inner()
+        assert preflight._DIGESTS.get() is current
+        assert current.retained == len(b"original")
+        raise ValueError("outer failure")
+
+    for _ in range(2):
+        with pytest.raises(ValueError, match="outer failure"):
+            outer()
+        assert preflight._DIGESTS.get() is None
+    assert scopes[0] is not scopes[1]
+    assert all(scope.retained == 0 and not scope.entries for scope in scopes)

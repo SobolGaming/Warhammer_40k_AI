@@ -5026,11 +5026,11 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "058ed43a3b1884850f202fc457982c3f4c27b0ce63c0cd6dd7c999a7daf1b807",
+      "after_sha256": "ea8d411dd7c028244cd67851d7ce4f080371c1461556feb23717b45c4738c236",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ff846782a6748558e30dbc90d05f1cee16ab3f994f80870f467c8dfb1b02c0fe"
+          "after": "c8c4a2f5e03e84be454f9849fc9f5cd214d95880117db5aab7b3f87b79365ed6"
         },
         "test_generated_inventory_changes_only_reviewed_perils_metadata": {
           "before": null,
@@ -5046,11 +5046,11 @@
         },
         "test_owned_scan_matches_independent_original_reader": {
           "before": null,
-          "after": "17bf5a4157738315f022f8dbc76ebd149e678288aa4662f81f81154867535587"
+          "after": "0e2b55604f64fe3fc9a18d29ecb7a2d910a68c3ddfd8b240d958c6c1aece66f2"
         },
         "test_owned_scan_reads_new_bytes_even_with_restored_mtime": {
           "before": null,
-          "after": "e9f4fd429efe00070f09ee17d2309b2a05dd784d68d7f615abfd991edeeb68c4"
+          "after": "9065e3b8f775702cb497f9f1787c9ad96c6a0773d8d1e615ec1b02d8f72e896b"
         },
         "test_owned_scan_rejects_aliases": {
           "before": null,
@@ -5058,7 +5058,7 @@
         },
         "test_owned_scan_rejects_midread_change": {
           "before": null,
-          "after": "a36a8cf9c805d15de4d80032154b199b419a2b5f89da709087d2eb0040c224f4"
+          "after": "ba8191c25e3eb580d12df5c8d7283ad4f280f56ffbcc4d93aa0ee96a887aa8f8"
         },
         "test_owner_cache_uses_exact_inputs_defensive_copies_and_exception_cleanup": {
           "before": null,
@@ -5071,6 +5071,14 @@
         "test_public_smoke_gate_revalidates_and_refuses_midrun_change": {
           "before": null,
           "after": "cdb07b4c0dc343e92848496ec5ce9452efc7bc1d3013adefe88403706fb0dcdb"
+        },
+        "test_pure_source_hash_memo_is_exact_bounded_and_validator_specific": {
+          "before": null,
+          "after": "d6e5980600bf7266b38781e857a56dc71fbbdf80431b349e987446f009ad73a9"
+        },
+        "test_pure_source_hash_memo_resets_after_nested_exceptions_and_new_invocations": {
+          "before": null,
+          "after": "22e27aca10c04bc7b06bef02edebdc4488e9c0c7d195c73310572d8f31e56915"
         },
         "test_recipe_cache_is_local_exact_and_validator_specific": {
           "before": null,
@@ -18006,15 +18014,31 @@
     },
     "tools/performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "e69e8c25e8c922bf81ed3aec337e43e907de209eaf4f39d9180a59ac083d21be",
+      "after_sha256": "1616043ec399c20ddef85de75c033ac93d41d9c0bde89b33a849029a89e0e991",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e64b66268e5240880c5102ce878623ef71f1203a58d9ff832221453c305a6c14"
+          "after": "af85906f3f6669e9ba2c8b2e3dac91a04f215e02a03495ee7a25a765c571d85e"
+        },
+        "_Digests": {
+          "before": null,
+          "after": "78228ca80fcc6b16bb19539a3c026fa6bec4b3ef6115e9dd0d2864c7c5ded601"
+        },
+        "_Digests.__init__": {
+          "before": null,
+          "after": "4d0a4feb5fa17add8c3a073509183f2fe4b77a50b96c3439849478bd11d64e8f"
+        },
+        "_Digests.digest": {
+          "before": null,
+          "after": "78c24a71f69b9d1101b7e6d1b4dd492ea37254648aca2768e473ce36d91f6809"
         },
         "_same_file": {
           "before": null,
           "after": "f2571ea1ad65d29b8ff92e8a2562f2f37fc1315eddc1ee23a7010c2921bb366a"
+        },
+        "_source_digest": {
+          "before": null,
+          "after": "09cc284b4ef7f73cdc185620920e18cc6754aae232ab3f354c389778ae2e065e"
         },
         "discovered_sources": {
           "before": null,
@@ -18022,7 +18046,7 @@
         },
         "invocation": {
           "before": null,
-          "after": "cab662abc1b519d647b900257888ea41e68bc795205d772c70becfd31794c3ac"
+          "after": "1d02d89962ffe207152783c4976aebe1abd0bde2abf72c46dc5ff5d7f71236d4"
         },
         "owner_proof": {
           "before": null,
@@ -18034,17 +18058,17 @@
         },
         "source_hashes": {
           "before": null,
-          "after": "8231048bde96008f7a0a5ec398614e50f767f2191d7c19da8b178202eeba57f9"
+          "after": "d26a0c020749dab219ba8b24eb9e9ae553eed62903256f9726d28109c3aac2fd"
         }
       }
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "5bc0843333938525b83e217943b8f162d7c5e6644776b5b2c165fe7883ba25e1",
+      "after_sha256": "3a3076cc4cffff0c3c84b913f4d9a15c2bc74d0cd7d63eb9b08e3ba2f8e3c11a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "40c2e47447f7639e695376ac5731912d85c6d76654153597a4a05b84841a1f9e"
+          "after": "a284b3cdf421b80a3374448cedec5a4650cc2368f7ba21e0df8f693a98291725"
         },
         "_assessment": {
           "before": null,
