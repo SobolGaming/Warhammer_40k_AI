@@ -176,7 +176,9 @@ def accepted_operation_map(root: Path) -> dict[str, Any]:
 def producing_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     """Requalify only declared symbolic metadata; every workload byte stays exact."""
     from tools.performance_policy import owner_hashes
+    from tools.performance_preflight_successor import measurement_inputs
 
+    current = measurement_inputs(root, current)
     freeze = _freeze(root)
     _git(root, "merge-base", "--is-ancestor", PRODUCING_COMMIT, freeze)
     measured: dict[str, str] = json.loads(

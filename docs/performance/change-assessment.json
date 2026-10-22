@@ -2760,11 +2760,15 @@
     },
     "scripts/check_performance_policy.py": {
       "before_sha256": "520da31556b55271ce74af77e553281d5974e6faf9b8baf23bcd8b5a76605b12",
-      "after_sha256": "94f76732f9d2f70006a5009b4f1624e85890159ed669437b5807e0a324e4b890",
+      "after_sha256": "211658e8b50b0bb1f443b5389d815a221e1e218c1d475f909b32fa2959cb4d75",
       "owners": {
+        "@module": {
+          "before": "49fc81fc3951fdcedab7cb2b0f62867313d7828aae3a09bce8e55652b185957f",
+          "after": "b489dd0002f837bad4346e9a8381b62e849db1cab8058acb02930bf4813a7b8c"
+        },
         "validate_current": {
           "before": "b7f165e16b5e2dd615d8038c524079e232ef827d44b2eb5712b641b256977893",
-          "after": "e49d77bb50819c06213ee65d65a24f14492448da8f2a892e46237ad87a3bb33f"
+          "after": "75d7a873e9517d64a285883531e07391f09b6990d68b3674c2e22d55538cb829"
         }
       }
     },
@@ -5020,6 +5024,40 @@
         }
       }
     },
+    "tests/code_quality/test_performance_preflight.py": {
+      "before_sha256": null,
+      "after_sha256": "93602c96aba0af5bc6342cfde686b5b99a6236ae32660344a08c996096a797a0",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a770946c2d5f061e63f4bcc28f6fdd419ae89f9c9391bac3dd97e69f11d91427"
+        },
+        "test_owned_scan_reads_new_bytes_even_with_restored_mtime": {
+          "before": null,
+          "after": "e9f4fd429efe00070f09ee17d2309b2a05dd784d68d7f615abfd991edeeb68c4"
+        },
+        "test_owned_scan_rejects_aliases": {
+          "before": null,
+          "after": "24b70a42829eafe2232665d2c44e5310343775fbad34917c22611c2f4d056db7"
+        },
+        "test_owned_scan_rejects_midread_change": {
+          "before": null,
+          "after": "a36a8cf9c805d15de4d80032154b199b419a2b5f89da709087d2eb0040c224f4"
+        },
+        "test_perils_admission_has_only_an_exact_governance_exception": {
+          "before": null,
+          "after": "edbbcd58d572d61421a8dcc8ab7712943b40ff12aaaac1e42376881d826ceafd"
+        },
+        "test_public_smoke_gate_revalidates_and_refuses_midrun_change": {
+          "before": null,
+          "after": "cdb07b4c0dc343e92848496ec5ce9452efc7bc1d3013adefe88403706fb0dcdb"
+        },
+        "test_recipe_cache_is_local_exact_and_validator_specific": {
+          "before": null,
+          "after": "e256ebefe1d859316af81ca6a48dbdb5898d58598d4453d6fe5030164767acb3"
+        }
+      }
+    },
     "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
       "before_sha256": "ba518e7f4f4c225ed3b9509fa3fd95492bd73e0be77a0a847ced44ffcb9cd979",
       "after_sha256": "6950af8fefe2a62e96e5fa1b4d3f759e2a26b2178f64dbac7de70bc305342b7f",
@@ -5066,7 +5104,7 @@
     },
     "tests/code_quality/test_qualification40_successor.py": {
       "before_sha256": null,
-      "after_sha256": "7305e4721433de43298408cdc02dc6d9fd614228697b20912add65ab60423821",
+      "after_sha256": "5a1f745da1d751f9c0be22ade0500831862381687c5de23d248e7269b64561d3",
       "owners": {
         "@module": {
           "before": null,
@@ -5090,7 +5128,7 @@
         },
         "test_qualification_producing_inputs_allows_only_anchor_literal": {
           "before": null,
-          "after": "ddaee25dce8b82ce8f1d25076482422294547818d5d6f59e7252a4e04ae187ba"
+          "after": "fd427be33bea72af7ca29fa2d7f898abe62da8afcafd026e80a715fb0c996978"
         },
         "test_qualification_rejects_live_fixture_source_evidence_or_control_drift": {
           "before": null,
@@ -5175,6 +5213,28 @@
         "test_reactive_inventory_prevalidation_and_resolver_share_one_predicate": {
           "before": null,
           "after": "2d9edb8c9ba22874d227c4e13c08bf762302a7fc6a1eb2e4580a97187e641441"
+        }
+      }
+    },
+    "tests/code_quality/test_thousand_sons_perils_preservation.py": {
+      "before_sha256": null,
+      "after_sha256": "90536a554564d41a7dc3aa8f2e66ce5374f5ebade673344283923c394853c41a",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a1c00a845350309805d5578141f8b200c769a6c5289e1cbade1a4b6871628f46"
+        },
+        "source_copy": {
+          "before": null,
+          "after": "9ee04c99dc7b9471d0ccbd968df67a0614fe6d53f9b69ed7732a94a578588ee2"
+        },
+        "test_perils_successor_preserves_complete_source_and_original_test_bytes": {
+          "before": null,
+          "after": "514d8626ccc45b64363bcdae663421984e6a5c885ed8c1ed70f867f384873a5c"
+        },
+        "test_perils_successor_rejects_source_drift_and_blind_repins": {
+          "before": null,
+          "after": "d852114a6df2096217e78ca3e36a4b886b30896854339c282f6d2bf193406c91"
         }
       }
     },
@@ -17636,6 +17696,16 @@
         }
       }
     },
+    "tests/unit/test_phase17g_thousand_sons_army_rule.py": {
+      "before_sha256": "164b74babdb28ec0b67c821951c32821402e7caf9181e55669fcbccde44d9373",
+      "after_sha256": "75105d6dc3eba760dce048c4a158b574bec2e9dd414ecc610349109d5d60914b",
+      "owners": {
+        "test_twist_of_fate_modifies_ap_and_rejects_drift_or_closed_window": {
+          "before": "4493378e57b766d36cb65869a79cf811bd2b2582ac851a76aa7df5941a12590a",
+          "after": "8f16cf9640f12af5b3b3d216b2d7edf874044791d0212f365dbec451c716d5fc"
+        }
+      }
+    },
     "tests/unit/test_phase17n_primary_scoring_spatial_evidence.py": {
       "before_sha256": "7b6276643dc3f2683fbebb0368faa29fb399840c630e23595ca840e93f4046ab",
       "after_sha256": "2a846f2f5a2373b03abc0ecfff5f311c274bfd573002e7ee22190558b10ed6a2",
@@ -17774,11 +17844,11 @@
     },
     "tools/cumulative_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "98dae9a0fd0509d1478c81459c8fb5120954438f0fa5d1059b7415702a38333a",
+      "after_sha256": "a2809fcd041552d8e5948590fa9d8a4baf57001bcc58e8167c1b3cf361548987",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b006e2162d7825c6390c38f7605cb4cfe88726dbe4b86b6e287032eb9f17a79f"
+          "after": "350e2555a753e1f6dc5b5322c43c772198ad67f48ad1fe51af0dd74e2d364299"
         },
         "_ast": {
           "before": null,
@@ -17810,7 +17880,7 @@
         },
         "assert_recipe": {
           "before": null,
-          "after": "8355443b7540311b04e690ab950316b3a1ba5781b75b76ab43c315a0aa2a4491"
+          "after": "cb1e0ac8c23285c6aac06438facd680a9d5baa63c79807cd38580d97f0db1293"
         },
         "assessment_map_inputs": {
           "before": null,
@@ -17822,7 +17892,7 @@
         },
         "d07_predecessors": {
           "before": null,
-          "after": "558cbabae2eda681d272c41930034482e200544988f9f135b20671f8f640b051"
+          "after": "db6f3527ae94ecbbd3142353726ef97082359f0f6a8f4b7ff701d77e507a2b29"
         },
         "expected_inputs": {
           "before": null,
@@ -17866,7 +17936,7 @@
         },
         "verify_live": {
           "before": null,
-          "after": "6bb7c73c47ddae0d4103031207d778dee98ccf2148b1b4a93dcedc8482307e1d"
+          "after": "9e8e6dda94f9486e3c734c765096564237fb612e397b28bf33aaa953525f17ce"
         },
         "verify_owner_ledger": {
           "before": null,
@@ -17894,11 +17964,83 @@
     },
     "tools/performance_policy.py": {
       "before_sha256": "cbc427774b6d8bb1e30af96310bd94d48eeffd28c99a87254aa9c90e9a0ee37d",
-      "after_sha256": "678f7e8c7c652fb48f89e2753fd42bc8426892906f581ea76072a5fd7976e13d",
+      "after_sha256": "bd0a045666a236c7513362a1b120fbccfd179ba8dec4697620f1554ac84d4066",
       "owners": {
+        "_governance": {
+          "before": "17fc3516b1b70de0265751c066ea4b96e974abc788cab3ab661baadb214c5a77",
+          "after": "e9fef867248f730e19416e3eb5ebcbe45706cb14cbd3364e960e25b231b53349"
+        },
         "_validate_single_comparison": {
           "before": "a2dc06d1df9081b71ecceb81556842f3262626ee4615a7ac2328c32abe52054e",
           "after": "149d1ce66e6f87b070ac0ddd911109bd5d4e0123940f0bcfc09485edad091e70"
+        }
+      }
+    },
+    "tools/performance_preflight.py": {
+      "before_sha256": null,
+      "after_sha256": "a5ab9a9fab150d9fb16cc869e5e6c7baa00dfae446139b49aeb5c24ff91fb6ef",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "93e8ef4db267dd004c98c72e085549de62492147d74e75a169463c17d2788714"
+        },
+        "_same_file": {
+          "before": null,
+          "after": "7d6b83187091ae4b10e6c0352fe47837e533d65473899b915e73d44c756789f0"
+        },
+        "invocation": {
+          "before": null,
+          "after": "6ac987a556e3dc48f6fb019730fc417b63fd04dad22513f3ed9fc5b99cd1e48f"
+        },
+        "recipe_proof": {
+          "before": null,
+          "after": "30c875dd17ca8dcfbb1d4a828eeb823244a1f7509f87997e31eb5395f0a7cc03"
+        },
+        "source_hashes": {
+          "before": null,
+          "after": "6df6e97716a04659ec87e4ec436df24d66c31970242dc4eb2718590e62d4e424"
+        }
+      }
+    },
+    "tools/performance_preflight_successor.py": {
+      "before_sha256": null,
+      "after_sha256": "e7b0ccbf77a1dd4139364acea539f74628bb28a9f2d975641f5c2f6bbd39486b",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "3f64456fd384ea99ed6d494c3bb924ec9478696d0508665d7554c2054f0515a0"
+        },
+        "_assessment": {
+          "before": null,
+          "after": "b540d37d8be59d07e1c1afea891ac8f9adfff56291ca006fb17616de2cac7f74"
+        },
+        "_freeze": {
+          "before": null,
+          "after": "79d19959b236eab72fbba808b5424cf5f0924993edc108771ff72da624022f9d"
+        },
+        "_git": {
+          "before": null,
+          "after": "674e65e2f37e6aff2076ef8b6ecd11db1f667d8974a82dfa5268e156fa557bdc"
+        },
+        "_read": {
+          "before": null,
+          "after": "2f79ad57ec0d0a33d097dd79c8c6d781a9b53a5929305865f3d2f8321a2e89e5"
+        },
+        "_sha": {
+          "before": null,
+          "after": "8f72dbfdc310957eeb857f007dc7be9414470c6878c7300c4da70e2c18567e8f"
+        },
+        "current_source": {
+          "before": null,
+          "after": "0e04e84ca076fa94709f1cb9f16f40875d6f45bcbf0254c1d5a52b7388bc1f29"
+        },
+        "measurement_inputs": {
+          "before": null,
+          "after": "449ad788bd1e67ebc372e91dcde2db84d878c2035766e0c2c0e45f3400311875"
+        },
+        "preceding_control": {
+          "before": null,
+          "after": "af91f8d177b8882e155f23280604fe834c5235bc58e2822ea1d99e8862daf414"
         }
       }
     },
@@ -17926,7 +18068,7 @@
     },
     "tools/performance_qualification_successor.py": {
       "before_sha256": null,
-      "after_sha256": "c606bc5f60f923158f9cc84bf4c0385acabcf12f1fdba8fa54e459e6c635b0fa",
+      "after_sha256": "f02faa899f7091553407a2d782ff0f16209f9db3fe23480112491bea1a794890",
       "owners": {
         "@module": {
           "before": null,
@@ -17950,7 +18092,7 @@
         },
         "_read": {
           "before": null,
-          "after": "1a626bd75812032180f591d0719bd979e8a2e131d22a6ae2f3ab4b53220c9165"
+          "after": "680e411995c316e9e9b263cf077d6c9770f158d219ac6b00c5a971a1b868da5a"
         },
         "_sha": {
           "before": null,
@@ -17970,7 +18112,7 @@
         },
         "expected_source": {
           "before": null,
-          "after": "1497af564d6772f69d8f2acefb325c412a3b44461f625250a5ac20b6f09b9e12"
+          "after": "93c78e3159b39a55dfb95bf2e3c3a11b84eee9f0da9cba02963c7a9bb0090dda"
         },
         "preceding_control": {
           "before": null,
@@ -17982,7 +18124,7 @@
         },
         "producing_inputs": {
           "before": null,
-          "after": "8d6fddd4263c94538fc05ba34d01949ba9c0555195713b91af60222d640cbc4f"
+          "after": "022e55a777192bf9c075982e56784156bd0b5570333594770b40005333171b22"
         }
       }
     },
@@ -18011,6 +18153,44 @@
         "validate_generated_evidence": {
           "before": null,
           "after": "3da5b9bfffc582c0d59550f6b49ddc171a000630345d7937ea5a2deb251625cd"
+        }
+      }
+    },
+    "tools/thousand_sons_perils_preservation.py": {
+      "before_sha256": null,
+      "after_sha256": "2e9ef0110809dde8b380e04a7b608095672c10ea39b8cfc9aff8318002320894",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "4d83f7c6f91883280ec4f402a22b8e9174c28a7bd4fabb3c364bd9e6e5d09b70"
+        },
+        "_freeze": {
+          "before": null,
+          "after": "b42f625a9d8879fdb8a7d990c59ce1ef9e685107e5bc1bf7106bcc355583f19c"
+        },
+        "_git": {
+          "before": null,
+          "after": "674e65e2f37e6aff2076ef8b6ecd11db1f667d8974a82dfa5268e156fa557bdc"
+        },
+        "_read": {
+          "before": null,
+          "after": "2238ccd1b3c5a1daa68d910915d8a9de3dfad0f9b2a6afc636de89e9797f0be8"
+        },
+        "_sha": {
+          "before": null,
+          "after": "8f72dbfdc310957eeb857f007dc7be9414470c6878c7300c4da70e2c18567e8f"
+        },
+        "current_source": {
+          "before": null,
+          "after": "7baa7d02a0381ab881470572dd235d52f2f7166ffb72c8d7264d3b12b149ce4f"
+        },
+        "preceding_control": {
+          "before": null,
+          "after": "beed3cdf114290dd68f9576313702e7f1e40f8f34122d6d65a71474f8ba0826d"
+        },
+        "preceding_test": {
+          "before": null,
+          "after": "6beffe435919250fbfd405a27057f8c27845d3f036e24ff53181fa5e7cf27bf0"
         }
       }
     }
@@ -22320,6 +22500,14 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "tests/code_quality/test_performance_preflight.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Exact bounded preflight successor or retained Perils admission. Untimed admission tooling remains part of whole-command timing; raw component arms are reused only through exact unchanged measurement input proof.",
+      "source_obligation": "Preserve complete current pre/post source admission, owned physical bytes, all Git provenance and the original finite Perils assertions.",
+      "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
+    },
     "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
       "category": "governance",
       "operations": [],
@@ -22375,6 +22563,14 @@
       "rationale": "Exact PR587-to-current owner changes: tests/code_quality/test_section21_authority.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+    },
+    "tests/code_quality/test_thousand_sons_perils_preservation.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Exact bounded preflight successor or retained Perils admission. Untimed admission tooling remains part of whole-command timing; raw component arms are reused only through exact unchanged measurement input proof.",
+      "source_obligation": "Preserve complete current pre/post source admission, owned physical bytes, all Git provenance and the original finite Perils assertions.",
+      "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     },
     "tests/conftest.py": {
       "category": "measured_workload",
@@ -27918,6 +28114,16 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "tests/unit/test_phase17g_thousand_sons_army_rule.py": {
+      "category": "measured_workload",
+      "operations": [
+        "d07-fixed-fixture-and-native-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Retained native Perils continuation regression uses the prior literal fixture operation. Original assertions and the exact added test block remain authenticated.",
+      "source_obligation": "Preserve complete current pre/post source admission, owned physical bytes, all Git provenance and the original finite Perils assertions.",
+      "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
+    },
     "tests/unit/test_phase17n_primary_scoring_spatial_evidence.py": {
       "category": "measured_workload",
       "operations": [
@@ -28032,6 +28238,22 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "tools/performance_preflight.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Exact bounded preflight successor or retained Perils admission. Untimed admission tooling remains part of whole-command timing; raw component arms are reused only through exact unchanged measurement input proof.",
+      "source_obligation": "Preserve complete current pre/post source admission, owned physical bytes, all Git provenance and the original finite Perils assertions.",
+      "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
+    },
+    "tools/performance_preflight_successor.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Exact bounded preflight successor or retained Perils admission. Untimed admission tooling remains part of whole-command timing; raw component arms are reused only through exact unchanged measurement input proof.",
+      "source_obligation": "Preserve complete current pre/post source admission, owned physical bytes, all Git provenance and the original finite Perils assertions.",
+      "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
+    },
     "tools/performance_qualification_measurements.py": {
       "category": "governance",
       "operations": [],
@@ -28063,6 +28285,14 @@
       "rationale": "Exact PR587-to-current owner changes: tools/performance_tool_inputs_v3.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+    },
+    "tools/thousand_sons_perils_preservation.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Exact bounded preflight successor or retained Perils admission. Untimed admission tooling remains part of whole-command timing; raw component arms are reused only through exact unchanged measurement input proof.",
+      "source_obligation": "Preserve complete current pre/post source admission, owned physical bytes, all Git provenance and the original finite Perils assertions.",
+      "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     }
   },
   "milestone": "ordinary",

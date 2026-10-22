@@ -20,6 +20,7 @@ from tools import performance_category_migration as legacy
 from tools import performance_qualification_successor as successor
 from tools import performance_reconstruction_campaign as reconstruction
 from tools import performance_tool_inputs as original
+from tools.performance_preflight import recipe_proof, source_hashes
 
 SCHEMA = "cumulative-preservation-pr587-v1"
 NAMESPACE = "data/source_audits/cumulative_preservation_v1"
@@ -200,8 +201,9 @@ def verify_live(root: Path) -> str:
         )
     if names != expected.keys():
         raise ValueError("Reviewed cumulative source membership changed.")
+    actual = source_hashes(root, names)
     for name, pin in expected.items():
-        if _sha(_read(root, name)) != pin:
+        if actual[name] != pin:
             raise ValueError("Reviewed migration source/data changed: " + name)
     verify_owner_ledger(root)
     verify_control_transformations(root)
@@ -249,6 +251,7 @@ def _ast(raw: bytes) -> Any:
     return fields(ast.parse(raw))
 
 
+@recipe_proof
 def assert_recipe(before: bytes, current: bytes, recipe: dict[str, Any]) -> None:
     """Apply only frozen field/statement edits, then compare the entire AST.
 

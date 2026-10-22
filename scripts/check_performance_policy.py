@@ -33,6 +33,7 @@ from tools.performance_policy import (
     validate_comparison,
     validate_full_game,
 )
+from tools.performance_preflight import invocation
 from tools.performance_tool_inputs import (
     SCHEMA as HISTORICAL_TOOL_SCHEMA,
 )
@@ -173,6 +174,7 @@ def validate_smoke_report(report: dict[str, object], *, binding: dict[str, objec
             raise ValueError("Smoke case limit exceeded.")
 
 
+@invocation
 def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[str, object]:
     from warhammer40k_core.build_identity import verified_engine_build_identity
 

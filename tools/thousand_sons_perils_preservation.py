@@ -32,7 +32,9 @@ def _read(root: Path, name: str) -> bytes:
 
     if root.absolute() != root.resolve(strict=True):
         raise ValueError("Aliased perils successor root.")
-    return read_owned_geometry_member(root, name)
+    from tools.performance_preflight_successor import preceding_control as preflight_control
+
+    return preflight_control(root, name, read_owned_geometry_member(root, name))
 
 
 def _git(root: Path, *args: str) -> bytes:
@@ -63,6 +65,9 @@ def _freeze(root: Path) -> str:
 
 
 def preceding_control(root: Path, name: str, raw: bytes) -> bytes:
+    from tools.performance_preflight_successor import preceding_control as preflight_control
+
+    raw = preflight_control(root, name, raw)
     if name not in {STAGE, CUMULATIVE}:
         return raw
     _freeze(root)
@@ -118,4 +123,6 @@ def current_source(root: Path, previous: dict[str, str]) -> dict[str, str]:
     for name in (STAGE, CUMULATIVE):
         preceding_control(root, name, _read(root, name))
     preceding_test(root, TEST, _read(root, TEST))
-    return previous | {name: _sha(_read(root, name)) for name in CHANGED}
+    from tools.performance_preflight_successor import current_source as preflight_source
+
+    return preflight_source(root, previous | {name: _sha(_read(root, name)) for name in CHANGED})

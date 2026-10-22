@@ -179,6 +179,7 @@ def _governance(path: str) -> bool:
         "README.md",
         ".pre-commit-config.yaml",
         ".gitignore",
+        "tools/thousand_sons_perils_preservation.py",
     } or path.startswith(
         (
             "docs/",

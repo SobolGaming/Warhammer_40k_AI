@@ -122,13 +122,16 @@ def test_qualification_map_mutation_cannot_inherit_historical_credit(
 def test_qualification_producing_inputs_allows_only_anchor_literal() -> None:
     current = policy.runtime_inputs(ROOT)
     producing = stage.producing_inputs(ROOT, current)
+    from tools.performance_preflight_successor import measurement_inputs
+
+    current = measurement_inputs(ROOT, current)
     assert {k for k in current if current[k] != producing[k]} == {
         stage.SELF,
         policy.MAP,
         "tests/code_quality/test_qualification40_successor.py",
     }
     assert current.keys() == producing.keys()
-    wrong = dict(current)
+    wrong = policy.runtime_inputs(ROOT)
     wrong.pop(stage.SELF)
     with pytest.raises(ValueError, match="collector omitted"):
         stage.producing_inputs(ROOT, wrong)
