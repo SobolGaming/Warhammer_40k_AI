@@ -22,13 +22,13 @@ from tools import performance_tool_inputs as original
 
 SCHEMA = "cumulative-preservation-pr587-v1"
 NAMESPACE = "data/source_audits/cumulative_preservation_v1"
-REGISTRY_SHA = "d569c085401f3e3faa897994c8e7b980a2821ab8b66ea748f4b4982eb1e7f2aa"
+REGISTRY_SHA = "8b0a1bd64c64d97c3833e7a178cb69c0bf63712db41957cefd8fb61b4ca416f3"
 ACCEPTED = "b75bfcf352e3e8bb5346e210a6b427a7af3a4242"
 CONTENT_BASE = "5f509724da25a2f6ded0c2739a8e7c84bdf59c91"
 CONTENT_TREE = "1fa709a167abb369932e651f89babbd0034941c5"
 SOURCE_ID = "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb"
 # The only permitted post-freeze edit is the None-to-commit literal below.
-SOURCE_COMMIT: str | None = "8b7c19ed04b5b74628553972b456d78fe67799f3"
+SOURCE_COMMIT: str | None = None
 SELF = "tools/cumulative_preservation.py"
 BASE, MEASURED, TREE = legacy.BASE, legacy.MEASURED, legacy.TREE
 ARCHIVE, EXTERNAL = legacy.ARCHIVE, legacy.EXTERNAL
@@ -196,6 +196,7 @@ def verify_live(root: Path) -> str:
         if _sha(_read(root, name)) != pin:
             raise ValueError("Reviewed migration source/data changed: " + name)
     verify_owner_ledger(root)
+    verify_control_transformations(root)
     return original.digest({"schema": SCHEMA, "source": expected, "freeze": SOURCE_COMMIT})
 
 
@@ -285,6 +286,37 @@ def verify_owner_ledger(root: Path) -> None:
                 raise ValueError("Cumulative source authority changed.")
 
 
+def verify_control_transformations(root: Path) -> None:
+    """Preserve seven authenticated control stages and all three exact changes."""
+    rows = _json(root, NAMESPACE + "/control-transformations.json")
+    if {row["path"] for row in rows} != legacy.CONTROLS or len(rows) != len(legacy.CONTROLS):
+        raise ValueError("Cumulative control admission membership changed.")
+    for row in rows:
+        name = row["path"]
+        historical = _git(root, "show", str(legacy.SOURCE_COMMIT) + ":" + name)
+        if name == legacy.SELF:
+            marker = b"\nSOURCE_COMMIT: str | None = None"
+            if historical.count(marker) != 1:
+                raise ValueError("Historical control activation occurrence changed.")
+            historical = historical.replace(
+                marker, f'\nSOURCE_COMMIT: str | None = "{legacy.SOURCE_COMMIT}"'.encode(), 1
+            )
+        baseline = _git(root, "show", CONTENT_BASE + ":" + name)
+        accepted = _git(root, "show", ACCEPTED + ":" + name)
+        current = _read(root, name)
+        for raw, key in (
+            (historical, "legacy_sha256"),
+            (baseline, "pr587_sha256"),
+            (accepted, "accepted_sha256"),
+            (current, "current_sha256"),
+        ):
+            if _sha(raw) != row[key]:
+                raise ValueError("Cumulative exact control-stage bytes changed: " + name)
+        assert_recipe(historical, accepted, row["historical_to_accepted"])
+        assert_recipe(baseline, accepted, row["baseline_to_accepted"])
+        assert_recipe(accepted, current, row["accepted_to_integration"])
+
+
 def d07_predecessors(root: Path) -> dict[str, bytes]:
     """One atomic historical request; live proofs precede predecessor exposure."""
     from tests.category_migration_preservation import read_historical_test_bytes
@@ -334,6 +366,12 @@ def d07_predecessors(root: Path) -> dict[str, bytes]:
 def assessment_map_inputs(
     root: Path, *, archive: dict[str, object], current: dict[str, str], tools: dict[str, str]
 ) -> tuple[dict[str, str], dict[str, str]]:
+    directory = root / ASSESSMENT_MAP
+    if not directory.is_dir() or {p.name for p in directory.iterdir()} != {
+        "original-operation-map.json.txt",
+        "assessment-map-additions.json.txt",
+    }:
+        raise ValueError("Assessment map proof membership changed.")
     # Registry authentication is independent of report-supplied hashes.
     _registry(root)
     proof = _json(root, ASSESSMENT_MAP + "/assessment-map-additions.json.txt")

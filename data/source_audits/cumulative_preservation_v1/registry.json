@@ -41,7 +41,7 @@
     "input-routing.json": "981fc3a46947747b883d50c0acead82026cb5d3ed10195a9e1cd7f1b37aa1ded",
     "map/assessment-map-additions.json.txt": "6457d3ef2e6e6d037912e9067f75f83fc2e9f9ee00b8e7bc38d444aaa65bc023",
     "map/original-operation-map.json.txt": "6911a7443ca67907df6c68105e2150e2a311f81a4ad90fe2f84fc3609e08447c",
-    "owner-ledger.json": "2a3f576a38eba7695de8af39e007a789db4e3af24094ca12a5172f37ef665b47",
+    "owner-ledger.json": "96aedbc89f4338c498c2db9934a72ebcab7018222daa0096f973464be5f5776c",
     "predecessors/tests/code_quality/test_order102_fight_completion_ownership.py.txt": "970490c9a26e006675c2eb100901cbd2a6bc9c5f7d2a0e042eaeff6ac4d96870",
     "predecessors/tests/code_quality/test_order130_source_authority.py.txt": "259f0f061b2f7da648627cae74e065582210ddc66c9f4e2f1061e0956bc38563",
     "predecessors/tests/code_quality/test_order135_current_core_audit.py.txt": "148ee2963292d29e9b97516fb528d635534b2392502dca3526212d886a7b1966",
@@ -74,7 +74,9 @@
     "predecessors/tests/unit/test_phase17g_orks_army_rule.py.txt": "01088de40e1d3b3166f6dd9ca18f7c9d0c2b8a806ce2639665cd6c3223395807",
     "predecessors/tests/unit/test_phase17g_tau_empire_army_rule.py.txt": "1ec85f7190dfd7c6bca5cc76ac1a0dc094e6f08ad9c1efe89ebc59b95ee0bbeb",
     "predecessors/tests/unit/test_phase17g_tyranids_army_rule.py.txt": "9b8d85efcd140e524fd66a1a550577fb9249dbe9cb76a580625565c29f03cbb0",
-    "predecessors/tests/unit/test_public_firing_deck_history.py.txt": "14b47c877477f7dddb2edfda518097ef300cd7740d89ba92019e0c428b0f4a1c"
+    "predecessors/tests/unit/test_public_firing_deck_history.py.txt": "14b47c877477f7dddb2edfda518097ef300cd7740d89ba92019e0c428b0f4a1c",
+    "control-transformations.json": "9af23d7c3753fdd9c008c97e3971125687c8cbb1c40d7fd20690459d28b13be5",
+    "evidence/task-18/design-phase/AELDARI-SOURCE-AND-CONSUMER-ADJUDICATION.json.txt": "ce36cf9efdbf60889cf20240411f6e9c775fc5db8d4fc10375a157409d69c689"
   },
   "integration_members": [
     "tools/cumulative_preservation.py",
@@ -153,7 +155,9 @@
     "data/source_audits/cumulative_preservation_v1/predecessors/tests/unit/test_phase17g_tau_empire_army_rule.py.txt",
     "data/source_audits/cumulative_preservation_v1/predecessors/tests/unit/test_phase17g_tyranids_army_rule.py.txt",
     "data/source_audits/cumulative_preservation_v1/predecessors/tests/unit/test_public_firing_deck_history.py.txt",
-    "data/source_audits/cumulative_preservation_v1/registry.json"
+    "data/source_audits/cumulative_preservation_v1/registry.json",
+    "data/source_audits/cumulative_preservation_v1/control-transformations.json",
+    "data/source_audits/cumulative_preservation_v1/evidence/task-18/design-phase/AELDARI-SOURCE-AND-CONSUMER-ADJUDICATION.json.txt"
   ],
   "status": "LOCAL_QUALIFICATION_REVIEW_CANDIDATE",
   "measurement_credit": "ORIGINAL_PRODUCING_COHORT_ONLY"

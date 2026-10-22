@@ -233,8 +233,16 @@ def test_every_d07_recipe_is_independently_sensitive_to_extra_or_removed_asserti
             cumulative.assert_recipe(before, forged, recipe)
         tree = ast.parse(current)
         assertions = [node for node in ast.walk(tree) if isinstance(node, ast.Assert)]
-        assert assertions
-        assertions[0].test = ast.Constant(value=True)
+        if assertions:
+            assertions[0].test = ast.Constant(value=True)
+        else:
+            # Shared helper/type modules carry structure, rather than test asserts.
+            literal = next(
+                n
+                for n in ast.walk(tree)
+                if isinstance(n, ast.Constant) and isinstance(n.value, str)
+            )
+            literal.value += ":unreviewed-helper-statement"
         with pytest.raises(ValueError, match="whole-module"):
             cumulative.assert_recipe(before, ast.unparse(tree).encode(), recipe)
         refused.append(path)
@@ -261,3 +269,48 @@ def test_ignored_consumer_inputs_do_not_escape_membership(copy_source: Path, nam
     finally:
         path.unlink()
         ignore.write_bytes(before)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "tests/category_migration_preservation.py",
+        "tests/code_quality/test_category_migration_preservation.py",
+        "tools/core_rules_order95_audit.py",
+    ],
+)
+def test_three_changed_controls_require_exact_transformations(path: str) -> None:
+    rows = cumulative._json(ROOT, cumulative.NAMESPACE + "/control-transformations.json")
+    row = next(r for r in rows if r["path"] == path)
+    before = subprocess.check_output(
+        ["git", "show", cumulative.CONTENT_BASE + ":" + path], cwd=ROOT
+    )
+    after = subprocess.check_output(["git", "show", cumulative.ACCEPTED + ":" + path], cwd=ROOT)
+    cumulative.assert_recipe(before, after, row["baseline_to_accepted"])
+    forged = after + b"\nassert False, 'unreviewed control'\n"
+    row["baseline_to_accepted"]["after_sha256"] = hashlib.sha256(forged).hexdigest()
+    with pytest.raises(ValueError, match="whole-module"):
+        cumulative.assert_recipe(before, forged, row["baseline_to_accepted"])
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "tests/unit/test_order97_facade_evidence.py",
+        "tests/unit/test_phase13b_shooting_declarations.py",
+    ],
+)
+def test_d09_successor_does_not_repin_historical_after_or_assertions(path: str) -> None:
+    from tests.category_migration_preservation import read_historical_test_bytes
+    from tests.d09_test_preservation_helpers import preserved_d09_predecessor_test_bytes
+
+    recipe = cumulative._json(ROOT, cumulative.NAMESPACE + "/d09-recipes.json")[path]
+    stage = (ROOT / cumulative.NAMESPACE / recipe["d09_stage"]).read_bytes()
+    current = read_historical_test_bytes(ROOT, path).replace(b"\r\n", b"\n")
+    assert hashlib.sha256(stage).hexdigest() == recipe["d09_after_sha256"]
+    predecessor = preserved_d09_predecessor_test_bytes(path, stage)
+    assert hashlib.sha256(predecessor).hexdigest() == recipe["d09_before_sha256"]
+    assert hashlib.sha256(predecessor).hexdigest() == recipe["d07_effective_sha256"]
+    cumulative.assert_recipe(stage, current, recipe)
+    with pytest.raises(ValueError, match="whole-module"):
+        cumulative.assert_recipe(stage, current + b"\nassert False\n", recipe)

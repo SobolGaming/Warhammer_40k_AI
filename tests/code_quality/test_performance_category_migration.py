@@ -127,13 +127,33 @@ def test_original_reconstruction_bridge_remains_separate() -> None:
         )
 
 
-def test_direct_v2_api_still_rejects_migrated_current_source() -> None:
+def test_direct_v2_api_still_rejects_migrated_current_source(tmp_path: Path) -> None:
+    # The legacy API requires actual worker ancestry. A deliberately dirty
+    # checkout at that genuine historical commit reaches its separate inventory
+    # refusal; the cumulative qualification HEAD is never reparented or relabeled.
+    root = tmp_path / "historical-dirty-checkout"
+    shutil.copytree(
+        ROOT,
+        root,
+        ignore=shutil.ignore_patterns(
+            ".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"
+        ),
+    )
+    shutil.copytree(ROOT / ".git", root / ".git")
+    subprocess.run(
+        ["git", "update-ref", "--no-deref", "HEAD", migration.MEASURED], cwd=root, check=True
+    )
+    subprocess.run(["git", "read-tree", migration.MEASURED], cwd=root, check=True)
+    assert (
+        subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root).decode().strip()
+        == migration.MEASURED
+    )
     with pytest.raises(ValueError, match="do not equal the current source inventory"):
         original.comparison_inputs(
-            ROOT,
+            root,
             base=migration.BASE,
             family=original.FAMILY,
-            head_input_digest=original.digest(policy.runtime_inputs(ROOT)),
+            head_input_digest=original.digest(policy.runtime_inputs(root)),
             measured_head=migration.MEASURED,
             schema=fresh.SCHEMA,
         )
