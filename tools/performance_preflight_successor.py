@@ -11,7 +11,7 @@ BASE = "fc1f186aeb0d143983e22382778177f4648438fd"
 BASE_SOURCE = "36ab649ef5a6ab747587dc25d05336252db5a4eb148dc24619e6881c38efec42"
 SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE_COMMIT: str | None = "cd57e8e8697c90f3e2699b0953fbc585f47f8991"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -20,7 +20,7 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_performance_preflight.py",
-        "be7a85f7285ece5ec3ec4a69979c14a9b113ca51e391ab6a73f11fa83e942f9e",
+        "1270d35ded44b9120f5cc0a53dad9ea3f938ca47a40902d61e6b5febca4c5f9d",
     ),
     (
         "tests/code_quality/test_qualification40_successor.py",
@@ -28,7 +28,7 @@ _PIN_ROWS = (
     ),
     (
         "tools/cumulative_preservation.py",
-        "a2809fcd041552d8e5948590fa9d8a4baf57001bcc58e8167c1b3cf361548987",
+        "b3e21ddadefb08e1a26c2a0f0d702252bd2ef23ebb2f2593b821cc000fc13e5a",
     ),
     (
         "tools/performance_policy.py",
@@ -36,7 +36,7 @@ _PIN_ROWS = (
     ),
     (
         "tools/performance_preflight.py",
-        "68380225cc0b8c7655550b423edfeeb3e232688e49596aa3f54f7661bd7a853f",
+        "e69e8c25e8c922bf81ed3aec337e43e907de209eaf4f39d9180a59ac083d21be",
     ),
     (
         "tools/performance_qualification_successor.py",

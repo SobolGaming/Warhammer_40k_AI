@@ -183,3 +183,57 @@ def test_owned_scan_matches_independent_original_reader(tmp_path: Path) -> None:
         name: hashlib.sha256(read_owned_geometry_member(tmp_path, name)).hexdigest()
         for name in contents
     }
+
+
+def test_native_discovery_matches_original_ignored_and_symlink_membership(tmp_path: Path) -> None:
+    root = tmp_path / "repository"
+    files = (
+        "src/deep/.ignored.data",
+        "src/deep/source.py",
+        "tests/.hidden/ignored.py",
+        "tests/nested/UPPER.PY",
+        "tests/nested/not-selected.txt",
+        "tools/.ignored/tool.py",
+        "scripts/nested/script.py",
+        "contracts/.hidden/schema.json",
+        "conformance/typescript/src/.ignored/input.ts",
+        "conformance/typescript/src/UPPER.TS",
+        "conformance/typescript/src/not-selected.py",
+        "outside/not-selected.py",
+    )
+    for name in files:
+        path = root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"source")
+    external = tmp_path / "external"
+    external.mkdir()
+    (external / "must-not-follow.py").write_bytes(b"outside")
+    (root / "tests/nested/linked.py").symlink_to(external, target_is_directory=True)
+    (root / "tests/nested/unselected-link").symlink_to(external, target_is_directory=True)
+    (root / "src/linked-directory").symlink_to(external, target_is_directory=True)
+    (root / "scripts/missing.py").symlink_to(external / "missing.py")
+    (root / "tools/linked.py").symlink_to(external / "must-not-follow.py")
+    (root / "tests/nested/ordinary-directory.py").mkdir()
+    original: set[str] = set()
+    for prefix, pattern in (
+        ("src", "*"),
+        ("tests", "*.py"),
+        ("tools", "*.py"),
+        ("scripts", "*.py"),
+        ("contracts", "*"),
+        ("conformance/typescript/src", "*.ts"),
+    ):
+        original.update(
+            path.relative_to(root).as_posix()
+            for path in (root / prefix).rglob(pattern)
+            if path.is_file() or path.is_symlink()
+        )
+    actual = preflight.discovered_sources(root)
+    assert actual == original
+    assert "tests/nested/linked.py" in actual
+    assert "src/linked-directory" in actual
+    assert "scripts/missing.py" in actual
+    assert not any("must-not-follow" in name for name in actual)
+    assert "tests/nested/ordinary-directory.py" not in actual
+    assert "outside/not-selected.py" not in actual
+    assert preflight.discovered_sources(tmp_path / "absent") == set()

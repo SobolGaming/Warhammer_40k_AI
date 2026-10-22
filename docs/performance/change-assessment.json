@@ -5026,11 +5026,15 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "be7a85f7285ece5ec3ec4a69979c14a9b113ca51e391ab6a73f11fa83e942f9e",
+      "after_sha256": "1270d35ded44b9120f5cc0a53dad9ea3f938ca47a40902d61e6b5febca4c5f9d",
       "owners": {
         "@module": {
           "before": null,
           "after": "a770946c2d5f061e63f4bcc28f6fdd419ae89f9c9391bac3dd97e69f11d91427"
+        },
+        "test_native_discovery_matches_original_ignored_and_symlink_membership": {
+          "before": null,
+          "after": "22da88ae078c9061240c7e50201cc9de520643be5495ae861b8b20d2c1198331"
         },
         "test_owned_scan_matches_independent_original_reader": {
           "before": null,
@@ -17852,11 +17856,11 @@
     },
     "tools/cumulative_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "a2809fcd041552d8e5948590fa9d8a4baf57001bcc58e8167c1b3cf361548987",
+      "after_sha256": "b3e21ddadefb08e1a26c2a0f0d702252bd2ef23ebb2f2593b821cc000fc13e5a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "350e2555a753e1f6dc5b5322c43c772198ad67f48ad1fe51af0dd74e2d364299"
+          "after": "3757b28fb38b3f71a575eb7df43ab39dc379fa322cf568d3f8dc373d643c5884"
         },
         "_ast": {
           "before": null,
@@ -17944,7 +17948,7 @@
         },
         "verify_live": {
           "before": null,
-          "after": "9e8e6dda94f9486e3c734c765096564237fb612e397b28bf33aaa953525f17ce"
+          "after": "5ea7077a49b02b3de962ed31568211b355410d94dd468b2b66cb9a821ddf0610"
         },
         "verify_owner_ledger": {
           "before": null,
@@ -17994,15 +17998,19 @@
     },
     "tools/performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "68380225cc0b8c7655550b423edfeeb3e232688e49596aa3f54f7661bd7a853f",
+      "after_sha256": "e69e8c25e8c922bf81ed3aec337e43e907de209eaf4f39d9180a59ac083d21be",
       "owners": {
         "@module": {
           "before": null,
-          "after": "f745892fbb13db92d7c653038c98ebbd98811a45043be276535b16d5fc579672"
+          "after": "e64b66268e5240880c5102ce878623ef71f1203a58d9ff832221453c305a6c14"
         },
         "_same_file": {
           "before": null,
           "after": "f2571ea1ad65d29b8ff92e8a2562f2f37fc1315eddc1ee23a7010c2921bb366a"
+        },
+        "discovered_sources": {
+          "before": null,
+          "after": "4cdb572eb8f721bee4dfae7d9b12bc6f808384d657f6ca682328f4a5d29a4476"
         },
         "invocation": {
           "before": null,
@@ -18024,11 +18032,11 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "727eca754c134027d796eb3756e085c5fc7fd65d57d1aae39e44332a1858201f",
+      "after_sha256": "c27782f0bc4c4dcf542799310dfc45a0a2f71af75da3953042b4d21639a36e15",
       "owners": {
         "@module": {
           "before": null,
-          "after": "df84d524bb348fb171e30b8cf9260ed6b80e048a7f5e146a43d6c063f7a36114"
+          "after": "d7b7ea0222e70686b9a2f20a67b236226465388ce29b8ed5ee8bfc74621a09b9"
         },
         "_assessment": {
           "before": null,

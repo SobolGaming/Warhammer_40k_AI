@@ -6,6 +6,7 @@ ownership afresh. Only the already checked ancestors within that scan are shared
 
 from __future__ import annotations
 
+import fnmatch
 import hashlib
 import json
 import os
@@ -72,6 +73,37 @@ def owner_proof[F: Callable[..., dict[str, str]]](function: F) -> F:
         return result
 
     return cast(F, wrapped)
+
+
+def discovered_sources(root: Path) -> set[str]:
+    """Enumerate the same ignored-source corpus without per-member Path bookkeeping."""
+    result: set[str] = set()
+    for prefix, pattern in (
+        ("src", "*"),
+        ("tests", "*.py"),
+        ("tools", "*.py"),
+        ("scripts", "*.py"),
+        ("contracts", "*"),
+        ("conformance/typescript/src", "*.ts"),
+    ):
+        start = root / prefix
+        if not start.is_dir():
+            continue
+        pending = [(str(start), prefix)]
+        while pending:
+            directory, relative = pending.pop()
+            with os.scandir(directory) as entries:
+                for entry in entries:
+                    name = relative + "/" + entry.name
+                    if entry.is_dir(follow_symlinks=False):
+                        if os.path.isjunction(entry.path):
+                            raise ValueError("Aliased cumulative source directory.")
+                        pending.append((entry.path, name))
+                    if fnmatch.fnmatch(entry.name, pattern) and (
+                        entry.is_file() or entry.is_symlink()
+                    ):
+                        result.add(name)
+    return result
 
 
 def source_hashes(root: Path, names: set[str]) -> dict[str, str]:

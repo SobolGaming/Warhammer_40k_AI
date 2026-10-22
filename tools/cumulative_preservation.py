@@ -20,7 +20,7 @@ from tools import performance_category_migration as legacy
 from tools import performance_qualification_successor as successor
 from tools import performance_reconstruction_campaign as reconstruction
 from tools import performance_tool_inputs as original
-from tools.performance_preflight import recipe_proof, source_hashes
+from tools.performance_preflight import discovered_sources, recipe_proof, source_hashes
 
 SCHEMA = "cumulative-preservation-pr587-v1"
 NAMESPACE = "data/source_audits/cumulative_preservation_v1"
@@ -186,19 +186,7 @@ def verify_live(root: Path) -> str:
         .split("\0")
     ) - {""}
     # Actual consumers also discover ignored Python, schema and TypeScript files.
-    for prefix, pattern in (
-        ("src", "*"),
-        ("tests", "*.py"),
-        ("tools", "*.py"),
-        ("scripts", "*.py"),
-        ("contracts", "*"),
-        ("conformance/typescript/src", "*.ts"),
-    ):
-        names.update(
-            p.relative_to(root).as_posix()
-            for p in (root / prefix).rglob(pattern)
-            if p.is_file() or p.is_symlink()
-        )
+    names.update(discovered_sources(root))
     if names != expected.keys():
         raise ValueError("Reviewed cumulative source membership changed.")
     actual = source_hashes(root, names)
