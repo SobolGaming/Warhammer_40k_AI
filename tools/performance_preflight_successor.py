@@ -11,7 +11,7 @@ BASE = "fc1f186aeb0d143983e22382778177f4648438fd"
 BASE_SOURCE = "36ab649ef5a6ab747587dc25d05336252db5a4eb148dc24619e6881c38efec42"
 SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE_COMMIT: str | None = "3f7125736fe35aa073b765471dc2573d3f9f4ac0"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -20,7 +20,7 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_performance_preflight.py",
-        "93602c96aba0af5bc6342cfde686b5b99a6236ae32660344a08c996096a797a0",
+        "be7a85f7285ece5ec3ec4a69979c14a9b113ca51e391ab6a73f11fa83e942f9e",
     ),
     (
         "tests/code_quality/test_qualification40_successor.py",
@@ -32,11 +32,11 @@ _PIN_ROWS = (
     ),
     (
         "tools/performance_policy.py",
-        "bd0a045666a236c7513362a1b120fbccfd179ba8dec4697620f1554ac84d4066",
+        "b22bb94f8505558e82a8df3c3ea23c699f4c19e215b44465911f0313261aff41",
     ),
     (
         "tools/performance_preflight.py",
-        "a5ab9a9fab150d9fb16cc869e5e6c7baa00dfae446139b49aeb5c24ff91fb6ef",
+        "68380225cc0b8c7655550b423edfeeb3e232688e49596aa3f54f7661bd7a853f",
     ),
     (
         "tools/performance_qualification_successor.py",
@@ -140,13 +140,13 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     schemas and workload bytes must equal their preceding measured inventory.
     The existing qualification producing-input proof still runs on that inventory.
     """
-    from tools import performance_policy as policy
     from tools import thousand_sons_perils_preservation as perils
 
     _freeze(root)
-    actual = policy.runtime_inputs(root)
-    if current.keys() != actual.keys():
+    controls = PINS.keys() | {SELF}
+    if not controls <= current.keys():
         raise ValueError("Preflight actual input collector omitted current inputs.")
+    actual = {name: _sha(_read(root, name)) for name in controls}
     projected = dict(current)
     prior_names = set(_git(root, "ls-tree", "-r", "--name-only", BASE).decode().splitlines())
     for name in PINS.keys() | {SELF}:

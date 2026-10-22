@@ -5026,11 +5026,15 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "93602c96aba0af5bc6342cfde686b5b99a6236ae32660344a08c996096a797a0",
+      "after_sha256": "be7a85f7285ece5ec3ec4a69979c14a9b113ca51e391ab6a73f11fa83e942f9e",
       "owners": {
         "@module": {
           "before": null,
           "after": "a770946c2d5f061e63f4bcc28f6fdd419ae89f9c9391bac3dd97e69f11d91427"
+        },
+        "test_owned_scan_matches_independent_original_reader": {
+          "before": null,
+          "after": "17bf5a4157738315f022f8dbc76ebd149e678288aa4662f81f81154867535587"
         },
         "test_owned_scan_reads_new_bytes_even_with_restored_mtime": {
           "before": null,
@@ -5043,6 +5047,10 @@
         "test_owned_scan_rejects_midread_change": {
           "before": null,
           "after": "a36a8cf9c805d15de4d80032154b199b419a2b5f89da709087d2eb0040c224f4"
+        },
+        "test_owner_cache_uses_exact_inputs_defensive_copies_and_exception_cleanup": {
+          "before": null,
+          "after": "24cc4c5dee0bedf669753d596a78c08f4bff2776f75d2cb471fc8f313cf308d0"
         },
         "test_perils_admission_has_only_an_exact_governance_exception": {
           "before": null,
@@ -17964,8 +17972,12 @@
     },
     "tools/performance_policy.py": {
       "before_sha256": "cbc427774b6d8bb1e30af96310bd94d48eeffd28c99a87254aa9c90e9a0ee37d",
-      "after_sha256": "bd0a045666a236c7513362a1b120fbccfd179ba8dec4697620f1554ac84d4066",
+      "after_sha256": "b22bb94f8505558e82a8df3c3ea23c699f4c19e215b44465911f0313261aff41",
       "owners": {
+        "@module": {
+          "before": "ac784ef7f6a1db6326b5102add78a7434b1866cdadc45a9d358ecb09816d4685",
+          "after": "b96d929545c0bd81fda6b6739291c0733acd2ea08f174b30bc5ac68dc327b947"
+        },
         "_governance": {
           "before": "17fc3516b1b70de0265751c066ea4b96e974abc788cab3ab661baadb214c5a77",
           "after": "e9fef867248f730e19416e3eb5ebcbe45706cb14cbd3364e960e25b231b53349"
@@ -17973,24 +17985,32 @@
         "_validate_single_comparison": {
           "before": "a2dc06d1df9081b71ecceb81556842f3262626ee4615a7ac2328c32abe52054e",
           "after": "149d1ce66e6f87b070ac0ddd911109bd5d4e0123940f0bcfc09485edad091e70"
+        },
+        "owner_hashes": {
+          "before": "924ec5df8f31ace704361cc7393c0333e0e444bbc7c0ff8c144e5ed9e63920c7",
+          "after": "d87e53a01a9323ed45efadd5777aded19dee8be1169b80962eaf5adb735d0998"
         }
       }
     },
     "tools/performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "a5ab9a9fab150d9fb16cc869e5e6c7baa00dfae446139b49aeb5c24ff91fb6ef",
+      "after_sha256": "68380225cc0b8c7655550b423edfeeb3e232688e49596aa3f54f7661bd7a853f",
       "owners": {
         "@module": {
           "before": null,
-          "after": "93e8ef4db267dd004c98c72e085549de62492147d74e75a169463c17d2788714"
+          "after": "f745892fbb13db92d7c653038c98ebbd98811a45043be276535b16d5fc579672"
         },
         "_same_file": {
           "before": null,
-          "after": "7d6b83187091ae4b10e6c0352fe47837e533d65473899b915e73d44c756789f0"
+          "after": "f2571ea1ad65d29b8ff92e8a2562f2f37fc1315eddc1ee23a7010c2921bb366a"
         },
         "invocation": {
           "before": null,
-          "after": "6ac987a556e3dc48f6fb019730fc417b63fd04dad22513f3ed9fc5b99cd1e48f"
+          "after": "cab662abc1b519d647b900257888ea41e68bc795205d772c70becfd31794c3ac"
+        },
+        "owner_proof": {
+          "before": null,
+          "after": "88056f281be9ba860cb0bcc8f445b5ef817620842ff8201cedf28d9e93440d6e"
         },
         "recipe_proof": {
           "before": null,
@@ -17998,17 +18018,17 @@
         },
         "source_hashes": {
           "before": null,
-          "after": "6df6e97716a04659ec87e4ec436df24d66c31970242dc4eb2718590e62d4e424"
+          "after": "8231048bde96008f7a0a5ec398614e50f767f2191d7c19da8b178202eeba57f9"
         }
       }
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "321ce4d4be919035101ca717a934faf52fd676020d588db3c8591635aa15d159",
+      "after_sha256": "60ed57a01a40a3f331a2e34d39b763afbb1c68931bb97434f2df3b5da1c804a4",
       "owners": {
         "@module": {
           "before": null,
-          "after": "cddcf7bb40e2a36e93943a4aca816aab9bb80ddff56291e9fd813040748d5bc7"
+          "after": "7ea0578456ef2b0a635728accdd97a4750b9bb125503f8d86511740f0b687460"
         },
         "_assessment": {
           "before": null,
@@ -18036,7 +18056,7 @@
         },
         "measurement_inputs": {
           "before": null,
-          "after": "449ad788bd1e67ebc372e91dcde2db84d878c2035766e0c2c0e45f3400311875"
+          "after": "3f701fd68681934f902df51b10ba04f7a2ae339b2ea86d255d353ca834654346"
         },
         "preceding_control": {
           "before": null,

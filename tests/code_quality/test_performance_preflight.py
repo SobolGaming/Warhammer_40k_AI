@@ -138,3 +138,48 @@ def test_perils_admission_has_only_an_exact_governance_exception() -> None:
 
     assert _governance("tools/thousand_sons_perils_preservation.py")
     assert not _governance("tools/thousand_sons_unreviewed_runtime.py")
+
+
+def test_owner_cache_uses_exact_inputs_defensive_copies_and_exception_cleanup() -> None:
+    calls: list[tuple[str, bytes | None]] = []
+
+    @preflight.owner_proof
+    def owner(path: str, content: bytes | None) -> dict[str, str]:
+        calls.append((path, content))
+        return {"owner": repr((path, content))}
+
+    @preflight.invocation
+    def validate() -> None:
+        result = owner("a.py", b"one")
+        expected = dict(result)
+        result["owner"] = "caller mutation"
+        assert owner("a.py", b"one") == expected
+        assert owner("b.py", b"one") != expected
+        assert owner("a.py", b"two") != expected
+        assert owner("a.py", None) != expected
+        raise ValueError("scope ended")
+
+    with pytest.raises(ValueError, match="scope ended"):
+        validate()
+    assert len(calls) == 4
+    owner("a.py", b"one")
+    owner("a.py", b"one")
+    assert len(calls) == 6
+
+
+def test_owned_scan_matches_independent_original_reader(tmp_path: Path) -> None:
+    from tests.d07_geometry_containment import read_owned_geometry_member
+
+    contents = {
+        "source.py": b"# exact source\r\n",
+        "nested/deep/evidence.bin": bytes(range(256)),
+        "nested/a spaced name.txt": b"immutable evidence\n",
+    }
+    for name, raw in contents.items():
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+    assert preflight.source_hashes(tmp_path, set(contents)) == {
+        name: hashlib.sha256(read_owned_geometry_member(tmp_path, name)).hexdigest()
+        for name in contents
+    }

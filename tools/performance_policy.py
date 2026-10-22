@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import cast
 
 from tools.performance_order103_exception import RECOGNITION, validate_owner_recognition
+from tools.performance_preflight import owner_proof
 from tools.performance_s25_rule_semantics import s25_rule_semantics_smoke_operations
 from tools.performance_tool_inputs import binding_enabled, validate_binding
 
@@ -84,6 +85,7 @@ def _strings(value: object) -> list[str]:
     return result
 
 
+@owner_proof
 def owner_hashes(path: str, content: bytes | None) -> dict[str, str]:
     if content is None:
         return {}
