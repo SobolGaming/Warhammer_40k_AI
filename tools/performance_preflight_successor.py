@@ -11,7 +11,7 @@ BASE = "fc1f186aeb0d143983e22382778177f4648438fd"
 BASE_SOURCE = "36ab649ef5a6ab747587dc25d05336252db5a4eb148dc24619e6881c38efec42"
 SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE_COMMIT: str | None = None
+FREEZE_COMMIT: str | None = "6dba60081a0d6cb22f2858d703d789608eb6744f"
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
