@@ -86,6 +86,7 @@ def test_explicit_content_route_retains_historical_measurement_identity() -> Non
     for name in ("info/grafts", "shallow", "objects/info/alternates"):
         assert not (ROOT / ".git" / name).exists()
     assert not subprocess.check_output(["git", "replace", "--list"], cwd=ROOT)
+    assert legacy.SOURCE_COMMIT is not None
     assert (
         subprocess.run(
             ["git", "merge-base", "--is-ancestor", legacy.SOURCE_COMMIT, "HEAD"], cwd=ROOT
@@ -242,6 +243,7 @@ def test_every_d07_recipe_is_independently_sensitive_to_extra_or_removed_asserti
                 for n in ast.walk(tree)
                 if isinstance(n, ast.Constant) and isinstance(n.value, str)
             )
+            assert isinstance(literal.value, str)
             literal.value += ":unreviewed-helper-statement"
         with pytest.raises(ValueError, match="whole-module"):
             cumulative.assert_recipe(before, ast.unparse(tree).encode(), recipe)
@@ -314,3 +316,26 @@ def test_d09_successor_does_not_repin_historical_after_or_assertions(path: str) 
     cumulative.assert_recipe(stage, current, recipe)
     with pytest.raises(ValueError, match="whole-module"):
         cumulative.assert_recipe(stage, current + b"\nassert False\n", recipe)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "tests/code_quality/test_order34_action_restrictions.py",
+        "tests/integration/test_fight_on_death_presence.py",
+        "tests/performance_evidence_helpers.py",
+    ],
+)
+def test_later_d07_successors_preserve_exact_separate_prerequisite_stages(path: str) -> None:
+    recipe = cumulative._json(ROOT, cumulative.NAMESPACE + "/later-d07-recipes.json")[path]
+    before = subprocess.check_output(
+        ["git", "show", cumulative.CONTENT_BASE + ":" + path], cwd=ROOT
+    )
+    current = (ROOT / path).read_bytes().replace(b"\r\n", b"\n")
+    assert hashlib.sha256(before).hexdigest() == recipe["before_sha256"]
+    assert hashlib.sha256(current).hexdigest() == recipe["after_sha256"]
+    cumulative.assert_recipe(before, current, recipe)
+    forged = current + b"\nassert False, 'unreviewed later successor'\n"
+    recipe["after_sha256"] = hashlib.sha256(forged).hexdigest()
+    with pytest.raises(ValueError, match="whole-module"):
+        cumulative.assert_recipe(before, forged, recipe)

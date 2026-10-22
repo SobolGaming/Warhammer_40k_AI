@@ -22,13 +22,13 @@ from tools import performance_tool_inputs as original
 
 SCHEMA = "cumulative-preservation-pr587-v1"
 NAMESPACE = "data/source_audits/cumulative_preservation_v1"
-REGISTRY_SHA = "8b0a1bd64c64d97c3833e7a178cb69c0bf63712db41957cefd8fb61b4ca416f3"
+REGISTRY_SHA = "ba78843b597acd3ef86f6b3f05c094b8267711bc9efb50876a746177bbbdf327"
 ACCEPTED = "b75bfcf352e3e8bb5346e210a6b427a7af3a4242"
 CONTENT_BASE = "5f509724da25a2f6ded0c2739a8e7c84bdf59c91"
 CONTENT_TREE = "1fa709a167abb369932e651f89babbd0034941c5"
 SOURCE_ID = "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb"
 # The only permitted post-freeze edit is the None-to-commit literal below.
-SOURCE_COMMIT: str | None = "2de13f43770c0bd4f29d3b3152771ba287780b04"
+SOURCE_COMMIT: str | None = None
 SELF = "tools/cumulative_preservation.py"
 BASE, MEASURED, TREE = legacy.BASE, legacy.MEASURED, legacy.TREE
 ARCHIVE, EXTERNAL = legacy.ARCHIVE, legacy.EXTERNAL
@@ -325,6 +325,11 @@ def d07_predecessors(root: Path) -> dict[str, bytes]:
     live_receipt = verify_live(root)
     verify_baseline(root)
     recipes = _json(root, NAMESPACE + "/d07-recipes.json")
+    later = _json(root, NAMESPACE + "/later-d07-recipes.json")
+    if recipes.keys() & later.keys():
+        raise ValueError("Historical and later D07 recipes overlap.")
+    recipes = recipes | later
+    canonical = {row["path"]: row for row in _json(root, NAMESPACE + "/baseline.json")}
     d09 = _json(root, NAMESPACE + "/d09-recipes.json")
     originals = _json(root, "data/source_audits/d07/original-tests.json")
     results = {}
@@ -352,7 +357,7 @@ def d07_predecessors(root: Path) -> dict[str, bytes]:
             if _sha(before) != recipe["before_sha256"] or _sha(live) != recipe["after_sha256"]:
                 raise ValueError("Cumulative D07 live/predecessor bytes changed: " + path)
             blob = hashlib.sha1(b"blob " + str(len(before)).encode() + b"\0" + before).hexdigest()
-            if blob != recipe["baseline_blob"]:
+            if blob != recipe["baseline_blob"] or blob != canonical[path]["git_oid"]:
                 raise ValueError("Cumulative predecessor is not its canonical Git blob.")
             assert_recipe(before, live, recipe)
             results[path] = before

@@ -76,7 +76,11 @@
     "predecessors/tests/unit/test_phase17g_tyranids_army_rule.py.txt": "9b8d85efcd140e524fd66a1a550577fb9249dbe9cb76a580625565c29f03cbb0",
     "predecessors/tests/unit/test_public_firing_deck_history.py.txt": "14b47c877477f7dddb2edfda518097ef300cd7740d89ba92019e0c428b0f4a1c",
     "control-transformations.json": "9af23d7c3753fdd9c008c97e3971125687c8cbb1c40d7fd20690459d28b13be5",
-    "evidence/task-18/design-phase/AELDARI-SOURCE-AND-CONSUMER-ADJUDICATION.json.txt": "ce36cf9efdbf60889cf20240411f6e9c775fc5db8d4fc10375a157409d69c689"
+    "evidence/task-18/design-phase/AELDARI-SOURCE-AND-CONSUMER-ADJUDICATION.json.txt": "ce36cf9efdbf60889cf20240411f6e9c775fc5db8d4fc10375a157409d69c689",
+    "later-d07-recipes.json": "a84177baf0d7e8bfbd27caaf9baf7c15faf279a0dc01b4e296b69e3cd8026a31",
+    "predecessors/tests/code_quality/test_order34_action_restrictions.py.txt": "25de6f828b57244cff84d8ec50a47d95efb3476c30a65f1017926b331ff48802",
+    "predecessors/tests/integration/test_fight_on_death_presence.py.txt": "30104bd3e02a18b7ec23dcccad9d1a52836aef1d83c3df1312a5701fbeed0b56",
+    "predecessors/tests/performance_evidence_helpers.py.txt": "f0926b93036bb6da198d153273355685e5b8b65305f2eb9be54affcdc401e5d4"
   },
   "integration_members": [
     "tools/cumulative_preservation.py",
@@ -157,7 +161,11 @@
     "data/source_audits/cumulative_preservation_v1/predecessors/tests/unit/test_public_firing_deck_history.py.txt",
     "data/source_audits/cumulative_preservation_v1/registry.json",
     "data/source_audits/cumulative_preservation_v1/control-transformations.json",
-    "data/source_audits/cumulative_preservation_v1/evidence/task-18/design-phase/AELDARI-SOURCE-AND-CONSUMER-ADJUDICATION.json.txt"
+    "data/source_audits/cumulative_preservation_v1/evidence/task-18/design-phase/AELDARI-SOURCE-AND-CONSUMER-ADJUDICATION.json.txt",
+    "data/source_audits/cumulative_preservation_v1/later-d07-recipes.json",
+    "data/source_audits/cumulative_preservation_v1/predecessors/tests/code_quality/test_order34_action_restrictions.py.txt",
+    "data/source_audits/cumulative_preservation_v1/predecessors/tests/integration/test_fight_on_death_presence.py.txt",
+    "data/source_audits/cumulative_preservation_v1/predecessors/tests/performance_evidence_helpers.py.txt"
   ],
   "status": "LOCAL_QUALIFICATION_REVIEW_CANDIDATE",
   "measurement_credit": "ORIGINAL_PRODUCING_COHORT_ONLY"

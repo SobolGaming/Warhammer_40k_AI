@@ -5,9 +5,10 @@ import hashlib
 import json
 from pathlib import Path
 
+from tools.cumulative_preservation import d07_predecessors
+
 from tests.d07_geometry_containment import verify_d07_geometry_containment
 from tests.support.section13_preservation import pre_section13_descriptor_bytes
-from tools.cumulative_preservation import d07_predecessors
 
 ROOT = Path(__file__).resolve().parents[2]
 ARCHIVE = ROOT / "data/source_audits/d07"

@@ -1,0 +1,2238 @@
+{
+  "tests/code_quality/test_order34_action_restrictions.py": {
+    "before_sha256": "25de6f828b57244cff84d8ec50a47d95efb3476c30a65f1017926b331ff48802",
+    "after_sha256": "42b011550184e5377296d5a325381a30f3912728846e61f8a6fab86244430124",
+    "edits": [
+      {
+        "kind": "splice",
+        "at": [
+          "body"
+        ],
+        "start": 15,
+        "end": 15,
+        "before": [],
+        "after": [
+          {
+            "_type": "FunctionDef",
+            "name": "test_r34_unrestricted_lookup_ceiling_is_inclusive_and_enforced",
+            "args": {
+              "_type": "arguments",
+              "posonlyargs": [],
+              "args": [
+                {
+                  "_type": "arg",
+                  "arg": "monkeypatch",
+                  "annotation": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "pytest",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "MonkeyPatch",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "type_comment": null
+                }
+              ],
+              "vararg": null,
+              "kwonlyargs": [],
+              "kw_defaults": [],
+              "kwarg": null,
+              "defaults": []
+            },
+            "body": [
+              {
+                "_type": "ImportFrom",
+                "module": "scripts",
+                "names": [
+                  {
+                    "_type": "alias",
+                    "name": "measure_action_restriction_live",
+                    "asname": "live"
+                  }
+                ],
+                "level": 0
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "budgets",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "json",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "loads",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [
+                    {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "BinOp",
+                          "left": {
+                            "_type": "Name",
+                            "id": "ROOT",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "op": {
+                            "_type": "Div"
+                          },
+                          "right": {
+                            "_type": "Constant",
+                            "value": "docs/performance/order34/budgets.json",
+                            "kind": null
+                          }
+                        },
+                        "attr": "read_text",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [],
+                      "keywords": []
+                    }
+                  ],
+                  "keywords": []
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "maximum",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Subscript",
+                  "value": {
+                    "_type": "Subscript",
+                    "value": {
+                      "_type": "Subscript",
+                      "value": {
+                        "_type": "Subscript",
+                        "value": {
+                          "_type": "Name",
+                          "id": "budgets",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "slice": {
+                          "_type": "Constant",
+                          "value": "live_cases",
+                          "kind": null
+                        },
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "slice": {
+                        "_type": "Constant",
+                        "value": "unrestricted",
+                        "kind": null
+                      },
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "slice": {
+                      "_type": "Constant",
+                      "value": "work_limits",
+                      "kind": null
+                    },
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "slice": {
+                    "_type": "Constant",
+                    "value": "rules_unit_view_by_id",
+                    "kind": null
+                  },
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "result",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "live",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "live_sample",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [],
+                  "keywords": [
+                    {
+                      "_type": "keyword",
+                      "arg": "profile",
+                      "value": {
+                        "_type": "Constant",
+                        "value": true,
+                        "kind": null
+                      }
+                    },
+                    {
+                      "_type": "keyword",
+                      "arg": "case",
+                      "value": {
+                        "_type": "Constant",
+                        "value": "unrestricted",
+                        "kind": null
+                      }
+                    }
+                  ]
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "counts",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Name",
+                    "id": "cast",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [
+                    {
+                      "_type": "Subscript",
+                      "value": {
+                        "_type": "Name",
+                        "id": "dict",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "slice": {
+                        "_type": "Tuple",
+                        "elts": [
+                          {
+                            "_type": "Name",
+                            "id": "str",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          {
+                            "_type": "Name",
+                            "id": "int",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          }
+                        ],
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    {
+                      "_type": "Subscript",
+                      "value": {
+                        "_type": "Name",
+                        "id": "result",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "slice": {
+                        "_type": "Constant",
+                        "value": "work_counts",
+                        "kind": null
+                      },
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    }
+                  ],
+                  "keywords": []
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "FunctionDef",
+                "name": "measured_result",
+                "args": {
+                  "_type": "arguments",
+                  "posonlyargs": [],
+                  "args": [],
+                  "vararg": null,
+                  "kwonlyargs": [
+                    {
+                      "_type": "arg",
+                      "arg": "profile",
+                      "annotation": {
+                        "_type": "Name",
+                        "id": "bool",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "type_comment": null
+                    },
+                    {
+                      "_type": "arg",
+                      "arg": "case",
+                      "annotation": {
+                        "_type": "Name",
+                        "id": "str",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "type_comment": null
+                    }
+                  ],
+                  "kw_defaults": [
+                    null,
+                    null
+                  ],
+                  "kwarg": null,
+                  "defaults": []
+                },
+                "body": [
+                  {
+                    "_type": "Assert",
+                    "test": {
+                      "_type": "Compare",
+                      "left": {
+                        "_type": "Name",
+                        "id": "profile",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "ops": [
+                        {
+                          "_type": "Is"
+                        }
+                      ],
+                      "comparators": [
+                        {
+                          "_type": "Constant",
+                          "value": true,
+                          "kind": null
+                        }
+                      ]
+                    },
+                    "msg": null
+                  },
+                  {
+                    "_type": "Assert",
+                    "test": {
+                      "_type": "Compare",
+                      "left": {
+                        "_type": "Name",
+                        "id": "case",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "ops": [
+                        {
+                          "_type": "Eq"
+                        }
+                      ],
+                      "comparators": [
+                        {
+                          "_type": "Constant",
+                          "value": "unrestricted",
+                          "kind": null
+                        }
+                      ]
+                    },
+                    "msg": null
+                  },
+                  {
+                    "_type": "Return",
+                    "value": {
+                      "_type": "Name",
+                      "id": "result",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    }
+                  }
+                ],
+                "decorator_list": [],
+                "returns": {
+                  "_type": "Subscript",
+                  "value": {
+                    "_type": "Name",
+                    "id": "dict",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "slice": {
+                    "_type": "Tuple",
+                    "elts": [
+                      {
+                        "_type": "Name",
+                        "id": "str",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      {
+                        "_type": "Name",
+                        "id": "object",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      }
+                    ],
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "type_comment": null,
+                "type_params": []
+              },
+              {
+                "_type": "Expr",
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "monkeypatch",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "setattr",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [
+                    {
+                      "_type": "Name",
+                      "id": "live",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    {
+                      "_type": "Constant",
+                      "value": "live_sample",
+                      "kind": null
+                    },
+                    {
+                      "_type": "Name",
+                      "id": "measured_result",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    }
+                  ],
+                  "keywords": []
+                }
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Subscript",
+                    "value": {
+                      "_type": "Name",
+                      "id": "counts",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "slice": {
+                      "_type": "Constant",
+                      "value": "rules_unit_view_by_id",
+                      "kind": null
+                    },
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Name",
+                  "id": "maximum",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Expr",
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Name",
+                    "id": "test_r34_003_live_consumers_stay_within_versioned_work_budgets",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [
+                    {
+                      "_type": "Constant",
+                      "value": "unrestricted",
+                      "kind": null
+                    }
+                  ],
+                  "keywords": []
+                }
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Subscript",
+                    "value": {
+                      "_type": "Name",
+                      "id": "counts",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "slice": {
+                      "_type": "Constant",
+                      "value": "rules_unit_view_by_id",
+                      "kind": null
+                    },
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "BinOp",
+                  "left": {
+                    "_type": "Name",
+                    "id": "maximum",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "op": {
+                    "_type": "Add"
+                  },
+                  "right": {
+                    "_type": "Constant",
+                    "value": 1,
+                    "kind": null
+                  }
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "With",
+                "items": [
+                  {
+                    "_type": "withitem",
+                    "context_expr": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "Name",
+                          "id": "pytest",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "attr": "raises",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [
+                        {
+                          "_type": "Name",
+                          "id": "AssertionError",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      ],
+                      "keywords": [
+                        {
+                          "_type": "keyword",
+                          "arg": "match",
+                          "value": {
+                            "_type": "Constant",
+                            "value": "rules_unit_view_by_id",
+                            "kind": null
+                          }
+                        }
+                      ]
+                    },
+                    "optional_vars": null
+                  }
+                ],
+                "body": [
+                  {
+                    "_type": "Expr",
+                    "value": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Name",
+                        "id": "test_r34_003_live_consumers_stay_within_versioned_work_budgets",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [
+                        {
+                          "_type": "Constant",
+                          "value": "unrestricted",
+                          "kind": null
+                        }
+                      ],
+                      "keywords": []
+                    }
+                  }
+                ],
+                "type_comment": null
+              }
+            ],
+            "decorator_list": [],
+            "returns": {
+              "_type": "Constant",
+              "value": null,
+              "kind": null
+            },
+            "type_comment": null,
+            "type_params": []
+          },
+          {
+            "_type": "FunctionDef",
+            "name": "test_r34_lookup_recalibration_preserves_authenticated_history",
+            "args": {
+              "_type": "arguments",
+              "posonlyargs": [],
+              "args": [
+                {
+                  "_type": "arg",
+                  "arg": "monkeypatch",
+                  "annotation": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "pytest",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "MonkeyPatch",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "type_comment": null
+                },
+                {
+                  "_type": "arg",
+                  "arg": "tmp_path",
+                  "annotation": {
+                    "_type": "Name",
+                    "id": "Path",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "type_comment": null
+                }
+              ],
+              "vararg": null,
+              "kwonlyargs": [],
+              "kw_defaults": [],
+              "kwarg": null,
+              "defaults": []
+            },
+            "body": [
+              {
+                "_type": "ImportFrom",
+                "module": "tests",
+                "names": [
+                  {
+                    "_type": "alias",
+                    "name": "performance_evidence_helpers",
+                    "asname": "historical"
+                  }
+                ],
+                "level": 0
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "name",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Constant",
+                  "value": "docs/performance/order34/budgets.json",
+                  "kind": null
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "original_bytes",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "historical",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "historical_input_bytes",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [
+                    {
+                      "_type": "Name",
+                      "id": "name",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    }
+                  ],
+                  "keywords": []
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "original",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "json",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "loads",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [
+                    {
+                      "_type": "Name",
+                      "id": "original_bytes",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    }
+                  ],
+                  "keywords": []
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "current",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "json",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "loads",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [
+                    {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "BinOp",
+                          "left": {
+                            "_type": "Name",
+                            "id": "ROOT",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "op": {
+                            "_type": "Div"
+                          },
+                          "right": {
+                            "_type": "Name",
+                            "id": "name",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          }
+                        },
+                        "attr": "read_bytes",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [],
+                      "keywords": []
+                    }
+                  ],
+                  "keywords": []
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Assert",
+                "test": {
+                  "_type": "Compare",
+                  "left": {
+                    "_type": "Subscript",
+                    "value": {
+                      "_type": "Subscript",
+                      "value": {
+                        "_type": "Subscript",
+                        "value": {
+                          "_type": "Subscript",
+                          "value": {
+                            "_type": "Name",
+                            "id": "original",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "slice": {
+                            "_type": "Constant",
+                            "value": "live_cases",
+                            "kind": null
+                          },
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "slice": {
+                          "_type": "Constant",
+                          "value": "unrestricted",
+                          "kind": null
+                        },
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "slice": {
+                        "_type": "Constant",
+                        "value": "work_limits",
+                        "kind": null
+                      },
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "slice": {
+                      "_type": "Constant",
+                      "value": "rules_unit_view_by_id",
+                      "kind": null
+                    },
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "ops": [
+                    {
+                      "_type": "Eq"
+                    }
+                  ],
+                  "comparators": [
+                    {
+                      "_type": "Constant",
+                      "value": 240,
+                      "kind": null
+                    }
+                  ]
+                },
+                "msg": null
+              },
+              {
+                "_type": "Assert",
+                "test": {
+                  "_type": "Compare",
+                  "left": {
+                    "_type": "Subscript",
+                    "value": {
+                      "_type": "Subscript",
+                      "value": {
+                        "_type": "Subscript",
+                        "value": {
+                          "_type": "Subscript",
+                          "value": {
+                            "_type": "Name",
+                            "id": "current",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "slice": {
+                            "_type": "Constant",
+                            "value": "live_cases",
+                            "kind": null
+                          },
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "slice": {
+                          "_type": "Constant",
+                          "value": "unrestricted",
+                          "kind": null
+                        },
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "slice": {
+                        "_type": "Constant",
+                        "value": "work_limits",
+                        "kind": null
+                      },
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "slice": {
+                      "_type": "Constant",
+                      "value": "rules_unit_view_by_id",
+                      "kind": null
+                    },
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "ops": [
+                    {
+                      "_type": "Eq"
+                    }
+                  ],
+                  "comparators": [
+                    {
+                      "_type": "Constant",
+                      "value": 270,
+                      "kind": null
+                    }
+                  ]
+                },
+                "msg": null
+              },
+              {
+                "_type": "Expr",
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "historical",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "assert_historical_report",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [
+                    {
+                      "_type": "Name",
+                      "id": "original",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    }
+                  ],
+                  "keywords": []
+                }
+              },
+              {
+                "_type": "With",
+                "items": [
+                  {
+                    "_type": "withitem",
+                    "context_expr": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "Name",
+                          "id": "pytest",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "attr": "raises",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [
+                        {
+                          "_type": "Name",
+                          "id": "ValueError",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      ],
+                      "keywords": [
+                        {
+                          "_type": "keyword",
+                          "arg": "match",
+                          "value": {
+                            "_type": "Constant",
+                            "value": "Unregistered or modified historical",
+                            "kind": null
+                          }
+                        }
+                      ]
+                    },
+                    "optional_vars": null
+                  }
+                ],
+                "body": [
+                  {
+                    "_type": "Expr",
+                    "value": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "Name",
+                          "id": "historical",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "attr": "assert_historical_report",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [
+                        {
+                          "_type": "Name",
+                          "id": "current",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      ],
+                      "keywords": []
+                    }
+                  }
+                ],
+                "type_comment": null
+              },
+              {
+                "_type": "With",
+                "items": [
+                  {
+                    "_type": "withitem",
+                    "context_expr": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "Name",
+                          "id": "monkeypatch",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "attr": "context",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [],
+                      "keywords": []
+                    },
+                    "optional_vars": {
+                      "_type": "Name",
+                      "id": "control",
+                      "ctx": {
+                        "_type": "Store"
+                      }
+                    }
+                  }
+                ],
+                "body": [
+                  {
+                    "_type": "Expr",
+                    "value": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "Name",
+                          "id": "control",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "attr": "setattr",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [
+                        {
+                          "_type": "Name",
+                          "id": "historical",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        {
+                          "_type": "Constant",
+                          "value": "historical_input_bytes",
+                          "kind": null
+                        },
+                        {
+                          "_type": "Lambda",
+                          "args": {
+                            "_type": "arguments",
+                            "posonlyargs": [],
+                            "args": [
+                              {
+                                "_type": "arg",
+                                "arg": "_name",
+                                "annotation": null,
+                                "type_comment": null
+                              }
+                            ],
+                            "vararg": null,
+                            "kwonlyargs": [],
+                            "kw_defaults": [],
+                            "kwarg": null,
+                            "defaults": []
+                          },
+                          "body": {
+                            "_type": "BinOp",
+                            "left": {
+                              "_type": "Name",
+                              "id": "original_bytes",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            },
+                            "op": {
+                              "_type": "Add"
+                            },
+                            "right": {
+                              "_type": "Constant",
+                              "value": {
+                                "_bytes": "0a"
+                              },
+                              "kind": null
+                            }
+                          }
+                        }
+                      ],
+                      "keywords": []
+                    }
+                  },
+                  {
+                    "_type": "With",
+                    "items": [
+                      {
+                        "_type": "withitem",
+                        "context_expr": {
+                          "_type": "Call",
+                          "func": {
+                            "_type": "Attribute",
+                            "value": {
+                              "_type": "Name",
+                              "id": "pytest",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            },
+                            "attr": "raises",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "args": [
+                            {
+                              "_type": "Name",
+                              "id": "ValueError",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            }
+                          ],
+                          "keywords": [
+                            {
+                              "_type": "keyword",
+                              "arg": "match",
+                              "value": {
+                                "_type": "Constant",
+                                "value": "Historical performance report bytes drifted",
+                                "kind": null
+                              }
+                            }
+                          ]
+                        },
+                        "optional_vars": null
+                      }
+                    ],
+                    "body": [
+                      {
+                        "_type": "Expr",
+                        "value": {
+                          "_type": "Call",
+                          "func": {
+                            "_type": "Attribute",
+                            "value": {
+                              "_type": "Name",
+                              "id": "historical",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            },
+                            "attr": "assert_historical_report",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "args": [
+                            {
+                              "_type": "Name",
+                              "id": "original",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            }
+                          ],
+                          "keywords": []
+                        }
+                      }
+                    ],
+                    "type_comment": null
+                  }
+                ],
+                "type_comment": null
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "other",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Constant",
+                  "value": "docs/performance/order101/head.json",
+                  "kind": null
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "raw",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "BinOp",
+                      "left": {
+                        "_type": "Name",
+                        "id": "ROOT",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "op": {
+                        "_type": "Div"
+                      },
+                      "right": {
+                        "_type": "Name",
+                        "id": "other",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      }
+                    },
+                    "attr": "read_bytes",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [],
+                  "keywords": []
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "target",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "BinOp",
+                  "left": {
+                    "_type": "Name",
+                    "id": "tmp_path",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "op": {
+                    "_type": "Div"
+                  },
+                  "right": {
+                    "_type": "Name",
+                    "id": "other",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Expr",
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Attribute",
+                      "value": {
+                        "_type": "Name",
+                        "id": "target",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "attr": "parent",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "mkdir",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [],
+                  "keywords": [
+                    {
+                      "_type": "keyword",
+                      "arg": "parents",
+                      "value": {
+                        "_type": "Constant",
+                        "value": true,
+                        "kind": null
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "_type": "Expr",
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "target",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "write_bytes",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [
+                    {
+                      "_type": "BinOp",
+                      "left": {
+                        "_type": "Name",
+                        "id": "raw",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "op": {
+                        "_type": "Add"
+                      },
+                      "right": {
+                        "_type": "Constant",
+                        "value": {
+                          "_bytes": "0a"
+                        },
+                        "kind": null
+                      }
+                    }
+                  ],
+                  "keywords": []
+                }
+              },
+              {
+                "_type": "With",
+                "items": [
+                  {
+                    "_type": "withitem",
+                    "context_expr": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "Name",
+                          "id": "monkeypatch",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "attr": "context",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [],
+                      "keywords": []
+                    },
+                    "optional_vars": {
+                      "_type": "Name",
+                      "id": "control",
+                      "ctx": {
+                        "_type": "Store"
+                      }
+                    }
+                  }
+                ],
+                "body": [
+                  {
+                    "_type": "Expr",
+                    "value": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "Name",
+                          "id": "control",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "attr": "setattr",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [
+                        {
+                          "_type": "Name",
+                          "id": "historical",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        {
+                          "_type": "Constant",
+                          "value": "ROOT",
+                          "kind": null
+                        },
+                        {
+                          "_type": "Name",
+                          "id": "tmp_path",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      ],
+                      "keywords": []
+                    }
+                  },
+                  {
+                    "_type": "With",
+                    "items": [
+                      {
+                        "_type": "withitem",
+                        "context_expr": {
+                          "_type": "Call",
+                          "func": {
+                            "_type": "Attribute",
+                            "value": {
+                              "_type": "Name",
+                              "id": "pytest",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            },
+                            "attr": "raises",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "args": [
+                            {
+                              "_type": "Name",
+                              "id": "ValueError",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            }
+                          ],
+                          "keywords": [
+                            {
+                              "_type": "keyword",
+                              "arg": "match",
+                              "value": {
+                                "_type": "Constant",
+                                "value": "Historical performance report bytes drifted",
+                                "kind": null
+                              }
+                            }
+                          ]
+                        },
+                        "optional_vars": null
+                      }
+                    ],
+                    "body": [
+                      {
+                        "_type": "Expr",
+                        "value": {
+                          "_type": "Call",
+                          "func": {
+                            "_type": "Attribute",
+                            "value": {
+                              "_type": "Name",
+                              "id": "historical",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            },
+                            "attr": "assert_historical_report",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "args": [
+                            {
+                              "_type": "Call",
+                              "func": {
+                                "_type": "Attribute",
+                                "value": {
+                                  "_type": "Name",
+                                  "id": "json",
+                                  "ctx": {
+                                    "_type": "Load"
+                                  }
+                                },
+                                "attr": "loads",
+                                "ctx": {
+                                  "_type": "Load"
+                                }
+                              },
+                              "args": [
+                                {
+                                  "_type": "Name",
+                                  "id": "raw",
+                                  "ctx": {
+                                    "_type": "Load"
+                                  }
+                                }
+                              ],
+                              "keywords": []
+                            }
+                          ],
+                          "keywords": []
+                        }
+                      }
+                    ],
+                    "type_comment": null
+                  }
+                ],
+                "type_comment": null
+              }
+            ],
+            "decorator_list": [],
+            "returns": {
+              "_type": "Constant",
+              "value": null,
+              "kind": null
+            },
+            "type_comment": null,
+            "type_params": []
+          }
+        ]
+      }
+    ],
+    "baseline_blob": "56cf334e1db91bcc7f9b892ad10d404ee0135b3a",
+    "rationale": "Two additive inclusive270/history refusal guards; every prior top-level definition remains exact. No new budget change.",
+    "acceptance_source": "Accepted base b75bfcf and task-33 REVIEW.md; exact source compatibility with unchanged historical scope"
+  },
+  "tests/integration/test_fight_on_death_presence.py": {
+    "before_sha256": "30104bd3e02a18b7ec23dcccad9d1a52836aef1d83c3df1312a5701fbeed0b56",
+    "after_sha256": "c63c3b334a69aa742e86da70d61f602a4eaf5144a51da88c1837bbc228917123",
+    "edits": [
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          39,
+          "body",
+          7,
+          "test",
+          "comparators"
+        ],
+        "start": 0,
+        "end": 1,
+        "before": [
+          {
+            "_type": "Call",
+            "func": {
+              "_type": "Attribute",
+              "value": {
+                "_type": "Attribute",
+                "value": {
+                  "_type": "Name",
+                  "id": "state",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "attr": "battlefield_state",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "attr": "placed_model_ids",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "args": [],
+            "keywords": []
+          }
+        ],
+        "after": [
+          {
+            "_type": "Attribute",
+            "value": {
+              "_type": "Attribute",
+              "value": {
+                "_type": "Name",
+                "id": "state",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "attr": "battlefield_state",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "attr": "removed_model_ids",
+            "ctx": {
+              "_type": "Load"
+            }
+          }
+        ]
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          39,
+          "body",
+          11,
+          "body",
+          5,
+          "test"
+        ],
+        "before": {
+          "_type": "Compare",
+          "left": {
+            "_type": "Name",
+            "id": "model_id",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "ops": [
+            {
+              "_type": "In"
+            }
+          ],
+          "comparators": [
+            {
+              "_type": "Attribute",
+              "value": {
+                "_type": "Attribute",
+                "value": {
+                  "_type": "Name",
+                  "id": "current",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "attr": "battlefield_state",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "attr": "removed_model_ids",
+              "ctx": {
+                "_type": "Load"
+              }
+            }
+          ]
+        },
+        "after": {
+          "_type": "Call",
+          "func": {
+            "_type": "Name",
+            "id": "any",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "args": [
+            {
+              "_type": "GeneratorExp",
+              "elt": {
+                "_type": "Compare",
+                "left": {
+                  "_type": "Attribute",
+                  "value": {
+                    "_type": "Name",
+                    "id": "event",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "attr": "event_type",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "ops": [
+                  {
+                    "_type": "Eq"
+                  }
+                ],
+                "comparators": [
+                  {
+                    "_type": "Constant",
+                    "value": "fight_on_death_destruction_completed",
+                    "kind": null
+                  }
+                ]
+              },
+              "generators": [
+                {
+                  "_type": "comprehension",
+                  "target": {
+                    "_type": "Name",
+                    "id": "event",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  },
+                  "iter": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Attribute",
+                      "value": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "Attribute",
+                          "value": {
+                            "_type": "Name",
+                            "id": "session",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "attr": "lifecycle",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "attr": "decision_controller",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "attr": "event_log",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "records",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "ifs": [],
+                  "is_async": 0
+                }
+              ]
+            }
+          ],
+          "keywords": []
+        }
+      }
+    ],
+    "baseline_blob": "4798ef7042b43ef46b4fc147933bf6852a454196",
+    "rationale": "Accepted retained-FNP removal-before-Deadly-Demise checkpoint: one physical-presence assertion and one completion-loop condition; task30/31/33 accepted repair. No additional gameplay delta.",
+    "acceptance_source": "Accepted base b75bfcf and task-33 REVIEW.md; exact source compatibility with unchanged historical scope"
+  },
+  "tests/performance_evidence_helpers.py": {
+    "before_sha256": "f0926b93036bb6da198d153273355685e5b8b65305f2eb9be54affcdc401e5d4",
+    "after_sha256": "56efb07574eb234d4d081bcf4b69d3afc5b03c32cb32a03f4eb9aae707bc13fd",
+    "edits": [
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          13,
+          "body",
+          6,
+          "body",
+          0,
+          "test",
+          "left",
+          "func",
+          "value",
+          "args",
+          0,
+          "func"
+        ],
+        "before": {
+          "_type": "Attribute",
+          "value": {
+            "_type": "BinOp",
+            "left": {
+              "_type": "Name",
+              "id": "ROOT",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "op": {
+              "_type": "Div"
+            },
+            "right": {
+              "_type": "Name",
+              "id": "name",
+              "ctx": {
+                "_type": "Load"
+              }
+            }
+          },
+          "attr": "read_bytes",
+          "ctx": {
+            "_type": "Load"
+          }
+        },
+        "after": {
+          "_type": "Name",
+          "id": "_historical_report_bytes",
+          "ctx": {
+            "_type": "Load"
+          }
+        }
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          13,
+          "body",
+          6,
+          "body",
+          0,
+          "test",
+          "left",
+          "func",
+          "value",
+          "args",
+          0,
+          "args"
+        ],
+        "start": 0,
+        "end": 0,
+        "before": [],
+        "after": [
+          {
+            "_type": "Name",
+            "id": "name",
+            "ctx": {
+              "_type": "Load"
+            }
+          }
+        ]
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          16,
+          "body",
+          1,
+          "body",
+          0,
+          "test",
+          "left",
+          "func",
+          "value",
+          "args",
+          0,
+          "func"
+        ],
+        "before": {
+          "_type": "Attribute",
+          "value": {
+            "_type": "BinOp",
+            "left": {
+              "_type": "Name",
+              "id": "ROOT",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "op": {
+              "_type": "Div"
+            },
+            "right": {
+              "_type": "Name",
+              "id": "name",
+              "ctx": {
+                "_type": "Load"
+              }
+            }
+          },
+          "attr": "read_bytes",
+          "ctx": {
+            "_type": "Load"
+          }
+        },
+        "after": {
+          "_type": "Name",
+          "id": "_historical_report_bytes",
+          "ctx": {
+            "_type": "Load"
+          }
+        }
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          16,
+          "body",
+          1,
+          "body",
+          0,
+          "test",
+          "left",
+          "func",
+          "value",
+          "args",
+          0,
+          "args"
+        ],
+        "start": 0,
+        "end": 0,
+        "before": [],
+        "after": [
+          {
+            "_type": "Name",
+            "id": "name",
+            "ctx": {
+              "_type": "Load"
+            }
+          }
+        ]
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body"
+        ],
+        "start": 13,
+        "end": 13,
+        "before": [],
+        "after": [
+          {
+            "_type": "FunctionDef",
+            "name": "_historical_report_bytes",
+            "args": {
+              "_type": "arguments",
+              "posonlyargs": [],
+              "args": [
+                {
+                  "_type": "arg",
+                  "arg": "name",
+                  "annotation": {
+                    "_type": "Name",
+                    "id": "str",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "type_comment": null
+                }
+              ],
+              "vararg": null,
+              "kwonlyargs": [],
+              "kw_defaults": [],
+              "kwarg": null,
+              "defaults": []
+            },
+            "body": [
+              {
+                "_type": "If",
+                "test": {
+                  "_type": "Compare",
+                  "left": {
+                    "_type": "Name",
+                    "id": "name",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "ops": [
+                    {
+                      "_type": "Eq"
+                    }
+                  ],
+                  "comparators": [
+                    {
+                      "_type": "Constant",
+                      "value": "docs/performance/order34/budgets.json",
+                      "kind": null
+                    }
+                  ]
+                },
+                "body": [
+                  {
+                    "_type": "Return",
+                    "value": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Name",
+                        "id": "historical_input_bytes",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [
+                        {
+                          "_type": "Name",
+                          "id": "name",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      ],
+                      "keywords": []
+                    }
+                  }
+                ],
+                "orelse": []
+              },
+              {
+                "_type": "Return",
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "BinOp",
+                      "left": {
+                        "_type": "Name",
+                        "id": "ROOT",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "op": {
+                        "_type": "Div"
+                      },
+                      "right": {
+                        "_type": "Name",
+                        "id": "name",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      }
+                    },
+                    "attr": "read_bytes",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [],
+                  "keywords": []
+                }
+              }
+            ],
+            "decorator_list": [],
+            "returns": {
+              "_type": "Name",
+              "id": "bytes",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "type_comment": null,
+            "type_params": []
+          }
+        ]
+      }
+    ],
+    "baseline_blob": "d245829cd1cd2babae75b94b68018e2effa2fc15",
+    "rationale": "Exact one-path historical240/current270 reader separation with live-byte checks for every other report; two original consumers delegate to the one typed historical reader.",
+    "acceptance_source": "Accepted base b75bfcf and task-33 REVIEW.md; exact source compatibility with unchanged historical scope"
+  }
+}
