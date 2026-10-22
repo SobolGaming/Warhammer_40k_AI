@@ -14,7 +14,7 @@ NAMESPACE = "data/source_audits/qualification40_v1"
 SELF = "tools/performance_qualification_successor.py"
 MAP = "docs/performance/policy-v3/operation-map.json"
 # Activated only after the genuine local implementation/measurement freeze.
-FREEZE_COMMIT: str | None = None
+FREEZE_COMMIT: str | None = "cdf6ed620ea1239c5ed34aed39e4c1ae23061d41"
 
 
 def _sha(raw: bytes) -> str:
