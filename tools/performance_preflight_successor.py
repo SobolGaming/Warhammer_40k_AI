@@ -11,16 +11,21 @@ BASE = "fc1f186aeb0d143983e22382778177f4648438fd"
 BASE_SOURCE = "36ab649ef5a6ab747587dc25d05336252db5a4eb148dc24619e6881c38efec42"
 SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE_COMMIT: str | None = "6dba60081a0d6cb22f2858d703d789608eb6744f"
+INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
+    (
+        "data/source_audits/order135/current-inventory-category-migration.json",
+        "c0460f930be48c49dcbef7568ea1af5e2319ca374d658b6abdb8eadd38869c16",
+    ),
     (
         "scripts/check_performance_policy.py",
         "211658e8b50b0bb1f443b5389d815a221e1e218c1d475f909b32fa2959cb4d75",
     ),
     (
         "tests/code_quality/test_performance_preflight.py",
-        "1270d35ded44b9120f5cc0a53dad9ea3f938ca47a40902d61e6b5febca4c5f9d",
+        "058ed43a3b1884850f202fc457982c3f4c27b0ce63c0cd6dd7c999a7daf1b807",
     ),
     (
         "tests/code_quality/test_qualification40_successor.py",
@@ -32,7 +37,7 @@ _PIN_ROWS = (
     ),
     (
         "tools/performance_policy.py",
-        "b22bb94f8505558e82a8df3c3ea23c699f4c19e215b44465911f0313261aff41",
+        "fb1bf3b9b983df3301edd047f5855efd1352507934f37bd88005e4b4eafe5a2e",
     ),
     (
         "tools/performance_preflight.py",
@@ -143,13 +148,15 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     from tools import thousand_sons_perils_preservation as perils
 
     _freeze(root)
-    controls = PINS.keys() | {SELF}
+    # This exact derived audit is outside runtime_inputs; its bytes and freeze
+    # remain authenticated by _freeze and the complete live source scan.
+    controls = (PINS.keys() - {INVENTORY}) | {SELF}
     if not controls <= current.keys():
         raise ValueError("Preflight actual input collector omitted current inputs.")
     actual = {name: _sha(_read(root, name)) for name in controls}
     projected = dict(current)
     prior_names = set(_git(root, "ls-tree", "-r", "--name-only", BASE).decode().splitlines())
-    for name in PINS.keys() | {SELF}:
+    for name in controls:
         if name not in current:
             continue
         if current[name] != actual[name]:

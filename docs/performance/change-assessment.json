@@ -1566,11 +1566,11 @@
     },
     "data/source_audits/order135/current-inventory-category-migration.json": {
       "before_sha256": "d626c4e8aea03e1229f2da5986a7a88278cbbc611df037345cb79e0fbb3e7533",
-      "after_sha256": "08aa9812a4c0244e2859aa63ade175a81d136dde435684c0b4d9863d47d0b33d",
+      "after_sha256": "c0460f930be48c49dcbef7568ea1af5e2319ca374d658b6abdb8eadd38869c16",
       "owners": {
         "@document": {
           "before": "d626c4e8aea03e1229f2da5986a7a88278cbbc611df037345cb79e0fbb3e7533",
-          "after": "08aa9812a4c0244e2859aa63ade175a81d136dde435684c0b4d9863d47d0b33d"
+          "after": "c0460f930be48c49dcbef7568ea1af5e2319ca374d658b6abdb8eadd38869c16"
         }
       }
     },
@@ -5026,11 +5026,19 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "1270d35ded44b9120f5cc0a53dad9ea3f938ca47a40902d61e6b5febca4c5f9d",
+      "after_sha256": "058ed43a3b1884850f202fc457982c3f4c27b0ce63c0cd6dd7c999a7daf1b807",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a770946c2d5f061e63f4bcc28f6fdd419ae89f9c9391bac3dd97e69f11d91427"
+          "after": "ff846782a6748558e30dbc90d05f1cee16ab3f994f80870f467c8dfb1b02c0fe"
+        },
+        "test_generated_inventory_changes_only_reviewed_perils_metadata": {
+          "before": null,
+          "after": "f269d78b5919c2d25163dcfb361d0831f1a1f12a0e6ffef8d286f34b4080b788"
+        },
+        "test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin": {
+          "before": null,
+          "after": "98dbb9b2d3e0b166a02effd692600bec122975a181c8586cd908fe5f9c650170"
         },
         "test_native_discovery_matches_original_ignored_and_symlink_membership": {
           "before": null,
@@ -17976,7 +17984,7 @@
     },
     "tools/performance_policy.py": {
       "before_sha256": "cbc427774b6d8bb1e30af96310bd94d48eeffd28c99a87254aa9c90e9a0ee37d",
-      "after_sha256": "b22bb94f8505558e82a8df3c3ea23c699f4c19e215b44465911f0313261aff41",
+      "after_sha256": "fb1bf3b9b983df3301edd047f5855efd1352507934f37bd88005e4b4eafe5a2e",
       "owners": {
         "@module": {
           "before": "ac784ef7f6a1db6326b5102add78a7434b1866cdadc45a9d358ecb09816d4685",
@@ -17984,7 +17992,7 @@
         },
         "_governance": {
           "before": "17fc3516b1b70de0265751c066ea4b96e974abc788cab3ab661baadb214c5a77",
-          "after": "e9fef867248f730e19416e3eb5ebcbe45706cb14cbd3364e960e25b231b53349"
+          "after": "5e46f1e1319d3cc7d3336338c2ed7038d259ae842d9caf8517b9ed608186b3f1"
         },
         "_validate_single_comparison": {
           "before": "a2dc06d1df9081b71ecceb81556842f3262626ee4615a7ac2328c32abe52054e",
@@ -18032,11 +18040,11 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "e921f9b19ac94b145ab0e17fe03d7c6edd84356b5a5c6c2e5aaf0d987e1c5377",
+      "after_sha256": "3a6996f611c6369cdc3290cc271f3690c2a3dfe7dfaa109f4455acfb8821f9c2",
       "owners": {
         "@module": {
           "before": null,
-          "after": "c06896d727b6a5fdec670b4bab56e3bde3fa104e93182ae975cfdd493ad5dcea"
+          "after": "e118685b67cfa78b4f40414eaf1473b44a37dbdaaab5db6a49d8917857d6d1d3"
         },
         "_assessment": {
           "before": null,
@@ -18064,7 +18072,7 @@
         },
         "measurement_inputs": {
           "before": null,
-          "after": "3f701fd68681934f902df51b10ba04f7a2ae339b2ea86d255d353ca834654346"
+          "after": "2452b16ad9ed1616b41f41d90e4f4d5b40e83c2a692a3ee8e189ed55303b4fa9"
         },
         "preceding_control": {
           "before": null,
@@ -19796,8 +19804,8 @@
         "ci-restructure-data-source_audits-order135-current-inventory-category-migration.json"
       ],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: data/source_audits/order135/current-inventory-category-migration.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
+      "rationale": "Regenerate the existing Order135 inventory for the already-reviewed Perils test insertion only: exactly fourteen changed JSON leaves; original equality assertion and all archived source evidence remain unchanged.",
+      "source_obligation": "Preserve every original inventory field, test assertion, source owner and authority record; update only exact current Perils file metadata, added assertions/body and AST identity.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
     "data/source_audits/order135/history/current-inventory-category-migration-before-reviewed-fnp.json": {

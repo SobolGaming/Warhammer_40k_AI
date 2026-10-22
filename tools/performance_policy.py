@@ -182,6 +182,7 @@ def _governance(path: str) -> bool:
         ".pre-commit-config.yaml",
         ".gitignore",
         "tools/thousand_sons_perils_preservation.py",
+        "data/source_audits/order135/current-inventory-category-migration.json",
     } or path.startswith(
         (
             "docs/",

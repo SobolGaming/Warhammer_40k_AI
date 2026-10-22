@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import ast
 import hashlib
+import json
 import os
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -237,3 +240,82 @@ def test_native_discovery_matches_original_ignored_and_symlink_membership(tmp_pa
     assert "tests/nested/ordinary-directory.py" not in actual
     assert "outside/not-selected.py" not in actual
     assert preflight.discovered_sources(tmp_path / "absent") == set()
+
+
+def test_generated_inventory_changes_only_reviewed_perils_metadata() -> None:
+    from tools import performance_preflight_successor as successor
+    from tools import thousand_sons_perils_preservation as perils
+    from tools.core_rules_order135_audit import LiveSymbols
+
+    root = Path(__file__).resolve().parents[2]
+    old_raw = subprocess.check_output(
+        ["git", "show", successor.BASE + ":" + successor.INVENTORY], cwd=root
+    )
+    expected = json.loads(old_raw)
+    live = LiveSymbols(root)
+    node = perils.TEST + "::test_twist_of_fate_modifies_ap_and_rejects_drift_or_closed_window"
+    current = live.test(node)
+    original_assertions = expected["tests"][node]["assertions"]
+    assertions = iter(current["assertions"])
+    assert all(
+        any(assertion == candidate for candidate in assertions) for assertion in original_assertions
+    )
+    old_test = perils.preceding_test(root, perils.TEST, (root / perils.TEST).read_bytes())
+    old_tree = ast.parse(old_test)
+    old_function = next(
+        child
+        for child in old_tree.body
+        if isinstance(child, ast.FunctionDef) and child.name == node.split("::")[1]
+    )
+    assert expected["tests"][node]["complete_current_body"] == ast.unparse(old_function)
+    assert expected["current_files_observed"][perils.TEST] == {
+        "bytes": len(old_test),
+        "sha256": hashlib.sha256(old_test).hexdigest(),
+    }
+    expected["current_files_observed"][perils.TEST] = live.files[perils.TEST]
+    for reference, record in expected["tests"].items():
+        if reference.startswith(perils.TEST + "::"):
+            record["file_sha256"] = live.files[perils.TEST]["sha256"]
+    expected["tests"][node] = current
+    actual = (root / successor.INVENTORY).read_bytes()
+    assert (
+        actual
+        == (json.dumps(expected, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
+    )
+    assert hashlib.sha256(actual).hexdigest() == successor.PINS[successor.INVENTORY]
+
+
+@pytest.mark.parametrize("coordinated_pin", [False, True])
+def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, coordinated_pin: bool
+) -> None:
+    from tools import performance_preflight_successor as successor
+
+    root = Path(__file__).resolve().parents[2]
+    direct_git = successor._git
+    for name in successor.PINS.keys() | {successor.SELF}:
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((root / name).read_bytes())
+
+    def original_git(_root: Path, *args: str) -> bytes:
+        return direct_git(root, *args)
+
+    monkeypatch.setattr(successor, "_git", original_git)
+    assert successor._freeze(tmp_path) == successor.FREEZE_COMMIT
+    path = tmp_path / successor.INVENTORY
+    payload = json.loads(path.read_bytes())
+    assert payload["runtime_pass_claimed"] is False
+    payload["runtime_pass_claimed"] = True
+    changed = (json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
+    path.write_bytes(changed)
+    if coordinated_pin:
+        old_pin = successor.PINS[successor.INVENTORY]
+        new_pin = hashlib.sha256(changed).hexdigest()
+        monkeypatch.setattr(successor, "PINS", successor.PINS | {successor.INVENTORY: new_pin})
+        control = tmp_path / successor.SELF
+        raw = control.read_bytes()
+        assert raw.count(old_pin.encode()) == 1
+        control.write_bytes(raw.replace(old_pin.encode(), new_pin.encode(), 1))
+    with pytest.raises(ValueError, match=r"Preflight successor activation|Preflight source"):
+        successor._freeze(tmp_path)
