@@ -36,7 +36,9 @@ def _read(root: Path, name: str) -> bytes:
 
     if root.is_symlink() or root.is_junction() or root.absolute() != root.resolve(strict=True):
         raise ValueError("Aliased qualification successor root.")
-    return read_owned_geometry_member(root, name)
+    from tools.thousand_sons_perils_preservation import preceding_control
+
+    return preceding_control(root, name, read_owned_geometry_member(root, name))
 
 
 def enabled(root: Path) -> bool:
@@ -101,7 +103,9 @@ def expected_source(root: Path, previous: dict[str, str]) -> dict[str, str]:
     if json.loads(current_assessment) != frozen_assessment:
         raise ValueError("Qualification assessment changed outside exact anchor derivation.")
     result[assessment] = _sha(current_assessment)
-    return result
+    from tools.thousand_sons_perils_preservation import current_source
+
+    return current_source(root, result)
 
 
 def control_projection(root: Path) -> dict[str, bytes]:

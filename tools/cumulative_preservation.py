@@ -334,6 +334,8 @@ def d07_predecessors(root: Path) -> dict[str, bytes]:
 
     live_receipt = verify_live(root)
     verify_baseline(root)
+    from tools.thousand_sons_perils_preservation import preceding_test
+
     recipes = _json(root, NAMESPACE + "/d07-recipes.json")
     later = _json(root, NAMESPACE + "/later-d07-recipes.json")
     if recipes.keys() & later.keys():
@@ -345,6 +347,7 @@ def d07_predecessors(root: Path) -> dict[str, bytes]:
     results = {}
     for path in originals:
         live = read_historical_test_bytes(root, path).replace(b"\r\n", b"\n")
+        live = preceding_test(root, path, live)
         if path in d09:
             stage_recipe = d09[path]
             stage = _read(root, NAMESPACE + "/" + stage_recipe["d09_stage"])

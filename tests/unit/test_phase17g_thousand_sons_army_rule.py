@@ -201,7 +201,8 @@ def test_twist_of_fate_modifies_ap_and_rejects_drift_or_closed_window() -> None:
         if candidate.option_id != manifesting_model_id
     )
     wounds_before_perils = sum(
-        model.current_wounds for model in _unit_by_id(state, unit_instance_id=MANIFESTER_ID).own_models
+        model.current_wounds
+        for model in _unit_by_id(state, unit_instance_id=MANIFESTER_ID).own_models
     )
     status = lifecycle.submit_decision(
         DecisionResult.for_request(
@@ -211,9 +212,13 @@ def test_twist_of_fate_modifies_ap_and_rejects_drift_or_closed_window() -> None:
         )
     )
     assert status.status_kind is not LifecycleStatusKind.INVALID
-    assert sum(
-        model.current_wounds for model in _unit_by_id(state, unit_instance_id=MANIFESTER_ID).own_models
-    ) == wounds_before_perils - 2
+    assert (
+        sum(
+            model.current_wounds
+            for model in _unit_by_id(state, unit_instance_id=MANIFESTER_ID).own_models
+        )
+        == wounds_before_perils - 2
+    )
     assert any(
         model.model_instance_id == manifesting_model_id and model.current_wounds > 0
         for model in _unit_by_id(state, unit_instance_id=MANIFESTER_ID).own_models
