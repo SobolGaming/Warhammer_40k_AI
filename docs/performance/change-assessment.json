@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
-  "operation_map_sha256": "9b622e2146a4143ae8a8abffc1a575814f95f0c54b3cc2a5382a5fede5236ef6",
+  "operation_map_sha256": "2d9966a5c52be2060ff9a059f15d161ed6c0efa4bf552530f0d85f6eb1f2570c",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "3735a992d4edacaa39c82bdaeca7edb07927826078494890aab7b0faf5fcefc4",
@@ -1596,11 +1596,11 @@
     },
     "data/source_audits/qualification40_v1/added-operations.json": {
       "before_sha256": null,
-      "after_sha256": "1f44c4f67fa34878d9a77ae42091c309fd03d23c5ae2e5e47e931ac2acc85e4d",
+      "after_sha256": "bc1424f564c05351285e49d1356aeb645527031b207d86f481369597ab7038a2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1f44c4f67fa34878d9a77ae42091c309fd03d23c5ae2e5e47e931ac2acc85e4d"
+          "after": "bc1424f564c05351285e49d1356aeb645527031b207d86f481369597ab7038a2"
         }
       }
     },
@@ -1636,21 +1636,21 @@
     },
     "data/source_audits/qualification40_v1/measurement-provenance.json": {
       "before_sha256": null,
-      "after_sha256": "6f1a69701018963789d2d48a6d3f94e4b6a2e130bf59a91909f0c46ec6cb2f2f",
+      "after_sha256": "370c45a930689d83a7e693e4a94fd742bb74ed84faecab88178395e9671cbf17",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6f1a69701018963789d2d48a6d3f94e4b6a2e130bf59a91909f0c46ec6cb2f2f"
+          "after": "370c45a930689d83a7e693e4a94fd742bb74ed84faecab88178395e9671cbf17"
         }
       }
     },
     "data/source_audits/qualification40_v1/owner-routing.json": {
       "before_sha256": null,
-      "after_sha256": "62b0c10cf4065df66ba03e6dec756c5f278c04d12948f6408c1bfb20bdcd0052",
+      "after_sha256": "d2874ea7d708d1a6ac15429023de8660f85899133e6a358f231f6d8890f05d53",
       "owners": {
         "@document": {
           "before": null,
-          "after": "62b0c10cf4065df66ba03e6dec756c5f278c04d12948f6408c1bfb20bdcd0052"
+          "after": "d2874ea7d708d1a6ac15429023de8660f85899133e6a358f231f6d8890f05d53"
         }
       }
     },
@@ -2186,11 +2186,11 @@
     },
     "data/source_audits/qualification40_v1/source-scope-audit.json": {
       "before_sha256": null,
-      "after_sha256": "ca75f58a6a64658600013710380e3ccc4a63413796b4f771ca8ae51ea5a401c7",
+      "after_sha256": "6350bbc64963a14408253baab71cb66da7c4d15bbb79599fac66a2bd28bb6337",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca75f58a6a64658600013710380e3ccc4a63413796b4f771ca8ae51ea5a401c7"
+          "after": "6350bbc64963a14408253baab71cb66da7c4d15bbb79599fac66a2bd28bb6337"
         }
       }
     },
@@ -2576,121 +2576,121 @@
     },
     "docs/performance/current/qualification40-dice.json": {
       "before_sha256": null,
-      "after_sha256": "8c9a9d960b3d25cd420cd4f22226d7fd271b6afed7b0163d1cc4369f355ab92b",
+      "after_sha256": "84ba455e20996cbd1fdeb246fc5410ab183d61da2ca6e4d760879168d2ddcd2e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8c9a9d960b3d25cd420cd4f22226d7fd271b6afed7b0163d1cc4369f355ab92b"
+          "after": "84ba455e20996cbd1fdeb246fc5410ab183d61da2ca6e4d760879168d2ddcd2e"
         }
       }
     },
     "docs/performance/current/qualification40-dice_sustained.json": {
       "before_sha256": null,
-      "after_sha256": "60a8f645e4ec2d5ebad575e99ed3ba65703b076c1ddc864541e2eb7e8f263446",
+      "after_sha256": "76fafa45cf162e140d07134e28e085c56d3b08dcd2947a3e32310bade0b89e5b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "60a8f645e4ec2d5ebad575e99ed3ba65703b076c1ddc864541e2eb7e8f263446"
+          "after": "76fafa45cf162e140d07134e28e085c56d3b08dcd2947a3e32310bade0b89e5b"
         }
       }
     },
     "docs/performance/current/qualification40-external_contract_source_reuse.json": {
       "before_sha256": null,
-      "after_sha256": "fde30d279036fb4980641108fe93f83570d91ab52875b057d25f8100773f4a40",
+      "after_sha256": "fc87e9a27ca8ae10602db2524d3f8be1c1e3bf429b82bcae018ed9c860c3ed2c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "fde30d279036fb4980641108fe93f83570d91ab52875b057d25f8100773f4a40"
+          "after": "fc87e9a27ca8ae10602db2524d3f8be1c1e3bf429b82bcae018ed9c860c3ed2c"
         }
       }
     },
     "docs/performance/current/qualification40-fight.json": {
       "before_sha256": null,
-      "after_sha256": "0157cdf2938760944882f37f625df0d33dc5041b64a0cd74272f4768839d2af7",
+      "after_sha256": "27fc3cba9c0da9b312eeb6cf980734f78f9b57f8bd3609d77a3405c511f8b86d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0157cdf2938760944882f37f625df0d33dc5041b64a0cd74272f4768839d2af7"
+          "after": "27fc3cba9c0da9b312eeb6cf980734f78f9b57f8bd3609d77a3405c511f8b86d"
         }
       }
     },
     "docs/performance/current/qualification40-movement.json": {
       "before_sha256": null,
-      "after_sha256": "b22161df5efce4c6f4dcde8bd5bae853d8a372786e007b6d7fae8a7271d3a14a",
+      "after_sha256": "bf5a007814b41cf78d1731677a86330eb3538c50c2ee1a95286d045a00b21d42",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b22161df5efce4c6f4dcde8bd5bae853d8a372786e007b6d7fae8a7271d3a14a"
+          "after": "bf5a007814b41cf78d1731677a86330eb3538c50c2ee1a95286d045a00b21d42"
         }
       }
     },
     "docs/performance/current/qualification40-objective_control.json": {
       "before_sha256": null,
-      "after_sha256": "d787b8f09e9b5b2d96e704e75e91163c182dfaf6e41e3a88a2f8e319d0ed4d99",
+      "after_sha256": "9a3dbd260593b859c21e984b684945612a9ac7651dd25fe9b75c7611ef2db9ab",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d787b8f09e9b5b2d96e704e75e91163c182dfaf6e41e3a88a2f8e319d0ed4d99"
+          "after": "9a3dbd260593b859c21e984b684945612a9ac7651dd25fe9b75c7611ef2db9ab"
         }
       }
     },
     "docs/performance/current/qualification40-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "d542350340b4a7a08f036473c7e19c48a52cdea7f2080096c18246e35b066b57",
+      "after_sha256": "a3a5f2831eb81a2b9c016f5a2debb36157a4e9836eabe253afa8fa786159a7bc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d542350340b4a7a08f036473c7e19c48a52cdea7f2080096c18246e35b066b57"
+          "after": "a3a5f2831eb81a2b9c016f5a2debb36157a4e9836eabe253afa8fa786159a7bc"
         }
       }
     },
     "docs/performance/current/qualification40-roster.json": {
       "before_sha256": null,
-      "after_sha256": "8337c34aef552eb585b9f4fd794199f126ae2946b5071a9df71822c3d37caf81",
+      "after_sha256": "400c84b7ac8833ca5251b45a79e440d61e5a15626cb6a4bb84dd6307741e46a9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8337c34aef552eb585b9f4fd794199f126ae2946b5071a9df71822c3d37caf81"
+          "after": "400c84b7ac8833ca5251b45a79e440d61e5a15626cb6a4bb84dd6307741e46a9"
         }
       }
     },
     "docs/performance/current/qualification40-setup.json": {
       "before_sha256": null,
-      "after_sha256": "05bba2e1f8fb1e50fa37eb685410d0c1bd20597a52b5fa2abdb20e4fc9caef32",
+      "after_sha256": "c845ab6764fef7f5ef1b91888fa4785cafa38383394d3433294da8632d942d8b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "05bba2e1f8fb1e50fa37eb685410d0c1bd20597a52b5fa2abdb20e4fc9caef32"
+          "after": "c845ab6764fef7f5ef1b91888fa4785cafa38383394d3433294da8632d942d8b"
         }
       }
     },
     "docs/performance/current/qualification40-shock_reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "9e8f148f0a3b5857db76c25378ecc8b86fa6679a5d974f52013bb5245da508d4",
+      "after_sha256": "18ce976b2063ab3f423574ccb460e0ad4f747e1842987178c78cd0260ee552d8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9e8f148f0a3b5857db76c25378ecc8b86fa6679a5d974f52013bb5245da508d4"
+          "after": "18ce976b2063ab3f423574ccb460e0ad4f747e1842987178c78cd0260ee552d8"
         }
       }
     },
     "docs/performance/current/qualification40-strength.json": {
       "before_sha256": null,
-      "after_sha256": "8693939704130d3d56845b2fb427e821ea602d11634fd6f747ffa57e7f8109c5",
+      "after_sha256": "89d57824df2b71b8459012b87f6f58fa5ec750e851fbfd071254da21e2143d70",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8693939704130d3d56845b2fb427e821ea602d11634fd6f747ffa57e7f8109c5"
+          "after": "89d57824df2b71b8459012b87f6f58fa5ec750e851fbfd071254da21e2143d70"
         }
       }
     },
     "docs/performance/current/qualification40-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "a6aa80ad8a37dabf5e38c89946248c1b9b7731b9fa09cf60bf5f029c455e3749",
+      "after_sha256": "b22afc0433f2ed9e3ab7078f0cbece7f6c637e1d4cab2139969bd54cab007aa5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a6aa80ad8a37dabf5e38c89946248c1b9b7731b9fa09cf60bf5f029c455e3749"
+          "after": "b22afc0433f2ed9e3ab7078f0cbece7f6c637e1d4cab2139969bd54cab007aa5"
         }
       }
     },
@@ -2736,11 +2736,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "68adb04ccee41e21e899623bf8eff3c524f7d9985c8f52914b359d691f6a9db4",
+      "after_sha256": "f330487a339f4e3d58f4301afd6a6c21f64d9ed47e1f46742ebcbdf3e3b867b9",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "68adb04ccee41e21e899623bf8eff3c524f7d9985c8f52914b359d691f6a9db4"
+          "after": "f330487a339f4e3d58f4301afd6a6c21f64d9ed47e1f46742ebcbdf3e3b867b9"
         }
       }
     },
@@ -5066,7 +5066,7 @@
     },
     "tests/code_quality/test_qualification40_successor.py": {
       "before_sha256": null,
-      "after_sha256": "4559d66823ddbe235664eefc5ed24e44089f9d1a7dce45741d97b4808e9244bc",
+      "after_sha256": "7305e4721433de43298408cdc02dc6d9fd614228697b20912add65ab60423821",
       "owners": {
         "@module": {
           "before": null,
@@ -5075,6 +5075,10 @@
         "successor_copy": {
           "before": null,
           "after": "f11b6c4f5948615ddc832c6edf3daa5164fd192a81f76c9e4d9f6006be4f2513"
+        },
+        "test_qualification_map_identifier_requalification_rejects_semantic_drift": {
+          "before": null,
+          "after": "287b3d6975add93de031048bc4c1c85c5ee2230bce493ac581a185110f46fb90"
         },
         "test_qualification_map_mutation_cannot_inherit_historical_credit": {
           "before": null,
@@ -5086,7 +5090,7 @@
         },
         "test_qualification_producing_inputs_allows_only_anchor_literal": {
           "before": null,
-          "after": "6b144afcf2d8e698c98fa3cdb64f6a5759bc8026db86a3caede4378299fff483"
+          "after": "ddaee25dce8b82ce8f1d25076482422294547818d5d6f59e7252a4e04ae187ba"
         },
         "test_qualification_rejects_live_fixture_source_evidence_or_control_drift": {
           "before": null,
@@ -17922,11 +17926,11 @@
     },
     "tools/performance_qualification_successor.py": {
       "before_sha256": null,
-      "after_sha256": "bb6c0926752e06561e1268361105d206fb6d5658ddd9073718d9b00d883b7dd6",
+      "after_sha256": "a06424d655407696171a50902e35b7b09aadcd8d21c1fe328d9197eac19ac730",
       "owners": {
         "@module": {
           "before": null,
-          "after": "0923c9efbf49fd1b2e7107b795fa5c031eb8f52da5a3aa3bf54c09ba41e73083"
+          "after": "2aaef33a080b9d0bdda6958ae430b7133b819185c44c62eb8565721cb3b450c9"
         },
         "_digest": {
           "before": null,
@@ -17978,7 +17982,7 @@
         },
         "producing_inputs": {
           "before": null,
-          "after": "73b578a95879080f1f337fde41294b04bf3eee48898fce83cf70fae86d392a32"
+          "after": "8d6fddd4263c94538fc05ba34d01949ba9c0555195713b91af60222d640cbc4f"
         }
       }
     },
@@ -18561,7 +18565,7 @@
     "data/source_audits/cumulative_preservation_v1/evidence/task-18/D07-33-EXCEPTION-AND-GUARD-LEDGER.json.txt": {
       "category": "measured_workload",
       "operations": [
-        "qualification40-exact-a210e725e60955d4"
+        "qualification40-exact-a210e725e60955d45ed926d442eef929c729d76d09818158c96eb9a6485c5a11"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: data/source_audits/cumulative_preservation_v1/evidence/task-18/D07-33-EXCEPTION-AND-GUARD-LEDGER.json.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -27074,7 +27078,7 @@
     "tests/rules/section25/test_enhancements.py": {
       "category": "measured_workload",
       "operations": [
-        "qualification40-exact-710ea918d3f737cd"
+        "qualification40-exact-710ea918d3f737cd1614842f321b1902a4f186a2aea8cf45348bea22fbcf0fe2"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: tests/rules/section25/test_enhancements.py. Literal operations cover each changed owner; complete mapped family obligations retained.",

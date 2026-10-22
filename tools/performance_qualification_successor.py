@@ -10,11 +10,13 @@ from typing import Any
 
 ACCEPTED = "ee3ecc1de30a799811f6cbdf04a05d56e02f6ae5"
 SOURCE_SHA256 = "3d3c08cfd731fd56494716aa64570ba656300abf4ffaf105131a65693dfd6244"
+PRODUCING_COMMIT = "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b"
+PRODUCING_INPUT_DIGEST = "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d"
 NAMESPACE = "data/source_audits/qualification40_v1"
 SELF = "tools/performance_qualification_successor.py"
 MAP = "docs/performance/policy-v3/operation-map.json"
 # Activated only after the genuine local implementation/measurement freeze.
-FREEZE_COMMIT: str | None = "c66e8acbc0e1d50fc8cd6b4cd5312f0af73daad1"
+FREEZE_COMMIT: str | None = None
 
 
 def _sha(raw: bytes) -> str:
@@ -168,9 +170,65 @@ def accepted_operation_map(root: Path) -> dict[str, Any]:
 
 
 def producing_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
-    """Only the declared post-measurement anchor literal can differ from producing code."""
+    """Requalify only declared symbolic metadata; every workload byte stays exact."""
+    from tools.performance_policy import owner_hashes
+
     freeze = _freeze(root)
-    frozen = _git(root, "show", freeze + ":" + SELF)
+    _git(root, "merge-base", "--is-ancestor", PRODUCING_COMMIT, freeze)
+    measured: dict[str, str] = json.loads(
+        _member(root, NAMESPACE + "/producing-inputs.json", freeze)
+    )
+    if _digest(measured) != PRODUCING_INPUT_DIGEST:
+        raise ValueError("Qualification producing input inventory changed.")
     if current.get(SELF) != _sha(_read(root, SELF)):
         raise ValueError("Qualification actual input collector omitted its successor control.")
-    return current | {SELF: _sha(frozen)}
+    quality = "tests/code_quality/test_qualification40_successor.py"
+    allowed = {SELF, MAP, quality}
+    raw = {name: _member(root, name, freeze) for name in allowed - {SELF}}
+    raw[SELF] = _git(root, "show", freeze + ":" + SELF)
+    expected = measured | {name: _sha(_read(root, name)) for name in allowed}
+    if current != expected:
+        raise ValueError("Qualification metadata inventory cannot change workload inputs.")
+    old = {name: _git(root, "show", PRODUCING_COMMIT + ":" + name) for name in allowed}
+    if any(_sha(content) != measured[name] for name, content in old.items()):
+        raise ValueError("Qualification original producing control/map identity changed.")
+    constants = (
+        f'PRODUCING_COMMIT = "{PRODUCING_COMMIT}"\n'
+        f'PRODUCING_INPUT_DIGEST = "{PRODUCING_INPUT_DIGEST}"\n'
+    ).encode()
+    if raw[SELF].count(constants) != 1:
+        raise ValueError("Qualification metadata declaration changed.")
+    control_before = owner_hashes(SELF, old[SELF])
+    control_after = owner_hashes(SELF, raw[SELF].replace(constants, b"", 1))
+    exempt = {"producing_inputs"}
+    if {k: v for k, v in control_before.items() if k not in exempt} != {
+        k: v for k, v in control_after.items() if k not in exempt
+    }:
+        raise ValueError("Qualification metadata admission changed another control owner.")
+    test_before = owner_hashes(quality, old[quality])
+    test_after = owner_hashes(quality, raw[quality])
+    revised = {
+        "test_qualification_producing_inputs_allows_only_anchor_literal",
+        "test_qualification_map_identifier_requalification_rejects_semantic_drift",
+    }
+    if {k: v for k, v in test_before.items() if k not in revised} != {
+        k: v for k, v in test_after.items() if k not in revised
+    }:
+        raise ValueError("Qualification metadata guard changed another assertion owner.")
+    mapping = json.loads(old[MAP])
+    paths = (
+        "data/source_audits/cumulative_preservation_v1/evidence/task-18/"
+        "D07-33-EXCEPTION-AND-GUARD-LEDGER.json.txt",
+        "tests/rules/section25/test_enhancements.py",
+    )
+    for path in paths:
+        digest = _sha(path.encode())
+        short = "qualification40-exact-" + digest[:16]
+        full = "qualification40-exact-" + digest
+        operation = mapping["operations"].pop(short)
+        if operation["paths"] != [path] or full in mapping["operations"]:
+            raise ValueError("Qualification symbolic map identity changed.")
+        mapping["operations"][full] = operation
+    if json.loads(raw[MAP]) != mapping:
+        raise ValueError("Qualification symbolic operation-ID requalification changed semantics.")
+    return dict(measured)

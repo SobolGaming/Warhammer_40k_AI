@@ -104,7 +104,7 @@
     "families": [],
     "proof": "literal owner/path plus actual driver import closure; source/restore roles explicitly classified"
   },
-  "qualification40-exact-a210e725e60955d4": {
+  "qualification40-exact-a210e725e60955d45ed926d442eef929c729d76d09818158c96eb9a6485c5a11": {
     "path": "data/source_audits/cumulative_preservation_v1/evidence/task-18/D07-33-EXCEPTION-AND-GUARD-LEDGER.json.txt",
     "owners": [
       "@document"
@@ -7128,7 +7128,7 @@
     "families": [],
     "proof": "literal owner/path plus actual driver import closure; source/restore roles explicitly classified"
   },
-  "qualification40-exact-710ea918d3f737cd": {
+  "qualification40-exact-710ea918d3f737cd1614842f321b1902a4f186a2aea8cf45348bea22fbcf0fe2": {
     "path": "tests/rules/section25/test_enhancements.py",
     "owners": [
       "@module",

@@ -96,6 +96,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   },
   "dice_sustained": {
@@ -195,6 +206,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   },
   "external_contract_source_reuse": {
@@ -252,6 +274,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   },
   "fight": {
@@ -305,6 +338,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   },
   "movement": {
@@ -368,6 +412,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   },
   "objective_control": {
@@ -507,6 +562,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   },
   "reconstruction": {
@@ -658,6 +724,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   },
   "roster": {
@@ -755,6 +832,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   },
   "setup": {
@@ -852,6 +940,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   },
   "shock_reconstruction": {
@@ -935,6 +1034,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   },
   "strength": {
@@ -1006,6 +1116,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   },
   "visibility": {
@@ -1175,6 +1296,17 @@
         "python": "3.14.5",
         "role": "provisional"
       }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
     }
   }
 }

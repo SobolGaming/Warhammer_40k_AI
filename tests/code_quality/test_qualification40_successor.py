@@ -122,9 +122,43 @@ def test_qualification_map_mutation_cannot_inherit_historical_credit(
 def test_qualification_producing_inputs_allows_only_anchor_literal() -> None:
     current = policy.runtime_inputs(ROOT)
     producing = stage.producing_inputs(ROOT, current)
-    assert {k for k in current if current[k] != producing[k]} == {stage.SELF}
+    assert {k for k in current if current[k] != producing[k]} == {
+        stage.SELF,
+        policy.MAP,
+        "tests/code_quality/test_qualification40_successor.py",
+    }
     assert current.keys() == producing.keys()
     wrong = dict(current)
     wrong.pop(stage.SELF)
     with pytest.raises(ValueError, match="collector omitted"):
         stage.producing_inputs(ROOT, wrong)
+
+
+@pytest.mark.parametrize("mutation", ["owner", "path", "profile", "prior_operation"])
+def test_qualification_map_identifier_requalification_rejects_semantic_drift(
+    monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
+    value: dict[str, Any] = json.loads((ROOT / policy.MAP).read_bytes())
+    key = next(k for k in value["operations"] if len(k) == len("qualification40-exact-") + 64)
+    if mutation == "owner":
+        value["operations"][key]["owners"].append("unreviewed_owner")
+    elif mutation == "path":
+        value["operations"][key]["paths"] = ["unreviewed/path.py"]
+    elif mutation == "profile":
+        value["families"]["reconstruction"]["samples_per_case"] = 1
+    else:
+        value["operations"].pop(next(iter(stage.accepted_operation_map(ROOT)["operations"])))
+    raw = json.dumps(value).encode()
+    member, read = stage._member, stage._read
+
+    def repinned_member(root: Path, name: str, freeze: str) -> bytes:
+        return raw if name == policy.MAP else member(root, name, freeze)
+
+    def repinned_read(root: Path, name: str) -> bytes:
+        return raw if name == policy.MAP else read(root, name)
+
+    monkeypatch.setattr(stage, "_member", repinned_member)
+    monkeypatch.setattr(stage, "_read", repinned_read)
+    current = policy.runtime_inputs(ROOT) | {policy.MAP: policy.digest(raw)}
+    with pytest.raises(ValueError, match="symbolic"):
+        stage.producing_inputs(ROOT, current)
