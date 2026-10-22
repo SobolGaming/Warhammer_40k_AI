@@ -1,1 +1,37 @@
-{}
+{
+  "command": [
+    "/tmp/task40-source-performance/venv/bin/python",
+    "-B",
+    "/mnt/c/Users/nostr/Documents/Codex/2026-10-21/task-40/measure_arm40.py",
+    "shock_reconstruction",
+    "head"
+  ],
+  "cwd": "/tmp/task40-source-performance/repo",
+  "cap_seconds": 600,
+  "warning_seconds": 500,
+  "source_identity": "abeca6ec9c2de502a998691f9e0e376e367679392cf483f3220fb7d3b278d74a",
+  "started_utc": "2026-10-22T04:24:36.983560+00:00",
+  "environment_overrides": {
+    "PATH": "/tmp/task13-linux-ci-yktl9iof/bin:/home/nostrademous/.local/opt/node-v24.18.0-linux-x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/usr/lib/linux-tools/6.18.54.1-microsoft-standard-WSL2/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell:/mnt/c/Users/nostr/.codex/tmp/arg0-windows/codex-arg0VRm5bq:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/libheif/libheif/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/jxrlib/jxrlib/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/poppler/Library/bin:/mnt/c/Program Files/Common Files/Oracle/Java/javapath:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/Intel/WiFi/bin/:/mnt/c/Program Files/Common Files/Intel/WirelessCommon/:/mnt/c/Program Files/dotnet/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/010 Editor:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA app/NvDLISR:/mnt/c/Program Files/Go/bin:/mnt/c/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/:/mnt/c/Program Files/GitHub CLI/:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/WSL/:/mnt/c/Users/nostr/.local/bin:/mnt/c/Users/nostr/AppData/Local/pnpm:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python312/Scripts/:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python312/:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python38-32/Scripts/:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python38-32/:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell:/mnt/c/Users/nostr/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/nostr/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/nostr/.dotnet/tools:/mnt/c/Users/nostr/go/bin:/mnt/c/Users/nostr/AppData/Local/Microsoft/WinGet/Packages/Schniz.fnm_Microsoft.Winget.Source_8wekyb3d8bbwe:/mnt/c/Users/nostr/AppData/Local/Programs/cursor/resources/app/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/cmd",
+    "PYTHONPATH": "/tmp/task40-source-performance/repo/src:/tmp/task40-source-performance/repo:/mnt/c/Users/nostr/Documents/Codex/2026-10-21/task-40",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "UV_PROJECT_ENVIRONMENT": "/tmp/task40-source-performance/venv",
+    "UV_NO_SYNC": "1",
+    "UV_FROZEN": "1",
+    "UV_OFFLINE": "1",
+    "UV_PYTHON_DOWNLOADS": "never",
+    "GIT_OPTIONAL_LOCKS": "0",
+    "GIT_NO_REPLACE_OBJECTS": "1",
+    "CAPTURE_OUT": "/tmp/task40-source-performance/MEAS-shock_reconstruction-head/capture",
+    "TEST_TIMING_DIR": "/tmp/task40-source-performance/MEAS-shock_reconstruction-head/timing",
+    "XDG_CACHE_HOME": "/tmp/task40-source-performance/MEAS-shock_reconstruction-head/cache",
+    "HYPOTHESIS_STORAGE_DIRECTORY": "/tmp/task40-source-performance/MEAS-shock_reconstruction-head/cache/hypothesis"
+  },
+  "seconds": 57.203655733000005,
+  "exit_code": 0,
+  "warning500": false,
+  "timeout": false,
+  "process_group_shutdown_complete": true,
+  "ended_utc": "2026-10-22T04:25:34.187434+00:00",
+  "source_drift": {}
+}

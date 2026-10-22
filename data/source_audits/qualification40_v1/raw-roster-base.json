@@ -1,1 +1,77 @@
-{}
+{
+  "workload": "order68-roster-validation-v1",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 67359387648,
+  "host_role": "provisional",
+  "cpu_allocation": 64,
+  "concurrency": 1,
+  "revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+  "timing_boundary": "100 validate_roster_legality calls; catalog/request construction excluded; no gameplay, terrain, RNG or decisions",
+  "hashes": {
+    "scripts/measure_order68.py": "aa9ef50a607044c756347e11193a6ea1a2e56ffe406c3fdd8ec15aad9ff43890",
+    "uv.lock": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa"
+  },
+  "rows": [
+    {
+      "unit_count": 2,
+      "model_count": 6,
+      "samples_seconds": [
+        0.03873358200007715,
+        0.03824169100016661,
+        0.038157577999982095,
+        0.03833214900009807,
+        0.038448684000059075,
+        0.03823552400012886,
+        0.038280512000028466
+      ],
+      "mean_seconds": 0.038347102857220046,
+      "maximum_seconds": 0.03873358200007715,
+      "complete": true,
+      "violation_codes": [
+        "source_awaiting_unit_points"
+      ]
+    },
+    {
+      "unit_count": 4,
+      "model_count": 16,
+      "samples_seconds": [
+        0.04645083299988073,
+        0.046465811999951256,
+        0.046615855000027295,
+        0.0463846459999786,
+        0.04641831499998261,
+        0.046250952000036705,
+        0.046413024000003134
+      ],
+      "mean_seconds": 0.046428490999980046,
+      "maximum_seconds": 0.046615855000027295,
+      "complete": true,
+      "violation_codes": [
+        "source_awaiting_unit_points"
+      ]
+    },
+    {
+      "unit_count": 20,
+      "model_count": 96,
+      "samples_seconds": [
+        0.11112074299990127,
+        0.11065578399984588,
+        0.11149415500017312,
+        0.1110742250000385,
+        0.11063700500017148,
+        0.11047496200012574,
+        0.11102236800002174
+      ],
+      "mean_seconds": 0.11092560600003967,
+      "maximum_seconds": 0.11149415500017312,
+      "complete": true,
+      "violation_codes": [
+        "source_awaiting_unit_points",
+        "unit_limit_exceeded"
+      ]
+    }
+  ]
+}

@@ -1,1 +1,109 @@
-{}
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "dice_sustained",
+  "workload_id": "order96-sustained-d3-optional-wound-rerolls-v1",
+  "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+  "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+  "budget_profile": "current-change-relative-v1",
+  "historical_failures": [
+    "Earlier accepted-source preflight failed before workloads because its assessment named another base/runtime. It remains retained as a failed attempt.",
+    "Fresh actual-PR587/current-runtime measurements use the complete original sample counts and hard cases. Source and runtime identities, full raw outputs and whole-process receipts are retained.",
+    "Some unchanged raw drivers retain descriptive notes about their original historical baseline. Those notes do not identify the current measured arms or transfer any historical correctness conclusion; exact current revision/runtime fields and arm inventories govern.",
+    "Provisional admission failures were corrected before any measurement. Sole final freeze-literal activation is separately admitted; final live smoke must bind the actual final execution head. No full-game or full-CI qualification is claimed."
+  ],
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359387648,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
+    "fixture_sha256": "2b6864b6e1065a0b7b9e27e32ed61b84859962f853507fc41b30b92bd15650a2",
+    "samples": {
+      "shooting/false": [
+        3.018865672999709,
+        2.9655232609998166,
+        2.8903514850003376,
+        2.892287425000177,
+        2.9724342670001533
+      ],
+      "shooting/true": [
+        2.5890905149999526,
+        2.6619202159999986,
+        2.5920217259999845,
+        2.5721323140001005,
+        2.59251089899999
+      ],
+      "fight/false": [
+        1.8076275029998214,
+        1.8873883520000163,
+        1.797172626000247,
+        1.8200322840002627,
+        1.8050851890002377
+      ],
+      "fight/true": [
+        1.901852340000005,
+        1.9057419840000875,
+        1.8948631670000395,
+        1.8976748310001312,
+        1.8971026259996506
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359387648,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
+    "fixture_sha256": "2b6864b6e1065a0b7b9e27e32ed61b84859962f853507fc41b30b92bd15650a2",
+    "samples": {
+      "shooting/false": [
+        2.664175969000098,
+        2.626743712000007,
+        2.520385639000324,
+        2.518824653000138,
+        2.607493423000051
+      ],
+      "shooting/true": [
+        2.5971815140001127,
+        2.5826696960002664,
+        2.6587807580003755,
+        2.6603135290001774,
+        2.573229180999988
+      ],
+      "fight/false": [
+        1.935173959000167,
+        1.9319565769997098,
+        1.927293488000032,
+        1.9584697069999493,
+        1.9339263669999127
+      ],
+      "fight/true": [
+        2.027673522999976,
+        2.019935223000175,
+        2.0472540979999394,
+        2.1477878890000284,
+        2.02338218199975
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  }
+}

@@ -1,1 +1,107 @@
-{}
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "setup",
+  "workload_id": "order101-failed-setup-restore-view-replay-v1",
+  "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+  "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+  "budget_profile": "current-change-relative-v1",
+  "historical_failures": [
+    "Earlier accepted-source preflight failed before workloads because its assessment named another base/runtime. It remains retained as a failed attempt.",
+    "Fresh actual-PR587/current-runtime measurements use the complete original sample counts and hard cases. Source and runtime identities, full raw outputs and whole-process receipts are retained.",
+    "Some unchanged raw drivers retain descriptive notes about their original historical baseline. Those notes do not identify the current measured arms or transfer any historical correctness conclusion; exact current revision/runtime fields and arm inventories govern.",
+    "Provisional admission failures were corrected before any measurement. Sole final freeze-literal activation is separately admitted; final live smoke must bind the actual final execution head. No full-game or full-CI qualification is claimed."
+  ],
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359387648,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "aa2a5bdaaaf26d8746cb800c482e3403092d7fa37741809abe5caba1741b6069",
+    "fixture_sha256": "2b6864b6e1065a0b7b9e27e32ed61b84859962f853507fc41b30b92bd15650a2",
+    "samples": {
+      "cargo-5": [
+        2.8906514410000455,
+        2.7677924059998986,
+        2.843518263000078,
+        2.7697451940002793,
+        2.751469208999879,
+        2.853842256000007,
+        2.7521393880001597
+      ],
+      "cargo-100": [
+        2.7767348069996842,
+        2.865693083000224,
+        2.7541727269999683,
+        2.7615445030000956,
+        2.8543741439998485,
+        2.767071875000056,
+        2.8516368780001358
+      ],
+      "loaded-deep-strike": [
+        4.471189346000301,
+        4.5482525300003545,
+        4.567911044000084,
+        4.456598184999621,
+        4.575197611000021,
+        4.546567622999646,
+        4.469013609000285
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359387648,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "aa2a5bdaaaf26d8746cb800c482e3403092d7fa37741809abe5caba1741b6069",
+    "fixture_sha256": "2b6864b6e1065a0b7b9e27e32ed61b84859962f853507fc41b30b92bd15650a2",
+    "samples": {
+      "cargo-5": [
+        2.9184431070002574,
+        2.7731210919996556,
+        2.873375014999965,
+        2.775181828999848,
+        2.7767043780004315,
+        2.880071089000012,
+        2.795395098999961
+      ],
+      "cargo-100": [
+        2.787645918999715,
+        2.901475883999865,
+        2.7810226320002585,
+        2.7793231300001935,
+        2.768260240000018,
+        2.7712317900000016,
+        2.873537982000016
+      ],
+      "loaded-deep-strike": [
+        4.5062153769999895,
+        4.59454408900001,
+        4.6130648809999,
+        4.504544292999981,
+        4.602025632999812,
+        4.603118013999847,
+        4.548364633999881
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  }
+}

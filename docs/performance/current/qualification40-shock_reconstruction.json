@@ -1,1 +1,93 @@
-{}
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "shock_reconstruction",
+  "workload_id": "v963-shock-reconstruction-v1",
+  "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+  "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+  "budget_profile": "current-change-relative-v1",
+  "historical_failures": [
+    "Earlier accepted-source preflight failed before workloads because its assessment named another base/runtime. It remains retained as a failed attempt.",
+    "Fresh actual-PR587/current-runtime measurements use the complete original sample counts and hard cases. Source and runtime identities, full raw outputs and whole-process receipts are retained.",
+    "Some unchanged raw drivers retain descriptive notes about their original historical baseline. Those notes do not identify the current measured arms or transfer any historical correctness conclusion; exact current revision/runtime fields and arm inventories govern.",
+    "Provisional admission failures were corrected before any measurement. Sole final freeze-literal activation is separately admitted; final live smoke must bind the actual final execution head. No full-game or full-CI qualification is claimed."
+  ],
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359387648,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5",
+    "fixture_sha256": "2b6864b6e1065a0b7b9e27e32ed61b84859962f853507fc41b30b92bd15650a2",
+    "samples": {
+      "active_shock/restore": [
+        2.9586464369999703,
+        2.9689092860000983,
+        2.9603665100000853
+      ],
+      "active_shock/replay": [
+        0.5520764020000115,
+        0.5533505329999571,
+        0.5537854029998925
+      ],
+      "expired_shock/restore": [
+        3.596930463000035,
+        3.6891863490000105,
+        3.66364895300012
+      ],
+      "expired_shock/replay": [
+        1.06046675399989,
+        1.058368148999989,
+        1.0448761479999575
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359387648,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5",
+    "fixture_sha256": "2b6864b6e1065a0b7b9e27e32ed61b84859962f853507fc41b30b92bd15650a2",
+    "samples": {
+      "active_shock/restore": [
+        2.901418182000043,
+        3.330314585999986,
+        3.1349946929999533
+      ],
+      "active_shock/replay": [
+        0.5515954429999965,
+        0.5503880460000801,
+        0.5454379889999927
+      ],
+      "expired_shock/restore": [
+        3.5355845540000246,
+        3.6274644830000398,
+        3.6234094290000485
+      ],
+      "expired_shock/replay": [
+        1.0662309439999262,
+        1.0441537310000513,
+        1.0424781960000473
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  }
+}

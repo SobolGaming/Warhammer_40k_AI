@@ -1606,11 +1606,11 @@
     },
     "data/source_audits/qualification40_v1/arm-provenance.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "51ef3555a5e153bc1bf40daeeb8998746b86afb9562e104fe34b276a5cbe6e67",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "51ef3555a5e153bc1bf40daeeb8998746b86afb9562e104fe34b276a5cbe6e67"
         }
       }
     },
@@ -1636,11 +1636,11 @@
     },
     "data/source_audits/qualification40_v1/measurement-provenance.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "6f1a69701018963789d2d48a6d3f94e4b6a2e130bf59a91909f0c46ec6cb2f2f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "6f1a69701018963789d2d48a6d3f94e4b6a2e130bf59a91909f0c46ec6cb2f2f"
         }
       }
     },
@@ -1656,531 +1656,531 @@
     },
     "data/source_audits/qualification40_v1/producing-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "95a21837fcd0809ccab3954a24a1e94633f95c10ae59701a92062403e2b67965",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "95a21837fcd0809ccab3954a24a1e94633f95c10ae59701a92062403e2b67965"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-dice-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "7fd72bbf84e1e92b10ee85335521e3105f8910463ae7f9bd735acf48b07301c3",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "7fd72bbf84e1e92b10ee85335521e3105f8910463ae7f9bd735acf48b07301c3"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-dice-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "4dff6b4ce3e8f0a0d2c24abe11938c737ab4cb13cf81d0b73a63e2fd93d839e7",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "4dff6b4ce3e8f0a0d2c24abe11938c737ab4cb13cf81d0b73a63e2fd93d839e7"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-dice_sustained-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "95fb8e41c1e5622a3c3b2ecf1f9c1dc9f1c8c47352c4bdfd1807ebd9ea805cd5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "95fb8e41c1e5622a3c3b2ecf1f9c1dc9f1c8c47352c4bdfd1807ebd9ea805cd5"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-dice_sustained-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "128a982c58b1fe739e976ed65dadef510603a530dc6e27793210489a03954fe6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "128a982c58b1fe739e976ed65dadef510603a530dc6e27793210489a03954fe6"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-external_contract_source_reuse-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "48147d0800de3bf888a2f4b3709215d2f57c9cd9dd214f8e19a26a1772b4f7a2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "48147d0800de3bf888a2f4b3709215d2f57c9cd9dd214f8e19a26a1772b4f7a2"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-external_contract_source_reuse-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "bf7227668db2f1b862875da3f261d65467dcd86110f1ba562cdceceee46cc66f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "bf7227668db2f1b862875da3f261d65467dcd86110f1ba562cdceceee46cc66f"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-fight-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "5b0380200edcd40913e41bf90622bcaf4d2b2fba607483a5609e0562db0af711",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "5b0380200edcd40913e41bf90622bcaf4d2b2fba607483a5609e0562db0af711"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-fight-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "19fc9dd8269c26980ca472f5013d51b394faa9fe0163b4bb713e68308e2302f0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "19fc9dd8269c26980ca472f5013d51b394faa9fe0163b4bb713e68308e2302f0"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-movement-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "0f8289994fa1b208c76379ceaede8b8ae0798863453f73360ea0f4a95f328bd0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "0f8289994fa1b208c76379ceaede8b8ae0798863453f73360ea0f4a95f328bd0"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-movement-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "720e7eb9f8e7b093fe1417c9c6e00fff3f65baaf7022f42061309110049053be",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "720e7eb9f8e7b093fe1417c9c6e00fff3f65baaf7022f42061309110049053be"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-objective_control-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "5368e8e65406d7d5a7afb9466bee809a32eaa831050ed2da11174f23442a436b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "5368e8e65406d7d5a7afb9466bee809a32eaa831050ed2da11174f23442a436b"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-objective_control-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "8d0578db8ce816f23ae2723ec44200e864566951113cc0de3ff4f8f8d7cc1231",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "8d0578db8ce816f23ae2723ec44200e864566951113cc0de3ff4f8f8d7cc1231"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-reconstruction-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "e65ff1a7d4d3fbe5c450a5d6eaa5304d8306df4f77e73c6240204e464b465161",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "e65ff1a7d4d3fbe5c450a5d6eaa5304d8306df4f77e73c6240204e464b465161"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-reconstruction-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "2d77e1472acfccc15761a896390b680bd298dab41ff13426e6b1aebf4b1872b7",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "2d77e1472acfccc15761a896390b680bd298dab41ff13426e6b1aebf4b1872b7"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-roster-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "77e30b8baecbe9cc55e1b25593dac32bee2c5644eb25e031dc92db4be0bf6b62",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "77e30b8baecbe9cc55e1b25593dac32bee2c5644eb25e031dc92db4be0bf6b62"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-roster-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "53c3add2a1a3f534683728a21047a0397a6b5b712eaf388c51d4831aa89047c7",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "53c3add2a1a3f534683728a21047a0397a6b5b712eaf388c51d4831aa89047c7"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-setup-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "84c0158140481bf07d00572ff1138bc92137dc3b735f7d2e4bd0b2ecfb634068",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "84c0158140481bf07d00572ff1138bc92137dc3b735f7d2e4bd0b2ecfb634068"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-setup-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "b41c732b3aa9da3f2f428d117256f83d42631214c752a7dc32f1622826bcfaf8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "b41c732b3aa9da3f2f428d117256f83d42631214c752a7dc32f1622826bcfaf8"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-shock_reconstruction-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "4fa5dc4655c77f060cdc9bf2a67454eef3c5fffc61a1b57355c9debff6e8c68d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "4fa5dc4655c77f060cdc9bf2a67454eef3c5fffc61a1b57355c9debff6e8c68d"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-shock_reconstruction-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "e28a7a4d4ebb945059f0f1aadac65def3f2b9084d53d62196f8f8c096b8fe1e3",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "e28a7a4d4ebb945059f0f1aadac65def3f2b9084d53d62196f8f8c096b8fe1e3"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-strength-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "0c5b32b82e15f635be54f4460505e86a381a64ac8eb5cfebb16c4ff2412ecbd8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "0c5b32b82e15f635be54f4460505e86a381a64ac8eb5cfebb16c4ff2412ecbd8"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-strength-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "a61d001fc30096023b100bf4d808232a3b210c2417e9eff786456499738a1bbc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "a61d001fc30096023b100bf4d808232a3b210c2417e9eff786456499738a1bbc"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-visibility-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "8bd272a1649b80b8aaa2acd65f5f96df30e0cbf182b7c9d3b255bbf3d67348db",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "8bd272a1649b80b8aaa2acd65f5f96df30e0cbf182b7c9d3b255bbf3d67348db"
         }
       }
     },
     "data/source_audits/qualification40_v1/raw-visibility-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "12c8aa3c54d073f0e027ba5a454c9347a91e1e70920fc9090812fc32b7d42528",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "12c8aa3c54d073f0e027ba5a454c9347a91e1e70920fc9090812fc32b7d42528"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-dice-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "ec41e81e98243e88372edbdd18f24133c3b21d351b2194624cc466c8895a91fb",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "ec41e81e98243e88372edbdd18f24133c3b21d351b2194624cc466c8895a91fb"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-dice-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "99a1bf2af491dc0bf09e0b1288180fd8cedce26ca42ec35f7d01aba742a5fbc9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "99a1bf2af491dc0bf09e0b1288180fd8cedce26ca42ec35f7d01aba742a5fbc9"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-dice_sustained-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "1cbd5a1415e55ca8915103217ba6a21c1fd6d9bb514a5fa5b07e33e381492e39",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "1cbd5a1415e55ca8915103217ba6a21c1fd6d9bb514a5fa5b07e33e381492e39"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-dice_sustained-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "2c9d254d22e4e27fe2269a930b1ac313ffa5ec518823ddee51fca630b17f16cf",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "2c9d254d22e4e27fe2269a930b1ac313ffa5ec518823ddee51fca630b17f16cf"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-base-0.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "04644c17e9820eb414d6d50107d1038c342f6ef20c987782c01d0ac1714488b7",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "04644c17e9820eb414d6d50107d1038c342f6ef20c987782c01d0ac1714488b7"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-base-1.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "ee6461a39649c91927282646d2dd9b2c45c6b864a8af135e3ccb3bce1f2b2aec",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "ee6461a39649c91927282646d2dd9b2c45c6b864a8af135e3ccb3bce1f2b2aec"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-base-2.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "a46f1a4b1b2d56512de5ce67029f4bf8c4c66cdcfdf3183603a0836dcd006613",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "a46f1a4b1b2d56512de5ce67029f4bf8c4c66cdcfdf3183603a0836dcd006613"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-head-0.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "644d538b8bcaa87487d073ead0d73d0087fe202c5e141c3cf090ca8f5e582e85",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "644d538b8bcaa87487d073ead0d73d0087fe202c5e141c3cf090ca8f5e582e85"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-head-1.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "5d5d4b7e2b3450ef0c75f7d01c6c2b7b85e70f37062b84d8b3da22dab11d87cf",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "5d5d4b7e2b3450ef0c75f7d01c6c2b7b85e70f37062b84d8b3da22dab11d87cf"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-head-2.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "42325c9ffb593c3dcf2d666a13f5e448cf4ac11d221d50d9d8f09a99428f42a8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "42325c9ffb593c3dcf2d666a13f5e448cf4ac11d221d50d9d8f09a99428f42a8"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-fight-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "05f9627967589c54366db7abc0aadc04c08feabcd05ad32f865459579482c06d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "05f9627967589c54366db7abc0aadc04c08feabcd05ad32f865459579482c06d"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-fight-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "eaf81b75fbf6453a47737fa81e9204c7c53d91eb9ef050c367a701437af4c545",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "eaf81b75fbf6453a47737fa81e9204c7c53d91eb9ef050c367a701437af4c545"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-movement-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "5c57a83d1767584684a13e07accf2758fb1c15bba02a4474b6b69aefa5a1d9e0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "5c57a83d1767584684a13e07accf2758fb1c15bba02a4474b6b69aefa5a1d9e0"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-movement-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "5e2fcb003c539e6724b9f7adf7e3868cdcef12368c32cf7439e233a20d3df621",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "5e2fcb003c539e6724b9f7adf7e3868cdcef12368c32cf7439e233a20d3df621"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-objective_control-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "f3d905a67009814940df2626645f11e6a17c08e9817d485003dfcd6a4bb27963",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "f3d905a67009814940df2626645f11e6a17c08e9817d485003dfcd6a4bb27963"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-objective_control-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "58a618fca334760dbd9651f496e2516938442cefca789368c3b6f2d6913f501e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "58a618fca334760dbd9651f496e2516938442cefca789368c3b6f2d6913f501e"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-reconstruction-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "4701628cd6d40cb39c2e3cee0d3642453716fbb0f8b1cd24f5acbce53cfdc384",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "4701628cd6d40cb39c2e3cee0d3642453716fbb0f8b1cd24f5acbce53cfdc384"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-reconstruction-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "8bdfc7d6c369643e884b08cde076113f2621f410107c1ed96c8bd133702f84b9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "8bdfc7d6c369643e884b08cde076113f2621f410107c1ed96c8bd133702f84b9"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-roster-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "3795f43e194b3af022fe73cb7504af12ad6d1834293d8130541ef53fd04ddfda",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "3795f43e194b3af022fe73cb7504af12ad6d1834293d8130541ef53fd04ddfda"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-roster-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "14a44bc9a1435135364e5f9edcfdca29457143b913ccab43479b1d871ca9b7f3",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "14a44bc9a1435135364e5f9edcfdca29457143b913ccab43479b1d871ca9b7f3"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-setup-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "b754e08f78ad97e638df0839f538c05bbb8a54a94a9033e6d25a2870cc86c0fe",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "b754e08f78ad97e638df0839f538c05bbb8a54a94a9033e6d25a2870cc86c0fe"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-setup-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "be6384885dac7bf7e0e2fc1d04de45aa803f903b6539b241faab81a2eaf6f447",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "be6384885dac7bf7e0e2fc1d04de45aa803f903b6539b241faab81a2eaf6f447"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-shock_reconstruction-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "41f0d1b79de2acafb781804d3dae1daa8ef768476b54c870c55cc8933c7d31fe",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "41f0d1b79de2acafb781804d3dae1daa8ef768476b54c870c55cc8933c7d31fe"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-shock_reconstruction-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "59ba257c6eebc5accbb18d9c2831cbdc1d1b366cc20d687f4203e5f4a9bac020",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "59ba257c6eebc5accbb18d9c2831cbdc1d1b366cc20d687f4203e5f4a9bac020"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-strength-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "7f8425d69271ee448e895b6be36acb2e22d70b42095fd9d1f1dff5581ae52f52",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "7f8425d69271ee448e895b6be36acb2e22d70b42095fd9d1f1dff5581ae52f52"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-strength-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "b0fc0045eff7839ba15bedc733ce3f1e78e9f2512728a0368d4ae93e3802a2fe",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "b0fc0045eff7839ba15bedc733ce3f1e78e9f2512728a0368d4ae93e3802a2fe"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-visibility-base.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "5d2d6484669c5988512e95487a358e8dddae6ef25d4e52d22ff7418dba53baa6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "5d2d6484669c5988512e95487a358e8dddae6ef25d4e52d22ff7418dba53baa6"
         }
       }
     },
     "data/source_audits/qualification40_v1/receipt-visibility-head.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "aab109fdaf990056ca7acfc6f00755080defb60ff0d1de3adc04216c02dd6861",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "aab109fdaf990056ca7acfc6f00755080defb60ff0d1de3adc04216c02dd6861"
         }
       }
     },
@@ -2196,21 +2196,21 @@
     },
     "data/source_audits/qualification40_v1/source-token-inventories.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "c8dab18d5a45e463ddefa3da00772148a60993e64dfb25436c960fc9af6afd08",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "c8dab18d5a45e463ddefa3da00772148a60993e64dfb25436c960fc9af6afd08"
         }
       }
     },
     "data/source_audits/qualification40_v1/tool-input-roles-v3.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "359d241309548297c66b9c4ba668078290b395aea879c97aaf7bcd4694a3651c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "359d241309548297c66b9c4ba668078290b395aea879c97aaf7bcd4694a3651c"
         }
       }
     },
@@ -2576,121 +2576,121 @@
     },
     "docs/performance/current/qualification40-dice.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "8c9a9d960b3d25cd420cd4f22226d7fd271b6afed7b0163d1cc4369f355ab92b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "8c9a9d960b3d25cd420cd4f22226d7fd271b6afed7b0163d1cc4369f355ab92b"
         }
       }
     },
     "docs/performance/current/qualification40-dice_sustained.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "60a8f645e4ec2d5ebad575e99ed3ba65703b076c1ddc864541e2eb7e8f263446",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "60a8f645e4ec2d5ebad575e99ed3ba65703b076c1ddc864541e2eb7e8f263446"
         }
       }
     },
     "docs/performance/current/qualification40-external_contract_source_reuse.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "fde30d279036fb4980641108fe93f83570d91ab52875b057d25f8100773f4a40",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "fde30d279036fb4980641108fe93f83570d91ab52875b057d25f8100773f4a40"
         }
       }
     },
     "docs/performance/current/qualification40-fight.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "0157cdf2938760944882f37f625df0d33dc5041b64a0cd74272f4768839d2af7",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "0157cdf2938760944882f37f625df0d33dc5041b64a0cd74272f4768839d2af7"
         }
       }
     },
     "docs/performance/current/qualification40-movement.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "b22161df5efce4c6f4dcde8bd5bae853d8a372786e007b6d7fae8a7271d3a14a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "b22161df5efce4c6f4dcde8bd5bae853d8a372786e007b6d7fae8a7271d3a14a"
         }
       }
     },
     "docs/performance/current/qualification40-objective_control.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "d787b8f09e9b5b2d96e704e75e91163c182dfaf6e41e3a88a2f8e319d0ed4d99",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "d787b8f09e9b5b2d96e704e75e91163c182dfaf6e41e3a88a2f8e319d0ed4d99"
         }
       }
     },
     "docs/performance/current/qualification40-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "d542350340b4a7a08f036473c7e19c48a52cdea7f2080096c18246e35b066b57",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "d542350340b4a7a08f036473c7e19c48a52cdea7f2080096c18246e35b066b57"
         }
       }
     },
     "docs/performance/current/qualification40-roster.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "8337c34aef552eb585b9f4fd794199f126ae2946b5071a9df71822c3d37caf81",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "8337c34aef552eb585b9f4fd794199f126ae2946b5071a9df71822c3d37caf81"
         }
       }
     },
     "docs/performance/current/qualification40-setup.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "05bba2e1f8fb1e50fa37eb685410d0c1bd20597a52b5fa2abdb20e4fc9caef32",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "05bba2e1f8fb1e50fa37eb685410d0c1bd20597a52b5fa2abdb20e4fc9caef32"
         }
       }
     },
     "docs/performance/current/qualification40-shock_reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "9e8f148f0a3b5857db76c25378ecc8b86fa6679a5d974f52013bb5245da508d4",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "9e8f148f0a3b5857db76c25378ecc8b86fa6679a5d974f52013bb5245da508d4"
         }
       }
     },
     "docs/performance/current/qualification40-strength.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "8693939704130d3d56845b2fb427e821ea602d11634fd6f747ffa57e7f8109c5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "8693939704130d3d56845b2fb427e821ea602d11634fd6f747ffa57e7f8109c5"
         }
       }
     },
     "docs/performance/current/qualification40-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "after_sha256": "a6aa80ad8a37dabf5e38c89946248c1b9b7731b9fa09cf60bf5f029c455e3749",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+          "after": "a6aa80ad8a37dabf5e38c89946248c1b9b7731b9fa09cf60bf5f029c455e3749"
         }
       }
     },

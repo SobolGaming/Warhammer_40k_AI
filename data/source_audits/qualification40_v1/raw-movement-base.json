@@ -1,1 +1,54 @@
-{}
+{
+  "workload": "order80-normal-move-occurrence-v1",
+  "revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "memory_bytes": 67359387648,
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+  "python": "3.14.5",
+  "host_role": "provisional",
+  "concurrency": 1,
+  "timing_boundary": "Accepted reactive move through next player Movement action enumeration, session checkpoint export and restore; initial scene/permission preparation excluded; three serial samples without coverage",
+  "hashes": {
+    "scripts/measure_order80.py": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "tests/normal_move_occurrence_helpers.py": "1fd2eed01572c889b3a5a85493709857198d23f652578023d787bb73c6dd6d5c",
+    "tests/phase15c_fight_order_helpers.py": "621bd527693f72bcd47264e92e0cbbc4d1fe95f96d5ffb52533ee8448083aedf",
+    "uv.lock": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa"
+  },
+  "rows": [
+    {
+      "case": "finite",
+      "samples_seconds": [
+        4.881471229999988,
+        4.858034343000099,
+        4.931164949000049
+      ],
+      "mean_seconds": 4.890223507333379,
+      "maximum_seconds": 4.931164949000049,
+      "complete": true,
+      "normal_move_available": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "case": "parameterized",
+      "samples_seconds": [
+        4.517786806999993,
+        4.534345278000046,
+        4.553283273000034
+      ],
+      "mean_seconds": 4.535138452666691,
+      "maximum_seconds": 4.553283273000034,
+      "complete": true,
+      "normal_move_available": [
+        true,
+        true,
+        true
+      ]
+    }
+  ],
+  "full_game_certified": false,
+  "semantic_note": "Base wrongly omits Normal Move; timing compares the same submitted decisions and checkpoint work, not semantic equivalence"
+}
