@@ -112,6 +112,57 @@ def test_owned_scan_rejects_midread_change(tmp_path: Path, monkeypatch: pytest.M
         preflight.source_hashes(tmp_path, {"source.py"})
 
 
+@pytest.mark.parametrize("same_bytes", [False, True])
+def test_owned_windows_scan_rejects_write_at_final_path_query(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, same_bytes: bool
+) -> None:
+    path = tmp_path / "source.py"
+    original = b"before"
+    path.write_bytes(original)
+    metadata = path.stat()
+    observations: list[os.stat_result] = []
+    reader_fd: int | None = None
+    mutated = False
+    final_path_observed = False
+    final_handle_observed = False
+
+    def observe_handle(fd: int) -> os.stat_result:
+        nonlocal reader_fd, final_handle_observed
+        reader_fd = fd
+        result = os.fstat(fd)
+        observations.append(result)
+        if final_path_observed:
+            final_handle_observed = True
+        return result
+
+    def observe_path(name: str) -> os.stat_result:
+        nonlocal mutated, final_path_observed
+        if name == path.as_posix() and len(observations) == 2:
+            assert reader_fd is not None
+            # The reader must remain open across this real final-query write.
+            assert os.fstat(reader_fd) == observations[-1]
+            path.write_bytes(original if same_bytes else b"edited")
+            os.utime(path, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+            assert os.fstat(reader_fd).st_ctime_ns != observations[-1].st_ctime_ns
+            mutated = True
+            final_path_observed = True
+        return os.lstat(name)
+
+    # Select the Windows path without changing os.name used by pathlib/pytest.
+    monkeypatch.setattr(
+        preflight,
+        "os",
+        SimpleNamespace(name="nt", path=os.path, lstat=observe_path, fstat=observe_handle),
+    )
+    with pytest.raises(ValueError, match="changed during owned read"):
+        preflight.source_hashes(tmp_path, {path.name})
+    assert mutated
+    assert final_handle_observed
+    assert len(observations) == 3
+    assert path.stat().st_mtime_ns == metadata.st_mtime_ns
+    assert path.read_bytes() == (original if same_bytes else b"edited")
+
+
 def _read_metadata(*, ctime: int, changed: str = "") -> os.stat_result:
     fields = {"mode": 0o100644, "ino": 2, "dev": 3, "nlink": 1, "size": 6, "mtime": 5}
     if changed:

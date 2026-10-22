@@ -12,7 +12,7 @@ BASE_SOURCE = "36ab649ef5a6ab747587dc25d05336252db5a4eb148dc24619e6881c38efec42"
 SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
 INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
-FREEZE_COMMIT: str | None = "ce62beb429ceb02a873c94c155e193fcd84470d3"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -29,7 +29,7 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_performance_preflight.py",
-        "1a7ae576cb4d9fbec33427208c93e255bd6f464f30984b8d81c436972678d1eb",
+        "d5612ca6ffe4932704d425eba3f2745600b0484fed165b7bd3285076a53a716b",
     ),
     (
         "tests/code_quality/test_qualification40_successor.py",
@@ -45,7 +45,7 @@ _PIN_ROWS = (
     ),
     (
         "tools/performance_preflight.py",
-        "60dc30623939bd82749c624e0ad8907cdde5669d63ca7a5fbfd9456731ab6886",
+        "68231d01c2be7c1a1c1951dd0a178acaf97738ddfc937e5aac88a921fd7048a8",
     ),
     (
         "tools/performance_qualification_successor.py",

@@ -179,12 +179,21 @@ def source_hashes(root: Path, names: set[str]) -> dict[str, str]:
         before = os.lstat(path)
         if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or os.path.isjunction(path):
             raise ValueError("D07 member must be an owned regular file: " + name)
+        windows = os.name == "nt"
         with Path(path).open("rb") as stream:
             opened = os.fstat(stream.fileno())
             raw = stream.read()
             closed = os.fstat(stream.fileno())
-        after = os.lstat(path)
-        if not _same_read(before, opened, closed, after, windows=os.name == "nt"):
+            if windows:
+                # Keep ChangeTime observable through the final path query;
+                # Windows lstat's creation-time ctime cannot detect this write.
+                after = os.lstat(path)
+                final = os.fstat(stream.fileno())
+                if not _same_file(closed, final):
+                    raise ValueError("Cumulative source changed during owned read: " + name)
+        if not windows:
+            after = os.lstat(path)
+        if not _same_read(before, opened, closed, after, windows=windows):
             raise ValueError("Cumulative source changed during owned read: " + name)
         result[name] = _source_digest(name, raw)
     for path, before in directories.items():

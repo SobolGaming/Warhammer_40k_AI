@@ -5026,7 +5026,7 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "1a7ae576cb4d9fbec33427208c93e255bd6f464f30984b8d81c436972678d1eb",
+      "after_sha256": "d5612ca6ffe4932704d425eba3f2745600b0484fed165b7bd3285076a53a716b",
       "owners": {
         "@module": {
           "before": null,
@@ -5079,6 +5079,10 @@
         "test_owned_scan_rejects_midread_change": {
           "before": null,
           "after": "ba8191c25e3eb580d12df5c8d7283ad4f280f56ffbcc4d93aa0ee96a887aa8f8"
+        },
+        "test_owned_windows_scan_rejects_write_at_final_path_query": {
+          "before": null,
+          "after": "6fcf08e8354b7da290bf4f3cc174f7d734a0a7f7dbe5455999a57d55fb8cfe2a"
         },
         "test_owner_cache_uses_exact_inputs_defensive_copies_and_exception_cleanup": {
           "before": null,
@@ -18034,7 +18038,7 @@
     },
     "tools/performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "60dc30623939bd82749c624e0ad8907cdde5669d63ca7a5fbfd9456731ab6886",
+      "after_sha256": "68231d01c2be7c1a1c1951dd0a178acaf97738ddfc937e5aac88a921fd7048a8",
       "owners": {
         "@module": {
           "before": null,
@@ -18082,17 +18086,17 @@
         },
         "source_hashes": {
           "before": null,
-          "after": "3fb1c14fa2cef403875218b7f96da76e2c17ad4755dee45c383877667e377b89"
+          "after": "8566e8eab074b6e08ba722b97f29b808169629ddfc22d42b5bd361950192ef9f"
         }
       }
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "55ecca184ec20673330ae8e6331e2874e0fd43db86e0e7f9baaacf97cbbf1420",
+      "after_sha256": "2e5a0297d7a49243489f7fda68caa2609dc44d15e94d5d53eacece7ecd8cded0",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e434cccec1d2faa3c7245d558f0eb9c94e30382f8081c4c0b47ce97b20e2cdb4"
+          "after": "d483eec52bcae0f1afd76a08072889dc90b337fda1a1cc13bd5a893a22cc7acd"
         },
         "_assessment": {
           "before": null,
@@ -22588,8 +22592,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve exact complete-byte source validation while comparing Windows creation/change timestamps only within their respective API channels. POSIX retains its original cross-API metadata checks; eight new guards cover stable differing Windows times and every existing metadata field.",
-      "source_obligation": "Retain all seven metadata fields within each matching API channel, every other field across APIs, fresh complete-byte hashes, ownership and alias checks; reject real midread changes with restored mtime.",
+      "rationale": "Preserve exact complete-byte source validation while comparing Windows creation/change timestamps only within their respective API channels. Windows retains its handle through the final path query and compares all seven handle metadata fields afterward. POSIX retains its original cross-API metadata checks and observation sequence; ten Windows guards cover stable differing times, every metadata field and changed/identical-byte writes at the final path query.",
+      "source_obligation": "Retain all seven metadata fields within each matching API channel, every other field across APIs, fresh complete-byte hashes, ownership and alias checks; reject real midread and final-path-query changes, including identical-byte writes with restored mtime.",
       "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     },
     "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
@@ -28326,8 +28330,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve exact complete-byte source validation while comparing Windows creation/change timestamps only within their respective API channels. POSIX retains its original cross-API metadata checks; eight new guards cover stable differing Windows times and every existing metadata field.",
-      "source_obligation": "Retain all seven metadata fields within each matching API channel, every other field across APIs, fresh complete-byte hashes, ownership and alias checks; reject real midread changes with restored mtime.",
+      "rationale": "Preserve exact complete-byte source validation while comparing Windows creation/change timestamps only within their respective API channels. Windows retains its handle through the final path query and compares all seven handle metadata fields afterward. POSIX retains its original cross-API metadata checks and observation sequence; ten Windows guards cover stable differing times, every metadata field and changed/identical-byte writes at the final path query.",
+      "source_obligation": "Retain all seven metadata fields within each matching API channel, every other field across APIs, fresh complete-byte hashes, ownership and alias checks; reject real midread and final-path-query changes, including identical-byte writes with restored mtime.",
       "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     },
     "tools/performance_preflight_successor.py": {
