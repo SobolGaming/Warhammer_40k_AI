@@ -184,11 +184,7 @@ def source_hashes(root: Path, names: set[str]) -> dict[str, str]:
             raw = stream.read()
             closed = os.fstat(stream.fileno())
         after = os.lstat(path)
-        if (
-            not _same_file(before, opened)
-            or not _same_file(opened, closed)
-            or not _same_file(closed, after)
-        ):
+        if not _same_read(before, opened, closed, after, windows=os.name == "nt"):
             raise ValueError("Cumulative source changed during owned read: " + name)
         result[name] = _source_digest(name, raw)
     for path, before in directories.items():
@@ -202,7 +198,28 @@ def source_hashes(root: Path, names: set[str]) -> dict[str, str]:
     return result
 
 
-def _same_file(before: os.stat_result, after: os.stat_result) -> bool:
+def _same_read(
+    before: os.stat_result,
+    opened: os.stat_result,
+    closed: os.stat_result,
+    after: os.stat_result,
+    *,
+    windows: bool,
+) -> bool:
+    # Windows Python can expose creation time through lstat's ctime and change
+    # time through fstat's ctime. Both channels must remain stable independently;
+    # compare all other identity/content metadata across the two APIs as well.
+    return (
+        (not windows or _same_file(before, after))
+        and _same_file(before, opened, compare_ctime=not windows)
+        and _same_file(opened, closed)
+        and _same_file(closed, after, compare_ctime=not windows)
+    )
+
+
+def _same_file(
+    before: os.stat_result, after: os.stat_result, *, compare_ctime: bool = True
+) -> bool:
     return (
         before.st_dev,
         before.st_ino,
@@ -210,7 +227,7 @@ def _same_file(before: os.stat_result, after: os.stat_result) -> bool:
         before.st_nlink,
         before.st_size,
         before.st_mtime_ns,
-        before.st_ctime_ns,
+        before.st_ctime_ns if compare_ctime else None,
     ) == (
         after.st_dev,
         after.st_ino,
@@ -218,5 +235,5 @@ def _same_file(before: os.stat_result, after: os.stat_result) -> bool:
         after.st_nlink,
         after.st_size,
         after.st_mtime_ns,
-        after.st_ctime_ns,
+        after.st_ctime_ns if compare_ctime else None,
     )

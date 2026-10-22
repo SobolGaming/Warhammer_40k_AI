@@ -5026,11 +5026,15 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "6a61c82df9d1a60b9dcc54ce25e254a56fa896436dd6abe354911320e44c6c1b",
+      "after_sha256": "1a7ae576cb4d9fbec33427208c93e255bd6f464f30984b8d81c436972678d1eb",
       "owners": {
         "@module": {
           "before": null,
           "after": "c8c4a2f5e03e84be454f9849fc9f5cd214d95880117db5aab7b3f87b79365ed6"
+        },
+        "_read_metadata": {
+          "before": null,
+          "after": "e79d880c6725c1af9be373d6e4dab1cd17b18cb170df1755dc772fb21464c46c"
         },
         "test_generated_inventory_changes_only_reviewed_perils_metadata": {
           "before": null,
@@ -5047,6 +5051,18 @@
         "test_native_discovery_matches_original_ignored_and_symlink_membership": {
           "before": null,
           "after": "22da88ae078c9061240c7e50201cc9de520643be5495ae861b8b20d2c1198331"
+        },
+        "test_owned_read_compares_windows_ctime_within_each_api_channel": {
+          "before": null,
+          "after": "acd82661223c11e397dca632e5be14dc5165cdffca9537055cdadce913c69650"
+        },
+        "test_owned_read_rejects_cross_api_metadata_drift": {
+          "before": null,
+          "after": "efa68c02c751721ddbae48a20abea4d8821c82c4ba9292aeccc6fec8d9e7a230"
+        },
+        "test_owned_read_rejects_ctime_drift_in_either_api_channel": {
+          "before": null,
+          "after": "10c4ae1a1c68bbe703fb587d0b866557eaac43ba36651ebc8b9215b6d27c0862"
         },
         "test_owned_scan_matches_independent_original_reader": {
           "before": null,
@@ -18018,7 +18034,7 @@
     },
     "tools/performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "1616043ec399c20ddef85de75c033ac93d41d9c0bde89b33a849029a89e0e991",
+      "after_sha256": "60dc30623939bd82749c624e0ad8907cdde5669d63ca7a5fbfd9456731ab6886",
       "owners": {
         "@module": {
           "before": null,
@@ -18038,7 +18054,11 @@
         },
         "_same_file": {
           "before": null,
-          "after": "f2571ea1ad65d29b8ff92e8a2562f2f37fc1315eddc1ee23a7010c2921bb366a"
+          "after": "c088aee98de7a1c8312b31c1662f7bb21da1b825003e108937aaa59cc6dc867d"
+        },
+        "_same_read": {
+          "before": null,
+          "after": "cfee6e9f77e93546fefaee262900201958adf3417e611767655ebf89f9a5a5d8"
         },
         "_source_digest": {
           "before": null,
@@ -18062,17 +18082,17 @@
         },
         "source_hashes": {
           "before": null,
-          "after": "d26a0c020749dab219ba8b24eb9e9ae553eed62903256f9726d28109c3aac2fd"
+          "after": "3fb1c14fa2cef403875218b7f96da76e2c17ad4755dee45c383877667e377b89"
         }
       }
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "619184d9385ee8907e6978a5ade40db7b9ac51756d53846394332fb38f95e749",
+      "after_sha256": "854ec68979e3a9243aa95454dea9749af94889e4ae9aeb46fed319d8ef54f294",
       "owners": {
         "@module": {
           "before": null,
-          "after": "4bde548cdb494b95e9649136935acde9d19e8b3585a8aeed81d9e96cf153fba5"
+          "after": "3487c527786d843197e2d48cba736fcb8e4f94d5b5eef6ec7dc0098ad451d8ac"
         },
         "_assessment": {
           "before": null,
@@ -22568,8 +22588,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact bounded preflight successor or retained Perils admission. Untimed admission tooling remains part of whole-command timing; raw component arms are reused only through exact unchanged measurement input proof.",
-      "source_obligation": "Preserve complete current pre/post source admission, owned physical bytes, all Git provenance and the original finite Perils assertions.",
+      "rationale": "Preserve exact complete-byte source validation while comparing Windows creation/change timestamps only within their respective API channels. POSIX retains its original cross-API metadata checks; eight new guards cover stable differing Windows times and every existing metadata field.",
+      "source_obligation": "Retain all seven metadata fields within each matching API channel, every other field across APIs, fresh complete-byte hashes, ownership and alias checks; reject real midread changes with restored mtime.",
       "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     },
     "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
@@ -28306,8 +28326,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact bounded preflight successor or retained Perils admission. Untimed admission tooling remains part of whole-command timing; raw component arms are reused only through exact unchanged measurement input proof.",
-      "source_obligation": "Preserve complete current pre/post source admission, owned physical bytes, all Git provenance and the original finite Perils assertions.",
+      "rationale": "Preserve exact complete-byte source validation while comparing Windows creation/change timestamps only within their respective API channels. POSIX retains its original cross-API metadata checks; eight new guards cover stable differing Windows times and every existing metadata field.",
+      "source_obligation": "Retain all seven metadata fields within each matching API channel, every other field across APIs, fresh complete-byte hashes, ownership and alias checks; reject real midread changes with restored mtime.",
       "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     },
     "tools/performance_preflight_successor.py": {

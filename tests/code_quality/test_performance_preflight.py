@@ -112,6 +112,53 @@ def test_owned_scan_rejects_midread_change(tmp_path: Path, monkeypatch: pytest.M
         preflight.source_hashes(tmp_path, {"source.py"})
 
 
+def _read_metadata(*, ctime: int, changed: str = "") -> os.stat_result:
+    fields = {"mode": 0o100644, "ino": 2, "dev": 3, "nlink": 1, "size": 6, "mtime": 5}
+    if changed:
+        fields[changed] += 1
+    return os.stat_result(
+        (
+            fields["mode"],
+            fields["ino"],
+            fields["dev"],
+            fields["nlink"],
+            0,
+            0,
+            fields["size"],
+            0,
+            0,
+            0,
+        ),
+        {"st_mtime_ns": fields["mtime"], "st_ctime_ns": ctime},
+    )
+
+
+def test_owned_read_compares_windows_ctime_within_each_api_channel() -> None:
+    path = _read_metadata(ctime=10)
+    handle = _read_metadata(ctime=20)
+    assert preflight._same_read(path, handle, handle, path, windows=True)
+    assert not preflight._same_read(path, handle, handle, path, windows=False)
+    for windows in (False, True):
+        assert preflight._same_read(path, path, path, path, windows=windows)
+
+
+def test_owned_read_rejects_ctime_drift_in_either_api_channel() -> None:
+    for windows in (False, True):
+        times = [10, 20 if windows else 10, 20 if windows else 10, 10]
+        for index in range(4):
+            observations = [_read_metadata(ctime=value) for value in times]
+            observations[index] = _read_metadata(ctime=times[index] + 1)
+            assert not preflight._same_read(*observations, windows=windows)
+
+
+@pytest.mark.parametrize("field", ["mode", "ino", "dev", "nlink", "size", "mtime"])
+def test_owned_read_rejects_cross_api_metadata_drift(field: str) -> None:
+    path = _read_metadata(ctime=10)
+    for windows in (False, True):
+        handle = _read_metadata(ctime=20 if windows else 10, changed=field)
+        assert not preflight._same_read(path, handle, handle, path, windows=windows)
+
+
 def test_public_smoke_gate_revalidates_and_refuses_midrun_change(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
