@@ -14,7 +14,7 @@ SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
 CI_WORKFLOW = ".github/workflows/ci.yml"
 INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
-FREEZE_COMMIT: str | None = "d3405a068765005547a920beb4d28ef65d0de335"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -27,7 +27,7 @@ _PIN_ROWS = (
     ),
     (
         "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
-        "3078440364a17fcb8ae09a7e8aad2217789a70968bde4ca9c560fcf34382ed52",
+        "630b8a18ca865d40b0b0d31dcff2a9d6f551f6a62c62a3c1ec9e02dea514de4a",
     ),
     (
         "docs/performance/ci-compatibility-successor49c.json",
@@ -39,7 +39,7 @@ _PIN_ROWS = (
     ),
     (
         "docs/performance/ci-runtime-successor51.json",
-        "8bba534af0a759ad39239e03f7c9be4f01d03f258281112d753494767470a393",
+        "b021fee4278a9cbba3cdcc63cde7dbfd9c8a8aaac401bdfdd4725746583d68f9",
     ),
     (
         "docs/performance/ci-successor49.json",
@@ -74,16 +74,8 @@ _PIN_ROWS = (
         "0380ba2c9ab5c1e045f281f810f0e6e582b0738a3db8eab7a18ecfc34fe6c4d8",
     ),
     (
-        "tests/category_migration_preservation.py",
-        "ac412880e4214d29d298622a8cfd11e774905470bcaa5c38e278753c14b91f59",
-    ),
-    (
         "tests/code_quality/__init__.py",
         "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
-    ),
-    (
-        "tests/code_quality/test_category_migration_preservation.py",
-        "96327a673bb20e584833464852f4235250f704602fa7402c81e5f44b381686cc",
     ),
     (
         "tests/code_quality/test_ci_history_input.py",
@@ -91,7 +83,7 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_ci_runtime_successor.py",
-        "862f40afb3a3b1e7adb309a8b249c46b51a2a2b2366ebecb174dfd978fc0dd72",
+        "f0a91c3093e954287cbebb8e05b2c03bf03f9d827c69b6e1bc6906da60bd7c89",
     ),
     (
         "tests/code_quality/test_cumulative_preservation.py",
@@ -115,7 +107,7 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_performance_integration_batch.py",
-        "4d75419da5b32011ee80a1038b1644bd61774168211f4a75e8f4e2e895ae87d5",
+        "bbdff0e56ccb7f90101363c02431db19e4ffd93d181af06d8a92f5a62eb2ccdd",
     ),
     (
         "tests/code_quality/test_performance_preflight.py",
@@ -139,7 +131,7 @@ _PIN_ROWS = (
     ),
     (
         "tools/cumulative_preservation.py",
-        "11686196454a263c214b087597a0eee21550fc5806de2883264e037f9348b737",
+        "0aed6e5a524e891710bc85c2eda40565ca1f5cfc5c07f268acdb6ec727c060f3",
     ),
     (
         "tools/generate_aeldari_datasheet_semantic_coverage.py",
@@ -322,14 +314,6 @@ _CI_RUNTIME_BEFORE_ROWS = (
         "fcde2b057946e9915403949209d2d39618aabdb09f8c3e5eafbc72c09d4ef061",
     ),
     (
-        "tests/category_migration_preservation.py",
-        "bb8fe47800cff5556d6b05d729224f3a4b22b099c8f07432012e6fa60e204519",
-    ),
-    (
-        "tests/code_quality/test_category_migration_preservation.py",
-        "341020dd1e9a8d6f64e5bfad83d444af19802b4a8eb04973755f75a2008c1fb5",
-    ),
-    (
         "tests/code_quality/test_ci_history_input.py",
         "fb94f5cef3b48fdafc4547f2a52493f315d2a8587a6cf83c6552861bac4e39bb",
     ),
@@ -338,16 +322,8 @@ _CI_RUNTIME_BEFORE_ROWS = (
         "9df6552a38bb198beab562cb1649e32ee14e9499e58cf0e44e5552b14f175577",
     ),
     (
-        "tests/code_quality/test_performance_integration_batch.py",
-        "bbdff0e56ccb7f90101363c02431db19e4ffd93d181af06d8a92f5a62eb2ccdd",
-    ),
-    (
         "tests/code_quality/test_performance_static_successor.py",
         "4aa98bd59b00a15f65efddd433d4b9c3fa2d748a6ff6fee1581cd7dad848e128",
-    ),
-    (
-        "tools/cumulative_preservation.py",
-        "0aed6e5a524e891710bc85c2eda40565ca1f5cfc5c07f268acdb6ec727c060f3",
     ),
 )
 CI_RUNTIME_BEFORE: dict[str, str] = dict(_CI_RUNTIME_BEFORE_ROWS)

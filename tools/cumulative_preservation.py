@@ -135,15 +135,7 @@ def reviewed_control_hashes(root: Path) -> dict[str, str]:
                 raise ValueError("Source freeze must contain the unactivated cumulative adapter.")
             raw = raw.replace(marker, bound, 1)
         current = _read(root, name)
-        comparison = current
-        if name in {
-            "tests/category_migration_preservation.py",
-            "tests/code_quality/test_category_migration_preservation.py",
-        }:
-            from tools.performance_preflight_successor import ci_comparison
-
-            comparison = ci_comparison(root, name, current)
-        preceding = projection.get(name, comparison)
+        preceding = projection.get(name, current)
         if preceding != raw:
             raise ValueError(
                 "Reviewed migration source/data changed; control bytes changed: " + name
@@ -315,15 +307,7 @@ def verify_control_transformations(root: Path) -> None:
         baseline = _git(root, "show", CONTENT_BASE + ":" + name)
         accepted = _git(root, "show", ACCEPTED + ":" + name)
         current = _read(root, name)
-        comparison = current
-        if name in {
-            "tests/category_migration_preservation.py",
-            "tests/code_quality/test_category_migration_preservation.py",
-        }:
-            from tools.performance_preflight_successor import ci_comparison
-
-            comparison = ci_comparison(root, name, current)
-        current = projection.get(name, comparison)
+        current = projection.get(name, current)
         for raw, key in (
             (historical, "legacy_sha256"),
             (baseline, "pr587_sha256"),

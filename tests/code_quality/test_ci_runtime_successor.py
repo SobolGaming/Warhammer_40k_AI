@@ -40,7 +40,7 @@ def test_ci_runtime_edits_match_exact_independent_predecessor(name: str) -> None
 
 
 def test_ci_runtime_transition_rejects_unlisted_sources_and_changed_predecessors() -> None:
-    name = "tests/category_migration_preservation.py"
+    name = "tests/code_quality/test_faction_content_runtime_structure.py"
     record: dict[str, Any] = json.loads((ROOT / successor.CI_RUNTIME_RECORD).read_bytes())
     before = subprocess.check_output(
         ["git", "show", successor.CI_RUNTIME_BASE + ":" + name], cwd=ROOT
@@ -56,8 +56,8 @@ def test_ci_runtime_transition_rejects_unlisted_sources_and_changed_predecessors
 @pytest.mark.parametrize(
     "name",
     [
-        "tests/category_migration_preservation.py",
-        "tests/code_quality/test_category_migration_preservation.py",
+        "tests/code_quality/test_faction_content_runtime_structure.py",
+        "tests/code_quality/test_ci_history_input.py",
     ],
 )
 def test_ci_runtime_control_comparison_rejects_unrelated_caller_bytes(name: str) -> None:
