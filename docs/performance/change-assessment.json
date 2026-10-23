@@ -18627,11 +18627,11 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "952f65095e143dc559451152d01ddfae0db8f357be9aa0c6b1c08866239e8f6c",
+      "after_sha256": "a3b8296b4cb56e00f806054b827655975cf89c0cd1c67afa25b291897a049ed4",
       "owners": {
         "@module": {
           "before": null,
-          "after": "0049c6b4399d6034abfeec8fda719e0ac92a8d25cf5c18d17cec695ba23de7c6"
+          "after": "b7c2ba3e6288a0c48477c80e4e83322a18275f8a140162db3b3b6b41651e68fd"
         },
         "_assert_ci_edits": {
           "before": null,
