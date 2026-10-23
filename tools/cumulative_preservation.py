@@ -153,8 +153,11 @@ def expected_source(root: Path) -> dict[str, str]:
     controls = reviewed_control_hashes(root)
     # No wildcard successor exception. Every changed/new implementation member
     # is frozen as an exact Git blob in the genuine local implementation commit.
+    from tools.performance_preflight_successor import read_frozen_blobs
+
+    frozen_members = read_frozen_blobs(root, str(SOURCE_COMMIT), record["integration_members"])
     for name in record["integration_members"]:
-        raw = _git(root, "show", str(SOURCE_COMMIT) + ":" + name)
+        raw = frozen_members[name]
         source[name] = controls.get(name, _sha(raw))
     return (
         successor.expected_source(root, cast(dict[str, str], source))

@@ -13,7 +13,7 @@ BASE_SOURCE = "36ab649ef5a6ab747587dc25d05336252db5a4eb148dc24619e6881c38efec42"
 SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
 INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
-FREEZE_COMMIT: str | None = "35e129b6b7a0c7eb4329143ac0a401117367d539"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -35,6 +35,10 @@ _PIN_ROWS = (
     (
         "docs/performance/ci-successor49.json",
         "ea9fd6be7ca6371b78461291d95c85ba2371838b82e4e2f3a7a391212f9d879c",
+    ),
+    (
+        "docs/performance/ci-transport-successor49d.json",
+        "b5ce1cda52ac28878942943c16f8e0db3f793560ae1c0c3d9b5af68231c3849d",
     ),
     (
         "docs/performance/policy-v3/operation-map.json",
@@ -81,6 +85,10 @@ _PIN_ROWS = (
         "0ee571c76b471dd9940f2a716c0c1f71ebc8a766f90ce2ae94c8239d47feda22",
     ),
     (
+        "tests/code_quality/test_performance_integration_batch.py",
+        "ae8d8761f8023f3367d51f39fcae6ff7a0bef4837f3bf97ee46512207f2f42e2",
+    ),
+    (
         "tests/code_quality/test_performance_preflight.py",
         "b6924bdca684374749f2a86d7e086192de3ace2b6eac595aa558deb8117c57e6",
     ),
@@ -102,7 +110,7 @@ _PIN_ROWS = (
     ),
     (
         "tools/cumulative_preservation.py",
-        "fd56f9037e9b5c1ae1466eed49195ee40be44ba32772a729c9ff724bc0c734e0",
+        "0aed6e5a524e891710bc85c2eda40565ca1f5cfc5c07f268acdb6ec727c060f3",
     ),
     (
         "tools/generate_aeldari_datasheet_semantic_coverage.py",
@@ -261,6 +269,17 @@ _CI_COMPAT_BEFORE_ROWS = (
 CI_COMPAT_BEFORE: dict[str, str] = dict(_CI_COMPAT_BEFORE_ROWS)
 
 
+CI_TRANSPORT_BASE = "599161cc0f76010c5ade3e257d6f700d72fc5c0b"
+CI_TRANSPORT_RECORD = "docs/performance/ci-transport-successor49d.json"
+_CI_TRANSPORT_BEFORE_ROWS = (
+    (
+        "tools/cumulative_preservation.py",
+        "fd56f9037e9b5c1ae1466eed49195ee40be44ba32772a729c9ff724bc0c734e0",
+    ),
+)
+CI_TRANSPORT_BEFORE: dict[str, str] = dict(_CI_TRANSPORT_BEFORE_ROWS)
+
+
 def _sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
@@ -337,6 +356,11 @@ def _blobs(root: Path, revision: str, names: list[str]) -> dict[str, bytes]:
     if offset != len(raw):
         raise ValueError("Preflight Git blob payload has trailing data.")
     return result
+
+
+def read_frozen_blobs(root: Path, revision: str, names: list[str]) -> dict[str, bytes]:
+    """Read a literal immutable group afresh with the complete existing Git checks."""
+    return _blobs(root, revision, names)
 
 
 def _read(root: Path, name: str) -> bytes:
@@ -445,6 +469,15 @@ def assert_ci_compatibility_transition(
     _assert_ci_edits(before, current, row, CI_COMPAT_BEFORE[name], False)
 
 
+def assert_ci_transport_transition(
+    name: str, before: bytes, current: bytes, row: dict[str, Any]
+) -> None:
+    """Admit only the exact immutable integration-member transport repair."""
+    if name not in CI_TRANSPORT_BEFORE:
+        raise ValueError("CI transition identity or bytes changed.")
+    _assert_ci_edits(before, current, row, CI_TRANSPORT_BEFORE[name], False)
+
+
 def _assert_ci_edits(
     before: bytes | None,
     current: bytes,
@@ -480,6 +513,20 @@ def _assert_ci_edits(
 
 
 def _ci_transitions(root: Path, frozen_members: dict[str, bytes]) -> dict[str, bytes]:
+    transport: dict[str, Any] = json.loads(frozen_members[CI_TRANSPORT_RECORD])
+    if (
+        transport.keys() != {"schema", "base", "changes"}
+        or transport["schema"] != "exact-ci-successor-v1"
+        or transport["base"] != CI_TRANSPORT_BASE
+        or transport["changes"].keys() != CI_TRANSPORT_BEFORE.keys()
+    ):
+        raise ValueError("CI transport membership or base changed.")
+    previous = _blobs(root, CI_TRANSPORT_BASE, list(CI_TRANSPORT_BEFORE))
+    for name in CI_TRANSPORT_BEFORE:
+        assert_ci_transport_transition(
+            name, previous[name], frozen_members[name], transport["changes"][name]
+        )
+    comparison = frozen_members | previous
     record: dict[str, Any] = json.loads(frozen_members[CI_COMPAT_RECORD])
     if (
         record.keys() != {"schema", "base", "changes"}
@@ -491,11 +538,11 @@ def _ci_transitions(root: Path, frozen_members: dict[str, bytes]) -> dict[str, b
     previous = _blobs(root, CI_COMPAT_BASE, list(CI_COMPAT_BEFORE))
     for name in CI_COMPAT_BEFORE:
         assert_ci_compatibility_transition(
-            name, previous[name], frozen_members[name], record["changes"][name]
+            name, previous[name], comparison[name], record["changes"][name]
         )
     # Current bytes have already passed their immutable freeze and physical reads.
     # Only this finite comparison view feeds the unchanged earlier recipes.
-    comparison = frozen_members | previous
+    comparison |= previous
     specifications: tuple[tuple[str, str, dict[str, str], set[str]], ...] = (
         (CI_BASE, CI_RECORD, CI_BEFORE, {CI_NEW}),
         (CI_FORMAT_BASE, CI_FORMAT_RECORD, CI_FORMAT_BEFORE, set()),
@@ -522,13 +569,15 @@ def _ci_transitions(root: Path, frozen_members: dict[str, bytes]) -> dict[str, b
 
 def ci_comparison(root: Path, name: str, raw: bytes) -> bytes:
     """Authenticate a finite later edit before its unchanged earlier recipe."""
-    if name not in CI_COMPAT_BEFORE:
+    if name not in CI_COMPAT_BEFORE and name not in CI_TRANSPORT_BEFORE:
         return raw
     _freeze(root)
     if raw != _read(root, name):
         raise ValueError("Static comparison caller supplied unrelated bytes.")
-    before = _git(root, "show", CI_COMPAT_BASE + ":" + name)
-    if _sha(before) != CI_COMPAT_BEFORE[name]:
+    base = CI_COMPAT_BASE if name in CI_COMPAT_BEFORE else CI_TRANSPORT_BASE
+    pin = CI_COMPAT_BEFORE[name] if name in CI_COMPAT_BEFORE else CI_TRANSPORT_BEFORE[name]
+    before = _git(root, "show", base + ":" + name)
+    if _sha(before) != pin:
         raise ValueError("Static comparison immutable bytes changed.")
     return before
 
@@ -559,6 +608,7 @@ def _freeze(root: Path) -> str:
     _git(root, "merge-base", "--is-ancestor", CI_BASE, freeze)
     _git(root, "merge-base", "--is-ancestor", CI_FORMAT_BASE, freeze)
     _git(root, "merge-base", "--is-ancestor", CI_COMPAT_BASE, freeze)
+    _git(root, "merge-base", "--is-ancestor", CI_TRANSPORT_BASE, freeze)
     names = _git(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
     if set(names) != PINS.keys() | {SELF, ASSESSMENT} or len(names) != len(PINS) + 2:
         raise ValueError("Preflight successor finite membership changed.")
@@ -634,7 +684,15 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     controls = (
         (
             PINS.keys()
-            - {INVENTORY, STATIC_RECORD, CI_RECORD, CI_FORMAT_RECORD, CI_COMPAT_RECORD, CI_ROADMAP}
+            - {
+                INVENTORY,
+                STATIC_RECORD,
+                CI_RECORD,
+                CI_FORMAT_RECORD,
+                CI_COMPAT_RECORD,
+                CI_TRANSPORT_RECORD,
+                CI_ROADMAP,
+            }
         )
         | ANCHORS.keys()
         | {SELF}
