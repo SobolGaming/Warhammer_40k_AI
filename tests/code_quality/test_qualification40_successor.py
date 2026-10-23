@@ -12,6 +12,7 @@ from typing import Any, Protocol, cast
 import pytest
 from tools import cumulative_preservation as prior
 from tools import performance_policy as policy
+from tools import performance_preflight_successor as preflight
 from tools import performance_qualification_successor as stage
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -156,9 +157,14 @@ def test_qualification_producing_inputs_allows_only_anchor_literal() -> None:
 
 @pytest.mark.parametrize("mutation", ["owner", "path", "profile", "prior_operation"])
 def test_qualification_map_identifier_requalification_rejects_semantic_drift(
-    monkeypatch: pytest.MonkeyPatch, mutation: str
+    mutation: str,
 ) -> None:
-    value: dict[str, Any] = json.loads((ROOT / policy.MAP).read_bytes())
+    before = subprocess.check_output(
+        ["git", "show", stage.PRODUCING_COMMIT + ":" + policy.MAP], cwd=ROOT
+    )
+    current = preflight.preceding_control(ROOT, policy.MAP, (ROOT / policy.MAP).read_bytes())
+    stage.assert_symbolic_operation_map(before, current)
+    value: dict[str, Any] = json.loads(current)
     key = next(k for k in value["operations"] if len(k) == len("qualification40-exact-") + 64)
     if mutation == "owner":
         value["operations"][key]["owners"].append("unreviewed_owner")
@@ -169,6 +175,14 @@ def test_qualification_map_identifier_requalification_rejects_semantic_drift(
     else:
         value["operations"].pop(next(iter(stage.accepted_operation_map(ROOT)["operations"])))
     raw = json.dumps(value).encode()
+    with pytest.raises(ValueError, match="symbolic"):
+        stage.assert_symbolic_operation_map(before, raw)
+
+
+def test_qualification_map_current_collector_rejects_forged_hash(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    raw = (ROOT / policy.MAP).read_bytes() + b"\n"
     member, read = _QualificationMechanisms.member(_stage), _QualificationMechanisms.read(_stage)
 
     def repinned_member(root: Path, name: str, freeze: str) -> bytes:
@@ -180,5 +194,5 @@ def test_qualification_map_identifier_requalification_rejects_semantic_drift(
     monkeypatch.setattr(stage, "_member", repinned_member)
     monkeypatch.setattr(stage, "_read", repinned_read)
     current = policy.runtime_inputs(ROOT) | {policy.MAP: policy.digest(raw)}
-    with pytest.raises(ValueError, match="symbolic"):
+    with pytest.raises(ValueError, match="actual input collector omitted current control bytes"):
         stage.producing_inputs(ROOT, current)

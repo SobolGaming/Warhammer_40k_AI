@@ -225,7 +225,13 @@ def producing_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
         k: v for k, v in test_after.items() if k not in revised
     }:
         raise ValueError("Qualification metadata guard changed another assertion owner.")
-    mapping = json.loads(old[MAP])
+    assert_symbolic_operation_map(old[MAP], raw[MAP])
+    return dict(measured)
+
+
+def assert_symbolic_operation_map(before: bytes, current: bytes) -> None:
+    """Validate the original finite ID renaming after caller source admission."""
+    mapping = json.loads(before)
     paths = (
         "data/source_audits/cumulative_preservation_v1/evidence/task-18/"
         "D07-33-EXCEPTION-AND-GUARD-LEDGER.json.txt",
@@ -239,6 +245,5 @@ def producing_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
         if operation["paths"] != [path] or full in mapping["operations"]:
             raise ValueError("Qualification symbolic map identity changed.")
         mapping["operations"][full] = operation
-    if json.loads(raw[MAP]) != mapping:
+    if json.loads(current) != mapping:
         raise ValueError("Qualification symbolic operation-ID requalification changed semantics.")
-    return dict(measured)

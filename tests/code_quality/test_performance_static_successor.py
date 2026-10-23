@@ -46,7 +46,10 @@ def test_static_edits_match_independent_immutable_whole_module_recipes(
     name: str, transitions: dict[str, Any], previous: dict[str, bytes]
 ) -> None:
     successor.assert_static_transition(
-        name, previous[name], (ROOT / name).read_bytes(), transitions[name]
+        name,
+        previous[name],
+        successor.ci_comparison(ROOT, name, (ROOT / name).read_bytes()),
+        transitions[name],
     )
 
 
@@ -162,7 +165,8 @@ def test_ci_transition_preserves_exact_import_bootstrap_and_mapping_edits(
         if name == successor.CI_NEW
         else subprocess.check_output(["git", "show", successor.CI_BASE + ":" + name], cwd=ROOT)
     )
-    successor.assert_ci_transition(name, before, (ROOT / name).read_bytes(), ci_transitions[name])
+    current = successor.ci_comparison(ROOT, name, (ROOT / name).read_bytes())
+    successor.assert_ci_transition(name, before, current, ci_transitions[name])
 
 
 @pytest.mark.parametrize(
@@ -190,7 +194,7 @@ def test_ci_transition_rejects_unreviewed_behavior_even_with_updated_after_hash(
         if name == successor.CI_NEW
         else subprocess.check_output(["git", "show", successor.CI_BASE + ":" + name], cwd=ROOT)
     )
-    raw = (ROOT / name).read_bytes()
+    raw = successor.ci_comparison(ROOT, name, (ROOT / name).read_bytes())
     assert old in raw
     changed = raw.replace(old, new, 1)
     row = copy.deepcopy(ci_transitions[name])
@@ -216,9 +220,13 @@ def test_ci_transition_rejects_false_absence_and_malformed_edits(
 def test_default_package_launch_prevents_own_bytecode_but_discovers_explicit_pyc(
     package: str, tmp_path: Path
 ) -> None:
-    directory = tmp_path / package
-    directory.mkdir()
-    (directory / "__init__.py").write_bytes((ROOT / package / "__init__.py").read_bytes())
+    module = "tests.code_quality" if package == "tests" else package
+    relative = module.replace(".", "/")
+    directory = tmp_path / relative
+    directory.mkdir(parents=True)
+    if package == "tests":
+        (tmp_path / "tests/__init__.py").write_bytes((ROOT / "tests/__init__.py").read_bytes())
+    (directory / "__init__.py").write_bytes((ROOT / relative / "__init__.py").read_bytes())
     source = tmp_path / "src" / "probe49.py"
     source.parent.mkdir()
     source.write_text("VALUE = 49\n")
@@ -240,7 +248,7 @@ def test_default_package_launch_prevents_own_bytecode_but_discovers_explicit_pyc
     environment.pop("PYTHONDONTWRITEBYTECODE", None)
     environment.pop("PYTHONPYCACHEPREFIX", None)
     result = subprocess.run(
-        [sys.executable, "-S", "-m", package + ".probe"],
+        [sys.executable, "-S", "-m", module + ".probe"],
         cwd=tmp_path,
         env=environment,
         capture_output=True,
@@ -304,3 +312,55 @@ def test_ci_formatting_cannot_absorb_changed_benchmark_samples() -> None:
     row["after_sha256"] = hashlib.sha256(changed).hexdigest()
     with pytest.raises(ValueError, match="outside the exact reviewed edits"):
         successor.assert_ci_transition(name, before, changed, row)
+
+
+@pytest.mark.parametrize("name", sorted(successor.CI_COMPAT_BEFORE))
+def test_ci_relocation_and_map_seam_match_exact_immutable_preimages(name: str) -> None:
+    record: dict[str, Any] = json.loads((ROOT / successor.CI_COMPAT_RECORD).read_bytes())
+    before = subprocess.check_output(
+        ["git", "show", successor.CI_COMPAT_BASE + ":" + name], cwd=ROOT
+    )
+    successor.assert_ci_compatibility_transition(
+        name, before, (ROOT / name).read_bytes(), record["changes"][name]
+    )
+
+
+@pytest.mark.parametrize(
+    ("name", "old", "new"),
+    [
+        (
+            "tests/code_quality/__init__.py",
+            b"dont_write_bytecode = True",
+            b"dont_write_bytecode = False",
+        ),
+        ("tests/__init__.py", b"\n", b"UNREVIEWED = True\n"),
+        (
+            "tools/performance_qualification_successor.py",
+            b"if json.loads(current) != mapping:",
+            b"if False:",
+        ),
+    ],
+)
+def test_ci_relocation_rejects_unreviewed_bootstrap_or_validation_even_if_repinned(
+    name: str, old: bytes, new: bytes
+) -> None:
+    record: dict[str, Any] = json.loads((ROOT / successor.CI_COMPAT_RECORD).read_bytes())
+    before = subprocess.check_output(
+        ["git", "show", successor.CI_COMPAT_BASE + ":" + name], cwd=ROOT
+    )
+    current = (ROOT / name).read_bytes()
+    assert current.count(old) == 1
+    changed = current.replace(old, new, 1)
+    row = copy.deepcopy(record["changes"][name])
+    row["after_sha256"] = hashlib.sha256(changed).hexdigest()
+    with pytest.raises(ValueError, match="outside the exact reviewed edits"):
+        successor.assert_ci_compatibility_transition(name, before, changed, row)
+
+
+def test_quality_bootstrap_historical_view_rejects_unrelated_caller_bytes() -> None:
+    name = successor.QUALITY_BOOTSTRAP
+    current = (ROOT / name).read_bytes()
+    assert successor.static_predecessor(ROOT, name, current) == b""
+    for supplied in (b"", current + b"# unreviewed\n"):
+        with pytest.raises(ValueError, match="caller supplied unrelated"):
+            successor.static_predecessor(ROOT, name, supplied)

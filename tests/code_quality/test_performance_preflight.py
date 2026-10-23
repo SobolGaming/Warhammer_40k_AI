@@ -558,7 +558,7 @@ def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
 
     root = Path(__file__).resolve().parents[2]
     direct_git = _SuccessorMechanisms.git_function(successor_probe)
-    for name in successor.PINS.keys() | {successor.SELF}:
+    for name in successor.PINS.keys() | successor.ANCHORS.keys() | {successor.SELF}:
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes((root / name).read_bytes())

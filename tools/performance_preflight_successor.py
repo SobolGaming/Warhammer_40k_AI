@@ -13,7 +13,7 @@ BASE_SOURCE = "36ab649ef5a6ab747587dc25d05336252db5a4eb148dc24619e6881c38efec42"
 SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
 INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
-FREEZE_COMMIT: str | None = "9c50a12e9452aad8299b2ac604a9470abab43d42"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -22,7 +22,11 @@ _PIN_ROWS = (
     ),
     (
         "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
-        "59d0624883ffa435a267416718d508a30994b175b7bf239ddce2ec235b07f7c5",
+        "fcde2b057946e9915403949209d2d39618aabdb09f8c3e5eafbc72c09d4ef061",
+    ),
+    (
+        "docs/performance/ci-compatibility-successor49c.json",
+        "87a053390797d9eec3c833a9fffaf571d528565886ad27f412d0237da7d78fe1",
     ),
     (
         "docs/performance/ci-format-successor49b.json",
@@ -34,7 +38,7 @@ _PIN_ROWS = (
     ),
     (
         "docs/performance/policy-v3/operation-map.json",
-        "5323c1736433605c84d150bb43371a85db5ee8d726b57fbe1ec1df600a1012a0",
+        "d18e059bfde5abae9d9196cc16ebb46e417d0e8a4aa5fb810ee1b630c58c5b8f",
     ),
     (
         "docs/performance/static-successor48.json",
@@ -57,7 +61,7 @@ _PIN_ROWS = (
         "0380ba2c9ab5c1e045f281f810f0e6e582b0738a3db8eab7a18ecfc34fe6c4d8",
     ),
     (
-        "tests/__init__.py",
+        "tests/code_quality/__init__.py",
         "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
     ),
     (
@@ -78,15 +82,15 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_performance_preflight.py",
-        "d313ad37d9836bd55d0e40026aca88445727b462f0e1b367781ffd4222114e31",
+        "b6924bdca684374749f2a86d7e086192de3ace2b6eac595aa558deb8117c57e6",
     ),
     (
         "tests/code_quality/test_performance_static_successor.py",
-        "e9c05fedb6a5aa657955b76115685daeb734af3500d06ed1df2543547749f050",
+        "4aa98bd59b00a15f65efddd433d4b9c3fa2d748a6ff6fee1581cd7dad848e128",
     ),
     (
         "tests/code_quality/test_qualification40_successor.py",
-        "dbc224be55ff45ba4d86eef3648ba641f4e6c350f84a58c0e5a6751229c550bc",
+        "bc50d496af49cd36d88e33cea60c01bf64f5ad040ff41b1f66d1f6353fa7a890",
     ),
     (
         "tests/support/section08_native_mission.py",
@@ -114,7 +118,7 @@ _PIN_ROWS = (
     ),
     (
         "tools/performance_qualification_successor.py",
-        "8306fec5f45dbddee62d899ff500a2d9d94799ad8ca2e6f09a23487b4c8f161c",
+        "45ba0c6dd10afb1f49f42e1cfe8ae77dab08b66436f2e9b4d8517415db28ed2a",
     ),
     (
         "tools/thousand_sons_perils_preservation.py",
@@ -122,6 +126,12 @@ _PIN_ROWS = (
     ),
 )
 PINS: dict[str, str] = dict(_PIN_ROWS)
+
+ANCHORS = {
+    "tests/__init__.py": ("01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"),
+}
+QUALITY_BOOTSTRAP = "tests/code_quality/__init__.py"
+
 
 STATIC_BASE = "b150e426c70d4705da100bc75f1d253483e021c7"
 STATIC_RECORD = "docs/performance/static-successor48.json"
@@ -210,6 +220,45 @@ _CI_FORMAT_BEFORE_ROWS = (
     ),
 )
 CI_FORMAT_BEFORE: dict[str, str] = dict(_CI_FORMAT_BEFORE_ROWS)
+
+
+CI_COMPAT_BASE = "856b74a69676fdc1cc7a8d7e54ab6adb2fbfa2c3"
+CI_COMPAT_RECORD = "docs/performance/ci-compatibility-successor49c.json"
+_CI_COMPAT_BEFORE_ROWS = (
+    (
+        "tests/__init__.py",
+        "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
+    ),
+    (
+        "tests/code_quality/__init__.py",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ),
+    (
+        "docs/performance/policy-v3/operation-map.json",
+        "5323c1736433605c84d150bb43371a85db5ee8d726b57fbe1ec1df600a1012a0",
+    ),
+    (
+        "tools/performance_qualification_successor.py",
+        "8306fec5f45dbddee62d899ff500a2d9d94799ad8ca2e6f09a23487b4c8f161c",
+    ),
+    (
+        "tests/code_quality/test_qualification40_successor.py",
+        "dbc224be55ff45ba4d86eef3648ba641f4e6c350f84a58c0e5a6751229c550bc",
+    ),
+    (
+        "tests/code_quality/test_performance_preflight.py",
+        "d313ad37d9836bd55d0e40026aca88445727b462f0e1b367781ffd4222114e31",
+    ),
+    (
+        "tests/code_quality/test_performance_static_successor.py",
+        "e9c05fedb6a5aa657955b76115685daeb734af3500d06ed1df2543547749f050",
+    ),
+    (
+        "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
+        "59d0624883ffa435a267416718d508a30994b175b7bf239ddce2ec235b07f7c5",
+    ),
+)
+CI_COMPAT_BEFORE: dict[str, str] = dict(_CI_COMPAT_BEFORE_ROWS)
 
 
 def _sha(raw: bytes) -> str:
@@ -382,12 +431,31 @@ def assert_ci_transition(
 ) -> None:
     """Admit only the frozen CI import/bootstrap edits and exact map additions."""
     allowed = CI_BEFORE | CI_FORMAT_BEFORE
-    expected = allowed.get(name)
+    if name not in allowed and name != CI_NEW:
+        raise ValueError("CI transition identity or bytes changed.")
+    _assert_ci_edits(before, current, row, allowed.get(name), name == CI_NEW)
+
+
+def assert_ci_compatibility_transition(
+    name: str, before: bytes, current: bytes, row: dict[str, Any]
+) -> None:
+    """Validate only this finite historical-consumer repair against immutable 856."""
+    if name not in CI_COMPAT_BEFORE:
+        raise ValueError("CI transition identity or bytes changed.")
+    _assert_ci_edits(before, current, row, CI_COMPAT_BEFORE[name], False)
+
+
+def _assert_ci_edits(
+    before: bytes | None,
+    current: bytes,
+    row: dict[str, Any],
+    expected: str | None,
+    added: bool,
+) -> None:
     if (
-        (name not in allowed and name != CI_NEW)
-        or row.keys() != {"before_sha256", "after_sha256", "edits"}
+        row.keys() != {"before_sha256", "after_sha256", "edits"}
         or row["before_sha256"] != expected
-        or (before is None) != (name == CI_NEW)
+        or (before is None) != added
         or (before is not None and _sha(before) != expected)
         or row["after_sha256"] != _sha(current)
         or not isinstance(row["edits"], list)
@@ -411,13 +479,29 @@ def assert_ci_transition(
         raise ValueError("CI transition changed outside the exact reviewed edits.")
 
 
-def _ci_transitions(root: Path, frozen_members: dict[str, bytes]) -> None:
+def _ci_transitions(root: Path, frozen_members: dict[str, bytes]) -> dict[str, bytes]:
+    record: dict[str, Any] = json.loads(frozen_members[CI_COMPAT_RECORD])
+    if (
+        record.keys() != {"schema", "base", "changes"}
+        or record["schema"] != "exact-ci-successor-v1"
+        or record["base"] != CI_COMPAT_BASE
+        or record["changes"].keys() != CI_COMPAT_BEFORE.keys()
+    ):
+        raise ValueError("CI compatibility membership or base changed.")
+    previous = _blobs(root, CI_COMPAT_BASE, list(CI_COMPAT_BEFORE))
+    for name in CI_COMPAT_BEFORE:
+        assert_ci_compatibility_transition(
+            name, previous[name], frozen_members[name], record["changes"][name]
+        )
+    # Current bytes have already passed their immutable freeze and physical reads.
+    # Only this finite comparison view feeds the unchanged earlier recipes.
+    comparison = frozen_members | previous
     specifications: tuple[tuple[str, str, dict[str, str], set[str]], ...] = (
         (CI_BASE, CI_RECORD, CI_BEFORE, {CI_NEW}),
         (CI_FORMAT_BASE, CI_FORMAT_RECORD, CI_FORMAT_BEFORE, set()),
     )
     for base, record_path, pins, added in specifications:
-        record: dict[str, Any] = json.loads(frozen_members[record_path])
+        record = json.loads(frozen_members[record_path])
         if (
             record.keys() != {"schema", "base", "changes"}
             or record["schema"] != "exact-ci-successor-v1"
@@ -431,20 +515,36 @@ def _ci_transitions(root: Path, frozen_members: dict[str, bytes]) -> None:
         previous = _blobs(root, base, list(pins))
         for name in record["changes"]:
             assert_ci_transition(
-                name, previous.get(name), frozen_members[name], record["changes"][name]
+                name, previous.get(name), comparison[name], record["changes"][name]
             )
+    return comparison
+
+
+def ci_comparison(root: Path, name: str, raw: bytes) -> bytes:
+    """Authenticate a finite later edit before its unchanged earlier recipe."""
+    if name not in CI_COMPAT_BEFORE:
+        return raw
+    _freeze(root)
+    if raw != _read(root, name):
+        raise ValueError("Static comparison caller supplied unrelated bytes.")
+    before = _git(root, "show", CI_COMPAT_BASE + ":" + name)
+    if _sha(before) != CI_COMPAT_BEFORE[name]:
+        raise ValueError("Static comparison immutable bytes changed.")
+    return before
 
 
 def static_predecessor(root: Path, name: str, raw: bytes) -> bytes:
-    """Only the reviewed Order34 annotation may expose its prior historical stage."""
-    if name != STATIC_TEST:
+    """Expose only the reviewed Order34 annotation and exact quality bootstrap history."""
+    if name not in {STATIC_TEST, QUALITY_BOOTSTRAP}:
         return raw
     _freeze(root)
     live = _read(root, name)
     if raw not in (live, live.replace(b"\r\n", b"\n")):
         raise ValueError("Static predecessor caller supplied unrelated bytes.")
-    before = _git(root, "show", STATIC_BASE + ":" + name)
-    if _sha(before) != STATIC_BEFORE[name]:
+    base = STATIC_BASE if name == STATIC_TEST else CI_COMPAT_BASE
+    pin = STATIC_BEFORE[name] if name == STATIC_TEST else CI_COMPAT_BEFORE[name]
+    before = _git(root, "show", base + ":" + name)
+    if _sha(before) != pin:
         raise ValueError("Static predecessor immutable bytes changed.")
     return before.replace(b"\r\n", b"\n") if raw != live else before
 
@@ -458,10 +558,11 @@ def _freeze(root: Path) -> str:
     _git(root, "merge-base", "--is-ancestor", STATIC_BASE, freeze)
     _git(root, "merge-base", "--is-ancestor", CI_BASE, freeze)
     _git(root, "merge-base", "--is-ancestor", CI_FORMAT_BASE, freeze)
+    _git(root, "merge-base", "--is-ancestor", CI_COMPAT_BASE, freeze)
     names = _git(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
     if set(names) != PINS.keys() | {SELF, ASSESSMENT} or len(names) != len(PINS) + 2:
         raise ValueError("Preflight successor finite membership changed.")
-    frozen_members = _blobs(root, freeze, [SELF, *PINS])
+    frozen_members = _blobs(root, freeze, [SELF, *PINS, *ANCHORS])
     frozen = frozen_members[SELF]
     marker = b"\nFREEZE_COMMIT: str | None = None"
     if frozen.count(marker) != 1 or _read(root, SELF) != frozen.replace(
@@ -474,8 +575,16 @@ def _freeze(root: Path) -> str:
                 "Reviewed migration source/data changed: "
                 "Qualification / Perils successor / Preflight source: " + name
             )
-    _static_transitions(root, frozen_members)
-    _ci_transitions(root, frozen_members)
+    anchor_before = _blobs(root, BASE, list(ANCHORS))
+    for name, pin in ANCHORS.items():
+        if (
+            _sha(anchor_before[name]) != pin
+            or _read(root, name) != anchor_before[name]
+            or frozen_members[name] != anchor_before[name]
+        ):
+            raise ValueError("Preflight unchanged owned anchor changed: " + name)
+    comparison = _ci_transitions(root, frozen_members)
+    _static_transitions(root, comparison)
     return freeze
 
 
@@ -523,8 +632,13 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     # The derived audit and proof records are outside runtime_inputs; their
     # bytes remain authenticated by _freeze and the complete live source scan.
     controls = (
-        PINS.keys() - {INVENTORY, STATIC_RECORD, CI_RECORD, CI_FORMAT_RECORD, CI_ROADMAP}
-    ) | {SELF}
+        (
+            PINS.keys()
+            - {INVENTORY, STATIC_RECORD, CI_RECORD, CI_FORMAT_RECORD, CI_COMPAT_RECORD, CI_ROADMAP}
+        )
+        | ANCHORS.keys()
+        | {SELF}
+    )
     if not controls <= current.keys():
         raise ValueError("Preflight actual input collector omitted current inputs.")
     actual = {name: _sha(_read(root, name)) for name in controls}

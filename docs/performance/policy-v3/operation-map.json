@@ -25151,7 +25151,7 @@
     },
     "ci49-exact-001e61d97d9dee27": {
       "paths": [
-        "tests/__init__.py"
+        "tests/code_quality/__init__.py"
       ],
       "owners": [
         "@module"
