@@ -4,6 +4,16 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
   "operation_map_sha256": "1ceb2c0784d67c87e784ccc7f748a1a3389940d3d251ae4c3c5f09d7956d9ea9",
   "changes": {
+    ".github/workflows/ci.yml": {
+      "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
+      "after_sha256": "60707f6e9ad8ad933297fdab2eab98b733f412680b78eb7c2a5253561df1679b",
+      "owners": {
+        "@document": {
+          "before": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
+          "after": "60707f6e9ad8ad933297fdab2eab98b733f412680b78eb7c2a5253561df1679b"
+        }
+      }
+    },
     "ci/test_shards/durations.json": {
       "before_sha256": "3735a992d4edacaa39c82bdaeca7edb07927826078494890aab7b0faf5fcefc4",
       "after_sha256": "3c0034b5e9fcd4333b992885238e3ead04fea111e2caca2c0974b34464bacf3f",
@@ -4790,6 +4800,32 @@
         "test_reviewed_inventory_fixture_whole_AST_rejects_unlisted_initializers": {
           "before": null,
           "after": "363e1e85285c4beb489999e8449d005fbeadb7e04c040396bdc5162aa94c305e"
+        }
+      }
+    },
+    "tests/code_quality/test_ci_history_input.py": {
+      "before_sha256": null,
+      "after_sha256": "fb94f5cef3b48fdafc4547f2a52493f315d2a8587a6cf83c6552861bac4e39bb",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a5641f6a8f8de8e44021467ae0650497ad3c57faf90b556928581818e7cfe72b"
+        },
+        "test_all_five_original_snapshot_identities_and_ancestry_are_available": {
+          "before": null,
+          "after": "7379dae010a1934994c28a1cf33c24492f84f3e622b0ce815a0daaf4a8aa8a39"
+        },
+        "test_history_fetch_is_the_only_workflow_change_before_validation": {
+          "before": null,
+          "after": "d426dc7675dece538e3387a759ef36dfa45e33044d98699445ac51b08c686d54"
+        },
+        "test_missing_original_commit_fails_and_exact_original_object_restores_lookup": {
+          "before": null,
+          "after": "28270b8d7853c6b2ddd94ab6099b6d7aef2f01a7899b0c5eeb9054e932fc8ddf"
+        },
+        "test_workflow_is_a_live_pinned_source_even_though_not_a_measured_runtime_input": {
+          "before": null,
+          "after": "ccf50de2a9b8272966893a24420983584c75c692c8e0d805d5dab60438ea759e"
         }
       }
     },
@@ -18505,11 +18541,11 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "25cd729182b947abe24eb7591a545259ef84615b111c17b59e703d9db545d431",
+      "after_sha256": "4ae39e3a0165dc7770a1cf60fa11fbec0b1c0565edb954676f91c37e0d8ad205",
       "owners": {
         "@module": {
           "before": null,
-          "after": "fe85064a6c9903f6f3e2107af027029fe2cf5bac442a97d601acd931993ac7b3"
+          "after": "12922a1ad7c397175c67ff25d65fc7f30572168e5af7adb7a41fd5abc87b4bd0"
         },
         "_assert_ci_edits": {
           "before": null,
@@ -18573,7 +18609,7 @@
         },
         "measurement_inputs": {
           "before": null,
-          "after": "f6ef884aa38db146723e1e0b3b5394c2b7c997c9365128f11cf3f417ddb4964a"
+          "after": "1caaab903ef6f70f044d9ac3b8881e6d1fa97e56e7b76b25c1500ce7529a1a06"
         },
         "preceding_control": {
           "before": null,
@@ -18745,6 +18781,14 @@
     }
   },
   "rows": {
+    ".github/workflows/ci.yml": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Provision the unchanged original historical Git inputs required by the existing code-quality/preflight consumers. The hosted checkout fetched current branch/main/merge history but did not contain the separately retained 4a8fb3c snapshot. Add exactly one unfiltered, no-tags, non-recursive-submodule fetch of that literal original SHA immediately after code-quality checkout. Its complete original history supplies the existing 1009, 1e70, 241f and 40a snapshots. The authentic hosted missing-object failure and original-object restoration establish a dependency-provisioning defect; no Git-version defect is claimed.",
+      "source_obligation": "The entire workflow must equal immutable f69b0702 bytes plus only the exact fetch step, whose SHA equals the unchanged legacy source pin. All original jobs, validation commands, sequencing, permissions, timeouts and mandatory gates remain byte-exact. The workflow and four-case guard are finite frozen/live PINS members. The workflow is explicitly outside the existing runtime-input collector, like other non-runtime governance records, but remains authenticated by complete source admission and its exact current pin. Guards validate all five original commit identities, SHA256 digests, tree identities and ancestry; an owned tiny Git store rejects absent and mismatched genuine commit inputs, an empty origin rejects the exact fetch command, and restoring the original commit bytes restores the exact pinned script lookup. A process-local public owned-reader seam also proves modified workflow bytes remain rejected. No old proof record or compatibility recipe is changed.",
+      "unchanged_work": "No engine code, gameplay input, workload output, seed, operation map, family/case/sample selection, validation algorithm, digest-retention cap, 180-second performance allowance, 600-second local watchdog or 85% coverage requirement changes. Setup fetch provisions immutable dependencies before the unchanged performance command; it does not move validation outside that command. Existing historical snapshots and receipts retain their original identity. Public fetch restoration and bounded local guards do not constitute final source qualification. Fresh exact-head default-launcher controls, full static, authentic performance, complete quality reconciliation and independent review remain required; no runtime budget, full behavioral coverage or hosted success is claimed."
+    },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
       "operations": [
@@ -22997,6 +23041,14 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "tests/code_quality/test_ci_history_input.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Provision the unchanged original historical Git inputs required by the existing code-quality/preflight consumers. The hosted checkout fetched current branch/main/merge history but did not contain the separately retained 4a8fb3c snapshot. Add exactly one unfiltered, no-tags, non-recursive-submodule fetch of that literal original SHA immediately after code-quality checkout. Its complete original history supplies the existing 1009, 1e70, 241f and 40a snapshots. The authentic hosted missing-object failure and original-object restoration establish a dependency-provisioning defect; no Git-version defect is claimed.",
+      "source_obligation": "The entire workflow must equal immutable f69b0702 bytes plus only the exact fetch step, whose SHA equals the unchanged legacy source pin. All original jobs, validation commands, sequencing, permissions, timeouts and mandatory gates remain byte-exact. The workflow and four-case guard are finite frozen/live PINS members. The workflow is explicitly outside the existing runtime-input collector, like other non-runtime governance records, but remains authenticated by complete source admission and its exact current pin. Guards validate all five original commit identities, SHA256 digests, tree identities and ancestry; an owned tiny Git store rejects absent and mismatched genuine commit inputs, an empty origin rejects the exact fetch command, and restoring the original commit bytes restores the exact pinned script lookup. A process-local public owned-reader seam also proves modified workflow bytes remain rejected. No old proof record or compatibility recipe is changed.",
+      "unchanged_work": "No engine code, gameplay input, workload output, seed, operation map, family/case/sample selection, validation algorithm, digest-retention cap, 180-second performance allowance, 600-second local watchdog or 85% coverage requirement changes. Setup fetch provisions immutable dependencies before the unchanged performance command; it does not move validation outside that command. Existing historical snapshots and receipts retain their original identity. Public fetch restoration and bounded local guards do not constitute final source qualification. Fresh exact-head default-launcher controls, full static, authentic performance, complete quality reconciliation and independent review remain required; no runtime budget, full behavioral coverage or hosted success is claimed."
+    },
     "tests/code_quality/test_cumulative_preservation.py": {
       "category": "governance",
       "operations": [],
@@ -23122,7 +23174,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Correct the new CI49D integration guard to match the demonstrated original loop boundary. Exactly four of ten reviewed controls belong to its 83 integration members; six controls remain at accepted-source values before downstream processing. Authenticate the accepted-source digest and reconstruct both complete pre-successor maps using all 83 member bytes and the original controls.get decision. Pin the exact four overlapping controls and three actual override-versus-raw differences. The original/new output, member count/order/bytes and zero individual-read assertions are retained.",
-      "source_obligation": "The proposed guard passed from an external copy against unchanged frozen bd94c174 before source editing. Only that new guard and its exact SELF pin/freeze/assessment metadata change; the production transport owner, hardened parser, public reader and 946-byte CI49D transition record remain byte-exact. All pre-D tests and STATIC48/CI49/CI49B/CI49C records remain byte-exact. Two erroneous D0 guard assertions are replaced with complete-map reconstruction and explicit control-scope assertions, preserving all other guard statements and all five case IDs. Every current-source, Git and historical comparison check remains mandatory.",
+      "source_obligation": "The proposed guard passed from an external copy against unchanged frozen bd94c174 before source editing. The preceding CI49E correction changed only that new guard and its exact SELF pin/freeze/assessment metadata; the production transport owner, hardened parser, public reader and 946-byte CI49D transition record remain byte-exact. All pre-D tests and STATIC48/CI49/CI49B/CI49C records remain byte-exact. Two erroneous D0 guard assertions are replaced with complete-map reconstruction and explicit control-scope assertions, preserving all other guard statements and all five case IDs. Every current-source, Git and historical comparison check remains mandatory.",
       "unchanged_work": "No production behavior, engine, gameplay input, measured workload, seed, operation map, family/case/sample selection, digest-retention limit, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The bd94 targeted 83-pass/1-fail result remains its original failed evidence. External-copy success proves the corrected assertion contract against that frozen source, not final-source qualification. Fresh exact-head default-launcher controls, static checks, performance, complete quality reconciliation and independent review remain required; no old timing or hosted acceptance is transferred."
     },
     "tests/code_quality/test_performance_preflight.py": {
@@ -28893,9 +28945,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Correct the new CI49D integration guard to match the demonstrated original loop boundary. Exactly four of ten reviewed controls belong to its 83 integration members; six controls remain at accepted-source values before downstream processing. Authenticate the accepted-source digest and reconstruct both complete pre-successor maps using all 83 member bytes and the original controls.get decision. Pin the exact four overlapping controls and three actual override-versus-raw differences. The original/new output, member count/order/bytes and zero individual-read assertions are retained.",
-      "source_obligation": "The proposed guard passed from an external copy against unchanged frozen bd94c174 before source editing. Only that new guard and its exact SELF pin/freeze/assessment metadata change; the production transport owner, hardened parser, public reader and 946-byte CI49D transition record remain byte-exact. All pre-D tests and STATIC48/CI49/CI49B/CI49C records remain byte-exact. Two erroneous D0 guard assertions are replaced with complete-map reconstruction and explicit control-scope assertions, preserving all other guard statements and all five case IDs. Every current-source, Git and historical comparison check remains mandatory.",
-      "unchanged_work": "No production behavior, engine, gameplay input, measured workload, seed, operation map, family/case/sample selection, digest-retention limit, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The bd94 targeted 83-pass/1-fail result remains its original failed evidence. External-copy success proves the corrected assertion contract against that frozen source, not final-source qualification. Fresh exact-head default-launcher controls, static checks, performance, complete quality reconciliation and independent review remain required; no old timing or hosted acceptance is transferred."
+      "rationale": "Provision the unchanged original historical Git inputs required by the existing code-quality/preflight consumers. The hosted checkout fetched current branch/main/merge history but did not contain the separately retained 4a8fb3c snapshot. Add exactly one unfiltered, no-tags, non-recursive-submodule fetch of that literal original SHA immediately after code-quality checkout. Its complete original history supplies the existing 1009, 1e70, 241f and 40a snapshots. The authentic hosted missing-object failure and original-object restoration establish a dependency-provisioning defect; no Git-version defect is claimed.",
+      "source_obligation": "The entire workflow must equal immutable f69b0702 bytes plus only the exact fetch step, whose SHA equals the unchanged legacy source pin. All original jobs, validation commands, sequencing, permissions, timeouts and mandatory gates remain byte-exact. The workflow and four-case guard are finite frozen/live PINS members. The workflow is explicitly outside the existing runtime-input collector, like other non-runtime governance records, but remains authenticated by complete source admission and its exact current pin. Guards validate all five original commit identities, SHA256 digests, tree identities and ancestry; an owned tiny Git store rejects absent and mismatched genuine commit inputs, an empty origin rejects the exact fetch command, and restoring the original commit bytes restores the exact pinned script lookup. A process-local public owned-reader seam also proves modified workflow bytes remain rejected. No old proof record or compatibility recipe is changed.",
+      "unchanged_work": "No engine code, gameplay input, workload output, seed, operation map, family/case/sample selection, validation algorithm, digest-retention cap, 180-second performance allowance, 600-second local watchdog or 85% coverage requirement changes. Setup fetch provisions immutable dependencies before the unchanged performance command; it does not move validation outside that command. Existing historical snapshots and receipts retain their original identity. Public fetch restoration and bounded local guards do not constitute final source qualification. Fresh exact-head default-launcher controls, full static, authentic performance, complete quality reconciliation and independent review remain required; no runtime budget, full behavioral coverage or hosted success is claimed."
     },
     "tools/performance_qualification_measurements.py": {
       "category": "governance",

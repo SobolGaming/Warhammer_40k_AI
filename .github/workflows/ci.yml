@@ -144,6 +144,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch original historical validation inputs
+        run: git fetch --no-tags --no-recurse-submodules origin 4a8fb3c10cbf9c6ce1766f048508b8a16f8f24e8
+
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:

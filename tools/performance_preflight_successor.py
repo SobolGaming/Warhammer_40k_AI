@@ -12,10 +12,15 @@ BASE = "fc1f186aeb0d143983e22382778177f4648438fd"
 BASE_SOURCE = "36ab649ef5a6ab747587dc25d05336252db5a4eb148dc24619e6881c38efec42"
 SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
+CI_WORKFLOW = ".github/workflows/ci.yml"
 INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
-FREEZE_COMMIT: str | None = "b52dd0f955fa7efe19bf8affe9ba6eca7c02ff6e"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
+    (
+        ".github/workflows/ci.yml",
+        "60707f6e9ad8ad933297fdab2eab98b733f412680b78eb7c2a5253561df1679b",
+    ),
     (
         "data/source_audits/order135/current-inventory-category-migration.json",
         "c0460f930be48c49dcbef7568ea1af5e2319ca374d658b6abdb8eadd38869c16",
@@ -67,6 +72,10 @@ _PIN_ROWS = (
     (
         "tests/code_quality/__init__.py",
         "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
+    ),
+    (
+        "tests/code_quality/test_ci_history_input.py",
+        "fb94f5cef3b48fdafc4547f2a52493f315d2a8587a6cf83c6552861bac4e39bb",
     ),
     (
         "tests/code_quality/test_cumulative_preservation.py",
@@ -679,7 +688,7 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     from tools import thousand_sons_perils_preservation as perils
 
     _freeze(root)
-    # The derived audit and proof records are outside runtime_inputs; their
+    # The audit, proof records and CI workflow are outside runtime_inputs; their
     # bytes remain authenticated by _freeze and the complete live source scan.
     controls = (
         (
@@ -692,6 +701,7 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
                 CI_COMPAT_RECORD,
                 CI_TRANSPORT_RECORD,
                 CI_ROADMAP,
+                CI_WORKFLOW,
             }
         )
         | ANCHORS.keys()
