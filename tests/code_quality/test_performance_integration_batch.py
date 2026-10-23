@@ -170,6 +170,12 @@ def test_transport_proof_cannot_drop_control_overrides_even_if_repinned() -> Non
         ["git", "show", stage.CI_TRANSPORT_BASE + ":" + OWNER], cwd=ROOT
     )
     current = (ROOT / OWNER).read_bytes()
+    stage.ci_comparison(ROOT, OWNER, current)
+    current = subprocess.check_output(
+        ["git", "show", stage.CI_RUNTIME_BASE + ":" + OWNER], cwd=ROOT
+    )
+    assert hashlib.sha256(current).hexdigest() == stage.CI_RUNTIME_BEFORE[OWNER]
+    stage.assert_ci_transport_transition(OWNER, before, current, record["changes"][OWNER])
     expression = b"controls.get(name, _sha(raw))"
     assert current.count(expression) == 1
     changed = current.replace(expression, b"_sha(raw)", 1)

@@ -14,7 +14,7 @@ SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
 CI_WORKFLOW = ".github/workflows/ci.yml"
 INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
-FREEZE_COMMIT: str | None = "161916ef7c0e2588528aa5b7d62bdb94fa9bc239"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -39,7 +39,7 @@ _PIN_ROWS = (
     ),
     (
         "docs/performance/ci-runtime-successor51.json",
-        "c80ea6215f7d8b55e53453bc9764dda65193a674a1c67feada264b058b6d6712",
+        "1a37f62c9ff1375d446617bc7d256b9ef7d6a32d6bc3737939c3af34b01acadb",
     ),
     (
         "docs/performance/ci-successor49.json",
@@ -115,7 +115,7 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_performance_integration_batch.py",
-        "896f7dd1c08a7d61b16c5d50c58d72744b164ba09c6323d753967321fac39df2",
+        "4d75419da5b32011ee80a1038b1644bd61774168211f4a75e8f4e2e895ae87d5",
     ),
     (
         "tests/code_quality/test_performance_preflight.py",

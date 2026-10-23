@@ -96,12 +96,16 @@
       ]
     },
     "tests/code_quality/test_performance_integration_batch.py": {
-      "after_sha256": "896f7dd1c08a7d61b16c5d50c58d72744b164ba09c6323d753967321fac39df2",
+      "after_sha256": "4d75419da5b32011ee80a1038b1644bd61774168211f4a75e8f4e2e895ae87d5",
       "before_sha256": "bbdff0e56ccb7f90101363c02431db19e4ffd93d181af06d8a92f5a62eb2ccdd",
       "edits": [
         {
           "after": "    before = subprocess.check_output(\n        [\"git\", \"show\", stage.CI_TRANSPORT_BASE + \":\" + name], cwd=ROOT\n    )\n    current = (ROOT / name).read_bytes()\n    if name in stage.CI_RUNTIME_BEFORE:\n        stage.ci_comparison(ROOT, name, current)\n        current = subprocess.check_output(\n            [\"git\", \"show\", stage.CI_RUNTIME_BASE + \":\" + name], cwd=ROOT\n        )\n        assert hashlib.sha256(current).hexdigest() == stage.CI_RUNTIME_BEFORE[name]\n    stage.assert_ci_transport_transition(name, before, current, record[\"changes\"][name])\n\n\ndef test_transport_proof_cannot_drop_control_overrides_even_if_repinned() -> None:\n",
           "before": "    before = subprocess.check_output(\n        [\"git\", \"show\", stage.CI_TRANSPORT_BASE + \":\" + name], cwd=ROOT\n    )\n    stage.assert_ci_transport_transition(\n        name, before, (ROOT / name).read_bytes(), record[\"changes\"][name]\n    )\n\n\ndef test_transport_proof_cannot_drop_control_overrides_even_if_repinned() -> None:\n"
+        },
+        {
+          "after": "        [\"git\", \"show\", stage.CI_TRANSPORT_BASE + \":\" + OWNER], cwd=ROOT\n    )\n    current = (ROOT / OWNER).read_bytes()\n    stage.ci_comparison(ROOT, OWNER, current)\n    current = subprocess.check_output(\n        [\"git\", \"show\", stage.CI_RUNTIME_BASE + \":\" + OWNER], cwd=ROOT\n    )\n    assert hashlib.sha256(current).hexdigest() == stage.CI_RUNTIME_BEFORE[OWNER]\n    stage.assert_ci_transport_transition(OWNER, before, current, record[\"changes\"][OWNER])\n    expression = b\"controls.get(name, _sha(raw))\"\n    assert current.count(expression) == 1\n    changed = current.replace(expression, b\"_sha(raw)\", 1)\n",
+          "before": "        [\"git\", \"show\", stage.CI_TRANSPORT_BASE + \":\" + OWNER], cwd=ROOT\n    )\n    current = (ROOT / OWNER).read_bytes()\n    expression = b\"controls.get(name, _sha(raw))\"\n    assert current.count(expression) == 1\n    changed = current.replace(expression, b\"_sha(raw)\", 1)\n"
         }
       ]
     },
