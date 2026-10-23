@@ -16,6 +16,7 @@ import pytest
 from tools import cumulative_preservation as cumulative
 from tools import performance_preflight_successor as stage
 from tools import performance_qualification_successor as qualification
+from tools.performance_tool_inputs import digest
 
 ROOT = Path(__file__).resolve().parents[2]
 OWNER = "tools/cumulative_preservation.py"
@@ -94,10 +95,27 @@ def test_integration_batch_matches_original_function_members_and_control_overrid
     assert len(inputs) == 2
     assert inputs[0] == inputs[1]
     controls = original_controls(ROOT)
-    assert all(inputs[0][name] == value for name, value in controls.items())
-    assert any(
-        controls[name] != hashlib.sha256(dict(members)[name]).hexdigest() for name in controls
+    accepted: dict[str, str] = json.loads(
+        (ROOT / cumulative.NAMESPACE / "accepted-source.json").read_bytes()
     )
+    assert digest(accepted) == cumulative.SOURCE_ID
+    reconstructed = accepted | {
+        name: controls.get(name, hashlib.sha256(raw).hexdigest()) for name, raw in members
+    }
+    assert inputs == [reconstructed, reconstructed]
+    member_hashes = {name: hashlib.sha256(raw).hexdigest() for name, raw in members}
+    overrides = controls.keys() & member_hashes.keys()
+    assert overrides == {
+        "tests/code_quality/test_cumulative_preservation.py",
+        "tests/code_quality/test_d07_upper_floor_preservation.py",
+        "tests/code_quality/test_performance_category_migration.py",
+        OWNER,
+    }
+    assert {name for name in overrides if controls[name] != member_hashes[name]} == {
+        "tests/code_quality/test_cumulative_preservation.py",
+        "tests/code_quality/test_performance_category_migration.py",
+        OWNER,
+    }
 
 
 def test_immutable_batch_rereads_and_rejects_actual_object_tamper(tmp_path: Path) -> None:

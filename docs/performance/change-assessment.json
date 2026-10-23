@@ -5133,11 +5133,11 @@
     },
     "tests/code_quality/test_performance_integration_batch.py": {
       "before_sha256": null,
-      "after_sha256": "ae8d8761f8023f3367d51f39fcae6ff7a0bef4837f3bf97ee46512207f2f42e2",
+      "after_sha256": "bbdff0e56ccb7f90101363c02431db19e4ffd93d181af06d8a92f5a62eb2ccdd",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ee35bfe63961c7ff7f970f64b72c1c9945f0b4a534ca34952dbf9debbffa1067"
+          "after": "1ec9fb919993dc0f3b3fb51f9458e2301c1e2e49387b0b3b41bddcec2c8d8a61"
         },
         "_GitAccess": {
           "before": null,
@@ -5157,7 +5157,7 @@
         },
         "test_integration_batch_matches_original_function_members_and_control_overrides": {
           "before": null,
-          "after": "789d453a504b5151f9dfdad03afb1e6558b91681aeec331d70b2a1e887d8e130"
+          "after": "0f26965e31b5aad914e630f7fd457d3f20ab9f6f908915047fae7c7bcce90219"
         },
         "test_integration_batch_rejects_duplicate_member_selection": {
           "before": null,
@@ -18505,11 +18505,11 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "eb4f752b06aa988ba399c81643260b12128dd2357b23bf57cc5062b7af0ba4bb",
+      "after_sha256": "a39cbbbb86046ff2be8059aa92d783efc2cfd5dffae935fe0afbadb440fe1513",
       "owners": {
         "@module": {
           "before": null,
-          "after": "70a5de0e9392de7050d2305d1fa69fe20a91e9b6cd699b1d5bbd1dc8f716c89d"
+          "after": "4b4fd39ab3c2125372dfaaf3671246797c22922cea0df2519eda629eb9d22922"
         },
         "_assert_ci_edits": {
           "before": null,
@@ -23121,9 +23121,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Repair the authentic CI49C whole-command budget failure by replacing only the cumulative expected-source loop's 83 individual immutable Git blob reads with one freshly authenticated batch. The public typed reader delegates to the existing unchanged hardened parser. Registry membership/order, eager hashing of all members, current control overrides and every downstream source check remain intact; no Git or filesystem success is cached.",
-      "source_obligation": "The separate CI49D record admits exactly the immutable 599161cc cumulative preimage and two literal edits. Full current freeze, physical live bytes, membership and ancestry authenticate this transition before its exact historical comparison feeds unchanged prior records. STATIC48, CI49, CI49B and CI49C records, all prior assertions/delegates, operation map and roadmap remain byte-exact. Five new guards cover real original/new function member and override equivalence, actual fresh Git-object tamper, exact transition, repinned override removal, and malformed duplicate selection; existing hardened parser guards remain unchanged. All 83 blobs are read and hashed even where live control hashes override them.",
-      "unchanged_work": "No engine, runtime build identity, gameplay function, fixture seed, measured workload, CI selection, operation/family/case/sample counts, 512 MiB digest retention cap, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The selected 3796-file historical inventory retains the prior 3795 raw-exact files and the single previously admitted Command-end export delta. The 83 immutable members total 15,619,849 bytes (maximum 1,879,442); batching adds bounded transient payload/slice retention without a success cache. The prior 188.799-second CI49C result remains a failed whole-budget receipt; paired transport measurements are diagnostic only. Fresh exact-source performance, full quality, static checks, integrity controls and independent review remain required; no prior timing, behavioral aggregate, coverage or hosted acceptance is transferred."
+      "rationale": "Correct the new CI49D integration guard to match the demonstrated original loop boundary. Exactly four of ten reviewed controls belong to its 83 integration members; six controls remain at accepted-source values before downstream processing. Authenticate the accepted-source digest and reconstruct both complete pre-successor maps using all 83 member bytes and the original controls.get decision. Pin the exact four overlapping controls and three actual override-versus-raw differences. The original/new output, member count/order/bytes and zero individual-read assertions are retained.",
+      "source_obligation": "The proposed guard passed from an external copy against unchanged frozen bd94c174 before source editing. Only that new guard and its exact SELF pin/freeze/assessment metadata change; the production transport owner, hardened parser, public reader and 946-byte CI49D transition record remain byte-exact. All pre-D tests and STATIC48/CI49/CI49B/CI49C records remain byte-exact. Two erroneous D0 guard assertions are replaced with complete-map reconstruction and explicit control-scope assertions, preserving all other guard statements and all five case IDs. Every current-source, Git and historical comparison check remains mandatory.",
+      "unchanged_work": "No production behavior, engine, gameplay input, measured workload, seed, operation map, family/case/sample selection, digest-retention limit, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The bd94 targeted 83-pass/1-fail result remains its original failed evidence. External-copy success proves the corrected assertion contract against that frozen source, not final-source qualification. Fresh exact-head default-launcher controls, static checks, performance, complete quality reconciliation and independent review remain required; no old timing or hosted acceptance is transferred."
     },
     "tests/code_quality/test_performance_preflight.py": {
       "category": "governance",
@@ -28893,9 +28893,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Repair the authentic CI49C whole-command budget failure by replacing only the cumulative expected-source loop's 83 individual immutable Git blob reads with one freshly authenticated batch. The public typed reader delegates to the existing unchanged hardened parser. Registry membership/order, eager hashing of all members, current control overrides and every downstream source check remain intact; no Git or filesystem success is cached.",
-      "source_obligation": "The separate CI49D record admits exactly the immutable 599161cc cumulative preimage and two literal edits. Full current freeze, physical live bytes, membership and ancestry authenticate this transition before its exact historical comparison feeds unchanged prior records. STATIC48, CI49, CI49B and CI49C records, all prior assertions/delegates, operation map and roadmap remain byte-exact. Five new guards cover real original/new function member and override equivalence, actual fresh Git-object tamper, exact transition, repinned override removal, and malformed duplicate selection; existing hardened parser guards remain unchanged. All 83 blobs are read and hashed even where live control hashes override them.",
-      "unchanged_work": "No engine, runtime build identity, gameplay function, fixture seed, measured workload, CI selection, operation/family/case/sample counts, 512 MiB digest retention cap, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The selected 3796-file historical inventory retains the prior 3795 raw-exact files and the single previously admitted Command-end export delta. The 83 immutable members total 15,619,849 bytes (maximum 1,879,442); batching adds bounded transient payload/slice retention without a success cache. The prior 188.799-second CI49C result remains a failed whole-budget receipt; paired transport measurements are diagnostic only. Fresh exact-source performance, full quality, static checks, integrity controls and independent review remain required; no prior timing, behavioral aggregate, coverage or hosted acceptance is transferred."
+      "rationale": "Correct the new CI49D integration guard to match the demonstrated original loop boundary. Exactly four of ten reviewed controls belong to its 83 integration members; six controls remain at accepted-source values before downstream processing. Authenticate the accepted-source digest and reconstruct both complete pre-successor maps using all 83 member bytes and the original controls.get decision. Pin the exact four overlapping controls and three actual override-versus-raw differences. The original/new output, member count/order/bytes and zero individual-read assertions are retained.",
+      "source_obligation": "The proposed guard passed from an external copy against unchanged frozen bd94c174 before source editing. Only that new guard and its exact SELF pin/freeze/assessment metadata change; the production transport owner, hardened parser, public reader and 946-byte CI49D transition record remain byte-exact. All pre-D tests and STATIC48/CI49/CI49B/CI49C records remain byte-exact. Two erroneous D0 guard assertions are replaced with complete-map reconstruction and explicit control-scope assertions, preserving all other guard statements and all five case IDs. Every current-source, Git and historical comparison check remains mandatory.",
+      "unchanged_work": "No production behavior, engine, gameplay input, measured workload, seed, operation map, family/case/sample selection, digest-retention limit, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The bd94 targeted 83-pass/1-fail result remains its original failed evidence. External-copy success proves the corrected assertion contract against that frozen source, not final-source qualification. Fresh exact-head default-launcher controls, static checks, performance, complete quality reconciliation and independent review remain required; no old timing or hosted acceptance is transferred."
     },
     "tools/performance_qualification_measurements.py": {
       "category": "governance",
