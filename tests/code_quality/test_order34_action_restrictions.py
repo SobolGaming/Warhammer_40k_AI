@@ -180,8 +180,11 @@ def test_r34_lookup_recalibration_preserves_authenticated_history(
         historical.assert_historical_report(current)
 
     # A corrupted historical budget cannot inherit the immutable inventory pin.
+    def corrupted_history(_name: str) -> bytes:
+        return original_bytes + b"\n"
+
     with monkeypatch.context() as control:
-        control.setattr(historical, "historical_input_bytes", lambda _name: original_bytes + b"\n")
+        control.setattr(historical, "historical_input_bytes", corrupted_history)
         with pytest.raises(ValueError, match="Historical performance report bytes drifted"):
             historical.assert_historical_report(original)
 

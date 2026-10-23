@@ -2744,6 +2744,16 @@
         }
       }
     },
+    "docs/performance/static-successor48.json": {
+      "before_sha256": null,
+      "after_sha256": "b834787bc3f8bcf503ea3ae985d1a6f46e598a6350e8f1b5621e3d41d25f3c33",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b834787bc3f8bcf503ea3ae985d1a6f46e598a6350e8f1b5621e3d41d25f3c33"
+        }
+      }
+    },
     "scripts/benchmark_order88_strength.py": {
       "before_sha256": "6ea19e9377d0ab0b4c51e818a2f22420891742b29878e8c6d3604b7a9fd33de6",
       "after_sha256": "e216b66054625f434b62944f50c545f772af88610498b818b39f0c1d6c34abcb",
@@ -4720,11 +4730,31 @@
     },
     "tests/code_quality/test_cumulative_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "a761f02992373d610f0df01b3c2b419c4825b61f86b4222f73560542e8d379da",
+      "after_sha256": "b27516e78bf1a911aa5f814b8f6bda1cc76ba404558715be843a47caa66b6629",
       "owners": {
         "@module": {
           "before": null,
-          "after": "5345a9c590ac8693f778a2b78784a436a7718063bb7bd220229eae9442103375"
+          "after": "891280ac6597e8c555307ad142ec2deb7eaa140f8c18a954b6ea9ee55d8b58a5"
+        },
+        "_CumulativeMechanisms": {
+          "before": null,
+          "after": "b89973d6fe2cc1693cf5df05cda8f9d7011a37cbe6890b07af31d986ac785d50"
+        },
+        "_CumulativeMechanisms._json": {
+          "before": null,
+          "after": "c289c988bce1eb09f5104ce5958bf33eec76c4ff36b201340c3b37d25da12cb5"
+        },
+        "_CumulativeMechanisms._registry": {
+          "before": null,
+          "after": "4b164fb4db3c99c94acbb1cd75f420fe9c39bafca4f7ce4abcb76bc45ec9fee5"
+        },
+        "_CumulativeMechanisms.json": {
+          "before": null,
+          "after": "be7e14ea4ca018fdf81a6386357e7679c9ab8b44690038b40974243415469e41"
+        },
+        "_CumulativeMechanisms.registry": {
+          "before": null,
+          "after": "8034072b670109fab344cd3dcdfa258dee8c91307f549acd52b24ae4d3d3904e"
         },
         "copy_source": {
           "before": null,
@@ -4736,11 +4766,11 @@
         },
         "test_d09_successor_does_not_repin_historical_after_or_assertions": {
           "before": null,
-          "after": "d176444a2b5ea23aa7c7120b3160fcfda3fbc47c373864400030118871c7f579"
+          "after": "0e295326321b08b0f183094e8aebb6c6ec7e5819d95750102f5b7dfcebe3d909"
         },
         "test_every_d07_recipe_is_independently_sensitive_to_extra_or_removed_assertion": {
           "before": null,
-          "after": "afb8f04f4063482482bb8835801b2caa250551db62227439e78394ab784a56ab"
+          "after": "c2d166026e97c48e12357ac96f74f8b81061c7b96ec56978d37705cc29ea939c"
         },
         "test_explicit_content_route_retains_historical_measurement_identity": {
           "before": null,
@@ -4748,7 +4778,7 @@
         },
         "test_finite_owner_and_operation_union_preserves_all_prior_obligations": {
           "before": null,
-          "after": "807f8eb228a1c6ff4ad8f260284439a7a58679c615d0805b0106576f3c3e3061"
+          "after": "bef8ffdf5973bd7fd87fcee99f33c914392a9fe1c205b48d4c9bd8557afe6a45"
         },
         "test_ignored_consumer_inputs_do_not_escape_membership": {
           "before": null,
@@ -4756,7 +4786,7 @@
         },
         "test_later_d07_successors_preserve_exact_separate_prerequisite_stages": {
           "before": null,
-          "after": "a1ea044615c8d59a58556f7dfe485988a5a4b2a75fe915163120ab967a443c77"
+          "after": "bd12285f7e21b7b3dad3a62f38e950c8976abc0108f3705d4bb2fe28d30a7970"
         },
         "test_physical_ownership_refuses_aliases": {
           "before": null,
@@ -4764,21 +4794,33 @@
         },
         "test_registry_and_accepted_evidence_cannot_be_rewritten": {
           "before": null,
-          "after": "a907b56abc30092141fcba19452d696f078feeebcb857366563398df6e06d640"
+          "after": "d837a849ff4bbd3143d6d2234c32236136b359525df9e0ef05311594f083a085"
         },
         "test_three_changed_controls_require_exact_transformations": {
           "before": null,
-          "after": "3ec389763cd4bcc25db279a8649ec61cee1cb4fbf31ce4bbdb845a8ec77f1099"
+          "after": "087e2ee28ce93e2fd70f1cbb89f22b677791ba52f0cee1b4dd1c788ad9f1890a"
         }
       }
     },
     "tests/code_quality/test_d07_geometry_containment.py": {
       "before_sha256": null,
-      "after_sha256": "241b0a96741494bb06ef77613a2cf4a1fcc4c60d12cb41bde1589efb491a91b0",
+      "after_sha256": "7de3292b5ac379ece05285fc4e94eab943af5dfc55f6961b5a0e42644384fdd4",
       "owners": {
         "@module": {
           "before": null,
-          "after": "2a2ec02aa24218dc6295e96442aca831db6b8e6d8bdeb4435d6a9b85398419f7"
+          "after": "994c306137322217a074cc01f314bd2f06db0a67f3abf2eecf605b1f693d3958"
+        },
+        "_SuccessorFreeze": {
+          "before": null,
+          "after": "375892bbf92c1dec1b408e22a6889a67c5757e6643e2dd60ea2765278396800c"
+        },
+        "_SuccessorFreeze._freeze": {
+          "before": null,
+          "after": "fb22285067d449c47f5838ce84a3c4825cbd1f570eb4ba76527d6cadc8ab6b48"
+        },
+        "_SuccessorFreeze.freeze": {
+          "before": null,
+          "after": "9dac7254e1c7ef6422d8cf2bad952e725ebf89dd6e7c771c0686682360501b07"
         },
         "_changed_geometry": {
           "before": null,
@@ -4826,7 +4868,7 @@
         },
         "test_order135_reviewed_fnp_metadata_transition_preserves_all_obligations": {
           "before": null,
-          "after": "cf5110313639aa09b2a3fe8805c50a3f00caad5637adc8f108a0d35edb9fe68f"
+          "after": "fc56c2326c0baabb6e9d202a362873a6e7341300bb92c944a5d70acfed7370ee"
         }
       }
     },
@@ -4896,11 +4938,11 @@
     },
     "tests/code_quality/test_order34_action_restrictions.py": {
       "before_sha256": "25de6f828b57244cff84d8ec50a47d95efb3476c30a65f1017926b331ff48802",
-      "after_sha256": "42b011550184e5377296d5a325381a30f3912728846e61f8a6fab86244430124",
+      "after_sha256": "47d450c66f0b0c801c5963d71fc182bb0eced3354dda416228c60038209da1c4",
       "owners": {
         "test_r34_lookup_recalibration_preserves_authenticated_history": {
           "before": null,
-          "after": "df7c973e44d1aa8d259f913cb3d451132492b1bd99a300f35de02c147810eb91"
+          "after": "5d5787117c97a73dc6c2811cdecbf4cdd7f040cbd2d4ebc969d545a0df46eff8"
         },
         "test_r34_unrestricted_lookup_ceiling_is_inclusive_and_enforced": {
           "before": null,
@@ -4978,11 +5020,11 @@
     },
     "tests/code_quality/test_order97_faction_relocation.py": {
       "before_sha256": null,
-      "after_sha256": "39833a0fb545a8121c4aa9d1ce74bcedae3c8790ea0f7624c25ed543b4547e7f",
+      "after_sha256": "0ee571c76b471dd9940f2a716c0c1f71ebc8a766f90ce2ae94c8239d47feda22",
       "owners": {
         "@module": {
           "before": null,
-          "after": "138fedf6a3706e2af748e4b3ef31cc6bbbc82266b43e04d77baaa259a70ae103"
+          "after": "0bc0ee5674eee188e02d67d1390433ee0153632bdeef56e9f00a96dc263f675e"
         },
         "test_order97_relocated_archive_rejects_live_or_historical_drift": {
           "before": null,
@@ -5026,11 +5068,147 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "5618fbac9cfbefae31c8ddeda8a6d5646026a01d48debc4c89379a6140e34e9f",
+      "after_sha256": "d313ad37d9836bd55d0e40026aca88445727b462f0e1b367781ffd4222114e31",
       "owners": {
         "@module": {
           "before": null,
-          "after": "c8c4a2f5e03e84be454f9849fc9f5cd214d95880117db5aab7b3f87b79365ed6"
+          "after": "842ad1f16dc3486954b618d67b88b65ade8edfe30cf6f28c82cb15e1d42e17f8"
+        },
+        "_DigestProbe": {
+          "before": null,
+          "after": "e981378cbc9a1f5356dca27d229c9a444c785cf677e937d6f135b12a4a485542"
+        },
+        "_DigestProbe.digest": {
+          "before": null,
+          "after": "6de92ee974b0ac48789a12148bb61a75f16fffa2516da9fa53d26df4e54f01cb"
+        },
+        "_DigestProbe.entries": {
+          "before": null,
+          "after": "1ad236926f2ae9ad632fa482c95392d74e7bb89cc3e35538f322f325851afa46"
+        },
+        "_DigestProbe.limit": {
+          "before": null,
+          "after": "05cdf76ab3e8cfe5ed0976b0eea16095f63555434b8773b43293926a88b8a06a"
+        },
+        "_DigestProbe.retained": {
+          "before": null,
+          "after": "6fbd73dfe0fe1bc9ac2e65404a49a532dd09a34c861d90e6aacdc0552c2995bd"
+        },
+        "_DigestScope": {
+          "before": null,
+          "after": "3740cc9c231bfdfa03fd16d4aa50ab99cb4ce06faedcde3bc3332e58f6ba022d"
+        },
+        "_DigestScope.get": {
+          "before": null,
+          "after": "c6ff86c9d79ba1c328a86de9cfd35d9acb0bcaa78573195d8412d677ae080c03"
+        },
+        "_GateMechanisms": {
+          "before": null,
+          "after": "4233b610e49e7bb56ad2d04ed6629d5f944851b606a9c113ca658d4f4f5a8753"
+        },
+        "_GateMechanisms._check_and_run": {
+          "before": null,
+          "after": "120f11ee66cdd761a75a54ffde1b5b5aa89804ed360e1ad44334c4b401efe024"
+        },
+        "_GateMechanisms.check_and_run": {
+          "before": null,
+          "after": "f242a375d4835d45bf877bd0741e2f94747f6743695ca8d266aad3093275e810"
+        },
+        "_GitCommand": {
+          "before": null,
+          "after": "65f61e03e11e7cbfe8fbc5ff7f924a32a8ac084beb5cb859e85c38414f4caa15"
+        },
+        "_GitCommand.__call__": {
+          "before": null,
+          "after": "920e0ffb53b744c8c3cfd35bda8ef34b93eeabfe0ad64f133b5e4aba359ffaaf"
+        },
+        "_PolicyMechanisms": {
+          "before": null,
+          "after": "d10d981e89f08415ea2cf8fb358dce762a32cbec458bf78d131d3aa8fa1f5fcf"
+        },
+        "_PolicyMechanisms._governance": {
+          "before": null,
+          "after": "d88ecb9b21febcc5d591798fa12bf70dc7266b6b8312797279733cfb5b9e3f8a"
+        },
+        "_PolicyMechanisms.governance": {
+          "before": null,
+          "after": "10f47c1f6d99385a111f282143e36414587b75b6be534c3ad2469a650424f28a"
+        },
+        "_PreflightMechanisms": {
+          "before": null,
+          "after": "759c632a86db144b7928001362c524b6b1313863f0a3510b2552578f0e980c63"
+        },
+        "_PreflightMechanisms._DIGESTS": {
+          "before": null,
+          "after": "7ff0d6e51217e6643b3e3eefa438856ad37aaa695106b5dca3f0879e93d96ff3"
+        },
+        "_PreflightMechanisms._DIGEST_LIMIT": {
+          "before": null,
+          "after": "03f871d04740826c91ca016e5d09630c6f17f7d49dae69d6536967068a08f546"
+        },
+        "_PreflightMechanisms._Digests": {
+          "before": null,
+          "after": "def23b53d4e62e364e48dfea3e3161ed54cd6744c9701e670e36c8f70137977a"
+        },
+        "_PreflightMechanisms._same_read": {
+          "before": null,
+          "after": "615d9d53dbc3cc7d609e9fdca7bc5a803ea1bb79e3a2c7e98988df47e4ff4438"
+        },
+        "_PreflightMechanisms._source_digest": {
+          "before": null,
+          "after": "740a01aeb8032ff0909f332c2611edfd957a48d331eebfe855efa0dbaefcf11b"
+        },
+        "_PreflightMechanisms.digest_limit": {
+          "before": null,
+          "after": "96153e7ca881d97d6148665eadf1c2329820e6b2f32d5ea7be3146370ce87b8e"
+        },
+        "_PreflightMechanisms.digest_scope": {
+          "before": null,
+          "after": "7cc19ec37210189a5cc2fdc883d011700ba23f8780be13291c288718f9060a2f"
+        },
+        "_PreflightMechanisms.digests": {
+          "before": null,
+          "after": "ac5441f17c957157a59885814077ca072cd58aad9e5203410058a8fb7598e3d8"
+        },
+        "_PreflightMechanisms.same_read": {
+          "before": null,
+          "after": "e668c3fd740157780d564dcab0bcb66b5a000cb42a300673f1f9db08cac72678"
+        },
+        "_PreflightMechanisms.source_digest": {
+          "before": null,
+          "after": "2b3d163bef3479599515d8ebf37c4c6eb1b8f5b6026f70a0455b6f313b49f9f8"
+        },
+        "_SuccessorMechanisms": {
+          "before": null,
+          "after": "7898c696834a840d8d227d7b62e7c708950bc5b8fe5bb7128ae4040c742792d9"
+        },
+        "_SuccessorMechanisms._blobs": {
+          "before": null,
+          "after": "cd597fcb19a644e7b47024192d6369cd016a64bb10a92b97612bcc0380cd0c4b"
+        },
+        "_SuccessorMechanisms._freeze": {
+          "before": null,
+          "after": "fb22285067d449c47f5838ce84a3c4825cbd1f570eb4ba76527d6cadc8ab6b48"
+        },
+        "_SuccessorMechanisms._git": {
+          "before": null,
+          "after": "73cddf3c431f5982c2e010cd822c8dedf9b8ea2f491a42f5fe3e173b9f8367c4"
+        },
+        "_SuccessorMechanisms.blobs": {
+          "before": null,
+          "after": "e2abf935a7e817614bed3bc208351f4d4de4d63134a53bc7723cc7ba5b0ceaa6"
+        },
+        "_SuccessorMechanisms.freeze": {
+          "before": null,
+          "after": "9dac7254e1c7ef6422d8cf2bad952e725ebf89dd6e7c771c0686682360501b07"
+        },
+        "_SuccessorMechanisms.git": {
+          "before": null,
+          "after": "59aa73e2c379c3981fa022586da3957ce524ed57611085da7ec196367c3f51c1"
+        },
+        "_SuccessorMechanisms.git_function": {
+          "before": null,
+          "after": "5db6934cb2f2e6d102328f6e765275680a88f2daf6d5fc3f59a154729aebce39"
         },
         "_read_metadata": {
           "before": null,
@@ -5038,15 +5216,15 @@
         },
         "test_frozen_blob_batch_matches_git_show_and_revalidates_each_call": {
           "before": null,
-          "after": "f7c211de67371c2687deaae08f5331252c5e4e651f24d2e1b72dc1321c901fdd"
+          "after": "efcb74ddc807474f457658c0e74fe4412f5b65c4f7179ba53f591e042dccc1fa"
         },
         "test_frozen_blob_batch_rejects_changed_members_and_malformed_payloads": {
           "before": null,
-          "after": "772c726d2bfb61a7f49f940bd83e852ac163d0b79678f83068b79942ecf4f998"
+          "after": "99f39e1f8525852e1752654e9088497b0ebf6066fdd8a977987c2303e1c1ec3d"
         },
         "test_frozen_blob_batch_rejects_nonliteral_or_ambiguous_selection": {
           "before": null,
-          "after": "07e2f3ad6588a07c26fae24bb311a2a9a3b1d38516792237996ea53fd277870e"
+          "after": "9827c34f2cacf592d61bf8baf75caec41f494b386fa2945e1f097a8309919774"
         },
         "test_generated_inventory_changes_only_reviewed_perils_metadata": {
           "before": null,
@@ -5054,11 +5232,11 @@
         },
         "test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin": {
           "before": null,
-          "after": "810c90a21f663c5a3038e19f4dc5a9a5db4bc50211414cdd2940c10e732c2ca3"
+          "after": "0b776587b368e45eef81e3b2248c8963e0940e9bfe63c419312ca5f8cedff960"
         },
         "test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelated_input": {
           "before": null,
-          "after": "e64d72380012ed27d69c0749cd21a56963dbf4624b2dd030c17b4f7fd515298d"
+          "after": "f88d78e33292abe2a95d885fde29717ac5ccb502b8c6fc0a515087fe829fa939"
         },
         "test_native_discovery_matches_original_ignored_and_symlink_membership": {
           "before": null,
@@ -5066,15 +5244,15 @@
         },
         "test_owned_read_compares_windows_ctime_within_each_api_channel": {
           "before": null,
-          "after": "acd82661223c11e397dca632e5be14dc5165cdffca9537055cdadce913c69650"
+          "after": "b6ae9ad821b7ac803d1375f8140ae354b344ce53bbe989b86d944721d6eaf482"
         },
         "test_owned_read_rejects_cross_api_metadata_drift": {
           "before": null,
-          "after": "efa68c02c751721ddbae48a20abea4d8821c82c4ba9292aeccc6fec8d9e7a230"
+          "after": "4c00779d3d6022c1e649f5b530772d7ebbb92dc16d3d92d4619b64475b0fb341"
         },
         "test_owned_read_rejects_ctime_drift_in_either_api_channel": {
           "before": null,
-          "after": "10c4ae1a1c68bbe703fb587d0b866557eaac43ba36651ebc8b9215b6d27c0862"
+          "after": "6042273a2f0b3582cd10c7a59814f56446668b5ba5f76128a6cefe7efd89ac55"
         },
         "test_owned_scan_matches_independent_original_reader": {
           "before": null,
@@ -5102,23 +5280,61 @@
         },
         "test_perils_admission_has_only_an_exact_governance_exception": {
           "before": null,
-          "after": "edbbcd58d572d61421a8dcc8ab7712943b40ff12aaaac1e42376881d826ceafd"
+          "after": "0b15910e2a195fed50b7c822c145886f5a452f77b56b4c3f2a33f28d25a34fc8"
         },
         "test_public_smoke_gate_revalidates_and_refuses_midrun_change": {
           "before": null,
-          "after": "cdb07b4c0dc343e92848496ec5ce9452efc7bc1d3013adefe88403706fb0dcdb"
+          "after": "c74f1c781793ba01127e7d7a5883c0714ec2215bbcef4172ab3f77a7e7aa5da7"
         },
         "test_pure_source_hash_memo_is_exact_bounded_and_validator_specific": {
           "before": null,
-          "after": "d6e5980600bf7266b38781e857a56dc71fbbdf80431b349e987446f009ad73a9"
+          "after": "c0366a312ac276209526ccc010487cc33f4c0030b8329f61d4aaa70cb53b876f"
         },
         "test_pure_source_hash_memo_resets_after_nested_exceptions_and_new_invocations": {
           "before": null,
-          "after": "22e27aca10c04bc7b06bef02edebdc4488e9c0c7d195c73310572d8f31e56915"
+          "after": "fd863192444049713fd65525743f2a053bd6a9f43f1a0e733120496cc8b6870f"
         },
         "test_recipe_cache_is_local_exact_and_validator_specific": {
           "before": null,
           "after": "e256ebefe1d859316af81ca6a48dbdb5898d58598d4453d6fe5030164767acb3"
+        }
+      }
+    },
+    "tests/code_quality/test_performance_static_successor.py": {
+      "before_sha256": null,
+      "after_sha256": "11f3b12c428845d8e62840c049dd2a36ceb596368a2dc9b956054bf8a9e1ad28",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "4c17b2495f54bc6aae6863d40f09b74da02ab635fa7be23c0688a8581c8bf6f6"
+        },
+        "previous": {
+          "before": null,
+          "after": "a764976f35b012dbd548a6f948586e2dfa77943b978f6bc50fc1d67a89d6fc36"
+        },
+        "test_static_edits_match_independent_immutable_whole_module_recipes": {
+          "before": null,
+          "after": "cf99f8732bdd0f426d0cf95dcbd3524935869cfaecfcdc4318540dfc541659da"
+        },
+        "test_static_historical_projection_rejects_unrelated_caller_bytes": {
+          "before": null,
+          "after": "e4d947093768910299cd9e8e8c3ef13cf10b7e49b246894a3cfd928dd33f936a"
+        },
+        "test_static_recipes_reject_changed_seams_assertions_and_fixture_behavior_even_if_repinned": {
+          "before": null,
+          "after": "183dddad313c135bc8129943d54c2e66b68bcbae257298c6822d0ae6796f8229"
+        },
+        "test_static_transition_rejects_malformed_records": {
+          "before": null,
+          "after": "36dd025f2e48cec912c54ba91e00bed67946c2f8a1abb8e845c540bd74cec401"
+        },
+        "test_static_transition_rejects_unlisted_source": {
+          "before": null,
+          "after": "f208ba7b2175ba670794fcc8039d0f5603641b5794898b85f95e3c87119bd452"
+        },
+        "transitions": {
+          "before": null,
+          "after": "39ac9411d228ff63e9b36ed5fcd024d2a028aaac09edd972ee1c930e1be4fe2f"
         }
       }
     },
@@ -5168,11 +5384,31 @@
     },
     "tests/code_quality/test_qualification40_successor.py": {
       "before_sha256": null,
-      "after_sha256": "5a1f745da1d751f9c0be22ade0500831862381687c5de23d248e7269b64561d3",
+      "after_sha256": "dbc224be55ff45ba4d86eef3648ba641f4e6c350f84a58c0e5a6751229c550bc",
       "owners": {
         "@module": {
           "before": null,
-          "after": "fecab2f69a794c9a27318621b999c696930025a4925568f3da1dbd4f39f9e753"
+          "after": "a2cc20110c8ee99fae3a78c543d3cfd02604dd0e39dc916f964f4cf23bdfa93f"
+        },
+        "_QualificationMechanisms": {
+          "before": null,
+          "after": "d9ee7676b730c4b54a138371849965e9916e9355deeb9f160a8da6c697b03ec6"
+        },
+        "_QualificationMechanisms._member": {
+          "before": null,
+          "after": "afedac545adc37dcb36a46dd14c9992bc6ce263ee92fb0481e2b26bea5d26555"
+        },
+        "_QualificationMechanisms._read": {
+          "before": null,
+          "after": "ce903f3b904b078e7c47edececabd292c9a82600405734d167106c3098b60745"
+        },
+        "_QualificationMechanisms.member": {
+          "before": null,
+          "after": "4086f8b58f35efae845eba32f3c36267246f0299b8fb7cf65624e98262f0f060"
+        },
+        "_QualificationMechanisms.read": {
+          "before": null,
+          "after": "d1940cabc5795ccc128abe8b9fd2f26fdb55bb6c3a3087408b32a512a0ec6378"
         },
         "successor_copy": {
           "before": null,
@@ -5180,7 +5416,7 @@
         },
         "test_qualification_map_identifier_requalification_rejects_semantic_drift": {
           "before": null,
-          "after": "287b3d6975add93de031048bc4c1c85c5ee2230bce493ac581a185110f46fb90"
+          "after": "28432b62c89dfa746e70f9b06a7c283d9b998fe0742d65057fe6105353f8262c"
         },
         "test_qualification_map_mutation_cannot_inherit_historical_credit": {
           "before": null,
@@ -16440,11 +16676,11 @@
     },
     "tests/support/section08_native_mission.py": {
       "before_sha256": null,
-      "after_sha256": "a4282eba8e4bfccb18ad17417e43ef9b9cd9063285777c155e13b0955be2ccc9",
+      "after_sha256": "c5cd5422243cc6a2b849b30c03743afc52a8535245b739ae00bde656c9e9feec",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ae658d1b4a201c333d41be6c4e96a5889911e796c4cb2d5cd5153244d3a1ea28"
+          "after": "0ea6facd68313cf98f2f51a147ca4ef3ae70a46eb03f7ebe428fcceab3ded562"
         },
         "assert_native_command_outcome": {
           "before": null,
@@ -17894,7 +18130,7 @@
     },
     "tools/core_rules_order97_inventory.py": {
       "before_sha256": "e50a6dff0a66b81310c2799c939200fe76c186286b20eb9a70d9f90f8c038110",
-      "after_sha256": "a9fcf75cffde412df9bd0aea2bfa99fcb2b9deb2c1a1e88cd870c00a459a39e6",
+      "after_sha256": "a2244c13bb62a966807801bd21929b60004d4f89260c3e1a7fde852d0721f0b5",
       "owners": {
         "@module": {
           "before": "88c4ae62aeb22e12e0f6d37a8889f62cbba3bfea24a9c76e50bf75d44e8ff1d4",
@@ -17908,7 +18144,7 @@
     },
     "tools/cumulative_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "b3e21ddadefb08e1a26c2a0f0d702252bd2ef23ebb2f2593b821cc000fc13e5a",
+      "after_sha256": "fd56f9037e9b5c1ae1466eed49195ee40be44ba32772a729c9ff724bc0c734e0",
       "owners": {
         "@module": {
           "before": null,
@@ -17956,7 +18192,7 @@
         },
         "d07_predecessors": {
           "before": null,
-          "after": "db6f3527ae94ecbbd3142353726ef97082359f0f6a8f4b7ff701d77e507a2b29"
+          "after": "d7a0f713a57e38453ad2956981303d0c450f137d560a0a1263de97b001058057"
         },
         "expected_inputs": {
           "before": null,
@@ -18104,11 +18340,11 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "d4d92cf5e498424aecccfe78dafecc564b0e93cb016fca1d69d6220b6409fe37",
+      "after_sha256": "1abf423b1034d593fd6a8c055a427330b2c5c48b86937597a75ef3d051fea37b",
       "owners": {
         "@module": {
           "before": null,
-          "after": "34a5e4a2da208eac2d441f616ca1d5b83ec8d9e431370d4ace7440ebb27a6f1f"
+          "after": "c66a6f0e67d15c1efa1b1a3453373465d03beed659e2c8f7ddea7751a68ee703"
         },
         "_assessment": {
           "before": null,
@@ -18120,7 +18356,7 @@
         },
         "_freeze": {
           "before": null,
-          "after": "2af39b3c2eada96e6d1d42807bee5c3ff004916a210f61a1ed057f137ac1315a"
+          "after": "53af657e613ef1a18e3ba115fa0fc338e65dd6228c5628670ca4631d625401a0"
         },
         "_git": {
           "before": null,
@@ -18134,17 +18370,29 @@
           "before": null,
           "after": "8f72dbfdc310957eeb857f007dc7be9414470c6878c7300c4da70e2c18567e8f"
         },
+        "_static_transitions": {
+          "before": null,
+          "after": "39d3f113060aedffc7d86eada84817ee73fdab136d12a9fcf18b71d6e47aed36"
+        },
+        "assert_static_transition": {
+          "before": null,
+          "after": "64b6275eb637da329dbc5049b277563d730fdb8443d4a35aa2c338eba7c95f25"
+        },
         "current_source": {
           "before": null,
           "after": "0e04e84ca076fa94709f1cb9f16f40875d6f45bcbf0254c1d5a52b7388bc1f29"
         },
         "measurement_inputs": {
           "before": null,
-          "after": "2452b16ad9ed1616b41f41d90e4f4d5b40e83c2a692a3ee8e189ed55303b4fa9"
+          "after": "642aef04c8c3fde975b90b762b575fee5db81957ce9c1fe4fb3ad6f0997e5ab9"
         },
         "preceding_control": {
           "before": null,
           "after": "af91f8d177b8882e155f23280604fe834c5235bc58e2822ea1d99e8862daf414"
+        },
+        "static_predecessor": {
+          "before": null,
+          "after": "a3c2d8bd314248aca0d3d6c12cfa4423e50c8d2b457ae04567e9e1388fb25bca"
         }
       }
     },
@@ -20956,6 +21204,14 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "docs/performance/static-successor48.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+    },
     "scripts/benchmark_order88_strength.py": {
       "category": "measured_workload",
       "operations": [
@@ -22488,17 +22744,17 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tests/code_quality/test_cumulative_preservation.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
     },
     "tests/code_quality/test_d07_geometry_containment.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tests/code_quality/test_d07_geometry_containment.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
     },
     "tests/code_quality/test_d07_upper_floor_preservation.py": {
       "category": "governance",
@@ -22536,9 +22792,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tests/code_quality/test_order34_action_restrictions.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
     },
     "tests/code_quality/test_order54_large_model_setup.py": {
       "category": "governance",
@@ -22592,9 +22848,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tests/code_quality/test_order97_faction_relocation.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
     },
     "tests/code_quality/test_performance_category_migration.py": {
       "category": "governance",
@@ -22608,9 +22864,17 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Batch only the finite immutable frozen-blob read sets into fresh Git commands. Every selected name, regular blob mode, OID, full payload, canonical size and framing is verified. Keep all independent live-byte/ownership, provenance, membership, activation and existing historical checks. No Git/physical-source result cache is added; malformed-output and real Git equivalence guards are retained.",
-      "source_obligation": "Preserve every previous validation and exact frozen assertion; only combine immutable blob transport. All engine/workload/imported fixtures, cases, samples, families, budgets and authoritative CI selection remain exact.",
-      "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+    },
+    "tests/code_quality/test_performance_static_successor.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
     },
     "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
       "category": "governance",
@@ -22632,9 +22896,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tests/code_quality/test_qualification40_successor.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
     },
     "tests/code_quality/test_s25_fixture_preservation.py": {
       "category": "governance",
@@ -27772,9 +28036,9 @@
         "qualification40-exact-411d2638fc43c127"
       ],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tests/support/section08_native_mission.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
     },
     "tests/support/section08_native_mission_source.py": {
       "category": "measured_workload",
@@ -28308,9 +28572,9 @@
         "shock-source-generation-and-audit"
       ],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tools/core_rules_order97_inventory.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
     },
     "tools/cumulative_preservation.py": {
       "category": "measured_workload",
@@ -28318,9 +28582,9 @@
         "qualification40-exact-b8a07a50d2ab636b"
       ],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tools/cumulative_preservation.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
     },
     "tools/generate_ability_support_matrix.py": {
       "category": "measured_workload",
@@ -28354,9 +28618,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Batch only the finite immutable frozen-blob read sets into fresh Git commands. Every selected name, regular blob mode, OID, full payload, canonical size and framing is verified. Keep all independent live-byte/ownership, provenance, membership, activation and existing historical checks. No Git/physical-source result cache is added; malformed-output and real Git equivalence guards are retained.",
-      "source_obligation": "Preserve every previous validation and exact frozen assertion; only combine immutable blob transport. All engine/workload/imported fixtures, cases, samples, families, budgets and authoritative CI selection remain exact.",
-      "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
+      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
+      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
+      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
     },
     "tools/performance_qualification_measurements.py": {
       "category": "governance",

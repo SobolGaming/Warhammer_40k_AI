@@ -19,6 +19,7 @@ from tests.support.faction_layout_preservation import (
     ORIGINALS as FACTION_LAYOUT_ORIGINALS,
 )
 from tests.support.faction_layout_preservation import verify_layout_original
+
 from tools.core_rules_40k_app_audit import roadmap_rows
 from tools.core_rules_order84_capture import fingerprint, source_inventory
 from tools.core_rules_order97_history import historical_evidence_path

@@ -5,8 +5,9 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol, cast
 
 import pytest
 from tools import cumulative_preservation as prior
@@ -14,6 +15,22 @@ from tools import performance_policy as policy
 from tools import performance_qualification_successor as stage
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+class _QualificationMechanisms(Protocol):
+    def _member(self, root: Path, name: str, freeze: str) -> bytes: ...
+
+    def _read(self, root: Path, name: str) -> bytes: ...
+
+    def member(self) -> Callable[[Path, str, str], bytes]:
+        return self._member
+
+    def read(self) -> Callable[[Path, str], bytes]:
+        return self._read
+
+
+# Capture real functions through a typed view before the test replaces them.
+_stage = cast(_QualificationMechanisms, stage)
 
 
 @pytest.fixture(scope="module")
@@ -152,7 +169,7 @@ def test_qualification_map_identifier_requalification_rejects_semantic_drift(
     else:
         value["operations"].pop(next(iter(stage.accepted_operation_map(ROOT)["operations"])))
     raw = json.dumps(value).encode()
-    member, read = stage._member, stage._read
+    member, read = _QualificationMechanisms.member(_stage), _QualificationMechanisms.read(_stage)
 
     def repinned_member(root: Path, name: str, freeze: str) -> bytes:
         return raw if name == policy.MAP else member(root, name, freeze)

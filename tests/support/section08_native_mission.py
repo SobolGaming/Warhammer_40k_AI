@@ -18,6 +18,8 @@ from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.geometry.pose import Pose
 
+__all__ = ["STICKY_SOURCE_ID", "assert_native_command_outcome", "native_command_scene"]
+
 
 def native_command_scene(definitions: Section02Definitions, *, active: str, reverse: bool) -> Scene:
     definitions = source_backed_command_definitions(definitions)

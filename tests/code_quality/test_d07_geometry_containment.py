@@ -7,14 +7,22 @@ import hashlib
 import json
 import shutil
 from pathlib import Path
-from typing import cast
+from typing import Protocol, cast
 
 import pytest
+
 from tests import d07_geometry_containment as geometry
 
 ROOT = Path(__file__).resolve().parents[2]
 RETRY_OWNER = "src/warhammer40k_core/engine/phases/movement_escape_mortals.py"
 CASUALTY_OWNER = "src/warhammer40k_core/engine/desperate_escape_mortal_wounds.py"
+
+
+class _SuccessorFreeze(Protocol):
+    def _freeze(self, root: Path) -> str: ...
+
+    def freeze(self, root: Path) -> str:
+        return self._freeze(root)
 
 
 @pytest.fixture(scope="module")
@@ -336,7 +344,8 @@ def test_order135_reviewed_fnp_metadata_transition_preserves_all_obligations() -
     # historical FNP transition with its exact accepted predecessor bytes.
     from tools import performance_preflight_successor as successor
 
-    successor._freeze(ROOT)
+    successor_probe = cast(_SuccessorFreeze, successor)
+    _SuccessorFreeze.freeze(successor_probe, ROOT)
     actual = successor.preceding_control(ROOT, transition["order135_output"], actual)
     assert hashlib.sha256(actual).hexdigest() == transition["order135_output_sha256"]
     assert json.loads(actual) == expected

@@ -9,6 +9,7 @@ import shutil
 import subprocess
 from collections import Counter
 from pathlib import Path
+from typing import Any, Protocol, cast
 
 import pytest
 from tools import cumulative_preservation as cumulative
@@ -21,9 +22,27 @@ from tools import performance_tool_inputs as original
 ROOT = Path(__file__).resolve().parents[2]
 
 
+class _CumulativeMechanisms(Protocol):
+    def _registry(self, root: Path) -> dict[str, Any]: ...
+
+    def _json(self, root: Path, name: str) -> Any: ...
+
+    def registry(self, root: Path) -> dict[str, Any]:
+        return self._registry(root)
+
+    def json(self, root: Path, name: str) -> Any:
+        return self._json(root, name)
+
+
+# The view is the actual module; negative controls still mutate its real inputs.
+_cumulative = cast(_CumulativeMechanisms, cumulative)
+
+
 def test_finite_owner_and_operation_union_preserves_all_prior_obligations() -> None:
-    record = cumulative._registry(ROOT)
-    ledger = cumulative._json(ROOT, cumulative.NAMESPACE + "/owner-ledger.json")
+    record = _CumulativeMechanisms.registry(_cumulative, ROOT)
+    ledger = _CumulativeMechanisms.json(
+        _cumulative, ROOT, cumulative.NAMESPACE + "/owner-ledger.json"
+    )
     assert len(ledger) == len({(r["path"], r["owner"]) for r in ledger}) == 153
     assert Counter(r["disposition"] for r in ledger) == {
         "needs_new_behavioral_guard": 97,
@@ -174,7 +193,7 @@ def test_registry_and_accepted_evidence_cannot_be_rewritten(copy_source: Path, k
                 ).hexdigest()
                 registry.write_text(json.dumps(data))
         with pytest.raises(ValueError, match="Cumulative"):
-            cumulative._registry(copy_source)
+            _CumulativeMechanisms.registry(_cumulative, copy_source)
     finally:
         target.write_bytes(before)
         registry.write_bytes(prior)
@@ -221,10 +240,12 @@ def test_physical_ownership_refuses_aliases(copy_source: Path, tmp_path: Path, k
 
 
 def test_every_d07_recipe_is_independently_sensitive_to_extra_or_removed_assertion() -> None:
-    recipes = cumulative._json(ROOT, cumulative.NAMESPACE + "/d07-recipes.json")
+    recipes = _CumulativeMechanisms.json(
+        _cumulative, ROOT, cumulative.NAMESPACE + "/d07-recipes.json"
+    )
     from tests.category_migration_preservation import read_historical_test_bytes
 
-    refused = []
+    refused: list[str] = []
     for path, recipe in recipes.items():
         before = (ROOT / cumulative.NAMESPACE / "predecessors" / (path + ".txt")).read_bytes()
         current = read_historical_test_bytes(ROOT, path).replace(b"\r\n", b"\n")
@@ -284,7 +305,9 @@ def test_ignored_consumer_inputs_do_not_escape_membership(copy_source: Path, nam
     ],
 )
 def test_three_changed_controls_require_exact_transformations(path: str) -> None:
-    rows = cumulative._json(ROOT, cumulative.NAMESPACE + "/control-transformations.json")
+    rows = _CumulativeMechanisms.json(
+        _cumulative, ROOT, cumulative.NAMESPACE + "/control-transformations.json"
+    )
     row = next(r for r in rows if r["path"] == path)
     before = subprocess.check_output(
         ["git", "show", cumulative.CONTENT_BASE + ":" + path], cwd=ROOT
@@ -308,7 +331,9 @@ def test_d09_successor_does_not_repin_historical_after_or_assertions(path: str) 
     from tests.category_migration_preservation import read_historical_test_bytes
     from tests.d09_test_preservation_helpers import preserved_d09_predecessor_test_bytes
 
-    recipe = cumulative._json(ROOT, cumulative.NAMESPACE + "/d09-recipes.json")[path]
+    recipe = _CumulativeMechanisms.json(
+        _cumulative, ROOT, cumulative.NAMESPACE + "/d09-recipes.json"
+    )[path]
     stage = (ROOT / cumulative.NAMESPACE / recipe["d09_stage"]).read_bytes()
     current = read_historical_test_bytes(ROOT, path).replace(b"\r\n", b"\n")
     assert hashlib.sha256(stage).hexdigest() == recipe["d09_after_sha256"]
@@ -329,11 +354,16 @@ def test_d09_successor_does_not_repin_historical_after_or_assertions(path: str) 
     ],
 )
 def test_later_d07_successors_preserve_exact_separate_prerequisite_stages(path: str) -> None:
-    recipe = cumulative._json(ROOT, cumulative.NAMESPACE + "/later-d07-recipes.json")[path]
+    from tools.performance_preflight_successor import static_predecessor
+
+    recipe = _CumulativeMechanisms.json(
+        _cumulative, ROOT, cumulative.NAMESPACE + "/later-d07-recipes.json"
+    )[path]
     before = subprocess.check_output(
         ["git", "show", cumulative.CONTENT_BASE + ":" + path], cwd=ROOT
     )
     current = (ROOT / path).read_bytes().replace(b"\r\n", b"\n")
+    current = static_predecessor(ROOT, path, current)
     assert hashlib.sha256(before).hexdigest() == recipe["before_sha256"]
     assert hashlib.sha256(current).hexdigest() == recipe["after_sha256"]
     cumulative.assert_recipe(before, current, recipe)

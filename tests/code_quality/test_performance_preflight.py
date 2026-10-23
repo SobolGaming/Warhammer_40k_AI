@@ -7,13 +7,124 @@ import hashlib
 import json
 import os
 import subprocess
+from collections.abc import Callable, Mapping
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, Protocol, cast
 
 import pytest
 from scripts import check_performance_policy as gate
 from tools import performance_preflight as preflight
+
+
+class _DigestProbe(Protocol):
+    @property
+    def limit(self) -> int: ...
+
+    @property
+    def retained(self) -> int: ...
+
+    @property
+    def entries(self) -> Mapping[tuple[Callable[..., Any], str], tuple[bytes, str]]: ...
+
+    def digest(self, path: str, raw: bytes) -> str: ...
+
+
+class _DigestScope(Protocol):
+    def get(self) -> _DigestProbe | None: ...
+
+
+class _PreflightMechanisms(Protocol):
+    @property
+    def _DIGEST_LIMIT(self) -> int: ...
+
+    @property
+    def _DIGESTS(self) -> _DigestScope: ...
+
+    def _Digests(self, limit: int = ...) -> _DigestProbe: ...
+
+    def _source_digest(self, path: str, raw: bytes) -> str: ...
+
+    def _same_read(
+        self,
+        before: os.stat_result,
+        opened: os.stat_result,
+        closed: os.stat_result,
+        after: os.stat_result,
+        *,
+        windows: bool,
+    ) -> bool: ...
+
+    def digest_limit(self) -> int:
+        return self._DIGEST_LIMIT
+
+    def digest_scope(self) -> _DigestScope:
+        return self._DIGESTS
+
+    def digests(self, limit: int) -> _DigestProbe:
+        return self._Digests(limit)
+
+    def source_digest(self, path: str, raw: bytes) -> str:
+        return self._source_digest(path, raw)
+
+    def same_read(
+        self,
+        before: os.stat_result,
+        opened: os.stat_result,
+        closed: os.stat_result,
+        after: os.stat_result,
+        *,
+        windows: bool,
+    ) -> bool:
+        return self._same_read(before, opened, closed, after, windows=windows)
+
+
+class _GateMechanisms(Protocol):
+    def _check_and_run(
+        self, base_ref: str, pr_head: str | None, output: Path
+    ) -> dict[str, object]: ...
+
+    def check_and_run(self, base_ref: str, pr_head: str | None, output: Path) -> dict[str, object]:
+        return self._check_and_run(base_ref, pr_head, output)
+
+
+class _PolicyMechanisms(Protocol):
+    def _governance(self, path: str) -> bool: ...
+
+    def governance(self, path: str) -> bool:
+        return self._governance(path)
+
+
+class _GitCommand(Protocol):
+    def __call__(self, root: Path, *args: str, payload: bytes | None = None) -> bytes: ...
+
+
+class _SuccessorMechanisms(Protocol):
+    def _git(self, root: Path, *args: str, payload: bytes | None = None) -> bytes: ...
+
+    def _freeze(self, root: Path) -> str: ...
+
+    def _blobs(self, root: Path, revision: str, names: list[str]) -> dict[str, bytes]: ...
+
+    def git(self, root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        return self._git(root, *args, payload=payload)
+
+    def git_function(self) -> _GitCommand:
+        return self._git
+
+    def freeze(self, root: Path) -> str:
+        return self._freeze(root)
+
+    def blobs(self, root: Path, revision: str, names: list[str]) -> dict[str, bytes]:
+        return self._blobs(root, revision, names)
+
+
+# These views keep the real module objects and their monkeypatch targets. They
+# describe only the private mechanisms whose boundaries these tests exercise.
+# Unbound methods keep private access inside its declaring Protocol and forward
+# to the same production functions; function capture returns the original object.
+_preflight = cast(_PreflightMechanisms, preflight)
+_gate = cast(_GateMechanisms, gate)
 
 
 def test_recipe_cache_is_local_exact_and_validator_specific() -> None:
@@ -187,10 +298,10 @@ def _read_metadata(*, ctime: int, changed: str = "") -> os.stat_result:
 def test_owned_read_compares_windows_ctime_within_each_api_channel() -> None:
     path = _read_metadata(ctime=10)
     handle = _read_metadata(ctime=20)
-    assert preflight._same_read(path, handle, handle, path, windows=True)
-    assert not preflight._same_read(path, handle, handle, path, windows=False)
+    assert _PreflightMechanisms.same_read(_preflight, path, handle, handle, path, windows=True)
+    assert not _PreflightMechanisms.same_read(_preflight, path, handle, handle, path, windows=False)
     for windows in (False, True):
-        assert preflight._same_read(path, path, path, path, windows=windows)
+        assert _PreflightMechanisms.same_read(_preflight, path, path, path, path, windows=windows)
 
 
 def test_owned_read_rejects_ctime_drift_in_either_api_channel() -> None:
@@ -199,7 +310,7 @@ def test_owned_read_rejects_ctime_drift_in_either_api_channel() -> None:
         for index in range(4):
             observations = [_read_metadata(ctime=value) for value in times]
             observations[index] = _read_metadata(ctime=times[index] + 1)
-            assert not preflight._same_read(*observations, windows=windows)
+            assert not _PreflightMechanisms.same_read(_preflight, *observations, windows=windows)
 
 
 @pytest.mark.parametrize("field", ["mode", "ino", "dev", "nlink", "size", "mtime"])
@@ -207,7 +318,9 @@ def test_owned_read_rejects_cross_api_metadata_drift(field: str) -> None:
     path = _read_metadata(ctime=10)
     for windows in (False, True):
         handle = _read_metadata(ctime=20 if windows else 10, changed=field)
-        assert not preflight._same_read(path, handle, handle, path, windows=windows)
+        assert not _PreflightMechanisms.same_read(
+            _preflight, path, handle, handle, path, windows=windows
+        )
 
 
 def test_public_smoke_gate_revalidates_and_refuses_midrun_change(
@@ -235,16 +348,20 @@ def test_public_smoke_gate_revalidates_and_refuses_midrun_change(
     monkeypatch.setattr(gate, "run_smoke", smoke)
     monkeypatch.setattr(gate, "_write_receipt", receipt)
     with pytest.raises(ValueError, match="changed during the required smoke"):
-        gate._check_and_run("exact-base", None, tmp_path / "receipt.json")
+        _GateMechanisms.check_and_run(_gate, "exact-base", None, tmp_path / "receipt.json")
     assert calls == [b"before", b"edited"]
     assert receipts == [{"status": "failed", "inputs_unchanged": False}]
 
 
 def test_perils_admission_has_only_an_exact_governance_exception() -> None:
-    from tools.performance_policy import _governance
+    from tools import performance_policy as policy
 
-    assert _governance("tools/thousand_sons_perils_preservation.py")
-    assert not _governance("tools/thousand_sons_unreviewed_runtime.py")
+    policy_probe = cast(_PolicyMechanisms, policy)
+
+    assert _PolicyMechanisms.governance(policy_probe, "tools/thousand_sons_perils_preservation.py")
+    assert not _PolicyMechanisms.governance(
+        policy_probe, "tools/thousand_sons_unreviewed_runtime.py"
+    )
 
 
 def test_owner_cache_uses_exact_inputs_defensive_copies_and_exception_cleanup() -> None:
@@ -398,8 +515,10 @@ def test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelat
 ) -> None:
     from tools import performance_preflight_successor as successor
 
+    successor_probe = cast(_SuccessorMechanisms, successor)
+
     root = Path(__file__).resolve().parents[2]
-    direct_git = successor._git
+    direct_git = _SuccessorMechanisms.git_function(successor_probe)
     current = (root / successor.INVENTORY).read_bytes()
     old = direct_git(root, "show", successor.BASE + ":" + successor.INVENTORY)
     assert current != old
@@ -435,8 +554,10 @@ def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
 ) -> None:
     from tools import performance_preflight_successor as successor
 
+    successor_probe = cast(_SuccessorMechanisms, successor)
+
     root = Path(__file__).resolve().parents[2]
-    direct_git = successor._git
+    direct_git = _SuccessorMechanisms.git_function(successor_probe)
     for name in successor.PINS.keys() | {successor.SELF}:
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -446,7 +567,7 @@ def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
         return direct_git(root, *args, payload=payload)
 
     monkeypatch.setattr(successor, "_git", original_git)
-    assert successor._freeze(tmp_path) == successor.FREEZE_COMMIT
+    assert _SuccessorMechanisms.freeze(successor_probe, tmp_path) == successor.FREEZE_COMMIT
     path = tmp_path / successor.INVENTORY
     payload = json.loads(path.read_bytes())
     assert payload["runtime_pass_claimed"] is False
@@ -462,13 +583,13 @@ def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
         assert raw.count(old_pin.encode()) == 1
         control.write_bytes(raw.replace(old_pin.encode(), new_pin.encode(), 1))
     with pytest.raises(ValueError, match=r"Preflight successor activation|Preflight source"):
-        successor._freeze(tmp_path)
+        _SuccessorMechanisms.freeze(successor_probe, tmp_path)
 
 
 def test_pure_source_hash_memo_is_exact_bounded_and_validator_specific(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    assert preflight._DIGEST_LIMIT == 512 * 1024 * 1024
+    assert _PreflightMechanisms.digest_limit(_preflight) == 512 * 1024 * 1024
     calls: list[str] = []
     sha = hashlib.sha256
 
@@ -481,7 +602,7 @@ def test_pure_source_hash_memo_is_exact_bounded_and_validator_specific(
         return sha(raw)
 
     monkeypatch.setattr(preflight, "hashlib", SimpleNamespace(sha256=first))
-    memo = preflight._Digests(8)
+    memo = _PreflightMechanisms.digests(_preflight, 8)
     assert memo.digest("a", b"1234") == sha(b"1234").hexdigest()
     assert memo.digest("a", b"1234") == sha(b"1234").hexdigest()
     assert calls == ["first"]
@@ -505,37 +626,37 @@ def test_pure_source_hash_memo_is_exact_bounded_and_validator_specific(
 
 
 def test_pure_source_hash_memo_resets_after_nested_exceptions_and_new_invocations() -> None:
-    assert preflight._DIGESTS.get() is None
-    scopes: list[preflight._Digests] = []
+    assert _PreflightMechanisms.digest_scope(_preflight).get() is None
+    scopes: list[_DigestProbe] = []
 
     @preflight.invocation
     def outer() -> None:
-        current = preflight._DIGESTS.get()
+        current = _PreflightMechanisms.digest_scope(_preflight).get()
         assert current is not None
         assert current.retained == 0
         scopes.append(current)
-        preflight._source_digest("a", b"original")
+        _PreflightMechanisms.source_digest(_preflight, "a", b"original")
         assert current.retained == len(b"original")
 
         @preflight.invocation
         def inner() -> None:
-            nested = preflight._DIGESTS.get()
+            nested = _PreflightMechanisms.digest_scope(_preflight).get()
             assert nested is not None
             assert nested is not current
             assert nested.retained == 0
-            preflight._source_digest("a", b"changed")
+            _PreflightMechanisms.source_digest(_preflight, "a", b"changed")
             raise ValueError("nested failure")
 
         with pytest.raises(ValueError, match="nested failure"):
             inner()
-        assert preflight._DIGESTS.get() is current
+        assert _PreflightMechanisms.digest_scope(_preflight).get() is current
         assert current.retained == len(b"original")
         raise ValueError("outer failure")
 
     for _ in range(2):
         with pytest.raises(ValueError, match="outer failure"):
             outer()
-        assert preflight._DIGESTS.get() is None
+        assert _PreflightMechanisms.digest_scope(_preflight).get() is None
     assert scopes[0] is not scopes[1]
     assert all(scope.retained == 0 and not scope.entries for scope in scopes)
 
@@ -545,15 +666,18 @@ def test_frozen_blob_batch_matches_git_show_and_revalidates_each_call(
 ) -> None:
     from tools import performance_preflight_successor as successor
 
+    successor_probe = cast(_SuccessorMechanisms, successor)
+
     contents = {"a.txt": b"exact\n", "nested/a spaced[1].bin": bytes(range(256)), "empty": b""}
-    successor._git(tmp_path, "init", "--quiet")
+    _SuccessorMechanisms.git(successor_probe, tmp_path, "init", "--quiet")
     for name, content in contents.items():
         path = tmp_path / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
-    successor._git(tmp_path, "add", "--all")
-    successor._git(tmp_path, "update-index", "--chmod=+x", "a.txt")
-    successor._git(
+    _SuccessorMechanisms.git(successor_probe, tmp_path, "add", "--all")
+    _SuccessorMechanisms.git(successor_probe, tmp_path, "update-index", "--chmod=+x", "a.txt")
+    _SuccessorMechanisms.git(
+        successor_probe,
         tmp_path,
         "-c",
         "user.name=Blob test",
@@ -566,10 +690,15 @@ def test_frozen_blob_batch_matches_git_show_and_revalidates_each_call(
         "-m",
         "Exact blob fixture",
     )
-    revision = successor._git(tmp_path, "rev-parse", "HEAD").decode().strip()
-    expected = {name: successor._git(tmp_path, "show", revision + ":" + name) for name in contents}
+    revision = (
+        _SuccessorMechanisms.git(successor_probe, tmp_path, "rev-parse", "HEAD").decode().strip()
+    )
+    expected = {
+        name: _SuccessorMechanisms.git(successor_probe, tmp_path, "show", revision + ":" + name)
+        for name in contents
+    }
     assert expected == contents
-    direct_git = successor._git
+    direct_git = _SuccessorMechanisms.git_function(successor_probe)
     calls: list[tuple[str, ...]] = []
 
     def tracked(root: Path, *args: str, payload: bytes | None = None) -> bytes:
@@ -577,14 +706,18 @@ def test_frozen_blob_batch_matches_git_show_and_revalidates_each_call(
         return direct_git(root, *args, payload=payload)
 
     monkeypatch.setattr(successor, "_git", tracked)
-    assert successor._blobs(tmp_path, revision, list(contents)) == expected
+    assert (
+        _SuccessorMechanisms.blobs(successor_probe, tmp_path, revision, list(contents)) == expected
+    )
     (tmp_path / "a.txt").write_bytes(b"uncommitted live drift")
-    assert successor._blobs(tmp_path, revision, list(contents)) == expected
+    assert (
+        _SuccessorMechanisms.blobs(successor_probe, tmp_path, revision, list(contents)) == expected
+    )
     assert len(calls) == 4
     assert calls[0] == calls[2]
     assert calls[1] == calls[3] == ("cat-file", "--batch")
     with pytest.raises(ValueError, match="Preflight Git tree membership"):
-        successor._blobs(tmp_path, revision, [*contents, "absent.txt"])
+        _SuccessorMechanisms.blobs(successor_probe, tmp_path, revision, [*contents, "absent.txt"])
 
 
 @pytest.mark.parametrize(
@@ -612,6 +745,8 @@ def test_frozen_blob_batch_rejects_changed_members_and_malformed_payloads(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
 ) -> None:
     from tools import performance_preflight_successor as successor
+
+    successor_probe = cast(_SuccessorMechanisms, successor)
 
     content = b"exact\0payload\n"
     size = str(len(content)).encode()
@@ -651,13 +786,15 @@ def test_frozen_blob_batch_rejects_changed_members_and_malformed_payloads(
 
     monkeypatch.setattr(successor, "_git", changed_git)
     with pytest.raises(ValueError, match="Preflight Git"):
-        successor._blobs(tmp_path, "1" * 40, ["a.txt"])
+        _SuccessorMechanisms.blobs(successor_probe, tmp_path, "1" * 40, ["a.txt"])
 
 
 def test_frozen_blob_batch_rejects_nonliteral_or_ambiguous_selection(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from tools import performance_preflight_successor as successor
+
+    successor_probe = cast(_SuccessorMechanisms, successor)
 
     def unexpected_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:
         raise AssertionError("Invalid selectors must fail before Git access.")
@@ -673,4 +810,4 @@ def test_frozen_blob_batch_rejects_nonliteral_or_ambiguous_selection(
         ("1" * 40, ["a.txt\nother"]),
     ):
         with pytest.raises(ValueError, match="Preflight Git"):
-            successor._blobs(tmp_path, revision, names)
+            _SuccessorMechanisms.blobs(successor_probe, tmp_path, revision, names)

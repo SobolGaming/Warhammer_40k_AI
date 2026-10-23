@@ -7,9 +7,10 @@ import json
 from pathlib import Path
 
 import pytest
-from tests.support.faction_layout_preservation import MANIFEST, verify_layout_original
 from tools import core_rules_order97_inventory as audit
 from tools.core_rules_order97_history import historical_evidence_path
+
+from tests.support.faction_layout_preservation import MANIFEST, verify_layout_original
 
 ROOT = Path(__file__).resolve().parents[2]
 ORIGINAL = "tests/unit/test_phase17g_world_eaters_army_rule.py"
