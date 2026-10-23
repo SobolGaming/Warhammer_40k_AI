@@ -6,11 +6,11 @@
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
-      "after_sha256": "60707f6e9ad8ad933297fdab2eab98b733f412680b78eb7c2a5253561df1679b",
+      "after_sha256": "ee0d1a9d331a06195836847d291184b82b94a5d9cfc36bb7485cfabb6bd1c0fe",
       "owners": {
         "@document": {
           "before": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
-          "after": "60707f6e9ad8ad933297fdab2eab98b733f412680b78eb7c2a5253561df1679b"
+          "after": "ee0d1a9d331a06195836847d291184b82b94a5d9cfc36bb7485cfabb6bd1c0fe"
         }
       }
     },
@@ -2336,11 +2336,11 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-      "after_sha256": "fcde2b057946e9915403949209d2d39618aabdb09f8c3e5eafbc72c09d4ef061",
+      "after_sha256": "3078440364a17fcb8ae09a7e8aad2217789a70968bde4ca9c560fcf34382ed52",
       "owners": {
         "@document": {
           "before": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-          "after": "fcde2b057946e9915403949209d2d39618aabdb09f8c3e5eafbc72c09d4ef061"
+          "after": "3078440364a17fcb8ae09a7e8aad2217789a70968bde4ca9c560fcf34382ed52"
         }
       }
     },
@@ -2601,6 +2601,16 @@
         "@document": {
           "before": null,
           "after": "00d1fb9f7dd5199decb969ed730261bf9cc1dc4eaf6e9040e3e34ecd0eee435e"
+        }
+      }
+    },
+    "docs/performance/ci-runtime-successor51.json": {
+      "before_sha256": null,
+      "after_sha256": "b460a785a8d88b4db6ed5e3eae2fac66685d43f553ad251047d721f29ed7367b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b460a785a8d88b4db6ed5e3eae2fac66685d43f553ad251047d721f29ed7367b"
         }
       }
     },
@@ -4735,11 +4745,15 @@
     },
     "tests/category_migration_preservation.py": {
       "before_sha256": "597e54b390d8c61d87cb1531ea7baee081a87ce3bd7ab2ca22b1a1dcfc3fb2aa",
-      "after_sha256": "bb8fe47800cff5556d6b05d729224f3a4b22b099c8f07432012e6fa60e204519",
+      "after_sha256": "ac412880e4214d29d298622a8cfd11e774905470bcaa5c38e278753c14b91f59",
       "owners": {
         "@module": {
           "before": "2e9543409a3f1d44c2ce45457b548c748619013bff0bd825a9e10c02da73d2ec",
           "after": "e4acd81f1730768f741a8e0d96f9c40fafce8eca36b1e10ac3a7ea59370b7407"
+        },
+        "_initializers": {
+          "before": "676de8be98fa58c404e3679bd8c5d0253b292fc6dc2ecf327d55e3fbe3f41245",
+          "after": "02fc6a376c08dce4aafa0c4ccbc6cecb259a377024fadd4e28707766bdee1025"
         },
         "_integration_migration_predecessor": {
           "before": null,
@@ -4775,11 +4789,51 @@
     },
     "tests/code_quality/test_category_migration_preservation.py": {
       "before_sha256": "3167e6d7b01b7fd9f0b99a49c4362e33e92fba4dfa0d6c8e44e0d121361575eb",
-      "after_sha256": "341020dd1e9a8d6f64e5bfad83d444af19802b4a8eb04973755f75a2008c1fb5",
+      "after_sha256": "2cedf03d573264df805e67ffc5aa7dbc6ce9c67feda553920fce7b209baf634a",
       "owners": {
+        "@module": {
+          "before": "022aec16ea293f5c74c355b9a84717675269923d74cf07b945d7d58eac5aeeb5",
+          "after": "ee6f64aa227d5db0dc04661b1b01c293f5977c5549892dede02fe8ad83ca6eeb"
+        },
+        "_InitializerMechanisms": {
+          "before": null,
+          "after": "c6f21dc4c2155eca58214f2c24fca868cbf4c67c06c2180efafccc0abf814410"
+        },
+        "_InitializerMechanisms._definitions": {
+          "before": null,
+          "after": "40ee031bf6033e53be23669a90cdf83b9a26622331346685feba3f5f62bdb60b"
+        },
+        "_InitializerMechanisms._initializers": {
+          "before": null,
+          "after": "da21a40c9cf51e40a7a6f2664f4a015e7ac106bda7b29c8e79d349fd93a11a8c"
+        },
+        "_InitializerMechanisms._normalized": {
+          "before": null,
+          "after": "532e1fedcc1c000f647733b2c4137cfc8e63e110b0727dbdc31fed4b27b4173d"
+        },
+        "_InitializerMechanisms.definitions": {
+          "before": null,
+          "after": "6bedb88834e232aa8ba59e2932563f23fc9ebbe3f491a459ecf9a02f846d2b43"
+        },
+        "_InitializerMechanisms.initializers": {
+          "before": null,
+          "after": "1b16ce2d339a6840e791d590e0ca21e3d8a1238b307fbf2b1d9d29d776ba5b1a"
+        },
+        "_InitializerMechanisms.normalized": {
+          "before": null,
+          "after": "bd34018bc032607387e336b3084ffb86ac882f5cea598e9102f33ad88d304f19"
+        },
         "preserved_root": {
           "before": "9e8c0ccedc8b43d1ecf63468dc2bc99de0ed5d0092aa21d956b4963c8c272611",
           "after": "ee82c7e88b81fa26f61fe6ffbdac51982724b204f91f06afa99aebb983fb5657"
+        },
+        "test_initializer_fingerprints_preserve_statement_order_and_changed_modes": {
+          "before": null,
+          "after": "5f764acb9662dea334e17b5687ee125a6f3f05be13682a17056e3b45ae8c3e20"
+        },
+        "test_initializer_normalization_skips_only_separately_compared_definitions": {
+          "before": null,
+          "after": "cb69d6ee6eaabda0357499db3165f83992539d1e026c62bed0c9df221e3caabd"
         },
         "test_integration_exact_preimage_byte_drift_is_rejected": {
           "before": null,
@@ -4805,7 +4859,7 @@
     },
     "tests/code_quality/test_ci_history_input.py": {
       "before_sha256": null,
-      "after_sha256": "fb94f5cef3b48fdafc4547f2a52493f315d2a8587a6cf83c6552861bac4e39bb",
+      "after_sha256": "762bfc9bd8d6094dc53205da38ecbbf11058dd8948a583d725e5b79b6fad4fcb",
       "owners": {
         "@module": {
           "before": null,
@@ -4817,7 +4871,7 @@
         },
         "test_history_fetch_is_the_only_workflow_change_before_validation": {
           "before": null,
-          "after": "d426dc7675dece538e3387a759ef36dfa45e33044d98699445ac51b08c686d54"
+          "after": "a765bb2385c41a84ba8647c79fc59d4c5da78643ca4e4b0b4f86b2d43f3c5ece"
         },
         "test_missing_original_commit_fails_and_exact_original_object_restores_lookup": {
           "before": null,
@@ -4826,6 +4880,24 @@
         "test_workflow_is_a_live_pinned_source_even_though_not_a_measured_runtime_input": {
           "before": null,
           "after": "ccf50de2a9b8272966893a24420983584c75c692c8e0d805d5dab60438ea759e"
+        }
+      }
+    },
+    "tests/code_quality/test_ci_runtime_successor.py": {
+      "before_sha256": null,
+      "after_sha256": "331f50966c0573f3e95705dd7f2756cb9ed9c25b6c7ab1e102b34c203de4254d",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e4cf31a3e24d5d13d97c603a3305c06d43cd92db5dac2b472a2b064e1f87f886"
+        },
+        "test_ci_runtime_edits_match_exact_independent_predecessor": {
+          "before": null,
+          "after": "8c0a0267c0a4b0880ea4c5dbacd78e75e235e555ddddee02c6f835e73b93a1dc"
+        },
+        "test_ci_runtime_transition_rejects_unlisted_sources_and_changed_predecessors": {
+          "before": null,
+          "after": "5c8447f5cb3678984e8373ba473262c64c08b9514dafaadf1cc9435d3114dfdf"
         }
       }
     },
@@ -4992,6 +5064,28 @@
         "test_d07_ruins_changes_only_the_monster_endpoint_token": {
           "before": "9c88ae3b2ad88b5d973cfeb618f4819d54942656d05c67ab38ed9b13ce92f61b",
           "after": "99e5505e4c848d3a5227f0d97f361948006eadd79656aeb71fe0d3e26bbb2a0c"
+        }
+      }
+    },
+    "tests/code_quality/test_faction_content_runtime_structure.py": {
+      "before_sha256": "9df6552a38bb198beab562cb1649e32ee14e9499e58cf0e44e5552b14f175577",
+      "after_sha256": "82c715824387446f1fc2abd20f6fd957a3644b5cde0eb13f1204b8e94215079c",
+      "owners": {
+        "@module": {
+          "before": "b668f8a6cc14e4d33d3dfffb11bc6f49d5322271aa943faa032300b068caa3e8",
+          "after": "6f2e8ce7bc75ae629cf434c4a8f34c57d690a7ba8a9896925f9dd011ef514ef8"
+        },
+        "_expected_semantic_status": {
+          "before": "abd02eb112367dd1463903b6f1c161e3214e9b83ab6bb10d550ee33536dc04f8",
+          "after": "d40c6f55e05be97bb0388bed17e79b3c479fe8d755bae1d117ef0b88187d1f30"
+        },
+        "test_generated_manifest_module_paths_match_scaffold_files": {
+          "before": "75d9522d65a49933c0eb6acc0a4eb67717e4b49a31d930fb3f5ded1056f069f2",
+          "after": "4e6a04d7a48876ad7841efc691f17ec8a9e8725ed5c75f56b9ac12d0725feee2"
+        },
+        "test_generated_manifest_semantic_status_is_source_backed": {
+          "before": "c1cf3225768c602eb64bbad5bdffddecc0b22cb9656bd5c14e9d1510ce5d2c5d",
+          "after": "31ffd4130e8384dc9004e73c0c491cfedfa55509c202be254a13344dc6369649"
         }
       }
     },
@@ -18541,11 +18635,11 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "07a35af53782e46f5043ba11ee9ac45db563665d05d77b612e5c32679f422025",
+      "after_sha256": "b907d535546ee8b810d73f1145cdb5723a41ec8aeb55c7a042df2e0c7041f8e1",
       "owners": {
         "@module": {
           "before": null,
-          "after": "2c71715566b5242ab008b053e53741bc46328817f607a4580dfd6526781a1909"
+          "after": "768589c99d4a5c472ebd72099be9f054b449fdbb17105b67ada6dc20399f7948"
         },
         "_assert_ci_edits": {
           "before": null,
@@ -18561,11 +18655,11 @@
         },
         "_ci_transitions": {
           "before": null,
-          "after": "6e777fd2ac3f0eb3ef2f4b0f2c8e8997b63accef84c0222b3468fa1b88ad8401"
+          "after": "8b5abeb031282e1476c6da02f9814ea3af649cd8046d308a471a9db4cc972645"
         },
         "_freeze": {
           "before": null,
-          "after": "f848bda69a9b9988ec7be8dd56a1997191775d61ab9b8a2ceab0519fcb8e6da9"
+          "after": "cd16549345436282b657fbb6683449302d65c6172a4f42c8ee2cc41fd4af724c"
         },
         "_git": {
           "before": null,
@@ -18574,6 +18668,10 @@
         "_read": {
           "before": null,
           "after": "2f79ad57ec0d0a33d097dd79c8c6d781a9b53a5929305865f3d2f8321a2e89e5"
+        },
+        "_runtime_transitions": {
+          "before": null,
+          "after": "721145869ce445d23c8493d7040d92513da6b564982a27c394af863b6bdf9810"
         },
         "_sha": {
           "before": null,
@@ -18586,6 +18684,10 @@
         "assert_ci_compatibility_transition": {
           "before": null,
           "after": "d3a450024e778d68a8d078d13448e7f2072c91b2729f478e11548f0c7f297b15"
+        },
+        "assert_ci_runtime_transition": {
+          "before": null,
+          "after": "3bf6ea328118ae5d6e7314453f9e41e4e60d77b6e552835a66eea853208ec55f"
         },
         "assert_ci_transition": {
           "before": null,
@@ -18601,7 +18703,7 @@
         },
         "ci_comparison": {
           "before": null,
-          "after": "c06be6f3f456456652a340b48e4f6e71cac6def1770d08da5c34b32aefa915ba"
+          "after": "3465e894c3e4e4271e3a8af0029da857cb8223eb7dd37d58453e64c52781d906"
         },
         "current_source": {
           "before": null,
@@ -18609,7 +18711,7 @@
         },
         "measurement_inputs": {
           "before": null,
-          "after": "1caaab903ef6f70f044d9ac3b8881e6d1fa97e56e7b76b25c1500ce7529a1a06"
+          "after": "051617c75069b70c11b2b64ea7dfc17dd656fa53eb66461edaec666d0a3224c8"
         },
         "preceding_control": {
           "before": null,
@@ -18785,9 +18887,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Provision the unchanged original historical Git inputs required by the existing code-quality/preflight consumers. The hosted checkout fetched current branch/main/merge history but did not contain the separately retained 4a8fb3c snapshot. Add exactly one unfiltered, no-tags, non-recursive-submodule fetch of that literal original SHA immediately after code-quality checkout. Its complete original history supplies the existing 1009, 1e70, 241f and 40a snapshots. The authentic hosted missing-object failure and original-object restoration establish a dependency-provisioning defect; no Git-version defect is claimed.",
-      "source_obligation": "The entire workflow must equal immutable f69b0702 bytes plus only the exact fetch step, whose SHA equals the unchanged legacy source pin. All original jobs, validation commands, sequencing, permissions, timeouts and mandatory gates remain byte-exact. The workflow and four-case guard are finite frozen/live PINS members. The workflow is explicitly outside the existing runtime-input collector, like other non-runtime governance records, but remains authenticated by complete source admission and its exact current pin. Guards validate all five original commit identities, SHA256 digests, tree identities and ancestry; an owned tiny Git store rejects absent and mismatched genuine commit inputs, an empty origin rejects the exact fetch command, and restoring the original commit bytes restores the exact pinned script lookup. A process-local public owned-reader seam also proves modified workflow bytes remain rejected. No old proof record or compatibility recipe is changed.",
-      "unchanged_work": "No engine code, gameplay input, workload output, seed, operation map, family/case/sample selection, validation algorithm, digest-retention cap, 180-second performance allowance, 600-second local watchdog or 85% coverage requirement changes. Setup fetch provisions immutable dependencies before the unchanged performance command; it does not move validation outside that command. Existing historical snapshots and receipts retain their original identity. Public fetch restoration and bounded local guards do not constitute final source qualification. Fresh exact-head default-launcher controls, full static, authentic performance, complete quality reconciliation and independent review remain required; no runtime budget, full behavioral coverage or hosted success is claimed."
+      "rationale": "The measured CI50 quality path rebuilt the independent complete faction execution-record map for each semantic-status row, and migration initializer fingerprinting normalized/deepcopied entire definitions immediately before discarding them. Build one fresh independent source-record map inside each of the two affected tests and pass it to all three existing semantic assertions; skip only FunctionDef, AsyncFunctionDef and ClassDef before initializer normalization, retaining the separate complete definition/decorator/default/body comparison. This is a local runtime correction with no new memoization, source cache, accepted input, engine behavior or workload-selection change.",
+      "source_obligation": "Authenticate the finite CI51 edits against immutable 9746a372344322abd77a496d2b9621629b79e7be bytes and exact replacement recipes before exposing predecessor comparison inputs to unchanged historical recipes. Preserve all original manifest/digest/definition membership and fresh live-file reads. Existing warm/mutate/restore controls retain real initializer, import, assertion, decorator and helper rejection; new initializer controls cover async/class/nested definitions, root-anchor modes, imports/exports, order and changed-byte false equivalence. The full real migration corpus requires independent old/new initializer equivalence evidence. The workflow differs from the retained historical workflow by the original literal fetch step and only one uniquely anchored timeout-minutes: 10 on Code-quality tests; retain original before hash, fetch/source binding, ordering, smoke timeout, all jobs and all validation commands. Both tests retain the initial execution-record tuple and compare it with one final fresh loader result, preserving tuple order and multiplicity and rejecting persistent drift visible to that loader; this is not a universal raw-byte guard.",
+      "unchanged_work": "All earlier historical pins, records, recipe cases, delegation targets and measurement identities remain retained. Only finite current after pins and exact source/assessment bindings change. No process-global or invocation cache is added; repeated calls continue fresh reads/hashes and existing byte-keyed pure fingerprints retain all original modes. This guard bounds failure and is not evidence of a runtime target achieved. Matched four-worker baseline/candidate evidence, a current serial receipt, complete local coverage/quality/static/contracts/package gates, both exact-head reviews and complete required hosted CI remain pending unless separately recorded as passed. No publication, final source qualification, 600-second quality success, full-game performance or rules certification is claimed. The migration helper is a changed recorded input of the prior selected3632 receipt. Whole-corpus initializer equivalence does not make those bytes unchanged or qualify that old receipt for this head; current aggregate evidence remains pending."
     },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
@@ -21113,9 +21215,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the exact static and hosted-entry repairs, while relocating pytest bytecode suppression from the historically pinned root test initializer to the quality package before its module imports. Root tests/__init__.py is restored byte-for-byte and separately authenticated as an unchanged owned anchor. D07 geometry and category-migration readers remain unchanged. Cumulative integration-member transport now uses one fresh hardened immutable Git batch while retaining the same member/hash/control decisions. Only their existing finite predecessor boundary admits the exact quality initializer history after full current-source authentication. The original symbolic operation-map validator is extracted without changing its comparisons and remains called after every actual current-input check; focused tests exercise it independently and retain a real forged-collector rejection.",
-      "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
-      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
+      "rationale": "The measured CI50 quality path rebuilt the independent complete faction execution-record map for each semantic-status row, and migration initializer fingerprinting normalized/deepcopied entire definitions immediately before discarding them. Build one fresh independent source-record map inside each of the two affected tests and pass it to all three existing semantic assertions; skip only FunctionDef, AsyncFunctionDef and ClassDef before initializer normalization, retaining the separate complete definition/decorator/default/body comparison. This is a local runtime correction with no new memoization, source cache, accepted input, engine behavior or workload-selection change.",
+      "source_obligation": "Authenticate the finite CI51 edits against immutable 9746a372344322abd77a496d2b9621629b79e7be bytes and exact replacement recipes before exposing predecessor comparison inputs to unchanged historical recipes. Preserve all original manifest/digest/definition membership and fresh live-file reads. Existing warm/mutate/restore controls retain real initializer, import, assertion, decorator and helper rejection; new initializer controls cover async/class/nested definitions, root-anchor modes, imports/exports, order and changed-byte false equivalence. The full real migration corpus requires independent old/new initializer equivalence evidence. The workflow differs from the retained historical workflow by the original literal fetch step and only one uniquely anchored timeout-minutes: 10 on Code-quality tests; retain original before hash, fetch/source binding, ordering, smoke timeout, all jobs and all validation commands. Both tests retain the initial execution-record tuple and compare it with one final fresh loader result, preserving tuple order and multiplicity and rejecting persistent drift visible to that loader; this is not a universal raw-byte guard.",
+      "unchanged_work": "All earlier historical pins, records, recipe cases, delegation targets and measurement identities remain retained. Only finite current after pins and exact source/assessment bindings change. No process-global or invocation cache is added; repeated calls continue fresh reads/hashes and existing byte-keyed pure fingerprints retain all original modes. This guard bounds failure and is not evidence of a runtime target achieved. Matched four-worker baseline/candidate evidence, a current serial receipt, complete local coverage/quality/static/contracts/package gates, both exact-head reviews and complete required hosted CI remain pending unless separately recorded as passed. No publication, final source qualification, 600-second quality success, full-game performance or rules certification is claimed. The migration helper is a changed recorded input of the prior selected3632 receipt. Whole-corpus initializer equivalence does not make those bytes unchanged or qualify that old receipt for this head; current aggregate evidence remains pending."
     },
     "docs/D11_ONE_SHOT_PHYSICAL_SCOPE.md": {
       "category": "governance",
@@ -21324,6 +21426,14 @@
       "rationale": "Preserve the exact static and hosted-entry repairs, while relocating pytest bytecode suppression from the historically pinned root test initializer to the quality package before its module imports. Root tests/__init__.py is restored byte-for-byte and separately authenticated as an unchanged owned anchor. D07 geometry and category-migration readers remain unchanged. Cumulative integration-member transport now uses one fresh hardened immutable Git batch while retaining the same member/hash/control decisions. Only their existing finite predecessor boundary admits the exact quality initializer history after full current-source authentication. The original symbolic operation-map validator is extracted without changing its comparisons and remains called after every actual current-input check; focused tests exercise it independently and retain a real forged-collector rejection.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
+    },
+    "docs/performance/ci-runtime-successor51.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "The measured CI50 quality path rebuilt the independent complete faction execution-record map for each semantic-status row, and migration initializer fingerprinting normalized/deepcopied entire definitions immediately before discarding them. Build one fresh independent source-record map inside each of the two affected tests and pass it to all three existing semantic assertions; skip only FunctionDef, AsyncFunctionDef and ClassDef before initializer normalization, retaining the separate complete definition/decorator/default/body comparison. This is a local runtime correction with no new memoization, source cache, accepted input, engine behavior or workload-selection change.",
+      "source_obligation": "Authenticate the finite CI51 edits against immutable 9746a372344322abd77a496d2b9621629b79e7be bytes and exact replacement recipes before exposing predecessor comparison inputs to unchanged historical recipes. Preserve all original manifest/digest/definition membership and fresh live-file reads. Existing warm/mutate/restore controls retain real initializer, import, assertion, decorator and helper rejection; new initializer controls cover async/class/nested definitions, root-anchor modes, imports/exports, order and changed-byte false equivalence. The full real migration corpus requires independent old/new initializer equivalence evidence. The workflow differs from the retained historical workflow by the original literal fetch step and only one uniquely anchored timeout-minutes: 10 on Code-quality tests; retain original before hash, fetch/source binding, ordering, smoke timeout, all jobs and all validation commands. Both tests retain the initial execution-record tuple and compare it with one final fresh loader result, preserving tuple order and multiplicity and rejecting persistent drift visible to that loader; this is not a universal raw-byte guard.",
+      "unchanged_work": "All earlier historical pins, records, recipe cases, delegation targets and measurement identities remain retained. Only finite current after pins and exact source/assessment bindings change. No process-global or invocation cache is added; repeated calls continue fresh reads/hashes and existing byte-keyed pure fingerprints retain all original modes. This guard bounds failure and is not evidence of a runtime target achieved. Matched four-worker baseline/candidate evidence, a current serial receipt, complete local coverage/quality/static/contracts/package gates, both exact-head reviews and complete required hosted CI remain pending unless separately recorded as passed. No publication, final source qualification, 600-second quality success, full-game performance or rules certification is claimed. The migration helper is a changed recorded input of the prior selected3632 receipt. Whole-corpus initializer equivalence does not make those bytes unchanged or qualify that old receipt for this head; current aggregate evidence remains pending."
     },
     "docs/performance/ci-successor49.json": {
       "category": "governance",
@@ -23019,9 +23129,9 @@
         "qualification40-exact-b34105b5e4dc89fe"
       ],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tests/category_migration_preservation.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "The measured CI50 quality path rebuilt the independent complete faction execution-record map for each semantic-status row, and migration initializer fingerprinting normalized/deepcopied entire definitions immediately before discarding them. Build one fresh independent source-record map inside each of the two affected tests and pass it to all three existing semantic assertions; skip only FunctionDef, AsyncFunctionDef and ClassDef before initializer normalization, retaining the separate complete definition/decorator/default/body comparison. This is a local runtime correction with no new memoization, source cache, accepted input, engine behavior or workload-selection change.",
+      "source_obligation": "Authenticate the finite CI51 edits against immutable 9746a372344322abd77a496d2b9621629b79e7be bytes and exact replacement recipes before exposing predecessor comparison inputs to unchanged historical recipes. Preserve all original manifest/digest/definition membership and fresh live-file reads. Existing warm/mutate/restore controls retain real initializer, import, assertion, decorator and helper rejection; new initializer controls cover async/class/nested definitions, root-anchor modes, imports/exports, order and changed-byte false equivalence. The full real migration corpus requires independent old/new initializer equivalence evidence. The workflow differs from the retained historical workflow by the original literal fetch step and only one uniquely anchored timeout-minutes: 10 on Code-quality tests; retain original before hash, fetch/source binding, ordering, smoke timeout, all jobs and all validation commands. Both tests retain the initial execution-record tuple and compare it with one final fresh loader result, preserving tuple order and multiplicity and rejecting persistent drift visible to that loader; this is not a universal raw-byte guard.",
+      "unchanged_work": "All earlier historical pins, records, recipe cases, delegation targets and measurement identities remain retained. Only finite current after pins and exact source/assessment bindings change. No process-global or invocation cache is added; repeated calls continue fresh reads/hashes and existing byte-keyed pure fingerprints retain all original modes. This guard bounds failure and is not evidence of a runtime target achieved. Matched four-worker baseline/candidate evidence, a current serial receipt, complete local coverage/quality/static/contracts/package gates, both exact-head reviews and complete required hosted CI remain pending unless separately recorded as passed. No publication, final source qualification, 600-second quality success, full-game performance or rules certification is claimed. The migration helper is a changed recorded input of the prior selected3632 receipt. Whole-corpus initializer equivalence does not make those bytes unchanged or qualify that old receipt for this head; current aggregate evidence remains pending."
     },
     "tests/code_quality/__init__.py": {
       "category": "dependency_environment",
@@ -23037,17 +23147,25 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tests/code_quality/test_category_migration_preservation.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "The measured CI50 quality path rebuilt the independent complete faction execution-record map for each semantic-status row, and migration initializer fingerprinting normalized/deepcopied entire definitions immediately before discarding them. Build one fresh independent source-record map inside each of the two affected tests and pass it to all three existing semantic assertions; skip only FunctionDef, AsyncFunctionDef and ClassDef before initializer normalization, retaining the separate complete definition/decorator/default/body comparison. This is a local runtime correction with no new memoization, source cache, accepted input, engine behavior or workload-selection change.",
+      "source_obligation": "Authenticate the finite CI51 edits against immutable 9746a372344322abd77a496d2b9621629b79e7be bytes and exact replacement recipes before exposing predecessor comparison inputs to unchanged historical recipes. Preserve all original manifest/digest/definition membership and fresh live-file reads. Existing warm/mutate/restore controls retain real initializer, import, assertion, decorator and helper rejection; new initializer controls cover async/class/nested definitions, root-anchor modes, imports/exports, order and changed-byte false equivalence. The full real migration corpus requires independent old/new initializer equivalence evidence. The workflow differs from the retained historical workflow by the original literal fetch step and only one uniquely anchored timeout-minutes: 10 on Code-quality tests; retain original before hash, fetch/source binding, ordering, smoke timeout, all jobs and all validation commands. Both tests retain the initial execution-record tuple and compare it with one final fresh loader result, preserving tuple order and multiplicity and rejecting persistent drift visible to that loader; this is not a universal raw-byte guard.",
+      "unchanged_work": "All earlier historical pins, records, recipe cases, delegation targets and measurement identities remain retained. Only finite current after pins and exact source/assessment bindings change. No process-global or invocation cache is added; repeated calls continue fresh reads/hashes and existing byte-keyed pure fingerprints retain all original modes. This guard bounds failure and is not evidence of a runtime target achieved. Matched four-worker baseline/candidate evidence, a current serial receipt, complete local coverage/quality/static/contracts/package gates, both exact-head reviews and complete required hosted CI remain pending unless separately recorded as passed. No publication, final source qualification, 600-second quality success, full-game performance or rules certification is claimed. The migration helper is a changed recorded input of the prior selected3632 receipt. Whole-corpus initializer equivalence does not make those bytes unchanged or qualify that old receipt for this head; current aggregate evidence remains pending."
     },
     "tests/code_quality/test_ci_history_input.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Provision the unchanged original historical Git inputs required by the existing code-quality/preflight consumers. The hosted checkout fetched current branch/main/merge history but did not contain the separately retained 4a8fb3c snapshot. Add exactly one unfiltered, no-tags, non-recursive-submodule fetch of that literal original SHA immediately after code-quality checkout. Its complete original history supplies the existing 1009, 1e70, 241f and 40a snapshots. The authentic hosted missing-object failure and original-object restoration establish a dependency-provisioning defect; no Git-version defect is claimed.",
-      "source_obligation": "The entire workflow must equal immutable f69b0702 bytes plus only the exact fetch step, whose SHA equals the unchanged legacy source pin. All original jobs, validation commands, sequencing, permissions, timeouts and mandatory gates remain byte-exact. The workflow and four-case guard are finite frozen/live PINS members. The workflow is explicitly outside the existing runtime-input collector, like other non-runtime governance records, but remains authenticated by complete source admission and its exact current pin. Guards validate all five original commit identities, SHA256 digests, tree identities and ancestry; an owned tiny Git store rejects absent and mismatched genuine commit inputs, an empty origin rejects the exact fetch command, and restoring the original commit bytes restores the exact pinned script lookup. A process-local public owned-reader seam also proves modified workflow bytes remain rejected. No old proof record or compatibility recipe is changed.",
-      "unchanged_work": "No engine code, gameplay input, workload output, seed, operation map, family/case/sample selection, validation algorithm, digest-retention cap, 180-second performance allowance, 600-second local watchdog or 85% coverage requirement changes. Setup fetch provisions immutable dependencies before the unchanged performance command; it does not move validation outside that command. Existing historical snapshots and receipts retain their original identity. Public fetch restoration and bounded local guards do not constitute final source qualification. Fresh exact-head default-launcher controls, full static, authentic performance, complete quality reconciliation and independent review remain required; no runtime budget, full behavioral coverage or hosted success is claimed."
+      "rationale": "The measured CI50 quality path rebuilt the independent complete faction execution-record map for each semantic-status row, and migration initializer fingerprinting normalized/deepcopied entire definitions immediately before discarding them. Build one fresh independent source-record map inside each of the two affected tests and pass it to all three existing semantic assertions; skip only FunctionDef, AsyncFunctionDef and ClassDef before initializer normalization, retaining the separate complete definition/decorator/default/body comparison. This is a local runtime correction with no new memoization, source cache, accepted input, engine behavior or workload-selection change.",
+      "source_obligation": "Authenticate the finite CI51 edits against immutable 9746a372344322abd77a496d2b9621629b79e7be bytes and exact replacement recipes before exposing predecessor comparison inputs to unchanged historical recipes. Preserve all original manifest/digest/definition membership and fresh live-file reads. Existing warm/mutate/restore controls retain real initializer, import, assertion, decorator and helper rejection; new initializer controls cover async/class/nested definitions, root-anchor modes, imports/exports, order and changed-byte false equivalence. The full real migration corpus requires independent old/new initializer equivalence evidence. The workflow differs from the retained historical workflow by the original literal fetch step and only one uniquely anchored timeout-minutes: 10 on Code-quality tests; retain original before hash, fetch/source binding, ordering, smoke timeout, all jobs and all validation commands. Both tests retain the initial execution-record tuple and compare it with one final fresh loader result, preserving tuple order and multiplicity and rejecting persistent drift visible to that loader; this is not a universal raw-byte guard.",
+      "unchanged_work": "All earlier historical pins, records, recipe cases, delegation targets and measurement identities remain retained. Only finite current after pins and exact source/assessment bindings change. No process-global or invocation cache is added; repeated calls continue fresh reads/hashes and existing byte-keyed pure fingerprints retain all original modes. This guard bounds failure and is not evidence of a runtime target achieved. Matched four-worker baseline/candidate evidence, a current serial receipt, complete local coverage/quality/static/contracts/package gates, both exact-head reviews and complete required hosted CI remain pending unless separately recorded as passed. No publication, final source qualification, 600-second quality success, full-game performance or rules certification is claimed. The migration helper is a changed recorded input of the prior selected3632 receipt. Whole-corpus initializer equivalence does not make those bytes unchanged or qualify that old receipt for this head; current aggregate evidence remains pending."
+    },
+    "tests/code_quality/test_ci_runtime_successor.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "The measured CI50 quality path rebuilt the independent complete faction execution-record map for each semantic-status row, and migration initializer fingerprinting normalized/deepcopied entire definitions immediately before discarding them. Build one fresh independent source-record map inside each of the two affected tests and pass it to all three existing semantic assertions; skip only FunctionDef, AsyncFunctionDef and ClassDef before initializer normalization, retaining the separate complete definition/decorator/default/body comparison. This is a local runtime correction with no new memoization, source cache, accepted input, engine behavior or workload-selection change.",
+      "source_obligation": "Authenticate the finite CI51 edits against immutable 9746a372344322abd77a496d2b9621629b79e7be bytes and exact replacement recipes before exposing predecessor comparison inputs to unchanged historical recipes. Preserve all original manifest/digest/definition membership and fresh live-file reads. Existing warm/mutate/restore controls retain real initializer, import, assertion, decorator and helper rejection; new initializer controls cover async/class/nested definitions, root-anchor modes, imports/exports, order and changed-byte false equivalence. The full real migration corpus requires independent old/new initializer equivalence evidence. The workflow differs from the retained historical workflow by the original literal fetch step and only one uniquely anchored timeout-minutes: 10 on Code-quality tests; retain original before hash, fetch/source binding, ordering, smoke timeout, all jobs and all validation commands. Both tests retain the initial execution-record tuple and compare it with one final fresh loader result, preserving tuple order and multiplicity and rejecting persistent drift visible to that loader; this is not a universal raw-byte guard.",
+      "unchanged_work": "All earlier historical pins, records, recipe cases, delegation targets and measurement identities remain retained. Only finite current after pins and exact source/assessment bindings change. No process-global or invocation cache is added; repeated calls continue fresh reads/hashes and existing byte-keyed pure fingerprints retain all original modes. This guard bounds failure and is not evidence of a runtime target achieved. Matched four-worker baseline/candidate evidence, a current serial receipt, complete local coverage/quality/static/contracts/package gates, both exact-head reviews and complete required hosted CI remain pending unless separately recorded as passed. No publication, final source qualification, 600-second quality success, full-game performance or rules certification is claimed. The migration helper is a changed recorded input of the prior selected3632 receipt. Whole-corpus initializer equivalence does not make those bytes unchanged or qualify that old receipt for this head; current aggregate evidence remains pending."
     },
     "tests/code_quality/test_cumulative_preservation.py": {
       "category": "governance",
@@ -23072,6 +23190,14 @@
       "rationale": "Exact PR587-to-current owner changes: tests/code_quality/test_d07_upper_floor_preservation.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+    },
+    "tests/code_quality/test_faction_content_runtime_structure.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "The measured CI50 quality path rebuilt the independent complete faction execution-record map for each semantic-status row, and migration initializer fingerprinting normalized/deepcopied entire definitions immediately before discarding them. Build one fresh independent source-record map inside each of the two affected tests and pass it to all three existing semantic assertions; skip only FunctionDef, AsyncFunctionDef and ClassDef before initializer normalization, retaining the separate complete definition/decorator/default/body comparison. This is a local runtime correction with no new memoization, source cache, accepted input, engine behavior or workload-selection change.",
+      "source_obligation": "Authenticate the finite CI51 edits against immutable 9746a372344322abd77a496d2b9621629b79e7be bytes and exact replacement recipes before exposing predecessor comparison inputs to unchanged historical recipes. Preserve all original manifest/digest/definition membership and fresh live-file reads. Existing warm/mutate/restore controls retain real initializer, import, assertion, decorator and helper rejection; new initializer controls cover async/class/nested definitions, root-anchor modes, imports/exports, order and changed-byte false equivalence. The full real migration corpus requires independent old/new initializer equivalence evidence. The workflow differs from the retained historical workflow by the original literal fetch step and only one uniquely anchored timeout-minutes: 10 on Code-quality tests; retain original before hash, fetch/source binding, ordering, smoke timeout, all jobs and all validation commands. Both tests retain the initial execution-record tuple and compare it with one final fresh loader result, preserving tuple order and multiplicity and rejecting persistent drift visible to that loader; this is not a universal raw-byte guard.",
+      "unchanged_work": "All earlier historical pins, records, recipe cases, delegation targets and measurement identities remain retained. Only finite current after pins and exact source/assessment bindings change. No process-global or invocation cache is added; repeated calls continue fresh reads/hashes and existing byte-keyed pure fingerprints retain all original modes. This guard bounds failure and is not evidence of a runtime target achieved. Matched four-worker baseline/candidate evidence, a current serial receipt, complete local coverage/quality/static/contracts/package gates, both exact-head reviews and complete required hosted CI remain pending unless separately recorded as passed. No publication, final source qualification, 600-second quality success, full-game performance or rules certification is claimed. The migration helper is a changed recorded input of the prior selected3632 receipt. Whole-corpus initializer equivalence does not make those bytes unchanged or qualify that old receipt for this head; current aggregate evidence remains pending."
     },
     "tests/code_quality/test_order102_fight_completion_ownership.py": {
       "category": "governance",
@@ -28945,9 +29071,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Provision the unchanged original historical Git inputs required by the existing code-quality/preflight consumers. The hosted checkout fetched current branch/main/merge history but did not contain the separately retained 4a8fb3c snapshot. Add exactly one unfiltered, no-tags, non-recursive-submodule fetch of that literal original SHA immediately after code-quality checkout. Its complete original history supplies the existing 1009, 1e70, 241f and 40a snapshots. The authentic hosted missing-object failure and original-object restoration establish a dependency-provisioning defect; no Git-version defect is claimed.",
-      "source_obligation": "The entire workflow must equal immutable f69b0702 bytes plus only the exact fetch step, whose SHA equals the unchanged legacy source pin. All original jobs, validation commands, sequencing, permissions, timeouts and mandatory gates remain byte-exact. The workflow and four-case guard are finite frozen/live PINS members. The workflow is explicitly outside the existing runtime-input collector, like other non-runtime governance records, but remains authenticated by complete source admission and its exact current pin. Guards validate all five original commit identities, SHA256 digests, tree identities and ancestry; an owned tiny Git store rejects absent and mismatched genuine commit inputs, an empty origin rejects the exact fetch command, and restoring the original commit bytes restores the exact pinned script lookup. A process-local public owned-reader seam also proves modified workflow bytes remain rejected. No old proof record or compatibility recipe is changed.",
-      "unchanged_work": "No engine code, gameplay input, workload output, seed, operation map, family/case/sample selection, validation algorithm, digest-retention cap, 180-second performance allowance, 600-second local watchdog or 85% coverage requirement changes. Setup fetch provisions immutable dependencies before the unchanged performance command; it does not move validation outside that command. Existing historical snapshots and receipts retain their original identity. Public fetch restoration and bounded local guards do not constitute final source qualification. Fresh exact-head default-launcher controls, full static, authentic performance, complete quality reconciliation and independent review remain required; no runtime budget, full behavioral coverage or hosted success is claimed."
+      "rationale": "The measured CI50 quality path rebuilt the independent complete faction execution-record map for each semantic-status row, and migration initializer fingerprinting normalized/deepcopied entire definitions immediately before discarding them. Build one fresh independent source-record map inside each of the two affected tests and pass it to all three existing semantic assertions; skip only FunctionDef, AsyncFunctionDef and ClassDef before initializer normalization, retaining the separate complete definition/decorator/default/body comparison. This is a local runtime correction with no new memoization, source cache, accepted input, engine behavior or workload-selection change.",
+      "source_obligation": "Authenticate the finite CI51 edits against immutable 9746a372344322abd77a496d2b9621629b79e7be bytes and exact replacement recipes before exposing predecessor comparison inputs to unchanged historical recipes. Preserve all original manifest/digest/definition membership and fresh live-file reads. Existing warm/mutate/restore controls retain real initializer, import, assertion, decorator and helper rejection; new initializer controls cover async/class/nested definitions, root-anchor modes, imports/exports, order and changed-byte false equivalence. The full real migration corpus requires independent old/new initializer equivalence evidence. The workflow differs from the retained historical workflow by the original literal fetch step and only one uniquely anchored timeout-minutes: 10 on Code-quality tests; retain original before hash, fetch/source binding, ordering, smoke timeout, all jobs and all validation commands. Both tests retain the initial execution-record tuple and compare it with one final fresh loader result, preserving tuple order and multiplicity and rejecting persistent drift visible to that loader; this is not a universal raw-byte guard.",
+      "unchanged_work": "All earlier historical pins, records, recipe cases, delegation targets and measurement identities remain retained. Only finite current after pins and exact source/assessment bindings change. No process-global or invocation cache is added; repeated calls continue fresh reads/hashes and existing byte-keyed pure fingerprints retain all original modes. This guard bounds failure and is not evidence of a runtime target achieved. Matched four-worker baseline/candidate evidence, a current serial receipt, complete local coverage/quality/static/contracts/package gates, both exact-head reviews and complete required hosted CI remain pending unless separately recorded as passed. No publication, final source qualification, 600-second quality success, full-game performance or rules certification is claimed. The migration helper is a changed recorded input of the prior selected3632 receipt. Whole-corpus initializer equivalence does not make those bytes unchanged or qualify that old receipt for this head; current aggregate evidence remains pending."
     },
     "tools/performance_qualification_measurements.py": {
       "category": "governance",

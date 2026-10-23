@@ -65,6 +65,13 @@ def test_history_fetch_is_the_only_workflow_change_before_validation() -> None:
     checkout = "          fetch-depth: 0\n\n"
     assert quality.count(checkout) == 1
     expected = start + "  code-quality:\n" + quality.replace(checkout, checkout + FETCH_STEP, 1)
+    quality_step = "      - name: Code-quality tests\n        env:"
+    assert expected.count(quality_step) == 1
+    expected = expected.replace(
+        quality_step,
+        "      - name: Code-quality tests\n        timeout-minutes: 10\n        env:",
+        1,
+    )
     current = (ROOT / WORKFLOW).read_text()
     assert current == expected
     lane = current.split("  code-quality:\n", 1)[1].split("  semantic-audit-macos:\n", 1)[0]

@@ -6,7 +6,7 @@ import ast
 import hashlib
 import json
 from pathlib import Path
-from typing import cast
+from typing import Protocol, cast
 
 import pytest
 from tools.core_rules_order95_audit import (
@@ -432,3 +432,100 @@ def test_reviewed_inventory_fixture_whole_AST_rejects_unlisted_initializers(refe
     tree.body.extend(ast.parse("unlisted_inventory_fixture_initializer = True").body)
     with pytest.raises(ValueError, match="fixture AST drifted"):
         assert_reviewed_inventory_fixture_ast(accepted, ast.unparse(tree).encode())
+
+
+class _InitializerMechanisms(Protocol):
+    def _initializers(
+        self, raw: bytes, original: bool, preserve_exports: bool
+    ) -> tuple[str, ...]: ...
+
+    def _normalized(self, node: ast.AST, *, original: bool) -> ast.AST: ...
+
+    def _definitions(self, raw: bytes, original: bool) -> tuple[tuple[str, str], ...]: ...
+
+    def initializers(self, raw: bytes, original: bool, preserve_exports: bool) -> tuple[str, ...]:
+        return self._initializers(raw, original, preserve_exports)
+
+    def normalized(self, node: ast.AST, *, original: bool) -> ast.AST:
+        return self._normalized(node, original=original)
+
+    def definitions(self, raw: bytes, original: bool) -> tuple[tuple[str, str], ...]:
+        return self._definitions(raw, original)
+
+
+_initializer_mechanisms = cast(_InitializerMechanisms, migration)
+
+
+@pytest.mark.parametrize("original", [False, True])
+@pytest.mark.parametrize("preserve_exports", [False, True])
+def test_initializer_normalization_skips_only_separately_compared_definitions(
+    monkeypatch: pytest.MonkeyPatch, original: bool, preserve_exports: bool
+) -> None:
+    raw = (
+        f"# initializer modes {original} {preserve_exports}\n".encode()
+        + b'''\
+"""Preserved module documentation."""
+from __future__ import annotations
+from pathlib import Path as Path
+from tests.shared.repository_root import REPOSITORY_ROOT
+from tests.shared.category_migration.example import helper
+import collections as collections
+ROOT = Path(__file__).resolve().parents[2]
+__all__ = ["outer"]
+@decorator(Path(__file__).resolve().parents[2])
+def outer(value=Path(__file__).resolve().parents[2]):
+    def nested():
+        assert value
+    return nested
+async def async_owner():
+    assert ROOT
+class Owner:
+    def method(self):
+        assert ROOT
+'''
+    )
+    normalized_types: list[type[ast.AST]] = []
+    normalize = _initializer_mechanisms.normalized
+
+    def observed(node: ast.AST, *, original: bool) -> ast.AST:
+        normalized_types.append(type(node))
+        return normalize(node, original=original)
+
+    monkeypatch.setattr(migration, "_normalized", observed)
+    expected_root = "REPOSITORY_ROOT" if original else "Path(__file__).resolve().parents[2]"
+    expected = (
+        repr(("ImportFrom", "pathlib", 0, "Path", None)),
+        repr(("Import", None, 0, "collections", None)),
+        ast.dump(ast.parse("ROOT = " + expected_root).body[0]),
+    )
+    assert _initializer_mechanisms.initializers(raw, original, preserve_exports) == expected
+    assert normalized_types
+    assert not set(normalized_types) & {ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef}
+    # Complete declaration/decorator/default/body checks still own these nodes.
+    before = dict(_initializer_mechanisms.definitions(raw, original))
+    assert set(before) == {"outer", "async_owner", "Owner"}
+    changed = raw.replace(b"assert value", b"assert False", 1)
+    assert _initializer_mechanisms.initializers(changed, original, preserve_exports) == expected
+    assert dict(_initializer_mechanisms.definitions(changed, original))["outer"] != before["outer"]
+    initializer_changed = raw + b"UNEXPECTED_INITIALIZER = True\n"
+    assert (
+        _initializer_mechanisms.initializers(initializer_changed, original, preserve_exports)
+        != expected
+    )
+    assert _initializer_mechanisms.initializers(raw, original, preserve_exports) == expected
+
+
+def test_initializer_fingerprints_preserve_statement_order_and_changed_modes() -> None:
+    raw = (
+        b"# order and mode control\nROOT = Path(__file__).resolve().parents[2]\nfirst()\nsecond()\n"
+    )
+    original = _initializer_mechanisms.initializers(raw, True, False)
+    live = _initializer_mechanisms.initializers(raw, False, False)
+    assert original != live
+    assert original[1:] == live[1:]
+    reversed_raw = raw.replace(b"first()\nsecond()", b"second()\nfirst()")
+    reversed_values = _initializer_mechanisms.initializers(reversed_raw, False, False)
+    assert reversed_values != live
+    assert reversed_values[1:] == tuple(reversed(live[1:]))
+    assert _initializer_mechanisms.initializers(raw, False, False) == live
+    assert _initializer_mechanisms.initializers(raw, True, True) == original

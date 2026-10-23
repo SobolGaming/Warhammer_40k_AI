@@ -205,9 +205,9 @@ def _exports(node: ast.AST) -> bool:
 def _initializers(raw: bytes, original: bool, preserve_exports: bool) -> tuple[str, ...]:
     result: list[str] = []
     for value in ast.parse(raw).body:
-        node = _normalized(value, original=original)
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+        if isinstance(value, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             continue
+        node = _normalized(value, original=original)
         if (
             isinstance(node, ast.Expr)
             and isinstance(node.value, ast.Constant)

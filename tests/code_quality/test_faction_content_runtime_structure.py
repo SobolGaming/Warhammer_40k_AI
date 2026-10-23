@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import importlib
+from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
@@ -351,6 +352,8 @@ def test_generated_detachment_manifest_aggregates_agent_owned_rule_module(
 
 
 def test_generated_manifest_module_paths_match_scaffold_files() -> None:
+    execution_records = faction_execution_2026_27.execution_records()
+    records_by_id = {record.execution_id: record for record in execution_records}
     rows_by_content_id = {
         row.content_id: row for row in generated_manifest.generated_runtime_content_rows()
     }
@@ -362,7 +365,9 @@ def test_generated_manifest_module_paths_match_scaffold_files() -> None:
         row = rows_by_content_id[faction_row.faction_id]
         assert row.family is RuntimeContentModuleFamily.FACTION
         assert row.support_status is RuntimeContentSupportStatus.SUPPORTED
-        assert row.semantic_status is _expected_semantic_status(row.execution_record_ids)
+        assert row.semantic_status is _expected_semantic_status(
+            row.execution_record_ids, records_by_id
+        )
         assert row.module_path == expected_module_path
         assert row.source_ids
         assert row.execution_record_ids
@@ -381,12 +386,16 @@ def test_generated_manifest_module_paths_match_scaffold_files() -> None:
         row = rows_by_content_id[detachment_row.detachment_id]
         assert row.family is RuntimeContentModuleFamily.DETACHMENT
         assert row.support_status is RuntimeContentSupportStatus.SUPPORTED
-        assert row.semantic_status is _expected_semantic_status(row.execution_record_ids)
+        assert row.semantic_status is _expected_semantic_status(
+            row.execution_record_ids, records_by_id
+        )
         assert row.module_path == expected_module_path
         assert row.owner_faction_id == detachment_row.faction_id
         assert row.owner_detachment_id == detachment_row.detachment_id
         assert row.source_ids
         assert row.execution_record_ids
+
+    assert faction_execution_2026_27.execution_records() == execution_records
 
 
 def test_generated_manifest_covers_every_executable_detachment_subrule() -> None:
@@ -427,17 +436,22 @@ def test_generated_manifest_covers_every_executable_detachment_subrule() -> None
 
 
 def test_generated_manifest_semantic_status_is_source_backed() -> None:
+    execution_records = faction_execution_2026_27.execution_records()
+    records_by_id = {record.execution_id: record for record in execution_records}
     status_counts = {
         RuntimeContentSemanticStatus.PLACEHOLDER: 0,
         RuntimeContentSemanticStatus.PARTIAL: 0,
         RuntimeContentSemanticStatus.IMPLEMENTED: 0,
     }
     for row in generated_manifest.generated_runtime_content_rows():
-        assert row.semantic_status is _expected_semantic_status(row.execution_record_ids)
+        assert row.semantic_status is _expected_semantic_status(
+            row.execution_record_ids, records_by_id
+        )
         status_counts[row.semantic_status] += 1
 
     assert status_counts[RuntimeContentSemanticStatus.PARTIAL] > 0
     assert status_counts[RuntimeContentSemanticStatus.IMPLEMENTED] > 0
+    assert faction_execution_2026_27.execution_records() == execution_records
 
 
 def _sentinel_detachment_ability_record() -> AbilityCatalogRecord:
@@ -459,12 +473,10 @@ def _sentinel_detachment_ability_record() -> AbilityCatalogRecord:
 
 def _expected_semantic_status(
     execution_record_ids: tuple[str, ...],
+    records_by_id: Mapping[str, faction_execution_2026_27.Phase17FExecutionRecord],
 ) -> RuntimeContentSemanticStatus:
     if not execution_record_ids:
         return RuntimeContentSemanticStatus.PLACEHOLDER
-    records_by_id = {
-        record.execution_id: record for record in faction_execution_2026_27.execution_records()
-    }
     records = tuple(records_by_id[execution_id] for execution_id in execution_record_ids)
     executable_statuses = {
         faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
