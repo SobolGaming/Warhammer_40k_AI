@@ -51,3 +51,21 @@ def test_ci_runtime_transition_rejects_unlisted_sources_and_changed_predecessors
         successor.assert_ci_runtime_transition("tools/unreviewed.py", before, current, row)
     with pytest.raises(ValueError, match="identity or bytes"):
         successor.assert_ci_runtime_transition(name, before + b"\n", current, row)
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "tests/category_migration_preservation.py",
+        "tests/code_quality/test_category_migration_preservation.py",
+    ],
+)
+def test_ci_runtime_control_comparison_rejects_unrelated_caller_bytes(name: str) -> None:
+    current = (ROOT / name).read_bytes()
+    before = subprocess.check_output(
+        ["git", "show", successor.CI_RUNTIME_BASE + ":" + name], cwd=ROOT
+    )
+    assert current != before
+    assert successor.ci_comparison(ROOT, name, current) == before
+    with pytest.raises(ValueError, match="caller supplied unrelated bytes"):
+        successor.ci_comparison(ROOT, name, current + b"\n")

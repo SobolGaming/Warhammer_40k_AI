@@ -154,9 +154,14 @@ def test_transport_proof_preserves_exact_immutable_preimage(name: str) -> None:
     before = subprocess.check_output(
         ["git", "show", stage.CI_TRANSPORT_BASE + ":" + name], cwd=ROOT
     )
-    stage.assert_ci_transport_transition(
-        name, before, (ROOT / name).read_bytes(), record["changes"][name]
-    )
+    current = (ROOT / name).read_bytes()
+    if name in stage.CI_RUNTIME_BEFORE:
+        stage.ci_comparison(ROOT, name, current)
+        current = subprocess.check_output(
+            ["git", "show", stage.CI_RUNTIME_BASE + ":" + name], cwd=ROOT
+        )
+        assert hashlib.sha256(current).hexdigest() == stage.CI_RUNTIME_BEFORE[name]
+    stage.assert_ci_transport_transition(name, before, current, record["changes"][name])
 
 
 def test_transport_proof_cannot_drop_control_overrides_even_if_repinned() -> None:

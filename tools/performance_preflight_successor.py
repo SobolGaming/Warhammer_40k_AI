@@ -14,7 +14,7 @@ SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
 CI_WORKFLOW = ".github/workflows/ci.yml"
 INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
-FREEZE_COMMIT: str | None = "1f365e6baae9a5d2d7aadd5bb10308170fba6d32"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -39,7 +39,7 @@ _PIN_ROWS = (
     ),
     (
         "docs/performance/ci-runtime-successor51.json",
-        "63350c6f60f38970d695ff3c8bcacf29e51737fda5d1d3216d2b1cdd9461a9b5",
+        "c80ea6215f7d8b55e53453bc9764dda65193a674a1c67feada264b058b6d6712",
     ),
     (
         "docs/performance/ci-successor49.json",
@@ -91,7 +91,7 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_ci_runtime_successor.py",
-        "331f50966c0573f3e95705dd7f2756cb9ed9c25b6c7ab1e102b34c203de4254d",
+        "862f40afb3a3b1e7adb309a8b249c46b51a2a2b2366ebecb174dfd978fc0dd72",
     ),
     (
         "tests/code_quality/test_cumulative_preservation.py",
@@ -115,7 +115,7 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_performance_integration_batch.py",
-        "bbdff0e56ccb7f90101363c02431db19e4ffd93d181af06d8a92f5a62eb2ccdd",
+        "896f7dd1c08a7d61b16c5d50c58d72744b164ba09c6323d753967321fac39df2",
     ),
     (
         "tests/code_quality/test_performance_preflight.py",
@@ -139,7 +139,7 @@ _PIN_ROWS = (
     ),
     (
         "tools/cumulative_preservation.py",
-        "0aed6e5a524e891710bc85c2eda40565ca1f5cfc5c07f268acdb6ec727c060f3",
+        "11686196454a263c214b087597a0eee21550fc5806de2883264e037f9348b737",
     ),
     (
         "tools/generate_aeldari_datasheet_semantic_coverage.py",
@@ -336,6 +336,14 @@ _CI_RUNTIME_BEFORE_ROWS = (
     (
         "tests/code_quality/test_faction_content_runtime_structure.py",
         "9df6552a38bb198beab562cb1649e32ee14e9499e58cf0e44e5552b14f175577",
+    ),
+    (
+        "tests/code_quality/test_performance_integration_batch.py",
+        "bbdff0e56ccb7f90101363c02431db19e4ffd93d181af06d8a92f5a62eb2ccdd",
+    ),
+    (
+        "tools/cumulative_preservation.py",
+        "0aed6e5a524e891710bc85c2eda40565ca1f5cfc5c07f268acdb6ec727c060f3",
     ),
 )
 CI_RUNTIME_BEFORE: dict[str, str] = dict(_CI_RUNTIME_BEFORE_ROWS)
