@@ -13,7 +13,7 @@ BASE_SOURCE = "36ab649ef5a6ab747587dc25d05336252db5a4eb148dc24619e6881c38efec42"
 SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
 INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
-FREEZE_COMMIT: str | None = "f765523d188b8526465804ff7eb0042791e54954"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -23,6 +23,10 @@ _PIN_ROWS = (
     (
         "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
         "59d0624883ffa435a267416718d508a30994b175b7bf239ddce2ec235b07f7c5",
+    ),
+    (
+        "docs/performance/ci-format-successor49b.json",
+        "00d1fb9f7dd5199decb969ed730261bf9cc1dc4eaf6e9040e3e34ecd0eee435e",
     ),
     (
         "docs/performance/ci-successor49.json",
@@ -41,8 +45,16 @@ _PIN_ROWS = (
         "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
     ),
     (
+        "scripts/benchmark_order88_strength.py",
+        "c2d5d84ed6f56e9852046f6acf87214883f0236afe61a77210e0e9489fe0e762",
+    ),
+    (
         "scripts/check_performance_policy.py",
-        "211658e8b50b0bb1f443b5389d815a221e1e218c1d475f909b32fa2959cb4d75",
+        "ce2c1e27152f0eb030b867078f543bb94472a7b3b0cf3cd0d5e2cc1102111209",
+    ),
+    (
+        "scripts/performance_smoke.py",
+        "0380ba2c9ab5c1e045f281f810f0e6e582b0738a3db8eab7a18ecfc34fe6c4d8",
     ),
     (
         "tests/__init__.py",
@@ -70,7 +82,7 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_performance_static_successor.py",
-        "cf46f4112a762e6c2fa87b67b982115867b40413bf53e9c45b63fda9fe3e2ba8",
+        "e9c05fedb6a5aa657955b76115685daeb734af3500d06ed1df2543547749f050",
     ),
     (
         "tests/code_quality/test_qualification40_successor.py",
@@ -179,6 +191,25 @@ _CI_BEFORE_ROWS = (
     ),
 )
 CI_BEFORE: dict[str, str] = dict(_CI_BEFORE_ROWS)
+
+
+CI_FORMAT_BASE = "d330382d40cd0487fec3b13e4ac315f817bad694"
+CI_FORMAT_RECORD = "docs/performance/ci-format-successor49b.json"
+_CI_FORMAT_BEFORE_ROWS = (
+    (
+        "scripts/benchmark_order88_strength.py",
+        "e216b66054625f434b62944f50c545f772af88610498b818b39f0c1d6c34abcb",
+    ),
+    (
+        "scripts/check_performance_policy.py",
+        "211658e8b50b0bb1f443b5389d815a221e1e218c1d475f909b32fa2959cb4d75",
+    ),
+    (
+        "scripts/performance_smoke.py",
+        "f3934ba9961ee31c80582ad1a2f8dc5a66cd56f1f05f4803f397f125f6502174",
+    ),
+)
+CI_FORMAT_BEFORE: dict[str, str] = dict(_CI_FORMAT_BEFORE_ROWS)
 
 
 def _sha(raw: bytes) -> str:
@@ -350,9 +381,10 @@ def assert_ci_transition(
     name: str, before: bytes | None, current: bytes, row: dict[str, Any]
 ) -> None:
     """Admit only the frozen CI import/bootstrap edits and exact map additions."""
-    expected = CI_BEFORE.get(name)
+    allowed = CI_BEFORE | CI_FORMAT_BEFORE
+    expected = allowed.get(name)
     if (
-        (name not in CI_BEFORE and name != CI_NEW)
+        (name not in allowed and name != CI_NEW)
         or row.keys() != {"before_sha256", "after_sha256", "edits"}
         or row["before_sha256"] != expected
         or (before is None) != (name == CI_NEW)
@@ -380,21 +412,27 @@ def assert_ci_transition(
 
 
 def _ci_transitions(root: Path, frozen_members: dict[str, bytes]) -> None:
-    record: dict[str, Any] = json.loads(frozen_members[CI_RECORD])
-    if (
-        record.keys() != {"schema", "base", "changes"}
-        or record["schema"] != "exact-ci-successor-v1"
-        or record["base"] != CI_BASE
-        or record["changes"].keys() != CI_BEFORE.keys() | {CI_NEW}
-    ):
-        raise ValueError("CI transition membership or base changed.")
-    if _git(root, "--literal-pathspecs", "ls-tree", "-r", "-z", CI_BASE, "--", CI_NEW):
-        raise ValueError("CI bootstrap predecessor was not absent.")
-    previous = _blobs(root, CI_BASE, list(CI_BEFORE))
-    for name in record["changes"]:
-        assert_ci_transition(
-            name, previous.get(name), frozen_members[name], record["changes"][name]
-        )
+    specifications: tuple[tuple[str, str, dict[str, str], set[str]], ...] = (
+        (CI_BASE, CI_RECORD, CI_BEFORE, {CI_NEW}),
+        (CI_FORMAT_BASE, CI_FORMAT_RECORD, CI_FORMAT_BEFORE, set()),
+    )
+    for base, record_path, pins, added in specifications:
+        record: dict[str, Any] = json.loads(frozen_members[record_path])
+        if (
+            record.keys() != {"schema", "base", "changes"}
+            or record["schema"] != "exact-ci-successor-v1"
+            or record["base"] != base
+            or record["changes"].keys() != pins.keys() | added
+        ):
+            raise ValueError("CI transition membership or base changed.")
+        for name in added:
+            if _git(root, "--literal-pathspecs", "ls-tree", "-r", "-z", base, "--", name):
+                raise ValueError("CI bootstrap predecessor was not absent.")
+        previous = _blobs(root, base, list(pins))
+        for name in record["changes"]:
+            assert_ci_transition(
+                name, previous.get(name), frozen_members[name], record["changes"][name]
+            )
 
 
 def static_predecessor(root: Path, name: str, raw: bytes) -> bytes:
@@ -419,6 +457,7 @@ def _freeze(root: Path) -> str:
     _git(root, "merge-base", "--is-ancestor", freeze, "HEAD")
     _git(root, "merge-base", "--is-ancestor", STATIC_BASE, freeze)
     _git(root, "merge-base", "--is-ancestor", CI_BASE, freeze)
+    _git(root, "merge-base", "--is-ancestor", CI_FORMAT_BASE, freeze)
     names = _git(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
     if set(names) != PINS.keys() | {SELF, ASSESSMENT} or len(names) != len(PINS) + 2:
         raise ValueError("Preflight successor finite membership changed.")
@@ -474,6 +513,8 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     The CI successor also changes package bootstrap to prevent generated bytecode
     and imports the same generator function from its canonical owner. Its three
     exact module mappings add no detailed families or altered workload semantics.
+    Exact later import-block edits retain all benchmark functions and constants;
+    reordered imports have separate current entry-point controls.
     Current collectors and a fresh smoke receipt still bind the actual source.
     """
     from tools import thousand_sons_perils_preservation as perils
@@ -481,7 +522,9 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     _freeze(root)
     # The derived audit and proof records are outside runtime_inputs; their
     # bytes remain authenticated by _freeze and the complete live source scan.
-    controls = (PINS.keys() - {INVENTORY, STATIC_RECORD, CI_RECORD, CI_ROADMAP}) | {SELF}
+    controls = (
+        PINS.keys() - {INVENTORY, STATIC_RECORD, CI_RECORD, CI_FORMAT_RECORD, CI_ROADMAP}
+    ) | {SELF}
     if not controls <= current.keys():
         raise ValueError("Preflight actual input collector omitted current inputs.")
     actual = {name: _sha(_read(root, name)) for name in controls}

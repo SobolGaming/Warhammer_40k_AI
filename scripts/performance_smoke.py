@@ -26,7 +26,6 @@ def run_case(case: str) -> dict[str, object]:
         work: dict[str, object] = {"candidate_queries": 10, "visibility_queries": 10}
     elif case == CASES[1]:
         from scripts.measure_ingress_reconstruction import prepare
-
         from warhammer40k_core.adapters.event_stream import EventStreamCursor
         from warhammer40k_core.adapters.local_session import LocalGameSession
         from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus

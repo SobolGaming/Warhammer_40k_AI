@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import copy
 import hashlib
 import json
@@ -252,7 +253,9 @@ def test_default_package_launch_prevents_own_bytecode_but_discovers_explicit_pyc
     assert "src/probe49.py" in expected
     assert not list(source.parent.rglob("*.pyc"))
     # Explicit writes remain visible: the bootstrap must not exempt bytecode.
-    compiled = Path(py_compile.compile(str(source), doraise=True))
+    compiled_name = py_compile.compile(str(source), doraise=True)
+    assert compiled_name is not None
+    compiled = Path(compiled_name)
     relative = compiled.relative_to(tmp_path).as_posix()
     assert compiled.is_file()
     assert discovered_sources(tmp_path) - expected == {relative}
@@ -262,10 +265,42 @@ def test_default_package_launch_prevents_own_bytecode_but_discovers_explicit_pyc
 def test_aeldari_generator_uses_the_canonical_source_loader_in_both_routes(
     package: bool, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.syspath_prepend(str(ROOT / "tools"))
+    monkeypatch.setattr(sys, "path", [str(ROOT / "tools"), *sys.path])
     namespace = runpy.run_path(
         str(ROOT / "tools/generate_aeldari_datasheet_semantic_coverage.py"),
         run_name="tools.ci49_probe" if package else "ci49_probe",
     )
     owner = import_module("tools.ability_support_sources" if package else "ability_support_sources")
     assert namespace["_load_source_artifacts"] is owner.load_source_artifacts
+
+
+@pytest.mark.parametrize("name", sorted(successor.CI_FORMAT_BEFORE))
+def test_ci_formatting_preserves_import_bindings_and_nonimport_ast(name: str) -> None:
+    record: dict[str, Any] = json.loads((ROOT / successor.CI_FORMAT_RECORD).read_bytes())
+    before = subprocess.check_output(
+        ["git", "show", successor.CI_FORMAT_BASE + ":" + name], cwd=ROOT
+    )
+    current = (ROOT / name).read_bytes()
+    successor.assert_ci_transition(name, before, current, record["changes"][name])
+    old_tree, new_tree = ast.parse(before), ast.parse(current)
+    old_imports = [n for n in old_tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
+    new_imports = [n for n in new_tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
+    assert sorted(ast.dump(n) for n in old_imports) == sorted(ast.dump(n) for n in new_imports)
+    old_tree.body = [n for n in old_tree.body if n not in old_imports]
+    new_tree.body = [n for n in new_tree.body if n not in new_imports]
+    assert ast.dump(old_tree) == ast.dump(new_tree)
+
+
+def test_ci_formatting_cannot_absorb_changed_benchmark_samples() -> None:
+    name = "scripts/benchmark_order88_strength.py"
+    record: dict[str, Any] = json.loads((ROOT / successor.CI_FORMAT_RECORD).read_bytes())
+    before = subprocess.check_output(
+        ["git", "show", successor.CI_FORMAT_BASE + ":" + name], cwd=ROOT
+    )
+    current = (ROOT / name).read_bytes()
+    assert current.count(b"range(5)") == 1
+    changed = current.replace(b"range(5)", b"range(1)", 1)
+    row = copy.deepcopy(record["changes"][name])
+    row["after_sha256"] = hashlib.sha256(changed).hexdigest()
+    with pytest.raises(ValueError, match="outside the exact reviewed edits"):
+        successor.assert_ci_transition(name, before, changed, row)

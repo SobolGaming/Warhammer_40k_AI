@@ -15,7 +15,6 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
-from scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_SECONDS, WORKLOAD
 from tools.performance_category_migration import applies as migration_applies
 from tools.performance_order103_exception import retained_comparison_inputs
 from tools.performance_policy import (
@@ -42,6 +41,8 @@ from tools.performance_tool_inputs import (
     comparison_inputs,
     retained_tool_comparison_inputs,
 )
+
+from scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_SECONDS, WORKLOAD
 
 ROOT = Path(__file__).resolve().parents[1]
 

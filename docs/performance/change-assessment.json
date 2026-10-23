@@ -2574,6 +2574,16 @@
         }
       }
     },
+    "docs/performance/ci-format-successor49b.json": {
+      "before_sha256": null,
+      "after_sha256": "00d1fb9f7dd5199decb969ed730261bf9cc1dc4eaf6e9040e3e34ecd0eee435e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "00d1fb9f7dd5199decb969ed730261bf9cc1dc4eaf6e9040e3e34ecd0eee435e"
+        }
+      }
+    },
     "docs/performance/ci-successor49.json": {
       "before_sha256": null,
       "after_sha256": "ea9fd6be7ca6371b78461291d95c85ba2371838b82e4e2f3a7a391212f9d879c",
@@ -2776,11 +2786,11 @@
     },
     "scripts/benchmark_order88_strength.py": {
       "before_sha256": "6ea19e9377d0ab0b4c51e818a2f22420891742b29878e8c6d3604b7a9fd33de6",
-      "after_sha256": "e216b66054625f434b62944f50c545f772af88610498b818b39f0c1d6c34abcb",
+      "after_sha256": "c2d5d84ed6f56e9852046f6acf87214883f0236afe61a77210e0e9489fe0e762",
       "owners": {
         "@module": {
           "before": "0c45fbc8ed0fa4149993905e351abcb9ce34771c696ad645d5e85b99496932aa",
-          "after": "9573824981fa2fa81c7e23d7aa227849805c66ae4fd13ca391106dcf0d25d875"
+          "after": "50e5a064f83a88bd33ee2ea39e9f15e7d2abbb8598328402fb379c1c1bf1f378"
         },
         "measure": {
           "before": "f2bb54bdd3ce33aace517541ca1e62053c5880049ce7e0095655a612300bd086",
@@ -2790,17 +2800,22 @@
     },
     "scripts/check_performance_policy.py": {
       "before_sha256": "520da31556b55271ce74af77e553281d5974e6faf9b8baf23bcd8b5a76605b12",
-      "after_sha256": "211658e8b50b0bb1f443b5389d815a221e1e218c1d475f909b32fa2959cb4d75",
+      "after_sha256": "ce2c1e27152f0eb030b867078f543bb94472a7b3b0cf3cd0d5e2cc1102111209",
       "owners": {
         "@module": {
           "before": "49fc81fc3951fdcedab7cb2b0f62867313d7828aae3a09bce8e55652b185957f",
-          "after": "b489dd0002f837bad4346e9a8381b62e849db1cab8058acb02930bf4813a7b8c"
+          "after": "64bd1a493b904147cec70d5ad6138d0863c714aa874257818235d013f04f5d79"
         },
         "validate_current": {
           "before": "b7f165e16b5e2dd615d8038c524079e232ef827d44b2eb5712b641b256977893",
           "after": "75d7a873e9517d64a285883531e07391f09b6990d68b3674c2e22d55538cb829"
         }
       }
+    },
+    "scripts/performance_smoke.py": {
+      "before_sha256": "f3934ba9961ee31c80582ad1a2f8dc5a66cd56f1f05f4803f397f125f6502174",
+      "after_sha256": "0380ba2c9ab5c1e045f281f810f0e6e582b0738a3db8eab7a18ecfc34fe6c4d8",
+      "owners": {}
     },
     "scripts/reconstruct_local_checkpoint.py": {
       "before_sha256": null,
@@ -5332,11 +5347,11 @@
     },
     "tests/code_quality/test_performance_static_successor.py": {
       "before_sha256": null,
-      "after_sha256": "cf46f4112a762e6c2fa87b67b982115867b40413bf53e9c45b63fda9fe3e2ba8",
+      "after_sha256": "e9c05fedb6a5aa657955b76115685daeb734af3500d06ed1df2543547749f050",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ff59a8096b63006956d363c78a2ffcc9b89a52748ad385ccdd52bea19dfef14f"
+          "after": "08bc8f32efed21287809e74177aa17b0b14bca0dafd615cd521c5d5b42418983"
         },
         "ci_transitions": {
           "before": null,
@@ -5348,7 +5363,15 @@
         },
         "test_aeldari_generator_uses_the_canonical_source_loader_in_both_routes": {
           "before": null,
-          "after": "39b521bfa79cdd8be9b429e0e44adb3eae358c08e4185af142203e97dc568012"
+          "after": "ad6c5446bc82b794f67921ea228d654cc993a092934d723e0d67a7739bdb7d85"
+        },
+        "test_ci_formatting_cannot_absorb_changed_benchmark_samples": {
+          "before": null,
+          "after": "7f4a5f215697ffb945249779ebf178cca9bf677b3dbc79964d896abe02fc0f8e"
+        },
+        "test_ci_formatting_preserves_import_bindings_and_nonimport_ast": {
+          "before": null,
+          "after": "1a9580f20be9525f3d120d89b802d7ab8577a4cf56dc08df453ea29601525705"
         },
         "test_ci_transition_preserves_exact_import_bootstrap_and_mapping_edits": {
           "before": null,
@@ -5364,7 +5387,7 @@
         },
         "test_default_package_launch_prevents_own_bytecode_but_discovers_explicit_pyc": {
           "before": null,
-          "after": "3aa0740507f563675a5f8b5193aabb56709137cb68371cee281cfa8280d23e53"
+          "after": "b64fc3ef9f69b4a02c9c194f4eb23e073d2a247b5ddb90192bd0559d3b272b80"
         },
         "test_static_edits_match_independent_immutable_whole_module_recipes": {
           "before": null,
@@ -18404,11 +18427,11 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "f96599915b13fb9e32b59383859b09d4208646f3f0ec3f34f6abcc19e6bd9ebc",
+      "after_sha256": "5ca70220e186bc46b383457b5a6023e51239f407efa394463ca6fdcbb73d58da",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a09bd7e06a8548fd82f72b2037b08fdfd820a437c313b156c1c0f0e3ba752fdd"
+          "after": "935068a3d8febff3f0f1cbbd03a439dfa32cb3e75fe51931654dc5bdf6f1bbf2"
         },
         "_assessment": {
           "before": null,
@@ -18420,11 +18443,11 @@
         },
         "_ci_transitions": {
           "before": null,
-          "after": "a01520b1732116cdca591150976304d54a75152d4cea383c34f8ee34299c99f6"
+          "after": "81a766542f674a18c8c0acf6568619ca2a27d32fa10e22724413087d66bfc6ff"
         },
         "_freeze": {
           "before": null,
-          "after": "959e738de528e38571e494863cae2e1493cf28e015bf776263bb24ce9b7ebb43"
+          "after": "29076cdf8e44a97bc4fdaf7bdc182841c90d9ad3ebfab0b1f4363d1be6f54a93"
         },
         "_git": {
           "before": null,
@@ -18444,7 +18467,7 @@
         },
         "assert_ci_transition": {
           "before": null,
-          "after": "5cf77dd3bcfa876bb4805d60f8680c87f6a63b15c23d8bd53c733169bb120f69"
+          "after": "545610e17ae4ac830994f680959e9714f3477f0debb777bba0ececdecacdcf55"
         },
         "assert_static_transition": {
           "before": null,
@@ -18456,7 +18479,7 @@
         },
         "measurement_inputs": {
           "before": null,
-          "after": "2bfcec33a18731d5d719af839e0ce4a32f751156ce5679fd51c98023fd18b0b2"
+          "after": "ebad5275550a974926899abd9313afec898939643a6ff321a2496d1d14cf2929"
         },
         "preceding_control": {
           "before": null,
@@ -20944,8 +20967,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "docs/D11_ONE_SHOT_PHYSICAL_SCOPE.md": {
@@ -21140,12 +21163,20 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "docs/performance/ci-format-successor49b.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
+    },
     "docs/performance/ci-successor49.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "docs/performance/current/qualification40-dice.json": {
@@ -21280,16 +21311,16 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "docs/performance/static-successor48.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "scripts/__init__.py": {
@@ -21298,8 +21329,8 @@
         "ci49-exact-64edd7fc2be5076d"
       ],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "scripts/benchmark_order88_strength.py": {
@@ -21310,17 +21341,25 @@
       "selected_families": [
         "strength"
       ],
-      "rationale": "Exact PR587-to-current owner changes: scripts/benchmark_order88_strength.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "scripts/check_performance_policy.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: scripts/check_performance_policy.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
+    },
+    "scripts/performance_smoke.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "scripts/reconstruct_local_checkpoint.py": {
       "category": "measured_workload",
@@ -22817,8 +22856,8 @@
         "ci49-exact-001e61d97d9dee27"
       ],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/category_migration_preservation.py": {
@@ -22844,16 +22883,16 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_d07_geometry_containment.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_d07_upper_floor_preservation.py": {
@@ -22892,8 +22931,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_order54_large_model_setup.py": {
@@ -22948,8 +22987,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_performance_category_migration.py": {
@@ -22964,16 +23003,16 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_performance_static_successor.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
@@ -22996,8 +23035,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_s25_fixture_preservation.py": {
@@ -28136,8 +28175,8 @@
         "qualification40-exact-411d2638fc43c127"
       ],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/support/section08_native_mission_source.py": {
@@ -28672,8 +28711,8 @@
         "shock-source-generation-and-audit"
       ],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tools/cumulative_preservation.py": {
@@ -28682,8 +28721,8 @@
         "qualification40-exact-b8a07a50d2ab636b"
       ],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tools/generate_ability_support_matrix.py": {
@@ -28704,8 +28743,8 @@
         "ci49-exact-744f0d2a2e506456"
       ],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tools/performance_policy.py": {
@@ -28728,8 +28767,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
-      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes. Three later import-block repairs are authenticated against immutable d330; two move imports and one changes whitespace only. Benchmark functions, constants and non-import module AST remain exact; bounded import-route controls and current CLI validation cover import ordering.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; bootstrap/import bytes and three explicit module operations require truthful current input binding. The changed strength driver import block is a real recorded producer-byte delta; its existing mandatory strength family remains selected. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tools/performance_qualification_measurements.py": {

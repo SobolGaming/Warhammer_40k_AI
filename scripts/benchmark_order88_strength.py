@@ -10,11 +10,11 @@ import statistics
 from pathlib import Path
 from time import perf_counter
 
-from scripts.measure_order65 import _host_inventory
 from tests.absent_strength_helpers import strength_session
 from tests.lethal_hits_helpers import attack_steps, complete_attack
 from tests.psychic_modifier_helpers import pending_request
 
+from scripts.measure_order65 import _host_inventory
 from warhammer40k_core.build_identity import verified_engine_build_identity
 from warhammer40k_core.engine.phase import BattlePhase
 
