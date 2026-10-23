@@ -12,7 +12,7 @@ BASE_SOURCE = "36ab649ef5a6ab747587dc25d05336252db5a4eb148dc24619e6881c38efec42"
 SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
 INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
-FREEZE_COMMIT: str | None = "0e8a3f4a5c9f7573735601f21a96dfb852f84d1c"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -29,7 +29,7 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_performance_preflight.py",
-        "d5612ca6ffe4932704d425eba3f2745600b0484fed165b7bd3285076a53a716b",
+        "5618fbac9cfbefae31c8ddeda8a6d5646026a01d48debc4c89379a6140e34e9f",
     ),
     (
         "tests/code_quality/test_qualification40_successor.py",
@@ -49,7 +49,7 @@ _PIN_ROWS = (
     ),
     (
         "tools/performance_qualification_successor.py",
-        "f02faa899f7091553407a2d782ff0f16209f9db3fe23480112491bea1a794890",
+        "8306fec5f45dbddee62d899ff500a2d9d94799ad8ca2e6f09a23487b4c8f161c",
     ),
     (
         "tools/thousand_sons_perils_preservation.py",
@@ -63,8 +63,78 @@ def _sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
-def _git(root: Path, *args: str) -> bytes:
-    return subprocess.check_output(["git", *args], cwd=root, timeout=60)
+def _git(root: Path, *args: str, payload: bytes | None = None) -> bytes:
+    return subprocess.check_output(["git", *args], cwd=root, input=payload, timeout=60)
+
+
+def _blobs(root: Path, revision: str, names: list[str]) -> dict[str, bytes]:
+    """Read exact immutable members afresh; never cache Git or filesystem results."""
+    if len(revision) != 40 or set(revision) - set("0123456789abcdef"):
+        raise ValueError("Preflight Git revision must be an exact SHA1 selector.")
+    if not names or len(set(names)) != len(names):
+        raise ValueError("Preflight Git selection must contain unique members.")
+    for name in names:
+        if any(part in {"", ".", ".."} for part in name.split("/")) or any(
+            character in name for character in "\\\x00\r\n"
+        ):
+            raise ValueError("Preflight Git member must be a canonical literal path.")
+    tree = _git(root, "--literal-pathspecs", "ls-tree", "-r", "-z", revision, "--", *names)
+    if not tree.endswith(b"\0"):
+        raise ValueError("Preflight Git tree membership is incomplete.")
+    objects: dict[str, str] = {}
+    for row in tree[:-1].split(b"\0"):
+        metadata, separator, encoded_name = row.partition(b"\t")
+        fields = metadata.split(b" ")
+        if not separator or len(fields) != 3:
+            raise ValueError("Preflight Git tree row is malformed.")
+        mode, kind, encoded_oid = fields
+        name, oid = encoded_name.decode(), encoded_oid.decode("ascii")
+        if (
+            mode not in {b"100644", b"100755"}
+            or kind != b"blob"
+            or len(oid) != 40
+            or set(oid) - set("0123456789abcdef")
+            or name not in names
+            or name in objects
+        ):
+            raise ValueError("Preflight Git member identity or type changed.")
+        objects[name] = oid
+    if objects.keys() != set(names):
+        raise ValueError("Preflight Git tree membership is incomplete.")
+    raw = _git(
+        root,
+        "cat-file",
+        "--batch",
+        payload="".join(objects[name] + "\n" for name in names).encode(),
+    )
+    result: dict[str, bytes] = {}
+    offset = 0
+    for name in names:
+        boundary = raw.find(b"\n", offset)
+        if boundary == -1:
+            raise ValueError("Preflight Git blob header is incomplete.")
+        fields = raw[offset:boundary].split(b" ")
+        if len(fields) != 3:
+            raise ValueError("Preflight Git blob header is malformed.")
+        encoded_oid, kind, size = fields
+        if encoded_oid != objects[name].encode() or kind != b"blob":
+            raise ValueError("Preflight Git blob identity or type changed.")
+        if not size.isdigit() or (len(size) > 1 and size.startswith(b"0")):
+            raise ValueError("Preflight Git blob size is not canonical.")
+        start = boundary + 1
+        end = start + int(size)
+        if end >= len(raw) or raw[end : end + 1] != b"\n":
+            raise ValueError("Preflight Git blob payload is incomplete.")
+        content = raw[start:end]
+        object_hash = hashlib.sha1(b"blob " + size + b"\0", usedforsecurity=False)
+        object_hash.update(content)
+        if object_hash.hexdigest() != objects[name]:
+            raise ValueError("Preflight Git blob bytes differ from the selected object.")
+        result[name] = content
+        offset = end + 1
+    if offset != len(raw):
+        raise ValueError("Preflight Git blob payload has trailing data.")
+    return result
 
 
 def _read(root: Path, name: str) -> bytes:
@@ -102,14 +172,15 @@ def _freeze(root: Path) -> str:
     names = _git(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
     if set(names) != PINS.keys() | {SELF, ASSESSMENT} or len(names) != len(PINS) + 2:
         raise ValueError("Preflight successor finite membership changed.")
-    frozen = _git(root, "show", freeze + ":" + SELF)
+    frozen_members = _blobs(root, freeze, [SELF, *PINS])
+    frozen = frozen_members[SELF]
     marker = b"\nFREEZE_COMMIT: str | None = None"
     if frozen.count(marker) != 1 or _read(root, SELF) != frozen.replace(
         marker, f'\nFREEZE_COMMIT: str | None = "{freeze}"'.encode(), 1
     ):
         raise ValueError("Preflight successor activation changed.")
     for name, pin in PINS.items():
-        if _sha(_read(root, name)) != pin or _sha(_git(root, "show", freeze + ":" + name)) != pin:
+        if _sha(_read(root, name)) != pin or _sha(frozen_members[name]) != pin:
             raise ValueError(
                 "Reviewed migration source/data changed: "
                 "Qualification / Perils successor / Preflight source: " + name

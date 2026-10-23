@@ -5026,7 +5026,7 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "d5612ca6ffe4932704d425eba3f2745600b0484fed165b7bd3285076a53a716b",
+      "after_sha256": "5618fbac9cfbefae31c8ddeda8a6d5646026a01d48debc4c89379a6140e34e9f",
       "owners": {
         "@module": {
           "before": null,
@@ -5036,17 +5036,29 @@
           "before": null,
           "after": "e79d880c6725c1af9be373d6e4dab1cd17b18cb170df1755dc772fb21464c46c"
         },
+        "test_frozen_blob_batch_matches_git_show_and_revalidates_each_call": {
+          "before": null,
+          "after": "f7c211de67371c2687deaae08f5331252c5e4e651f24d2e1b72dc1321c901fdd"
+        },
+        "test_frozen_blob_batch_rejects_changed_members_and_malformed_payloads": {
+          "before": null,
+          "after": "772c726d2bfb61a7f49f940bd83e852ac163d0b79678f83068b79942ecf4f998"
+        },
+        "test_frozen_blob_batch_rejects_nonliteral_or_ambiguous_selection": {
+          "before": null,
+          "after": "07e2f3ad6588a07c26fae24bb311a2a9a3b1d38516792237996ea53fd277870e"
+        },
         "test_generated_inventory_changes_only_reviewed_perils_metadata": {
           "before": null,
           "after": "f269d78b5919c2d25163dcfb361d0831f1a1f12a0e6ffef8d286f34b4080b788"
         },
         "test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin": {
           "before": null,
-          "after": "98dbb9b2d3e0b166a02effd692600bec122975a181c8586cd908fe5f9c650170"
+          "after": "810c90a21f663c5a3038e19f4dc5a9a5db4bc50211414cdd2940c10e732c2ca3"
         },
         "test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelated_input": {
           "before": null,
-          "after": "361c665fe9182636e312adb5c96923c427d7ab11319ff21eb067e314e92bcfc6"
+          "after": "e64d72380012ed27d69c0749cd21a56963dbf4624b2dd030c17b4f7fd515298d"
         },
         "test_native_discovery_matches_original_ignored_and_symlink_membership": {
           "before": null,
@@ -18092,23 +18104,27 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "86d5b07105913ded6fb9c5d3dca3399d0dd5c8c83676b8353ebb4e86cf972b94",
+      "after_sha256": "73d06dda981854a9d40547b11c02a2616959067aec469c72e53f50c5a8836689",
       "owners": {
         "@module": {
           "before": null,
-          "after": "6935b01bb5a5d571000faefa9f4feb030170ef0d19fc1b9ff3357e20ae37ac74"
+          "after": "bcbd3907e15c3cee55ae45f389cbb2f074ca9225eee4130e691607e149335839"
         },
         "_assessment": {
           "before": null,
           "after": "b540d37d8be59d07e1c1afea891ac8f9adfff56291ca006fb17616de2cac7f74"
         },
+        "_blobs": {
+          "before": null,
+          "after": "b80c97d216075c8e75df6e1b8f1b13c19b437b3c206cc1096f05a0388f64debd"
+        },
         "_freeze": {
           "before": null,
-          "after": "79d19959b236eab72fbba808b5424cf5f0924993edc108771ff72da624022f9d"
+          "after": "2af39b3c2eada96e6d1d42807bee5c3ff004916a210f61a1ed057f137ac1315a"
         },
         "_git": {
           "before": null,
-          "after": "674e65e2f37e6aff2076ef8b6ecd11db1f667d8974a82dfa5268e156fa557bdc"
+          "after": "7006de435bb0a829c4448aabbe6c8edf36869cf90b1af71c4aa8af69f4e096a2"
         },
         "_read": {
           "before": null,
@@ -18156,7 +18172,7 @@
     },
     "tools/performance_qualification_successor.py": {
       "before_sha256": null,
-      "after_sha256": "f02faa899f7091553407a2d782ff0f16209f9db3fe23480112491bea1a794890",
+      "after_sha256": "8306fec5f45dbddee62d899ff500a2d9d94799ad8ca2e6f09a23487b4c8f161c",
       "owners": {
         "@module": {
           "before": null,
@@ -18200,7 +18216,7 @@
         },
         "expected_source": {
           "before": null,
-          "after": "93c78e3159b39a55dfb95bf2e3c3a11b84eee9f0da9cba02963c7a9bb0090dda"
+          "after": "a82daf14ce6acefa897ac5e0536a63c17afc527fc29844641e86d274fd9c821c"
         },
         "preceding_control": {
           "before": null,
@@ -22592,8 +22608,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve exact complete-byte source validation while comparing Windows creation/change timestamps only within their respective API channels. Windows retains its handle through the final path query and compares all seven handle metadata fields afterward. POSIX retains its original cross-API metadata checks and observation sequence; ten Windows guards cover stable differing times, every metadata field and changed/identical-byte writes at the final path query.",
-      "source_obligation": "Retain all seven metadata fields within each matching API channel, every other field across APIs, fresh complete-byte hashes, ownership and alias checks; reject real midread and final-path-query changes, including identical-byte writes with restored mtime.",
+      "rationale": "Batch only the finite immutable frozen-blob read sets into fresh Git commands. Every selected name, regular blob mode, OID, full payload, canonical size and framing is verified. Keep all independent live-byte/ownership, provenance, membership, activation and existing historical checks. No Git/physical-source result cache is added; malformed-output and real Git equivalence guards are retained.",
+      "source_obligation": "Preserve every previous validation and exact frozen assertion; only combine immutable blob transport. All engine/workload/imported fixtures, cases, samples, families, budgets and authoritative CI selection remain exact.",
       "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     },
     "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
@@ -28338,8 +28354,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact bounded preflight successor or retained Perils admission. Untimed admission tooling remains part of whole-command timing; raw component arms are reused only through exact unchanged measurement input proof.",
-      "source_obligation": "Preserve complete current pre/post source admission, owned physical bytes, all Git provenance and the original finite Perils assertions.",
+      "rationale": "Batch only the finite immutable frozen-blob read sets into fresh Git commands. Every selected name, regular blob mode, OID, full payload, canonical size and framing is verified. Keep all independent live-byte/ownership, provenance, membership, activation and existing historical checks. No Git/physical-source result cache is added; malformed-output and real Git equivalence guards are retained.",
+      "source_obligation": "Preserve every previous validation and exact frozen assertion; only combine immutable blob transport. All engine/workload/imported fixtures, cases, samples, families, budgets and authoritative CI selection remain exact.",
       "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     },
     "tools/performance_qualification_measurements.py": {
@@ -28354,8 +28370,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tools/performance_qualification_successor.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
+      "rationale": "Batch only the finite immutable frozen-blob read sets into fresh Git commands. Every selected name, regular blob mode, OID, full payload, canonical size and framing is verified. Keep all independent live-byte/ownership, provenance, membership, activation and existing historical checks. No Git/physical-source result cache is added; malformed-output and real Git equivalence guards are retained.",
+      "source_obligation": "Preserve every previous validation and exact frozen assertion; only combine immutable blob transport. All engine/workload/imported fixtures, cases, samples, families, budgets and authoritative CI selection remain exact.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
     "tools/performance_tool_inputs.py": {

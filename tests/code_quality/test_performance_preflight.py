@@ -407,8 +407,8 @@ def test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelat
     target.parent.mkdir(parents=True)
     target.write_bytes(current)
 
-    def original_git(_root: Path, *args: str) -> bytes:
-        return direct_git(root, *args)
+    def original_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        return direct_git(root, *args, payload=payload)
 
     monkeypatch.setattr(successor, "_git", original_git)
     for supplied in (current, old):
@@ -442,8 +442,8 @@ def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes((root / name).read_bytes())
 
-    def original_git(_root: Path, *args: str) -> bytes:
-        return direct_git(root, *args)
+    def original_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        return direct_git(root, *args, payload=payload)
 
     monkeypatch.setattr(successor, "_git", original_git)
     assert successor._freeze(tmp_path) == successor.FREEZE_COMMIT
@@ -538,3 +538,139 @@ def test_pure_source_hash_memo_resets_after_nested_exceptions_and_new_invocation
         assert preflight._DIGESTS.get() is None
     assert scopes[0] is not scopes[1]
     assert all(scope.retained == 0 and not scope.entries for scope in scopes)
+
+
+def test_frozen_blob_batch_matches_git_show_and_revalidates_each_call(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tools import performance_preflight_successor as successor
+
+    contents = {"a.txt": b"exact\n", "nested/a spaced[1].bin": bytes(range(256)), "empty": b""}
+    successor._git(tmp_path, "init", "--quiet")
+    for name, content in contents.items():
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(content)
+    successor._git(tmp_path, "add", "--all")
+    successor._git(tmp_path, "update-index", "--chmod=+x", "a.txt")
+    successor._git(
+        tmp_path,
+        "-c",
+        "user.name=Blob test",
+        "-c",
+        "user.email=blob@example.invalid",
+        "-c",
+        "commit.gpgsign=false",
+        "commit",
+        "--quiet",
+        "-m",
+        "Exact blob fixture",
+    )
+    revision = successor._git(tmp_path, "rev-parse", "HEAD").decode().strip()
+    expected = {name: successor._git(tmp_path, "show", revision + ":" + name) for name in contents}
+    assert expected == contents
+    direct_git = successor._git
+    calls: list[tuple[str, ...]] = []
+
+    def tracked(root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        calls.append(args)
+        return direct_git(root, *args, payload=payload)
+
+    monkeypatch.setattr(successor, "_git", tracked)
+    assert successor._blobs(tmp_path, revision, list(contents)) == expected
+    (tmp_path / "a.txt").write_bytes(b"uncommitted live drift")
+    assert successor._blobs(tmp_path, revision, list(contents)) == expected
+    assert len(calls) == 4
+    assert calls[0] == calls[2]
+    assert calls[1] == calls[3] == ("cat-file", "--batch")
+    with pytest.raises(ValueError, match="Preflight Git tree membership"):
+        successor._blobs(tmp_path, revision, [*contents, "absent.txt"])
+
+
+@pytest.mark.parametrize(
+    "kind",
+    [
+        "missing_member",
+        "extra_member",
+        "duplicate_member",
+        "nonregular",
+        "tree_type",
+        "tree_oid",
+        "tree_framing",
+        "missing_blob",
+        "blob_oid",
+        "blob_type",
+        "negative_size",
+        "noncanonical_size",
+        "truncated",
+        "separator",
+        "trailing",
+        "content",
+    ],
+)
+def test_frozen_blob_batch_rejects_changed_members_and_malformed_payloads(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+) -> None:
+    from tools import performance_preflight_successor as successor
+
+    content = b"exact\0payload\n"
+    size = str(len(content)).encode()
+    oid = (
+        hashlib.sha1(b"blob " + size + b"\0" + content, usedforsecurity=False).hexdigest().encode()
+    )
+    row = b"100644 blob " + oid + b"\ta.txt\0"
+    batch = oid + b" blob " + size + b"\n" + content + b"\n"
+    tree_changes = {
+        "missing_member": b"",
+        "extra_member": row + row.replace(b"a.txt", b"extra.txt"),
+        "duplicate_member": row + row,
+        "nonregular": row.replace(b"100644", b"120000"),
+        "tree_type": row.replace(b"blob", b"tree"),
+        "tree_oid": row.replace(oid, b"g" * 40),
+        "tree_framing": row[:-1],
+    }
+    blob_changes = {
+        "missing_blob": oid + b" missing\n",
+        "blob_oid": batch.replace(oid, b"0" * 40, 1),
+        "blob_type": batch.replace(b" blob ", b" tree ", 1),
+        "negative_size": batch.replace(b" blob " + size, b" blob -1", 1),
+        "noncanonical_size": batch.replace(b" blob " + size, b" blob 0" + size, 1),
+        "truncated": batch[:-2],
+        "separator": batch[:-1] + b"x",
+        "trailing": batch + b"unrequested\n",
+        "content": batch.replace(b"exact", b"other", 1),
+    }
+
+    def changed_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        if args == ("cat-file", "--batch"):
+            assert payload == oid + b"\n"
+            return blob_changes.get(kind, batch)
+        assert args == ("--literal-pathspecs", "ls-tree", "-r", "-z", "1" * 40, "--", "a.txt")
+        assert payload is None
+        return tree_changes.get(kind, row)
+
+    monkeypatch.setattr(successor, "_git", changed_git)
+    with pytest.raises(ValueError, match="Preflight Git"):
+        successor._blobs(tmp_path, "1" * 40, ["a.txt"])
+
+
+def test_frozen_blob_batch_rejects_nonliteral_or_ambiguous_selection(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tools import performance_preflight_successor as successor
+
+    def unexpected_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        raise AssertionError("Invalid selectors must fail before Git access.")
+
+    monkeypatch.setattr(successor, "_git", unexpected_git)
+    for revision, names in (
+        ("HEAD", ["a.txt"]),
+        ("1" * 40, []),
+        ("1" * 40, ["a.txt", "a.txt"]),
+        ("1" * 40, ["../a.txt"]),
+        ("1" * 40, ["/a.txt"]),
+        ("1" * 40, ["nested//a.txt"]),
+        ("1" * 40, ["a.txt\nother"]),
+    ):
+        with pytest.raises(ValueError, match="Preflight Git"):
+            successor._blobs(tmp_path, revision, names)

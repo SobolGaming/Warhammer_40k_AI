@@ -81,9 +81,12 @@ def expected_source(root: Path, previous: dict[str, str]) -> dict[str, str]:
     for name, pin in previous.items():
         if name not in declared and accepted.get(name) != pin:
             raise ValueError("Qualification prior-source projection changed: " + name)
+    from tools.performance_preflight_successor import _blobs
+
+    frozen_members = _blobs(root, freeze, names)
     result = dict(accepted)
     for name in names:
-        raw = _git(root, "show", freeze + ":" + name)
+        raw = frozen_members[name]
         if name == SELF:
             raw = raw.replace(
                 b"\nFREEZE_COMMIT: str | None = None",
@@ -91,6 +94,7 @@ def expected_source(root: Path, previous: dict[str, str]) -> dict[str, str]:
                 1,
             )
         result[name] = _sha(raw)
+    del frozen_members
     assessment = "docs/performance/change-assessment.json"
     frozen_assessment = json.loads(_git(root, "show", freeze + ":" + assessment))
     actual_control = _read(root, SELF)
