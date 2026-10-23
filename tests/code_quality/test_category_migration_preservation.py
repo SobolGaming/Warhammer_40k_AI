@@ -434,6 +434,10 @@ def test_reviewed_inventory_fixture_whole_AST_rejects_unlisted_initializers(refe
         assert_reviewed_inventory_fixture_ast(accepted, ast.unparse(tree).encode())
 
 
+class _Normalizer(Protocol):
+    def __call__(self, node: ast.AST, *, original: bool) -> ast.AST: ...
+
+
 class _InitializerMechanisms(Protocol):
     def _initializers(
         self, raw: bytes, original: bool, preserve_exports: bool
@@ -442,6 +446,15 @@ class _InitializerMechanisms(Protocol):
     def _normalized(self, node: ast.AST, *, original: bool) -> ast.AST: ...
 
     def _definitions(self, raw: bytes, original: bool) -> tuple[tuple[str, str], ...]: ...
+
+    def initializers(self, raw: bytes, original: bool, preserve_exports: bool) -> tuple[str, ...]:
+        return self._initializers(raw, original, preserve_exports)
+
+    def normalizer(self) -> _Normalizer:
+        return self._normalized
+
+    def definitions(self, raw: bytes, original: bool) -> tuple[tuple[str, str], ...]:
+        return self._definitions(raw, original)
 
 
 _initializer_mechanisms = cast(_InitializerMechanisms, migration)
@@ -476,7 +489,7 @@ class Owner:
 '''
     )
     normalized_types: list[type[ast.AST]] = []
-    normalize = _initializer_mechanisms._normalized
+    normalize = _InitializerMechanisms.normalizer(_initializer_mechanisms)
 
     def observed(node: ast.AST, *, original: bool) -> ast.AST:
         normalized_types.append(type(node))
@@ -489,34 +502,58 @@ class Owner:
         repr(("Import", None, 0, "collections", None)),
         ast.dump(ast.parse("ROOT = " + expected_root).body[0]),
     )
-    assert _initializer_mechanisms._initializers(raw, original, preserve_exports) == expected
+    assert (
+        _InitializerMechanisms.initializers(
+            _initializer_mechanisms, raw, original, preserve_exports
+        )
+        == expected
+    )
     assert normalized_types
     assert not set(normalized_types) & {ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef}
     # Complete declaration/decorator/default/body checks still own these nodes.
-    before = dict(_initializer_mechanisms._definitions(raw, original))
+    before = dict(_InitializerMechanisms.definitions(_initializer_mechanisms, raw, original))
     assert set(before) == {"outer", "async_owner", "Owner"}
     changed = raw.replace(b"assert value", b"assert False", 1)
-    assert _initializer_mechanisms._initializers(changed, original, preserve_exports) == expected
-    assert dict(_initializer_mechanisms._definitions(changed, original))["outer"] != before["outer"]
+    assert (
+        _InitializerMechanisms.initializers(
+            _initializer_mechanisms, changed, original, preserve_exports
+        )
+        == expected
+    )
+    assert (
+        dict(_InitializerMechanisms.definitions(_initializer_mechanisms, changed, original))[
+            "outer"
+        ]
+        != before["outer"]
+    )
     initializer_changed = raw + b"UNEXPECTED_INITIALIZER = True\n"
     assert (
-        _initializer_mechanisms._initializers(initializer_changed, original, preserve_exports)
+        _InitializerMechanisms.initializers(
+            _initializer_mechanisms, initializer_changed, original, preserve_exports
+        )
         != expected
     )
-    assert _initializer_mechanisms._initializers(raw, original, preserve_exports) == expected
+    assert (
+        _InitializerMechanisms.initializers(
+            _initializer_mechanisms, raw, original, preserve_exports
+        )
+        == expected
+    )
 
 
 def test_initializer_fingerprints_preserve_statement_order_and_changed_modes() -> None:
     raw = (
         b"# order and mode control\nROOT = Path(__file__).resolve().parents[2]\nfirst()\nsecond()\n"
     )
-    original = _initializer_mechanisms._initializers(raw, True, False)
-    live = _initializer_mechanisms._initializers(raw, False, False)
+    original = _InitializerMechanisms.initializers(_initializer_mechanisms, raw, True, False)
+    live = _InitializerMechanisms.initializers(_initializer_mechanisms, raw, False, False)
     assert original != live
     assert original[1:] == live[1:]
     reversed_raw = raw.replace(b"first()\nsecond()", b"second()\nfirst()")
-    reversed_values = _initializer_mechanisms._initializers(reversed_raw, False, False)
+    reversed_values = _InitializerMechanisms.initializers(
+        _initializer_mechanisms, reversed_raw, False, False
+    )
     assert reversed_values != live
     assert reversed_values[1:] == tuple(reversed(live[1:]))
-    assert _initializer_mechanisms._initializers(raw, False, False) == live
-    assert _initializer_mechanisms._initializers(raw, True, True) == original
+    assert _InitializerMechanisms.initializers(_initializer_mechanisms, raw, False, False) == live
+    assert _InitializerMechanisms.initializers(_initializer_mechanisms, raw, True, True) == original
