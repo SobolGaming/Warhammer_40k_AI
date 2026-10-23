@@ -109,6 +109,16 @@
         }
       ]
     },
+    "tests/code_quality/test_performance_static_successor.py": {
+      "after_sha256": "56987d69a6f8918842a6720bbfb1461995a7626542628269c9b0a8e9c01d2e46",
+      "before_sha256": "4aa98bd59b00a15f65efddd433d4b9c3fa2d748a6ff6fee1581cd7dad848e128",
+      "edits": [
+        {
+          "after": "    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_COMPAT_BASE + \":\" + name], cwd=ROOT\n    )\n    current = (ROOT / name).read_bytes()\n    if name in successor.CI_RUNTIME_BEFORE:\n        successor.ci_comparison(ROOT, name, current)\n        current = subprocess.check_output(\n            [\"git\", \"show\", successor.CI_RUNTIME_BASE + \":\" + name], cwd=ROOT\n        )\n        assert hashlib.sha256(current).hexdigest() == successor.CI_RUNTIME_BEFORE[name]\n    successor.assert_ci_compatibility_transition(name, before, current, record[\"changes\"][name])\n\n\n@pytest.mark.parametrize(\n",
+          "before": "    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_COMPAT_BASE + \":\" + name], cwd=ROOT\n    )\n    successor.assert_ci_compatibility_transition(\n        name, before, (ROOT / name).read_bytes(), record[\"changes\"][name]\n    )\n\n\n@pytest.mark.parametrize(\n"
+        }
+      ]
+    },
     "tools/cumulative_preservation.py": {
       "after_sha256": "11686196454a263c214b087597a0eee21550fc5806de2883264e037f9348b737",
       "before_sha256": "0aed6e5a524e891710bc85c2eda40565ca1f5cfc5c07f268acdb6ec727c060f3",

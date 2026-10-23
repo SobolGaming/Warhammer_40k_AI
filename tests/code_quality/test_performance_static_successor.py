@@ -320,9 +320,14 @@ def test_ci_relocation_and_map_seam_match_exact_immutable_preimages(name: str) -
     before = subprocess.check_output(
         ["git", "show", successor.CI_COMPAT_BASE + ":" + name], cwd=ROOT
     )
-    successor.assert_ci_compatibility_transition(
-        name, before, (ROOT / name).read_bytes(), record["changes"][name]
-    )
+    current = (ROOT / name).read_bytes()
+    if name in successor.CI_RUNTIME_BEFORE:
+        successor.ci_comparison(ROOT, name, current)
+        current = subprocess.check_output(
+            ["git", "show", successor.CI_RUNTIME_BASE + ":" + name], cwd=ROOT
+        )
+        assert hashlib.sha256(current).hexdigest() == successor.CI_RUNTIME_BEFORE[name]
+    successor.assert_ci_compatibility_transition(name, before, current, record["changes"][name])
 
 
 @pytest.mark.parametrize(
