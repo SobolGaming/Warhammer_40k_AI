@@ -1,0 +1,68 @@
+{
+  "base": "d1d37f45c17e7ecc4d60b990b011d4c725ac4d1c",
+  "changes": {
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "after_sha256": "59d0624883ffa435a267416718d508a30994b175b7bf239ddce2ec235b07f7c5",
+      "before_sha256": "df1b90a433e4f38aa0e2cd0974a9428f9d230c6bbce1d9079a0276ee16dc7442",
+      "edits": [
+        {
+          "after": "| 135 | PFINAL | CAUDIT-01 | Prior source selection retained345 observations but34 obligations lacked current assertion links and14 historical links had changed; physical LOS ignored body components and had no outgoing battlefield clipping. Order135 binds1078 original obligations and five added complete FAQs to exact live owners/assertions, explicit current successor and authority qualifications, September10/v931/v946/C12-04/C18-07 and cross-category consumers. Shared physical-union visibility clips only outgoing origins, retains incoming endpoints and same-point cover, with native reserve-ingress shooting, persistence/fork/viewer/event/replay regressions. Static inventory alone earns no runtime pass; complete current gates and both exact-final reviews govern closure. Conditional Core restrictions remain separate from faction granting providers; complete-game performance certification remains outstanding.  Explicitly approved typed unchanged-scalar LOS RNG projection preserves authentic legacy dice metadata while retaining current physical/bounds authority and identical live/save/replay validation; composite/clipped domains retain current RNG input.  Explicitly approved B01 shared boundary history repair counts only validated nonempty actual attack pools as shots; empty and selected-targetless accepted declarations retain completion without shot, preserving all causal guards and native save/fork/replay controls. The prior owner is BASE-identical; no regression-introduction claim.  Explicitly approved B02 Core Counter-offensive opponent-turn metadata repair through shared discovery/admission before CP spend, preserving generic ordering and unflagged Carnival. Native both-direction actual-fight, persistence/replay and continuation regressions; original source15.12-window unchanged, no same-handler redesign or granting-rule certification.  Explicitly approved B03 shared typed proposal-context equality rejects malformed live-client input before queue/history/events, retaining valid retry and all state/CP/source checks. Original observed impact was decisions99\u2192100/queue1\u21920 with every gameplay field unchanged CP5\u21925; no legal-play/introduction exaggeration.  Explicit subsequent B03 clarification authorizes same-boundary JSON-kind equality before queue/history, distinguishing bool/number while retaining valid numeric echoes; native malformed true-to1 observation and unchanged gameplay/CP impact retained.  Selected local D04 follow-up repairs surviving Combat passenger authoritative Battle-shock through the shared direct-state owner after completed hazard, with accepted setup/result/event-bound history. Charge turn expiry remains separate from shock retained until ordinary own Command success; failed tests retain status. Exact-final gates and independent reviews remain pending; Emergency and other postmerge repair families remain separate. See D04_COMBAT_BATTLE_SHOCK_SCOPE.md. CI qualification now imports the Aeldari source loader from its canonical public owner and sets process-local bytecode suppression before script/test engine imports, preserving strict detection of pre-existing unlisted files. Fresh exact-head local and hosted gates remain required. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ \u2192 immutable source observation \u2192 engine owner \u2192 facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01\u201325 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All prior roadmap rows, including P15J and S-MIRRORS | FINAL-CERTIFICATION |\r\n",
+          "before": "| 135 | PFINAL | CAUDIT-01 | Prior source selection retained345 observations but34 obligations lacked current assertion links and14 historical links had changed; physical LOS ignored body components and had no outgoing battlefield clipping. Order135 binds1078 original obligations and five added complete FAQs to exact live owners/assertions, explicit current successor and authority qualifications, September10/v931/v946/C12-04/C18-07 and cross-category consumers. Shared physical-union visibility clips only outgoing origins, retains incoming endpoints and same-point cover, with native reserve-ingress shooting, persistence/fork/viewer/event/replay regressions. Static inventory alone earns no runtime pass; complete current gates and both exact-final reviews govern closure. Conditional Core restrictions remain separate from faction granting providers; complete-game performance certification remains outstanding.  Explicitly approved typed unchanged-scalar LOS RNG projection preserves authentic legacy dice metadata while retaining current physical/bounds authority and identical live/save/replay validation; composite/clipped domains retain current RNG input.  Explicitly approved B01 shared boundary history repair counts only validated nonempty actual attack pools as shots; empty and selected-targetless accepted declarations retain completion without shot, preserving all causal guards and native save/fork/replay controls. The prior owner is BASE-identical; no regression-introduction claim.  Explicitly approved B02 Core Counter-offensive opponent-turn metadata repair through shared discovery/admission before CP spend, preserving generic ordering and unflagged Carnival. Native both-direction actual-fight, persistence/replay and continuation regressions; original source15.12-window unchanged, no same-handler redesign or granting-rule certification.  Explicitly approved B03 shared typed proposal-context equality rejects malformed live-client input before queue/history/events, retaining valid retry and all state/CP/source checks. Original observed impact was decisions99\u2192100/queue1\u21920 with every gameplay field unchanged CP5\u21925; no legal-play/introduction exaggeration.  Explicit subsequent B03 clarification authorizes same-boundary JSON-kind equality before queue/history, distinguishing bool/number while retaining valid numeric echoes; native malformed true-to1 observation and unchanged gameplay/CP impact retained.  Selected local D04 follow-up repairs surviving Combat passenger authoritative Battle-shock through the shared direct-state owner after completed hazard, with accepted setup/result/event-bound history. Charge turn expiry remains separate from shock retained until ordinary own Command success; failed tests retain status. Exact-final gates and independent reviews remain pending; Emergency and other postmerge repair families remain separate. See D04_COMBAT_BATTLE_SHOCK_SCOPE.md. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ \u2192 immutable source observation \u2192 engine owner \u2192 facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01\u201325 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All prior roadmap rows, including P15J and S-MIRRORS | FINAL-CERTIFICATION |\r\n"
+        }
+      ]
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "after_sha256": "5323c1736433605c84d150bb43371a85db5ee8d726b57fbe1ec1df600a1012a0",
+      "before_sha256": "f330487a339f4e3d58f4301afd6a6c21f64d9ed47e1f46742ebcbdf3e3b867b9",
+      "edits": [
+        {
+          "after": "        \"_load_source_artifacts\"\n      ],\n      \"families\": [\n        \"external_contract_source_reuse\"\n      ],\n      \"sensitive\": true,\n      \"mandatory\": true\n    },\n    \"ci49-exact-64edd7fc2be5076d\": {\n      \"paths\": [\n        \"scripts/__init__.py\"\n      ],\n      \"owners\": [\n        \"@module\"\n      ],\n      \"families\": [],\n      \"sensitive\": false,\n      \"mandatory\": true\n    },\n    \"ci49-exact-001e61d97d9dee27\": {\n      \"paths\": [\n        \"tests/__init__.py\"\n      ],\n      \"owners\": [\n        \"@module\"\n      ],\n      \"families\": [],\n      \"sensitive\": false,\n      \"mandatory\": true\n    },\n    \"ci49-exact-744f0d2a2e506456\": {\n      \"paths\": [\n        \"tools/generate_aeldari_datasheet_semantic_coverage.py\"\n      ],\n      \"owners\": [\n        \"@module\"\n      ],\n      \"families\": [],\n      \"sensitive\": false,\n      \"mandatory\": true\n",
+          "before": "        \"_load_source_artifacts\"\n      ],\n      \"families\": [\n        \"external_contract_source_reuse\"\n      ],\n      \"sensitive\": true,\n      \"mandatory\": true\n"
+        }
+      ]
+    },
+    "scripts/__init__.py": {
+      "after_sha256": "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
+      "before_sha256": null,
+      "edits": [
+        {
+          "after": "\"\"\"Keep validation imports from changing the exact source inventory.\"\"\"\n\nimport os\nimport sys\n\nsys.dont_write_bytecode = True\nos.environ[\"PYTHONDONTWRITEBYTECODE\"] = \"1\"\n",
+          "before": ""
+        }
+      ]
+    },
+    "tests/__init__.py": {
+      "after_sha256": "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
+      "before_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "edits": [
+        {
+          "after": "\"\"\"Keep validation imports from changing the exact source inventory.\"\"\"\n\nimport os\nimport sys\n\nsys.dont_write_bytecode = True\nos.environ[\"PYTHONDONTWRITEBYTECODE\"] = \"1\"\n",
+          "before": "\n"
+        }
+      ]
+    },
+    "tools/generate_aeldari_datasheet_semantic_coverage.py": {
+      "after_sha256": "1e49fd40cf7f9841054315e1db8eb4e6ba4c92c94db9080a9efab375b254b3bc",
+      "before_sha256": "59c535dbeac16d8aad6d413558fb20269ebb020d1cf5ec0927ff372ca44a220d",
+      "edits": [
+        {
+          "after": "    from generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR\n",
+          "before": "    from generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR, _load_source_artifacts\n"
+        },
+        {
+          "after": "else:\n    from ability_support_sources import load_source_artifacts as _load_source_artifacts\n",
+          "before": "else:\n"
+        },
+        {
+          "after": "    from tools.generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR\n",
+          "before": "    from tools.generate_ability_support_matrix import (\n        DEFAULT_SOURCE_JSON_DIR,\n        _load_source_artifacts,\n    )\n"
+        },
+        {
+          "after": "if TYPE_CHECKING or __package__:\n    from tools.ability_support_sources import load_source_artifacts as _load_source_artifacts\n",
+          "before": "if TYPE_CHECKING or __package__:\n"
+        }
+      ]
+    }
+  },
+  "schema": "exact-ci-successor-v1"
+}

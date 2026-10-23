@@ -13,7 +13,7 @@ BASE_SOURCE = "36ab649ef5a6ab747587dc25d05336252db5a4eb148dc24619e6881c38efec42"
 SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
 INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
-FREEZE_COMMIT: str | None = "8a58e5f9c1feb68ed8fd5ce2b3f7d712b26aded7"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -21,12 +21,32 @@ _PIN_ROWS = (
         "c0460f930be48c49dcbef7568ea1af5e2319ca374d658b6abdb8eadd38869c16",
     ),
     (
+        "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
+        "59d0624883ffa435a267416718d508a30994b175b7bf239ddce2ec235b07f7c5",
+    ),
+    (
+        "docs/performance/ci-successor49.json",
+        "ea9fd6be7ca6371b78461291d95c85ba2371838b82e4e2f3a7a391212f9d879c",
+    ),
+    (
+        "docs/performance/policy-v3/operation-map.json",
+        "5323c1736433605c84d150bb43371a85db5ee8d726b57fbe1ec1df600a1012a0",
+    ),
+    (
         "docs/performance/static-successor48.json",
         "b834787bc3f8bcf503ea3ae985d1a6f46e598a6350e8f1b5621e3d41d25f3c33",
     ),
     (
+        "scripts/__init__.py",
+        "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
+    ),
+    (
         "scripts/check_performance_policy.py",
         "211658e8b50b0bb1f443b5389d815a221e1e218c1d475f909b32fa2959cb4d75",
+    ),
+    (
+        "tests/__init__.py",
+        "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
     ),
     (
         "tests/code_quality/test_cumulative_preservation.py",
@@ -50,7 +70,7 @@ _PIN_ROWS = (
     ),
     (
         "tests/code_quality/test_performance_static_successor.py",
-        "11f3b12c428845d8e62840c049dd2a36ceb596368a2dc9b956054bf8a9e1ad28",
+        "cf46f4112a762e6c2fa87b67b982115867b40413bf53e9c45b63fda9fe3e2ba8",
     ),
     (
         "tests/code_quality/test_qualification40_successor.py",
@@ -67,6 +87,10 @@ _PIN_ROWS = (
     (
         "tools/cumulative_preservation.py",
         "fd56f9037e9b5c1ae1466eed49195ee40be44ba32772a729c9ff724bc0c734e0",
+    ),
+    (
+        "tools/generate_aeldari_datasheet_semantic_coverage.py",
+        "1e49fd40cf7f9841054315e1db8eb4e6ba4c92c94db9080a9efab375b254b3bc",
     ),
     (
         "tools/performance_policy.py",
@@ -130,6 +154,31 @@ _STATIC_BEFORE_ROWS = (
     ),
 )
 STATIC_BEFORE: dict[str, str] = dict(_STATIC_BEFORE_ROWS)
+
+
+CI_BASE = "d1d37f45c17e7ecc4d60b990b011d4c725ac4d1c"
+CI_RECORD = "docs/performance/ci-successor49.json"
+CI_NEW = "scripts/__init__.py"
+CI_ROADMAP = "docs/CORE_RULES_REMEDIATION_ROADMAP.md"
+_CI_BEFORE_ROWS = (
+    (
+        "tests/__init__.py",
+        "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    ),
+    (
+        "tools/generate_aeldari_datasheet_semantic_coverage.py",
+        "59c535dbeac16d8aad6d413558fb20269ebb020d1cf5ec0927ff372ca44a220d",
+    ),
+    (
+        "docs/performance/policy-v3/operation-map.json",
+        "f330487a339f4e3d58f4301afd6a6c21f64d9ed47e1f46742ebcbdf3e3b867b9",
+    ),
+    (
+        "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
+        "df1b90a433e4f38aa0e2cd0974a9428f9d230c6bbce1d9079a0276ee16dc7442",
+    ),
+)
+CI_BEFORE: dict[str, str] = dict(_CI_BEFORE_ROWS)
 
 
 def _sha(raw: bytes) -> str:
@@ -297,6 +346,57 @@ def _static_transitions(root: Path, frozen_members: dict[str, bytes]) -> None:
         )
 
 
+def assert_ci_transition(
+    name: str, before: bytes | None, current: bytes, row: dict[str, Any]
+) -> None:
+    """Admit only the frozen CI import/bootstrap edits and exact map additions."""
+    expected = CI_BEFORE.get(name)
+    if (
+        (name not in CI_BEFORE and name != CI_NEW)
+        or row.keys() != {"before_sha256", "after_sha256", "edits"}
+        or row["before_sha256"] != expected
+        or (before is None) != (name == CI_NEW)
+        or (before is not None and _sha(before) != expected)
+        or row["after_sha256"] != _sha(current)
+        or not isinstance(row["edits"], list)
+        or not row["edits"]
+    ):
+        raise ValueError("CI transition identity or bytes changed.")
+    projected = b"" if before is None else before
+    for edit in cast(list[dict[str, Any]], row["edits"]):
+        if (
+            not isinstance(edit, dict)
+            or edit.keys() != {"before", "after"}
+            or not isinstance(edit["before"], str)
+            or not isinstance(edit["after"], str)
+        ):
+            raise ValueError("CI transition edit is malformed.")
+        old, new = edit["before"].encode(), edit["after"].encode()
+        if projected.count(old) != 1:
+            raise ValueError("CI transition edit does not have one exact occurrence.")
+        projected = projected.replace(old, new, 1)
+    if projected != current:
+        raise ValueError("CI transition changed outside the exact reviewed edits.")
+
+
+def _ci_transitions(root: Path, frozen_members: dict[str, bytes]) -> None:
+    record: dict[str, Any] = json.loads(frozen_members[CI_RECORD])
+    if (
+        record.keys() != {"schema", "base", "changes"}
+        or record["schema"] != "exact-ci-successor-v1"
+        or record["base"] != CI_BASE
+        or record["changes"].keys() != CI_BEFORE.keys() | {CI_NEW}
+    ):
+        raise ValueError("CI transition membership or base changed.")
+    if _git(root, "--literal-pathspecs", "ls-tree", "-r", "-z", CI_BASE, "--", CI_NEW):
+        raise ValueError("CI bootstrap predecessor was not absent.")
+    previous = _blobs(root, CI_BASE, list(CI_BEFORE))
+    for name in record["changes"]:
+        assert_ci_transition(
+            name, previous.get(name), frozen_members[name], record["changes"][name]
+        )
+
+
 def static_predecessor(root: Path, name: str, raw: bytes) -> bytes:
     """Only the reviewed Order34 annotation may expose its prior historical stage."""
     if name != STATIC_TEST:
@@ -318,6 +418,7 @@ def _freeze(root: Path) -> str:
     _git(root, "merge-base", "--is-ancestor", BASE, freeze)
     _git(root, "merge-base", "--is-ancestor", freeze, "HEAD")
     _git(root, "merge-base", "--is-ancestor", STATIC_BASE, freeze)
+    _git(root, "merge-base", "--is-ancestor", CI_BASE, freeze)
     names = _git(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
     if set(names) != PINS.keys() | {SELF, ASSESSMENT} or len(names) != len(PINS) + 2:
         raise ValueError("Preflight successor finite membership changed.")
@@ -335,6 +436,7 @@ def _freeze(root: Path) -> str:
                 "Qualification / Perils successor / Preflight source: " + name
             )
     _static_transitions(root, frozen_members)
+    _ci_transitions(root, frozen_members)
     return freeze
 
 
@@ -369,15 +471,17 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     The finite static recipes also admit the Command-end fixture's explicit
     export list; its functions, source-ID import and initializers remain exact.
     This is a changed recorded fixture input, not a byte-identical measurement.
-    All other runtime, fixture, dependency, schema and workload bytes stay exact.
+    The CI successor also changes package bootstrap to prevent generated bytecode
+    and imports the same generator function from its canonical owner. Its three
+    exact module mappings add no detailed families or altered workload semantics.
     Current collectors and a fresh smoke receipt still bind the actual source.
     """
     from tools import thousand_sons_perils_preservation as perils
 
     _freeze(root)
-    # The derived audit and static proof record are outside runtime_inputs; their
+    # The derived audit and proof records are outside runtime_inputs; their
     # bytes remain authenticated by _freeze and the complete live source scan.
-    controls = (PINS.keys() - {INVENTORY, STATIC_RECORD}) | {SELF}
+    controls = (PINS.keys() - {INVENTORY, STATIC_RECORD, CI_RECORD, CI_ROADMAP}) | {SELF}
     if not controls <= current.keys():
         raise ValueError("Preflight actual input collector omitted current inputs.")
     actual = {name: _sha(_read(root, name)) for name in controls}

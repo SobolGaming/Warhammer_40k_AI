@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
-  "operation_map_sha256": "2d9966a5c52be2060ff9a059f15d161ed6c0efa4bf552530f0d85f6eb1f2570c",
+  "operation_map_sha256": "fc3a67de7cc3c6a907530ca9a7483236a9a8235b00f08ae56b36496663398c51",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "3735a992d4edacaa39c82bdaeca7edb07927826078494890aab7b0faf5fcefc4",
@@ -2326,11 +2326,11 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-      "after_sha256": "df1b90a433e4f38aa0e2cd0974a9428f9d230c6bbce1d9079a0276ee16dc7442",
+      "after_sha256": "59d0624883ffa435a267416718d508a30994b175b7bf239ddce2ec235b07f7c5",
       "owners": {
         "@document": {
           "before": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-          "after": "df1b90a433e4f38aa0e2cd0974a9428f9d230c6bbce1d9079a0276ee16dc7442"
+          "after": "59d0624883ffa435a267416718d508a30994b175b7bf239ddce2ec235b07f7c5"
         }
       }
     },
@@ -2574,6 +2574,16 @@
         }
       }
     },
+    "docs/performance/ci-successor49.json": {
+      "before_sha256": null,
+      "after_sha256": "ea9fd6be7ca6371b78461291d95c85ba2371838b82e4e2f3a7a391212f9d879c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ea9fd6be7ca6371b78461291d95c85ba2371838b82e4e2f3a7a391212f9d879c"
+        }
+      }
+    },
     "docs/performance/current/qualification40-dice.json": {
       "before_sha256": null,
       "after_sha256": "84ba455e20996cbd1fdeb246fc5410ab183d61da2ca6e4d760879168d2ddcd2e",
@@ -2736,11 +2746,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "f330487a339f4e3d58f4301afd6a6c21f64d9ed47e1f46742ebcbdf3e3b867b9",
+      "after_sha256": "5323c1736433605c84d150bb43371a85db5ee8d726b57fbe1ec1df600a1012a0",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "f330487a339f4e3d58f4301afd6a6c21f64d9ed47e1f46742ebcbdf3e3b867b9"
+          "after": "5323c1736433605c84d150bb43371a85db5ee8d726b57fbe1ec1df600a1012a0"
         }
       }
     },
@@ -2751,6 +2761,16 @@
         "@document": {
           "before": null,
           "after": "b834787bc3f8bcf503ea3ae985d1a6f46e598a6350e8f1b5621e3d41d25f3c33"
+        }
+      }
+    },
+    "scripts/__init__.py": {
+      "before_sha256": null,
+      "after_sha256": "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a59de67f2d23ce124ebc631d3a376becb349dd92225a4d17b532c0f5f18c3bd6"
         }
       }
     },
@@ -4668,6 +4688,16 @@
         }
       }
     },
+    "tests/__init__.py": {
+      "before_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "after_sha256": "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
+      "owners": {
+        "@module": {
+          "before": "ad2e13b69c4fc1fda46413f740f426fc1793cfc6d6da8d226ba619f1aef48be7",
+          "after": "a59de67f2d23ce124ebc631d3a376becb349dd92225a4d17b532c0f5f18c3bd6"
+        }
+      }
+    },
     "tests/category_migration_preservation.py": {
       "before_sha256": "597e54b390d8c61d87cb1531ea7baee081a87ce3bd7ab2ca22b1a1dcfc3fb2aa",
       "after_sha256": "bb8fe47800cff5556d6b05d729224f3a4b22b099c8f07432012e6fa60e204519",
@@ -5302,15 +5332,39 @@
     },
     "tests/code_quality/test_performance_static_successor.py": {
       "before_sha256": null,
-      "after_sha256": "11f3b12c428845d8e62840c049dd2a36ceb596368a2dc9b956054bf8a9e1ad28",
+      "after_sha256": "cf46f4112a762e6c2fa87b67b982115867b40413bf53e9c45b63fda9fe3e2ba8",
       "owners": {
         "@module": {
           "before": null,
-          "after": "4c17b2495f54bc6aae6863d40f09b74da02ab635fa7be23c0688a8581c8bf6f6"
+          "after": "ff59a8096b63006956d363c78a2ffcc9b89a52748ad385ccdd52bea19dfef14f"
+        },
+        "ci_transitions": {
+          "before": null,
+          "after": "768411255d0a6ac76758a4b26b1f4da3f19bfbb5ec0c6a6ee7cafbd677166234"
         },
         "previous": {
           "before": null,
           "after": "a764976f35b012dbd548a6f948586e2dfa77943b978f6bc50fc1d67a89d6fc36"
+        },
+        "test_aeldari_generator_uses_the_canonical_source_loader_in_both_routes": {
+          "before": null,
+          "after": "39b521bfa79cdd8be9b429e0e44adb3eae358c08e4185af142203e97dc568012"
+        },
+        "test_ci_transition_preserves_exact_import_bootstrap_and_mapping_edits": {
+          "before": null,
+          "after": "7b248b26ed2b04e17871cec02cc7ef0ee2277fd813aad0493db960896b573923"
+        },
+        "test_ci_transition_rejects_false_absence_and_malformed_edits": {
+          "before": null,
+          "after": "1a6258e2962afdd6f3fd2f29d1d79d06ae8d9fc676fdd0603f7f391866289614"
+        },
+        "test_ci_transition_rejects_unreviewed_behavior_even_with_updated_after_hash": {
+          "before": null,
+          "after": "2352d5749d8529a623b512178457204264a513cc72dc24d28c924eb7bb8550e3"
+        },
+        "test_default_package_launch_prevents_own_bytecode_but_discovers_explicit_pyc": {
+          "before": null,
+          "after": "3aa0740507f563675a5f8b5193aabb56709137cb68371cee281cfa8280d23e53"
         },
         "test_static_edits_match_independent_immutable_whole_module_recipes": {
           "before": null,
@@ -18262,6 +18316,16 @@
         }
       }
     },
+    "tools/generate_aeldari_datasheet_semantic_coverage.py": {
+      "before_sha256": "59c535dbeac16d8aad6d413558fb20269ebb020d1cf5ec0927ff372ca44a220d",
+      "after_sha256": "1e49fd40cf7f9841054315e1db8eb4e6ba4c92c94db9080a9efab375b254b3bc",
+      "owners": {
+        "@module": {
+          "before": "12149515983044e0d324e0d10f8f0b3204f00be56ac87e98e3aede3819628a4d",
+          "after": "59e41ff7e87a5d79a49c26033ec42216ed17576c05177a416e1915d2265b131d"
+        }
+      }
+    },
     "tools/performance_policy.py": {
       "before_sha256": "cbc427774b6d8bb1e30af96310bd94d48eeffd28c99a87254aa9c90e9a0ee37d",
       "after_sha256": "fb1bf3b9b983df3301edd047f5855efd1352507934f37bd88005e4b4eafe5a2e",
@@ -18340,11 +18404,11 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "acf91295b57805bb919d1eec52e8217db57f3647058620245c2091ee6d1ff040",
+      "after_sha256": "c33600816e8708bb1ce50a330884e89b8f1f2e916fcd5682189e770bf81e38e7",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b4ee7c2dc7c2bf73019ccbd68b36941302af1ed31d9d1d1deb93a13d4fce1aaf"
+          "after": "3720ade5b1617440f9a5082b4fca5bbe106cac44ef64157abbbeb00b99e4eb23"
         },
         "_assessment": {
           "before": null,
@@ -18354,9 +18418,13 @@
           "before": null,
           "after": "b80c97d216075c8e75df6e1b8f1b13c19b437b3c206cc1096f05a0388f64debd"
         },
+        "_ci_transitions": {
+          "before": null,
+          "after": "a01520b1732116cdca591150976304d54a75152d4cea383c34f8ee34299c99f6"
+        },
         "_freeze": {
           "before": null,
-          "after": "53af657e613ef1a18e3ba115fa0fc338e65dd6228c5628670ca4631d625401a0"
+          "after": "959e738de528e38571e494863cae2e1493cf28e015bf776263bb24ce9b7ebb43"
         },
         "_git": {
           "before": null,
@@ -18374,6 +18442,10 @@
           "before": null,
           "after": "39d3f113060aedffc7d86eada84817ee73fdab136d12a9fcf18b71d6e47aed36"
         },
+        "assert_ci_transition": {
+          "before": null,
+          "after": "5cf77dd3bcfa876bb4805d60f8680c87f6a63b15c23d8bd53c733169bb120f69"
+        },
         "assert_static_transition": {
           "before": null,
           "after": "64b6275eb637da329dbc5049b277563d730fdb8443d4a35aa2c338eba7c95f25"
@@ -18384,7 +18456,7 @@
         },
         "measurement_inputs": {
           "before": null,
-          "after": "642aef04c8c3fde975b90b762b575fee5db81957ce9c1fe4fb3ad6f0997e5ab9"
+          "after": "2bfcec33a18731d5d719af839e0ce4a32f751156ce5679fd51c98023fd18b0b2"
         },
         "preceding_control": {
           "before": null,
@@ -20872,9 +20944,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: docs/CORE_RULES_REMEDIATION_ROADMAP.md. Versioned governance/evidence; no timed engine operation is changed by this document.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "docs/D11_ONE_SHOT_PHYSICAL_SCOPE.md": {
       "category": "governance",
@@ -21068,6 +21140,14 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "docs/performance/ci-successor49.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
+    },
     "docs/performance/current/qualification40-dice.json": {
       "category": "governance",
       "operations": [],
@@ -21200,17 +21280,27 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: docs/performance/policy-v3/operation-map.json. Versioned governance/evidence; no timed engine operation is changed by this document.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "docs/performance/static-successor48.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
+    },
+    "scripts/__init__.py": {
+      "category": "dependency_environment",
+      "operations": [
+        "ci49-exact-64edd7fc2be5076d"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "scripts/benchmark_order88_strength.py": {
       "category": "measured_workload",
@@ -22721,6 +22811,16 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "tests/__init__.py": {
+      "category": "dependency_environment",
+      "operations": [
+        "ci49-exact-001e61d97d9dee27"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
+    },
     "tests/category_migration_preservation.py": {
       "category": "measured_workload",
       "operations": [
@@ -22744,17 +22844,17 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_d07_geometry_containment.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_d07_upper_floor_preservation.py": {
       "category": "governance",
@@ -22792,9 +22892,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_order54_large_model_setup.py": {
       "category": "governance",
@@ -22848,9 +22948,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_performance_category_migration.py": {
       "category": "governance",
@@ -22864,17 +22964,17 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_performance_static_successor.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
       "category": "governance",
@@ -22896,9 +22996,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/code_quality/test_s25_fixture_preservation.py": {
       "category": "governance",
@@ -28036,9 +28136,9 @@
         "qualification40-exact-411d2638fc43c127"
       ],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tests/support/section08_native_mission_source.py": {
       "category": "measured_workload",
@@ -28572,9 +28672,9 @@
         "shock-source-generation-and-audit"
       ],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tools/cumulative_preservation.py": {
       "category": "measured_workload",
@@ -28582,9 +28682,9 @@
         "qualification40-exact-b8a07a50d2ab636b"
       ],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tools/generate_ability_support_matrix.py": {
       "category": "measured_workload",
@@ -28597,6 +28697,16 @@
       "rationale": "Exact PR587-to-current owner changes: tools/generate_ability_support_matrix.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+    },
+    "tools/generate_aeldari_datasheet_semantic_coverage.py": {
+      "category": "dependency_environment",
+      "operations": [
+        "ci49-exact-744f0d2a2e506456"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tools/performance_policy.py": {
       "category": "governance",
@@ -28618,9 +28728,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Retain this owner's existing implementation and mapped obligations. The static successor adds only lint ordering, explicit types, direct test-scoped delegation, the Command-end explicit export, and authenticated historical-reader compatibility. Immutable b150 whole-AST transitions verify the finite edits; this assessment grants no current performance, behavioral or coverage result.",
-      "source_obligation": "Preserve the row's existing operations and owner selections, all 244 prior assertions and 16 direct delegation contracts, historical source pins, source-ID imports, live source readers and tamper rejection. The exact Command-end export addition changes a recorded fixture input; its existing function bodies and initializers are preserved by the finite recipe.",
-      "unchanged_work": "This static closure changes no engine algorithm, runtime build identity, operation map, family, profile, case, sample, budget or CI selection. Historical measurements remain evidence for their original sources. No 3796-file byte identity, current 3632-case result or inherited coverage/timing is claimed; fresh affected native replay and current-source smoke qualification remain required."
+      "rationale": "Preserve the reviewed static closure and repair the actual hosted entry paths: script/test package bootstrap suppresses process-generated bytecode before engine imports, and the Aeldari generator imports the identical public loader from its canonical owner. Exact immutable d1d preimages, explicit new-file absence and finite literal edits authenticate this CI continuation separately from the nine unchanged b150 static recipes.",
+      "source_obligation": "Preserve all existing gameplay and integrity assertions, source-ID imports, native consumers, source discovery and tamper rejection. The Command-end export remains the prior exact fixture change; new bootstrap/import bytes and three explicit module operations require truthful current input binding. The additive map retains all prior operations and increases complete live-map mandatory entries from 865 to 868; the historical 52-operation cohort is unchanged without changing families, cases, samples or budgets.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. Bootstrap makes default launches match the bytecode suppression already used in prior local qualification. Historical measurements retain their original source identities; no full raw-input identity, inherited current receipt, current 3632-case aggregate or new covered-behavior result is claimed. Current-source smoke, exact-head quality/type checks and hosted acceptance remain required."
     },
     "tools/performance_qualification_measurements.py": {
       "category": "governance",
