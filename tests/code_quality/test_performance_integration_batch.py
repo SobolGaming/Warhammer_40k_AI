@@ -155,8 +155,10 @@ def test_transport_proof_preserves_exact_immutable_preimage(name: str) -> None:
     before = subprocess.check_output(
         ["git", "show", stage.CI_TRANSPORT_BASE + ":" + name], cwd=ROOT
     )
-    ci54.admit(ROOT)
-    current = ci54.previous(ROOT, name, (ROOT / name).read_bytes())
+    current = (ROOT / name).read_bytes()
+    if name == OWNER:
+        ci54.admit(ROOT)
+        current = ci54.previous(ROOT, name, current)
     stage.assert_ci_transport_transition(name, before, current, record["changes"][name])
 
 

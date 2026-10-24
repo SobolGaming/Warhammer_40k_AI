@@ -289,8 +289,10 @@ def test_ci_formatting_preserves_import_bindings_and_nonimport_ast(name: str) ->
     before = subprocess.check_output(
         ["git", "show", successor.CI_FORMAT_BASE + ":" + name], cwd=ROOT
     )
-    ci54.admit(ROOT)
-    current = ci54.previous(ROOT, name, (ROOT / name).read_bytes())
+    current = (ROOT / name).read_bytes()
+    if name == "scripts/check_performance_policy.py":
+        ci54.admit(ROOT)
+        current = ci54.previous(ROOT, name, current)
     successor.assert_ci_transition(name, before, current, record["changes"][name])
     old_tree, new_tree = ast.parse(before), ast.parse(current)
     old_imports = [n for n in old_tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
@@ -322,8 +324,10 @@ def test_ci_relocation_and_map_seam_match_exact_immutable_preimages(name: str) -
     before = subprocess.check_output(
         ["git", "show", successor.CI_COMPAT_BASE + ":" + name], cwd=ROOT
     )
-    ci54.admit(ROOT)
-    current = ci54.previous(ROOT, name, (ROOT / name).read_bytes())
+    current = (ROOT / name).read_bytes()
+    if name == "tools/performance_qualification_successor.py":
+        ci54.admit(ROOT)
+        current = ci54.previous(ROOT, name, current)
     if name in successor.CI_RUNTIME_BEFORE:
         successor.ci_comparison(ROOT, name, current)
         current = subprocess.check_output(

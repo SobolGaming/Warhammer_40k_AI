@@ -12,7 +12,7 @@ BASE = "5396b557fd90a67e0c097da1020959b58724a7ec"
 SELF = "tools/quality_runtime_successor.py"
 RECORD = "docs/performance/ci-quality-runtime54.json"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE: str | None = "9f9cb1e685d2c326396199f86f434c550a9ec81d"
+FREEZE: str | None = None
 PINS: dict[str, str] = {
     ".github/workflows/ci.yml": (
         "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
@@ -51,7 +51,7 @@ PINS: dict[str, str] = {
         "b627e0688559b1fc46307c8449d17095307dd1fdc7a969c20cf5378a34887a0a"
     ),
     "docs/performance/ci-quality-runtime54.json": (
-        "12904e8b2b71acd6b4e39d53f5102fd75bc3f6f4f756e43077f53d6735bf3761"
+        "2901e574ba4045d972ac516d81ef4f66a31381b387c7f76c681f4907687a2b85"
     ),
     "docs/performance/history-phase-snapshot.md": (
         "eff5ac4c71a42a547507bbba0713b33f89330fecaa1a931032395629f063e72a"
@@ -78,7 +78,7 @@ PINS: dict[str, str] = {
         "e90ce2f38ae81cf82a7de6648d1482e0d6d23a81c449506fa2f3326633399f79"
     ),
     "tests/code_quality/test_performance_integration_batch.py": (
-        "612b5b49f004dcf1ce1779578b0ca5e5e1ed595d568200966cdeb978634ddfba"
+        "eae7ee805f17598291f3fbafbecd2ecfc8df85b966e6e424e2fcefae9af1f574"
     ),
     "tests/code_quality/test_performance_policy.py": (
         "8494642f66f70ce0cc71d330e164eba067e90e9ebea3eb1f0c11fbb4dbc25c69"
@@ -87,7 +87,7 @@ PINS: dict[str, str] = {
         "1e6dbe6f7e99215cc8c9199460e9d896b0fff079563608da3063d6cfd9d75255"
     ),
     "tests/code_quality/test_performance_static_successor.py": (
-        "4f3782dd0cf3af4330eb5fc3365a5e5bca5344597524b8033b589ff5bd090557"
+        "0933d271541f35fd819b3ff6f8307af47996fe1d06d11151237d0fea25ff9161"
     ),
     "tests/code_quality/test_quality_runtime.py": (
         "5cf6835a7592ea83bf8a2e8a175a1a7a825277a9fea77a2a27d8e2bfdcff795b"

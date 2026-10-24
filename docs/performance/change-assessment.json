@@ -2706,11 +2706,11 @@
     },
     "docs/performance/ci-quality-runtime54.json": {
       "before_sha256": null,
-      "after_sha256": "12904e8b2b71acd6b4e39d53f5102fd75bc3f6f4f756e43077f53d6735bf3761",
+      "after_sha256": "2901e574ba4045d972ac516d81ef4f66a31381b387c7f76c681f4907687a2b85",
       "owners": {
         "@document": {
           "before": null,
-          "after": "12904e8b2b71acd6b4e39d53f5102fd75bc3f6f4f756e43077f53d6735bf3761"
+          "after": "2901e574ba4045d972ac516d81ef4f66a31381b387c7f76c681f4907687a2b85"
         }
       }
     },
@@ -5693,7 +5693,7 @@
     },
     "tests/code_quality/test_performance_integration_batch.py": {
       "before_sha256": null,
-      "after_sha256": "612b5b49f004dcf1ce1779578b0ca5e5e1ed595d568200966cdeb978634ddfba",
+      "after_sha256": "eae7ee805f17598291f3fbafbecd2ecfc8df85b966e6e424e2fcefae9af1f574",
       "owners": {
         "@module": {
           "before": null,
@@ -5729,7 +5729,7 @@
         },
         "test_transport_proof_preserves_exact_immutable_preimage": {
           "before": null,
-          "after": "7ff406f7944f8d680becab7dfbc66d6b5aad34dc06c1a309d841283c897e71f1"
+          "after": "5143b5f13c819afad3b0f156fae163299db4b8ead4fa0a79040d58a9f9deddd7"
         }
       }
     },
@@ -6119,7 +6119,7 @@
     },
     "tests/code_quality/test_performance_static_successor.py": {
       "before_sha256": null,
-      "after_sha256": "4f3782dd0cf3af4330eb5fc3365a5e5bca5344597524b8033b589ff5bd090557",
+      "after_sha256": "0933d271541f35fd819b3ff6f8307af47996fe1d06d11151237d0fea25ff9161",
       "owners": {
         "@module": {
           "before": null,
@@ -6143,11 +6143,11 @@
         },
         "test_ci_formatting_preserves_import_bindings_and_nonimport_ast": {
           "before": null,
-          "after": "c4dee4e736c8a8653b8b64a82b39e00c742f6e23fa96daf69ffa85db9c1a9a6f"
+          "after": "9d6c92d144c7b566691624a3fdeee2bfa5690a6f10d324c04a0166f4457a0e34"
         },
         "test_ci_relocation_and_map_seam_match_exact_immutable_preimages": {
           "before": null,
-          "after": "19e5c246b365b5f9f9de95dbb5040bedc6fffb48b1eaa8a4adf6acae094d02fa"
+          "after": "8f55afcc6744164683c67f03c5ac7b07b5d00aacf82f9e73a6bb0f42566ec967"
         },
         "test_ci_relocation_rejects_unreviewed_bootstrap_or_validation_even_if_repinned": {
           "before": null,
@@ -19755,11 +19755,11 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "f3990eeba4dd37d6bbe9cd690a191aa2320d5e86c84cce8b6d5d8842d69719d3",
+      "after_sha256": "799a6c14a373f0e663017d51e501e401033f2379295772e698aa67d5b40d3f15",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ebb0a1adbc4e732bb1ff68d9c989548adc22b3eb9b57d424f481b0c63fd522a4"
+          "after": "e1554dad64cae639b3873b18297a4cdf610fab8e3b86cf0040e95fab899ae03a"
         },
         "_history": {
           "before": null,

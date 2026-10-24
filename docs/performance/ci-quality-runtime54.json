@@ -260,7 +260,7 @@
     },
     "tests/code_quality/test_performance_integration_batch.py": {
       "before_sha256": "bbdff0e56ccb7f90101363c02431db19e4ffd93d181af06d8a92f5a62eb2ccdd",
-      "after_sha256": "612b5b49f004dcf1ce1779578b0ca5e5e1ed595d568200966cdeb978634ddfba",
+      "after_sha256": "eae7ee805f17598291f3fbafbecd2ecfc8df85b966e6e424e2fcefae9af1f574",
       "edits": [
         {
           "before": "from tools import performance_qualification_successor as qualification\n",
@@ -276,13 +276,13 @@
         },
         {
           "before": "    stage.assert_ci_transport_transition(\n        name, before, (ROOT / name).read_bytes(), record[\"changes\"][name]\n    )\n",
-          "after": "    ci54.admit(ROOT)\n    current = ci54.previous(ROOT, name, (ROOT / name).read_bytes())\n    stage.assert_ci_transport_transition(name, before, current, record[\"changes\"][name])\n"
+          "after": "    current = (ROOT / name).read_bytes()\n    if name == OWNER:\n        ci54.admit(ROOT)\n        current = ci54.previous(ROOT, name, current)\n    stage.assert_ci_transport_transition(name, before, current, record[\"changes\"][name])\n"
         }
       ]
     },
     "tests/code_quality/test_performance_static_successor.py": {
       "before_sha256": "56987d69a6f8918842a6720bbfb1461995a7626542628269c9b0a8e9c01d2e46",
-      "after_sha256": "4f3782dd0cf3af4330eb5fc3365a5e5bca5344597524b8033b589ff5bd090557",
+      "after_sha256": "0933d271541f35fd819b3ff6f8307af47996fe1d06d11151237d0fea25ff9161",
       "edits": [
         {
           "before": "from tools import performance_preflight_successor as successor\n",
@@ -290,11 +290,11 @@
         },
         {
           "before": "def test_ci_formatting_preserves_import_bindings_and_nonimport_ast(name: str) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_FORMAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_FORMAT_BASE + \":\" + name], cwd=ROOT\n    )\n    current = (ROOT / name).read_bytes()\n",
-          "after": "def test_ci_formatting_preserves_import_bindings_and_nonimport_ast(name: str) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_FORMAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_FORMAT_BASE + \":\" + name], cwd=ROOT\n    )\n    ci54.admit(ROOT)\n    current = ci54.previous(ROOT, name, (ROOT / name).read_bytes())\n"
+          "after": "def test_ci_formatting_preserves_import_bindings_and_nonimport_ast(name: str) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_FORMAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_FORMAT_BASE + \":\" + name], cwd=ROOT\n    )\n    current = (ROOT / name).read_bytes()\n    if name == \"scripts/check_performance_policy.py\":\n        ci54.admit(ROOT)\n        current = ci54.previous(ROOT, name, current)\n"
         },
         {
           "before": "def test_ci_relocation_and_map_seam_match_exact_immutable_preimages(name: str) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_COMPAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_COMPAT_BASE + \":\" + name], cwd=ROOT\n    )\n    current = (ROOT / name).read_bytes()\n",
-          "after": "def test_ci_relocation_and_map_seam_match_exact_immutable_preimages(name: str) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_COMPAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_COMPAT_BASE + \":\" + name], cwd=ROOT\n    )\n    ci54.admit(ROOT)\n    current = ci54.previous(ROOT, name, (ROOT / name).read_bytes())\n"
+          "after": "def test_ci_relocation_and_map_seam_match_exact_immutable_preimages(name: str) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_COMPAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_COMPAT_BASE + \":\" + name], cwd=ROOT\n    )\n    current = (ROOT / name).read_bytes()\n    if name == \"tools/performance_qualification_successor.py\":\n        ci54.admit(ROOT)\n        current = ci54.previous(ROOT, name, current)\n"
         }
       ]
     },
