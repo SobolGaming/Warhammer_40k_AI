@@ -189,9 +189,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch original historical validation inputs
-        run: git fetch --no-tags --no-recurse-submodules origin 4a8fb3c10cbf9c6ce1766f048508b8a16f8f24e8
-
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -199,6 +196,9 @@ jobs:
 
       - name: Declare quality evidence before dependency setup
         run: python -B -m scripts.quality_runner prepare --shard 2
+
+      - name: Fetch original historical validation inputs
+        run: git fetch --no-tags --no-recurse-submodules origin 4a8fb3c10cbf9c6ce1766f048508b8a16f8f24e8
 
       - name: Set up uv
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
@@ -261,9 +261,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch original historical validation inputs
-        run: git fetch --no-tags --no-recurse-submodules origin 4a8fb3c10cbf9c6ce1766f048508b8a16f8f24e8
-
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -271,6 +268,9 @@ jobs:
 
       - name: Declare quality evidence before dependency setup
         run: python -B -m scripts.quality_runner prepare --shard ${{ matrix.shard }}
+
+      - name: Fetch original historical validation inputs
+        run: git fetch --no-tags --no-recurse-submodules origin 4a8fb3c10cbf9c6ce1766f048508b8a16f8f24e8
 
       - name: Set up uv
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6

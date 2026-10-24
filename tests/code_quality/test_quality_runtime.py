@@ -48,6 +48,9 @@ def test_live_workflow_preserves_required_names_and_all_four_producer_controls()
     assert policy.index("scripts.check_performance_policy") < policy.index(
         "scripts.quality_runner run --shard 2"
     )
+    assert policy.index("git fetch --no-tags --no-recurse-submodules") < policy.index(
+        "scripts.check_performance_policy"
+    )
     assert "timeout-minutes: 3" in policy
     assert "timeout-minutes: 10" in policy
     matrix = workflow.split("  quality-shards:\n")[1].split("  semantic-audit-macos:\n")[0]
@@ -58,7 +61,15 @@ def test_live_workflow_preserves_required_names_and_all_four_producer_controls()
         assert "fetch-depth: 0" in lane
         assert "4a8fb3c10cbf9c6ce1766f048508b8a16f8f24e8" in lane
         assert "uv sync --locked --no-default-groups --group test" in lane
-        assert "scripts.quality_runner prepare" in lane
+        assert (
+            lane.index("name: Checkout repository")
+            < lane.index("name: Set up Python")
+            < lane.index("scripts.quality_runner prepare")
+            < lane.index("git fetch --no-tags --no-recurse-submodules")
+            < lane.index("name: Set up uv")
+            < lane.index("uv sync --locked --no-default-groups --group test")
+            < lane.index("scripts.quality_runner run")
+        )
         assert "retention-days: 30" in lane
         assert "overwrite: false" in lane
         assert "if-no-files-found: error" in lane
