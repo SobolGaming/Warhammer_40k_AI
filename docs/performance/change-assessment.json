@@ -6,11 +6,11 @@
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
-      "after_sha256": "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7",
+      "after_sha256": "cca13ad6ae3af0db067198cc993fadf9349875800aa22491d4fd4496d5422a9b",
       "owners": {
         "@document": {
           "before": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
-          "after": "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
+          "after": "cca13ad6ae3af0db067198cc993fadf9349875800aa22491d4fd4496d5422a9b"
         }
       }
     },
@@ -2436,11 +2436,11 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-      "after_sha256": "49f6426c42b1697b0b8f99daa7466f31f261a503315bb173357200f67471c64a",
+      "after_sha256": "8205271957c765766bfe08a1dd464cf230199d3acc30724705212b1929960445",
       "owners": {
         "@document": {
           "before": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-          "after": "49f6426c42b1697b0b8f99daa7466f31f261a503315bb173357200f67471c64a"
+          "after": "8205271957c765766bfe08a1dd464cf230199d3acc30724705212b1929960445"
         }
       }
     },
@@ -2706,11 +2706,11 @@
     },
     "docs/performance/ci-quality-runtime54.json": {
       "before_sha256": null,
-      "after_sha256": "1c922592055b70aef02369e1e2abd49f1893095e6da1f6ef66f2cda109e9d4ec",
+      "after_sha256": "e1be23071927a47d12b7c5e53d721c81042b0cda04b127d602beae0bdee3e8ef",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1c922592055b70aef02369e1e2abd49f1893095e6da1f6ef66f2cda109e9d4ec"
+          "after": "e1be23071927a47d12b7c5e53d721c81042b0cda04b127d602beae0bdee3e8ef"
         }
       }
     },
@@ -6303,7 +6303,7 @@
     },
     "tests/code_quality/test_quality_runtime.py": {
       "before_sha256": null,
-      "after_sha256": "906977ca7fb86d6d3271474f64b97f079592e2ae993e044f46ea3a4b8f06156f",
+      "after_sha256": "7f6710fc78c0f81256f75aea97beb8991f6ea23c2f6f95a62be8fb4e9a1b85ca",
       "owners": {
         "@module": {
           "before": null,
@@ -6423,7 +6423,7 @@
         },
         "test_live_workflow_preserves_required_names_and_all_four_producer_controls": {
           "before": null,
-          "after": "04a4988a5dbe0c2609822d5ebe1e01799c055792db87baea677d6cc0ba70b7f9"
+          "after": "4a76908ed5badcf43aac5d09d1db3664e1cb8dadcfa4dd6fed08a77b3f33d463"
         },
         "test_measurement_batch_matches_literal_projection_and_reads_each_invocation": {
           "before": null,
@@ -19763,11 +19763,11 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "2f537a6a8c9631b2d397c1625232e9305fb985aa54256113b972c352af0ddd24",
+      "after_sha256": "ce38433505ebe78fedee48d15167e7d9fc6bc8b2cde30548fe0959ee577b88c9",
       "owners": {
         "@module": {
           "before": null,
-          "after": "9c4634e7fadb89b45f3fcce52ef9ef4091c9cf83ab1285830bca57f42112a7e2"
+          "after": "83c08184980a0e28af5ef1d84cc884d70007f7f389177e9aff411a670a27ce92"
         },
         "_history": {
           "before": null,
@@ -19851,8 +19851,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "rationale": "CI55 launch-time bytecode suppression for the existing serial performance command, with an exact live-workflow regression and refreshed finite CI54 bindings only.",
+      "source_obligation": "Prevent package-initializer bytecode before strict sequential quality source admission; preserve original transition preimages, historical checks and all 1,809 quality cases.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
     "ci/quality_shards/all.txt": {
@@ -22259,8 +22259,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "rationale": "CI55 launch-time bytecode suppression for the existing serial performance command, with an exact live-workflow regression and refreshed finite CI54 bindings only.",
+      "source_obligation": "Prevent package-initializer bytecode before strict sequential quality source admission; preserve original transition preimages, historical checks and all 1,809 quality cases.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "docs/D11_ONE_SHOT_PHYSICAL_SCOPE.md": {
@@ -22475,8 +22475,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "rationale": "CI55 launch-time bytecode suppression for the existing serial performance command, with an exact live-workflow regression and refreshed finite CI54 bindings only.",
+      "source_obligation": "Prevent package-initializer bytecode before strict sequential quality source admission; preserve original transition preimages, historical checks and all 1,809 quality cases.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "docs/performance/ci-runtime-successor51.json": {
@@ -24455,8 +24455,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused. The reviewed cold-start repair creates the validated outside-checkout scratch root inside the existing supervised try before pytest; the new native regression starts with an absent parent and executes real tmp_path cases on four workers. The reviewed finite D07 repair routes only the two existing CI54 BEFORE fixture members through previous using authenticated raw current bytes before the unchanged newline normalization. The reviewed reporter-integration repair confines the existing serialization/disk-full/directory-sync control to a scoped monkeypatch context so injected faults are restored before real outer reporter hooks.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog. Preserve containment, original supervision/cancellation and failure receipts, current native input admission, exact collection, all prior assertions and fixed watchdog deadlines. Preserve original pins, the existing pre/post live verification, downstream whole-module assertions, five borrowed roles and all catalog authorities; one genuine batch regression checks both native predecessors and rejects unrelated supplied bytes. Preserve every original assertion and the three existing parameter cases; production reporter persistence remains fail-closed with complete setup/call/teardown evidence and unchanged selection.",
+      "rationale": "CI55 launch-time bytecode suppression for the existing serial performance command, with an exact live-workflow regression and refreshed finite CI54 bindings only.",
+      "source_obligation": "Prevent package-initializer bytecode before strict sequential quality source admission; preserve original transition preimages, historical checks and all 1,809 quality cases.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tests/code_quality/test_quality_runtime_process.py": {
@@ -30243,8 +30243,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "rationale": "CI55 launch-time bytecode suppression for the existing serial performance command, with an exact live-workflow regression and refreshed finite CI54 bindings only.",
+      "source_obligation": "Prevent package-initializer bytecode before strict sequential quality source admission; preserve original transition preimages, historical checks and all 1,809 quality cases.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tools/thousand_sons_perils_preservation.py": {

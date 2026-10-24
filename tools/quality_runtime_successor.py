@@ -12,10 +12,10 @@ BASE = "5396b557fd90a67e0c097da1020959b58724a7ec"
 SELF = "tools/quality_runtime_successor.py"
 RECORD = "docs/performance/ci-quality-runtime54.json"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE: str | None = "1136ffb4c38ae64150b7bddecf734b734826f569"
+FREEZE: str | None = None
 PINS: dict[str, str] = {
     ".github/workflows/ci.yml": (
-        "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
+        "cca13ad6ae3af0db067198cc993fadf9349875800aa22491d4fd4496d5422a9b"
     ),
     "ci/quality_shards/all.txt": (
         "5506915b054481cb77748f68fe3e0bf3013184ab3dfd70c55696d17f7367f8a5"
@@ -48,10 +48,10 @@ PINS: dict[str, str] = {
         "0aad7ecd08330f2a3de1480a480c095cb86f7fb55d7b48bd5b2cf406ecc674e1"
     ),
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": (
-        "49f6426c42b1697b0b8f99daa7466f31f261a503315bb173357200f67471c64a"
+        "8205271957c765766bfe08a1dd464cf230199d3acc30724705212b1929960445"
     ),
     "docs/performance/ci-quality-runtime54.json": (
-        "1c922592055b70aef02369e1e2abd49f1893095e6da1f6ef66f2cda109e9d4ec"
+        "e1be23071927a47d12b7c5e53d721c81042b0cda04b127d602beae0bdee3e8ef"
     ),
     "docs/performance/history-phase-snapshot.md": (
         "fc3764129cd939cf2e1dea36c929eeab81cbc82c92ee8573113b4af446615574"
@@ -90,7 +90,7 @@ PINS: dict[str, str] = {
         "0933d271541f35fd819b3ff6f8307af47996fe1d06d11151237d0fea25ff9161"
     ),
     "tests/code_quality/test_quality_runtime.py": (
-        "906977ca7fb86d6d3271474f64b97f079592e2ae993e044f46ea3a4b8f06156f"
+        "7f6710fc78c0f81256f75aea97beb8991f6ea23c2f6f95a62be8fb4e9a1b85ca"
     ),
     "tests/code_quality/test_quality_runtime_process.py": (
         "8c19b977eefd4d587b8116f9af0c0ced4c2a1040cec9a1d5fe619014ac03e45d"

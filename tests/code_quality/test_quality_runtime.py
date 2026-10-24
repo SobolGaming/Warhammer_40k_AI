@@ -56,6 +56,7 @@ def test_live_workflow_preserves_required_names_and_all_four_producer_controls()
     assert policy.index("git fetch --no-tags --no-recurse-submodules") < policy.index(
         "scripts.check_performance_policy"
     )
+    assert 'uv run --no-sync python -B -m scripts.check_performance_policy "${args[@]}"' in policy
     assert "timeout-minutes: 3" in policy
     assert "timeout-minutes: 10" in policy
     matrix = workflow.split("  quality-shards:\n")[1].split("  semantic-audit-macos:\n")[0]

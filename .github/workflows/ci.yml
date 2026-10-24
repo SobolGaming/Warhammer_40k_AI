@@ -219,7 +219,7 @@ jobs:
           if [ -n "$PERFORMANCE_PR_HEAD" ]; then
             args+=(--pr-head "$PERFORMANCE_PR_HEAD")
           fi
-          uv run --no-sync python -m scripts.check_performance_policy "${args[@]}"
+          uv run --no-sync python -B -m scripts.check_performance_policy "${args[@]}"
 
       - name: Code-quality shard 2
         timeout-minutes: 10
