@@ -60,9 +60,11 @@ bounded acquisition with observable boundary checks, not an atomic filesystem
 snapshot or continuous historical-store monitoring.
 
 The original CI54 BEFORE map and five borrowed predecessor roles remain exact.
-Newly edited owners have a disjoint SNAPSHOT_BEFORE map at the same original
-BASE; the existing finite transition recipe appends exact edits while retaining
-all earlier operations and preimages. The same existing admission path checks
+Edited owners already present at that BASE have a disjoint SNAPSHOT_BEFORE
+map at the same original BASE; the existing finite transition recipe appends
+exact edits while retaining all earlier operations and preimages. CI54-added
+owners absent at that BASE retain their absence and are authenticated by
+current PINS and the native freeze; no historical preimage is invented. The same existing admission path checks
 current pins and caller bytes before historical projection.
 
 The unchanged 180-second complete-command budget includes both acquisitions,
@@ -72,3 +74,11 @@ behavior shards are unchanged. Focused controls establish their tested
 mechanisms only. Complete local and hosted qualification and independent
 exact-source reviews remain required; no speedup or full-game certification is
 asserted by this contract.
+
+The quality runner creates its validated outside-checkout scratch root inside
+the existing supervised operation before launching pytest. A cold task path
+therefore supports both collection and four-worker execution without requiring
+caller precreation. Existing containment, failure receipts, cancellation and
+watchdog behavior remain unchanged. A native checkout control starts with an
+absent scratch parent, executes real tmp_path cases on four workers, and passes
+the same strict source, dependency, journal and seal validation.

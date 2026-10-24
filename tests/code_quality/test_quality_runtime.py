@@ -8,6 +8,7 @@ import errno
 import json
 import os
 import subprocess
+import sys
 import xml.etree.ElementTree as ET
 from collections.abc import Callable
 from contextvars import ContextVar
@@ -1323,3 +1324,121 @@ class _HistoryActivity(Protocol):
 
     def active(self) -> Snapshot | None:
         return self._ACTIVE.get()
+
+
+def test_real_lane_creates_absent_scratch_before_four_worker_pytest(tmp_path: Path) -> None:
+    root = tmp_path / "checkout"
+    root.mkdir()
+    for name in (
+        "scripts/quality_runner.py",
+        "scripts/quality_reporter.py",
+        "scripts/quality_evidence.py",
+        "pyproject.toml",
+        "uv.lock",
+    ):
+        target = root / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / name).read_bytes())
+    package = root / "src/warhammer40k_core"
+    package.mkdir(parents=True)
+    (package / "__init__.py").write_text("")
+    (root / ".gitignore").write_text("reports/\n.pytest_cache/\n__pycache__/\n")
+    manifest = root / "ci/quality_shards"
+    manifest.mkdir(parents=True)
+    tests = root / "tests/code_quality"
+    tests.mkdir(parents=True)
+    all_nodes: list[str] = []
+    source = (
+        "import pytest\n"
+        "@pytest.mark.parametrize('number', range(12))\n"
+        "def test_sample(number, tmp_path):\n"
+        "    target = tmp_path / 'result.txt'\n"
+        "    target.write_text(str(number))\n"
+        "    assert target.read_text() == str(number)\n"
+    )
+    for shard in range(1, 5):
+        module = (
+            "tests/code_quality/test_performance_policy.py"
+            if shard == 2
+            else f"tests/code_quality/test_probe_{shard}.py"
+        )
+        (root / module).write_text(source)
+        nodes = [f"{module}::test_sample[{number}]" for number in range(12)]
+        all_nodes.extend(nodes)
+        (manifest / f"shard-{shard}.txt").write_text("\n".join(nodes) + "\n")
+        (manifest / f"shard-{shard}-modules.txt").write_text(module + "\n")
+    (manifest / "all.txt").write_text("\n".join(sorted(all_nodes)) + "\n")
+    for arguments in (
+        ("init", "-q"),
+        ("add", "."),
+        (
+            "-c",
+            "user.name=quality-control",
+            "-c",
+            "user.email=control@example.invalid",
+            "commit",
+            "-qm",
+            "native cold scratch control",
+        ),
+    ):
+        subprocess.run(["git", *arguments], cwd=root, check=True, capture_output=True)
+    head = evidence.git(root, "rev-parse", "HEAD")
+    expected = {
+        "mode": "local",
+        "repository": "control/quality",
+        "repository_id": "cold-scratch",
+        "workflow_ref": "control/quality/local",
+        "run_id": "cold-scratch",
+        "run_attempt": "1",
+        "event": "local-control",
+        "checkout": head,
+        "tree": evidence.git(root, "rev-parse", "HEAD^{tree}"),
+        "pr_head": head,
+        "base": head,
+    }
+    context_path = tmp_path / "context.json"
+    context_path.write_text(json.dumps(expected))
+    scratch = tmp_path / "missing-parent" / "scratch"
+    environment = dict(
+        os.environ,
+        PYTHONPATH=str(root / "src") + os.pathsep + str(root),
+        PYTHONDONTWRITEBYTECODE="1",
+    )
+    # This nested native fixture has its own explicit local context.
+    environment.pop("GITHUB_ACTIONS", None)
+    for name in ("PYTEST_XDIST_WORKER", "PYTEST_XDIST_WORKER_COUNT", "PYTEST_XDIST_TESTRUNUID"):
+        environment.pop(name, None)
+    command = [sys.executable, "-B", "-m", "scripts.quality_runner"]
+    common = ["--shard", "4", "--context", str(context_path)]
+    subprocess.run(
+        [*command, "prepare", *common],
+        cwd=root,
+        env=environment,
+        check=True,
+        capture_output=True,
+        timeout=30,
+    )
+    assert not scratch.parent.exists()
+    result = subprocess.run(
+        [*command, "run", *common, "--scratch", str(scratch)],
+        cwd=root,
+        env=environment,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    directory = root / "reports/quality-timing" / evidence.artifact_name(expected, "4")
+    admitted = evidence.validate_lane(
+        directory, expected, evidence.source_identity(root), evidence.inventory(root), "4", root
+    )
+    evidence.verify_seal(directory)
+    assert scratch.is_dir()
+    assert (scratch / "execute").is_dir()
+    assert admitted["scratch"] == str(scratch)
+    assert admitted["commands"]["execute"].count("-n") == 1
+    assert admitted["commands"]["execute"][admitted["commands"]["execute"].index("-n") + 1] == "4"
+    assert admitted["inventory"]["shards"]["4"]["nodes"] == [
+        f"tests/code_quality/test_probe_4.py::test_sample[{number}]" for number in range(12)
+    ]

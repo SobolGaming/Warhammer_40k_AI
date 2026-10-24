@@ -390,6 +390,7 @@ def run_lane(
         "children_reaped": False,
     }
     try:
+        scratch.mkdir(parents=True, exist_ok=True)
         source = source_identity(root)
         dependencies = dependency_identity()
         inventories = inventory(root)
