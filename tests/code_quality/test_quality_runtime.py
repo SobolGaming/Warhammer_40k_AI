@@ -166,20 +166,21 @@ def test_evidence_write_failure_never_creates_a_referencing_event(
     def fail_sync(path: Path) -> None:
         raise OSError(errno.ENOSPC, "injected bounded disk-full control")
 
-    payload: Any = {"detail": "complete failure"}
-    if failure == "serialization":
-        payload = object()
-    elif failure == "disk_full":
+    with monkeypatch.context() as scoped:
+        payload: Any = {"detail": "complete failure"}
+        if failure == "serialization":
+            payload = object()
+        elif failure == "disk_full":
 
-        def fail_encode(value: Any) -> bytes:
-            raise OSError(errno.ENOSPC, "injected bounded payload write failure")
+            def fail_encode(value: Any) -> bytes:
+                raise OSError(errno.ENOSPC, "injected bounded payload write failure")
 
-        monkeypatch.setattr(evidence, "encoded", fail_encode)
-    else:
-        monkeypatch.setattr(evidence, "sync_directory", fail_sync)
-    with pytest.raises(evidence.EvidenceError, match="Cannot persist"):
-        journal.failure("test", "call", payload)
-    assert journal.path.read_bytes() == b""
+            scoped.setattr(evidence, "encoded", fail_encode)
+        else:
+            scoped.setattr(evidence, "sync_directory", fail_sync)
+        with pytest.raises(evidence.EvidenceError, match="Cannot persist"):
+            journal.failure("test", "call", payload)
+        assert journal.path.read_bytes() == b""
 
 
 def test_payload_names_are_exclusive_and_never_overwrite_earlier_failure(tmp_path: Path) -> None:

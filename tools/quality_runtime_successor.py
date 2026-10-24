@@ -12,7 +12,7 @@ BASE = "5396b557fd90a67e0c097da1020959b58724a7ec"
 SELF = "tools/quality_runtime_successor.py"
 RECORD = "docs/performance/ci-quality-runtime54.json"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE: str | None = "1e90533e3847669c949a25327b5b849ca92f1caf"
+FREEZE: str | None = None
 PINS: dict[str, str] = {
     ".github/workflows/ci.yml": (
         "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
@@ -90,7 +90,7 @@ PINS: dict[str, str] = {
         "0933d271541f35fd819b3ff6f8307af47996fe1d06d11151237d0fea25ff9161"
     ),
     "tests/code_quality/test_quality_runtime.py": (
-        "033ad22b218fae1f77bdd133b54367e656c15709028448677a8740c630ca644f"
+        "906977ca7fb86d6d3271474f64b97f079592e2ae993e044f46ea3a4b8f06156f"
     ),
     "tests/code_quality/test_quality_runtime_process.py": (
         "8c19b977eefd4d587b8116f9af0c0ced4c2a1040cec9a1d5fe619014ac03e45d"

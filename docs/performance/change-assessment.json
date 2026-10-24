@@ -6303,7 +6303,7 @@
     },
     "tests/code_quality/test_quality_runtime.py": {
       "before_sha256": null,
-      "after_sha256": "033ad22b218fae1f77bdd133b54367e656c15709028448677a8740c630ca644f",
+      "after_sha256": "906977ca7fb86d6d3271474f64b97f079592e2ae993e044f46ea3a4b8f06156f",
       "owners": {
         "@module": {
           "before": null,
@@ -6391,7 +6391,7 @@
         },
         "test_evidence_write_failure_never_creates_a_referencing_event": {
           "before": null,
-          "after": "4c8aad38730dff1af4311bfb61e9518e9c117735ed3d053969a5fd408344ef08"
+          "after": "21e56a8bb4bda779ffec54afeb901487068f3df2e1da2afa55b58d575ee66908"
         },
         "test_failure_payload_is_synced_before_the_reference": {
           "before": null,
@@ -19763,11 +19763,11 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "29c935c312b3a597b83b0e205afd98bc159002f3f64d1aeba7497a8be8bbb7c5",
+      "after_sha256": "65f11e79e95b5eec23ffab1166700e01c7b145c18912234aa2fbf39d90b8865b",
       "owners": {
         "@module": {
           "before": null,
-          "after": "2f81d06f57d8db5dc95ba1752f08040d5b260cb70ea33ade4daa3af9cd61c197"
+          "after": "cdd6441c888c383f3562579babbf57e248740b7740a3af5f6308286611868f94"
         },
         "_history": {
           "before": null,
@@ -24455,8 +24455,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused. The reviewed cold-start repair creates the validated outside-checkout scratch root inside the existing supervised try before pytest; the new native regression starts with an absent parent and executes real tmp_path cases on four workers. The reviewed finite D07 repair routes only the two existing CI54 BEFORE fixture members through previous using authenticated raw current bytes before the unchanged newline normalization.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog. Preserve containment, original supervision/cancellation and failure receipts, current native input admission, exact collection, all prior assertions and fixed watchdog deadlines. Preserve original pins, the existing pre/post live verification, downstream whole-module assertions, five borrowed roles and all catalog authorities; one genuine batch regression checks both native predecessors and rejects unrelated supplied bytes.",
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused. The reviewed cold-start repair creates the validated outside-checkout scratch root inside the existing supervised try before pytest; the new native regression starts with an absent parent and executes real tmp_path cases on four workers. The reviewed finite D07 repair routes only the two existing CI54 BEFORE fixture members through previous using authenticated raw current bytes before the unchanged newline normalization. The reviewed reporter-integration repair confines the existing serialization/disk-full/directory-sync control to a scoped monkeypatch context so injected faults are restored before real outer reporter hooks.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog. Preserve containment, original supervision/cancellation and failure receipts, current native input admission, exact collection, all prior assertions and fixed watchdog deadlines. Preserve original pins, the existing pre/post live verification, downstream whole-module assertions, five borrowed roles and all catalog authorities; one genuine batch regression checks both native predecessors and rejects unrelated supplied bytes. Preserve every original assertion and the three existing parameter cases; production reporter persistence remains fail-closed with complete setup/call/teardown evidence and unchanged selection.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tests/code_quality/test_quality_runtime_process.py": {
