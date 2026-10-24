@@ -14,7 +14,7 @@ SELF = "tools/performance_preflight_successor.py"
 ASSESSMENT = "docs/performance/change-assessment.json"
 CI_WORKFLOW = ".github/workflows/ci.yml"
 INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
-FREEZE_COMMIT: str | None = "e026561d5344527f5717a4ef74b3f33a96ce1dec"
+FREEZE_COMMIT: str | None = None
 # Filled from exact reviewed implementation bytes before the immutable freeze.
 _PIN_ROWS = (
     (
@@ -80,6 +80,10 @@ _PIN_ROWS = (
     (
         "tests/code_quality/test_ci_history_input.py",
         "762bfc9bd8d6094dc53205da38ecbbf11058dd8948a583d725e5b79b6fad4fcb",
+    ),
+    (
+        "tests/code_quality/test_ci_lookup_history.py",
+        "2e3b3f8901aed5d55f0113b021f917da9f2fd14571579057291db7e1160e7379",
     ),
     (
         "tests/code_quality/test_ci_runtime_successor.py",
@@ -671,15 +675,20 @@ def ci_comparison(root: Path, name: str, raw: bytes) -> bytes:
 
 
 def static_predecessor(root: Path, name: str, raw: bytes) -> bytes:
-    """Expose only the reviewed Order34 annotation and exact quality bootstrap history."""
-    if name not in {STATIC_TEST, QUALITY_BOOTSTRAP}:
+    """Expose reviewed annotation, bootstrap and lookup-only test predecessors."""
+    lookup_test = "tests/code_quality/test_faction_content_runtime_structure.py"
+    if name not in {STATIC_TEST, QUALITY_BOOTSTRAP, lookup_test}:
         return raw
     _freeze(root)
     live = _read(root, name)
     if raw not in (live, live.replace(b"\r\n", b"\n")):
         raise ValueError("Static predecessor caller supplied unrelated bytes.")
-    base = STATIC_BASE if name == STATIC_TEST else CI_COMPAT_BASE
-    pin = STATIC_BEFORE[name] if name == STATIC_TEST else CI_COMPAT_BEFORE[name]
+    if name == lookup_test:
+        base, pin = CI_RUNTIME_BASE, CI_RUNTIME_BEFORE[name]
+    elif name == STATIC_TEST:
+        base, pin = STATIC_BASE, STATIC_BEFORE[name]
+    else:
+        base, pin = CI_COMPAT_BASE, CI_COMPAT_BEFORE[name]
     before = _git(root, "show", base + ":" + name)
     if _sha(before) != pin:
         raise ValueError("Static predecessor immutable bytes changed.")

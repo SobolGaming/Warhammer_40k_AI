@@ -4839,6 +4839,32 @@
         }
       }
     },
+    "tests/code_quality/test_ci_lookup_history.py": {
+      "before_sha256": null,
+      "after_sha256": "2e3b3f8901aed5d55f0113b021f917da9f2fd14571579057291db7e1160e7379",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "b183855fca6355ec259e0eb2d7be9ed81fde2e5c4be628daf7e78c16874e2c05"
+        },
+        "_historical_lookup": {
+          "before": null,
+          "after": "555e3a6b2c22477a4d8d22cbb3a175cf5d9e1a8f08df96356ff9007086dc81b7"
+        },
+        "test_lookup_predecessor_preserves_the_original_d07_pin_after_live_admission": {
+          "before": null,
+          "after": "972861a57b5286eff84ed6bdee2b4a2fd3c736a80667d07e280d361e9906be2b"
+        },
+        "test_lookup_predecessor_rejects_unrelated_caller_bytes": {
+          "before": null,
+          "after": "54569cb8c522c7bb63293500c92204dccff17f922ca2cfdcb43dd5102f0ee243"
+        },
+        "test_lookup_predecessor_rereads_physical_bytes_after_success": {
+          "before": null,
+          "after": "b285278e1e839d7a9e490ec55e5e7a92a3e294586ba4cea4288c1177022d8d83"
+        }
+      }
+    },
     "tests/code_quality/test_ci_runtime_successor.py": {
       "before_sha256": null,
       "after_sha256": "f0a91c3093e954287cbebb8e05b2c03bf03f9d827c69b6e1bc6906da60bd7c89",
@@ -18595,11 +18621,11 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "9d120d50d31d5ce4295ff6fcac07787f0af1efa2e7cdff91c479ad17d4a01ed1",
+      "after_sha256": "b2b947d3109a84aaec74151965f1a478130abe41ffc270af553c85317bda2c42",
       "owners": {
         "@module": {
           "before": null,
-          "after": "3b3fe1f5e75e44e00d0ea694816a27c08938bc4a09302c362ed98da5242a6b5f"
+          "after": "0a5021a4f807b6448468ad3dc739504ab8a63ac438366bb18b49ae269e81fca4"
         },
         "_assert_ci_edits": {
           "before": null,
@@ -18683,7 +18709,7 @@
         },
         "static_predecessor": {
           "before": null,
-          "after": "18498f7c0370db8cd6434f228f82ac57940e24928eeecd3ca2af4bf6711b6ae9"
+          "after": "c5baebce61964df175b155cc227121f84173f1edcb91618fd4b3b2cd598b94ea"
         }
       }
     },
@@ -23118,6 +23144,14 @@
       "rationale": "The two faction manifest tests previously rebuilt the independent complete execution-record lookup for every row. Each affected test now builds one fresh local map and passes it to the same three semantic assertions, then compares the initial record tuple with a final fresh loader result. The explicitly selected lookup-only successor restores the migration helper, migration quality tests, cumulative adapter and transport guard to exact CI50 bytes after the broader candidate regressed whole-command validation time.",
       "source_obligation": "Authenticate the narrowed current finite edits against immutable CI50 9746a372344322abd77a496d2b9621629b79e7be bytes before exposing predecessor inputs to unchanged historical recipes. Preserve independent record provenance, all row assertions, tuple ordering/multiplicity and persistent drift visible to the loader; the final reload is not a universal raw-byte guard. Historical compatibility positives still authenticate live roadmap/static-test bytes before selecting hash-checked CI50 after inputs. The workflow is exact frozen CI51F, retaining the existing ten-minute quality-step cap, original fetch/source checks, jobs, concurrency and every validation command.",
       "unchanged_work": "All 1683 historical quality cases, their original assertions, the audited 244 assertions and 16 delegates, original source obligations, historical pins/recipes, all production code and 85/180/600 limits remain retained. Five explicitly new initializer-optimization cases and four current-member parameters are retired with that removed optimization; two unrelated-caller parameters now exercise retained faction/history owners, preserving both rejection controls. No cache, skipped validation or new comparison infrastructure is introduced. Expected collection is 1692 cases, pending actual collection. Exact restoration makes the changed migration input equal CI50 again; historical receipts remain historical and neither aggregate applicability nor a current runtime pass is inherited. A genuine current receipt, complete applicable local/hosted gates and both exact-head reviews remain required. No performance target, rules certification or publication is claimed."
+    },
+    "tests/code_quality/test_ci_lookup_history.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "The published lookup-only test changed its bytes while the existing shared D07 historical request returned those current bytes unchanged. The unchanged original D07 assertion therefore rejected the valid current source. Extend the existing static predecessor dispatcher for only that exact faction quality-test path, reusing complete current-source admission and fresh owned reads before returning the independently pinned CI50 predecessor.",
+      "source_obligation": "Keep the original D07 pin, archive, assertion, cumulative request and before/after live checks byte-exact. The new branch uses one existing full freeze, fresh physical current bytes, exact caller or normalized-byte equality, the existing immutable CI_RUNTIME_BASE/CI_RUNTIME_BEFORE pin and the existing normalized-return convention. Reject historical or extra caller bytes and physical file drift after successful admission; restore then re-admit. Preserve the two prior dispatcher branches and unchanged nonmember passthrough. The new guard owns only one temporary physical file, not a repository copy or mutation of shared source.",
+      "unchanged_work": "All 1692 existing quality cases, all historical assertions including the audited244/16delegates, CI51 finite record and earlier source obligations/recipes/pins, production files, workflow/concurrency and85/180/600limits remain unchanged. Add four guard cases, expected1696pendingactualcollection. No cache, skipped validation, new per-family comparison, global reader projection or historical repin is introduced. Existing whole-source admission still binds the new guard through current PINS and the actual source freeze. Current performance, applicable final local/hosted gates and both exact-head reviews remain pending; no gameplay defect or performance success is claimed."
     },
     "tests/code_quality/test_ci_runtime_successor.py": {
       "category": "governance",
@@ -29031,9 +29065,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "The two faction manifest tests previously rebuilt the independent complete execution-record lookup for every row. Each affected test now builds one fresh local map and passes it to the same three semantic assertions, then compares the initial record tuple with a final fresh loader result. The explicitly selected lookup-only successor restores the migration helper, migration quality tests, cumulative adapter and transport guard to exact CI50 bytes after the broader candidate regressed whole-command validation time.",
-      "source_obligation": "Authenticate the narrowed current finite edits against immutable CI50 9746a372344322abd77a496d2b9621629b79e7be bytes before exposing predecessor inputs to unchanged historical recipes. Preserve independent record provenance, all row assertions, tuple ordering/multiplicity and persistent drift visible to the loader; the final reload is not a universal raw-byte guard. Historical compatibility positives still authenticate live roadmap/static-test bytes before selecting hash-checked CI50 after inputs. The workflow is exact frozen CI51F, retaining the existing ten-minute quality-step cap, original fetch/source checks, jobs, concurrency and every validation command.",
-      "unchanged_work": "All 1683 historical quality cases, their original assertions, the audited 244 assertions and 16 delegates, original source obligations, historical pins/recipes, all production code and 85/180/600 limits remain retained. Five explicitly new initializer-optimization cases and four current-member parameters are retired with that removed optimization; two unrelated-caller parameters now exercise retained faction/history owners, preserving both rejection controls. No cache, skipped validation or new comparison infrastructure is introduced. Expected collection is 1692 cases, pending actual collection. Exact restoration makes the changed migration input equal CI50 again; historical receipts remain historical and neither aggregate applicability nor a current runtime pass is inherited. A genuine current receipt, complete applicable local/hosted gates and both exact-head reviews remain required. No performance target, rules certification or publication is claimed."
+      "rationale": "The published lookup-only test changed its bytes while the existing shared D07 historical request returned those current bytes unchanged. The unchanged original D07 assertion therefore rejected the valid current source. Extend the existing static predecessor dispatcher for only that exact faction quality-test path, reusing complete current-source admission and fresh owned reads before returning the independently pinned CI50 predecessor.",
+      "source_obligation": "Keep the original D07 pin, archive, assertion, cumulative request and before/after live checks byte-exact. The new branch uses one existing full freeze, fresh physical current bytes, exact caller or normalized-byte equality, the existing immutable CI_RUNTIME_BASE/CI_RUNTIME_BEFORE pin and the existing normalized-return convention. Reject historical or extra caller bytes and physical file drift after successful admission; restore then re-admit. Preserve the two prior dispatcher branches and unchanged nonmember passthrough. The new guard owns only one temporary physical file, not a repository copy or mutation of shared source.",
+      "unchanged_work": "All 1692 existing quality cases, all historical assertions including the audited244/16delegates, CI51 finite record and earlier source obligations/recipes/pins, production files, workflow/concurrency and85/180/600limits remain unchanged. Add four guard cases, expected1696pendingactualcollection. No cache, skipped validation, new per-family comparison, global reader projection or historical repin is introduced. Existing whole-source admission still binds the new guard through current PINS and the actual source freeze. Current performance, applicable final local/hosted gates and both exact-head reviews remain pending; no gameplay defect or performance success is claimed."
     },
     "tools/performance_qualification_measurements.py": {
       "category": "governance",
