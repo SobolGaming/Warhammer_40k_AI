@@ -19383,11 +19383,11 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "a5bd5260c5e8293adeb5b0f66c4e2c8384322f96ca68e094489ec0747d679b2b",
+      "after_sha256": "775ad61f14aaebfb2888a3af7929ef8bbee564a120f3aa54895ad341ee081fff",
       "owners": {
         "@module": {
           "before": null,
-          "after": "2dd7b814ff54ba2ee365357e627a9a58aff654aff0b34f2971559390116910ce"
+          "after": "18601ac46bfd8f650d490879bdc6f03dfc9f0f51505574709c1994d987d392f7"
         },
         "admit": {
           "before": null,
