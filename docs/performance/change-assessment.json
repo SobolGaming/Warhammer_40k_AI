@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "aef1b304d48f4beab0bc7761f048b134268fc0197de476eda6075c3abc2cbb4b",
+      "after_sha256": "da5ac7af7ae8417cf29cc9829279414d4ea1244620c17a0858bd7ae1fca11893",
       "owners": {
         "@document": {
           "before": null,
-          "after": "aef1b304d48f4beab0bc7761f048b134268fc0197de476eda6075c3abc2cbb4b"
+          "after": "da5ac7af7ae8417cf29cc9829279414d4ea1244620c17a0858bd7ae1fca11893"
         }
       }
     },
@@ -106,11 +106,11 @@
     },
     "ci/quality_shards/shard-4.txt": {
       "before_sha256": null,
-      "after_sha256": "2d1526a0c56ab4c66423b22f916715e8b0fe098b140314368c50de4cbe2528ae",
+      "after_sha256": "829be478820238159e69cc3e6eeb5d6691714dcff0ee2ddf363ac457cd82df01",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2d1526a0c56ab4c66423b22f916715e8b0fe098b140314368c50de4cbe2528ae"
+          "after": "829be478820238159e69cc3e6eeb5d6691714dcff0ee2ddf363ac457cd82df01"
         }
       }
     },
@@ -2706,11 +2706,11 @@
     },
     "docs/performance/ci-quality-runtime54.json": {
       "before_sha256": null,
-      "after_sha256": "f40b82016e4af525424fc31839ec3f52dbbe791d6169c0f3c7641e8182ef690b",
+      "after_sha256": "869d2f2c617106d5fa6a13b5e07f621b2583aaad62ea0d9bedffc4d0c944a9d0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f40b82016e4af525424fc31839ec3f52dbbe791d6169c0f3c7641e8182ef690b"
+          "after": "869d2f2c617106d5fa6a13b5e07f621b2583aaad62ea0d9bedffc4d0c944a9d0"
         }
       }
     },
@@ -6141,7 +6141,7 @@
     },
     "tests/code_quality/test_quality_runtime.py": {
       "before_sha256": null,
-      "after_sha256": "a157b3fe51e8564ff3a60faeae26888f6f019c1db40c76bb10025ecc99c0db05",
+      "after_sha256": "137e4778d85a7dfe6ed3da88525fea3f9503c1dcd37323b0b0d033bee541f102",
       "owners": {
         "@module": {
           "before": null,
@@ -6213,7 +6213,7 @@
         },
         "test_complete_preflight_freeze_forwards_only_five_authenticated_members": {
           "before": null,
-          "after": "856e2e0ceb085575505463e8f3f9a81d1d967270e474cbc0e2370398959fb52f"
+          "after": "fc91d22761052138b5e9f8598aa84a2c1f931ecc49f98549bff512e964009e1b"
         },
         "test_evidence_write_failure_never_creates_a_referencing_event": {
           "before": null,
@@ -6222,6 +6222,10 @@
         "test_failure_payload_is_synced_before_the_reference": {
           "before": null,
           "after": "09ec7dadcde194cdfccaa91b763b9a0e0cdd718551dd4ec565e8d70e9e0d78c0"
+        },
+        "test_fixture_compatibility_view_requires_fresh_authentic_module_owned_checkout": {
+          "before": null,
+          "after": "253f5c9addbbd09c2124cac95d0cfabf7fc8490d83c7663182e873c09a69ddde"
         },
         "test_ignored_source_and_bytecode_cannot_escape_exact_checkout_admission": {
           "before": null,
@@ -19217,7 +19221,7 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "08b945f8b3c2c25b097aae5c930a634a20336761c35bf8b7e7d11c14aaa0055a",
+      "after_sha256": "77d12b35688a6890aa41c90ab6fe63dd03524cde33dd56c3204c6ea2b2a5b986",
       "owners": {
         "@module": {
           "before": null,
@@ -19269,7 +19273,7 @@
         },
         "assert_ci_compatibility_transition": {
           "before": null,
-          "after": "d3a450024e778d68a8d078d13448e7f2072c91b2729f478e11548f0c7f297b15"
+          "after": "6672130f4cc53d8fd7634a493e5464891c8b8811d8bffa6f1b6072c5e28636fb"
         },
         "assert_ci_runtime_transition": {
           "before": null,
@@ -19431,11 +19435,11 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "e5b3838237a8691555d704160990b8c2433369e20157bc3cbc96c2bd12efc949",
+      "after_sha256": "1e768a70f7e10d889b570bfe58fd6cac3be658e4794c04eabc8a1ad43547b021",
       "owners": {
         "@module": {
           "before": null,
-          "after": "3c64ea1c0953bb3b3ee85d227a1f78ba18ffe98fc323e030efe0ac0e07aaec92"
+          "after": "d9a7e6c813aae66993e7795f7ee836c7fb38b3a7352890ced850a0c8b2a944d7"
         },
         "admit": {
           "before": null,

@@ -1082,6 +1082,13 @@ def test_complete_preflight_freeze_forwards_only_five_authenticated_members(
     actual = {name: successor.owned(ROOT, name) for name in names}
     original_previous = successor.previous
     original_git = successor.git
+    original_admit = successor.admit
+    admissions: list[Path] = []
+
+    def counted_admit(root: Path) -> None:
+        admissions.append(root)
+        original_admit(root)
+
     borrowed: list[str] = []
     fallback_shows: list[tuple[str, ...]] = []
 
@@ -1105,13 +1112,119 @@ def test_complete_preflight_freeze_forwards_only_five_authenticated_members(
             fallback_shows.append(args)
         return original_git(root, *args)
 
+    monkeypatch.setattr(successor, "admit", counted_admit)
     monkeypatch.setattr(successor, "previous", counted_previous)
     monkeypatch.setattr(successor, "git", counted_git)
     probe = cast(_PreflightBatchProbe, stage)
     assert _PreflightBatchProbe.freeze(probe, ROOT) == stage.FREEZE_COMMIT
+    assert admissions == [ROOT]
     assert sorted(borrowed) == names
     assert fallback_shows == []
     assert {name: successor.owned(ROOT, name) for name in names} == actual
     print(
         "CI54 complete preflight freeze: five authenticated borrowed members; zero redundant shows."
     )
+
+
+def test_fixture_compatibility_view_requires_fresh_authentic_module_owned_checkout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tools import performance_preflight_successor as stage
+    from tools import quality_runtime_successor as successor
+
+    original_admit = successor.admit
+    original_previous = successor.previous
+    admissions: list[Path] = []
+    projections: list[tuple[Path, str, bytes | None]] = []
+
+    def counted_admit(root: Path) -> None:
+        admissions.append(root)
+        original_admit(root)
+
+    def counted_previous(
+        root: Path, name: str, supplied: bytes, *, predecessor: bytes | None = None
+    ) -> bytes:
+        projections.append((root, name, predecessor))
+        return original_previous(root, name, supplied, predecessor=predecessor)
+
+    monkeypatch.setattr(successor, "admit", counted_admit)
+    monkeypatch.setattr(successor, "previous", counted_previous)
+    name = "tests/code_quality/test_performance_preflight.py"
+    record = json.loads((ROOT / stage.CI_COMPAT_RECORD).read_bytes())
+    row = record["changes"][name]
+    before = subprocess.check_output(["git", "show", stage.CI_COMPAT_BASE + ":" + name], cwd=ROOT)
+    historical = subprocess.check_output(["git", "show", successor.BASE + ":" + name], cwd=ROOT)
+    current = successor.owned(ROOT, name)
+    assert evidence.sha(historical) == row["after_sha256"] == successor.BEFORE[name]
+    assert evidence.sha(current) == successor.PINS[name]
+    assert current != historical
+    stage.assert_ci_compatibility_transition(name, before, historical, row)
+    assert admissions == []
+    assert projections == []
+    stage.assert_ci_compatibility_transition(name, before, current, row)
+    assert admissions == [ROOT]
+    assert projections == [(ROOT, name, None)]
+
+    owned_root = tmp_path / "owned"
+    for member in successor.PINS.keys() | {successor.SELF, successor.ASSESSMENT}:
+        target = owned_root / member
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(successor.owned(ROOT, member))
+    git_directory = (
+        subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=ROOT)
+        .decode()
+        .strip()
+    )
+    (owned_root / ".git").write_text("gitdir: " + git_directory + "\n")
+    monkeypatch.setattr(stage, "__file__", str(owned_root / stage.SELF))
+    stage.assert_ci_compatibility_transition(name, before, current, row)
+    assert admissions == [ROOT, owned_root]
+    assert projections == [(ROOT, name, None), (owned_root, name, None)]
+
+    bad_rows = [copy.deepcopy(row) for _ in range(3)]
+    bad_rows[0]["before_sha256"] = "0" * 64
+    bad_rows[1]["after_sha256"] = evidence.sha(current)
+    bad_rows[2]["edits"][0]["after"] += "\n# unrelated edit\n"
+    for bad_row in bad_rows:
+        with pytest.raises(ValueError, match="CI transition"):
+            stage.assert_ci_compatibility_transition(name, before, current, bad_row)
+    with pytest.raises(ValueError, match="CI transition"):
+        stage.assert_ci_compatibility_transition(name, before + b" ", current, row)
+    for unrelated in (b"unrelated", current + b" "):
+        with pytest.raises(ValueError, match="CI transition"):
+            stage.assert_ci_compatibility_transition(name, before, unrelated, row)
+    with pytest.raises(ValueError, match="CI transition"):
+        stage.assert_ci_compatibility_transition(
+            "tests/code_quality/__init__.py", before, current, row
+        )
+
+    target = owned_root / name
+    metadata = target.stat()
+    changed = bytes([current[0] ^ 1]) + current[1:]
+    assert len(changed) == len(current)
+    assert changed != current
+    target.write_bytes(changed)
+    os.utime(target, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+    with pytest.raises(ValueError, match="Preflight source changed"):
+        stage.assert_ci_compatibility_transition(name, before, current, row)
+    with pytest.raises(ValueError, match="CI transition"):
+        stage.assert_ci_compatibility_transition(name, before, changed, row)
+    changed_row = copy.deepcopy(row)
+    changed_row["after_sha256"] = evidence.sha(changed)
+    with pytest.raises(ValueError, match="outside the exact reviewed edits"):
+        stage.assert_ci_compatibility_transition(name, before, changed, changed_row)
+    target.write_bytes(current)
+    os.utime(target, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+    stage.assert_ci_compatibility_transition(name, before, current, row)
+
+    monkeypatch.setattr(stage, "__file__", str(tmp_path / "absent/tools/module.py"))
+    admission_count, projection_count = len(admissions), len(projections)
+    stage.assert_ci_compatibility_transition(name, before, historical, row)
+    assert len(admissions) == admission_count
+    assert len(projections) == projection_count
+    with pytest.raises(FileNotFoundError):
+        stage.assert_ci_compatibility_transition(name, before, current, row)
+    assert len(admissions) == admission_count + 1
+    assert len(projections) == projection_count
+    print("CI54 current fixture view: one fresh admission and one native projection per positive.")
+    print("Historical raw view: zero current admissions; failed current admission never projects.")

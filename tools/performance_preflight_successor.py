@@ -522,9 +522,21 @@ def assert_ci_transition(
 def assert_ci_compatibility_transition(
     name: str, before: bytes, current: bytes, row: dict[str, Any]
 ) -> None:
-    """Validate only this finite historical-consumer repair against immutable 856."""
+    """Validate the original repair, admitting one exact module-owned checkout view.
+
+    Historical raw bytes remain independent of the loaded module's checkout.
+    Only the pinned CI54 inventory fixture uses its owning checkout's fresh proof.
+    """
     if name not in CI_COMPAT_BEFORE:
         raise ValueError("CI transition identity or bytes changed.")
+    fixture = "tests/code_quality/test_performance_preflight.py"
+    if name == fixture:
+        from tools import quality_runtime_successor as ci54
+
+        if _sha(current) == ci54.PINS[fixture]:
+            root = Path(__file__).resolve().parents[1]
+            ci54.admit(root)
+            current = ci54.previous(root, name, current)
     _assert_ci_edits(before, current, row, CI_COMPAT_BEFORE[name], False)
 
 
