@@ -231,6 +231,69 @@ def test_ignored_source_and_bytecode_cannot_escape_exact_checkout_admission(tmp_
         assert evidence.source_identity(tmp_path) == original
 
 
+def test_raw_crlf_checkout_accepts_only_exact_head_bytes_index_modes_and_members(
+    tmp_path: Path,
+) -> None:
+    def git(*arguments: str) -> bytes:
+        return subprocess.check_output(
+            ["git", "-c", "gc.auto=0", *arguments], cwd=tmp_path, stderr=subprocess.PIPE
+        )
+
+    git("init", "-q")
+    (tmp_path / ".gitattributes").write_text("*.json text eol=lf\n")
+    (tmp_path / "uv.lock").write_text("version = 1\n")
+    member = tmp_path / "historical.json"
+    original = b'{\r\n  "retained": true\r\n}\r\n'
+    member.write_bytes(original)
+    git("add", ".gitattributes", "uv.lock")
+    oid = git("hash-object", "-w", "--no-filters", "historical.json").decode().strip()
+    git("update-index", "--add", "--cacheinfo", "100644", oid, "historical.json")
+    git(
+        "-c",
+        "user.name=quality-control",
+        "-c",
+        "user.email=quality-control@example.invalid",
+        "commit",
+        "-qm",
+        "raw historical CRLF fixture",
+    )
+    assert git("status", "--porcelain") == b" M historical.json\n"
+    assert git("show", "HEAD:historical.json") == member.read_bytes() == original
+    baseline = evidence.source_identity(tmp_path)
+
+    member.write_bytes(original.replace(b"true", b"false"))
+    with pytest.raises(evidence.EvidenceError, match="Source bytes differ from HEAD"):
+        evidence.source_identity(tmp_path)
+    member.write_bytes(original)
+    assert evidence.source_identity(tmp_path) == baseline
+
+    member.write_bytes(original.replace(b"true", b"false"))
+    git("add", "historical.json")
+    member.write_bytes(original)
+    with pytest.raises(evidence.EvidenceError, match="Source index differs from HEAD"):
+        evidence.source_identity(tmp_path)
+    git("update-index", "--cacheinfo", "100644", oid, "historical.json")
+    assert evidence.source_identity(tmp_path) == baseline
+
+    mode = member.stat().st_mode
+    member.chmod(mode | 0o100)
+    with pytest.raises(evidence.EvidenceError, match="Source executable mode differs"):
+        evidence.source_identity(tmp_path)
+    member.chmod(mode)
+    git("update-index", "--chmod=+x", "historical.json")
+    with pytest.raises(evidence.EvidenceError, match="Source index differs from HEAD"):
+        evidence.source_identity(tmp_path)
+    git("update-index", "--cacheinfo", "100644", oid, "historical.json")
+    assert evidence.source_identity(tmp_path) == baseline
+
+    extra = tmp_path / "untracked.txt"
+    extra.write_text("ordinary untracked source\n")
+    with pytest.raises(evidence.EvidenceError, match="untracked members"):
+        evidence.source_identity(tmp_path)
+    extra.unlink()
+    assert evidence.source_identity(tmp_path) == baseline
+
+
 @pytest.fixture
 def execution(tmp_path: Path) -> tuple[Path, list[str]]:
     """A complete causal trace; actual pytest transport is qualified separately."""

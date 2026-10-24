@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "5facde3469437959ee6afb90cf11dac66183444a52611feeead909667dba1ebb",
+      "after_sha256": "e5e705546c194844ccbd3b0af8189dab76d28af613dffac3632e5a96a98ace07",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5facde3469437959ee6afb90cf11dac66183444a52611feeead909667dba1ebb"
+          "after": "e5e705546c194844ccbd3b0af8189dab76d28af613dffac3632e5a96a98ace07"
         }
       }
     },
@@ -106,11 +106,11 @@
     },
     "ci/quality_shards/shard-4.txt": {
       "before_sha256": null,
-      "after_sha256": "e29c4795b9668cbb14406e1ea4927edef9508df417e23b70538b4b15e409207a",
+      "after_sha256": "5bd58b7b717895f399f6176553551f5b9608ea61dce28e4b65794537adbe89cc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e29c4795b9668cbb14406e1ea4927edef9508df417e23b70538b4b15e409207a"
+          "after": "5bd58b7b717895f399f6176553551f5b9608ea61dce28e4b65794537adbe89cc"
         }
       }
     },
@@ -2969,7 +2969,7 @@
     },
     "scripts/quality_evidence.py": {
       "before_sha256": null,
-      "after_sha256": "8f9423a3644ee8b7e80518558c9b1e492da7259fd255436d5f65d3f854e6c57d",
+      "after_sha256": "923b8da16949a54a2d8e1b984aecce34e1e9d6de08bc698b54469dd920418808",
       "owners": {
         "@module": {
           "before": null,
@@ -3069,7 +3069,7 @@
         },
         "source_identity": {
           "before": null,
-          "after": "808d52ba087bd28fbaa3eef03d445e60fc98d8669afd975f3c8d0f002b1320ea"
+          "after": "66750482ea3952855eb8500fbf90d04d1bd108fb38f706951db7fc30da18592e"
         },
         "sync_directory": {
           "before": null,
@@ -6141,7 +6141,7 @@
     },
     "tests/code_quality/test_quality_runtime.py": {
       "before_sha256": null,
-      "after_sha256": "b18200b9a09125ed0ca88744750b1e6658129cf317bfc4c971137134d09d9b2e",
+      "after_sha256": "f8f304feb5078358da19ae32da7abb3314bf3ee72e2625bfdaea4693bb8ba877",
       "owners": {
         "@module": {
           "before": null,
@@ -6226,6 +6226,10 @@
         "test_preserved_performance_receipt_is_validated_without_running_engine_admission": {
           "before": null,
           "after": "6a85457e293fe2e84fcd9f0ddb10b028eae7707833e402644494ef8fe7ffac2c"
+        },
+        "test_raw_crlf_checkout_accepts_only_exact_head_bytes_index_modes_and_members": {
+          "before": null,
+          "after": "0810bc079c32b47dde1fd5b9699d42488b06213bdcfe7130b78d9247fa364c94"
         }
       }
     },
@@ -19383,11 +19387,11 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "7480d6aeaa822325c42e6d59affc2e4dfdb693642676febd08523805d303aedb",
+      "after_sha256": "1e59694c9d4996a57061ba81aa00b116697d30fda58f1a5e4747cbba41910dfb",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e895d5b0303acaa93f836331e7c3f67e011e97d498d7595690c0c512fb0a49b1"
+          "after": "c12c6855e35a1a19528f0ef183a84c42b05eb20353fbc0e9c287678274d144dc"
         },
         "admit": {
           "before": null,

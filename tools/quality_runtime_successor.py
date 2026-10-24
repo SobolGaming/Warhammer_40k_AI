@@ -12,13 +12,13 @@ BASE = "5396b557fd90a67e0c097da1020959b58724a7ec"
 SELF = "tools/quality_runtime_successor.py"
 RECORD = "docs/performance/ci-quality-runtime54.json"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE: str | None = "1646f129d0375057489697a435cf3287a0efb245"
+FREEZE: str | None = None
 PINS: dict[str, str] = {
     ".github/workflows/ci.yml": (
         "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
     ),
     "ci/quality_shards/all.txt": (
-        "5facde3469437959ee6afb90cf11dac66183444a52611feeead909667dba1ebb"
+        "e5e705546c194844ccbd3b0af8189dab76d28af613dffac3632e5a96a98ace07"
     ),
     "ci/quality_shards/baseline-ci53.txt": (
         "308870fb4095de8e263def2e75ac71687bc65c3b32f06f591fed848fc34b4ef3"
@@ -45,7 +45,7 @@ PINS: dict[str, str] = {
         "e5ab009fc440840dac9717a0f05b64cd47f371664a9f838e5ca17fe1d210e7bd"
     ),
     "ci/quality_shards/shard-4.txt": (
-        "e29c4795b9668cbb14406e1ea4927edef9508df417e23b70538b4b15e409207a"
+        "5bd58b7b717895f399f6176553551f5b9608ea61dce28e4b65794537adbe89cc"
     ),
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": (
         "c965819e71f0a7b6a3f1440fdb9721e7d88c0950175721318fb9712205ed40d7"
@@ -54,7 +54,7 @@ PINS: dict[str, str] = {
         "89e5636da4dbcbbad99e8cef28d4ab17e87f576b173ddb1588ef70896c53998b"
     ),
     "scripts/quality_evidence.py": (
-        "8f9423a3644ee8b7e80518558c9b1e492da7259fd255436d5f65d3f854e6c57d"
+        "923b8da16949a54a2d8e1b984aecce34e1e9d6de08bc698b54469dd920418808"
     ),
     "scripts/quality_reporter.py": (
         "3e0fdae7fabd9342a5350cde41cc5f678966851733d029e6ca36051174ccc014"
@@ -75,7 +75,7 @@ PINS: dict[str, str] = {
         "8494642f66f70ce0cc71d330e164eba067e90e9ebea3eb1f0c11fbb4dbc25c69"
     ),
     "tests/code_quality/test_quality_runtime.py": (
-        "b18200b9a09125ed0ca88744750b1e6658129cf317bfc4c971137134d09d9b2e"
+        "f8f304feb5078358da19ae32da7abb3314bf3ee72e2625bfdaea4693bb8ba877"
     ),
     "tests/code_quality/test_quality_runtime_process.py": (
         "8c19b977eefd4d587b8116f9af0c0ced4c2a1040cec9a1d5fe619014ac03e45d"

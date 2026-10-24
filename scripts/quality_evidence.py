@@ -157,9 +157,20 @@ def git(root: Path, *arguments: str) -> str:
 def source_identity(root: Path) -> dict[str, str]:
     """Fresh complete tracked bytes, membership, modes and exact checkout admission."""
     require(
-        not git(root, "status", "--porcelain", "--untracked-files=all"),
-        "Quality source must be a clean exact checkout",
+        not subprocess.check_output(
+            ["git", "ls-files", "--others", "--exclude-standard", "-z"], cwd=root, timeout=30
+        ),
+        "Quality source has untracked members",
     )
+    index: dict[bytes, tuple[bytes, bytes]] = {}
+    staged = subprocess.check_output(["git", "ls-files", "--stage", "-z"], cwd=root, timeout=30)
+    for row in staged.split(b"\0"):
+        if not row:
+            continue
+        metadata, name_raw = row.split(b"\t", 1)
+        mode, oid, stage = metadata.split()
+        require(stage == b"0" and name_raw not in index, "Invalid or duplicate source index")
+        index[name_raw] = (mode, oid)
     rows = subprocess.check_output(["git", "ls-tree", "-rz", "HEAD"], cwd=root, timeout=30)
     digest = hashlib.sha256()
     tracked: set[str] = set()
@@ -169,11 +180,17 @@ def source_identity(root: Path) -> dict[str, str]:
         metadata, name_raw = row.split(b"\t", 1)
         mode, kind, oid = metadata.split()
         name = name_raw.decode("utf-8")
+        require(name not in tracked, "Duplicate HEAD source member")
+        require(index.get(name_raw) == (mode, oid), "Source index differs from HEAD: " + name)
         tracked.add(name)
         path = root / name
         require(
             mode in {b"100644", b"100755"} and kind == b"blob" and not path.is_symlink(),
             "Unsupported source member: " + name,
+        )
+        require(
+            bool(path.stat().st_mode & 0o100) == (mode == b"100755"),
+            "Source executable mode differs from HEAD: " + name,
         )
         raw = path.read_bytes()
         actual = hashlib.sha1(
@@ -181,6 +198,7 @@ def source_identity(root: Path) -> dict[str, str]:
         ).hexdigest()
         require(actual.encode() == oid, "Source bytes differ from HEAD: " + name)
         digest.update(encoded([name, mode.decode(), sha(raw)]))
+    require(len(index) == len(tracked), "Source index has extra members")
     for prefix, pattern in (
         ("src", "*"),
         ("tests", "*"),
