@@ -1442,3 +1442,26 @@ def test_real_lane_creates_absent_scratch_before_four_worker_pytest(tmp_path: Pa
     assert admitted["inventory"]["shards"]["4"]["nodes"] == [
         f"tests/code_quality/test_probe_4.py::test_sample[{number}]" for number in range(12)
     ]
+
+
+def test_d07_dispatch_preserves_both_exact_ci54_predecessors() -> None:
+    import hashlib
+
+    from tools import cumulative_preservation as cumulative
+    from tools import quality_runtime_successor as ci54
+
+    names = {
+        "tests/code_quality/test_ci_performance_gates.py",
+        "tests/code_quality/test_performance_policy.py",
+    }
+    originals: dict[str, str] = json.loads(
+        (ROOT / "data/source_audits/d07/original-tests.json").read_bytes()
+    )
+    assert names == ci54.BEFORE.keys() & originals.keys()
+    actual = cumulative.d07_predecessors(ROOT)
+    for name in sorted(names):
+        native = subprocess.check_output(["git", "show", ci54.BASE + ":" + name], cwd=ROOT)
+        assert hashlib.sha256(native).hexdigest() == ci54.BEFORE[name] == originals[name]
+        assert actual[name] == native
+        with pytest.raises(ValueError, match="caller supplied unrelated bytes"):
+            ci54.previous(ROOT, name, (ROOT / name).read_bytes() + b" ")

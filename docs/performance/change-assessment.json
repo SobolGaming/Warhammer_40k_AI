@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "6b07bd37bb597ad85f56da81b9b56a9c6a2db590751a337d7938cc59e46da4d4",
+      "after_sha256": "5506915b054481cb77748f68fe3e0bf3013184ab3dfd70c55696d17f7367f8a5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6b07bd37bb597ad85f56da81b9b56a9c6a2db590751a337d7938cc59e46da4d4"
+          "after": "5506915b054481cb77748f68fe3e0bf3013184ab3dfd70c55696d17f7367f8a5"
         }
       }
     },
@@ -106,11 +106,11 @@
     },
     "ci/quality_shards/shard-4.txt": {
       "before_sha256": null,
-      "after_sha256": "15e58f02a2d5ce4d1e8bee7b37d7bd4c6591c19493175fa2cb66cbdecc1cb98d",
+      "after_sha256": "1e9548a6aa1a8b08d117bc183da58daf84d5188ec6c6d9a89ea4c9626c8ba0f8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "15e58f02a2d5ce4d1e8bee7b37d7bd4c6591c19493175fa2cb66cbdecc1cb98d"
+          "after": "1e9548a6aa1a8b08d117bc183da58daf84d5188ec6c6d9a89ea4c9626c8ba0f8"
         }
       }
     },
@@ -2706,11 +2706,11 @@
     },
     "docs/performance/ci-quality-runtime54.json": {
       "before_sha256": null,
-      "after_sha256": "8361a02fffc7740ef9d43fda393a82aa55974d40da8f1d86dcb904bf3f4e9776",
+      "after_sha256": "1c922592055b70aef02369e1e2abd49f1893095e6da1f6ef66f2cda109e9d4ec",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8361a02fffc7740ef9d43fda393a82aa55974d40da8f1d86dcb904bf3f4e9776"
+          "after": "1c922592055b70aef02369e1e2abd49f1893095e6da1f6ef66f2cda109e9d4ec"
         }
       }
     },
@@ -6303,7 +6303,7 @@
     },
     "tests/code_quality/test_quality_runtime.py": {
       "before_sha256": null,
-      "after_sha256": "a27abcd6d656a65c8573efe918047d0a7153326f0b5587785aa35b1cf0372011",
+      "after_sha256": "033ad22b218fae1f77bdd133b54367e656c15709028448677a8740c630ca644f",
       "owners": {
         "@module": {
           "before": null,
@@ -6384,6 +6384,10 @@
         "test_complete_preflight_freeze_forwards_only_five_authenticated_members": {
           "before": null,
           "after": "fc91d22761052138b5e9f8598aa84a2c1f931ecc49f98549bff512e964009e1b"
+        },
+        "test_d07_dispatch_preserves_both_exact_ci54_predecessors": {
+          "before": null,
+          "after": "5587275699bfb66a6e4552a50f0c387a3d29f52cb09b7b6c31fc51b1e22d47d8"
         },
         "test_evidence_write_failure_never_creates_a_referencing_event": {
           "before": null,
@@ -19197,7 +19201,7 @@
     },
     "tools/cumulative_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "8f3a7a87d29bd4fe49a04321fc83070b396e930d25e7c3fe97f656c625609d64",
+      "after_sha256": "78322da20097309c580eba10deb70495490d4ec2c513f7861791101775653295",
       "owners": {
         "@module": {
           "before": null,
@@ -19245,7 +19249,7 @@
         },
         "d07_predecessors": {
           "before": null,
-          "after": "d7a0f713a57e38453ad2956981303d0c450f137d560a0a1263de97b001058057"
+          "after": "1dbf01630704bda09585281aafa0291dd3ee39a1afdfccb7002757bcdcd04433"
         },
         "expected_inputs": {
           "before": null,
@@ -19759,11 +19763,11 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "9a6c58fabb01056a745abe28125c50ce2362b4dca4eda219b157355744d5fc94",
+      "after_sha256": "663b98ea93447fdb6bd237e3393da479adc131364252b719564172d4afb4c5b5",
       "owners": {
         "@module": {
           "before": null,
-          "after": "0a19e11f12405213acef82eb749eb72e89de9e1490d317707c3917bb72543731"
+          "after": "db806cf13916e0b4f5d20f0d591346e4a2dff119c8344169c556e5243c7e5340"
         },
         "_history": {
           "before": null,
@@ -24451,8 +24455,8 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused. The reviewed cold-start repair creates the validated outside-checkout scratch root inside the existing supervised try before pytest; the new native regression starts with an absent parent and executes real tmp_path cases on four workers.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog. Preserve containment, original supervision/cancellation and failure receipts, current native input admission, exact collection, all prior assertions and fixed watchdog deadlines.",
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused. The reviewed cold-start repair creates the validated outside-checkout scratch root inside the existing supervised try before pytest; the new native regression starts with an absent parent and executes real tmp_path cases on four workers. The reviewed finite D07 repair routes only the two existing CI54 BEFORE fixture members through previous using authenticated raw current bytes before the unchanged newline normalization.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog. Preserve containment, original supervision/cancellation and failure receipts, current native input admission, exact collection, all prior assertions and fixed watchdog deadlines. Preserve original pins, the existing pre/post live verification, downstream whole-module assertions, five borrowed roles and all catalog authorities; one genuine batch regression checks both native predecessors and rejects unrelated supplied bytes.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tests/code_quality/test_quality_runtime_process.py": {
@@ -30145,8 +30149,8 @@
         "qualification40-exact-b8a07a50d2ab636b"
       ],
       "selected_families": [],
-      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
-      "source_obligation": "The separate CI49D record admits exactly the immutable 599161cc cumulative preimage and two literal edits. Full current freeze, physical live bytes, membership and ancestry authenticate this transition before its exact historical comparison feeds unchanged prior records. STATIC48, CI49, CI49B and CI49C records, all prior assertions/delegates, operation map and roadmap remain byte-exact. Five new guards cover real original/new function member and override equivalence, actual fresh Git-object tamper, exact transition, repinned override removal, and malformed duplicate selection; existing hardened parser guards remain unchanged. All 83 blobs are read and hashed even where live control hashes override them. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused. The reviewed finite D07 repair routes only the two existing CI54 BEFORE fixture members through previous using authenticated raw current bytes before the unchanged newline normalization.",
+      "source_obligation": "The separate CI49D record admits exactly the immutable 599161cc cumulative preimage and two literal edits. Full current freeze, physical live bytes, membership and ancestry authenticate this transition before its exact historical comparison feeds unchanged prior records. STATIC48, CI49, CI49B and CI49C records, all prior assertions/delegates, operation map and roadmap remain byte-exact. Five new guards cover real original/new function member and override equivalence, actual fresh Git-object tamper, exact transition, repinned override removal, and malformed duplicate selection; existing hardened parser guards remain unchanged. All 83 blobs are read and hashed even where live control hashes override them. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog. Preserve original pins, the existing pre/post live verification, downstream whole-module assertions, five borrowed roles and all catalog authorities; one genuine batch regression checks both native predecessors and rejects unrelated supplied bytes.",
       "unchanged_work": "No engine, runtime build identity, gameplay function, fixture seed, measured workload, CI selection, operation/family/case/sample counts, 512 MiB digest retention cap, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The selected 3796-file historical inventory retains the prior 3795 raw-exact files and the single previously admitted Command-end export delta. The 83 immutable members total 15,619,849 bytes (maximum 1,879,442); batching adds bounded transient payload/slice retention without a success cache. The prior 188.799-second CI49C result remains a failed whole-budget receipt; paired transport measurements are diagnostic only. Fresh exact-source performance, full quality, static checks, integrity controls and independent review remain required; no prior timing, behavioral aggregate, coverage or hosted acceptance is transferred. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tools/generate_ability_support_matrix.py": {

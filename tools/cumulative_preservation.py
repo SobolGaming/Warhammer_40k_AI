@@ -335,6 +335,7 @@ def d07_predecessors(root: Path) -> dict[str, bytes]:
     live_receipt = verify_live(root)
     verify_baseline(root)
     from tools.performance_preflight_successor import static_predecessor
+    from tools.quality_runtime_successor import previous
     from tools.thousand_sons_perils_preservation import preceding_test
 
     recipes = _json(root, NAMESPACE + "/d07-recipes.json")
@@ -347,7 +348,13 @@ def d07_predecessors(root: Path) -> dict[str, bytes]:
     originals = _json(root, "data/source_audits/d07/original-tests.json")
     results = {}
     for path in originals:
-        live = read_historical_test_bytes(root, path).replace(b"\r\n", b"\n")
+        live = read_historical_test_bytes(root, path)
+        if path in {
+            "tests/code_quality/test_ci_performance_gates.py",
+            "tests/code_quality/test_performance_policy.py",
+        }:
+            live = previous(root, path, live)
+        live = live.replace(b"\r\n", b"\n")
         live = static_predecessor(root, path, live)
         live = preceding_test(root, path, live)
         if path in d09:

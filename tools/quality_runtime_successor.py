@@ -12,13 +12,13 @@ BASE = "5396b557fd90a67e0c097da1020959b58724a7ec"
 SELF = "tools/quality_runtime_successor.py"
 RECORD = "docs/performance/ci-quality-runtime54.json"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE: str | None = "80d94d8c28aad8e0a50e644e85c85434189c10f5"
+FREEZE: str | None = None
 PINS: dict[str, str] = {
     ".github/workflows/ci.yml": (
         "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
     ),
     "ci/quality_shards/all.txt": (
-        "6b07bd37bb597ad85f56da81b9b56a9c6a2db590751a337d7938cc59e46da4d4"
+        "5506915b054481cb77748f68fe3e0bf3013184ab3dfd70c55696d17f7367f8a5"
     ),
     "ci/quality_shards/baseline-ci53.txt": (
         "308870fb4095de8e263def2e75ac71687bc65c3b32f06f591fed848fc34b4ef3"
@@ -45,13 +45,13 @@ PINS: dict[str, str] = {
         "e5ab009fc440840dac9717a0f05b64cd47f371664a9f838e5ca17fe1d210e7bd"
     ),
     "ci/quality_shards/shard-4.txt": (
-        "15e58f02a2d5ce4d1e8bee7b37d7bd4c6591c19493175fa2cb66cbdecc1cb98d"
+        "1e9548a6aa1a8b08d117bc183da58daf84d5188ec6c6d9a89ea4c9626c8ba0f8"
     ),
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": (
         "49f6426c42b1697b0b8f99daa7466f31f261a503315bb173357200f67471c64a"
     ),
     "docs/performance/ci-quality-runtime54.json": (
-        "8361a02fffc7740ef9d43fda393a82aa55974d40da8f1d86dcb904bf3f4e9776"
+        "1c922592055b70aef02369e1e2abd49f1893095e6da1f6ef66f2cda109e9d4ec"
     ),
     "docs/performance/history-phase-snapshot.md": (
         "fc3764129cd939cf2e1dea36c929eeab81cbc82c92ee8573113b4af446615574"
@@ -90,13 +90,13 @@ PINS: dict[str, str] = {
         "0933d271541f35fd819b3ff6f8307af47996fe1d06d11151237d0fea25ff9161"
     ),
     "tests/code_quality/test_quality_runtime.py": (
-        "a27abcd6d656a65c8573efe918047d0a7153326f0b5587785aa35b1cf0372011"
+        "033ad22b218fae1f77bdd133b54367e656c15709028448677a8740c630ca644f"
     ),
     "tests/code_quality/test_quality_runtime_process.py": (
         "8c19b977eefd4d587b8116f9af0c0ced4c2a1040cec9a1d5fe619014ac03e45d"
     ),
     "tools/cumulative_preservation.py": (
-        "8f3a7a87d29bd4fe49a04321fc83070b396e930d25e7c3fe97f656c625609d64"
+        "78322da20097309c580eba10deb70495490d4ec2c513f7861791101775653295"
     ),
     "tools/performance_history_snapshot.py": (
         "108f451110eac2162ca25bb68aa0e2610222a306db5ac04f5eb002f4e81c19c1"
