@@ -7,7 +7,9 @@ import hashlib
 import json
 import os
 import subprocess
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, MutableMapping
+from contextlib import AbstractContextManager
+from contextvars import ContextVar
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Protocol, cast
@@ -15,6 +17,7 @@ from typing import Any, Protocol, cast
 import pytest
 from scripts import check_performance_policy as gate
 from tools import performance_preflight as preflight
+from tools.performance_history_snapshot import Domain, Member, Snapshot
 
 
 class _DigestProbe(Protocol):
@@ -864,13 +867,13 @@ def _history_fixture(tmp_path: Path, *, packed: bool) -> tuple[Path, str, dict[s
 @pytest.mark.parametrize("domain", ["plain60", "safe60", "plain30"])
 @pytest.mark.parametrize("packed", [False, True])
 def test_history_native_domains_preserve_complete_commit_tree_blob_bindings(
-    tmp_path: Path, domain: str, packed: bool
+    tmp_path: Path, domain: Domain, packed: bool
 ) -> None:
     from tools import performance_history_snapshot
 
-    history = cast(Any, performance_history_snapshot)
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
     root, revision, contents = _history_fixture(tmp_path, packed=packed)
-    builder = history._Builder(root)
+    builder = _HistoryMechanisms.builder(history, root)
     pins = {name: hashlib.sha256(raw).hexdigest() for name, raw in contents.items()}
     assert builder.add(domain, revision, pins, "native-test-authority") == contents
     assert builder.all_paths(domain, revision) == set(contents)
@@ -897,13 +900,14 @@ def test_history_native_acquisition_rejects_wrong_authority_or_member(
 ) -> None:
     from tools import performance_history_snapshot
 
-    history = cast(Any, performance_history_snapshot)
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
     root, revision, contents = _history_fixture(tmp_path, packed=False)
-    builder = history._Builder(root)
+    builder = _HistoryMechanisms.builder(history, root)
     assert builder.add(
         "plain60", revision, {"a": hashlib.sha256(contents["a"]).hexdigest()}, "original"
     ) == {"a": contents["a"]}
-    domain, selected, pins = "plain60", revision, {"a": None}
+    domain, selected = "plain60", revision
+    pins: dict[str, str | None] = {"a": None}
     if bad == "pin":
         pins = {"a": "0" * 64}
     elif bad == "missing":
@@ -948,7 +952,7 @@ def test_history_native_acquisition_rejects_wrong_authority_or_member(
         )
         pins = {"link": None}
     with pytest.raises(ValueError, match=r"History|history"):
-        builder.add(domain, selected, pins, "negative")
+        builder.add(cast(Domain, domain), selected, pins, "negative")
     assert builder.add("plain60", revision, {"a": None}, "restored") == {"a": contents["a"]}
 
 
@@ -958,14 +962,14 @@ def test_history_closed_protocol_rejects_synthetic_malformed_native_response(
 ) -> None:
     from tools import performance_history_snapshot
 
-    history = cast(Any, performance_history_snapshot)
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
     root, revision, contents = _history_fixture(tmp_path, packed=False)
-    original = history._closed
-    positive = history._Builder(root)
+    original = _HistoryMechanisms.closed(history)
+    positive = _HistoryMechanisms.builder(history, root)
     assert positive.add("plain60", revision, {"a": None}, "positive") == {"a": contents["a"]}
 
-    def corrupt(root: Path, domain: str, args: tuple[str, ...], **kwargs: Any) -> bytes:
-        raw = cast(bytes, original(root, domain, args, **kwargs))
+    def corrupt(root: Path, domain: Domain, args: tuple[str, ...], **kwargs: Any) -> bytes:
+        raw = original(root, domain, args, **kwargs)
         if args != ("cat-file", "--batch"):
             return raw
         if kind == "nonzero":
@@ -983,11 +987,11 @@ def test_history_closed_protocol_rejects_synthetic_malformed_native_response(
 
     monkeypatch.setattr(history, "_closed", corrupt)
     with pytest.raises((ValueError, subprocess.CalledProcessError)):
-        history._Builder(root).add("plain60", revision, {"a": None}, "negative")
+        _HistoryMechanisms.builder(history, root).add("plain60", revision, {"a": None}, "negative")
     monkeypatch.setattr(history, "_closed", original)
-    assert history._Builder(root).add("plain60", revision, {"a": None}, "restored") == {
-        "a": contents["a"]
-    }
+    assert _HistoryMechanisms.builder(history, root).add(
+        "plain60", revision, {"a": None}, "restored"
+    ) == {"a": contents["a"]}
 
 
 @pytest.mark.parametrize("mode", ["nonzero", "timeout", "overflow", "cancellation", "blocked_pipe"])
@@ -998,16 +1002,31 @@ def test_history_closed_process_requires_eof_zero_exit_and_reaps_child(
 
     from tools import performance_history_snapshot
 
-    history = cast(Any, performance_history_snapshot)
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
     children: list[subprocess.Popen[bytes]] = []
     original_popen = subprocess.Popen
     original_read = os.read
 
-    def tracked(*args: Any, **kwargs: Any) -> subprocess.Popen[bytes]:
-        child = original_popen(*args, **kwargs)
+    def tracked(
+        command: list[str],
+        *,
+        cwd: Path,
+        stdin: int,
+        stdout: int,
+        stderr: int,
+        start_new_session: bool,
+    ) -> subprocess.Popen[bytes]:
+        child = original_popen(
+            command,
+            cwd=cwd,
+            stdin=stdin,
+            stdout=stdout,
+            stderr=stderr,
+            start_new_session=start_new_session,
+        )
         children.append(child)
         if mode == "cancellation":
-            monkeypatch.setattr(history.os, "read", cancelled)
+            monkeypatch.setattr(os, "read", cancelled)
         return child
 
     program = {
@@ -1021,8 +1040,12 @@ def test_history_closed_process_requires_eof_zero_exit_and_reaps_child(
             "print('complete',flush=True)"
         ),
     }[mode]
-    monkeypatch.setattr(history, "_argv", lambda *_: [sys.executable, "-B", "-c", program])
-    monkeypatch.setattr(history.subprocess, "Popen", tracked)
+
+    def command(*_: object) -> list[str]:
+        return [sys.executable, "-B", "-c", program]
+
+    monkeypatch.setattr(history, "_argv", command)
+    monkeypatch.setattr(subprocess, "Popen", tracked)
     monkeypatch.setattr(history, "_LIMITS", {"plain60": 0.2})
 
     def cancelled(descriptor: int, count: int) -> bytes:
@@ -1036,8 +1059,8 @@ def test_history_closed_process_requires_eof_zero_exit_and_reaps_child(
         "blocked_pipe": subprocess.TimeoutExpired,
     }[mode]
     with pytest.raises(error):
-        history._closed(tmp_path, "plain60", ("synthetic",), limit=16)
-    monkeypatch.setattr(history.os, "read", original_read)
+        _HistoryMechanisms.closed(history)(tmp_path, "plain60", ("synthetic",), limit=16)
+    monkeypatch.setattr(os, "read", original_read)
     assert len(children) == 1
     assert children[0].poll() is not None
     assert children[0].stdin is not None
@@ -1053,9 +1076,9 @@ def test_history_native_completion_detects_missing_object_after_acquisition(
 ) -> None:
     from tools import performance_history_snapshot
 
-    history = cast(Any, performance_history_snapshot)
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
     root, revision, contents = _history_fixture(tmp_path, packed=False)
-    builder = history._Builder(root)
+    builder = _HistoryMechanisms.builder(history, root)
     assert builder.add("plain60", revision, {"a": None}, "positive") == {"a": contents["a"]}
     oid = builder.members["plain60", revision, "a"].oid
     path = root / ".git/objects" / oid[:2] / oid[2:]
@@ -1078,23 +1101,28 @@ def test_history_phase_owns_immutable_bytes_revokes_copied_context_and_reacquire
 
     from tools import performance_history_snapshot
 
-    history = cast(Any, performance_history_snapshot)
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
     root, revision, contents = _history_fixture(tmp_path, packed=packed)
-    builder = history._Builder(root)
+    builder = _HistoryMechanisms.builder(history, root)
     assert builder.add("plain60", revision, {"a": None}, "native-authority") == {"a": contents["a"]}
     builder.finish()
-    first = history._seal(builder, {"root": str(root)}, "fixture-runtime", "phase-one")
+    first = _HistoryMechanisms.seal(
+        history, builder, {"root": str(root)}, "fixture-runtime", "phase-one"
+    )
     original_certificate = first.certificate
     builder.contents.clear()
     builder.members.clear()
-    with history._activate(first):
+    with _HistoryMechanisms.activate(history, first):
         assert first.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
         copied = contextvars.copy_context()
         view = first.blobs(root, "plain60", revision, ["a"])
         view["a"] = b"caller mutation"
         assert first.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
         with pytest.raises(TypeError):
-            first.contents["plain60", revision, "a"] = b"mutation"
+            # Deliberately cross the immutable mapping boundary for this rejection control.
+            cast(MutableMapping[tuple[Domain, str, str], bytes], first.contents)[
+                "plain60", revision, "a"
+            ] = b"mutation"
         with pytest.raises(TypeError):
             vars(first)
         with pytest.raises(TypeError):
@@ -1107,34 +1135,41 @@ def test_history_phase_owns_immutable_bytes_revokes_copied_context_and_reacquire
             ("plain60", revision, ["a"], tmp_path),
         ):
             with pytest.raises(ValueError, match=r"History|history"):
-                first.blobs(selected_root, domain, commit, names)
-        with pytest.raises(ValueError, match="Nested"), history._activate(first):
+                first.blobs(selected_root, cast(Domain, domain), commit, names)
+        with pytest.raises(ValueError, match="Nested"), _HistoryMechanisms.activate(history, first):
             raise AssertionError("Nested phase must never publish.")
         with ThreadPoolExecutor(max_workers=1) as executor:
             future = executor.submit(first.blobs, root, "plain60", revision, ["a"])
             with pytest.raises(ValueError, match="owner"):
                 future.result()
         assert first.certificate == original_certificate
-    assert history.eligible_blobs(root, revision, ["a"]) is None
+    assert performance_history_snapshot.eligible_blobs(root, revision, ["a"]) is None
     with pytest.raises(ValueError, match="inactive"):
         first.blobs(root, "plain60", revision, ["a"])
     with pytest.raises(ValueError, match="inactive"):
         copied.run(first.blobs, root, "plain60", revision, ["a"])
-    second_builder = history._Builder(root)
+    second_builder = _HistoryMechanisms.builder(history, root)
     second_builder.add("plain60", revision, {"a": None}, "native-authority")
     second_builder.finish()
-    second = history._seal(second_builder, {"root": str(root)}, "fixture-runtime", "phase-two")
+    second = _HistoryMechanisms.seal(
+        history, second_builder, {"root": str(root)}, "fixture-runtime", "phase-two"
+    )
     assert first.semantic_digest == second.semantic_digest
     assert first.phase_id != second.phase_id
-    with history._activate(second):
+    with _HistoryMechanisms.activate(history, second):
         assert second.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
         with pytest.raises(ValueError, match="inactive"):
             copied.run(first.blobs, root, "plain60", revision, ["a"])
-    third = history._seal(second_builder, {"root": str(root)}, "fixture-runtime", "phase-three")
-    with pytest.raises(RuntimeError, match="body failure"), history._activate(third):
+    third = _HistoryMechanisms.seal(
+        history, second_builder, {"root": str(root)}, "fixture-runtime", "phase-three"
+    )
+    with (
+        pytest.raises(RuntimeError, match="body failure"),
+        _HistoryMechanisms.activate(history, third),
+    ):
         raise RuntimeError("body failure")
-    assert history.eligible_blobs(root, revision, ["a"]) is None
-    assert third._lease.valid() is False
+    assert performance_history_snapshot.eligible_blobs(root, revision, ["a"]) is None
+    assert _LeasedSnapshot.valid(cast(_LeasedSnapshot, third)) is False
 
 
 @pytest.mark.parametrize("packed", [False, True])
@@ -1143,26 +1178,30 @@ def test_history_published_operands_remain_stable_but_next_acquisition_is_fresh(
 ) -> None:
     from tools import performance_history_snapshot
 
-    history = cast(Any, performance_history_snapshot)
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
     root, revision, contents = _history_fixture(tmp_path, packed=packed)
-    builder = history._Builder(root)
+    builder = _HistoryMechanisms.builder(history, root)
     builder.add("plain60", revision, {"a": None}, "native-authority")
     builder.finish()
-    snapshot = history._seal(builder, {"root": str(root)}, "fixture-runtime", "phase-one")
+    snapshot = _HistoryMechanisms.seal(
+        history, builder, {"root": str(root)}, "fixture-runtime", "phase-one"
+    )
     objects = root / ".git/objects"
     held = root / ".git/objects-withheld"
-    with history._activate(snapshot):
+    with _HistoryMechanisms.activate(history, snapshot):
         objects.rename(held)
         objects.mkdir()
         try:
             assert snapshot.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
             with pytest.raises((ValueError, subprocess.CalledProcessError)):
-                history._Builder(root).add("plain60", revision, {"a": None}, "fresh-phase")
+                _HistoryMechanisms.builder(history, root).add(
+                    "plain60", revision, {"a": None}, "fresh-phase"
+                )
             assert snapshot.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
         finally:
             objects.rmdir()
             held.rename(objects)
-    restored = history._Builder(root)
+    restored = _HistoryMechanisms.builder(history, root)
     assert restored.add("plain60", revision, {"a": None}, "restored") == {"a": contents["a"]}
     restored.finish()
 
@@ -1173,7 +1212,7 @@ def test_history_postflight_failure_replaces_successful_smoke_receipt(
 ) -> None:
     from tools import performance_history_snapshot
 
-    history = cast(Any, performance_history_snapshot)
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
     calls = 0
     output = tmp_path / "receipt.json"
     attempt = tmp_path / "attempt.json"
@@ -1182,7 +1221,9 @@ def test_history_postflight_failure_replaces_successful_smoke_receipt(
     def validate(root: Path, base_ref: str, *, pr_head: str | None) -> dict[str, object]:
         nonlocal calls
         calls += 1
-        history._WITNESSES.get().append({"role": "preflight" if calls == 1 else "postflight"})
+        records = _HistoryMechanisms.records(history)
+        assert records is not None
+        records.append({"role": "preflight" if calls == 1 else "postflight"})
         if calls == 2:
             if failure == "timeout":
                 raise subprocess.TimeoutExpired(["git", "cat-file"], 60)
@@ -1193,7 +1234,7 @@ def test_history_postflight_failure_replaces_successful_smoke_receipt(
 
     def smoke(root: Path, path: Path, *, binding: dict[str, object]) -> dict[str, object]:
         report = binding | {"status": "passed", "attempt_receipt": str(attempt)}
-        cast(Any, gate)._write_receipt(path, report)
+        _ReceiptWriter.write(cast(_ReceiptWriter, gate), path, report)
         assert json.loads(path.read_text())["status"] == "passed"
         return report
 
@@ -1206,14 +1247,14 @@ def test_history_postflight_failure_replaces_successful_smoke_receipt(
         "cancellation": KeyboardInterrupt,
     }[failure]
     with pytest.raises(error):
-        cast(Any, gate)._check_and_run("exact-base", None, output)
+        _GateMechanisms.check_and_run(_gate, "exact-base", None, output)
     receipt = json.loads(output.read_text())
     assert receipt == json.loads(attempt.read_text())
     assert receipt["status"] == "failed"
     assert receipt["inputs_unchanged"] is False
     assert receipt["history_phase_witnesses"] == [{"role": "preflight"}, {"role": "postflight"}]
     assert calls == 2
-    assert history._WITNESSES.get() is None
+    assert _HistoryMechanisms.records(history) is None
 
 
 def test_history_portable_digest_ignores_local_clone_and_pytest_identity(
@@ -1221,26 +1262,31 @@ def test_history_portable_digest_ignores_local_clone_and_pytest_identity(
 ) -> None:
     from tools import performance_history_snapshot
 
-    history = cast(Any, performance_history_snapshot)
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
     root, revision, contents = _history_fixture(tmp_path, packed=False)
     clone = tmp_path / "clone"
     subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", str(root), str(clone)], check=True)
     for checkout in (root, clone):
         (checkout / "pyproject.toml").write_text("[project]\nname='native-history'\n")
         (checkout / "uv.lock").write_text("version = 1\n")
-    first_identity = history._identity(root, revision, None, domain_state=True)
+    first_identity = _HistoryMechanisms.identity(history, root, revision, None, domain_state=True)
     monkeypatch.setenv("PYTEST_CURRENT_TEST", "another-consumer")
-    second_identity = history._identity(clone, revision, None, domain_state=True)
+    second_identity = _HistoryMechanisms.identity(history, clone, revision, None, domain_state=True)
     assert first_identity != second_identity
-    first_builder, second_builder = history._Builder(root), history._Builder(clone)
+    first_builder, second_builder = (
+        _HistoryMechanisms.builder(history, root),
+        _HistoryMechanisms.builder(history, clone),
+    )
     pins = {"a": hashlib.sha256(contents["a"]).hexdigest()}
     first_builder.add("plain60", revision, pins, "native-authority")
     second_builder.add("plain60", revision, pins, "native-authority")
-    first = history._seal(first_builder, first_identity, "same-runtime", "one")
-    second = history._seal(second_builder, second_identity, "same-runtime", "two")
+    first = _HistoryMechanisms.seal(history, first_builder, first_identity, "same-runtime", "one")
+    second = _HistoryMechanisms.seal(
+        history, second_builder, second_identity, "same-runtime", "two"
+    )
     assert first.semantic_digest == second.semantic_digest
     assert first.certificate != second.certificate
-    with history._activate(first):
+    with _HistoryMechanisms.activate(history, first):
         with pytest.raises(ValueError, match="another repository"):
             first.blobs(clone, "plain60", revision, ["a"])
         assert first.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
@@ -1254,17 +1300,17 @@ def test_history_publication_reconciles_native_members_and_original_declarations
 
     from tools import performance_history_snapshot
 
-    history = cast(Any, performance_history_snapshot)
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
     root, revision, contents = _history_fixture(tmp_path, packed=False)
-    builder = history._Builder(root)
+    builder = _HistoryMechanisms.builder(history, root)
     builder.add(
         "plain60", revision, {"a": hashlib.sha256(contents["a"]).hexdigest()}, "native-authority"
     )
     builder.finish()
-    positive = history._seal(builder, {}, "runtime", "positive")
-    with history._activate(positive):
+    positive = _HistoryMechanisms.seal(history, builder, {}, "runtime", "positive")
+    with _HistoryMechanisms.activate(history, positive):
         assert positive.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
-    key = "plain60", revision, "a"
+    key: tuple[Domain, str, str] = "plain60", revision, "a"
     if mutation == "missing":
         del builder.contents[key]
     elif mutation == "extra":
@@ -1278,7 +1324,7 @@ def test_history_publication_reconciles_native_members_and_original_declarations
     else:
         builder.members[key] = replace(builder.members[key], authorities=("self-invented",))
     with pytest.raises(ValueError, match="History"):
-        history._seal(builder, {}, "runtime", "negative")
+        _HistoryMechanisms.seal(history, builder, {}, "runtime", "negative")
 
 
 def test_history_cumulative_transport_requires_explicit_opt_in_and_preserves_live_calls(
@@ -1287,6 +1333,25 @@ def test_history_cumulative_transport_requires_explicit_opt_in_and_preserves_liv
     from tools import cumulative_preservation as cumulative
     from tools import performance_history_snapshot as history
 
+    class CumulativeTransport(Protocol):
+        def _git(
+            self,
+            root: Path,
+            *args: str,
+            payload: bytes | None = None,
+            historical: bool = False,
+        ) -> bytes: ...
+
+        def git(
+            self,
+            root: Path,
+            *args: str,
+            payload: bytes | None = None,
+            historical: bool = False,
+        ) -> bytes:
+            return self._git(root, *args, payload=payload, historical=historical)
+
+    transport = cast(CumulativeTransport, cumulative)
     commands: list[tuple[list[str], dict[str, Any]]] = []
     selected: list[tuple[Path, str, tuple[str, ...]]] = []
 
@@ -1300,9 +1365,12 @@ def test_history_cumulative_transport_requires_explicit_opt_in_and_preserves_liv
         selected.append((root, domain, args))
         return fresh()
 
-    monkeypatch.setattr(cumulative.subprocess, "check_output", execute)
+    monkeypatch.setattr(subprocess, "check_output", execute)
     monkeypatch.setattr(history, "historical", historical)
-    assert cumulative._git(tmp_path, "ls-files", payload=b"input") == b"native bytes"
+    assert (
+        CumulativeTransport.git(transport, tmp_path, "ls-files", payload=b"input")
+        == b"native bytes"
+    )
     assert commands == [
         (
             ["git", "-c", f"safe.directory={tmp_path.as_posix()}", "ls-files"],
@@ -1311,13 +1379,86 @@ def test_history_cumulative_transport_requires_explicit_opt_in_and_preserves_liv
     ]
     assert selected == []
     args = ("show", "a" * 40 + ":control.py")
-    assert cumulative._git(tmp_path, *args, historical=True) == b"native bytes"
+    assert CumulativeTransport.git(transport, tmp_path, *args, historical=True) == b"native bytes"
     assert selected == [(tmp_path, "safe60", args)]
     assert commands[-1] == (
         ["git", "-c", f"safe.directory={tmp_path.as_posix()}", *args],
         {"cwd": tmp_path, "input": None, "timeout": 60},
     )
     with pytest.raises(ValueError, match="does not accept a mutable payload"):
-        cumulative._git(tmp_path, *args, payload=b"input", historical=True)
+        CumulativeTransport.git(transport, tmp_path, *args, payload=b"input", historical=True)
     assert len(commands) == 2
     assert len(selected) == 1
+
+
+class _HistoryBuilder(Protocol):
+    objects: dict[tuple[Domain, str], tuple[str, bytes]]
+    roots: dict[tuple[Domain, str], str]
+    members: dict[tuple[Domain, str, str], Member]
+    contents: dict[tuple[Domain, str, str], bytes]
+
+    def add(
+        self, domain: Domain, revision: str, pins: Mapping[str, str | None], authority: str
+    ) -> dict[str, bytes]: ...
+    def all_paths(self, domain: Domain, revision: str) -> set[str]: ...
+    def finish(self) -> None: ...
+
+
+class _ClosedHistory(Protocol):
+    def __call__(
+        self, root: Path, domain: Domain, args: tuple[str, ...], *, limit: int, payload: bytes = b""
+    ) -> bytes: ...
+
+
+class _HistoryIdentity(Protocol):
+    def __call__(
+        self, root: Path, base_ref: str, pr_head: str | None, *, domain_state: bool
+    ) -> dict[str, object]: ...
+
+
+class _HistoryMechanisms(Protocol):
+    _Builder: Callable[[Path], _HistoryBuilder]
+    _closed: _ClosedHistory
+    _seal: Callable[[_HistoryBuilder, dict[str, object], str, str], Snapshot]
+    _activate: Callable[[Snapshot], AbstractContextManager[Snapshot]]
+    _identity: _HistoryIdentity
+    _WITNESSES: ContextVar[list[dict[str, object]] | None]
+
+    def builder(self, root: Path) -> _HistoryBuilder:
+        return self._Builder(root)
+
+    def closed(self) -> _ClosedHistory:
+        return self._closed
+
+    def seal(
+        self, builder: _HistoryBuilder, identity: dict[str, object], runtime: str, phase_id: str
+    ) -> Snapshot:
+        return self._seal(builder, identity, runtime, phase_id)
+
+    def activate(self, snapshot: Snapshot) -> AbstractContextManager[Snapshot]:
+        return self._activate(snapshot)
+
+    def identity(
+        self, root: Path, base_ref: str, pr_head: str | None, *, domain_state: bool
+    ) -> dict[str, object]:
+        return self._identity(root, base_ref, pr_head, domain_state=domain_state)
+
+    def records(self) -> list[dict[str, object]] | None:
+        return self._WITNESSES.get()
+
+
+class _LeaseState(Protocol):
+    def valid(self) -> bool: ...
+
+
+class _LeasedSnapshot(Protocol):
+    _lease: _LeaseState
+
+    def valid(self) -> bool:
+        return self._lease.valid()
+
+
+class _ReceiptWriter(Protocol):
+    def _write_receipt(self, output: Path, report: dict[str, object]) -> None: ...
+    def write(self, output: Path, report: dict[str, object]) -> None:
+        self._write_receipt(output, report)

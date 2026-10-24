@@ -10,12 +10,14 @@ import os
 import subprocess
 import xml.etree.ElementTree as ET
 from collections.abc import Callable
+from contextvars import ContextVar
 from pathlib import Path
 from typing import Any, Protocol, cast
 
 import pytest
 from scripts import quality_evidence as evidence
 from scripts import quality_runner as runner
+from tools.performance_history_snapshot import Domain, Snapshot
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -1260,24 +1262,24 @@ def test_history_complete_current_protocol_resolves_every_actual_consumer(
     from tools import performance_history_snapshot
     from tools import quality_runtime_successor as successor
 
-    history = cast(Any, performance_history_snapshot)
+    history = performance_history_snapshot
     original = history.historical
     original_blobs = history.eligible_blobs
     queries: set[tuple[str, tuple[str, ...]]] = set()
     blob_queries: set[tuple[str, str]] = set()
 
     def historical(
-        root: Path, domain: str, args: tuple[str, ...], fresh: Callable[[], bytes]
+        root: Path, domain: Domain, args: tuple[str, ...], fresh: Callable[[], bytes]
     ) -> bytes:
         def unexpected() -> bytes:
             raise AssertionError("An active immutable consumer escaped the complete catalog.")
 
         queries.add((domain, args))
-        return cast(bytes, original(root, domain, args, unexpected))
+        return original(root, domain, args, unexpected)
 
     def blobs(root: Path, revision: str, names: list[str]) -> dict[str, bytes] | None:
         blob_queries.update((revision, name) for name in names)
-        result = cast(dict[str, bytes] | None, original_blobs(root, revision, names))
+        result = original_blobs(root, revision, names)
         assert result is not None
         return result
 
@@ -1302,7 +1304,7 @@ def test_history_complete_current_protocol_resolves_every_actual_consumer(
     assert ("plain60", successor.FREEZE, "tools/performance_history_snapshot.py") in members
     assert catalog["commit_trees"]
     assert catalog["tree_edges"]
-    assert history._ACTIVE.get() is None
+    assert _HistoryActivity.active(cast(_HistoryActivity, history)) is None
     print(
         json.dumps(
             {
@@ -1314,3 +1316,10 @@ def test_history_complete_current_protocol_resolves_every_actual_consumer(
             sort_keys=True,
         )
     )
+
+
+class _HistoryActivity(Protocol):
+    _ACTIVE: ContextVar[Snapshot | None]
+
+    def active(self) -> Snapshot | None:
+        return self._ACTIVE.get()
