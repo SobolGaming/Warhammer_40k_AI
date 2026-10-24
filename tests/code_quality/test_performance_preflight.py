@@ -553,15 +553,29 @@ def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, coordinated_pin: bool
 ) -> None:
     from tools import performance_preflight_successor as successor
+    from tools import quality_runtime_successor as ci54
 
     successor_probe = cast(_SuccessorMechanisms, successor)
 
     root = Path(__file__).resolve().parents[2]
     direct_git = _SuccessorMechanisms.git_function(successor_probe)
-    for name in successor.PINS.keys() | successor.ANCHORS.keys() | {successor.SELF}:
+    owned = (
+        successor.PINS.keys()
+        | successor.ANCHORS.keys()
+        | {successor.SELF}
+        | ci54.PINS.keys()
+        | {ci54.SELF, ci54.ASSESSMENT}
+    )
+    for name in owned:
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes((root / name).read_bytes())
+    git_directory = (
+        subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=root)
+        .decode()
+        .strip()
+    )
+    (tmp_path / ".git").write_text("gitdir: " + git_directory + chr(10))
 
     def original_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:
         return direct_git(root, *args, payload=payload)

@@ -153,6 +153,16 @@
           "after": "    actual = {name: _sha(_ci54_previous(root, name, _read(root, name))) for name in controls}\n    projected = dict(current)\n    prior_names = set(_git(root, \"ls-tree\", \"-r\", \"--name-only\", BASE).decode().splitlines())\n    historical = _blobs(root, BASE, sorted((controls & prior_names) | perils.CHANGED))\n    for name in controls:\n        if name not in current:\n            continue\n        if current[name] != actual[name]:\n            raise ValueError(\"Preflight actual input collector omitted current control bytes.\")\n        if name in prior_names:\n            projected[name] = _sha(historical[name])\n        else:\n            del projected[name]\n    # These five exact paths are already authenticated by the native Perils\n    # admission. Its added test is not a measured driver or imported fixture.\n    perils._freeze(root)\n    for name in perils.CHANGED:\n        raw = historical[name]\n        if projected.get(name) != _sha(raw):\n            raise ValueError(\"Preflight Perils producing projection changed.\")\n        if name in {perils.SELF, perils.GUARD}:\n"
         }
       ]
+    },
+    "tests/code_quality/test_performance_preflight.py": {
+      "before_sha256": "b6924bdca684374749f2a86d7e086192de3ace2b6eac595aa558deb8117c57e6",
+      "after_sha256": "5c7728edee024687b43acf3c5204f8da8c4698c25ae4c4ff2c56482130e7b64e",
+      "edits": [
+        {
+          "before": "    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, coordinated_pin: bool\n) -> None:\n    from tools import performance_preflight_successor as successor\n\n    successor_probe = cast(_SuccessorMechanisms, successor)\n\n    root = Path(__file__).resolve().parents[2]\n    direct_git = _SuccessorMechanisms.git_function(successor_probe)\n    for name in successor.PINS.keys() | successor.ANCHORS.keys() | {successor.SELF}:\n        target = tmp_path / name\n        target.parent.mkdir(parents=True, exist_ok=True)\n        target.write_bytes((root / name).read_bytes())\n\n    def original_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:\n        return direct_git(root, *args, payload=payload)\n",
+          "after": "    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, coordinated_pin: bool\n) -> None:\n    from tools import performance_preflight_successor as successor\n    from tools import quality_runtime_successor as ci54\n\n    successor_probe = cast(_SuccessorMechanisms, successor)\n\n    root = Path(__file__).resolve().parents[2]\n    direct_git = _SuccessorMechanisms.git_function(successor_probe)\n    owned = (\n        successor.PINS.keys()\n        | successor.ANCHORS.keys()\n        | {successor.SELF}\n        | ci54.PINS.keys()\n        | {ci54.SELF, ci54.ASSESSMENT}\n    )\n    for name in owned:\n        target = tmp_path / name\n        target.parent.mkdir(parents=True, exist_ok=True)\n        target.write_bytes((root / name).read_bytes())\n    git_directory = (\n        subprocess.check_output([\"git\", \"rev-parse\", \"--absolute-git-dir\"], cwd=root)\n        .decode()\n        .strip()\n    )\n    (tmp_path / \".git\").write_text(\"gitdir: \" + git_directory + chr(10))\n\n    def original_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:\n        return direct_git(root, *args, payload=payload)\n"
+        }
+      ]
     }
   }
 }

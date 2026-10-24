@@ -848,7 +848,17 @@ def test_predecessor_borrowing_matches_five_real_fallbacks_and_rejects_wrong_rol
     from tools import quality_runtime_successor as successor
 
     names = sorted(successor.BORROWED_PREDECESSORS)
-    assert set(names) == stage.PINS.keys() & successor.BEFORE.keys()
+    expected = {
+        ".github/workflows/ci.yml",
+        "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
+        "tests/code_quality/test_ci_history_input.py",
+        "tests/code_quality/test_ci_runtime_successor.py",
+        "tools/performance_policy.py",
+    }
+    fixture = "tests/code_quality/test_performance_preflight.py"
+    assert set(names) == expected
+    assert stage.PINS.keys() & successor.BEFORE.keys() == expected | {fixture}
+    assert fixture not in successor.BORROWED_PREDECESSORS
     assert len(names) == 5
     assert stage.FREEZE_COMMIT is not None
     frozen = stage.read_frozen_blobs(ROOT, stage.FREEZE_COMMIT, names)

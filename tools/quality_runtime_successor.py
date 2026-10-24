@@ -12,7 +12,7 @@ BASE = "5396b557fd90a67e0c097da1020959b58724a7ec"
 SELF = "tools/quality_runtime_successor.py"
 RECORD = "docs/performance/ci-quality-runtime54.json"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE: str | None = "74f4c89431a756de50c8409bfad6240e10bc2935"
+FREEZE: str | None = None
 PINS: dict[str, str] = {
     ".github/workflows/ci.yml": (
         "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
@@ -51,7 +51,7 @@ PINS: dict[str, str] = {
         "c965819e71f0a7b6a3f1440fdb9721e7d88c0950175721318fb9712205ed40d7"
     ),
     "docs/performance/ci-quality-runtime54.json": (
-        "924507379d3925af22d450feb8e2c9dce4c6ded98a7998beedfd7129c631ba2e"
+        "f40b82016e4af525424fc31839ec3f52dbbe791d6169c0f3c7641e8182ef690b"
     ),
     "scripts/quality_evidence.py": (
         "923b8da16949a54a2d8e1b984aecce34e1e9d6de08bc698b54469dd920418808"
@@ -75,7 +75,7 @@ PINS: dict[str, str] = {
         "8494642f66f70ce0cc71d330e164eba067e90e9ebea3eb1f0c11fbb4dbc25c69"
     ),
     "tests/code_quality/test_quality_runtime.py": (
-        "396924784fcac3a47d5b69710e648b4243f16585da45a79a15ece70e7be6188a"
+        "a157b3fe51e8564ff3a60faeae26888f6f019c1db40c76bb10025ecc99c0db05"
     ),
     "tests/code_quality/test_quality_runtime_process.py": (
         "8c19b977eefd4d587b8116f9af0c0ced4c2a1040cec9a1d5fe619014ac03e45d"
@@ -85,6 +85,9 @@ PINS: dict[str, str] = {
     ),
     "tools/performance_preflight_successor.py": (
         "08b945f8b3c2c25b097aae5c930a634a20336761c35bf8b7e7d11c14aaa0055a"
+    ),
+    "tests/code_quality/test_performance_preflight.py": (
+        "5c7728edee024687b43acf3c5204f8da8c4698c25ae4c4ff2c56482130e7b64e"
     ),
 }
 BEFORE: dict[str, str] = {
@@ -115,8 +118,10 @@ BEFORE: dict[str, str] = {
     "tools/performance_preflight_successor.py": (
         "d5eb85fb360283515f99beb3b01dd7f6351750f4b72c43e68bbf686981796dba"
     ),
+    "tests/code_quality/test_performance_preflight.py": (
+        "b6924bdca684374749f2a86d7e086192de3ace2b6eac595aa558deb8117c57e6"
+    ),
 }
-
 
 BORROWED_PREDECESSORS = frozenset(
     {

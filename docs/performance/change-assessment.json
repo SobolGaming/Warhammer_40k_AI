@@ -2706,11 +2706,11 @@
     },
     "docs/performance/ci-quality-runtime54.json": {
       "before_sha256": null,
-      "after_sha256": "924507379d3925af22d450feb8e2c9dce4c6ded98a7998beedfd7129c631ba2e",
+      "after_sha256": "f40b82016e4af525424fc31839ec3f52dbbe791d6169c0f3c7641e8182ef690b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "924507379d3925af22d450feb8e2c9dce4c6ded98a7998beedfd7129c631ba2e"
+          "after": "f40b82016e4af525424fc31839ec3f52dbbe791d6169c0f3c7641e8182ef690b"
         }
       }
     },
@@ -5723,7 +5723,7 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "b6924bdca684374749f2a86d7e086192de3ace2b6eac595aa558deb8117c57e6",
+      "after_sha256": "5c7728edee024687b43acf3c5204f8da8c4698c25ae4c4ff2c56482130e7b64e",
       "owners": {
         "@module": {
           "before": null,
@@ -5887,7 +5887,7 @@
         },
         "test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin": {
           "before": null,
-          "after": "483c6bcb3fbb6a9fe44e4f5f8c0986e93b58e4196d94e3c073c9c132bf8052c8"
+          "after": "8edab6227005efb21cdcfb4a5c105af4e273d2f52e78f8c873b2d15edb0e5c81"
         },
         "test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelated_input": {
           "before": null,
@@ -6141,7 +6141,7 @@
     },
     "tests/code_quality/test_quality_runtime.py": {
       "before_sha256": null,
-      "after_sha256": "396924784fcac3a47d5b69710e648b4243f16585da45a79a15ece70e7be6188a",
+      "after_sha256": "a157b3fe51e8564ff3a60faeae26888f6f019c1db40c76bb10025ecc99c0db05",
       "owners": {
         "@module": {
           "before": null,
@@ -6261,7 +6261,7 @@
         },
         "test_predecessor_borrowing_matches_five_real_fallbacks_and_rejects_wrong_roles": {
           "before": null,
-          "after": "08e23826b13fc5f5030378d06400c37a14ba5f6ef23ed17c6de5ea381f042bac"
+          "after": "170ca42157d9ad74bddf952c2000fb1ed594dfd801493af382123ee7dc69aafd"
         },
         "test_predecessor_borrowing_revalidates_distinct_roots_and_warm_same_size_mutation": {
           "before": null,
@@ -19431,11 +19431,11 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "908c9d5bca6e8b7b26ba254b5f8d198d8f5712693461bac77448fa50e3f60ba4",
+      "after_sha256": "f0d02c4aeb7496aa597eed632609716245e5d78371912c51f2fc8077640964e1",
       "owners": {
         "@module": {
           "before": null,
-          "after": "c15999d874d3a71fa8cc2cbbb7a7d03db15903be325c59b63aa7c2c9d1e256c6"
+          "after": "aa4486c8913ede8d096238e792634ada41ac7900801e0f884d6dd427cdc89290"
         },
         "admit": {
           "before": null,
