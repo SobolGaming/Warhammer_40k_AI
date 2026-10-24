@@ -341,8 +341,19 @@ def _git(root: Path, *args: str, payload: bytes | None = None) -> bytes:
     return subprocess.check_output(["git", *args], cwd=root, input=payload, timeout=60)
 
 
+def _history(root: Path, *args: str) -> bytes:
+    from tools.performance_history_snapshot import historical
+
+    return historical(root, "plain60", args, lambda: _git(root, *args))
+
+
 def _blobs(root: Path, revision: str, names: list[str]) -> dict[str, bytes]:
     """Read exact immutable members afresh; never cache Git or filesystem results."""
+    from tools.performance_history_snapshot import eligible_blobs
+
+    selected = eligible_blobs(root, revision, names)
+    if selected is not None:
+        return selected
     if len(revision) != 40 or set(revision) - set("0123456789abcdef"):
         raise ValueError("Preflight Git revision must be an exact SHA1 selector.")
     if not names or len(set(names)) != len(names):
@@ -442,7 +453,7 @@ def preceding_control(root: Path, name: str, raw: bytes) -> bytes:
             "Reviewed migration source/data changed: "
             "Qualification / Perils successor / Preflight source: " + name
         )
-    old = _git(root, "show", BASE + ":" + name)
+    old = _history(root, "show", BASE + ":" + name)
     if raw not in (actual, old):
         raise ValueError("Preflight control caller supplied unrelated bytes.")
     return old
@@ -568,7 +579,7 @@ def _runtime_transitions(root: Path, frozen_members: dict[str, bytes]) -> dict[s
     ):
         raise ValueError("CI runtime membership or base changed.")
     previous = _blobs(root, CI_RUNTIME_BASE, list(CI_RUNTIME_BEFORE))
-    if _git(
+    if _history(
         root, "--literal-pathspecs", "ls-tree", "-r", "-z", CI_RUNTIME_BASE, "--", CI_RUNTIME_NEW
     ):
         raise ValueError("CI runtime guard predecessor was not absent.")
@@ -659,7 +670,7 @@ def _ci_transitions(root: Path, frozen_members: dict[str, bytes]) -> dict[str, b
         ):
             raise ValueError("CI transition membership or base changed.")
         for name in added:
-            if _git(root, "--literal-pathspecs", "ls-tree", "-r", "-z", base, "--", name):
+            if _history(root, "--literal-pathspecs", "ls-tree", "-r", "-z", base, "--", name):
                 raise ValueError("CI bootstrap predecessor was not absent.")
         previous = _blobs(root, base, list(pins))
         for name in record["changes"]:
@@ -686,7 +697,7 @@ def ci_comparison(root: Path, name: str, raw: bytes) -> bytes:
         base, pin = CI_TRANSPORT_BASE, CI_TRANSPORT_BEFORE[name]
     else:
         base, pin = CI_RUNTIME_BASE, CI_RUNTIME_BEFORE[name]
-    before = _git(root, "show", base + ":" + name)
+    before = _history(root, "show", base + ":" + name)
     if _sha(before) != pin:
         raise ValueError("Static comparison immutable bytes changed.")
     return before
@@ -707,7 +718,7 @@ def static_predecessor(root: Path, name: str, raw: bytes) -> bytes:
         base, pin = STATIC_BASE, STATIC_BEFORE[name]
     else:
         base, pin = CI_COMPAT_BASE, CI_COMPAT_BEFORE[name]
-    before = _git(root, "show", base + ":" + name)
+    before = _history(root, "show", base + ":" + name)
     if _sha(before) != pin:
         raise ValueError("Static predecessor immutable bytes changed.")
     return before.replace(b"\r\n", b"\n") if raw != live else before
@@ -720,15 +731,15 @@ def _freeze(root: Path) -> str:
     freeze = FREEZE_COMMIT
     if freeze is None or len(freeze) != 40 or set(freeze) - set("0123456789abcdef"):
         raise ValueError("Preflight successor awaits its exact source freeze.")
-    _git(root, "merge-base", "--is-ancestor", BASE, freeze)
+    _history(root, "merge-base", "--is-ancestor", BASE, freeze)
     _git(root, "merge-base", "--is-ancestor", freeze, "HEAD")
-    _git(root, "merge-base", "--is-ancestor", STATIC_BASE, freeze)
-    _git(root, "merge-base", "--is-ancestor", CI_BASE, freeze)
-    _git(root, "merge-base", "--is-ancestor", CI_FORMAT_BASE, freeze)
-    _git(root, "merge-base", "--is-ancestor", CI_COMPAT_BASE, freeze)
-    _git(root, "merge-base", "--is-ancestor", CI_TRANSPORT_BASE, freeze)
-    _git(root, "merge-base", "--is-ancestor", CI_RUNTIME_BASE, freeze)
-    names = _git(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
+    _history(root, "merge-base", "--is-ancestor", STATIC_BASE, freeze)
+    _history(root, "merge-base", "--is-ancestor", CI_BASE, freeze)
+    _history(root, "merge-base", "--is-ancestor", CI_FORMAT_BASE, freeze)
+    _history(root, "merge-base", "--is-ancestor", CI_COMPAT_BASE, freeze)
+    _history(root, "merge-base", "--is-ancestor", CI_TRANSPORT_BASE, freeze)
+    _history(root, "merge-base", "--is-ancestor", CI_RUNTIME_BASE, freeze)
+    names = _history(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
     if set(names) != PINS.keys() | {SELF, ASSESSMENT} or len(names) != len(PINS) + 2:
         raise ValueError("Preflight successor finite membership changed.")
     frozen_members = _blobs(root, freeze, [SELF, *PINS, *ANCHORS])
@@ -771,7 +782,7 @@ def _freeze(root: Path) -> str:
 def _assessment(root: Path, freeze: str) -> bytes:
     from tools.performance_policy import owner_hashes
 
-    assessment = json.loads(_git(root, "show", freeze + ":" + ASSESSMENT))
+    assessment = json.loads(_history(root, "show", freeze + ":" + ASSESSMENT))
     current = _ci54_previous(root, SELF, _read(root, SELF))
     change = assessment["changes"][SELF]
     change["after_sha256"] = _sha(current)
@@ -838,7 +849,7 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
         raise ValueError("Preflight actual input collector omitted current inputs.")
     actual = {name: _sha(_ci54_previous(root, name, _read(root, name))) for name in controls}
     projected = dict(current)
-    prior_names = set(_git(root, "ls-tree", "-r", "--name-only", BASE).decode().splitlines())
+    prior_names = set(_history(root, "ls-tree", "-r", "--name-only", BASE).decode().splitlines())
     historical = _blobs(root, BASE, sorted((controls & prior_names) | perils.CHANGED))
     for name in controls:
         if name not in current:

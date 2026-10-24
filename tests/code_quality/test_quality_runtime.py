@@ -1228,3 +1228,89 @@ def test_fixture_compatibility_view_requires_fresh_authentic_module_owned_checko
     assert len(projections) == projection_count
     print("CI54 current fixture view: one fresh admission and one native projection per positive.")
     print("Historical raw view: zero current admissions; failed current admission never projects.")
+
+
+def test_history_snapshot_preimages_extend_only_existing_native_bridge() -> None:
+    from tools import performance_preflight_successor as stage
+    from tools import quality_runtime_successor as successor
+
+    assert not successor.BEFORE.keys() & successor.SNAPSHOT_BEFORE.keys()
+    assert successor.SNAPSHOT_BEFORE.keys() <= successor.PINS.keys()
+    assert not successor.SNAPSHOT_BEFORE.keys() & successor.BORROWED_PREDECESSORS
+    assert stage.PINS.keys() & successor.BEFORE.keys() == successor.BORROWED_PREDECESSORS | {
+        "tests/code_quality/test_performance_preflight.py"
+    }
+    for name, pin in successor.SNAPSHOT_BEFORE.items():
+        old = subprocess.check_output(["git", "show", successor.BASE + ":" + name], cwd=ROOT)
+        assert evidence.sha(old) == pin
+        actual = successor.owned(ROOT, name)
+        assert evidence.sha(actual) == successor.PINS[name]
+        assert successor.previous(ROOT, name, actual) == old
+        with pytest.raises(ValueError, match="borrowing is not admitted"):
+            successor.previous(ROOT, name, actual, predecessor=old)
+        with pytest.raises(ValueError, match="unrelated bytes"):
+            successor.previous(ROOT, name, actual + b" ")
+    successor.admit(ROOT)
+
+
+def test_history_complete_current_protocol_resolves_every_actual_consumer(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from scripts import check_performance_policy as gate
+    from tools import performance_history_snapshot
+    from tools import quality_runtime_successor as successor
+
+    history = cast(Any, performance_history_snapshot)
+    original = history.historical
+    original_blobs = history.eligible_blobs
+    queries: set[tuple[str, tuple[str, ...]]] = set()
+    blob_queries: set[tuple[str, str]] = set()
+
+    def historical(
+        root: Path, domain: str, args: tuple[str, ...], fresh: Callable[[], bytes]
+    ) -> bytes:
+        def unexpected() -> bytes:
+            raise AssertionError("An active immutable consumer escaped the complete catalog.")
+
+        queries.add((domain, args))
+        return cast(bytes, original(root, domain, args, unexpected))
+
+    def blobs(root: Path, revision: str, names: list[str]) -> dict[str, bytes] | None:
+        blob_queries.update((revision, name) for name in names)
+        result = cast(dict[str, bytes] | None, original_blobs(root, revision, names))
+        assert result is not None
+        return result
+
+    monkeypatch.setattr(history, "historical", historical)
+    monkeypatch.setattr(history, "eligible_blobs", blobs)
+    witnesses: list[dict[str, object]] = []
+    with history.witnesses(witnesses):
+        binding = gate.validate_current(
+            ROOT, "5f509724da25a2f6ded0c2739a8e7c84bdf59c91", pr_head=None
+        )
+    assert queries
+    assert blob_queries
+    assert len(witnesses) == 1
+    witness = witnesses[0]
+    assert witness["status"] == "completed"
+    assert witness["role"] == "preflight"
+    assert binding["history_snapshot_digest"] == witness["semantic_digest"]
+    catalog = cast(dict[str, Any], witness["catalog"])
+    assert catalog["declared_count"] == catalog["acquired_count"] == len(catalog["members"])
+    members = {(row["domain"], row["commit"], row["path"]) for row in catalog["members"]}
+    assert all(("plain60", commit, name) in members for commit, name in blob_queries)
+    assert ("plain60", successor.FREEZE, "tools/performance_history_snapshot.py") in members
+    assert catalog["commit_trees"]
+    assert catalog["tree_edges"]
+    assert history._ACTIVE.get() is None
+    print(
+        json.dumps(
+            {
+                "actual_historical_requests": len(queries),
+                "actual_blob_requests": len(blob_queries),
+                "declared_members": catalog["declared_count"],
+                "semantic_digest": witness["semantic_digest"],
+            },
+            sort_keys=True,
+        )
+    )

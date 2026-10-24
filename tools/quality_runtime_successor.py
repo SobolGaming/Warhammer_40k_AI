@@ -12,13 +12,13 @@ BASE = "5396b557fd90a67e0c097da1020959b58724a7ec"
 SELF = "tools/quality_runtime_successor.py"
 RECORD = "docs/performance/ci-quality-runtime54.json"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE: str | None = "28b42c48798c5e4a38efa53e7e0f218f54ccc4c8"
+FREEZE: str | None = None
 PINS: dict[str, str] = {
     ".github/workflows/ci.yml": (
         "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
     ),
     "ci/quality_shards/all.txt": (
-        "da5ac7af7ae8417cf29cc9829279414d4ea1244620c17a0858bd7ae1fca11893"
+        "7d1475168f6ca407cf2aa27e039fdc603bd1f01c9bacd9276d98149aea82e088"
     ),
     "ci/quality_shards/baseline-ci53.txt": (
         "308870fb4095de8e263def2e75ac71687bc65c3b32f06f591fed848fc34b4ef3"
@@ -39,19 +39,25 @@ PINS: dict[str, str] = {
         "1677cbafcc8257c3803cd4bfa65f12a2d4293e622840bfb47c657893b0315344"
     ),
     "ci/quality_shards/shard-3.txt": (
-        "4f832f0acbc04944e1a35b8030a5f5b51c55eb641af3745b4274d4b8f909b15f"
+        "33c48982c63ba5a62901ce6b90a1205eeea1b85324885fefdb346a5430d7ab2b"
     ),
     "ci/quality_shards/shard-4-modules.txt": (
         "e5ab009fc440840dac9717a0f05b64cd47f371664a9f838e5ca17fe1d210e7bd"
     ),
     "ci/quality_shards/shard-4.txt": (
-        "829be478820238159e69cc3e6eeb5d6691714dcff0ee2ddf363ac457cd82df01"
+        "53ea730de39ce522a62461daec9ccf353c0b0fe04534aadb7800f53705ef8341"
     ),
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": (
-        "c965819e71f0a7b6a3f1440fdb9721e7d88c0950175721318fb9712205ed40d7"
+        "b627e0688559b1fc46307c8449d17095307dd1fdc7a969c20cf5378a34887a0a"
     ),
     "docs/performance/ci-quality-runtime54.json": (
-        "869d2f2c617106d5fa6a13b5e07f621b2583aaad62ea0d9bedffc4d0c944a9d0"
+        "b0e2b87add484eb96b76cc15bf914832c33f9f25a61d8832afa5f2f91b33b898"
+    ),
+    "docs/performance/history-phase-snapshot.md": (
+        "eff5ac4c71a42a547507bbba0713b33f89330fecaa1a931032395629f063e72a"
+    ),
+    "scripts/check_performance_policy.py": (
+        "2179ae2ef01777edf025960cb40c3a62564d7f6390aeb38cdc8781dd550ff2a1"
     ),
     "scripts/quality_evidence.py": (
         "923b8da16949a54a2d8e1b984aecce34e1e9d6de08bc698b54469dd920418808"
@@ -74,20 +80,32 @@ PINS: dict[str, str] = {
     "tests/code_quality/test_performance_policy.py": (
         "8494642f66f70ce0cc71d330e164eba067e90e9ebea3eb1f0c11fbb4dbc25c69"
     ),
+    "tests/code_quality/test_performance_preflight.py": (
+        "6a47c37e512bbd06a2c0119da5fd755dabf30f53181b20602c9c0c846020cfea"
+    ),
     "tests/code_quality/test_quality_runtime.py": (
-        "137e4778d85a7dfe6ed3da88525fea3f9503c1dcd37323b0b0d033bee541f102"
+        "0203134e35a15f7862bd51107684251d8ef741788eac47658e1e5b3d85070221"
     ),
     "tests/code_quality/test_quality_runtime_process.py": (
         "8c19b977eefd4d587b8116f9af0c0ced4c2a1040cec9a1d5fe619014ac03e45d"
+    ),
+    "tools/cumulative_preservation.py": (
+        "cb32ce7c7986bc5eff74cae64707828fb192a684ecb8feb89fb8f24356c8882a"
+    ),
+    "tools/performance_history_snapshot.py": (
+        "741cfe627c295d5a0537fe6977bb7e83ff835e26b43f4936a6fef38b7caddbce"
     ),
     "tools/performance_policy.py": (
         "c110135e06b3ded99c69adc23d2571e610824a562ce0a7acc84dcb6955e2708d"
     ),
     "tools/performance_preflight_successor.py": (
-        "77d12b35688a6890aa41c90ab6fe63dd03524cde33dd56c3204c6ea2b2a5b986"
+        "60e1e493fe3aaaf98e88c28c85b781c52c5355ece3be556ea33681819817df59"
     ),
-    "tests/code_quality/test_performance_preflight.py": (
-        "5c7728edee024687b43acf3c5204f8da8c4698c25ae4c4ff2c56482130e7b64e"
+    "tools/performance_qualification_successor.py": (
+        "d5fccbb82ccce15700443eba27130f3e859d60f7b6b5b64294cd9619c9f1923b"
+    ),
+    "tools/thousand_sons_perils_preservation.py": (
+        "3dbedc63406bf2088320d62d4571981457f130453e52f4ba7643433cdd878e3b"
     ),
 }
 BEFORE: dict[str, str] = {
@@ -123,6 +141,22 @@ BEFORE: dict[str, str] = {
     ),
 }
 
+# Additional snapshot owner preimages; the original borrowed-role map stays exact.
+SNAPSHOT_BEFORE: dict[str, str] = {
+    "scripts/check_performance_policy.py": (
+        "ce2c1e27152f0eb030b867078f543bb94472a7b3b0cf3cd0d5e2cc1102111209"
+    ),
+    "tools/cumulative_preservation.py": (
+        "0aed6e5a524e891710bc85c2eda40565ca1f5cfc5c07f268acdb6ec727c060f3"
+    ),
+    "tools/performance_qualification_successor.py": (
+        "45ba0c6dd10afb1f49f42e1cfe8ae77dab08b66436f2e9b4d8517415db28ed2a"
+    ),
+    "tools/thousand_sons_perils_preservation.py": (
+        "2e9ef0110809dde8b380e04a7b608095672c10ea39b8cfc9aff8318002320894"
+    ),
+}
+
 BORROWED_PREDECESSORS = frozenset(
     {
         ".github/workflows/ci.yml",
@@ -142,6 +176,12 @@ def git(root: Path, *args: str) -> bytes:
     return subprocess.check_output(["git", *args], cwd=root, timeout=30)
 
 
+def _history(root: Path, *args: str) -> bytes:
+    from tools.performance_history_snapshot import historical
+
+    return historical(root, "plain30", args, lambda: git(root, *args))
+
+
 def owned(root: Path, name: str) -> bytes:
     from tests.d07_geometry_containment import read_owned_geometry_member
 
@@ -156,7 +196,8 @@ def previous(root: Path, name: str, supplied: bytes, *, predecessor: bytes | Non
 
         if name not in BORROWED_PREDECESSORS or preflight_pins.get(name) != BEFORE.get(name):
             raise ValueError("CI54 predecessor borrowing is not admitted for this path.")
-    if name not in BEFORE:
+    before_pins = BEFORE | SNAPSHOT_BEFORE
+    if name not in before_pins:
         return supplied
     actual = owned(root, name)
     if name == ASSESSMENT:
@@ -165,8 +206,8 @@ def previous(root: Path, name: str, supplied: bytes, *, predecessor: bytes | Non
         raise ValueError("CI54 Preflight source changed: " + name)
     if supplied != actual:
         raise ValueError("CI54 predecessor caller supplied unrelated bytes.")
-    old = git(root, "show", BASE + ":" + name) if predecessor is None else predecessor
-    if digest(old) != BEFORE[name]:
+    old = _history(root, "show", BASE + ":" + name) if predecessor is None else predecessor
+    if digest(old) != before_pins[name]:
         raise ValueError("CI54 immutable predecessor changed.")
     return old
 
@@ -179,9 +220,9 @@ def admit(root: Path) -> None:
     freeze = FREEZE
     if freeze is None or len(freeze) != 40:
         raise ValueError("CI54 source freeze is pending.")
-    git(root, "merge-base", "--is-ancestor", BASE, freeze)
+    _history(root, "merge-base", "--is-ancestor", BASE, freeze)
     git(root, "merge-base", "--is-ancestor", freeze, "HEAD")
-    names = git(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
+    names = _history(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
     if set(names) != PINS.keys() | {SELF, ASSESSMENT}:
         raise ValueError("CI54 finite source membership changed.")
     frozen = read_frozen_blobs(root, freeze, [SELF, ASSESSMENT, *PINS])
@@ -195,14 +236,17 @@ def admit(root: Path) -> None:
     record: dict[str, Any] = json.loads(frozen[RECORD])
     if record.keys() != {"schema", "base", "changes"} or record["schema"] != "exact-ci-quality-v1":
         raise ValueError("CI54 transition schema changed.")
-    if record["base"] != BASE or record["changes"].keys() != BEFORE.keys() - {ASSESSMENT}:
+    before_pins = BEFORE | SNAPSHOT_BEFORE
+    if BEFORE.keys() & SNAPSHOT_BEFORE.keys():
+        raise ValueError("CI54 snapshot predecessor maps overlap.")
+    if record["base"] != BASE or record["changes"].keys() != before_pins.keys() - {ASSESSMENT}:
         raise ValueError("CI54 transition membership changed.")
-    originals = read_frozen_blobs(root, BASE, list(BEFORE.keys() - {ASSESSMENT}))
+    originals = read_frozen_blobs(root, BASE, list(before_pins.keys() - {ASSESSMENT}))
     for name, row in record["changes"].items():
         before = originals[name]
         if (
-            digest(before) != BEFORE[name]
-            or row["before_sha256"] != BEFORE[name]
+            digest(before) != before_pins[name]
+            or row["before_sha256"] != before_pins[name]
             or row["after_sha256"] != PINS[name]
             or row.keys() != {"before_sha256", "after_sha256", "edits"}
         ):
@@ -248,8 +292,8 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
             continue
         if result[name] != digest(owned(root, name)):
             raise ValueError("CI54 actual input collector omitted current control bytes.")
-        if name in BEFORE:
-            result[name] = BEFORE[name]
+        if name in BEFORE | SNAPSHOT_BEFORE:
+            result[name] = (BEFORE | SNAPSHOT_BEFORE)[name]
         else:
             del result[name]
     return result

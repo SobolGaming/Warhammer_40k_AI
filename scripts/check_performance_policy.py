@@ -175,8 +175,23 @@ def validate_smoke_report(report: dict[str, object], *, binding: dict[str, objec
             raise ValueError("Smoke case limit exceeded.")
 
 
+def _base_manifest(root: Path, base: str) -> bytes:
+    from tools.performance_history_snapshot import historical
+
+    args = ("show", f"{base}:src/warhammer40k_core/_engine_build_manifest.json")
+    return historical(root, "safe60", args, lambda: git(root, *args))
+
+
 @invocation
 def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[str, object]:
+    from tools.performance_history_snapshot import phase
+
+    with phase(root, base_ref, pr_head) as snapshot:
+        binding = _validate_current(root, base_ref, pr_head=pr_head)
+        return binding | {"history_snapshot_digest": snapshot.semantic_digest}
+
+
+def _validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[str, object]:
     from warhammer40k_core.build_identity import verified_engine_build_identity
 
     base, changes = changed_inputs(root, base_ref)
@@ -193,9 +208,7 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
     input_digest = canonical_digest(inputs)
     comparisons = object_value(assessment["comparisons"])
     families = object_value(operation_map["families"])
-    base_identity = object_value(
-        json.loads(git(root, "show", f"{base}:src/warhammer40k_core/_engine_build_manifest.json"))
-    )["build_id"]
+    base_identity = object_value(json.loads(_base_manifest(root, base)))["build_id"]
     if not isinstance(base_identity, str):
         raise TypeError("Base runtime identity missing.")
     approved_failures: list[dict[str, object]] = []
@@ -338,10 +351,33 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
 
 
 def _check_and_run(base_ref: str, pr_head: str | None, output: Path) -> dict[str, object]:
-    binding = validate_current(ROOT, base_ref, pr_head=pr_head)
+    from tools.performance_history_snapshot import witnesses
+
+    records: list[dict[str, object]] = []
+    with witnesses(records):
+        binding = validate_current(ROOT, base_ref, pr_head=pr_head)
     report = run_smoke(ROOT, output, binding=binding)
     # An edit during measurements cannot inherit the completed receipt.
-    if binding != validate_current(ROOT, base_ref, pr_head=pr_head):
+    try:
+        with witnesses(records):
+            after = validate_current(ROOT, base_ref, pr_head=pr_head)
+    except ValueError, TypeError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired:
+        report["status"] = "failed"
+        report["inputs_unchanged"] = False
+        if records:
+            report["history_phase_witnesses"] = records
+        _write_receipt(output, report)
+        raise
+    if records:
+        report["history_phase_witnesses"] = records
+    if binding != after or (
+        records
+        and (
+            len(records) != 2
+            or records[0]["domain_identity"] != records[1]["domain_identity"]
+            or any(record["status"] != "completed" for record in records)
+        )
+    ):
         report["status"] = "failed"
         report["inputs_unchanged"] = False
         _write_receipt(output, report)
@@ -360,7 +396,13 @@ def main() -> None:
     output = args.output.resolve()
     try:
         binding = _check_and_run(args.base_ref, args.pr_head, output)
-    except (ValueError, TypeError, OSError, subprocess.CalledProcessError) as error:
+    except (
+        ValueError,
+        TypeError,
+        OSError,
+        subprocess.CalledProcessError,
+        subprocess.TimeoutExpired,
+    ) as error:
         stamp = dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%S%fZ")
         failure_path = output.parent / "performance-attempts" / f"{stamp}-gate-failure.json"
         failure_path.parent.mkdir(parents=True, exist_ok=True)

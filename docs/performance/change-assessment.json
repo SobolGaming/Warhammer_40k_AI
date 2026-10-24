@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "da5ac7af7ae8417cf29cc9829279414d4ea1244620c17a0858bd7ae1fca11893",
+      "after_sha256": "7d1475168f6ca407cf2aa27e039fdc603bd1f01c9bacd9276d98149aea82e088",
       "owners": {
         "@document": {
           "before": null,
-          "after": "da5ac7af7ae8417cf29cc9829279414d4ea1244620c17a0858bd7ae1fca11893"
+          "after": "7d1475168f6ca407cf2aa27e039fdc603bd1f01c9bacd9276d98149aea82e088"
         }
       }
     },
@@ -86,11 +86,11 @@
     },
     "ci/quality_shards/shard-3.txt": {
       "before_sha256": null,
-      "after_sha256": "4f832f0acbc04944e1a35b8030a5f5b51c55eb641af3745b4274d4b8f909b15f",
+      "after_sha256": "33c48982c63ba5a62901ce6b90a1205eeea1b85324885fefdb346a5430d7ab2b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4f832f0acbc04944e1a35b8030a5f5b51c55eb641af3745b4274d4b8f909b15f"
+          "after": "33c48982c63ba5a62901ce6b90a1205eeea1b85324885fefdb346a5430d7ab2b"
         }
       }
     },
@@ -106,11 +106,11 @@
     },
     "ci/quality_shards/shard-4.txt": {
       "before_sha256": null,
-      "after_sha256": "829be478820238159e69cc3e6eeb5d6691714dcff0ee2ddf363ac457cd82df01",
+      "after_sha256": "53ea730de39ce522a62461daec9ccf353c0b0fe04534aadb7800f53705ef8341",
       "owners": {
         "@document": {
           "before": null,
-          "after": "829be478820238159e69cc3e6eeb5d6691714dcff0ee2ddf363ac457cd82df01"
+          "after": "53ea730de39ce522a62461daec9ccf353c0b0fe04534aadb7800f53705ef8341"
         }
       }
     },
@@ -2436,11 +2436,11 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-      "after_sha256": "c965819e71f0a7b6a3f1440fdb9721e7d88c0950175721318fb9712205ed40d7",
+      "after_sha256": "b627e0688559b1fc46307c8449d17095307dd1fdc7a969c20cf5378a34887a0a",
       "owners": {
         "@document": {
           "before": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-          "after": "c965819e71f0a7b6a3f1440fdb9721e7d88c0950175721318fb9712205ed40d7"
+          "after": "b627e0688559b1fc46307c8449d17095307dd1fdc7a969c20cf5378a34887a0a"
         }
       }
     },
@@ -2706,11 +2706,11 @@
     },
     "docs/performance/ci-quality-runtime54.json": {
       "before_sha256": null,
-      "after_sha256": "869d2f2c617106d5fa6a13b5e07f621b2583aaad62ea0d9bedffc4d0c944a9d0",
+      "after_sha256": "b0e2b87add484eb96b76cc15bf914832c33f9f25a61d8832afa5f2f91b33b898",
       "owners": {
         "@document": {
           "before": null,
-          "after": "869d2f2c617106d5fa6a13b5e07f621b2583aaad62ea0d9bedffc4d0c944a9d0"
+          "after": "b0e2b87add484eb96b76cc15bf914832c33f9f25a61d8832afa5f2f91b33b898"
         }
       }
     },
@@ -2864,6 +2864,16 @@
         }
       }
     },
+    "docs/performance/history-phase-snapshot.md": {
+      "before_sha256": null,
+      "after_sha256": "eff5ac4c71a42a547507bbba0713b33f89330fecaa1a931032395629f063e72a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "eff5ac4c71a42a547507bbba0713b33f89330fecaa1a931032395629f063e72a"
+        }
+      }
+    },
     "docs/performance/order34/budgets.json": {
       "before_sha256": "5178d85cec2077035e405a95ba59fa7f68d377bbcdd51a2cb1fef3a475ac06cc",
       "after_sha256": "65d346fee8c65f9accd6e5636110eefc0f41f253f771917e42f190321b16a2a6",
@@ -2950,15 +2960,31 @@
     },
     "scripts/check_performance_policy.py": {
       "before_sha256": "520da31556b55271ce74af77e553281d5974e6faf9b8baf23bcd8b5a76605b12",
-      "after_sha256": "ce2c1e27152f0eb030b867078f543bb94472a7b3b0cf3cd0d5e2cc1102111209",
+      "after_sha256": "2179ae2ef01777edf025960cb40c3a62564d7f6390aeb38cdc8781dd550ff2a1",
       "owners": {
         "@module": {
           "before": "49fc81fc3951fdcedab7cb2b0f62867313d7828aae3a09bce8e55652b185957f",
           "after": "64bd1a493b904147cec70d5ad6138d0863c714aa874257818235d013f04f5d79"
         },
+        "_base_manifest": {
+          "before": null,
+          "after": "d2775fa00e575d25d42788e70665d146085e24bca386d24efc0b05f17f69ab6c"
+        },
+        "_check_and_run": {
+          "before": "61501b46901a4bb4787d17333663c075913dc643be60864ac34e0c29b3ca1d0b",
+          "after": "b4994f5a770ecd462f761b06de6933e8b3e189c3437ceb14490ea355445f4523"
+        },
+        "_validate_current": {
+          "before": null,
+          "after": "d62cb94c20a6536700c5c4d90993d0ff4678756fac3f9d4cd58a92c33192369c"
+        },
+        "main": {
+          "before": "5d57c4ed7db2a0ef34e71dc84c275bf90401ba2daacb4579864d0adb81acbcf1",
+          "after": "e033dadf2c470483d350f7d1b25244fb63cb556ade674fb164801fda9bcd77a3"
+        },
         "validate_current": {
           "before": "b7f165e16b5e2dd615d8038c524079e232ef827d44b2eb5712b641b256977893",
-          "after": "75d7a873e9517d64a285883531e07391f09b6990d68b3674c2e22d55538cb829"
+          "after": "a3317037bbfc90abeec1ced32e8742c945b6ec141245981fb075c534a5f2c122"
         }
       }
     },
@@ -5723,7 +5749,7 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "5c7728edee024687b43acf3c5204f8da8c4698c25ae4c4ff2c56482130e7b64e",
+      "after_sha256": "6a47c37e512bbd06a2c0119da5fd755dabf30f53181b20602c9c0c846020cfea",
       "owners": {
         "@module": {
           "before": null,
@@ -5865,6 +5891,10 @@
           "before": null,
           "after": "5db6934cb2f2e6d102328f6e765275680a88f2daf6d5fc3f59a154729aebce39"
         },
+        "_history_fixture": {
+          "before": null,
+          "after": "59de9676234987a971669971e2ce50b6acf97cda4a94e63b14eb4ca1d23455e4"
+        },
         "_read_metadata": {
           "before": null,
           "after": "e79d880c6725c1af9be373d6e4dab1cd17b18cb170df1755dc772fb21464c46c"
@@ -5888,6 +5918,46 @@
         "test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin": {
           "before": null,
           "after": "8edab6227005efb21cdcfb4a5c105af4e273d2f52e78f8c873b2d15edb0e5c81"
+        },
+        "test_history_closed_process_requires_eof_zero_exit_and_reaps_child": {
+          "before": null,
+          "after": "ffc104dcaca11d9f5fe12c64a05826c2158e0e6062a90eb3f6dc73ec38ebbdd5"
+        },
+        "test_history_closed_protocol_rejects_synthetic_malformed_native_response": {
+          "before": null,
+          "after": "16ec39874853358e885258bc46caba2e4f3bfd48c256d6a59f886aac1bfc4ff9"
+        },
+        "test_history_native_acquisition_rejects_wrong_authority_or_member": {
+          "before": null,
+          "after": "bdfdd469a4293d43f1a8c813c50753f8faf9edcad477b73f984ef22f449dd0a8"
+        },
+        "test_history_native_completion_detects_missing_object_after_acquisition": {
+          "before": null,
+          "after": "7c4f74a7691eed3d85ae1b28e6ed76b366b2362b866870d9ffe50656ea6a5160"
+        },
+        "test_history_native_domains_preserve_complete_commit_tree_blob_bindings": {
+          "before": null,
+          "after": "c158f17499550a2faa05f7cbc3175b3f78144ec0bb7574ba47dc41bd22839a0a"
+        },
+        "test_history_phase_owns_immutable_bytes_revokes_copied_context_and_reacquires": {
+          "before": null,
+          "after": "8b9b14b55fe870adb1006ea8f6778c3bd93dde61c7d3da2fcf1cae62026e2441"
+        },
+        "test_history_portable_digest_ignores_local_clone_and_pytest_identity": {
+          "before": null,
+          "after": "5f35e83f5e7986cae998adf71ecfe8bafc1a26ea80577f1f01c0a4114e31798d"
+        },
+        "test_history_postflight_failure_replaces_successful_smoke_receipt": {
+          "before": null,
+          "after": "25a1373b07b068ba1ba6cb108f2ee24cf18d27c216569a5301f385e5666f3d07"
+        },
+        "test_history_publication_reconciles_native_members_and_original_declarations": {
+          "before": null,
+          "after": "a389d0f015c44e25058e0fadd7326e897c3b978cf174c3be0dd32686593ae116"
+        },
+        "test_history_published_operands_remain_stable_but_next_acquisition_is_fresh": {
+          "before": null,
+          "after": "34d2743d8729dd4c07f06a2812233a4828391452479c19e65a9dd0d778beb2f1"
         },
         "test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelated_input": {
           "before": null,
@@ -6141,7 +6211,7 @@
     },
     "tests/code_quality/test_quality_runtime.py": {
       "before_sha256": null,
-      "after_sha256": "137e4778d85a7dfe6ed3da88525fea3f9503c1dcd37323b0b0d033bee541f102",
+      "after_sha256": "0203134e35a15f7862bd51107684251d8ef741788eac47658e1e5b3d85070221",
       "owners": {
         "@module": {
           "before": null,
@@ -6226,6 +6296,14 @@
         "test_fixture_compatibility_view_requires_fresh_authentic_module_owned_checkout": {
           "before": null,
           "after": "253f5c9addbbd09c2124cac95d0cfabf7fc8490d83c7663182e873c09a69ddde"
+        },
+        "test_history_complete_current_protocol_resolves_every_actual_consumer": {
+          "before": null,
+          "after": "d1ec65e4a0f7e075d55c72be61aa7af759876de424eb44e88b5492874a975358"
+        },
+        "test_history_snapshot_preimages_extend_only_existing_native_bridge": {
+          "before": null,
+          "after": "d135bad846edd42e9af96419236319940708504a6d41380d59b4eb635b08507a"
         },
         "test_ignored_source_and_bytecode_cannot_escape_exact_checkout_admission": {
           "before": null,
@@ -19015,7 +19093,7 @@
     },
     "tools/cumulative_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "0aed6e5a524e891710bc85c2eda40565ca1f5cfc5c07f268acdb6ec727c060f3",
+      "after_sha256": "cb32ce7c7986bc5eff74cae64707828fb192a684ecb8feb89fb8f24356c8882a",
       "owners": {
         "@module": {
           "before": null,
@@ -19028,6 +19106,10 @@
         "_git": {
           "before": null,
           "after": "b168c37c802021f5a5947e9b80c432a9a9a74e5553fbb0a9bbebbb0922a74e7c"
+        },
+        "_history": {
+          "before": null,
+          "after": "ada8f2b48bd8f9f2e6422690e7196773807dbac7852d6bc1b292a9f5969b6ee7"
         },
         "_json": {
           "before": null,
@@ -19087,7 +19169,7 @@
         },
         "reviewed_control_hashes": {
           "before": null,
-          "after": "155c66b0f088a3f1f94bd2982c000e9c437b96e33988b1299c2601df8fab72cf"
+          "after": "d048335f3a3cb3506b5300098556e5fd9cae8a7d0015efca34d91c546adac881"
         },
         "verify_baseline": {
           "before": null,
@@ -19095,7 +19177,7 @@
         },
         "verify_control_transformations": {
           "before": null,
-          "after": "c83e4dd5e1e85f749747b8ebde1100c959587217187fcf46b83c0c0dc9658089"
+          "after": "dec8bbdb9243fc64d8501ffb735b9eb62fa6dcdd0b3c518b1f080e50d3ae771b"
         },
         "verify_current_inventory": {
           "before": null,
@@ -19140,6 +19222,140 @@
         "@module": {
           "before": "12149515983044e0d324e0d10f8f0b3204f00be56ac87e98e3aede3819628a4d",
           "after": "59e41ff7e87a5d79a49c26033ec42216ed17576c05177a416e1915d2265b131d"
+        }
+      }
+    },
+    "tools/performance_history_snapshot.py": {
+      "before_sha256": null,
+      "after_sha256": "741cfe627c295d5a0537fe6977bb7e83ff835e26b43f4936a6fef38b7caddbce",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "49567a1b47fcbb54c29d752d053de14bb8af7b9a3f5ce4c0e220228e4dcf0cff"
+        },
+        "Member": {
+          "before": null,
+          "after": "01565821520519203ab00080761f0fe1483181a2c89c37e2ff32e269365e2d69"
+        },
+        "Snapshot": {
+          "before": null,
+          "after": "10ead81c4d9281a8d6bb471aea30c9a102d7dc0cdfb35565bea94a767d160e21"
+        },
+        "Snapshot.blobs": {
+          "before": null,
+          "after": "62ef09575b7e3d2d5df7821f6f0bac94de089d8523d4e91f75645e2d21f03afe"
+        },
+        "_Builder": {
+          "before": null,
+          "after": "664e6f676004aeb79a40debf82b141c8436926e39079a294791490fa0f2815b0"
+        },
+        "_Builder.__init__": {
+          "before": null,
+          "after": "e77b141e28d6f1ec8a0b20f2b0eed8b58df84a27617f971dfe9104addb9b9f3b"
+        },
+        "_Builder.add": {
+          "before": null,
+          "after": "53ef59f6cc2294d941f87295d2138c62348afa29bfc48e2e4528d438ea0ac91a"
+        },
+        "_Builder.all_paths": {
+          "before": null,
+          "after": "ac1edeb0e62d4a024a3386978a367c2b1965f6fae7889f334d1801f64f65d502"
+        },
+        "_Builder.bindings": {
+          "before": null,
+          "after": "436105f3b189549f6125b1e08b27504adb2f4ce45a4eeb6eec106d18894be7c8"
+        },
+        "_Builder.commit": {
+          "before": null,
+          "after": "10640241ef8d9c4542ebca2d6429c96df0d2d1c6675647d1d37c4213519a2db2"
+        },
+        "_Builder.fact": {
+          "before": null,
+          "after": "cda4b24615a086d686780a9e542ba5e2da28bbd1af1ec703a5605824db536b3a"
+        },
+        "_Builder.finish": {
+          "before": null,
+          "after": "a246227be2a0c5d20ffad0213d547f9f88ce926a97017322ab85166f51fab266"
+        },
+        "_Builder.objects_for": {
+          "before": null,
+          "after": "5bfb89b5318fcbfbb176fe764cc8a86dec41e03aea7c0b931bbf34de08c83d07"
+        },
+        "_Builder.tree": {
+          "before": null,
+          "after": "b7a3ece68526d5804ecc11c298481c5c4ac9a96874270f4815d7ebe76d7f1aea"
+        },
+        "_Lease": {
+          "before": null,
+          "after": "ec650e92baf70c42d0efdac8c3e900bed9180daa8afc075887f5a168a9d56710"
+        },
+        "_activate": {
+          "before": null,
+          "after": "196d02906152ccf41bd2aee2beea17a41f6590ece00f559b1b2045d81e328d3f"
+        },
+        "_argv": {
+          "before": null,
+          "after": "73f57872c8b002794d2916260ab57d718bc40476e7ab9519e1b5670ac2340421"
+        },
+        "_catalog": {
+          "before": null,
+          "after": "ba403045716030da149400271674bedd435ddb5e5fb2ef8be940829df8064138"
+        },
+        "_closed": {
+          "before": null,
+          "after": "572c8735362f4343a1ed475d9e08944c3dda4f3c6e28a4fb370c5cf35ee8c4df"
+        },
+        "_digest": {
+          "before": null,
+          "after": "efd52a33fb5e359d25c0daa5f75e6fff158f9a17689efe22831f167a9fc12645"
+        },
+        "_identity": {
+          "before": null,
+          "after": "63db51325afabd309d2ced43c687e4107e11b08be2b2847fc843a0115ef34ddc"
+        },
+        "_new_lease": {
+          "before": null,
+          "after": "f171841ab5a74d61f0019ecb58ff251ca7383ed0d8ebdfa3698e64304cd203fc"
+        },
+        "_oid": {
+          "before": null,
+          "after": "cbf71a10f8a3f1085a61d5cc16485e37d4b2d6fa18a4fd78cb54bcfac5da0da9"
+        },
+        "_path": {
+          "before": null,
+          "after": "860b6d2b88d7d14c10611346da5bb1f32d8ce41a59e842ad450685ba77bdda45"
+        },
+        "_reconcile": {
+          "before": null,
+          "after": "2e540d48fbf7031235976b9e09abf49734b4deae9ada0aade493744326ec0d34"
+        },
+        "_seal": {
+          "before": null,
+          "after": "529944d60d72e4893ef23b072cf19331e9fa6958f0160c0ab7f0a37c73de4bfc"
+        },
+        "_sha": {
+          "before": null,
+          "after": "8f72dbfdc310957eeb857f007dc7be9414470c6878c7300c4da70e2c18567e8f"
+        },
+        "_unpinned": {
+          "before": null,
+          "after": "1c53b7fb971f90b882959989917842dd93240390cd1eefffc610f235378ac562"
+        },
+        "eligible_blobs": {
+          "before": null,
+          "after": "5a357772836d669e094320713a356f61aaa502cad5730e6940b7c3b0098887ae"
+        },
+        "historical": {
+          "before": null,
+          "after": "618c601dab2f98fdc2a29f4cccc695389395ab9d8a988b4229d434dd529dc282"
+        },
+        "phase": {
+          "before": null,
+          "after": "925ebdcfc8df3b92cca7884caf21b167548ff32816d3ffebc52f18e4e8071610"
+        },
+        "witnesses": {
+          "before": null,
+          "after": "2297fe40a70fc3bdbd536afb133025d6c477cde9bde3544770672be02ab95962"
         }
       }
     },
@@ -19221,7 +19437,7 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "77d12b35688a6890aa41c90ab6fe63dd03524cde33dd56c3204c6ea2b2a5b986",
+      "after_sha256": "60e1e493fe3aaaf98e88c28c85b781c52c5355ece3be556ea33681819817df59",
       "owners": {
         "@module": {
           "before": null,
@@ -19233,11 +19449,11 @@
         },
         "_assessment": {
           "before": null,
-          "after": "a454107b0afd7e24c91e0dc1f6380075479bad679eea241f2ffc8e3f79954c7b"
+          "after": "f8de7bded23a6baf79c3e143e149076fcf4c0b8901f5eea09d6d5dc37951195a"
         },
         "_blobs": {
           "before": null,
-          "after": "b80c97d216075c8e75df6e1b8f1b13c19b437b3c206cc1096f05a0388f64debd"
+          "after": "70ed807ff88316fb1175b6cdce8ceea4e67b74e60c3d5eeedd3ab422f6b2c903"
         },
         "_ci54_previous": {
           "before": null,
@@ -19245,15 +19461,19 @@
         },
         "_ci_transitions": {
           "before": null,
-          "after": "8b5abeb031282e1476c6da02f9814ea3af649cd8046d308a471a9db4cc972645"
+          "after": "b31fb3a56bbe822a163e16e618a28a309b37054b1d5d9bdef4a144fe39f99661"
         },
         "_freeze": {
           "before": null,
-          "after": "8f7fbe5a30ede6a6f873569616aea76f7f79549d0511f4f023a14982a34ebb1a"
+          "after": "01722cd44bd27b1144dbf88168b49ed745b61aaa2fadce1264708a9b5582aa17"
         },
         "_git": {
           "before": null,
           "after": "7006de435bb0a829c4448aabbe6c8edf36869cf90b1af71c4aa8af69f4e096a2"
+        },
+        "_history": {
+          "before": null,
+          "after": "cae3170267c3a0f9a7293d059cc3e79e66e9115ab2097ee49a9cc225e713d152"
         },
         "_read": {
           "before": null,
@@ -19261,7 +19481,7 @@
         },
         "_runtime_transitions": {
           "before": null,
-          "after": "721145869ce445d23c8493d7040d92513da6b564982a27c394af863b6bdf9810"
+          "after": "64c92ec316ec565d595c95c85560b10593c441d4b553e3f9c0663a76ce954238"
         },
         "_sha": {
           "before": null,
@@ -19293,7 +19513,7 @@
         },
         "ci_comparison": {
           "before": null,
-          "after": "3465e894c3e4e4271e3a8af0029da857cb8223eb7dd37d58453e64c52781d906"
+          "after": "ca40bb70ddd062cce75a1bc00f8562942cc7626861bf16d16fe8086a275d1676"
         },
         "current_source": {
           "before": null,
@@ -19301,11 +19521,11 @@
         },
         "measurement_inputs": {
           "before": null,
-          "after": "5b1db4d6f860f12fe71855f41e2dc16cc0338a41283aecebdbe4c71b0643af89"
+          "after": "5ed09db6a41ef26da5b605ff920108ceead769b4d0649ffd1cbbe7ae6280f6c6"
         },
         "preceding_control": {
           "before": null,
-          "after": "d9039d64481b807adf982186d93e930ba38498507ad3e193f3d9c425fdb4677b"
+          "after": "3795bb7a840d59e497054bc1854eac9623c49a680d9b53d43c88f5fc7e9e7b44"
         },
         "read_frozen_blobs": {
           "before": null,
@@ -19313,7 +19533,7 @@
         },
         "static_predecessor": {
           "before": null,
-          "after": "c5baebce61964df175b155cc227121f84173f1edcb91618fd4b3b2cd598b94ea"
+          "after": "89113d8462afd2ec178c11a1e9d53dd6345a0238935b7add52b3431277bd620b"
         }
       }
     },
@@ -19341,7 +19561,7 @@
     },
     "tools/performance_qualification_successor.py": {
       "before_sha256": null,
-      "after_sha256": "45ba0c6dd10afb1f49f42e1cfe8ae77dab08b66436f2e9b4d8517415db28ed2a",
+      "after_sha256": "d5fccbb82ccce15700443eba27130f3e859d60f7b6b5b64294cd9619c9f1923b",
       "owners": {
         "@module": {
           "before": null,
@@ -19353,15 +19573,19 @@
         },
         "_freeze": {
           "before": null,
-          "after": "39af01836125e1442f8029666d4408607639a57589ffe4ce60b931119724d969"
+          "after": "8fcc09445b84b759f15f62e2eacb8befa4b690a9f33271f836ca3a2560adcf2a"
         },
         "_git": {
           "before": null,
           "after": "674e65e2f37e6aff2076ef8b6ecd11db1f667d8974a82dfa5268e156fa557bdc"
         },
+        "_history": {
+          "before": null,
+          "after": "cae3170267c3a0f9a7293d059cc3e79e66e9115ab2097ee49a9cc225e713d152"
+        },
         "_member": {
           "before": null,
-          "after": "68067100d6ce89dfcfdb788c20c5938a76175194a19e0043b602d9dae027cb0e"
+          "after": "4f10e26a8dd36767e97fc0704d07e7aa3c46057ea960e83a82a4135aa695df2f"
         },
         "_read": {
           "before": null,
@@ -19381,7 +19605,7 @@
         },
         "control_projection": {
           "before": null,
-          "after": "c28ed2d86f8d474784fc1e3c264a65d351ebed8d1972c34ecd2af3c9a87b3ba6"
+          "after": "12c2fe4626fe8ca8c0bd8980f31fc0db82941e98e7103e7ea56f50188782d328"
         },
         "enabled": {
           "before": null,
@@ -19389,7 +19613,7 @@
         },
         "expected_source": {
           "before": null,
-          "after": "a82daf14ce6acefa897ac5e0536a63c17afc527fc29844641e86d274fd9c821c"
+          "after": "875759311be7f88d1095ef1766b201e4da618e6b2f18bb423755b602a816bd0d"
         },
         "preceding_control": {
           "before": null,
@@ -19397,11 +19621,11 @@
         },
         "prior_operation_map_bytes": {
           "before": null,
-          "after": "c8cf8b67dabf6d905d328b86255190579fb39cd17f69fc2d06c169cfc214d1da"
+          "after": "ff363039be73d62c75c826a3297a8c9ca93d4333e26624ba644bd57992eedea2"
         },
         "producing_inputs": {
           "before": null,
-          "after": "36deff9ad03ee035ff4440b1a314895e58c744b60fe43881e2d3bbe28e97e525"
+          "after": "ca8bb965ac7ac7b1f4240b99f3f024960e9baaecf1b824745ea56649601b3ff4"
         }
       }
     },
@@ -19435,15 +19659,19 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "d1a32227d687da3ca65326fab0e047104b2200cb790d570947c38b6f3aeff821",
+      "after_sha256": "88e670ba728e02b24dc7b3baa65cd40c632d13cba2efb9f721d54f53aa6ce304",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e17ec3f855f973b650e89e366cb934581742f4df07e015ab64f8721a6ff97a85"
+          "after": "fd7c03ebb219b83bcd60df0e2b8a299b3947d86f32da440d1c92413721728ab0"
+        },
+        "_history": {
+          "before": null,
+          "after": "db5a24d4df3cce1247e7bd4e344bc00d86daac6c029b6db1eb875d3df3a31517"
         },
         "admit": {
           "before": null,
-          "after": "371f5168956c31711f200209ba59b463e36af603f55a01729ee27698f12d52ab"
+          "after": "cf810fe9177e85add59bff4ff661d9c6210ba68501795824f899eda03f807532"
         },
         "current_source": {
           "before": null,
@@ -19459,7 +19687,7 @@
         },
         "measurement_inputs": {
           "before": null,
-          "after": "43b66ba49063756aed0481854f8cea88a4e2aee5bf45d23574ea5638ab349d5f"
+          "after": "9417363c0cf5b59e6966eb6bcf293d38652b4552d2b3c043bc9c946a1c28215a"
         },
         "owned": {
           "before": null,
@@ -19467,13 +19695,13 @@
         },
         "previous": {
           "before": null,
-          "after": "86a5fd5928d9764c5ad70b546d28959eea2a56b70d758cc06286457f1cd6a1ae"
+          "after": "228e58770ee218127e2b2aa50864f35423aa23f0d5306b8b127e077badf7041e"
         }
       }
     },
     "tools/thousand_sons_perils_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "2e9ef0110809dde8b380e04a7b608095672c10ea39b8cfc9aff8318002320894",
+      "after_sha256": "3dbedc63406bf2088320d62d4571981457f130453e52f4ba7643433cdd878e3b",
       "owners": {
         "@module": {
           "before": null,
@@ -19481,11 +19709,15 @@
         },
         "_freeze": {
           "before": null,
-          "after": "b42f625a9d8879fdb8a7d990c59ce1ef9e685107e5bc1bf7106bcc355583f19c"
+          "after": "c2acc04d655ade24a936a6f1b0012286593dca74d1f7df342e78f9230366a2ef"
         },
         "_git": {
           "before": null,
           "after": "674e65e2f37e6aff2076ef8b6ecd11db1f667d8974a82dfa5268e156fa557bdc"
+        },
+        "_history": {
+          "before": null,
+          "after": "cae3170267c3a0f9a7293d059cc3e79e66e9115ab2097ee49a9cc225e713d152"
         },
         "_read": {
           "before": null,
@@ -19501,11 +19733,11 @@
         },
         "preceding_control": {
           "before": null,
-          "after": "beed3cdf114290dd68f9576313702e7f1e40f8f34122d6d65a71474f8ba0826d"
+          "after": "3320c78e7c54ca6549714dd5beaff6e36c1aca0c7aeeb36fb91f8f1ad4b728c4"
         },
         "preceding_test": {
           "before": null,
-          "after": "6beffe435919250fbfd405a27057f8c27845d3f036e24ff53181fa5e7cf27bf0"
+          "after": "451128d505919b471bfca87a7bfe21763f9d6adbd69ef1aec8b4397af07325b7"
         }
       }
     }
@@ -19523,9 +19755,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
-      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "ci/quality_shards/baseline-ci53.txt": {
       "category": "governance",
@@ -19579,9 +19811,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
-      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "ci/quality_shards/shard-4-modules.txt": {
       "category": "governance",
@@ -19595,9 +19827,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
-      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
@@ -21923,9 +22155,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
-      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "docs/D11_ONE_SHOT_PHYSICAL_SCOPE.md": {
       "category": "governance",
@@ -22139,9 +22371,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
-      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "docs/performance/ci-runtime-successor51.json": {
       "category": "governance",
@@ -22263,6 +22495,14 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "docs/performance/history-phase-snapshot.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
+    },
     "docs/performance/order34/budgets.json": {
       "category": "governance",
       "operations": [],
@@ -22337,9 +22577,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the exact static and hosted-entry repairs, while relocating pytest bytecode suppression from the historically pinned root test initializer to the quality package before its module imports. Root tests/__init__.py is restored byte-for-byte and separately authenticated as an unchanged owned anchor. D07 geometry and category-migration readers remain unchanged. Cumulative integration-member transport now uses one fresh hardened immutable Git batch while retaining the same member/hash/control decisions. Only their existing finite predecessor boundary admits the exact quality initializer history after full current-source authentication. The original symbolic operation-map validator is extracted without changing its comparisons and remains called after every actual current-input check; focused tests exercise it independently and retain a real forged-collector rejection.",
-      "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
-      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "scripts/performance_smoke.py": {
       "category": "governance",
@@ -24071,9 +24311,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the exact static and hosted-entry repairs, while relocating pytest bytecode suppression from the historically pinned root test initializer to the quality package before its module imports. Root tests/__init__.py is restored byte-for-byte and separately authenticated as an unchanged owned anchor. D07 geometry and category-migration readers remain unchanged. Cumulative integration-member transport now uses one fresh hardened immutable Git batch while retaining the same member/hash/control decisions. Only their existing finite predecessor boundary admits the exact quality initializer history after full current-source authentication. The original symbolic operation-map validator is extracted without changing its comparisons and remains called after every actual current-input check; focused tests exercise it independently and retain a real forged-collector rejection.",
-      "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
-      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tests/code_quality/test_performance_static_successor.py": {
       "category": "governance",
@@ -24111,9 +24351,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
-      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tests/code_quality/test_quality_runtime_process.py": {
       "category": "governance",
@@ -29805,9 +30045,9 @@
         "qualification40-exact-b8a07a50d2ab636b"
       ],
       "selected_families": [],
-      "rationale": "Repair the authentic CI49C whole-command budget failure by replacing only the cumulative expected-source loop's 83 individual immutable Git blob reads with one freshly authenticated batch. The public typed reader delegates to the existing unchanged hardened parser. Registry membership/order, eager hashing of all members, current control overrides and every downstream source check remain intact; no Git or filesystem success is cached.",
-      "source_obligation": "The separate CI49D record admits exactly the immutable 599161cc cumulative preimage and two literal edits. Full current freeze, physical live bytes, membership and ancestry authenticate this transition before its exact historical comparison feeds unchanged prior records. STATIC48, CI49, CI49B and CI49C records, all prior assertions/delegates, operation map and roadmap remain byte-exact. Five new guards cover real original/new function member and override equivalence, actual fresh Git-object tamper, exact transition, repinned override removal, and malformed duplicate selection; existing hardened parser guards remain unchanged. All 83 blobs are read and hashed even where live control hashes override them.",
-      "unchanged_work": "No engine, runtime build identity, gameplay function, fixture seed, measured workload, CI selection, operation/family/case/sample counts, 512 MiB digest retention cap, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The selected 3796-file historical inventory retains the prior 3795 raw-exact files and the single previously admitted Command-end export delta. The 83 immutable members total 15,619,849 bytes (maximum 1,879,442); batching adds bounded transient payload/slice retention without a success cache. The prior 188.799-second CI49C result remains a failed whole-budget receipt; paired transport measurements are diagnostic only. Fresh exact-source performance, full quality, static checks, integrity controls and independent review remain required; no prior timing, behavioral aggregate, coverage or hosted acceptance is transferred."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "The separate CI49D record admits exactly the immutable 599161cc cumulative preimage and two literal edits. Full current freeze, physical live bytes, membership and ancestry authenticate this transition before its exact historical comparison feeds unchanged prior records. STATIC48, CI49, CI49B and CI49C records, all prior assertions/delegates, operation map and roadmap remain byte-exact. Five new guards cover real original/new function member and override equivalence, actual fresh Git-object tamper, exact transition, repinned override removal, and malformed duplicate selection; existing hardened parser guards remain unchanged. All 83 blobs are read and hashed even where live control hashes override them. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "No engine, runtime build identity, gameplay function, fixture seed, measured workload, CI selection, operation/family/case/sample counts, 512 MiB digest retention cap, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The selected 3796-file historical inventory retains the prior 3795 raw-exact files and the single previously admitted Command-end export delta. The 83 immutable members total 15,619,849 bytes (maximum 1,879,442); batching adds bounded transient payload/slice retention without a success cache. The prior 188.799-second CI49C result remains a failed whole-budget receipt; paired transport measurements are diagnostic only. Fresh exact-source performance, full quality, static checks, integrity controls and independent review remain required; no prior timing, behavioral aggregate, coverage or hosted acceptance is transferred. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tools/generate_ability_support_matrix.py": {
       "category": "measured_workload",
@@ -29831,6 +30071,14 @@
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
     },
+    "tools/performance_history_snapshot.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
+    },
     "tools/performance_policy.py": {
       "category": "governance",
       "operations": [],
@@ -29851,9 +30099,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
-      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tools/performance_qualification_measurements.py": {
       "category": "governance",
@@ -29867,9 +30115,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the exact static and hosted-entry repairs, while relocating pytest bytecode suppression from the historically pinned root test initializer to the quality package before its module imports. Root tests/__init__.py is restored byte-for-byte and separately authenticated as an unchanged owned anchor. D07 geometry and category-migration readers remain unchanged. Cumulative integration-member transport now uses one fresh hardened immutable Git batch while retaining the same member/hash/control decisions. Only their existing finite predecessor boundary admits the exact quality initializer history after full current-source authentication. The original symbolic operation-map validator is extracted without changing its comparisons and remains called after every actual current-input check; focused tests exercise it independently and retain a real forged-collector rejection.",
-      "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
-      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tools/performance_tool_inputs.py": {
       "category": "governance",
@@ -29891,17 +30139,17 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
-      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tools/thousand_sons_perils_preservation.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact bounded preflight successor or retained Perils admission. Untimed admission tooling remains part of whole-command timing; raw component arms are reused only through exact unchanged measurement input proof.",
-      "source_obligation": "Preserve complete current pre/post source admission, owned physical bytes, all Git provenance and the original finite Perils assertions.",
-      "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Preserve complete current pre/post source admission, owned physical bytes, all Git provenance and the original finite Perils assertions. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     }
   },
   "milestone": "ordinary",

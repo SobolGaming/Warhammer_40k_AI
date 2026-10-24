@@ -31,6 +31,12 @@ def _git(root: Path, *args: str) -> bytes:
     return subprocess.check_output(["git", *args], cwd=root, timeout=60)
 
 
+def _history(root: Path, *args: str) -> bytes:
+    from tools.performance_history_snapshot import historical
+
+    return historical(root, "plain60", args, lambda: _git(root, *args))
+
+
 def _read(root: Path, name: str) -> bytes:
     from tests.d07_geometry_containment import read_owned_geometry_member
 
@@ -50,9 +56,9 @@ def _freeze(root: Path) -> str:
         raise ValueError("Qualification successor awaits its exact implementation freeze.")
     if len(FREEZE_COMMIT) != 40 or any(c not in "0123456789abcdef" for c in FREEZE_COMMIT):
         raise ValueError("Invalid qualification successor freeze.")
-    _git(root, "merge-base", "--is-ancestor", ACCEPTED, FREEZE_COMMIT)
+    _history(root, "merge-base", "--is-ancestor", ACCEPTED, FREEZE_COMMIT)
     _git(root, "merge-base", "--is-ancestor", FREEZE_COMMIT, "HEAD")
-    frozen = _git(root, "show", FREEZE_COMMIT + ":" + SELF)
+    frozen = _history(root, "show", FREEZE_COMMIT + ":" + SELF)
     marker = b"\nFREEZE_COMMIT: str | None = None"
     activated = f'\nFREEZE_COMMIT: str | None = "{FREEZE_COMMIT}"'.encode()
     if frozen.count(marker) != 1 or _read(root, SELF) != frozen.replace(marker, activated, 1):
@@ -62,7 +68,7 @@ def _freeze(root: Path) -> str:
 
 def _member(root: Path, name: str, freeze: str) -> bytes:
     raw = _read(root, name)
-    if raw != _git(root, "show", freeze + ":" + name):
+    if raw != _history(root, "show", freeze + ":" + name):
         raise ValueError(
             "Reviewed migration source/data changed: Qualification evidence/control: " + name
         )
@@ -74,7 +80,7 @@ def expected_source(root: Path, previous: dict[str, str]) -> dict[str, str]:
     accepted = json.loads(_member(root, NAMESPACE + "/accepted-source.json", freeze))
     if _digest(accepted) != SOURCE_SHA256:
         raise ValueError("Qualification accepted predecessor source changed.")
-    names = _git(root, "diff", "--name-only", ACCEPTED, freeze).decode().splitlines()
+    names = _history(root, "diff", "--name-only", ACCEPTED, freeze).decode().splitlines()
     declared = json.loads(_member(root, NAMESPACE + "/changed-members.json", freeze))
     if sorted(names) != declared or len(set(declared)) != len(declared):
         raise ValueError("Qualification finite changed membership changed.")
@@ -96,7 +102,7 @@ def expected_source(root: Path, previous: dict[str, str]) -> dict[str, str]:
         result[name] = _sha(raw)
     del frozen_members
     assessment = "docs/performance/change-assessment.json"
-    frozen_assessment = json.loads(_git(root, "show", freeze + ":" + assessment))
+    frozen_assessment = json.loads(_history(root, "show", freeze + ":" + assessment))
     actual_control = _read(root, SELF)
     from tools.performance_policy import owner_hashes
 
@@ -121,7 +127,7 @@ def control_projection(root: Path) -> dict[str, bytes]:
     projected = {}
     for row in rows:
         name = row["path"]
-        old = _git(root, "show", ACCEPTED + ":" + name)
+        old = _history(root, "show", ACCEPTED + ":" + name)
         new = _member(root, name, freeze)
         if _sha(old) != row["before_sha256"] or _sha(new) != row["after_sha256"]:
             raise ValueError("Qualification exact control transition changed: " + name)
@@ -137,7 +143,7 @@ def preceding_control(root: Path, name: str, current: bytes) -> bytes:
 
 def prior_operation_map_bytes(root: Path) -> bytes:
     freeze = _freeze(root)
-    old_raw = _git(root, "show", ACCEPTED + ":" + MAP)
+    old_raw = _history(root, "show", ACCEPTED + ":" + MAP)
     old = json.loads(old_raw)
     new = json.loads(_member(root, MAP, freeze))
     metadata = {k: v for k, v in new.items() if k != "operations"}
@@ -184,7 +190,7 @@ def producing_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
 
     current = measurement_inputs(root, current)
     freeze = _freeze(root)
-    _git(root, "merge-base", "--is-ancestor", PRODUCING_COMMIT, freeze)
+    _history(root, "merge-base", "--is-ancestor", PRODUCING_COMMIT, freeze)
     measured: dict[str, str] = json.loads(
         _member(root, NAMESPACE + "/producing-inputs.json", freeze)
     )
@@ -195,11 +201,11 @@ def producing_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     quality = "tests/code_quality/test_qualification40_successor.py"
     allowed = {SELF, MAP, quality}
     raw = {name: _member(root, name, freeze) for name in allowed - {SELF}}
-    raw[SELF] = _git(root, "show", freeze + ":" + SELF)
+    raw[SELF] = _history(root, "show", freeze + ":" + SELF)
     expected = measured | {name: _sha(_read(root, name)) for name in allowed}
     if current != expected:
         raise ValueError("Qualification metadata inventory cannot change workload inputs.")
-    old = {name: _git(root, "show", PRODUCING_COMMIT + ":" + name) for name in allowed}
+    old = {name: _history(root, "show", PRODUCING_COMMIT + ":" + name) for name in allowed}
     if any(_sha(content) != measured[name] for name, content in old.items()):
         raise ValueError("Qualification original producing control/map identity changed.")
     constants = (

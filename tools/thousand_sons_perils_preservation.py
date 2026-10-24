@@ -41,17 +41,23 @@ def _git(root: Path, *args: str) -> bytes:
     return subprocess.check_output(["git", *args], cwd=root, timeout=60)
 
 
+def _history(root: Path, *args: str) -> bytes:
+    from tools.performance_history_snapshot import historical
+
+    return historical(root, "plain60", args, lambda: _git(root, *args))
+
+
 def _freeze(root: Path) -> str:
     freeze = FREEZE_COMMIT
     if freeze is None or len(freeze) != 40 or set(freeze) - set("0123456789abcdef"):
         raise ValueError("Perils successor awaits its exact source freeze.")
-    _git(root, "merge-base", "--is-ancestor", BASE, freeze)
+    _history(root, "merge-base", "--is-ancestor", BASE, freeze)
     _git(root, "merge-base", "--is-ancestor", freeze, "HEAD")
-    names = _git(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
+    names = _history(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
     if set(names) != CHANGED or len(names) != len(CHANGED):
         raise ValueError("Perils successor finite changed membership drift.")
     for name in CHANGED:
-        expected = _git(root, "show", freeze + ":" + name)
+        expected = _history(root, "show", freeze + ":" + name)
         if name == SELF:
             marker = b"\nFREEZE_COMMIT: str | None = None"
             if expected.count(marker) != 1:
@@ -95,7 +101,7 @@ def preceding_control(root: Path, name: str, raw: bytes) -> bytes:
         if raw.count(added) != 1:
             raise ValueError("Perils successor exact control insertion drift.")
         raw = raw.replace(added, original, 1)
-    if raw != _git(root, "show", BASE + ":" + name):
+    if raw != _history(root, "show", BASE + ":" + name):
         raise ValueError("Perils successor changed a preceding control owner.")
     return raw
 
@@ -111,7 +117,7 @@ def preceding_test(root: Path, name: str, raw: bytes) -> bytes:
     if raw not in (live, live.replace(b"\r\n", b"\n")):
         raise ValueError("Perils successor caller omitted the actual test bytes.")
     original = live[:OFFSET] + live[OFFSET + LENGTH :]
-    if _sha(original) != BEFORE or original != _git(root, "show", BASE + ":" + TEST):
+    if _sha(original) != BEFORE or original != _history(root, "show", BASE + ":" + TEST):
         raise ValueError("Perils successor original assertion/branch/identity drift.")
     return original.replace(b"\r\n", b"\n") if raw != live else original
 
