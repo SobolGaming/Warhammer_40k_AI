@@ -430,14 +430,14 @@ def lane(
         )
         for mode in ("collect", "execute")
     }
-    dependencies = {
+    dependencies: dict[str, Any] = {
         "python": "3.14.5",
         "executable": "binary",
         "physical_sha256": "physical",
         "distributions": {},
         "plugins": [],
     }
-    admitted = {
+    admitted: dict[str, Any] = {
         "binding": binding,
         "source": source,
         "dependencies": dependencies,
@@ -585,8 +585,15 @@ def test_missing_or_stale_upload_cannot_be_accepted(
     lane: tuple[Path, dict[str, Any], dict[str, str], dict[str, Any]],
 ) -> None:
     _, expected, source, inventories = lane
-    monkeypatch.setattr(evidence, "source_identity", lambda root: source)
-    monkeypatch.setattr(evidence, "inventory", lambda root: inventories)
+
+    def fixed_source(root: Path) -> dict[str, str]:
+        return source
+
+    def fixed_inventory(root: Path) -> dict[str, Any]:
+        return inventories
+
+    monkeypatch.setattr(evidence, "source_identity", fixed_source)
+    monkeypatch.setattr(evidence, "inventory", fixed_inventory)
     for shard in ("1", "2", "3"):
         (tmp_path / evidence.artifact_name(expected, shard)).mkdir()
     with pytest.raises(evidence.EvidenceError, match="Missing/duplicate/stale artifacts"):
