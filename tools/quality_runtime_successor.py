@@ -12,13 +12,13 @@ BASE = "5396b557fd90a67e0c097da1020959b58724a7ec"
 SELF = "tools/quality_runtime_successor.py"
 RECORD = "docs/performance/ci-quality-runtime54.json"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE: str | None = "27e775bff9a7108667a7ff9280d36e24750a38a4"
+FREEZE: str | None = None
 PINS: dict[str, str] = {
     ".github/workflows/ci.yml": (
         "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
     ),
     "ci/quality_shards/all.txt": (
-        "8df91b5d75cc914289c8f590597ac295a67b18ba728fc9365b0c6eb9f30c7dd0"
+        "9a0ae6cbc77c20ff03b892faca76e117fd4817151480050880ea2a28b0185e60"
     ),
     "ci/quality_shards/baseline-ci53.txt": (
         "308870fb4095de8e263def2e75ac71687bc65c3b32f06f591fed848fc34b4ef3"
@@ -51,7 +51,7 @@ PINS: dict[str, str] = {
         "b627e0688559b1fc46307c8449d17095307dd1fdc7a969c20cf5378a34887a0a"
     ),
     "docs/performance/ci-quality-runtime54.json": (
-        "2bdc7331fcc4d6faafb4f32a692890c6b2d302857ab4778491b178dcc9cfc95c"
+        "12904e8b2b71acd6b4e39d53f5102fd75bc3f6f4f756e43077f53d6735bf3761"
     ),
     "docs/performance/history-phase-snapshot.md": (
         "eff5ac4c71a42a547507bbba0713b33f89330fecaa1a931032395629f063e72a"
@@ -77,11 +77,17 @@ PINS: dict[str, str] = {
     "tests/code_quality/test_ci_runtime_successor.py": (
         "e90ce2f38ae81cf82a7de6648d1482e0d6d23a81c449506fa2f3326633399f79"
     ),
+    "tests/code_quality/test_performance_integration_batch.py": (
+        "612b5b49f004dcf1ce1779578b0ca5e5e1ed595d568200966cdeb978634ddfba"
+    ),
     "tests/code_quality/test_performance_policy.py": (
         "8494642f66f70ce0cc71d330e164eba067e90e9ebea3eb1f0c11fbb4dbc25c69"
     ),
     "tests/code_quality/test_performance_preflight.py": (
         "1e6dbe6f7e99215cc8c9199460e9d896b0fff079563608da3063d6cfd9d75255"
+    ),
+    "tests/code_quality/test_performance_static_successor.py": (
+        "4f3782dd0cf3af4330eb5fc3365a5e5bca5344597524b8033b589ff5bd090557"
     ),
     "tests/code_quality/test_quality_runtime.py": (
         "5cf6835a7592ea83bf8a2e8a175a1a7a825277a9fea77a2a27d8e2bfdcff795b"
@@ -105,7 +111,7 @@ PINS: dict[str, str] = {
         "d5fccbb82ccce15700443eba27130f3e859d60f7b6b5b64294cd9619c9f1923b"
     ),
     "tools/thousand_sons_perils_preservation.py": (
-        "3dbedc63406bf2088320d62d4571981457f130453e52f4ba7643433cdd878e3b"
+        "32718561e2154c6c869e66b411328e8a953b4d3365b884a535503fc3136cc0cc"
     ),
 }
 BEFORE: dict[str, str] = {
@@ -145,6 +151,12 @@ BEFORE: dict[str, str] = {
 SNAPSHOT_BEFORE: dict[str, str] = {
     "scripts/check_performance_policy.py": (
         "ce2c1e27152f0eb030b867078f543bb94472a7b3b0cf3cd0d5e2cc1102111209"
+    ),
+    "tests/code_quality/test_performance_integration_batch.py": (
+        "bbdff0e56ccb7f90101363c02431db19e4ffd93d181af06d8a92f5a62eb2ccdd"
+    ),
+    "tests/code_quality/test_performance_static_successor.py": (
+        "56987d69a6f8918842a6720bbfb1461995a7626542628269c9b0a8e9c01d2e46"
     ),
     "tools/cumulative_preservation.py": (
         "0aed6e5a524e891710bc85c2eda40565ca1f5cfc5c07f268acdb6ec727c060f3"

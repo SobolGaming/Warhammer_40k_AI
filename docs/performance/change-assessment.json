@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "8df91b5d75cc914289c8f590597ac295a67b18ba728fc9365b0c6eb9f30c7dd0",
+      "after_sha256": "9a0ae6cbc77c20ff03b892faca76e117fd4817151480050880ea2a28b0185e60",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8df91b5d75cc914289c8f590597ac295a67b18ba728fc9365b0c6eb9f30c7dd0"
+          "after": "9a0ae6cbc77c20ff03b892faca76e117fd4817151480050880ea2a28b0185e60"
         }
       }
     },
@@ -2706,11 +2706,11 @@
     },
     "docs/performance/ci-quality-runtime54.json": {
       "before_sha256": null,
-      "after_sha256": "2bdc7331fcc4d6faafb4f32a692890c6b2d302857ab4778491b178dcc9cfc95c",
+      "after_sha256": "12904e8b2b71acd6b4e39d53f5102fd75bc3f6f4f756e43077f53d6735bf3761",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2bdc7331fcc4d6faafb4f32a692890c6b2d302857ab4778491b178dcc9cfc95c"
+          "after": "12904e8b2b71acd6b4e39d53f5102fd75bc3f6f4f756e43077f53d6735bf3761"
         }
       }
     },
@@ -5693,11 +5693,11 @@
     },
     "tests/code_quality/test_performance_integration_batch.py": {
       "before_sha256": null,
-      "after_sha256": "bbdff0e56ccb7f90101363c02431db19e4ffd93d181af06d8a92f5a62eb2ccdd",
+      "after_sha256": "612b5b49f004dcf1ce1779578b0ca5e5e1ed595d568200966cdeb978634ddfba",
       "owners": {
         "@module": {
           "before": null,
-          "after": "1ec9fb919993dc0f3b3fb51f9458e2301c1e2e49387b0b3b41bddcec2c8d8a61"
+          "after": "2b6b43f6a1988601e5270c134ee72aac132586bafac740cc25ab3687c2dd839f"
         },
         "_GitAccess": {
           "before": null,
@@ -5705,7 +5705,7 @@
         },
         "_GitAccess._git": {
           "before": null,
-          "after": "a09d05fca7185837d1e0f65530c9aa856a41ea8a7b6cb1e13570e48777c92afe"
+          "after": "1b657650055edbb45bf34a6eb0525a802588bca25ba7ee0fa5126541c1be0517"
         },
         "_GitAccess.function": {
           "before": null,
@@ -5717,7 +5717,7 @@
         },
         "test_integration_batch_matches_original_function_members_and_control_overrides": {
           "before": null,
-          "after": "0f26965e31b5aad914e630f7fd457d3f20ab9f6f908915047fae7c7bcce90219"
+          "after": "422498e497ce3a82dcf927dd087e9c31108d4b5e39491c9afd92f0ec3bcf2355"
         },
         "test_integration_batch_rejects_duplicate_member_selection": {
           "before": null,
@@ -5729,7 +5729,7 @@
         },
         "test_transport_proof_preserves_exact_immutable_preimage": {
           "before": null,
-          "after": "f85198b9f5d9f0d9fe60e705e6b3c26a6a553650981d29f4f76d3f3bd2f39d81"
+          "after": "7ff406f7944f8d680becab7dfbc66d6b5aad34dc06c1a309d841283c897e71f1"
         }
       }
     },
@@ -6119,11 +6119,11 @@
     },
     "tests/code_quality/test_performance_static_successor.py": {
       "before_sha256": null,
-      "after_sha256": "56987d69a6f8918842a6720bbfb1461995a7626542628269c9b0a8e9c01d2e46",
+      "after_sha256": "4f3782dd0cf3af4330eb5fc3365a5e5bca5344597524b8033b589ff5bd090557",
       "owners": {
         "@module": {
           "before": null,
-          "after": "08bc8f32efed21287809e74177aa17b0b14bca0dafd615cd521c5d5b42418983"
+          "after": "2cc57a31074197a7f9aa7bc9e235c4bf6a3c49f31c6306e174629809afd3456e"
         },
         "ci_transitions": {
           "before": null,
@@ -6143,11 +6143,11 @@
         },
         "test_ci_formatting_preserves_import_bindings_and_nonimport_ast": {
           "before": null,
-          "after": "1a9580f20be9525f3d120d89b802d7ab8577a4cf56dc08df453ea29601525705"
+          "after": "c4dee4e736c8a8653b8b64a82b39e00c742f6e23fa96daf69ffa85db9c1a9a6f"
         },
         "test_ci_relocation_and_map_seam_match_exact_immutable_preimages": {
           "before": null,
-          "after": "0583a9d7de0e0cdcdb5c80a3012782cf8e5620d08afa39a30e240fe84b54c8e7"
+          "after": "19e5c246b365b5f9f9de95dbb5040bedc6fffb48b1eaa8a4adf6acae094d02fa"
         },
         "test_ci_relocation_rejects_unreviewed_bootstrap_or_validation_even_if_repinned": {
           "before": null,
@@ -19755,11 +19755,11 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "ebb8305d0cb54d261e8500abe38afd3b7c11d99883887d4363e0db6c7eb6425a",
+      "after_sha256": "0423b04e213618f88b14cbdbaa6960645cdd536a30cc61c8634c0ff78c9da375",
       "owners": {
         "@module": {
           "before": null,
-          "after": "4bb349652a5f2f091510a388f685045302e6a8d532e7d870e87ea725678fc9bb"
+          "after": "0af7cec259460d436c54ac15bcc033de0c1f100194312430fae392b3a5c6b9ca"
         },
         "_history": {
           "before": null,
@@ -19797,7 +19797,7 @@
     },
     "tools/thousand_sons_perils_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "3dbedc63406bf2088320d62d4571981457f130453e52f4ba7643433cdd878e3b",
+      "after_sha256": "32718561e2154c6c869e66b411328e8a953b4d3365b884a535503fc3136cc0cc",
       "owners": {
         "@module": {
           "before": null,
@@ -19817,7 +19817,7 @@
         },
         "_read": {
           "before": null,
-          "after": "2238ccd1b3c5a1daa68d910915d8a9de3dfad0f9b2a6afc636de89e9797f0be8"
+          "after": "6ebf87cc9e0f4cae5e945800e328996f84eb61997f299c4cb8e797493a759c9f"
         },
         "_sha": {
           "before": null,
@@ -19829,7 +19829,7 @@
         },
         "preceding_control": {
           "before": null,
-          "after": "3320c78e7c54ca6549714dd5beaff6e36c1aca0c7aeeb36fb91f8f1ad4b728c4"
+          "after": "ea408c9b58cedfabb41c9c476cfd33bdd4e6ec6c8e4b625b694ac0201b014e76"
         },
         "preceding_test": {
           "before": null,
@@ -24391,9 +24391,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Correct the new CI49D integration guard to match the demonstrated original loop boundary. Exactly four of ten reviewed controls belong to its 83 integration members; six controls remain at accepted-source values before downstream processing. Authenticate the accepted-source digest and reconstruct both complete pre-successor maps using all 83 member bytes and the original controls.get decision. Pin the exact four overlapping controls and three actual override-versus-raw differences. The original/new output, member count/order/bytes and zero individual-read assertions are retained.",
-      "source_obligation": "The proposed guard passed from an external copy against unchanged frozen bd94c174 before source editing. The preceding CI49E correction changed only that new guard and its exact SELF pin/freeze/assessment metadata; the production transport owner, hardened parser, public reader and 946-byte CI49D transition record remain byte-exact. All pre-D tests and STATIC48/CI49/CI49B/CI49C records remain byte-exact. Two erroneous D0 guard assertions are replaced with complete-map reconstruction and explicit control-scope assertions, preserving all other guard statements and all five case IDs. Every current-source, Git and historical comparison check remains mandatory.",
-      "unchanged_work": "No production behavior, engine, gameplay input, measured workload, seed, operation map, family/case/sample selection, digest-retention limit, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The bd94 targeted 83-pass/1-fail result remains its original failed evidence. External-copy success proves the corrected assertion contract against that frozen source, not final-source qualification. Fresh exact-head default-launcher controls, static checks, performance, complete quality reconciliation and independent review remain required; no old timing or hosted acceptance is transferred."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "The proposed guard passed from an external copy against unchanged frozen bd94c174 before source editing. The preceding CI49E correction changed only that new guard and its exact SELF pin/freeze/assessment metadata; the production transport owner, hardened parser, public reader and 946-byte CI49D transition record remain byte-exact. All pre-D tests and STATIC48/CI49/CI49B/CI49C records remain byte-exact. Two erroneous D0 guard assertions are replaced with complete-map reconstruction and explicit control-scope assertions, preserving all other guard statements and all five case IDs. Every current-source, Git and historical comparison check remains mandatory. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "No production behavior, engine, gameplay input, measured workload, seed, operation map, family/case/sample selection, digest-retention limit, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The bd94 targeted 83-pass/1-fail result remains its original failed evidence. External-copy success proves the corrected assertion contract against that frozen source, not final-source qualification. Fresh exact-head default-launcher controls, static checks, performance, complete quality reconciliation and independent review remain required; no old timing or hosted acceptance is transferred. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tests/code_quality/test_performance_policy.py": {
       "category": "governance",
@@ -24415,9 +24415,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "The two faction manifest tests previously rebuilt the independent complete execution-record lookup for every row. Each affected test now builds one fresh local map and passes it to the same three semantic assertions, then compares the initial record tuple with a final fresh loader result. The explicitly selected lookup-only successor restores the migration helper, migration quality tests, cumulative adapter and transport guard to exact CI50 bytes after the broader candidate regressed whole-command validation time.",
-      "source_obligation": "Authenticate the narrowed current finite edits against immutable CI50 9746a372344322abd77a496d2b9621629b79e7be bytes before exposing predecessor inputs to unchanged historical recipes. Preserve independent record provenance, all row assertions, tuple ordering/multiplicity and persistent drift visible to the loader; the final reload is not a universal raw-byte guard. Historical compatibility positives still authenticate live roadmap/static-test bytes before selecting hash-checked CI50 after inputs. The workflow is exact frozen CI51F, retaining the existing ten-minute quality-step cap, original fetch/source checks, jobs, concurrency and every validation command.",
-      "unchanged_work": "All 1683 historical quality cases, their original assertions, the audited 244 assertions and 16 delegates, original source obligations, historical pins/recipes, all production code and 85/180/600 limits remain retained. Five explicitly new initializer-optimization cases and four current-member parameters are retired with that removed optimization; two unrelated-caller parameters now exercise retained faction/history owners, preserving both rejection controls. No cache, skipped validation or new comparison infrastructure is introduced. Expected collection is 1692 cases, pending actual collection. Exact restoration makes the changed migration input equal CI50 again; historical receipts remain historical and neither aggregate applicability nor a current runtime pass is inherited. A genuine current receipt, complete applicable local/hosted gates and both exact-head reviews remain required. No performance target, rules certification or publication is claimed."
+      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "source_obligation": "Authenticate the narrowed current finite edits against immutable CI50 9746a372344322abd77a496d2b9621629b79e7be bytes before exposing predecessor inputs to unchanged historical recipes. Preserve independent record provenance, all row assertions, tuple ordering/multiplicity and persistent drift visible to the loader; the final reload is not a universal raw-byte guard. Historical compatibility positives still authenticate live roadmap/static-test bytes before selecting hash-checked CI50 after inputs. The workflow is exact frozen CI51F, retaining the existing ten-minute quality-step cap, original fetch/source checks, jobs, concurrency and every validation command. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
+      "unchanged_work": "All 1683 historical quality cases, their original assertions, the audited 244 assertions and 16 delegates, original source obligations, historical pins/recipes, all production code and 85/180/600 limits remain retained. Five explicitly new initializer-optimization cases and four current-member parameters are retired with that removed optimization; two unrelated-caller parameters now exercise retained faction/history owners, preserving both rejection controls. No cache, skipped validation or new comparison infrastructure is introduced. Expected collection is 1692 cases, pending actual collection. Exact restoration makes the changed migration input equal CI50 again; historical receipts remain historical and neither aggregate applicability nor a current runtime pass is inherited. A genuine current receipt, complete applicable local/hosted gates and both exact-head reviews remain required. No performance target, rules certification or publication is claimed. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tests/code_quality/test_phase14h_attack_resolution_convergence.py": {
       "category": "governance",

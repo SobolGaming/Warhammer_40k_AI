@@ -258,6 +258,46 @@
         }
       ]
     },
+    "tests/code_quality/test_performance_integration_batch.py": {
+      "before_sha256": "bbdff0e56ccb7f90101363c02431db19e4ffd93d181af06d8a92f5a62eb2ccdd",
+      "after_sha256": "612b5b49f004dcf1ce1779578b0ca5e5e1ed595d568200966cdeb978634ddfba",
+      "edits": [
+        {
+          "before": "from tools import performance_qualification_successor as qualification\n",
+          "after": "from tools import performance_qualification_successor as qualification\nfrom tools import quality_runtime_successor as ci54\n"
+        },
+        {
+          "before": "    def _git(self, root: Path, *args: str) -> bytes: ...\n",
+          "after": "    def _git(self, root: Path, *args: str, historical: bool = False) -> bytes: ...\n"
+        },
+        {
+          "before": "    def observe_git(root: Path, *args: str) -> bytes:\n        result = original_git(root, *args)\n",
+          "after": "    def observe_git(root: Path, *args: str, historical: bool = False) -> bytes:\n        result = original_git(root, *args, historical=historical)\n"
+        },
+        {
+          "before": "    stage.assert_ci_transport_transition(\n        name, before, (ROOT / name).read_bytes(), record[\"changes\"][name]\n    )\n",
+          "after": "    ci54.admit(ROOT)\n    current = ci54.previous(ROOT, name, (ROOT / name).read_bytes())\n    stage.assert_ci_transport_transition(name, before, current, record[\"changes\"][name])\n"
+        }
+      ]
+    },
+    "tests/code_quality/test_performance_static_successor.py": {
+      "before_sha256": "56987d69a6f8918842a6720bbfb1461995a7626542628269c9b0a8e9c01d2e46",
+      "after_sha256": "4f3782dd0cf3af4330eb5fc3365a5e5bca5344597524b8033b589ff5bd090557",
+      "edits": [
+        {
+          "before": "from tools import performance_preflight_successor as successor\n",
+          "after": "from tools import performance_preflight_successor as successor\nfrom tools import quality_runtime_successor as ci54\n"
+        },
+        {
+          "before": "def test_ci_formatting_preserves_import_bindings_and_nonimport_ast(name: str) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_FORMAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_FORMAT_BASE + \":\" + name], cwd=ROOT\n    )\n    current = (ROOT / name).read_bytes()\n",
+          "after": "def test_ci_formatting_preserves_import_bindings_and_nonimport_ast(name: str) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_FORMAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_FORMAT_BASE + \":\" + name], cwd=ROOT\n    )\n    ci54.admit(ROOT)\n    current = ci54.previous(ROOT, name, (ROOT / name).read_bytes())\n"
+        },
+        {
+          "before": "def test_ci_relocation_and_map_seam_match_exact_immutable_preimages(name: str) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_COMPAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_COMPAT_BASE + \":\" + name], cwd=ROOT\n    )\n    current = (ROOT / name).read_bytes()\n",
+          "after": "def test_ci_relocation_and_map_seam_match_exact_immutable_preimages(name: str) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_COMPAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_COMPAT_BASE + \":\" + name], cwd=ROOT\n    )\n    ci54.admit(ROOT)\n    current = ci54.previous(ROOT, name, (ROOT / name).read_bytes())\n"
+        }
+      ]
+    },
     "tools/cumulative_preservation.py": {
       "before_sha256": "0aed6e5a524e891710bc85c2eda40565ca1f5cfc5c07f268acdb6ec727c060f3",
       "after_sha256": "8f3a7a87d29bd4fe49a04321fc83070b396e930d25e7c3fe97f656c625609d64",
@@ -332,8 +372,12 @@
     },
     "tools/thousand_sons_perils_preservation.py": {
       "before_sha256": "2e9ef0110809dde8b380e04a7b608095672c10ea39b8cfc9aff8318002320894",
-      "after_sha256": "3dbedc63406bf2088320d62d4571981457f130453e52f4ba7643433cdd878e3b",
+      "after_sha256": "32718561e2154c6c869e66b411328e8a953b4d3365b884a535503fc3136cc0cc",
       "edits": [
+        {
+          "before": "    return preflight_control(root, name, read_owned_geometry_member(root, name))\n",
+          "after": "    raw = read_owned_geometry_member(root, name)\n    try:\n        return preflight_control(root, name, raw)\n    except ValueError as exc:\n        raise ValueError(f\"Perils successor current-source admission failed: {exc}\") from exc\n"
+        },
         {
           "before": "    return subprocess.check_output([\"git\", *args], cwd=root, timeout=60)\n\n\n",
           "after": "    return subprocess.check_output([\"git\", *args], cwd=root, timeout=60)\n\n\ndef _history(root: Path, *args: str) -> bytes:\n    from tools.performance_history_snapshot import historical\n\n    return historical(root, \"plain60\", args, lambda: _git(root, *args))\n\n\n"
@@ -349,6 +393,10 @@
         {
           "before": "        expected = _git(root, \"show\", freeze + \":\" + name)\n",
           "after": "        expected = _history(root, \"show\", freeze + \":\" + name)\n"
+        },
+        {
+          "before": "    raw = preflight_control(root, name, raw)\n",
+          "after": "    try:\n        raw = preflight_control(root, name, raw)\n    except ValueError as exc:\n        raise ValueError(f\"Perils successor current-source admission failed: {exc}\") from exc\n"
         },
         {
           "before": "    if raw != _git(root, \"show\", BASE + \":\" + name):\n",

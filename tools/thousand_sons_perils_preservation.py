@@ -34,7 +34,11 @@ def _read(root: Path, name: str) -> bytes:
         raise ValueError("Aliased perils successor root.")
     from tools.performance_preflight_successor import preceding_control as preflight_control
 
-    return preflight_control(root, name, read_owned_geometry_member(root, name))
+    raw = read_owned_geometry_member(root, name)
+    try:
+        return preflight_control(root, name, raw)
+    except ValueError as exc:
+        raise ValueError(f"Perils successor current-source admission failed: {exc}") from exc
 
 
 def _git(root: Path, *args: str) -> bytes:
@@ -73,7 +77,10 @@ def _freeze(root: Path) -> str:
 def preceding_control(root: Path, name: str, raw: bytes) -> bytes:
     from tools.performance_preflight_successor import preceding_control as preflight_control
 
-    raw = preflight_control(root, name, raw)
+    try:
+        raw = preflight_control(root, name, raw)
+    except ValueError as exc:
+        raise ValueError(f"Perils successor current-source admission failed: {exc}") from exc
     if name not in {STAGE, CUMULATIVE}:
         return raw
     _freeze(root)

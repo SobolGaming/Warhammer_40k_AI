@@ -16,6 +16,7 @@ import pytest
 from tools import cumulative_preservation as cumulative
 from tools import performance_preflight_successor as stage
 from tools import performance_qualification_successor as qualification
+from tools import quality_runtime_successor as ci54
 from tools.performance_tool_inputs import digest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,7 +24,7 @@ OWNER = "tools/cumulative_preservation.py"
 
 
 class _GitAccess(Protocol):
-    def _git(self, root: Path, *args: str) -> bytes: ...
+    def _git(self, root: Path, *args: str, historical: bool = False) -> bytes: ...
 
     def function(self) -> Callable[..., bytes]:
         return self._git
@@ -46,8 +47,8 @@ def test_integration_batch_matches_original_function_members_and_control_overrid
     inputs: list[dict[str, str]] = []
     prefix = str(cumulative.SOURCE_COMMIT) + ":"
 
-    def observe_git(root: Path, *args: str) -> bytes:
-        result = original_git(root, *args)
+    def observe_git(root: Path, *args: str, historical: bool = False) -> bytes:
+        result = original_git(root, *args, historical=historical)
         if len(args) == 2 and args[0] == "show" and args[1].startswith(prefix):
             individual.append((args[1][len(prefix) :], result))
         return result
@@ -154,9 +155,9 @@ def test_transport_proof_preserves_exact_immutable_preimage(name: str) -> None:
     before = subprocess.check_output(
         ["git", "show", stage.CI_TRANSPORT_BASE + ":" + name], cwd=ROOT
     )
-    stage.assert_ci_transport_transition(
-        name, before, (ROOT / name).read_bytes(), record["changes"][name]
-    )
+    ci54.admit(ROOT)
+    current = ci54.previous(ROOT, name, (ROOT / name).read_bytes())
+    stage.assert_ci_transport_transition(name, before, current, record["changes"][name])
 
 
 def test_transport_proof_cannot_drop_control_overrides_even_if_repinned() -> None:
