@@ -1279,3 +1279,45 @@ def test_history_publication_reconciles_native_members_and_original_declarations
         builder.members[key] = replace(builder.members[key], authorities=("self-invented",))
     with pytest.raises(ValueError, match="History"):
         history._seal(builder, {}, "runtime", "negative")
+
+
+def test_history_cumulative_transport_requires_explicit_opt_in_and_preserves_live_calls(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tools import cumulative_preservation as cumulative
+    from tools import performance_history_snapshot as history
+
+    commands: list[tuple[list[str], dict[str, Any]]] = []
+    selected: list[tuple[Path, str, tuple[str, ...]]] = []
+
+    def execute(command: list[str], **kwargs: Any) -> bytes:
+        commands.append((command, kwargs))
+        return b"native bytes"
+
+    def historical(
+        root: Path, domain: str, args: tuple[str, ...], fresh: Callable[[], bytes]
+    ) -> bytes:
+        selected.append((root, domain, args))
+        return fresh()
+
+    monkeypatch.setattr(cumulative.subprocess, "check_output", execute)
+    monkeypatch.setattr(history, "historical", historical)
+    assert cumulative._git(tmp_path, "ls-files", payload=b"input") == b"native bytes"
+    assert commands == [
+        (
+            ["git", "-c", f"safe.directory={tmp_path.as_posix()}", "ls-files"],
+            {"cwd": tmp_path, "input": b"input", "timeout": 60},
+        )
+    ]
+    assert selected == []
+    args = ("show", "a" * 40 + ":control.py")
+    assert cumulative._git(tmp_path, *args, historical=True) == b"native bytes"
+    assert selected == [(tmp_path, "safe60", args)]
+    assert commands[-1] == (
+        ["git", "-c", f"safe.directory={tmp_path.as_posix()}", *args],
+        {"cwd": tmp_path, "input": None, "timeout": 60},
+    )
+    with pytest.raises(ValueError, match="does not accept a mutable payload"):
+        cumulative._git(tmp_path, *args, payload=b"input", historical=True)
+    assert len(commands) == 2
+    assert len(selected) == 1

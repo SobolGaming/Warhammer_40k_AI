@@ -60,19 +60,19 @@ def _read(root: Path, name: str) -> bytes:
         raise ValueError("Cumulative member missing: " + name) from error
 
 
-def _git(root: Path, *args: str, payload: bytes | None = None) -> bytes:
+def _git(root: Path, *args: str, payload: bytes | None = None, historical: bool = False) -> bytes:
+    if historical:
+        if payload is not None:
+            raise ValueError("Historical cumulative Git does not accept a mutable payload.")
+        from tools.performance_history_snapshot import historical as read_historical
+
+        return read_historical(root, "safe60", args, lambda: _git(root, *args))
     return subprocess.check_output(
         ["git", "-c", f"safe.directory={root.as_posix()}", *args],
         cwd=root,
         input=payload,
         timeout=60,
     )
-
-
-def _history(root: Path, *args: str) -> bytes:
-    from tools.performance_history_snapshot import historical
-
-    return historical(root, "safe60", args, lambda: _git(root, *args))
 
 
 def _json(root: Path, name: str) -> Any:
@@ -135,7 +135,7 @@ def reviewed_control_hashes(root: Path) -> dict[str, str]:
     projection = successor.control_projection(root) if successor.enabled(root) else {}
     result = {}
     for name in sorted(CONTROLS | SOURCE_ARCHIVES):
-        raw = _history(root, "show", SOURCE_COMMIT + ":" + name)
+        raw = _git(root, "show", SOURCE_COMMIT + ":" + name, historical=True)
         if name == SELF:
             if raw.count(marker) != 1:
                 raise ValueError("Source freeze must contain the unactivated cumulative adapter.")
@@ -302,7 +302,7 @@ def verify_control_transformations(root: Path) -> None:
     projection = successor.control_projection(root) if successor.enabled(root) else {}
     for row in rows:
         name = row["path"]
-        historical = _history(root, "show", str(legacy.SOURCE_COMMIT) + ":" + name)
+        historical = _git(root, "show", str(legacy.SOURCE_COMMIT) + ":" + name, historical=True)
         if name == legacy.SELF:
             marker = b"\nSOURCE_COMMIT: str | None = None"
             if historical.count(marker) != 1:
@@ -310,8 +310,8 @@ def verify_control_transformations(root: Path) -> None:
             historical = historical.replace(
                 marker, f'\nSOURCE_COMMIT: str | None = "{legacy.SOURCE_COMMIT}"'.encode(), 1
             )
-        baseline = _history(root, "show", CONTENT_BASE + ":" + name)
-        accepted = _history(root, "show", ACCEPTED + ":" + name)
+        baseline = _git(root, "show", CONTENT_BASE + ":" + name, historical=True)
+        accepted = _git(root, "show", ACCEPTED + ":" + name, historical=True)
         current = _read(root, name)
         current = projection.get(name, current)
         for raw, key in (

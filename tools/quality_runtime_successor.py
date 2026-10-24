@@ -12,13 +12,13 @@ BASE = "5396b557fd90a67e0c097da1020959b58724a7ec"
 SELF = "tools/quality_runtime_successor.py"
 RECORD = "docs/performance/ci-quality-runtime54.json"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE: str | None = "900f825164db9179a8f9653c2e91b08b7998bd30"
+FREEZE: str | None = None
 PINS: dict[str, str] = {
     ".github/workflows/ci.yml": (
         "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
     ),
     "ci/quality_shards/all.txt": (
-        "c65af5732232fd91cb154bfa820d97fb8484513ac8ee282ebe819f9928b93490"
+        "8df91b5d75cc914289c8f590597ac295a67b18ba728fc9365b0c6eb9f30c7dd0"
     ),
     "ci/quality_shards/baseline-ci53.txt": (
         "308870fb4095de8e263def2e75ac71687bc65c3b32f06f591fed848fc34b4ef3"
@@ -39,7 +39,7 @@ PINS: dict[str, str] = {
         "1677cbafcc8257c3803cd4bfa65f12a2d4293e622840bfb47c657893b0315344"
     ),
     "ci/quality_shards/shard-3.txt": (
-        "fc358c9ee538f6fcaef8dc59b05adb446e684b028f2cdd89dbd68ed8ed931035"
+        "d2a169aea7729bbb173304ee53e095a08f0a98e1400afe82502d87c83a10ecee"
     ),
     "ci/quality_shards/shard-4-modules.txt": (
         "e5ab009fc440840dac9717a0f05b64cd47f371664a9f838e5ca17fe1d210e7bd"
@@ -51,7 +51,7 @@ PINS: dict[str, str] = {
         "b627e0688559b1fc46307c8449d17095307dd1fdc7a969c20cf5378a34887a0a"
     ),
     "docs/performance/ci-quality-runtime54.json": (
-        "3ec40d1ad513a3232b6caba71cab706a951506581a4a0b673696d0ae1495994d"
+        "a837c4caaab81880e6e4bd5c93943954647bcaa62cd750c85f2596191516aeb4"
     ),
     "docs/performance/history-phase-snapshot.md": (
         "eff5ac4c71a42a547507bbba0713b33f89330fecaa1a931032395629f063e72a"
@@ -81,7 +81,7 @@ PINS: dict[str, str] = {
         "8494642f66f70ce0cc71d330e164eba067e90e9ebea3eb1f0c11fbb4dbc25c69"
     ),
     "tests/code_quality/test_performance_preflight.py": (
-        "bc4a5bf923471a7392bb8bcbf3616afcbd0b4f15593cf7827cb14ae0ce0026f2"
+        "68c001826e8d063d840ddf704d81fbd720b69e8f72a57a188e920f5e76982e76"
     ),
     "tests/code_quality/test_quality_runtime.py": (
         "0203134e35a15f7862bd51107684251d8ef741788eac47658e1e5b3d85070221"
@@ -90,7 +90,7 @@ PINS: dict[str, str] = {
         "8c19b977eefd4d587b8116f9af0c0ced4c2a1040cec9a1d5fe619014ac03e45d"
     ),
     "tools/cumulative_preservation.py": (
-        "cb32ce7c7986bc5eff74cae64707828fb192a684ecb8feb89fb8f24356c8882a"
+        "8f3a7a87d29bd4fe49a04321fc83070b396e930d25e7c3fe97f656c625609d64"
     ),
     "tools/performance_history_snapshot.py": (
         "108f451110eac2162ca25bb68aa0e2610222a306db5ac04f5eb002f4e81c19c1"

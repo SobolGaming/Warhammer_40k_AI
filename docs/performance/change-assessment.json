@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "c65af5732232fd91cb154bfa820d97fb8484513ac8ee282ebe819f9928b93490",
+      "after_sha256": "8df91b5d75cc914289c8f590597ac295a67b18ba728fc9365b0c6eb9f30c7dd0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c65af5732232fd91cb154bfa820d97fb8484513ac8ee282ebe819f9928b93490"
+          "after": "8df91b5d75cc914289c8f590597ac295a67b18ba728fc9365b0c6eb9f30c7dd0"
         }
       }
     },
@@ -86,11 +86,11 @@
     },
     "ci/quality_shards/shard-3.txt": {
       "before_sha256": null,
-      "after_sha256": "fc358c9ee538f6fcaef8dc59b05adb446e684b028f2cdd89dbd68ed8ed931035",
+      "after_sha256": "d2a169aea7729bbb173304ee53e095a08f0a98e1400afe82502d87c83a10ecee",
       "owners": {
         "@document": {
           "before": null,
-          "after": "fc358c9ee538f6fcaef8dc59b05adb446e684b028f2cdd89dbd68ed8ed931035"
+          "after": "d2a169aea7729bbb173304ee53e095a08f0a98e1400afe82502d87c83a10ecee"
         }
       }
     },
@@ -2706,11 +2706,11 @@
     },
     "docs/performance/ci-quality-runtime54.json": {
       "before_sha256": null,
-      "after_sha256": "3ec40d1ad513a3232b6caba71cab706a951506581a4a0b673696d0ae1495994d",
+      "after_sha256": "a837c4caaab81880e6e4bd5c93943954647bcaa62cd750c85f2596191516aeb4",
       "owners": {
         "@document": {
           "before": null,
-          "after": "3ec40d1ad513a3232b6caba71cab706a951506581a4a0b673696d0ae1495994d"
+          "after": "a837c4caaab81880e6e4bd5c93943954647bcaa62cd750c85f2596191516aeb4"
         }
       }
     },
@@ -5749,7 +5749,7 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "bc4a5bf923471a7392bb8bcbf3616afcbd0b4f15593cf7827cb14ae0ce0026f2",
+      "after_sha256": "68c001826e8d063d840ddf704d81fbd720b69e8f72a57a188e920f5e76982e76",
       "owners": {
         "@module": {
           "before": null,
@@ -5926,6 +5926,10 @@
         "test_history_closed_protocol_rejects_synthetic_malformed_native_response": {
           "before": null,
           "after": "16ec39874853358e885258bc46caba2e4f3bfd48c256d6a59f886aac1bfc4ff9"
+        },
+        "test_history_cumulative_transport_requires_explicit_opt_in_and_preserves_live_calls": {
+          "before": null,
+          "after": "14966fe8b19ca91aabf52c1b7466aa3c88879caa4504ac1c00e6b543e528b1d3"
         },
         "test_history_native_acquisition_rejects_wrong_authority_or_member": {
           "before": null,
@@ -19093,7 +19097,7 @@
     },
     "tools/cumulative_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "cb32ce7c7986bc5eff74cae64707828fb192a684ecb8feb89fb8f24356c8882a",
+      "after_sha256": "8f3a7a87d29bd4fe49a04321fc83070b396e930d25e7c3fe97f656c625609d64",
       "owners": {
         "@module": {
           "before": null,
@@ -19105,11 +19109,7 @@
         },
         "_git": {
           "before": null,
-          "after": "b168c37c802021f5a5947e9b80c432a9a9a74e5553fbb0a9bbebbb0922a74e7c"
-        },
-        "_history": {
-          "before": null,
-          "after": "ada8f2b48bd8f9f2e6422690e7196773807dbac7852d6bc1b292a9f5969b6ee7"
+          "after": "e4fa918725e2a7a797b9e8a282435c9bea2017a19a22e6629c131cec8b7e1a49"
         },
         "_json": {
           "before": null,
@@ -19169,7 +19169,7 @@
         },
         "reviewed_control_hashes": {
           "before": null,
-          "after": "d048335f3a3cb3506b5300098556e5fd9cae8a7d0015efca34d91c546adac881"
+          "after": "a483f6025b3224e9c1b71810c961922e4a65bc9c8f403d0fb9383eba2e598371"
         },
         "verify_baseline": {
           "before": null,
@@ -19177,7 +19177,7 @@
         },
         "verify_control_transformations": {
           "before": null,
-          "after": "dec8bbdb9243fc64d8501ffb735b9eb62fa6dcdd0b3c518b1f080e50d3ae771b"
+          "after": "752034ae611952247b8e69a11c4a356525950a139d796bf878d68b5d18024f7c"
         },
         "verify_current_inventory": {
           "before": null,
@@ -19659,11 +19659,11 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "5c716a9d0967548a2a756c4f1f6f741b2f6467c16e339273d2ab5c4444ae5f51",
+      "after_sha256": "58e7d848bf43cabeeae9db7eea75270c15ae301e3d3d40f8bbc2fbf6093f270b",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b9bea06c486b5ea8f6de86d41fb438d8d85ce0915a076394baea9f4f5c007374"
+          "after": "74651af1cff60223923dd08b51529bc21ca216a62eb6338f09374010008055cd"
         },
         "_history": {
           "before": null,
