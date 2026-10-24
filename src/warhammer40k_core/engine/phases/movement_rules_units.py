@@ -257,6 +257,7 @@ def resolve_rules_unit_fall_back_move(
         movement_phase_action=MovementPhaseActionKind.FALL_BACK,
         displacement_kind=ModelDisplacementKind.FALL_BACK,
         action_label="Fall Back",
+        fall_back_mode=fall_back_mode,
         objective_markers=objective_markers,
         movement_bonus_inches=movement_bonus_inches,
         runtime_modifier_registry=runtime_modifier_registry,
@@ -297,6 +298,7 @@ def resolve_rules_unit_fall_back_move(
             [requirement.to_payload() for requirement in requirements]
         ),
         "desperate_escape_rolls": [],
+        "desperate_escape_auto_pass_model_ids": validate_json_value(sorted(auto_pass_ids)),
     }
     if forced_desperate_escape_source_rule_ids:
         movement_payload["forced_desperate_escape_source_rule_ids"] = list(
@@ -333,6 +335,7 @@ def _resolve_rules_unit_move(
     ability_index: AbilityCatalogIndex,
     temporary_movement_keywords: tuple[str, ...],
     ignores_vertical_distance: bool = False,
+    fall_back_mode: FallBackModeKind | None = None,
 ) -> _ResolvedRulesUnitMove:
     before.validate_for_view(rules_unit)
     if not before.matches_witness_models(witness):
@@ -390,6 +393,7 @@ def _resolve_rules_unit_move(
             ignores_vertical_distance=ignores_vertical_distance,
             rules_unit_instance_id=rules_unit.unit_instance_id,
             occupancy_witness=witness,
+            fall_back_mode=fall_back_mode,
         )
         if (
             component_resolution.attempted_placement

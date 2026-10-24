@@ -62,7 +62,7 @@ def test_emergency_disembark_places_every_survivor_on_the_closest_ring() -> None
     assert result.is_valid, result.violations
     assert result.updated_cargo_state is not None
     assert result.disembarked_unit_state is not None
-    assert result.disembarked_unit_state.battle_shocked_until == "end_of_turn"
+    assert result.disembarked_unit_state.battle_shocked_until == "until_cleared"
     assert type(result).from_payload(result.to_payload()) == result
     assert placement_source.PLACEMENT_POLICY.destroys_only_unplaceable_models is True
 

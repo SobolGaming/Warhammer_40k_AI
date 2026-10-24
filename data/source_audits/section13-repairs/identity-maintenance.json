@@ -1,0 +1,14 @@
+{
+  "authorization": "Fix both defects; user Oct18 02:37UTC",
+  "source": "rule:13:13.06:1 blocks12-14",
+  "incoming_source_sha256": "fc4f613c010fad6e328ed172e06b1bf13583dc45493a79a04223bafe839ec639",
+  "pins": {
+    "descriptor_before": "40eb947f9582890a4c4daf117a776d02e29fa299d74a2aebb89783e9ca863b4c",
+    "descriptor_after": "d4d30951aa60f5c7ef10941f609ee76abb3400945cba928a69f5321a14cbb7b8",
+    "test_before": "98ea3e421d654ca84d6bc21f360f2383d60c740c108c63e0b250c67a663d951d",
+    "test_after": "4a8d071b4a0fa245b456373ac64b466b78eadd68a5b1ac01b8357224f245db9c"
+  },
+  "descriptor_test_change": "Exactly one strict expected descriptor hash literal; no comparison, assertion, decorator or historical archive is removed.",
+  "historical_guard": "Authenticate exact current descriptor and archived predecessor before running unchanged D07 MONSTER-only assertions on that predecessor.",
+  "revision2": "SF13-R001: seed source endpoint eligibility before physical narrowing; classification never restores removed keywords."
+}

@@ -684,13 +684,17 @@ def _unit_coherency_departure_source(
         (
             index
             for index, record in enumerate(event_records)
-            if record.event_type == "battle_phase_completed" and index > max(source_orders)
+            if record.event_type == "coherency_cleanup_model_removed"
+            and isinstance(record.payload, dict)
+            and record.payload.get("cleanup_id") == cleanup_id
+            and record.payload.get("cleanup") == cleanup.to_payload()
+            and index < min(source_orders)
         ),
         None,
     )
     if terminal_order is None:
         raise GameLifecycleError(
-            "Unit Coherency departure requires an authoritative phase-boundary event."
+            "Unit Coherency departure requires an authoritative casualty decision event."
         )
     return _DestroyedDepartureSource(
         source_key=f"unit-coherency:{cleanup_id}",

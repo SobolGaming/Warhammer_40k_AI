@@ -11,7 +11,13 @@ from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict, cast
 
 if TYPE_CHECKING or __package__:
-    from tools import aeldari_datasheet_semantic_coverage
+    from tools.ability_support_sources import (
+        ability_support_index_inputs,
+        load_ability_support_sources,
+    )
+    from tools.ability_support_sources import (
+        load_source_artifacts as _load_source_artifacts,
+    )
     from tools.aeldari_support_report import (
         aeldari_datasheet_support_markdown,
         aeldari_detachment_semantics_needed,
@@ -47,7 +53,13 @@ if TYPE_CHECKING or __package__:
         maulerfiend_cross_faction_support_markdown,
     )
 else:
-    import aeldari_datasheet_semantic_coverage
+    from ability_support_sources import (
+        ability_support_index_inputs,
+        load_ability_support_sources,
+    )
+    from ability_support_sources import (
+        load_source_artifacts as _load_source_artifacts,
+    )
     from aeldari_support_report import (
         aeldari_datasheet_support_markdown,
         aeldari_detachment_semantics_needed,
@@ -200,21 +212,12 @@ from warhammer40k_core.engine.stratagem_catalog import (
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_report
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
-from warhammer40k_core.rules.source_overlay import (
-    SourceOverlayPack,
-    SourceOverlayPackPayload,
-    SourceReleaseManifest,
-    SourceReleaseManifestPayload,
-    apply_source_release_overlays,
-)
+from warhammer40k_core.rules.selected_source_index import load_selected_source_rows
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_maulerfiend_datasheet_overlay_2026_07 as maulerfiend_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_space_marines_defiler_datasheet_overlay_2026_07 as csm_defiler_overlay,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    emperors_children_datasheet_overlay_2026_06 as emperors_children_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
@@ -264,10 +267,6 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     EMPERORS_CHILDREN_LORD_KAKOPHONIST_NOISE_MARINES_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_LUCIUS_HEIGHT_OVERRIDES,
     MAULERFIEND_HEIGHT_OVERRIDES,
-)
-from warhammer40k_core.rules.wahapedia_schema import (
-    WahapediaJsonArtifact,
-    WahapediaJsonArtifactPayload,
 )
 
 DEFAULT_SOURCE_JSON_DIR = (
@@ -485,19 +484,7 @@ _DATASHEET_ABILITY_BLOCKING_STAGES = frozenset(
 )
 _SUPPORTED_WEAPON_KEYWORDS = frozenset(WeaponKeyword)
 _SUPPORTED_WEAPON_ABILITY_KINDS = frozenset(AbilityKind)
-REQUIRED_TABLES = (
-    "Abilities",
-    "Datasheets",
-    "Datasheets_abilities",
-    "Datasheets_keywords",
-    "Datasheets_leader",
-    "Datasheets_models",
-    "Datasheets_models_cost",
-    "Datasheets_options",
-    "Datasheets_unit_composition",
-    "Datasheets_wargear",
-    "Factions",
-)
+
 BLOODLETTERS_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000001114",
@@ -1696,6 +1683,7 @@ def _ability_support_catalog_package(
     *,
     source_json_dir: Path = DEFAULT_SOURCE_JSON_DIR,
     datasheet_ids: tuple[str, ...] = ABILITY_SUPPORT_DATASHEET_IDS,
+    source_index_dir: Path | None = None,
 ) -> CanonicalCatalogPackage:
     if type(datasheet_ids) is not tuple or not datasheet_ids:
         raise ValueError("Ability support catalog datasheet_ids must be a non-empty tuple.")
@@ -1706,73 +1694,14 @@ def _ability_support_catalog_package(
     if len(datasheet_ids) != len(set(datasheet_ids)):
         raise ValueError("Ability support catalog datasheet_ids must not contain duplicates.")
     source_json_dir = _resolve_repo_path(source_json_dir)
-    artifacts = _load_source_artifacts(source_json_dir)
-    chaos_overlaid_artifacts = apply_source_release_overlays(
-        source_artifacts=artifacts,
-        release_manifest=chaos_defiler_overlay.source_release_manifest(),
-        overlay_packs=(chaos_defiler_overlay.overlay_pack(),),
-    )
-    csm_overlaid_artifacts = apply_source_release_overlays(
-        source_artifacts=chaos_overlaid_artifacts,
-        release_manifest=csm_defiler_overlay.source_release_manifest(),
-        overlay_packs=(csm_defiler_overlay.overlay_pack(),),
-    )
-    emperors_children_overlaid_artifacts = apply_source_release_overlays(
-        source_artifacts=csm_overlaid_artifacts,
-        release_manifest=emperors_children_overlay.source_release_manifest(),
-        overlay_packs=(emperors_children_overlay.overlay_pack(),),
-    )
-    maulerfiend_overlaid_artifacts = apply_source_release_overlays(
-        source_artifacts=emperors_children_overlaid_artifacts,
-        release_manifest=maulerfiend_overlay.source_release_manifest(),
-        overlay_packs=(maulerfiend_overlay.overlay_pack(),),
-    )
-    aeldari_overlay_pack = SourceOverlayPack.from_payload(
-        cast(
-            SourceOverlayPackPayload,
-            json.loads(
-                aeldari_datasheet_semantic_coverage.OVERLAY_PACK_PATH.read_text(encoding="utf-8")
-            ),
+    overlaid_artifacts = (
+        load_ability_support_sources(source_json_dir)
+        if source_index_dir is None
+        else load_selected_source_rows(
+            source_index_dir,
+            input_files=ability_support_index_inputs(source_json_dir),
+            datasheet_ids=datasheet_ids,
         )
-    )
-    aeldari_tacoma_overlay_pack = SourceOverlayPack.from_payload(
-        cast(
-            SourceOverlayPackPayload,
-            json.loads(
-                aeldari_datasheet_semantic_coverage.TACOMA_OVERLAY_PACK_PATH.read_text(
-                    encoding="utf-8"
-                )
-            ),
-        )
-    )
-    aeldari_july_overlay_pack = SourceOverlayPack.from_payload(
-        cast(
-            SourceOverlayPackPayload,
-            json.loads(
-                aeldari_datasheet_semantic_coverage.JULY_OVERLAY_PACK_PATH.read_text(
-                    encoding="utf-8"
-                )
-            ),
-        )
-    )
-    aeldari_release_manifest = SourceReleaseManifest.from_payload(
-        cast(
-            SourceReleaseManifestPayload,
-            json.loads(
-                aeldari_datasheet_semantic_coverage.RELEASE_MANIFEST_PATH.read_text(
-                    encoding="utf-8"
-                )
-            ),
-        )
-    )
-    overlaid_artifacts = apply_source_release_overlays(
-        source_artifacts=maulerfiend_overlaid_artifacts,
-        release_manifest=aeldari_release_manifest,
-        overlay_packs=(
-            aeldari_overlay_pack,
-            aeldari_tacoma_overlay_pack,
-            aeldari_july_overlay_pack,
-        ),
     )
     bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=overlaid_artifacts,
@@ -2502,21 +2431,6 @@ def _resolve_repo_path(path: Path) -> Path:
     if path.is_absolute():
         return path
     return Path(__file__).resolve().parents[1] / path
-
-
-def _load_source_artifacts(source_json_dir: Path) -> tuple[WahapediaJsonArtifact, ...]:
-    if not source_json_dir.is_dir():
-        raise ValueError("Ability support matrix source JSON directory must exist.")
-    artifacts: list[WahapediaJsonArtifact] = []
-    for table_name in REQUIRED_TABLES:
-        artifact_path = source_json_dir / f"{table_name}.json"
-        payload = json.loads(artifact_path.read_text(encoding="utf-8"))
-        if type(payload) is not dict:
-            raise ValueError("Wahapedia source artifact JSON must contain an object.")
-        artifacts.append(
-            WahapediaJsonArtifact.from_payload(cast(WahapediaJsonArtifactPayload, payload))
-        )
-    return tuple(artifacts)
 
 
 def leader_attachment_consumer_evidence_datasheet_ids(

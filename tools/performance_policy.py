@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import cast
 
 from tools.performance_order103_exception import RECOGNITION, validate_owner_recognition
+from tools.performance_preflight import owner_proof
 from tools.performance_s25_rule_semantics import s25_rule_semantics_smoke_operations
 from tools.performance_tool_inputs import binding_enabled, validate_binding
 
@@ -84,6 +85,7 @@ def _strings(value: object) -> list[str]:
     return result
 
 
+@owner_proof
 def owner_hashes(path: str, content: bytes | None) -> dict[str, str]:
     if content is None:
         return {}
@@ -176,9 +178,25 @@ def runtime_inputs(root: Path) -> dict[str, str]:
 def _governance(path: str) -> bool:
     return path in {
         "AGENTS.md",
+        "scripts/quality_evidence.py",
+        "scripts/quality_reporter.py",
+        "scripts/quality_runner.py",
+        "tools/quality_runtime_successor.py",
+        "ci/quality_shards/all.txt",
+        "ci/quality_shards/baseline-ci53.txt",
+        "ci/quality_shards/shard-1.txt",
+        "ci/quality_shards/shard-1-modules.txt",
+        "ci/quality_shards/shard-2.txt",
+        "ci/quality_shards/shard-2-modules.txt",
+        "ci/quality_shards/shard-3.txt",
+        "ci/quality_shards/shard-3-modules.txt",
+        "ci/quality_shards/shard-4.txt",
+        "ci/quality_shards/shard-4-modules.txt",
         "README.md",
         ".pre-commit-config.yaml",
         ".gitignore",
+        "tools/thousand_sons_perils_preservation.py",
+        "data/source_audits/order135/current-inventory-category-migration.json",
     } or path.startswith(
         (
             "docs/",
@@ -539,13 +557,21 @@ def _validate_single_comparison(
 ) -> list[dict[str, object]]:
     tool_binding = binding_enabled(family, specification)
     from tools import performance_tool_inputs_v2 as fresh
+    from tools import performance_tool_inputs_v3 as current
 
+    current_binding = (
+        tool_binding and object_value(specification["input_binding"])["schema"] == current.SCHEMA
+    )
     fresh_binding = (
         tool_binding and object_value(specification["input_binding"])["schema"] == fresh.SCHEMA
     )
     if tool_binding:
         validate_binding(observed=report.get("input_binding"), expected=expected_binding)
-        if fresh_binding:
+        if current_binding:
+            current.validate_generated_evidence(
+                report.get("generated_output_binding"), object_value(expected_binding)
+            )
+        elif fresh_binding:
             fresh.validate_generated_evidence(
                 report.get("generated_output_binding"), object_value(expected_binding)
             )
@@ -567,7 +593,7 @@ def _validate_single_comparison(
         }
         | ({"owner_exception"} if "owner_exception" in report else set())
         | ({"input_binding"} if tool_binding else set())
-        | ({"generated_output_binding"} if fresh_binding else set()),
+        | ({"generated_output_binding"} if fresh_binding or current_binding else set()),
     )
     if (
         report["policy"],

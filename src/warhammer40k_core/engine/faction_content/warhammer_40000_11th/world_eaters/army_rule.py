@@ -283,6 +283,27 @@ def apply_blessings_selection_result(context: BattleRoundStartResultContext) -> 
         ),
     )
     context.state.record_persisting_effect(effect)
+    if BlessingOfKhorne.RAGE_FUELLED_INVIGORATION in blessings:
+        # The round blessing must exist before the initial Pile In step.
+        # Fight activation occurs later, during the Fight step; its optional
+        # ability window cannot grant the earlier movement permission.
+        context.state.record_persisting_effect(
+            PersistingEffect(
+                effect_id=f"{effect.effect_id}:rage-fuelled-movement",
+                source_rule_id=SOURCE_RULE_ID,
+                owner_player_id=player_id,
+                target_unit_instance_ids=target_unit_ids,
+                started_battle_round=context.state.battle_round,
+                started_phase=BattlePhaseKind.COMMAND,
+                expiration=effect.expiration,
+                effect_payload={
+                    "effect_kind": FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
+                    "source_id": SOURCE_RULE_ID,
+                    "pile_in_distance_inches": 6.0,
+                    "consolidate_distance_inches": 6.0,
+                },
+            )
+        )
     if BlessingOfKhorne.TOTAL_CARNAGE in blessings:
         _record_total_carnage_sources(state=context.state, army=army)
     context.decisions.event_log.append(

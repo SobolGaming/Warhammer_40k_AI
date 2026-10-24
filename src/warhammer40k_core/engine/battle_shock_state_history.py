@@ -65,6 +65,10 @@ def validate_battle_shock_state_history(
     )
 
     validate_combat_battle_shock_completions(event_records)
+    from warhammer40k_core.engine.emergency_disembark_battle_shock import (
+        is_emergency_disembark_completion,
+    )
+
     if (
         not state.battle_shocked_unit_ids
         and not state.battle_shocked_unit_states
@@ -75,6 +79,7 @@ def validate_battle_shock_state_history(
                 "move_keyword_roll_resolved",
                 COMBAT_DISEMBARK_BATTLE_SHOCK_EVENT,
             }
+            or is_emergency_disembark_completion(event)
             for event in event_records
         )
     ):
@@ -143,6 +148,22 @@ def _replay_battle_shock_state_until(
     seen_result_ids: set[str] = set()
     seen_request_ids: set[str] = set()
     for event_index, event in enumerate(event_records[:stop_index]):
+        from warhammer40k_core.engine.emergency_disembark_battle_shock import (
+            is_emergency_disembark_completion,
+            replay_emergency_disembark_battle_shock,
+        )
+
+        if is_emergency_disembark_completion(event):
+            replay_emergency_disembark_battle_shock(
+                state=state,
+                event_records=event_records,
+                decision_records=decision_records,
+                event_index=event_index,
+                replayed_states=replayed_states,
+                owner_by_unit_id=owner_by_unit_id,
+                model_ids_by_unit_id=model_ids_by_unit_id,
+            )
+            continue
         if event.event_type in _FORBIDDEN_ATTACHED_SPLIT_EVENT_TYPES:
             raise GameLifecycleError(
                 "Attached rules-unit split events are invalid under retained identity semantics."

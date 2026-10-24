@@ -82,8 +82,9 @@ from warhammer40k_core.rules.wahapedia_bridge_patterns import (
 )
 from warhammer40k_core.rules.wahapedia_bridge_rows import (
     BridgeSourceArtifact,
-    bridge_rows_by_table,
+    SelectedSourceRows,
     resolve_bridge_ability_source_row,
+    selected_or_full_bridge_rows,
 )
 from warhammer40k_core.rules.wahapedia_equipment_choice_bridge import append_choice_rows
 from warhammer40k_core.rules.wahapedia_invulnerable_save_bridge import (
@@ -139,23 +140,21 @@ _SOURCE_KEYWORD_SEQUENCE_PARTS = (
 
 def build_wahapedia_canonical_bridge_artifacts(
     *,
-    source_artifacts: tuple[BridgeSourceArtifact, ...],
+    source_artifacts: tuple[BridgeSourceArtifact, ...] | SelectedSourceRows,
     bridge_package_id: DataPackageId,
     datasheet_ids: tuple[str, ...],
     pdf_corrections: tuple[PdfDatasheetCorrection, ...] | None = None,
     height_overrides: tuple[ModelHeightOverride, ...] | None = None,
     attachment_wargear_requirements: tuple[AttachmentWargearRequirement, ...] = (),
 ) -> tuple[WahapediaJsonArtifact, ...]:
-    if type(source_artifacts) is not tuple:
-        raise WahapediaBridgeError("source_artifacts must be a tuple.")
-    if not source_artifacts:
-        raise WahapediaBridgeError("source_artifacts must not be empty.")
     if type(bridge_package_id) is not DataPackageId:
         raise WahapediaBridgeError("bridge_package_id must be DataPackageId.")
     selected_datasheet_ids = _validate_identifier_tuple("datasheet_ids", datasheet_ids)
     if not selected_datasheet_ids:
         raise WahapediaBridgeError("datasheet_ids must not be empty.")
-    rows_by_table = bridge_rows_by_table(source_artifacts, error_type=WahapediaBridgeError)
+    rows_by_table = selected_or_full_bridge_rows(
+        source_artifacts, datasheet_ids=selected_datasheet_ids, error_type=WahapediaBridgeError
+    )
     selected_pdf_corrections = (
         DEFAULT_PDF_CORRECTIONS if pdf_corrections is None else pdf_corrections
     )

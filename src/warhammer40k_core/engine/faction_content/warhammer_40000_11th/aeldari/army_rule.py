@@ -62,6 +62,7 @@ from warhammer40k_core.engine.shooting_end_surge_hooks import (
     ShootingEndSurgeGrant,
     ShootingEndSurgeHookBinding,
 )
+from warhammer40k_core.engine.triggered_movement import TriggeredMovementKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
 CONTRIBUTION_ID = "warhammer_40000_11th:aeldari:army_rule:scaffold"
@@ -437,6 +438,7 @@ def opportunity_seized_surge_grants(
             MovementEndSurgeGrant(
                 hook_id=OPPORTUNITY_SEIZED_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
+                movement_kind=TriggeredMovementKind.TRIGGERED,
                 unit_instance_id=unit.unit_instance_id,
                 distance_spec=MovementEndSurgeDistanceSpec.dice(quantity=1, sides=6),
                 max_distance_bonus_inches=_AGILE_SURGE_DISTANCE_BONUS_INCHES,
@@ -508,6 +510,7 @@ def fade_back_surge_grants(
             ShootingEndSurgeGrant(
                 hook_id=FADE_BACK_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
+                movement_kind=TriggeredMovementKind.TRIGGERED,
                 unit_instance_id=unit.unit_instance_id,
                 max_distance_bonus_inches=_AGILE_SURGE_DISTANCE_BONUS_INCHES,
                 replay_payload={
@@ -673,7 +676,7 @@ def _battle_focus_spend_payload_with_refund(
         player_id=player_id,
         resource_kind="battle_focus_token",
     )
-    enriched = dict(payload)
+    enriched = {**payload, "turn_player_id": state.active_player_id}
     if refund_roll is not None:
         enriched["faction_resource_refund_roll"] = refund_roll
     return validate_json_value(enriched)
@@ -719,6 +722,8 @@ def _unit_already_performed_agile_manoeuvre_this_phase(
         if effect.started_phase is not phase:
             continue
         payload = _battle_focus_spend_payload(effect.effect_payload)
+        if payload["turn_player_id"] != state.active_player_id:
+            continue
         if payload["unit_instance_id"] == unit.unit_instance_id:
             return True
     return False
@@ -739,6 +744,8 @@ def _maneuver_already_used_this_phase(
         if effect.started_phase is not phase:
             continue
         payload = _battle_focus_spend_payload(effect.effect_payload)
+        if payload["turn_player_id"] != state.active_player_id:
+            continue
         if payload["maneuver"] == requested_maneuver:
             return True
     return False
@@ -774,6 +781,7 @@ def _battle_focus_spend_payload(payload: JsonValue) -> dict[str, str]:
     if type(maneuver) is not str or type(unit_instance_id) is not str:
         raise GameLifecycleError("Aeldari Battle Focus spend effect payload is incomplete.")
     return {
+        "turn_player_id": _validate_identifier("turn_player_id", payload.get("turn_player_id")),
         "maneuver": _validate_identifier("maneuver", maneuver),
         "unit_instance_id": _validate_identifier("unit_instance_id", unit_instance_id),
     }

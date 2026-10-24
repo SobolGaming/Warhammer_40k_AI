@@ -38,9 +38,6 @@ from warhammer40k_core.engine.fight_geometry import (
     attack_targetable_engaged_enemy_unit_ids as _attack_targetable_engaged_enemy_unit_ids,
 )
 from warhammer40k_core.engine.fight_geometry import (
-    closest_fight_unit_distance_inches as _closest_unit_distance_inches,
-)
-from warhammer40k_core.engine.fight_geometry import (
     closest_model_distance_to_units as _closest_model_distance_to_units,
 )
 from warhammer40k_core.engine.fight_geometry import (
@@ -1112,16 +1109,18 @@ def legal_pile_in_target_unit_ids(
             selectable_enemy_ids=selectable_enemy_ids,
             canonical_inventory=physically_engaged_ids,
         )
+    from warhammer40k_core.engine.fight_geometry import fight_units_within_distance
+
     return tuple(
         enemy_id
         for enemy_id in selectable_enemy_ids
-        if _closest_unit_distance_inches(
+        if fight_units_within_distance(
             scenario=scenario,
             first_unit_instance_id=unit_instance_id,
             second_unit_instance_id=enemy_id,
+            distance_inches=PILE_IN_TARGET_DISTANCE_INCHES,
             state=state,
         )
-        <= PILE_IN_TARGET_DISTANCE_INCHES
     )
 
 

@@ -1,0 +1,3287 @@
+[
+  {
+    "row_id": "B1-001",
+    "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-019",
+    "raw_sha256": "c991553e35a725b8a9cba2658381c1d3d531e22d5e65ab0d82b1a36682dd38ed",
+    "ast_sha256": "a15c83fe8038aabdcf826defe6dce8c9ebbe5cfabf186977051ffe83649d8695",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-001",
+      "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-019",
+      "verdict": "ACCEPT",
+      "assessment": "Module imports/constants only; exact projected AST and authenticated import destinations. No gameplay admission from module import.",
+      "decisive_source_assertion_anchors": [],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/coherency_cleanup_decisions.py :: @module",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-002",
+    "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+    "owner": "CleanupLifecycleHost",
+    "operation": "cumulative-exact-019",
+    "raw_sha256": "c991553e35a725b8a9cba2658381c1d3d531e22d5e65ab0d82b1a36682dd38ed",
+    "ast_sha256": "08b96aa677e23865cfe717afa68027e0abbf9d6a90654956b17ded753d2943a9",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-002",
+      "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+      "owner": "CleanupLifecycleHost",
+      "operation": "cumulative-exact-019",
+      "verdict": "ACCEPT",
+      "assessment": "Protocol field declaration only; separate method owners excluded from class projection.",
+      "decisive_source_assertion_anchors": [],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/coherency_cleanup_decisions.py :: CleanupLifecycleHost",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-003",
+    "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+    "owner": "CleanupLifecycleHost._require_state",
+    "operation": "cumulative-exact-019",
+    "raw_sha256": "c991553e35a725b8a9cba2658381c1d3d531e22d5e65ab0d82b1a36682dd38ed",
+    "ast_sha256": "5dce720f76ec507ab97351a6b49e4ab296e3e8672f4cf81fc14fedd75130d72c",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-003",
+      "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+      "owner": "CleanupLifecycleHost._require_state",
+      "operation": "cumulative-exact-019",
+      "verdict": "ACCEPT",
+      "assessment": "Exact typed signature and Ellipsis body; native lifecycle supplies implementation. No fabricated Protocol execution.",
+      "decisive_source_assertion_anchors": [],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/coherency_cleanup_decisions.py :: CleanupLifecycleHost._require_state",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-004",
+    "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+    "owner": "CleanupLifecycleHost.advance_until_decision_or_terminal",
+    "operation": "cumulative-exact-019",
+    "raw_sha256": "c991553e35a725b8a9cba2658381c1d3d531e22d5e65ab0d82b1a36682dd38ed",
+    "ast_sha256": "db32f16db54bc26d8d4052c319ec2adb9e1ac5acb6518359a7102c2afdcee3dc",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-004",
+      "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+      "owner": "CleanupLifecycleHost.advance_until_decision_or_terminal",
+      "operation": "cumulative-exact-019",
+      "verdict": "ACCEPT",
+      "assessment": "Exact typed signature and Ellipsis body; registered facade applier invokes native continuation.",
+      "decisive_source_assertion_anchors": [],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/coherency_cleanup_decisions.py :: CleanupLifecycleHost.advance_until_decision_or_terminal",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-005",
+    "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+    "owner": "apply_coherency_result",
+    "operation": "cumulative-exact-019",
+    "raw_sha256": "c991553e35a725b8a9cba2658381c1d3d531e22d5e65ab0d82b1a36682dd38ed",
+    "ast_sha256": "68b6657ed83e2ffce16d16c03c3bf0a1b8355819880724ec447160953ebe5ba5",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-005",
+      "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+      "owner": "apply_coherency_result",
+      "operation": "cumulative-exact-019",
+      "verdict": "ACCEPT",
+      "assessment": "Current recorded choice kills only its physical model, retains false completion marker and emits causal application/departure evidence. Missing record refuses atomically. The later context guard is dominated by the pure current-request validation.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 167,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 168,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 169,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 176,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 387,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 388,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 397,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 27,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 30,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 36,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/coherency_cleanup_decisions.py :: apply_coherency_result",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-006",
+    "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+    "owner": "cleanup_id_for_state",
+    "operation": "cumulative-exact-019",
+    "raw_sha256": "c991553e35a725b8a9cba2658381c1d3d531e22d5e65ab0d82b1a36682dd38ed",
+    "ast_sha256": "281a56928cb4395817427c82fa4d2151130add0916e04fd08e76e8a3169f0978",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-006",
+      "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+      "owner": "cleanup_id_for_state",
+      "operation": "cumulative-exact-019",
+      "verdict": "ACCEPT",
+      "assessment": "Exact game/round/active-player occurrence key; native pending/completed restore, alternative fork and replay retain identity.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 311,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 312,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 328,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 329,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/coherency_cleanup_decisions.py :: cleanup_id_for_state",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-007",
+    "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+    "owner": "decision_dispatch_handlers",
+    "operation": "cumulative-exact-019",
+    "raw_sha256": "c991553e35a725b8a9cba2658381c1d3d531e22d5e65ab0d82b1a36682dd38ed",
+    "ast_sha256": "dce3b51b8fc21106551839dbed26d4dea858903484be00f3cb30e92e5127caa2",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-007",
+      "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+      "owner": "decision_dispatch_handlers",
+      "operation": "cumulative-exact-019",
+      "verdict": "ACCEPT",
+      "assessment": "Registered select_coherency_casualty closures bind current request, result validation and engine applier. Five altered actor/stale/foreign/payload/geometry cases preserve state and queue before legal retry.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 276,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 277,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 278,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 283,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/coherency_cleanup_decisions.py :: decision_dispatch_handlers",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-008",
+    "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+    "owner": "next_coherency_request",
+    "operation": "cumulative-exact-019",
+    "raw_sha256": "c991553e35a725b8a9cba2658381c1d3d531e22d5e65ab0d82b1a36682dd38ed",
+    "ast_sha256": "8b3a5cc68913f0280a5082852b89757326be69c4dc4b88202e29ca4e2cb0adc9",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-008",
+      "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+      "owner": "next_coherency_request",
+      "operation": "cumulative-exact-019",
+      "verdict": "ACCEPT",
+      "assessment": "Both turn actors, both candidate casualties, all live options/recomputation, attached neighbor/ownership, exact geometry, seven-to-six threshold and two broken units bind discovery. Active-owner sorting and first-different-owner break prove actor partition statically; simultaneous two-player execution is not claimed.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 158,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 209,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 224,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 366,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 427,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 480,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 482,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 520,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 524,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 562,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/coherency_cleanup_decisions.py :: next_coherency_request",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-009",
+    "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+    "owner": "request_coherency_cleanup",
+    "operation": "cumulative-exact-019",
+    "raw_sha256": "c991553e35a725b8a9cba2658381c1d3d531e22d5e65ab0d82b1a36682dd38ed",
+    "ast_sha256": "c40ae9b55d4266a6a2c1b946579face6bbcc76cc5898fb79e19556e50bed8a05",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-009",
+      "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+      "owner": "request_coherency_cleanup",
+      "operation": "cumulative-exact-019",
+      "verdict": "ACCEPT",
+      "assessment": "Pending request/window and continuation survive native restore. Foreign request refuses before mutation; existing four lifecycle tamper cases retain registry/window/queue authentication.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 311,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 322,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 27,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 30,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 56,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/coherency_cleanup_decisions.py :: request_coherency_cleanup",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-010",
+    "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+    "owner": "validate_restored_coherency_choices",
+    "operation": "cumulative-exact-019",
+    "raw_sha256": "c991553e35a725b8a9cba2658381c1d3d531e22d5e65ab0d82b1a36682dd38ed",
+    "ast_sha256": "62cdb763ca79b209aee36fe5cd6212cd956fc46ad21d2e0ef2a1a85a5578ca8f",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-010",
+      "path": "src/warhammer40k_core/engine/coherency_cleanup_decisions.py",
+      "owner": "validate_restored_coherency_choices",
+      "operation": "cumulative-exact-019",
+      "verdict": "ACCEPT",
+      "assessment": "Pending/completed restore/fork/views/replay pass; deleted casualty, physical-owner drift, missing decision/application and reversed event order reach the exact restoration owner. Each altered input is isolated; pristine authority is revalidated.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 311,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 314,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 328,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 329,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 27,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 30,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/coherency_cleanup_decisions.py :: validate_restored_coherency_choices",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-011",
+    "path": "src/warhammer40k_core/engine/primary_scoring_boundary_lifecycle.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-036",
+    "raw_sha256": "cfa1e61880a767ff76dbab73cb84448a8591beac1a420c0e03740f63ea308d85",
+    "ast_sha256": "558c9405e4935e39eb68b0426f8b3375d44f5e2b8fdd5739a4db7413d43adf92",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-011",
+      "path": "src/warhammer40k_core/engine/primary_scoring_boundary_lifecycle.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-036",
+      "verdict": "ACCEPT",
+      "assessment": "Exact module delta adds the coherency window constant, legal member, provenance mapping and export. Additional faction pending-window implementation is a separate excluded owner.",
+      "decisive_source_assertion_anchors": [],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/primary_scoring_boundary_lifecycle.py :: @module",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-012",
+    "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-047",
+    "raw_sha256": "56bbcd87260c17637c38023dac15f4f8e1a4d6be18106437d92cd24b125bab7c",
+    "ast_sha256": "48b2fb551dba480612b4291ced3635da981fcd98c3a49fc7d59ec3078c54495a",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-012",
+      "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-047",
+      "verdict": "ACCEPT",
+      "assessment": "Exact imports switch physical auto-cleanup helpers to rules-unit/current-placement authority. Consumer semantics are bound under the separate owners.",
+      "decisive_source_assertion_anchors": [],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/turn_cleanup.py :: @module",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-013",
+    "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+    "owner": "EndTurnCleanupState",
+    "operation": "cumulative-exact-047",
+    "raw_sha256": "56bbcd87260c17637c38023dac15f4f8e1a4d6be18106437d92cd24b125bab7c",
+    "ast_sha256": "fdaaef8606ffa34b0d9085b6a3346846dfbbdb164d233a56e3a9df4e73dc6713",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-013",
+      "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+      "owner": "EndTurnCleanupState",
+      "operation": "cumulative-exact-047",
+      "verdict": "ACCEPT",
+      "assessment": "Only default-True completes_boundary field added. Native casualty False, final boundary True and per-choice noncompletion execute.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 170,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 176,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 224,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 227,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/turn_cleanup.py :: EndTurnCleanupState",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-014",
+    "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+    "owner": "EndTurnCleanupState.__post_init__",
+    "operation": "cumulative-exact-047",
+    "raw_sha256": "56bbcd87260c17637c38023dac15f4f8e1a4d6be18106437d92cd24b125bab7c",
+    "ast_sha256": "279acbd2a8b6979a23ab061739581c485fb519b4201cff9e621f9725f4bf2f4d",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-014",
+      "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+      "owner": "EndTurnCleanupState.__post_init__",
+      "operation": "cumulative-exact-047",
+      "verdict": "ACCEPT",
+      "assessment": "Only strict Boolean validation added; invalid string marker raises, earlier validation ASTs unchanged.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 179,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/turn_cleanup.py :: EndTurnCleanupState.__post_init__",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-015",
+    "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+    "owner": "EndTurnCleanupState.from_payload",
+    "operation": "cumulative-exact-047",
+    "raw_sha256": "56bbcd87260c17637c38023dac15f4f8e1a4d6be18106437d92cd24b125bab7c",
+    "ast_sha256": "4e79f398b65c1ffa16ec8e92bc9c936ef4c04fc3bfacdb92c43f652fd0590d5a",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-015",
+      "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+      "owner": "EndTurnCleanupState.from_payload",
+      "operation": "cumulative-exact-047",
+      "verdict": "ACCEPT",
+      "assessment": "Mandatory payload key, without compatibility default. Native persistence/replay retains markers; missing key rejects and string marker rejects.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 179,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 328,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 329,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 60,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/turn_cleanup.py :: EndTurnCleanupState.from_payload",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-016",
+    "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+    "owner": "EndTurnCleanupState.to_payload",
+    "operation": "cumulative-exact-047",
+    "raw_sha256": "56bbcd87260c17637c38023dac15f4f8e1a4d6be18106437d92cd24b125bab7c",
+    "ast_sha256": "a6ed60702aaf5db2fc964f331d0a59ce8131c80314329cddadef40a79747b7dc",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-016",
+      "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+      "owner": "EndTurnCleanupState.to_payload",
+      "operation": "cumulative-exact-047",
+      "verdict": "ACCEPT",
+      "assessment": "Only explicit completion marker serialization added; exact native pending/completed persistence payloads and replay bind consumers.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 311,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 328,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 329,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/turn_cleanup.py :: EndTurnCleanupState.to_payload",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-017",
+    "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+    "owner": "EndTurnCleanupStatePayload",
+    "operation": "cumulative-exact-047",
+    "raw_sha256": "56bbcd87260c17637c38023dac15f4f8e1a4d6be18106437d92cd24b125bab7c",
+    "ast_sha256": "03a8d0923f1e3d7c068f178615c571ea2b8c44734bab9470c670e740540fc7b5",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-017",
+      "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+      "owner": "EndTurnCleanupStatePayload",
+      "operation": "cumulative-exact-047",
+      "verdict": "ACCEPT",
+      "assessment": "Only required bool annotation added to TypedDict; runtime key/strict-bool consumers are separately bound.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 179,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 60,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/turn_cleanup.py :: EndTurnCleanupStatePayload",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-018",
+    "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+    "owner": "_model_placement_for_unit",
+    "operation": "cumulative-exact-047",
+    "raw_sha256": "56bbcd87260c17637c38023dac15f4f8e1a4d6be18106437d92cd24b125bab7c",
+    "ast_sha256": null,
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-018",
+      "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+      "owner": "_model_placement_for_unit",
+      "operation": "cumulative-exact-047",
+      "verdict": "ACCEPT",
+      "assessment": "Removed physical-unit placement helper absent; no remaining import of that owner. Chosen attached Leader removal retains its real physical unit/model.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 387,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 388,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 390,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 391,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/turn_cleanup.py :: _model_placement_for_unit",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-019",
+    "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+    "owner": "_next_cleanup_model_id",
+    "operation": "cumulative-exact-047",
+    "raw_sha256": "56bbcd87260c17637c38023dac15f4f8e1a4d6be18106437d92cd24b125bab7c",
+    "ast_sha256": null,
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-019",
+      "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+      "owner": "_next_cleanup_model_id",
+      "operation": "cumulative-exact-047",
+      "verdict": "ACCEPT",
+      "assessment": "Removed automatic heuristic absent. No-choice call removes nothing; current complete option sets, arbitrary legal casualties and per-choice recomputation replace it under Core03.03 block5.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 77,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 209,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 219,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 224,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 226,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/turn_cleanup.py :: _next_cleanup_model_id",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-020",
+    "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+    "owner": "_unit_is_placed",
+    "operation": "cumulative-exact-047",
+    "raw_sha256": "56bbcd87260c17637c38023dac15f4f8e1a4d6be18106437d92cd24b125bab7c",
+    "ast_sha256": null,
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-020",
+      "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+      "owner": "_unit_is_placed",
+      "operation": "cumulative-exact-047",
+      "verdict": "ACCEPT",
+      "assessment": "Removed placement-loop helper absent; same-name helper elsewhere has distinct lexical ownership. Explicit choice/current rules-unit placement consumers handle ordinary and attached models.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 47,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 387,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 388,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "unheld-control/test_final_boundary_controls.py",
+          "line": 20,
+          "sha256": "58d19fb673d48890fb4f1f8d1f4ed6dab5615eff8dbf7ff9f87e598c55aa3f2f"
+        },
+        {
+          "path": "unheld-control/test_final_boundary_controls.py",
+          "line": 22,
+          "sha256": "58d19fb673d48890fb4f1f8d1f4ed6dab5615eff8dbf7ff9f87e598c55aa3f2f"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/turn_cleanup.py :: _unit_is_placed",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-021",
+    "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+    "owner": "resolve_end_turn_cleanup",
+    "operation": "cumulative-exact-047",
+    "raw_sha256": "56bbcd87260c17637c38023dac15f4f8e1a4d6be18106437d92cd24b125bab7c",
+    "ast_sha256": "d0663ab6097dade2873ae10db45d38a361feba9d4fe4bd722de4a927d5de2d05",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-021",
+      "path": "src/warhammer40k_core/engine/turn_cleanup.py",
+      "owner": "resolve_end_turn_cleanup",
+      "operation": "cumulative-exact-047",
+      "verdict": "ACCEPT",
+      "assessment": "Explicit choices only; malformed tuple, foreign model and coherent-model inputs reject atomically. Ordinary/attached chosen casualties pass. Existing scenario/descriptor/phase guards remain exact; present-placement membership dominates the final None arm.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 47,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 77,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 387,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 388,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 27,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 30,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "unheld-control/test_final_boundary_controls.py",
+          "line": 20,
+          "sha256": "58d19fb673d48890fb4f1f8d1f4ed6dab5615eff8dbf7ff9f87e598c55aa3f2f"
+        },
+        {
+          "path": "unheld-control/test_final_boundary_controls.py",
+          "line": 22,
+          "sha256": "58d19fb673d48890fb4f1f8d1f4ed6dab5615eff8dbf7ff9f87e598c55aa3f2f"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/turn_cleanup.py :: resolve_end_turn_cleanup",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-022",
+    "path": "src/warhammer40k_core/engine/unit_coherency.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-048",
+    "raw_sha256": "3bcb78ab8d94e3af1221aecf56d29150b60aba35f9fdf07928d71474d4c3da74",
+    "ast_sha256": "f3205161ac492f9f6334f1dc469759788ef1522d2aa50fb6b5daec2632eb3ba2",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-022",
+      "path": "src/warhammer40k_core/engine/unit_coherency.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-048",
+      "verdict": "ACCEPT",
+      "assessment": "Only rules-unit view import added to module projection; grouped behavior is the separately reviewed function.",
+      "decisive_source_assertion_anchors": [],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/unit_coherency.py :: @module",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-023",
+    "path": "src/warhammer40k_core/engine/unit_coherency.py",
+    "owner": "assert_battlefield_rules_units_in_coherency",
+    "operation": "cumulative-exact-048",
+    "raw_sha256": "3bcb78ab8d94e3af1221aecf56d29150b60aba35f9fdf07928d71474d4c3da74",
+    "ast_sha256": "a1c468d2f2086a8c162291c3164003861e36f6060b66a5d243952ef81d4a1b86",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-023",
+      "path": "src/warhammer40k_core/engine/unit_coherency.py",
+      "owner": "assert_battlefield_rules_units_in_coherency",
+      "operation": "cumulative-exact-048",
+      "verdict": "ACCEPT",
+      "assessment": "Attached Leader bridges coherency at native restore, while a truly broken native group raises with offending model IDs. Wrong Python type branches are caller/type-contract proof, not behavioral-negative credit.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 422,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 427,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "tests/rules/section03/test_cleanup.py",
+          "line": 439,
+          "sha256": "aacc56a23df1c68ff06de7dae9569e17063f4c5039ae6413ea621483ade1ce8a"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 39,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 41,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/unit_coherency.py :: assert_battlefield_rules_units_in_coherency",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-024",
+    "path": "src/warhammer40k_core/engine/mission_turn_end_sequencing.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-026",
+    "raw_sha256": "efa4010cc1cf2d32a9f962b78f3546215d9e9e7e3f721bc8d2bd45518bfd3f0b",
+    "ast_sha256": "d1e914f2b3f6dd1c8884fb083d7a12383c18fb3ba9ee7107107abadd528b6fb4",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-024",
+      "path": "src/warhammer40k_core/engine/mission_turn_end_sequencing.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-026",
+      "verdict": "ACCEPT",
+      "assessment": "Only source-action and delayed-secondary resolver imports added to module projection; destinations and bytes authenticated.",
+      "decisive_source_assertion_anchors": [],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/mission_turn_end_sequencing.py :: @module",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-025",
+    "path": "src/warhammer40k_core/engine/mission_turn_end_sequencing.py",
+    "owner": "mission_turn_end_candidates",
+    "operation": "cumulative-exact-026",
+    "raw_sha256": "efa4010cc1cf2d32a9f962b78f3546215d9e9e7e3f721bc8d2bd45518bfd3f0b",
+    "ast_sha256": "5285662cef844791c19da0355dc72a2684dbecda79198df22d6c54a5c7a7c268",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-025",
+      "path": "src/warhammer40k_core/engine/mission_turn_end_sequencing.py",
+      "owner": "mission_turn_end_candidates",
+      "operation": "cumulative-exact-026",
+      "verdict": "ACCEPT",
+      "assessment": "Only pending-secondary discovery/mandatory mission participant loop added. Exact callback binds real delayed Cleanse completion/scoring for both actors. Prior mission candidate/refusal statements retain ASTs.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 40,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 43,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 100,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section07/test_mission_boundary.py",
+          "line": 37,
+          "sha256": "2cb283bcd4df0f6286fc5efb025d2de5164aac4ad8fa9a06ecefdbf9fe8a2b03"
+        },
+        {
+          "path": "tests/rules/section07/test_mission_boundary.py",
+          "line": 38,
+          "sha256": "2cb283bcd4df0f6286fc5efb025d2de5164aac4ad8fa9a06ecefdbf9fe8a2b03"
+        },
+        {
+          "path": "tests/rules/section07/test_mission_boundary.py",
+          "line": 39,
+          "sha256": "2cb283bcd4df0f6286fc5efb025d2de5164aac4ad8fa9a06ecefdbf9fe8a2b03"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/mission_turn_end_sequencing.py :: mission_turn_end_candidates",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-026",
+    "path": "src/warhammer40k_core/engine/secondary_mission_action_resolution.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-041",
+    "raw_sha256": "4dec1e87cf8335b7dd184ee52514beb462aca0bdeedb127aef95f330c39ba3ba",
+    "ast_sha256": "619ebc236e760ad5dd41bf44e4d027e8bae9342507c659eff84b718b8d2eda86",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-026",
+      "path": "src/warhammer40k_core/engine/secondary_mission_action_resolution.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-041",
+      "verdict": "ACCEPT",
+      "assessment": "Module declaration/import closure for delayed secondary Actions; no all-mission-family admission.",
+      "decisive_source_assertion_anchors": [],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/secondary_mission_action_resolution.py :: @module",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-027",
+    "path": "src/warhammer40k_core/engine/secondary_mission_action_resolution.py",
+    "owner": "pending_secondary_mission_actions_at_turn_end",
+    "operation": "cumulative-exact-041",
+    "raw_sha256": "4dec1e87cf8335b7dd184ee52514beb462aca0bdeedb127aef95f330c39ba3ba",
+    "ast_sha256": "1df89a53dae64446348100f0c331005f0613caed157e9b758b1ee045e4fb74f4",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-027",
+      "path": "src/warhammer40k_core/engine/secondary_mission_action_resolution.py",
+      "owner": "pending_secondary_mission_actions_at_turn_end",
+      "operation": "cumulative-exact-041",
+      "verdict": "ACCEPT",
+      "assessment": "Exact STARTED/current-player/current-round/turn_end/secondary predicate. Native Cleanse enters, interrupted/terminal states leave. Both explicit source packs share Cleanse delayed and Plunder immediate; other source families are excluded.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 86,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 32,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 195,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 207,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 219,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/secondary_mission_action_resolution.py :: pending_secondary_mission_actions_at_turn_end",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-028",
+    "path": "src/warhammer40k_core/engine/secondary_mission_action_resolution.py",
+    "owner": "resolve_secondary_mission_action_at_turn_end",
+    "operation": "cumulative-exact-041",
+    "raw_sha256": "4dec1e87cf8335b7dd184ee52514beb462aca0bdeedb127aef95f330c39ba3ba",
+    "ast_sha256": "b681b2237e49e676d6597f9109b3f78f4519d5b21602d454c7d02a201e968497",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-028",
+      "path": "src/warhammer40k_core/engine/secondary_mission_action_resolution.py",
+      "owner": "resolve_secondary_mission_action_at_turn_end",
+      "operation": "cumulative-exact-041",
+      "verdict": "ACCEPT",
+      "assessment": "Real delayed completion/effect/event/exact 2 VP for both actors; repeated completion rejects. Six retained-boundary fields, two source IDs and missing target reject atomically. Sole shocked actor with explicit FAQ17 continuation reaches unheld native failure, exactly one event, zero effect/VP. Only admitted delayed Cleanse source makes unsupported policy arm unreachable.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 40,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 43,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 55,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 65,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 72,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 100,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 102,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 27,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 30,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 101,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 102,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "unheld-control/test_final_boundary_controls.py",
+          "line": 28,
+          "sha256": "58d19fb673d48890fb4f1f8d1f4ed6dab5615eff8dbf7ff9f87e598c55aa3f2f"
+        },
+        {
+          "path": "unheld-control/test_final_boundary_controls.py",
+          "line": 29,
+          "sha256": "58d19fb673d48890fb4f1f8d1f4ed6dab5615eff8dbf7ff9f87e598c55aa3f2f"
+        },
+        {
+          "path": "unheld-control/test_final_boundary_controls.py",
+          "line": 31,
+          "sha256": "58d19fb673d48890fb4f1f8d1f4ed6dab5615eff8dbf7ff9f87e598c55aa3f2f"
+        },
+        {
+          "path": "unheld-control/test_final_boundary_controls.py",
+          "line": 32,
+          "sha256": "58d19fb673d48890fb4f1f8d1f4ed6dab5615eff8dbf7ff9f87e598c55aa3f2f"
+        },
+        {
+          "path": "unheld-control/test_final_boundary_controls.py",
+          "line": 34,
+          "sha256": "58d19fb673d48890fb4f1f8d1f4ed6dab5615eff8dbf7ff9f87e598c55aa3f2f"
+        },
+        {
+          "path": "unheld-control/test_final_boundary_controls.py",
+          "line": 35,
+          "sha256": "58d19fb673d48890fb4f1f8d1f4ed6dab5615eff8dbf7ff9f87e598c55aa3f2f"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/secondary_mission_action_resolution.py :: resolve_secondary_mission_action_at_turn_end",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-029",
+    "path": "src/warhammer40k_core/engine/secondary_mission_action_resolution.py",
+    "owner": "secondary_action_completions_after_control",
+    "operation": "cumulative-exact-041",
+    "raw_sha256": "4dec1e87cf8335b7dd184ee52514beb462aca0bdeedb127aef95f330c39ba3ba",
+    "ast_sha256": "a530de73550853938937042f77dbd22d339b74d5d555a1b3d13c9f9515420138",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-029",
+      "path": "src/warhammer40k_core/engine/secondary_mission_action_resolution.py",
+      "owner": "secondary_action_completions_after_control",
+      "operation": "cumulative-exact-041",
+      "verdict": "ACCEPT",
+      "assessment": "Accepted frozen prior-use plus retained objective control required. Forged action identity and no-control same-target witness reach distinct raises, with exact baseline restored/rechecked. Earlier IDs and unrelated status/source/epoch are partitioned by side-effect-free filters.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 82,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 90,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 27,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 30,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 111,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        },
+        {
+          "path": "supplement/test_boundary_missing.py",
+          "line": 114,
+          "sha256": "be15aa363c828f1041a3acf2eb8d587cd1a1fec1b99c5a72cc57dca5c0954bf1"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/secondary_mission_action_resolution.py :: secondary_action_completions_after_control",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B1-030",
+    "path": "src/warhammer40k_core/engine/secondary_scoring_state_evidence_authority.py",
+    "owner": "_secondary_mission_action_projections_for_boundary",
+    "operation": "cumulative-exact-042",
+    "raw_sha256": "898e15b83ad16a8cb403d235670dd8ec02db35d83a8deb7cd871df390611490d",
+    "ast_sha256": "593525169024332d66d2197c5aaa6e093e4960a81604089aa8db45d6422bcf7e",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B1-030",
+      "path": "src/warhammer40k_core/engine/secondary_scoring_state_evidence_authority.py",
+      "owner": "_secondary_mission_action_projections_for_boundary",
+      "operation": "cumulative-exact-042",
+      "verdict": "ACCEPT",
+      "assessment": "Exactly earlier_relevant split and sorted authenticated delayed union change. Native Cleanse scoring consumes union; all other boundary/source/effect/identity guards remain exact predecessor statements. No fresh full restore of every secondary family.",
+      "decisive_source_assertion_anchors": [
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 100,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 101,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        },
+        {
+          "path": "tests/rules/section16/test_turn_end_review.py",
+          "line": 102,
+          "sha256": "1c913dc32267c8da1a25ee987f3ded1b812c6726a5c60658b49ddab306ad87f4"
+        }
+      ],
+      "raw_owner_branch_map": "task-24/BRANCH-ASSERTION-MAP.json :: src/warhammer40k_core/engine/secondary_scoring_state_evidence_authority.py :: _secondary_mission_action_projections_for_boundary",
+      "unresolved_gaps_in_this_owner": []
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-001",
+    "path": "src/warhammer40k_core/engine/attack_destruction_reactions.py",
+    "owner": "resolve_mandatory_destruction_reactions_before_removal",
+    "operation": "cumulative-exact-009",
+    "raw_sha256": "42123a8b608add4b489bfa332a1a7b228967dc6048567c25347c2caf23b30b90",
+    "ast_sha256": "81374121cb2465143a5991ea601d5b3a91e514e625736be9ad45c4e3a07f91d9",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-001",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/attack_destruction_reactions.py",
+      "owner": "resolve_mandatory_destruction_reactions_before_removal",
+      "operation": "cumulative-exact-009",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "42123a8b608add4b489bfa332a1a7b228967dc6048567c25347c2caf23b30b90",
+      "owner_ast_sha256": "81374121cb2465143a5991ea601d5b3a91e514e625736be9ad45c4e3a07f91d9",
+      "semantic_edge": "Only a completing retained Fight is finalized before its Deadly Demise; ordinary triggers retain pre-removal timing and existing causal reservation.",
+      "independent_completed_case_calls": 50,
+      "independent_completed_cases": [
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+        "tests/rules/section04/test_facade.py::test_native_shooting_selection_declaration_and_completed_participation[2]",
+        "tests/rules/section04/test_fight_facade.py::test_native_fight_selection_declaration_and_completion",
+        "tests/rules/section05/test_destruction_credit.py::test_native_attack_credits_actual_attacking_player_and_model",
+        "tests/rules/section05/test_reaction_boundaries.py::test_faq20_deadly_demise_resolves_after_retained_model_removed",
+        "tests/rules/section05/test_reaction_boundaries.py::test_ordinary_destroyed_trigger_resolves_before_removal",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_cause_reuse_is_read_only_and_expires",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[True]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[False]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[True]",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[False]",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_reaction_boundaries.py::test_ordinary_destroyed_trigger_resolves_before_removal",
+          "parameters": {}
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[False]",
+          "parameters": {
+            "demise": false
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[True]",
+          "parameters": {
+            "demise": true
+          }
+        },
+        {
+          "attempt": "controls-retry",
+          "nodeid": "test_attack_missing.py::test_retained_attack_continuation_missing_guards",
+          "parameters": {}
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/rules/section12/test_retained_interactions.py::test_section05_faq20_independent_enemy_retention_survives_other_cleanup_and_demise",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-002",
+    "path": "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py",
+    "owner": "_finish_resumed_deadly_demise_source_damage",
+    "operation": "cumulative-exact-010",
+    "raw_sha256": "9f0087e3b4ac269e0f9bcc7c8c41526932395268612cc28bb5dfbcc00b5adb06",
+    "ast_sha256": "ec6d3ff8263294ea069755512ab4cfd5b93e206425de1c5efbbec0a0dfaecf67",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-002",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py",
+      "owner": "_finish_resumed_deadly_demise_source_damage",
+      "operation": "cumulative-exact-010",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "9f0087e3b4ac269e0f9bcc7c8c41526932395268612cc28bb5dfbcc00b5adb06",
+      "owner_ast_sha256": "ec6d3ff8263294ea069755512ab4cfd5b93e206425de1c5efbbec0a0dfaecf67",
+      "semantic_edge": "Interrupted Deadly Demise resumes through the same shared finalizer and exact consumed removal artifact, then resumes the original secondary/source completion.",
+      "independent_completed_case_calls": 11,
+      "independent_completed_cases": [
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_cause_reuse_is_read_only_and_expires",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "controls-retry",
+          "nodeid": "test_attack_missing.py::test_retained_attack_continuation_missing_guards",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-003",
+    "path": "src/warhammer40k_core/engine/attack_sequence_destruction_boundary.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-011",
+    "raw_sha256": "5860be140325cabd60422e85a674f85328dc885e58229c525aced39317c5a65c",
+    "ast_sha256": "76639e701d08c13a2e55a75024afd78b68cf40f71fe7e0d03092825ae2120562",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-003",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/attack_sequence_destruction_boundary.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-011",
+      "proof_kind": "static_whole_module",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "5860be140325cabd60422e85a674f85328dc885e58229c525aced39317c5a65c",
+      "owner_ast_sha256": "76639e701d08c13a2e55a75024afd78b68cf40f71fe7e0d03092825ae2120562",
+      "semantic_edge": "Whole-module structural owner: exact complete non-function statements/imports/constants/type-only declarations are pinned before/after. Consumer semantics remain assigned to their listed function owners. No unrelated module owner is admitted.",
+      "independent_completed_case_calls": 0,
+      "independent_completed_cases": [],
+      "historical_case_edges": [],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-004",
+    "path": "src/warhammer40k_core/engine/attack_sequence_destruction_boundary.py",
+    "owner": "_validate_retained_model_placement",
+    "operation": "cumulative-exact-011",
+    "raw_sha256": "5860be140325cabd60422e85a674f85328dc885e58229c525aced39317c5a65c",
+    "ast_sha256": null,
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-004",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/attack_sequence_destruction_boundary.py",
+      "owner": "_validate_retained_model_placement",
+      "operation": "cumulative-exact-011",
+      "proof_kind": "static_removed_helper_and_replacement",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "5860be140325cabd60422e85a674f85328dc885e58229c525aced39317c5a65c",
+      "owner_ast_sha256": null,
+      "semantic_edge": "Deleted helper is replaced by the finalizer canonical-payload comparison and retained fixed-placement validation. No surviving private reference or relocation grant remains.",
+      "independent_completed_case_calls": 0,
+      "independent_completed_cases": [],
+      "historical_case_edges": [
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[False]",
+          "parameters": {
+            "demise": false
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[True]",
+          "parameters": {
+            "demise": true
+          }
+        },
+        {
+          "attempt": "placement-control",
+          "nodeid": "test_attack_missing.py::test_pending_attack_placement_extraction_guard",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-005",
+    "path": "src/warhammer40k_core/engine/attack_sequence_destruction_boundary.py",
+    "owner": "resolve_pending_attack_destruction_until_blocked",
+    "operation": "cumulative-exact-011",
+    "raw_sha256": "5860be140325cabd60422e85a674f85328dc885e58229c525aced39317c5a65c",
+    "ast_sha256": "bac3d67f6ba879e77e11a442dd0b329145beabb062b2c00a9d15cf04d92d4eae",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-005",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/attack_sequence_destruction_boundary.py",
+      "owner": "resolve_pending_attack_destruction_until_blocked",
+      "operation": "cumulative-exact-011",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "5860be140325cabd60422e85a674f85328dc885e58229c525aced39317c5a65c",
+      "owner_ast_sha256": "bac3d67f6ba879e77e11a442dd0b329145beabb062b2c00a9d15cf04d92d4eae",
+      "semantic_edge": "Completed attacks precede target reactions; WAITING retention blocks removal, REMOVED continuation reuses exact cause; independent casualties remain retained.",
+      "independent_completed_case_calls": 36,
+      "independent_completed_cases": [
+        "::test_model_completion_missing_history_guards",
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "test_external_b2.py::test_pending_attack_placement_extraction_guard",
+        "test_external_b2.py::test_retained_attack_continuation_missing_guards",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+        "tests/rules/section05/test_reaction_boundaries.py::test_attack_reactions_wait_for_all_attacks",
+        "tests/rules/section05/test_reaction_boundaries.py::test_faq20_deadly_demise_resolves_after_retained_model_removed",
+        "tests/rules/section05/test_reaction_boundaries.py::test_ordinary_destroyed_trigger_resolves_before_removal",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[False]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[True]",
+        "tests/rules/section05/test_retention.py::test_faq49_datasheet_permission_needs_authenticated_retention",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[False]",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+          "parameters": {
+            "retain": false
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+          "parameters": {
+            "retain": true
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[False]",
+          "parameters": {
+            "demise": false
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[True]",
+          "parameters": {
+            "demise": true
+          }
+        },
+        {
+          "attempt": "controls-retry",
+          "nodeid": "test_attack_missing.py::test_retained_attack_continuation_missing_guards",
+          "parameters": {}
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/rules/section12/test_retained_interactions.py::test_section05_faq20_independent_enemy_retention_survives_other_cleanup_and_demise",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-006",
+    "path": "src/warhammer40k_core/engine/retained_demise_removal.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-038",
+    "raw_sha256": "59e685da563e6cd0ed95bfe4d69e9c06e625a679f0f443ff3fc5c3bff5fad880",
+    "ast_sha256": "81979e962b68717c54c258f2ed1060a431a324d68e507e37734bacbf5473a59f",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-006",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/retained_demise_removal.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-038",
+      "proof_kind": "static_whole_module",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "59e685da563e6cd0ed95bfe4d69e9c06e625a679f0f443ff3fc5c3bff5fad880",
+      "owner_ast_sha256": "81979e962b68717c54c258f2ed1060a431a324d68e507e37734bacbf5473a59f",
+      "semantic_edge": "Whole-module structural owner: exact complete non-function statements/imports/constants/type-only declarations are pinned before/after. Consumer semantics remain assigned to their listed function owners. No unrelated module owner is admitted.",
+      "independent_completed_case_calls": 0,
+      "independent_completed_cases": [],
+      "historical_case_edges": [],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-007",
+    "path": "src/warhammer40k_core/engine/retained_demise_removal.py",
+    "owner": "finalize_attack_casualty",
+    "operation": "cumulative-exact-038",
+    "raw_sha256": "59e685da563e6cd0ed95bfe4d69e9c06e625a679f0f443ff3fc5c3bff5fad880",
+    "ast_sha256": "875eb8f8093ed830e5a5515ab15b40bde7f3cfd2734b9c95ff0510da683e63ac",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-007",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/retained_demise_removal.py",
+      "owner": "finalize_attack_casualty",
+      "operation": "cumulative-exact-038",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "59e685da563e6cd0ed95bfe4d69e9c06e625a679f0f443ff3fc5c3bff5fad880",
+      "owner_ast_sha256": "875eb8f8093ed830e5a5515ab15b40bde7f3cfd2734b9c95ff0510da683e63ac",
+      "semantic_edge": "Ordinary finalization authenticates reserved attribution, compares the pending footprint before removal and emits one cause-bound event; cached retained finalization requires exact sequence/model/target and removal/damage artifacts.",
+      "independent_completed_case_calls": 45,
+      "independent_completed_cases": [
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "test_external_b2.py::test_pending_attack_placement_extraction_guard",
+        "test_external_b2.py::test_retained_attack_continuation_missing_guards",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section05/test_reaction_boundaries.py::test_faq20_deadly_demise_resolves_after_retained_model_removed",
+        "tests/rules/section05/test_reaction_boundaries.py::test_ordinary_destroyed_trigger_resolves_before_removal",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_cause_reuse_is_read_only_and_expires",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[True]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[False]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[True]",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[False]",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destruction_credit.py::test_native_attack_credits_actual_attacking_player_and_model",
+          "parameters": {}
+        },
+        {
+          "attempt": "controls-retry",
+          "nodeid": "test_attack_missing.py::test_retained_attack_continuation_missing_guards",
+          "parameters": {}
+        },
+        {
+          "attempt": "placement-control",
+          "nodeid": "test_attack_missing.py::test_pending_attack_placement_extraction_guard",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-008",
+    "path": "src/warhammer40k_core/engine/retained_demise_removal.py",
+    "owner": "retained_fight_is_completing",
+    "operation": "cumulative-exact-038",
+    "raw_sha256": "59e685da563e6cd0ed95bfe4d69e9c06e625a679f0f443ff3fc5c3bff5fad880",
+    "ast_sha256": "48871d867d86518ef47b1391c46e14451975bbf15801273c26a3488be263b277",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-008",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/retained_demise_removal.py",
+      "owner": "retained_fight_is_completing",
+      "operation": "cumulative-exact-038",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "59e685da563e6cd0ed95bfe4d69e9c06e625a679f0f443ff3fc5c3bff5fad880",
+      "owner_ast_sha256": "48871d867d86518ef47b1391c46e14451975bbf15801273c26a3488be263b277",
+      "semantic_edge": "Pure conjunction: existing retained record, selected FIGHT, stage RESOLVING. No permission or ownership mutation; ordinary and WAITING branches remain false.",
+      "independent_completed_case_calls": 6,
+      "independent_completed_cases": [
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "tests/rules/section05/test_reaction_boundaries.py::test_faq20_deadly_demise_resolves_after_retained_model_removed",
+        "tests/rules/section05/test_reaction_boundaries.py::test_ordinary_destroyed_trigger_resolves_before_removal",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[True]",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_reaction_boundaries.py::test_ordinary_destroyed_trigger_resolves_before_removal",
+          "parameters": {}
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[False]",
+          "parameters": {
+            "demise": false
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[True]",
+          "parameters": {
+            "demise": true
+          }
+        },
+        {
+          "attempt": "controls",
+          "nodeid": "test_attack_missing.py::test_retained_rule_continuation_missing_guards",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-009",
+    "path": "src/warhammer40k_core/engine/retained_demise_removal.py",
+    "owner": "retained_fight_removed_event",
+    "operation": "cumulative-exact-038",
+    "raw_sha256": "59e685da563e6cd0ed95bfe4d69e9c06e625a679f0f443ff3fc5c3bff5fad880",
+    "ast_sha256": "9016fb0453a822d807be8264f6e21670b56abee270b6bd3c6e6b2415dd9cce5f",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-009",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/retained_demise_removal.py",
+      "owner": "retained_fight_removed_event",
+      "operation": "cumulative-exact-038",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "59e685da563e6cd0ed95bfe4d69e9c06e625a679f0f443ff3fc5c3bff5fad880",
+      "owner_ast_sha256": "9016fb0453a822d807be8264f6e21670b56abee270b6bd3c6e6b2415dd9cce5f",
+      "semantic_edge": "Only a removed retained Fight can reuse its consumed cause; fixed placement and unique consumed authority remain mandatory.",
+      "independent_completed_case_calls": 235,
+      "independent_completed_cases": [
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "test_external_b2.py::test_pending_attack_placement_extraction_guard",
+        "test_external_b2.py::test_retained_attack_continuation_missing_guards",
+        "test_external_b2.py::test_retained_rule_continuation_missing_guards",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000599]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000968]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004078]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004080]",
+        "tests/rules/section05/test_destruction_credit.py::test_native_attack_credits_actual_attacking_player_and_model",
+        "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[opponent]",
+        "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[owner]",
+        "tests/rules/section05/test_reaction_boundaries.py::test_faq20_deadly_demise_resolves_after_retained_model_removed",
+        "tests/rules/section05/test_reaction_boundaries.py::test_ordinary_destroyed_trigger_resolves_before_removal",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_cause_reuse_is_read_only_and_expires",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[fabricated_consumption]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_retention]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_damage]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_owner]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_request]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_source]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[True]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[False]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[True]",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[False]",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "controls",
+          "nodeid": "test_attack_missing.py::test_retained_rule_continuation_missing_guards",
+          "parameters": {}
+        },
+        {
+          "attempt": "controls-retry",
+          "nodeid": "test_attack_missing.py::test_retained_attack_continuation_missing_guards",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-010",
+    "path": "src/warhammer40k_core/engine/rule_model_destruction.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-039",
+    "raw_sha256": "176b33aff2161208a37b400c4d0742d6aa37fb612a21ea51020ebff37d9887ac",
+    "ast_sha256": "ea1b959bfcbb6a08ee0f4fc69d2e0b5aa5b0a796a877a49d188774cae9a20357",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-010",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/rule_model_destruction.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-039",
+      "proof_kind": "static_whole_module",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "176b33aff2161208a37b400c4d0742d6aa37fb612a21ea51020ebff37d9887ac",
+      "owner_ast_sha256": "ea1b959bfcbb6a08ee0f4fc69d2e0b5aa5b0a796a877a49d188774cae9a20357",
+      "semantic_edge": "Whole-module structural owner: exact complete non-function statements/imports/constants/type-only declarations are pinned before/after. Consumer semantics remain assigned to their listed function owners. No unrelated module owner is admitted.",
+      "independent_completed_case_calls": 0,
+      "independent_completed_cases": [],
+      "historical_case_edges": [],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-011",
+    "path": "src/warhammer40k_core/engine/rule_model_destruction.py",
+    "owner": "_continue_rule_deadly_demise_sources",
+    "operation": "cumulative-exact-039",
+    "raw_sha256": "176b33aff2161208a37b400c4d0742d6aa37fb612a21ea51020ebff37d9887ac",
+    "ast_sha256": "9639caa86a9a5b92f874255c4cbaafea133629cd8ee8c7bda51a0fbdbc5827ae",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-011",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/rule_model_destruction.py",
+      "owner": "_continue_rule_deadly_demise_sources",
+      "operation": "cumulative-exact-039",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "176b33aff2161208a37b400c4d0742d6aa37fb612a21ea51020ebff37d9887ac",
+      "owner_ast_sha256": "9639caa86a9a5b92f874255c4cbaafea133629cd8ee8c7bda51a0fbdbc5827ae",
+      "semantic_edge": "Rule destruction shares the same retained-Fight exception: skip duplicate reservation only for authenticated removal, finalize before nonempty Deadly Demise sources, preserve rule continuation and collateral ownership.",
+      "independent_completed_case_calls": 10,
+      "independent_completed_cases": [
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000599]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000968]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004078]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004080]",
+        "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[opponent]",
+        "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[owner]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[opponent]",
+          "parameters": {
+            "destroyer": "opponent"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[owner]",
+          "parameters": {
+            "destroyer": "owner"
+          }
+        },
+        {
+          "attempt": "controls",
+          "nodeid": "test_attack_missing.py::test_retained_rule_continuation_missing_guards",
+          "parameters": {}
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_phase12a_timing_reactions_effects.py::test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-012",
+    "path": "src/warhammer40k_core/engine/rule_model_destruction.py",
+    "owner": "_remove_rule_destroyed_model_and_continue",
+    "operation": "cumulative-exact-039",
+    "raw_sha256": "176b33aff2161208a37b400c4d0742d6aa37fb612a21ea51020ebff37d9887ac",
+    "ast_sha256": "7fceefc8d1f64928d2432d352817c421bbcf9cee4f3a012ee640d41795bc3b41",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-012",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/rule_model_destruction.py",
+      "owner": "_remove_rule_destroyed_model_and_continue",
+      "operation": "cumulative-exact-039",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "176b33aff2161208a37b400c4d0742d6aa37fb612a21ea51020ebff37d9887ac",
+      "owner_ast_sha256": "7fceefc8d1f64928d2432d352817c421bbcf9cee4f3a012ee640d41795bc3b41",
+      "semantic_edge": "Rule finalizer extraction preserves physical/rules-unit attribution, the destruction event, transition batch and mandatory/source-completion continuation.",
+      "independent_completed_case_calls": 10,
+      "independent_completed_cases": [
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000599]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000968]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004078]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004080]",
+        "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[opponent]",
+        "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[owner]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000599]",
+          "parameters": {
+            "datasheet": "000000599"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000968]",
+          "parameters": {
+            "datasheet": "000000968"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004078]",
+          "parameters": {
+            "datasheet": "000004078"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004080]",
+          "parameters": {
+            "datasheet": "000004080"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[opponent]",
+          "parameters": {
+            "destroyer": "opponent"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[owner]",
+          "parameters": {
+            "destroyer": "owner"
+          }
+        },
+        {
+          "attempt": "controls",
+          "nodeid": "test_attack_missing.py::test_retained_rule_continuation_missing_guards",
+          "parameters": {}
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_phase12a_timing_reactions_effects.py::test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-013",
+    "path": "src/warhammer40k_core/engine/rule_model_destruction.py",
+    "owner": "_validate_pre_removal_context_matches_state",
+    "operation": "cumulative-exact-039",
+    "raw_sha256": "176b33aff2161208a37b400c4d0742d6aa37fb612a21ea51020ebff37d9887ac",
+    "ast_sha256": "b67af9c4157aae1ec7024245e62d9400b95982886083334e48667f27d2cb964c",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-013",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/rule_model_destruction.py",
+      "owner": "_validate_pre_removal_context_matches_state",
+      "operation": "cumulative-exact-039",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "176b33aff2161208a37b400c4d0742d6aa37fb612a21ea51020ebff37d9887ac",
+      "owner_ast_sha256": "b67af9c4157aae1ec7024245e62d9400b95982886083334e48667f27d2cb964c",
+      "semantic_edge": "Absent placement is accepted only through a consumed retained Fight event whose original rule context still matches. All ordinary original state/identity checks remain.",
+      "independent_completed_case_calls": 10,
+      "independent_completed_cases": [
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000599]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000968]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004078]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004080]",
+        "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[opponent]",
+        "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[owner]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[opponent]",
+          "parameters": {
+            "destroyer": "opponent"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[owner]",
+          "parameters": {
+            "destroyer": "owner"
+          }
+        },
+        {
+          "attempt": "controls",
+          "nodeid": "test_attack_missing.py::test_retained_rule_continuation_missing_guards",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-014",
+    "path": "src/warhammer40k_core/engine/rule_model_destruction_removal.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-040",
+    "raw_sha256": "8bedadac8ae55612a53084fa593ef65768ecdf6bcac0bf96cd524eaf2b9d90d1",
+    "ast_sha256": "dd3c5c609cc387fbb6b3c51da0de2eacb3429091dcc6b12ce331492bbd7fe6ec",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-014",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/rule_model_destruction_removal.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-040",
+      "proof_kind": "static_whole_module",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "8bedadac8ae55612a53084fa593ef65768ecdf6bcac0bf96cd524eaf2b9d90d1",
+      "owner_ast_sha256": "dd3c5c609cc387fbb6b3c51da0de2eacb3429091dcc6b12ce331492bbd7fe6ec",
+      "semantic_edge": "Whole-module structural owner: exact complete non-function statements/imports/constants/type-only declarations are pinned before/after. Consumer semantics remain assigned to their listed function owners. No unrelated module owner is admitted.",
+      "independent_completed_case_calls": 0,
+      "independent_completed_cases": [],
+      "historical_case_edges": [],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-015",
+    "path": "src/warhammer40k_core/engine/rule_model_destruction_removal.py",
+    "owner": "finalize_rule_casualty",
+    "operation": "cumulative-exact-040",
+    "raw_sha256": "8bedadac8ae55612a53084fa593ef65768ecdf6bcac0bf96cd524eaf2b9d90d1",
+    "ast_sha256": "d538f1c272df35bfb7e56b3cb44d869e3de94199f182a0f17e1fc774a3d0aa9e",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-015",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/rule_model_destruction_removal.py",
+      "owner": "finalize_rule_casualty",
+      "operation": "cumulative-exact-040",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "8bedadac8ae55612a53084fa593ef65768ecdf6bcac0bf96cd524eaf2b9d90d1",
+      "owner_ast_sha256": "d538f1c272df35bfb7e56b3cb44d869e3de94199f182a0f17e1fc774a3d0aa9e",
+      "semantic_edge": "Ordinary rule removal preserves the former footprint, cause event, physical ownership and transition; cached path validates source identity and reuses one original removal.",
+      "independent_completed_case_calls": 20,
+      "independent_completed_cases": [
+        "test_external_b2.py::test_retained_rule_continuation_missing_guards",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000599]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000968]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004078]",
+        "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004080]",
+        "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[opponent]",
+        "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[owner]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000599]",
+          "parameters": {
+            "datasheet": "000000599"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000000968]",
+          "parameters": {
+            "datasheet": "000000968"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004078]",
+          "parameters": {
+            "datasheet": "000004078"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destroyed_measurement.py::test_former_base_or_hull_and_last_destroyed_member[000004080]",
+          "parameters": {
+            "datasheet": "000004080"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[opponent]",
+          "parameters": {
+            "destroyer": "opponent"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section05/test_destruction_credit.py::test_player_rule_credits_its_owner_not_other_player[owner]",
+          "parameters": {
+            "destroyer": "owner"
+          }
+        },
+        {
+          "attempt": "controls",
+          "nodeid": "test_attack_missing.py::test_retained_rule_continuation_missing_guards",
+          "parameters": {}
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_phase12a_timing_reactions_effects.py::test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-016",
+    "path": "src/warhammer40k_core/engine/rule_model_destruction_removal.py",
+    "owner": "validate_removed_rule_context",
+    "operation": "cumulative-exact-040",
+    "raw_sha256": "8bedadac8ae55612a53084fa593ef65768ecdf6bcac0bf96cd524eaf2b9d90d1",
+    "ast_sha256": "2927b2714afee7b0ef0390ad8203dc4ff76f7ae2d6abc33f6b45072c8871f240",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-016",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/rule_model_destruction_removal.py",
+      "owner": "validate_removed_rule_context",
+      "operation": "cumulative-exact-040",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "8bedadac8ae55612a53084fa593ef65768ecdf6bcac0bf96cd524eaf2b9d90d1",
+      "owner_ast_sha256": "2927b2714afee7b0ef0390ad8203dc4ff76f7ae2d6abc33f6b45072c8871f240",
+      "semantic_edge": "Cached rule removal binds seven original context fields plus model identity to retained authority; external negatives change each field and removal artifact independently.",
+      "independent_completed_case_calls": 19,
+      "independent_completed_cases": [
+        "test_external_b2.py::test_retained_rule_continuation_missing_guards"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "controls",
+          "nodeid": "test_attack_missing.py::test_retained_rule_continuation_missing_guards",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-017",
+    "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-027",
+    "raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+    "ast_sha256": "d61a9eda22ff1116054afe131f9fb3d07efb066fdd5803420a81a5ae23b4a94f",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-017",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-027",
+      "proof_kind": "static_whole_module",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+      "owner_ast_sha256": "d61a9eda22ff1116054afe131f9fb3d07efb066fdd5803420a81a5ae23b4a94f",
+      "semantic_edge": "Whole-module structural owner: exact complete non-function statements/imports/constants/type-only declarations are pinned before/after. Consumer semantics remain assigned to their listed function owners. No unrelated module owner is admitted.",
+      "independent_completed_case_calls": 0,
+      "independent_completed_cases": [],
+      "historical_case_edges": [],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-018",
+    "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+    "owner": "all_attacks_resolved",
+    "operation": "cumulative-exact-027",
+    "raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+    "ast_sha256": "f7119cbc984d01898d806049bbe786722c5b4b42bac42f32f169cf092f6b3db0",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-018",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+      "owner": "all_attacks_resolved",
+      "operation": "cumulative-exact-027",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+      "owner_ast_sha256": "f7119cbc984d01898d806049bbe786722c5b4b42bac42f32f169cf092f6b3db0",
+      "semantic_edge": "Nonempty attack selection counts only after all attacks and deferred mortals resolve; target post-attack choices do not erase the completed unit boundary.",
+      "independent_completed_case_calls": 59,
+      "independent_completed_cases": [
+        "::test_model_completion_missing_history_guards",
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_unit_is_not_shot_before_any_declared_attack_resolves",
+        "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+        "tests/rules/section04/test_facade.py::test_native_shooting_selection_declaration_and_completed_participation[2]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+          "parameters": {
+            "retain": false
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+          "parameters": {
+            "retain": true
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_bearer_owned_deferred_damage_prevents_model_completion[fight]",
+          "parameters": {
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_bearer_owned_deferred_damage_prevents_model_completion[shooting]",
+          "parameters": {
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_native_unit_is_not_shot_before_any_declared_attack_resolves",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-019",
+    "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+    "owner": "completed_model_ids",
+    "operation": "cumulative-exact-027",
+    "raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+    "ast_sha256": "7c9e40dffaa08839f7ac48243da4df37959001cb89d98b73963623c65b2766d3",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-019",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+      "owner": "completed_model_ids",
+      "operation": "cumulative-exact-027",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+      "owner_ast_sha256": "7c9e40dffaa08839f7ac48243da4df37959001cb89d98b73963623c65b2766d3",
+      "semantic_edge": "Physical bearers complete incrementally; unfinished sibling weapons, pending gathered contexts, transport work and bearer-owned deferred damage stay unresolved.",
+      "independent_completed_case_calls": 895,
+      "independent_completed_cases": [
+        "::test_model_completion_missing_history_guards",
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "test_external_b2.py::test_generated_hit_missing_terminal_step_blocks_completion",
+        "test_external_b2.py::test_native_postroll_lost_inventory_does_not_discharge_bearer",
+        "test_external_b2.py::test_pending_attack_placement_extraction_guard",
+        "test_external_b2.py::test_retained_attack_continuation_missing_guards",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+        "tests/rules/section04/test_completion_boundaries.py::test_bearer_owned_deferred_damage_prevents_model_completion[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_bearer_owned_deferred_damage_prevents_model_completion[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_completed_weapon_is_distinct_from_unfinished_model_and_unit[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_completed_weapon_is_distinct_from_unfinished_model_and_unit[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[False-fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[False-shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[True-fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[True-shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_unit_is_not_shot_before_any_declared_attack_resolves",
+        "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+        "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[8-False]",
+        "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[8-True]",
+        "tests/rules/section04/test_facade.py::test_native_shooting_selection_declaration_and_completed_participation[1]",
+        "tests/rules/section04/test_facade.py::test_native_shooting_selection_declaration_and_completed_participation[2]",
+        "tests/rules/section04/test_facade.py::test_one_physical_weapon_cannot_commit_both_profiles_then_legal_retry[False]",
+        "tests/rules/section04/test_facade.py::test_one_physical_weapon_cannot_commit_both_profiles_then_legal_retry[True]",
+        "tests/rules/section04/test_fight_facade.py::test_native_fight_selection_declaration_and_completion",
+        "tests/rules/section05/test_destruction_credit.py::test_native_attack_credits_actual_attacking_player_and_model",
+        "tests/rules/section05/test_reaction_boundaries.py::test_attack_reactions_wait_for_all_attacks",
+        "tests/rules/section05/test_reaction_boundaries.py::test_faq20_deadly_demise_resolves_after_retained_model_removed",
+        "tests/rules/section05/test_reaction_boundaries.py::test_ordinary_destroyed_trigger_resolves_before_removal",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_cause_reuse_is_read_only_and_expires",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[fabricated_consumption]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_retention]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_damage]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_owner]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_request]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_source]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[True]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[False]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[True]",
+        "tests/rules/section05/test_retention.py::test_faq49_datasheet_permission_needs_authenticated_retention",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[False]",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_bearer_owned_deferred_damage_prevents_model_completion[fight]",
+          "parameters": {
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_bearer_owned_deferred_damage_prevents_model_completion[shooting]",
+          "parameters": {
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_completed_weapon_is_distinct_from_unfinished_model_and_unit[fight]",
+          "parameters": {
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_completed_weapon_is_distinct_from_unfinished_model_and_unit[shooting]",
+          "parameters": {
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[fight]",
+          "parameters": {
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[shooting]",
+          "parameters": {
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[False-fight]",
+          "parameters": {
+            "first_hit": false,
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[False-shooting]",
+          "parameters": {
+            "first_hit": false,
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[True-fight]",
+          "parameters": {
+            "first_hit": true,
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[True-shooting]",
+          "parameters": {
+            "first_hit": true,
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/integration/test_order135_gathered_override.py::test_later_native_override_continues_identically_across_persistence[False-decline]",
+          "parameters": {
+            "generated": false,
+            "choice": "decline"
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/integration/test_order135_gathered_override.py::test_later_native_override_continues_identically_across_persistence[False-use]",
+          "parameters": {
+            "generated": false,
+            "choice": "use"
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/rules/section05/test_post_roll.py::test_modified_wounds_form_pools_and_active_player_chooses_order[False]",
+          "parameters": {
+            "reverse": false
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/rules/section05/test_post_roll.py::test_modified_wounds_form_pools_and_active_player_chooses_order[True]",
+          "parameters": {
+            "reverse": true
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise",
+          "parameters": {}
+        },
+        {
+          "attempt": "final-controls",
+          "nodeid": "test_attack_missing.py::test_native_postroll_lost_inventory_does_not_discharge_bearer",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-020",
+    "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+    "owner": "model_completion_evidence",
+    "operation": "cumulative-exact-027",
+    "raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+    "ast_sha256": "a61e1f5dcc83ee693b4f0c0624cee41c1c28ce6e561e763b88a86d337a466a9d",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-020",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+      "owner": "model_completion_evidence",
+      "operation": "cumulative-exact-027",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+      "owner_ast_sha256": "a61e1f5dcc83ee693b4f0c0624cee41c1c28ce6e561e763b88a86d337a466a9d",
+      "semantic_edge": "Immediately adjacent state evidence binds phase, physical model/weapon/target, actor and original accepted decision prefix; incremental completion cannot regress or invent a bearer.",
+      "independent_completed_case_calls": 128,
+      "independent_completed_cases": [
+        "::test_model_completion_missing_history_guards",
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_cause_reuse_is_read_only_and_expires",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[fabricated_consumption]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_retention]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_damage]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_owner]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_request]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_source]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+          "parameters": {
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+          "parameters": {
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+          "parameters": {}
+        },
+        {
+          "attempt": "controls",
+          "nodeid": "test_attack_missing.py::test_model_completion_missing_history_guards",
+          "parameters": {}
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[False-False]",
+          "parameters": {
+            "reroll": false,
+            "reaction": false
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[False-True]",
+          "parameters": {
+            "reroll": false,
+            "reaction": true
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[True-False]",
+          "parameters": {
+            "reroll": true,
+            "reaction": false
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[True-True]",
+          "parameters": {
+            "reroll": true,
+            "reaction": true
+          }
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-021",
+    "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+    "owner": "resolved_model_ids",
+    "operation": "cumulative-exact-027",
+    "raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+    "ast_sha256": "b78a911377ef315b42e5af1fadb949ee56022672a6311b740ef451be8b85583f",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-021",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+      "owner": "resolved_model_ids",
+      "operation": "cumulative-exact-027",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+      "owner_ast_sha256": "b78a911377ef315b42e5af1fadb949ee56022672a6311b740ef451be8b85583f",
+      "semantic_edge": "Each physical original/generated attack needs a finalized miss, failed wound or completed damage; typed remaining work blocks completion despite a claimed journal or pending inventory.",
+      "independent_completed_case_calls": 881,
+      "independent_completed_cases": [
+        "::test_model_completion_missing_history_guards",
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "test_external_b2.py::test_generated_hit_missing_terminal_step_blocks_completion",
+        "test_external_b2.py::test_native_postroll_lost_inventory_does_not_discharge_bearer",
+        "test_external_b2.py::test_pending_attack_placement_extraction_guard",
+        "test_external_b2.py::test_retained_attack_continuation_missing_guards",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+        "tests/rules/section04/test_completion_boundaries.py::test_bearer_owned_deferred_damage_prevents_model_completion[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_bearer_owned_deferred_damage_prevents_model_completion[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_completed_weapon_is_distinct_from_unfinished_model_and_unit[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_completed_weapon_is_distinct_from_unfinished_model_and_unit[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[False-fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[False-shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[True-fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[True-shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_unit_is_not_shot_before_any_declared_attack_resolves",
+        "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+        "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[8-False]",
+        "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[8-True]",
+        "tests/rules/section04/test_facade.py::test_native_shooting_selection_declaration_and_completed_participation[1]",
+        "tests/rules/section04/test_facade.py::test_native_shooting_selection_declaration_and_completed_participation[2]",
+        "tests/rules/section04/test_facade.py::test_one_physical_weapon_cannot_commit_both_profiles_then_legal_retry[False]",
+        "tests/rules/section04/test_facade.py::test_one_physical_weapon_cannot_commit_both_profiles_then_legal_retry[True]",
+        "tests/rules/section04/test_fight_facade.py::test_native_fight_selection_declaration_and_completion",
+        "tests/rules/section05/test_destruction_credit.py::test_native_attack_credits_actual_attacking_player_and_model",
+        "tests/rules/section05/test_reaction_boundaries.py::test_attack_reactions_wait_for_all_attacks",
+        "tests/rules/section05/test_reaction_boundaries.py::test_faq20_deadly_demise_resolves_after_retained_model_removed",
+        "tests/rules/section05/test_reaction_boundaries.py::test_ordinary_destroyed_trigger_resolves_before_removal",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_cause_reuse_is_read_only_and_expires",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[fabricated_consumption]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_retention]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_damage]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_owner]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_request]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_source]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[True]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[False]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[True]",
+        "tests/rules/section05/test_retention.py::test_faq49_datasheet_permission_needs_authenticated_retention",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[False]",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[False-fight]",
+          "parameters": {
+            "first_hit": false,
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[False-shooting]",
+          "parameters": {
+            "first_hit": false,
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[True-fight]",
+          "parameters": {
+            "first_hit": true,
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[True-shooting]",
+          "parameters": {
+            "first_hit": true,
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+          "parameters": {}
+        },
+        {
+          "attempt": "generated-control",
+          "nodeid": "test_attack_missing.py::test_generated_hit_missing_terminal_step_blocks_completion",
+          "parameters": {}
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/integration/test_order135_gathered_override.py::test_later_native_override_continues_identically_across_persistence[False-decline]",
+          "parameters": {
+            "generated": false,
+            "choice": "decline"
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/integration/test_order135_gathered_override.py::test_later_native_override_continues_identically_across_persistence[False-use]",
+          "parameters": {
+            "generated": false,
+            "choice": "use"
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/rules/section05/test_post_roll.py::test_modified_wounds_form_pools_and_active_player_chooses_order[False]",
+          "parameters": {
+            "reverse": false
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/rules/section05/test_post_roll.py::test_modified_wounds_form_pools_and_active_player_chooses_order[True]",
+          "parameters": {
+            "reverse": true
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_sustained_d3_is_stable_across_twin_linked_resume_restore_and_replay[False-fight]",
+          "parameters": {
+            "reroll": false,
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_sustained_d3_is_stable_across_twin_linked_resume_restore_and_replay[False-shooting]",
+          "parameters": {
+            "reroll": false,
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_sustained_d3_is_stable_across_twin_linked_resume_restore_and_replay[True-fight]",
+          "parameters": {
+            "reroll": true,
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_sustained_d3_is_stable_across_twin_linked_resume_restore_and_replay[True-shooting]",
+          "parameters": {
+            "reroll": true,
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-022",
+    "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+    "owner": "validate_shot_unit_inventory",
+    "operation": "cumulative-exact-027",
+    "raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+    "ast_sha256": "245c15237a7a805ffff33af2ecfb1394cbfbdd11deaea6f1a4eaadde3a8f8cf7",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-022",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/model_attack_completion.py",
+      "owner": "validate_shot_unit_inventory",
+      "operation": "cumulative-exact-027",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "bd90a9138ab51714cef04d98b9882617bf35d2d63fe2d5acd6f32c408496b310",
+      "owner_ast_sha256": "245c15237a7a805ffff33af2ecfb1394cbfbdd11deaea6f1a4eaadde3a8f8cf7",
+      "semantic_edge": "Ordinary has-shot inventory is exactly the complete nonempty declared bearer union in this player/round; empty and out-of-phase selections preserve their distinct authority.",
+      "independent_completed_case_calls": 166,
+      "independent_completed_cases": [
+        "::test_model_completion_missing_history_guards",
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_cause_reuse_is_read_only_and_expires",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[fabricated_consumption]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_retention]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_damage]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_owner]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_request]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_source]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+          "parameters": {
+            "retain": false
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+          "parameters": {
+            "retain": true
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+          "parameters": {
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+          "parameters": {
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[40-False]",
+          "parameters": {
+            "distance": 40,
+            "select_weapons": false
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[8-False]",
+          "parameters": {
+            "distance": 8,
+            "select_weapons": false
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[8-True]",
+          "parameters": {
+            "distance": 8,
+            "select_weapons": true
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_facade.py::test_faq02_native_weaponless_shooter_resolves_type_without_attacks",
+          "parameters": {}
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[False-False]",
+          "parameters": {
+            "reroll": false,
+            "reaction": false
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[False-True]",
+          "parameters": {
+            "reroll": false,
+            "reaction": true
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[True-False]",
+          "parameters": {
+            "reroll": true,
+            "reaction": false
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[True-True]",
+          "parameters": {
+            "reroll": true,
+            "reaction": true
+          }
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-023",
+    "path": "src/warhammer40k_core/engine/model_attack_history.py",
+    "owner": "@module",
+    "operation": "cumulative-exact-028",
+    "raw_sha256": "a5ce2b7df8280e4090213a218f55b4288e97b2f5cea8703970b319c119d56f02",
+    "ast_sha256": "6d720f412d297e2854210c32c22231712b026c9507a490b043269de465e63e18",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-023",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/model_attack_history.py",
+      "owner": "@module",
+      "operation": "cumulative-exact-028",
+      "proof_kind": "static_whole_module",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "a5ce2b7df8280e4090213a218f55b4288e97b2f5cea8703970b319c119d56f02",
+      "owner_ast_sha256": "6d720f412d297e2854210c32c22231712b026c9507a490b043269de465e63e18",
+      "semantic_edge": "Whole-module structural owner: exact complete non-function statements/imports/constants/type-only declarations are pinned before/after. Consumer semantics remain assigned to their listed function owners. No unrelated module owner is admitted.",
+      "independent_completed_case_calls": 0,
+      "independent_completed_cases": [],
+      "historical_case_edges": [],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-024",
+    "path": "src/warhammer40k_core/engine/model_attack_history.py",
+    "owner": "_validate_model_attack_history",
+    "operation": "cumulative-exact-028",
+    "raw_sha256": "a5ce2b7df8280e4090213a218f55b4288e97b2f5cea8703970b319c119d56f02",
+    "ast_sha256": "46a0a516866cdef233af2201352cb34f52b303df7f745d5c1287feac6628d085",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-024",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/model_attack_history.py",
+      "owner": "_validate_model_attack_history",
+      "operation": "cumulative-exact-028",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "a5ce2b7df8280e4090213a218f55b4288e97b2f5cea8703970b319c119d56f02",
+      "owner_ast_sha256": "46a0a516866cdef233af2201352cb34f52b303df7f745d5c1287feac6628d085",
+      "semantic_edge": "Declarations, paired completion receipts and participation form one ordered inventory; newly completed sets accumulate exactly once and whole-sequence markers require the complete union.",
+      "independent_completed_case_calls": 178,
+      "independent_completed_cases": [
+        "::test_model_completion_missing_history_guards",
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_cause_reuse_is_read_only_and_expires",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[fabricated_consumption]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_retention]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_damage]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_owner]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_request]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_source]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+          "parameters": {
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+          "parameters": {
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+          "parameters": {}
+        },
+        {
+          "attempt": "controls",
+          "nodeid": "test_attack_missing.py::test_model_completion_missing_history_guards",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-025",
+    "path": "src/warhammer40k_core/engine/model_attack_history.py",
+    "owner": "record_models_attacked",
+    "operation": "cumulative-exact-028",
+    "raw_sha256": "a5ce2b7df8280e4090213a218f55b4288e97b2f5cea8703970b319c119d56f02",
+    "ast_sha256": "ed1b9592b56d2818e00923c2a0eccb278b7f66912d19edd7dbcd33a4b6a77dab",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-025",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/model_attack_history.py",
+      "owner": "record_models_attacked",
+      "operation": "cumulative-exact-028",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "a5ce2b7df8280e4090213a218f55b4288e97b2f5cea8703970b319c119d56f02",
+      "owner_ast_sha256": "ed1b9592b56d2818e00923c2a0eccb278b7f66912d19edd7dbcd33a4b6a77dab",
+      "semantic_edge": "Emit only sorted new physical IDs, immediately after one state receipt; repeated boundaries add no duplicate participation and empty completion retains its one explicit empty receipt.",
+      "independent_completed_case_calls": 651,
+      "independent_completed_cases": [
+        "::test_model_completion_missing_history_guards",
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "test_external_b2.py::test_generated_hit_missing_terminal_step_blocks_completion",
+        "test_external_b2.py::test_native_postroll_lost_inventory_does_not_discharge_bearer",
+        "test_external_b2.py::test_pending_attack_placement_extraction_guard",
+        "test_external_b2.py::test_retained_attack_continuation_missing_guards",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+        "tests/rules/section04/test_completion_boundaries.py::test_bearer_owned_deferred_damage_prevents_model_completion[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_bearer_owned_deferred_damage_prevents_model_completion[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_completed_weapon_is_distinct_from_unfinished_model_and_unit[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_completed_weapon_is_distinct_from_unfinished_model_and_unit[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[False-fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[False-shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[True-fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_group_discharge_uses_finished_physical_contributions[True-shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_native_unit_is_not_shot_before_any_declared_attack_resolves",
+        "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+        "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[8-False]",
+        "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[8-True]",
+        "tests/rules/section04/test_facade.py::test_native_shooting_selection_declaration_and_completed_participation[1]",
+        "tests/rules/section04/test_facade.py::test_native_shooting_selection_declaration_and_completed_participation[2]",
+        "tests/rules/section04/test_facade.py::test_one_physical_weapon_cannot_commit_both_profiles_then_legal_retry[False]",
+        "tests/rules/section04/test_facade.py::test_one_physical_weapon_cannot_commit_both_profiles_then_legal_retry[True]",
+        "tests/rules/section04/test_fight_facade.py::test_native_fight_selection_declaration_and_completion",
+        "tests/rules/section05/test_destruction_credit.py::test_native_attack_credits_actual_attacking_player_and_model",
+        "tests/rules/section05/test_reaction_boundaries.py::test_attack_reactions_wait_for_all_attacks",
+        "tests/rules/section05/test_reaction_boundaries.py::test_faq20_deadly_demise_resolves_after_retained_model_removed",
+        "tests/rules/section05/test_reaction_boundaries.py::test_ordinary_destroyed_trigger_resolves_before_removal",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[False]",
+        "tests/rules/section05/test_retained_completion.py::test_real_retained_melee_finishes_before_removal[True]",
+        "tests/rules/section05/test_retention.py::test_faq49_datasheet_permission_needs_authenticated_retention",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[False]",
+        "tests/rules/section05/test_retention.py::test_retained_model_keeps_geometry_then_phase_end_removes_it[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+          "parameters": {
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+          "parameters": {
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[fight]",
+          "parameters": {
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[shooting]",
+          "parameters": {
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[40-False]",
+          "parameters": {
+            "distance": 40,
+            "select_weapons": false
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[8-False]",
+          "parameters": {
+            "distance": 8,
+            "select_weapons": false
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_facade.py::test_declining_legal_targets_completes_selection_without_shot[8-True]",
+          "parameters": {
+            "distance": 8,
+            "select_weapons": true
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_facade.py::test_native_shooting_selection_declaration_and_completed_participation[1]",
+          "parameters": {
+            "weapons": 1
+          }
+        },
+        {
+          "attempt": ".",
+          "nodeid": "tests/rules/section04/test_facade.py::test_native_shooting_selection_declaration_and_completed_participation[2]",
+          "parameters": {
+            "weapons": 2
+          }
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-026",
+    "path": "src/warhammer40k_core/engine/model_attack_history.py",
+    "owner": "validate_declared_model_attack_completions",
+    "operation": "cumulative-exact-028",
+    "raw_sha256": "a5ce2b7df8280e4090213a218f55b4288e97b2f5cea8703970b319c119d56f02",
+    "ast_sha256": "aa50c54b0f9c2799184c94664123703199a2e912e6e17f8cd5020f9d27892624",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-026",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/model_attack_history.py",
+      "owner": "validate_declared_model_attack_completions",
+      "operation": "cumulative-exact-028",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "a5ce2b7df8280e4090213a218f55b4288e97b2f5cea8703970b319c119d56f02",
+      "owner_ast_sha256": "aa50c54b0f9c2799184c94664123703199a2e912e6e17f8cd5020f9d27892624",
+      "semantic_edge": "Restored history keeps original declaration/decision/physical weapon and ranged parent timing authority, then validates the exact ordinary shot inventory.",
+      "independent_completed_case_calls": 166,
+      "independent_completed_cases": [
+        "::test_model_completion_missing_history_guards",
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_cause_reuse_is_read_only_and_expires",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[fabricated_consumption]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_retention]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_damage]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_owner]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_request]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_source]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+          "parameters": {
+            "retain": false
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+          "parameters": {
+            "retain": true
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+          "parameters": {
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+          "parameters": {
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[False-False]",
+          "parameters": {
+            "reroll": false,
+            "reaction": false
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[False-True]",
+          "parameters": {
+            "reroll": false,
+            "reaction": true
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[True-False]",
+          "parameters": {
+            "reroll": true,
+            "reaction": false
+          }
+        },
+        {
+          "attempt": "existing-supplement",
+          "nodeid": "tests/unit/test_order96_twin_linked.py::test_out_of_phase_twin_linked_resumes_its_shooting_host_from_movement[True-True]",
+          "parameters": {
+            "reroll": true,
+            "reaction": true
+          }
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "B2-027",
+    "path": "src/warhammer40k_core/engine/shooting_target_replacement_authority.py",
+    "owner": "validate_recorded_sequence_authority",
+    "operation": "cumulative-exact-045",
+    "raw_sha256": "ac70ae498485e9e65090e3033d0f59b4bfcbd04679782556d462dae1117ad466",
+    "ast_sha256": "64e9e8597a20701c76bebc0d6044629968b1cd0dd3c40b2d737b5625e3d91ed5",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "row_id": "B2-027",
+      "decision": "ACCEPT",
+      "path": "src/warhammer40k_core/engine/shooting_target_replacement_authority.py",
+      "owner": "validate_recorded_sequence_authority",
+      "operation": "cumulative-exact-045",
+      "proof_kind": "source_branch_to_actual_assertion",
+      "source_identity": "0ee7ad889d21fff46951bdb1048fab58cf9d78d9ffc5a250abe4da74658b8e13",
+      "source_raw_sha256": "ac70ae498485e9e65090e3033d0f59b4bfcbd04679782556d462dae1117ad466",
+      "owner_ast_sha256": "64e9e8597a20701c76bebc0d6044629968b1cd0dd3c40b2d737b5625e3d91ed5",
+      "semantic_edge": "Require one exact declaration decision in the recorded prefix and delegate the original target-replacement history validator without alternate authority.",
+      "independent_completed_case_calls": 117,
+      "independent_completed_cases": [
+        "::test_model_completion_missing_history_guards",
+        "::test_resumed_retained_demise_rejects_missing_consumed_cause",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[False]",
+        "tests/rules/section04/test_completion_boundaries.py::test_all_attacks_unit_boundary_survives_pending_target_reaction[True]",
+        "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_shared_group_pending_damage_valid_save_fork_continue_and_replay",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_cause_reuse_is_read_only_and_expires",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[fabricated_consumption]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[missing_retention]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_cause]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_damage]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_owner]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_request]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_rejects_forged_checkpoint[wrong_source]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[False]",
+        "tests/rules/section05/test_retained_completion.py::test_faq20_removed_demise_fnp_restores_forks_replays_and_continues[True]"
+      ],
+      "historical_case_edges": [
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[fight]",
+          "parameters": {
+            "phase": "fight"
+          }
+        },
+        {
+          "attempt": "interrupted-quality-overlap",
+          "nodeid": "tests/rules/section04/test_completion_boundaries.py::test_facade_incremental_completion_restore_continue_fork_and_replay[shooting]",
+          "parameters": {
+            "phase": "shooting"
+          }
+        },
+        {
+          "attempt": "controls",
+          "nodeid": "test_attack_missing.py::test_model_completion_missing_history_guards",
+          "parameters": {}
+        }
+      ],
+      "unresolved_scoped_gaps": [],
+      "limits": "Structural/type-only/deleted-owner proof is not branch-hit credit; source-family and aggregate gates remain separate."
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  },
+  {
+    "row_id": "Psychic-001",
+    "path": "src/warhammer40k_core/engine/psychic_ability_usage.py",
+    "owner": "psychic_ability_unavailable_reason",
+    "operation": "cumulative-exact-037",
+    "raw_sha256": "b07b2a4d52cdbfec849d91f45baa45b8139754e7b5c2d48f2d1549be65565d8f",
+    "ast_sha256": "07d429c23c9ddcf5ee5bce4c4119d8c6b37849e94499d4b159a1c231e95c967f",
+    "decision": "ACCEPT_EXACT_SOURCE_REBIND_ONLY",
+    "prior_proof": {
+      "reference": "task-23/INDEPENDENT-REVIEW.txt"
+    },
+    "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+    "cumulative_activation": false
+  }
+]

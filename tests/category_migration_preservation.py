@@ -13,8 +13,17 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import TypedDict, cast
 
+from tests.support.faction_layout_preservation import (
+    ORIGINALS as FACTION_LAYOUT_ORIGINALS,
+)
+from tests.support.faction_layout_preservation import (
+    layout_live_reference,
+    verify_layout_original,
+)
+from tests.support.section13_preservation import preserved_section13_golden_bytes
+
 MANIFEST = "data/source_audits/category_migration/preservation.json"
-MANIFEST_SHA256 = "3214a0f3951b6fb921cd09e71bea7f741c06ba06a214db4f4573da5bd7d644e5"
+MANIFEST_SHA256 = "b19ad632479d97f4d0624bbdeb2bc8c9c42bc351fcfd4a0894b499791e149438"
 UTF8_TEST = "tests/code_quality/test_order97_inventory.py"
 UTF8_ARCHIVE = "docs/performance/policy-v3/ci-compatibility-20261015/order97-original.py.txt"
 UTF8_BEFORE_SHA256 = "78697c357cf227480a58cf22d2f1d201e621d1cb3e7c0e1631151613bacf3955"
@@ -230,6 +239,186 @@ def _initializers(raw: bytes, original: bool, preserve_exports: bool) -> tuple[s
     return tuple(result)
 
 
+INTEGRATION_PREIMAGES: dict[str, tuple[str, str, str]] = {
+    "tests/unit/test_phase11e_mission_scoring_cleanup.py": (
+        "data/source_audits/integration_2026_10_19/migration/tests/unit/test_phase11e_mission_scoring_cleanup.py.before.py.txt",
+        "5704133047a16d4606d2f1160b5cddffd139d1c61d0af3c6f156893db6cf2b1e",
+        "008b0b412980a292b956fae4fa4bccb79d2f403a9c3e89cf168e63a7d3e14ecb",
+    ),
+    "tests/unit/test_phase17_source_overlays.py": (
+        "data/source_audits/integration_2026_10_19/migration/tests/unit/test_phase17_source_overlays.py.before.py.txt",
+        "7c9b7975b79a88b8c4f6e9b2aaf65331bb06e4f7ce7b9e62dbe50867fb80e20b",
+        "f035cb204d30032784e3b9daa599485bc82561e5bc5e7503f55f4e9e0eeeac22",
+    ),
+    "tests/unit/test_phase17n_primary_scoring_spatial_evidence.py": (
+        "data/source_audits/integration_2026_10_19/migration/tests/unit/test_phase17n_primary_scoring_spatial_evidence.py.before.py.txt",
+        "7b6276643dc3f2683fbebb0368faa29fb399840c630e23595ca840e93f4046ab",
+        "2a846f2f5a2373b03abc0ecfff5f311c274bfd573002e7ee22190558b10ed6a2",
+    ),
+}
+
+
+INTEGRATION_OVERLAY_ADDITIONS = (
+    "data/source_audits/integration_2026_10_19/migration/source-overlays-accepted-additions.py.txt",
+    "45d376633291ee88c17385c4ae58d98fb9309202e921036a7b982813ba404814",
+)
+
+
+def assert_integration_migration_ast(
+    path: str, before: bytes, current: bytes, *, root: Path | None = None
+) -> None:
+    """Allow only the independently reviewed fixture/preservation changes."""
+    if path == "tests/unit/test_phase17_source_overlays.py":
+        actual_root = Path(__file__).resolve().parents[1] if root is None else root
+        archive, digest = INTEGRATION_OVERLAY_ADDITIONS
+        additions = _read(actual_root, archive)
+        if hashlib.sha256(additions).hexdigest() != digest:
+            raise ValueError("Exact additive source-index tests drifted.")
+        expected_definitions = dict(_definitions(before, False))
+        added_definitions = dict(_definitions(additions, False))
+        if len(added_definitions) != 10 or expected_definitions.keys() & added_definitions.keys():
+            raise ValueError("Additive source-index definition membership drifted.")
+        expected_definitions.update(added_definitions)
+        if expected_definitions != dict(_definitions(current, False)) or (
+            collections.Counter(_initializers(before, False, False))
+            + collections.Counter(_initializers(additions, False, False))
+            != collections.Counter(_initializers(current, False, False))
+        ):
+            raise ValueError("Integration source-overlay AST or initialization drifted.")
+        return
+    expected, actual = ast.parse(before), ast.parse(current)
+
+    def function(name: str) -> ast.FunctionDef:
+        matches = [n for n in expected.body if isinstance(n, ast.FunctionDef) and n.name == name]
+        if len(matches) != 1:
+            raise ValueError("Integration fixture function membership drifted.")
+        return matches[0]
+
+    def replace_statement(owner: ast.FunctionDef, old: str, new: str) -> None:
+        wanted = ast.dump(ast.parse(old).body[0])
+        matches = [i for i, n in enumerate(owner.body) if ast.dump(n) == wanted]
+        if len(matches) != 1:
+            raise ValueError("Integration literal fixture preimage drifted.")
+        index = matches[0]
+        owner.body[index : index + 1] = ast.parse(new).body
+
+    if path == "tests/unit/test_phase17n_primary_scoring_spatial_evidence.py":
+        owner = function("test_primary_spatial_evidence_counts_survivors_after_coherency_cleanup")
+        calls = [
+            n
+            for n in ast.walk(owner)
+            if isinstance(n, ast.Call)
+            and isinstance(n.func, ast.Name)
+            and n.func.id == "resolve_end_turn_cleanup"
+        ]
+        if len(calls) != 1 or any(k.arg == "chosen_model_instance_ids" for k in calls[0].keywords):
+            raise ValueError("Integration selected-casualty fixture preimage drifted.")
+        calls[0].keywords.append(
+            ast.keyword(
+                arg="chosen_model_instance_ids",
+                value=ast.parse("(isolated.model_instance_id,)", mode="eval").body,
+            )
+        )
+    elif path == "tests/unit/test_phase11e_mission_scoring_cleanup.py":
+        owner = function(
+            "test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers"
+        )
+        replace_statement(
+            owner,
+            "assert status.status_kind in {LifecycleStatusKind.WAITING_FOR_DECISION, "
+            "LifecycleStatusKind.TERMINAL}",
+            """
+assert status.status_kind in {
+    LifecycleStatusKind.WAITING_FOR_DECISION, LifecycleStatusKind.TERMINAL
+}
+request = lifecycle.pending_decision_request()
+assert request is not None
+assert request.decision_type == "select_coherency_casualty"
+assert request.actor_id == "player-a"
+assert {option.option_id for option in request.options} == {
+    row.model_instance_id for row in broken.model_placements
+}
+assert removed_model_id not in state.battlefield_state.removed_model_ids
+status = lifecycle.submit_decision(DecisionResult.for_request(
+    request=request, result_id="explicit-coherency-choice", selected_option_id=removed_model_id
+))
+""",
+        )
+        matches = [
+            n
+            for n in ast.walk(owner)
+            if isinstance(n, ast.keyword)
+            and n.arg == "match"
+            and isinstance(n.value, ast.Constant)
+            and n.value.value
+            == "Unit Coherency departure requires an authoritative phase-boundary event"
+        ]
+        if len(matches) != 1:
+            raise ValueError("Original phase-boundary rejection assertion drifted.")
+        # The archived mutation remains intact. Independent review reproduced this
+        # current typed rejection; the original literal stays in the pinned archive.
+        matches[0].value = ast.Constant(
+            "ObjectiveControlRecord phase-start history lacks exactly one prior "
+            "completed phase event"
+        )
+        owner.body.extend(
+            ast.parse("""
+forged_payload = cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
+forged_events = forged_payload["decisions"]["event_log"]
+for event in forged_events:
+    if event["event_type"] == "coherency_cleanup_model_removed":
+        event["event_type"] = "battle_phase_boundary_tampered"
+with pytest.raises(
+    GameLifecycleError, match="Coherency casualty requires one preceding owner decision"
+):
+    GameLifecycle.from_payload(forged_payload)
+""").body
+        )
+        owner = function("test_turn_end_control_and_primary_scoring_use_pre_cleanup_battlefield")
+        replace_statement(
+            owner,
+            'state = _battle_state_for_primary("primary-immovable-object")',
+            """
+lifecycle = _battle_lifecycle_for_primary("primary-immovable-object")
+state = lifecycle.state
+assert state is not None
+""",
+        )
+        replace_statement(
+            owner,
+            "state.advance_to_next_battle_phase()",
+            """
+status = lifecycle.advance_until_decision_or_terminal()
+status = _decline_stratagem_window_if_pending(lifecycle, status, result_id="control-decline")
+request = lifecycle.pending_decision_request()
+assert request is not None
+assert request.decision_type == "select_coherency_casualty"
+assert isolated_objective_model_id not in state.battlefield_state.removed_model_ids
+lifecycle.submit_decision(DecisionResult.for_request(
+    request=request, result_id="control-chosen", selected_option_id=isolated_objective_model_id
+))
+""",
+        )
+    else:
+        raise ValueError("Unknown integration fixture preservation path.")
+    if ast.dump(actual) != ast.dump(expected):
+        raise ValueError("Integration whole-module assertion or fixture AST drifted.")
+
+
+def _integration_migration_predecessor(root: Path, path: str, current: bytes) -> bytes:
+    if path not in INTEGRATION_PREIMAGES:
+        return current
+    archive, before_hash, current_hash = INTEGRATION_PREIMAGES[path]
+    before = _read(root, archive)
+    if (
+        hashlib.sha256(before).hexdigest() != before_hash
+        or hashlib.sha256(current).hexdigest() != current_hash
+    ):
+        raise ValueError("Exact integration fixture or predecessor bytes drifted.")
+    assert_integration_migration_ast(path, before, current, root=root)
+    return before
+
+
 def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRecord]:
     """Read current bytes every time; cache only immutable AST fingerprints by bytes."""
     if relative not in MIGRATED_PATHS:
@@ -241,7 +430,9 @@ def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRec
         raise ValueError("Original migrated test archive drifted: " + relative)
     current: dict[str, bytes] = {}
     for path, expected in record["successors"].items():
-        raw = _read(root, path)
+        raw = preserved_section13_golden_bytes(
+            root, path, _integration_migration_predecessor(root, path, _read(root, path))
+        )
         if hashlib.sha256(raw).hexdigest() != expected:
             raise ValueError("Live migration successor bytes drifted: " + path)
         current[path] = raw
@@ -274,6 +465,8 @@ def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRec
 
 def read_historical_test_bytes(root: Path, relative: str) -> bytes:
     """Historical readers alone may request predecessor bytes after live verification."""
+    if relative in FACTION_LAYOUT_ORIGINALS:
+        return verify_layout_original(root, relative)[0]
     if relative == EDITION_TEST:
         current = _read(root, relative).replace(b"\r\n", b"\n")
         original = _read(root, EDITION_ARCHIVE)
@@ -329,6 +522,8 @@ def read_historical_test_bytes(root: Path, relative: str) -> bytes:
 def live_test_reference(root: Path, reference: str) -> str:
     """Live audits follow the real current node; they never parse an archival substitute."""
     path, separator, name = reference.partition("::")
+    if path in FACTION_LAYOUT_ORIGINALS:
+        return layout_live_reference(root, reference)
     if path not in MIGRATED_PATHS:
         return reference
     if not separator or not name:

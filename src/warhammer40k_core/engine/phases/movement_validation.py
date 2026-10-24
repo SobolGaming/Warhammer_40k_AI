@@ -729,7 +729,14 @@ def _fall_back_mode_violation_code(
                 if DesperateEscapeRequirementReason.SELECTED_MODE in requirement.reasons
             )
         )
-        if requirement_model_ids != tuple(sorted(resolution.witness.model_ids())):
+        auto_pass_ids = _identifier_list_from_json_object(
+            resolution.movement_payload,
+            key="desperate_escape_auto_pass_model_ids",
+            field_name="Desperate Escape auto-pass model ID",
+        )
+        if tuple(sorted((*requirement_model_ids, *auto_pass_ids))) != tuple(
+            sorted(resolution.witness.model_ids())
+        ):
             return "desperate_escape_requirement_inventory_incomplete"
         return None
     raise GameLifecycleError("Unsupported Fall Back mode.")

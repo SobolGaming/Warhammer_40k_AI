@@ -80,6 +80,13 @@ def record_move_completion_event(
     )
     if phase_record is not None:
         state.phase_movement_history.append(phase_record)
+    from warhammer40k_core.engine.emergency_disembark_battle_shock import (
+        apply_emergency_disembark_battle_shock,
+        is_emergency_disembark_completion,
+    )
+
+    if is_emergency_disembark_completion(event):
+        apply_emergency_disembark_battle_shock(state=state, decisions=decisions, event=event)
     from warhammer40k_core.engine.normal_move_history import normal_move_from_completion
 
     normal_move = normal_move_from_completion(state, event)

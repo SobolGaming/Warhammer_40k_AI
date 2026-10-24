@@ -1,0 +1,135 @@
+{
+  "schema": "section11-future-fixes-v1",
+  "policy": "Enabled source-correct failures, no skip/xfail, guard weakening, semantic repair or compatibility shim.",
+  "findings": [
+    {
+      "id": "SF11-001",
+      "title": "Shared native inclusive engagement numerical edge permits a charge",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "source": [
+        "rule:11:11.02:1 block5",
+        "rule:03:03.04:1"
+      ],
+      "expected": "An exactly2-inch mathematical native base gap is engaged, so an ordinary charge is unavailable at either translated origin.",
+      "actual": "At origin10 native radius arithmetic produces2.000000000000001 and offers the unit; origin2 and +/-0.001 controls distinguish the shared numerical edge.",
+      "tests": [
+        "tests/rules/section11/test_boundaries.py::test_inclusive_engagement_prevents_charge_at_translated_native_edge[0-10]"
+      ],
+      "owners": [
+        "geometry/base.py",
+        "geometry/volume.py",
+        "engine/charge_eligibility.py"
+      ],
+      "cross_reference": "Same underlying defect as SF10-001, new Charge consumer evidence, not a new Boolean policy defect.",
+      "qualification": "Constructed Charge boundary using native definitions and legal poses; preceding movement/setup and whole-game reachability are not certified.",
+      "repair_performed": true,
+      "pre_repair_observation": {
+        "id": "SF11-001",
+        "title": "Shared native inclusive engagement numerical edge permits a charge",
+        "status": "OPEN_ENABLED_FAILURE_NO_REPAIR",
+        "source": [
+          "rule:11:11.02:1 block5",
+          "rule:03:03.04:1"
+        ],
+        "expected": "An exactly2-inch mathematical native base gap is engaged, so an ordinary charge is unavailable at either translated origin.",
+        "actual": "At origin10 native radius arithmetic produces2.000000000000001 and offers the unit; origin2 and +/-0.001 controls distinguish the shared numerical edge.",
+        "tests": [
+          "tests/rules/section11/test_boundaries.py::test_inclusive_engagement_prevents_charge_at_translated_native_edge[0-10]"
+        ],
+        "owners": [
+          "geometry/base.py",
+          "geometry/volume.py",
+          "engine/charge_eligibility.py"
+        ],
+        "cross_reference": "Same underlying defect as SF10-001, new Charge consumer evidence, not a new Boolean policy defect.",
+        "qualification": "Constructed Charge boundary using native definitions and legal poses; preceding movement/setup and whole-game reachability are not certified.",
+        "repair_performed": false
+      },
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": "SF10-001",
+        "independent_review_revision": {
+          "finding": "R1",
+          "prior_verdict": "SCOPED_NOT_CLEAN",
+          "prior_source_map": "cd334b13a3a8102dddbfc0f79de8e38d4999f38df3f376f7971f5aca2db26534",
+          "revision": "task11/revision-2",
+          "status": "REPAIRED_AWAITING_RENEWED_REVIEW",
+          "comparison": "exact authoritative binary input ratios; no exterior tolerance",
+          "fixture_correction": "nearest legal native placement; original assertions/parameters preserved"
+        }
+      }
+    },
+    {
+      "id": "SF11-002",
+      "title": "Out-of-phase required-target consumer forbids optional no-move continuation",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "source": [
+        "rule:11:11.02:1 block8",
+        "faq:fdefb262-1eb9-43fd-a2c8-70cf3bd2a621"
+      ],
+      "expected": "After declaring and rolling an out-of-phase charge, the player may still choose not to make the Charge move; the source requires a target if a move is made, rather than requiring a move.",
+      "actual": "The valid no-move proposal (empty targets, no witness) is rejected charge_required_target_not_selected because the generic reactive request requires its selected arrival target. The move/reject/retry/success sibling completes.",
+      "tests": [
+        "tests/rules/section11/test_reactive.py::test_constructed_out_of_phase_charge_roll_attempt_reject_retry_and_legal_continuation[True]"
+      ],
+      "owners": [
+        "engine/phases/charge.py:ChargeMoveProposal.validation_result_for_request",
+        "engine/catalog_setup_reactive_shoot_charge.py",
+        "engine/catalog_setup_reactive_charge_move.py"
+      ],
+      "qualification": "Native Lord Exultant definitions under a constructed compiled generic reactive permission and constructed already-completed arrival boundary; no named faction admission or reserve ingress claim. The permission explicitly suppresses Charge bonus. Ordinary Charge target/proposal declines both pass.",
+      "repair_performed": true,
+      "pre_repair_observation": {
+        "id": "SF11-002",
+        "title": "Out-of-phase required-target consumer forbids optional no-move continuation",
+        "status": "OPEN_ENABLED_FAILURE_NO_REPAIR",
+        "source": [
+          "rule:11:11.02:1 block8",
+          "faq:fdefb262-1eb9-43fd-a2c8-70cf3bd2a621"
+        ],
+        "expected": "After declaring and rolling an out-of-phase charge, the player may still choose not to make the Charge move; the source requires a target if a move is made, rather than requiring a move.",
+        "actual": "The valid no-move proposal (empty targets, no witness) is rejected charge_required_target_not_selected because the generic reactive request requires its selected arrival target. The move/reject/retry/success sibling completes.",
+        "tests": [
+          "tests/rules/section11/test_reactive.py::test_constructed_out_of_phase_charge_roll_attempt_reject_retry_and_legal_continuation[True]"
+        ],
+        "owners": [
+          "engine/phases/charge.py:ChargeMoveProposal.validation_result_for_request",
+          "engine/catalog_setup_reactive_shoot_charge.py",
+          "engine/catalog_setup_reactive_charge_move.py"
+        ],
+        "qualification": "Native Lord Exultant definitions under a constructed compiled generic reactive permission and constructed already-completed arrival boundary; no named faction admission or reserve ingress claim. The permission explicitly suppresses Charge bonus. Ordinary Charge target/proposal declines both pass.",
+        "repair_performed": false
+      },
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": null
+      }
+    }
+  ],
+  "inherited": {
+    "registers": [
+      "tests/rules/section01/future-fixes.json",
+      "tests/rules/section02/future-fixes.json",
+      "tests/rules/section03/future-fixes.json",
+      "tests/rules/section04/future-fixes.json",
+      "tests/rules/section05/future-fixes.json",
+      "tests/rules/section06/future-fixes.json",
+      "tests/rules/section07/future-fixes.json",
+      "tests/rules/section08/future-fixes.json",
+      "tests/rules/section09/future-fixes.json",
+      "tests/rules/section10/future-fixes.json"
+    ],
+    "status": "Unmodified; prior Stealth, Epic Challenge, Deadly Demise/Fight On Death removal order, qualified Command-end sequencing, Section09 Ordered Retreat transit, whole-model hazard removal and partial Defiler auto-pass remain deferred. Section10 SF10-001 remains enabled.",
+    "prior_results": "combined01-08:1226/1216pass/10fail; separate09:105/100pass/5fail; separate10:136/135pass/1fail;23dependencies pass on both platforms. No combined01-10 credit."
+  },
+  "development": "All unsuccessful pilots and diagnoses are retained under runs. Fixture/API corrections include minimum native definition dependency, Charge constructor, static-source preparation, physical placement signature, transition preimage, explicit no-move schema, target-context refresh through advance, one timing source, and terrain legality owner. No production edits.",
+  "current_checkpoint_note": "User-approved focused repair checkpoint supersedes this file's historical no-repair milestone policy only for marked findings; original observations and source qualifications remain retained. Independent review pending."
+}

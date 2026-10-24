@@ -83,6 +83,8 @@ def resolve_attack_sequence_until_blocked(
         if dice_manager is None
         else dice_manager
     )
+    from warhammer40k_core.engine.model_attack_history import record_models_attacked
+
     while not current.is_complete:
         if current.pending_destroyed_transport_disembark is not None:
             next_current, allocated_model_ids, status = (
@@ -97,6 +99,8 @@ def resolve_attack_sequence_until_blocked(
                 )
             )
             if status is not None:
+                if next_current is not None:
+                    record_models_attacked(state=state, decisions=decisions, sequence=next_current)
                 return next_current, allocated_model_ids, status
             if next_current is None:
                 return None, allocated_model_ids, None
@@ -115,12 +119,15 @@ def resolve_attack_sequence_until_blocked(
                 runtime_modifier_registry=runtime_modifiers,
             )
             if status is not None:
+                if next_current is not None:
+                    record_models_attacked(state=state, decisions=decisions, sequence=next_current)
                 return next_current, allocated_model_ids, status
             if next_current is None:
                 return None, allocated_model_ids, None
             current = next_current
             continue
         if current.current_gathered_group is None:
+            record_models_attacked(state=state, decisions=decisions, sequence=current)
             if before_gathering is not None:
                 replacement_status = before_gathering(current)
                 if replacement_status is not None:
@@ -149,13 +156,12 @@ def resolve_attack_sequence_until_blocked(
             runtime_modifier_registry=runtime_modifiers,
         )
         if status is not None:
+            if next_current is not None:
+                record_models_attacked(state=state, decisions=decisions, sequence=next_current)
             return next_current, allocated_model_ids, status
         if next_current is None:
             return None, allocated_model_ids, None
         current = next_current
-    from warhammer40k_core.engine.model_attack_history import record_models_attacked
-
-    record_models_attacked(state=state, decisions=decisions, sequence=current)
     current, status = _apply_deferred_mortal_wounds(
         state=state,
         decisions=decisions,
@@ -164,6 +170,7 @@ def resolve_attack_sequence_until_blocked(
     )
     if status is not None:
         return current, allocated_model_ids, status
+    record_models_attacked(state=state, decisions=decisions, sequence=current)
     from warhammer40k_core.engine.attack_ability_source_retention import (
         expire_attack_ability_sources,
     )

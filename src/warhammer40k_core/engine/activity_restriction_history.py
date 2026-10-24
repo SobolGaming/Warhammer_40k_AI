@@ -101,6 +101,7 @@ def restore_checkpoint_activity_restrictions(
         if type(sequence_id) is not str or sequence_id in completed_sequences:
             raise GameLifecycleError("Completed shooting activity sequence identity drifted.")
         completed_sequences.add(sequence_id)
+    restricted_sequences: set[str] = set()
     for event in prior_events:
         if event.event_type != MODELS_ATTACKED_EVENT_TYPE:
             continue
@@ -130,6 +131,9 @@ def restore_checkpoint_activity_restrictions(
         }
         if len(owners) != 1:
             raise GameLifecycleError("Completed shooting activity model ownership drifted.")
+        if row.sequence_id in restricted_sequences:
+            continue
+        restricted_sequences.add(row.sequence_id)
         target_ids = {
             *rules_unit_identity_ids(state=state, unit_instance_id=row.attacking_unit_instance_id),
             *(model_owners[model_id][1] for model_id in row.model_instance_ids),

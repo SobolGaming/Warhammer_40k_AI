@@ -55,6 +55,13 @@ HELPER_PINS: dict[str, dict[str, object]] = {
         "raw_sha256": "407c76f7be4eded9ffcbe27c4593653be630d3a4114b5f441f2994d7a8a83bb8",
     },
 }
+# Authenticate current integration fixtures before the unchanged historical pins.
+# The preimage is byte-identical to FILE_PINS' reviewed S25 current source.
+INTEGRATION_RANDOM_PREIMAGE = (
+    "data/source_audits/integration_2026_10_19/test_order92_random_melee.before.py.txt"
+)
+INTEGRATION_RANDOM_RAW_BYTES = 49370
+INTEGRATION_RANDOM_RAW_SHA256 = "d66808312139f8931f3476fe076293ad78e94ec3a27965f8442d9c788df52164"
 MANIFEST_HEADER: dict[str, object] = {
     "schema": "s25-explicit-fixture-archival-preservation-v1",
     "base": "b652c9f8148963a5a9f9a79d5ddf5e9bd230d971",
@@ -176,6 +183,37 @@ def _same_ast(actual: ast.AST, expected: ast.AST) -> None:
     )
 
 
+def _integration_reviewed_random_bytes(current: bytes) -> bytes:
+    """Permit only two literal fixture changes; retain the entire assertion AST."""
+    pin = FILE_PINS["tests/unit/test_order92_random_melee.py"]
+    before = _pinned_bytes(
+        ROOT / INTEGRATION_RANDOM_PREIMAGE,
+        pin["current_raw_bytes"],
+        pin["current_raw_sha256"],
+    )
+    expected, actual = ast.parse(before), ast.parse(current)
+    # This change is already present in the accepted incoming Section25 handoff.
+    cleave = _one_function(
+        expected, "test_random_cleave_is_a_single_target_bonus_never_a_splittable_budget"
+    )
+    call = _one_call(cleave, "random_melee_session")
+    _same_ast(
+        call, _expression('random_melee_session(cleave=True, game_id="order92-cleave-name-2")')
+    )
+    _one_keyword(call, "game_id").value = ast.Constant(value="order92-cleave-name-3")
+    call.keywords.append(ast.keyword(arg="pause_at_first_hit", value=ast.Constant(value=True)))
+    # Fixed-A otherwise rolls two wound ones and never reaches its existing
+    # primary-kill/extra-pool assertions. The random variant identity is unchanged.
+    fixture = _one_function(expected, "_lethal_extra_session")
+    identity = _one_keyword(_one_call(fixture, "fight_lifecycle"), "game_id")
+    _same_ast(identity.value, _expression('"order56-retained-fight-0"'))
+    identity.value = _expression(
+        '"order56-retained-fight-0" if random else "order112-lethal-extra-fixed"'
+    )
+    _same_ast(actual, expected)
+    return before
+
+
 def assert_s25_fixture_only_ast(path: str, original: bytes, current: bytes) -> None:
     """Check the actual complete module after only literal reviewed substitutions.
 
@@ -186,6 +224,8 @@ def assert_s25_fixture_only_ast(path: str, original: bytes, current: bytes) -> N
     pin = FILE_PINS[path]
     assert len(original) == pin["base_raw_bytes"]
     assert hashlib.sha256(original).hexdigest() == pin["base_raw_sha256"]
+    if path == "tests/unit/test_order92_random_melee.py":
+        current = _integration_reviewed_random_bytes(current)
     expected, actual = ast.parse(original), ast.parse(current)
     if path == "tests/unit/test_order92_random_melee.py":
         name = "test_all_weapons_commit_before_dice_and_each_budget_is_conserved"
@@ -261,7 +301,16 @@ def preserved_s25_predecessor_test_bytes(path: str, current: bytes) -> bytes:
     for helper_path, helper in HELPER_PINS.items():
         _pinned_bytes(ROOT / helper_path, helper["raw_bytes"], helper["raw_sha256"])
     pin = FILE_PINS[path]
-    actual_raw = _pinned_bytes(ROOT / path, pin["current_raw_bytes"], pin["current_raw_sha256"])
+    supplied_current = current
+    if path == "tests/unit/test_order92_random_melee.py":
+        integration_raw = _pinned_bytes(
+            ROOT / path, INTEGRATION_RANDOM_RAW_BYTES, INTEGRATION_RANDOM_RAW_SHA256
+        )
+        assert current in (integration_raw, integration_raw.replace(b"\r\n", b"\n"))
+        actual_raw = _integration_reviewed_random_bytes(current)
+        current = actual_raw
+    else:
+        actual_raw = _pinned_bytes(ROOT / path, pin["current_raw_bytes"], pin["current_raw_sha256"])
     normalized = actual_raw.replace(b"\r\n", b"\n")
     assert len(normalized) == pin["current_lf_bytes"]
     assert hashlib.sha256(normalized).hexdigest() == pin["current_lf_sha256"]
@@ -272,5 +321,5 @@ def preserved_s25_predecessor_test_bytes(path: str, current: bytes) -> bytes:
     assert pin["base_mode"] == pin["current_mode"] == "100644"
     original = _pinned_bytes(archive, pin["base_raw_bytes"], pin["base_raw_sha256"])
     assert _git_blob(original) == pin["base_git_blob"]
-    assert_s25_fixture_only_ast(path, original, normalized)
+    assert_s25_fixture_only_ast(path, original, supplied_current)
     return original

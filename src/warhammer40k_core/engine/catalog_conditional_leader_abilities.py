@@ -54,6 +54,7 @@ from warhammer40k_core.engine.rule_execution import (
 )
 from warhammer40k_core.engine.runtime_event_candidates import runtime_event_candidate
 from warhammer40k_core.engine.sequencing import SequencingRequirement
+from warhammer40k_core.engine.static_rule_source_identity import static_rule_source_keywords
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -255,7 +256,7 @@ def _persisting_effect_for_source(
         active_player_id=None,
         source_unit_instance_id=source.unit.unit_instance_id,
         source_model_instance_id=_source_model_instance_id(source),
-        source_keywords=tuple(sorted({*source.unit.keywords, *source.unit.faction_keywords})),
+        source_keywords=static_rule_source_keywords(source.unit),
         state=state,
         record_persisting_effects=False,
     )

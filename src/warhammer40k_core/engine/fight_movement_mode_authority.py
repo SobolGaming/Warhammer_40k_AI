@@ -65,14 +65,14 @@ def legal_pile_in_target_rules_unit_ids(
     return tuple(
         target.unit_instance_id
         for target in targetable
-        if _closest_distance(
+        if _within_distance(
             source_models,
             physical_geometry_models_for_rules_unit(
                 scenario=scenario,
                 unit_instance_id=target.unit_instance_id,
             ),
+            PILE_IN_TARGET_DISTANCE_INCHES,
         )
-        <= PILE_IN_TARGET_DISTANCE_INCHES
     )
 
 
@@ -108,14 +108,14 @@ def legal_consolidation_modes(
         unit_instance_id=rules_unit.unit_instance_id,
     )
     if any(
-        _closest_distance(
+        _within_distance(
             source_models,
             physical_geometry_models_for_rules_unit(
                 scenario=scenario,
                 unit_instance_id=target.unit_instance_id,
             ),
+            CONSOLIDATE_ENEMY_DISTANCE_INCHES,
         )
-        <= CONSOLIDATE_ENEMY_DISTANCE_INCHES
         for target in targetable
     ):
         return (ConsolidationModeKind.ENGAGING,)
@@ -154,13 +154,16 @@ def _targetable_enemy_rules_units(
     )
 
 
-def _closest_distance(
+def _within_distance(
     first_models: tuple[GeometryModel, ...],
     second_models: tuple[GeometryModel, ...],
-) -> float:
+    inches: float,
+) -> bool:
     if not first_models or not second_models:
         raise GameLifecycleError("Fight movement target distance requires present models.")
-    return min(first.range_to(second) for first in first_models for second in second_models)
+    return any(
+        first.is_within_range(second, inches) for first in first_models for second in second_models
+    )
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

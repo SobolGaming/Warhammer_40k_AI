@@ -1,0 +1,167 @@
+"""Deep Strike at declared setup and Movement boundaries; no full-army claim."""
+
+import json
+
+import pytest
+
+from tests.support.faction_batch01 import (
+    CRUSHERS,
+    LORD,
+    anchor,
+    events,
+    request,
+    scene,
+    selection,
+    unit_placement,
+)
+from tests.support.section02_fixtures import Section02Definitions
+from warhammer40k_core.engine.battlefield_state import BattlefieldPlacementKind
+from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.movement_proposals import (
+    MovementProposalRequest,
+    PlacementProposalPayload,
+)
+from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.reserve_declarations import reserve_declaration_options_for_player
+from warhammer40k_core.engine.reserves import ReserveKind, ReserveState, ReserveStatus
+from warhammer40k_core.geometry.pose import Pose
+
+
+def test_deep_strike_uses_native_declaration_and_hides_opponent_options(
+    faction_definitions: Section02Definitions,
+) -> None:
+    d = faction_definitions
+    s = scene(d, (selection(d, CRUSHERS, "crushers"),), (selection(d, LORD, "enemy"),), setup=True)
+    r = request(s.session.advance_until_decision_or_terminal(), "select_reserve_declaration")
+    assert "declare_deep_strike:own:crushers" in {o.option_id for o in r.options}
+    enemy_options = reserve_declaration_options_for_player(
+        state=s.state,
+        config=s.session.lifecycle.config,
+        player_id="opponent",
+        include_completion=False,
+    )
+    assert not any(o.option_id.startswith("declare_deep_strike:") for o in enemy_options)
+    hidden = s.session.view(viewer_player_id="opponent")["pending_decision"]
+    assert hidden is not None
+    assert hidden["decision_type"] == "hidden_decision"
+    assert hidden["options"] == []
+    before = s.session.lifecycle.to_payload()
+    with pytest.raises(GameLifecycleError, match="request_id does not match pending"):
+        s.session.submit_option(
+            request_id="stale-declaration",
+            option_id=r.options[0].option_id,
+            result_id="deep-strike:stale",
+        )
+    assert s.session.lifecycle.to_payload() == before
+    status = s.session.submit_option(
+        request_id=r.request_id,
+        option_id="declare_deep_strike:own:crushers",
+        result_id="deep-strike:declared",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    reserve = s.state.reserve_state_for_unit("own:crushers")
+    assert reserve is not None
+    assert reserve.reserve_kind is ReserveKind.DEEP_STRIKE
+    assert reserve.status is ReserveStatus.IN_RESERVES
+    assert reserve.source_rule_ids == ("deep_strike",)
+    assert len(events(s.session, "reserve_unit_declared")) == 1
+    assert json.loads(json.dumps(reserve.to_payload())) == reserve.to_payload()
+
+
+def test_deep_strike_placement_checks_distance_then_continues_legally(
+    faction_definitions: Section02Definitions,
+) -> None:
+    d = faction_definitions
+    s = scene(
+        d,
+        (selection(d, CRUSHERS, "crushers"), selection(d, CRUSHERS, "spare")),
+        (selection(d, LORD, "enemy"),),
+    )
+    unit = s.units["own:crushers"]
+    s.state.battle_round = 2
+    # Explicit declared-reserve checkpoint. Native declaration is tested above;
+    # this case skips deployment/round one and certifies only arrival consumption.
+    s.state.record_reserve_state(
+        ReserveState.declared_before_battle(
+            player_id="owner",
+            unit_instance_id=unit.unit_instance_id,
+            reserve_kind=ReserveKind.DEEP_STRIKE,
+        )
+    )
+    assert s.state.battlefield_state is not None
+    s.state.replace_battlefield_state(
+        s.state.battlefield_state.without_unit_placement(unit.unit_instance_id)
+    )
+    anchor(s, physical=False)
+    r = request(s.session.advance_until_decision_or_terminal(), "select_movement_unit")
+    r = request(
+        s.session.submit_option(
+            request_id=r.request_id, option_id=unit.unit_instance_id, result_id="deep-strike:select"
+        ),
+        "select_movement_action",
+    )
+    r = request(
+        s.session.submit_option(
+            request_id=r.request_id, option_id="ingress", result_id="deep-strike:ingress"
+        ),
+        "submit_placement_proposal",
+    )
+    context = MovementProposalRequest.from_decision_request_payload(r.payload)
+
+    def proposal(x: float) -> PlacementProposalPayload:
+        return PlacementProposalPayload(
+            r.request_id,
+            context.proposal_kind,
+            unit.unit_instance_id,
+            BattlefieldPlacementKind.DEEP_STRIKE,
+            attempted_placement=unit_placement(
+                "own", "owner", unit, tuple(Pose.at(x, 10 + i * 2.5) for i in range(3))
+            ),
+        )
+
+    before = s.session.lifecycle.to_payload()
+    invalid = s.session.submit_parameterized_payload(
+        request_id=r.request_id, payload={}, result_id="deep-strike:malformed"
+    )
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert s.session.lifecycle.to_payload() == before
+    invalid = s.session.submit_parameterized_payload(
+        request_id=r.request_id,
+        payload=validate_json_value(proposal(30).to_payload()),
+        result_id="deep-strike:too-close",
+    )
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    reserve = s.state.reserve_state_for_unit(unit.unit_instance_id)
+    assert reserve is not None
+    assert reserve.status is ReserveStatus.IN_RESERVES
+    assert s.state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is None
+    # Rule-invalid geometry is recorded and reopens unit selection by contract.
+    retry = request(s.session.advance_until_decision_or_terminal(), "select_movement_unit")
+    action = request(
+        s.session.submit_option(
+            request_id=retry.request_id,
+            option_id=unit.unit_instance_id,
+            result_id="deep-strike:retry",
+        )
+    )
+    r = request(
+        s.session.submit_option(
+            request_id=action.request_id, option_id="ingress", result_id="deep-strike:retry-ingress"
+        )
+    )
+    context = MovementProposalRequest.from_decision_request_payload(r.payload)
+    status = s.session.submit_parameterized_payload(
+        request_id=r.request_id,
+        payload=validate_json_value(proposal(20).to_payload()),
+        result_id="deep-strike:arrived",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    reserve = s.state.reserve_state_for_unit(unit.unit_instance_id)
+    assert reserve is not None
+    assert reserve.status is ReserveStatus.ARRIVED
+    placed = s.state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    assert {p.model_instance_id for p in placed.model_placements} == set(unit.own_model_ids())
+    assert len(events(s.session, "reinforcement_unit_arrived")) == 1
+    history = s.state.phase_movement_history[-1]
+    assert history.is_ingress
+    assert history.setup_kind is BattlefieldPlacementKind.DEEP_STRIKE

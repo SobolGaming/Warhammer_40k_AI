@@ -1,0 +1,3325 @@
+{
+  "tests/unit/test_order97_facade_evidence.py": {
+    "before_sha256": "a62e7b0ec38394ca970bd0a079c3a7c94673060bde1fdf127f7386c1facf2a97",
+    "after_sha256": "a62e7b0ec38394ca970bd0a079c3a7c94673060bde1fdf127f7386c1facf2a97",
+    "edits": [],
+    "d09_stage": "d09-stages/tests/unit/test_order97_facade_evidence.py.txt",
+    "d09_before_sha256": "4bca5a0e6d0275458cbf34971ff3f984def0db4bc65509b110039a9fe7c6a263",
+    "d09_after_sha256": "a62e7b0ec38394ca970bd0a079c3a7c94673060bde1fdf127f7386c1facf2a97",
+    "d07_effective_sha256": "4bca5a0e6d0275458cbf34971ff3f984def0db4bc65509b110039a9fe7c6a263",
+    "canonical_stage_blob": null,
+    "stage_authority": "independently-verified-category-predecessor"
+  },
+  "tests/unit/test_phase13b_shooting_declarations.py": {
+    "before_sha256": "7302211caf393b50454d2e69488a6470574df9266e91de740f9414d0c4cfafbf",
+    "after_sha256": "6d009e0edd18ae45e003daa0a8a1a7a2c1ae242349eaf764d6f8fff01d87f991",
+    "edits": [
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          88,
+          "body",
+          17,
+          "test",
+          "comparators",
+          0,
+          "elts"
+        ],
+        "start": 0,
+        "end": 1,
+        "before": [
+          {
+            "_type": "Attribute",
+            "value": {
+              "_type": "Subscript",
+              "value": {
+                "_type": "Name",
+                "id": "units",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "slice": {
+                "_type": "Constant",
+                "value": "intercessor-1",
+                "kind": null
+              },
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "attr": "unit_instance_id",
+            "ctx": {
+              "_type": "Load"
+            }
+          }
+        ],
+        "after": []
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          96,
+          "body"
+        ],
+        "start": 9,
+        "end": 9,
+        "before": [],
+        "after": [
+          {
+            "_type": "If",
+            "test": {
+              "_type": "Name",
+              "id": "attached",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "body": [
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "battlefield",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Attribute",
+                  "value": {
+                    "_type": "Name",
+                    "id": "state",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "attr": "battlefield_state",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Assert",
+                "test": {
+                  "_type": "Compare",
+                  "left": {
+                    "_type": "Name",
+                    "id": "battlefield",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "ops": [
+                    {
+                      "_type": "IsNot"
+                    }
+                  ],
+                  "comparators": [
+                    {
+                      "_type": "Constant",
+                      "value": null,
+                      "kind": null
+                    }
+                  ]
+                },
+                "msg": null
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "poses",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Name",
+                    "id": "_compact_test_unit_poses",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [],
+                  "keywords": [
+                    {
+                      "_type": "keyword",
+                      "arg": "origin",
+                      "value": {
+                        "_type": "Call",
+                        "func": {
+                          "_type": "Attribute",
+                          "value": {
+                            "_type": "Name",
+                            "id": "Pose",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "attr": "at",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "args": [
+                          {
+                            "_type": "Constant",
+                            "value": 35.0,
+                            "kind": null
+                          },
+                          {
+                            "_type": "Constant",
+                            "value": 35.0,
+                            "kind": null
+                          }
+                        ],
+                        "keywords": []
+                      }
+                    },
+                    {
+                      "_type": "keyword",
+                      "arg": "model_count",
+                      "value": {
+                        "_type": "Constant",
+                        "value": 6,
+                        "kind": null
+                      }
+                    }
+                  ]
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "Assign",
+                "targets": [
+                  {
+                    "_type": "Name",
+                    "id": "offset",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  }
+                ],
+                "value": {
+                  "_type": "Constant",
+                  "value": 0,
+                  "kind": null
+                },
+                "type_comment": null
+              },
+              {
+                "_type": "For",
+                "target": {
+                  "_type": "Name",
+                  "id": "key",
+                  "ctx": {
+                    "_type": "Store"
+                  }
+                },
+                "iter": {
+                  "_type": "Tuple",
+                  "elts": [
+                    {
+                      "_type": "Constant",
+                      "value": "bodyguard-unit",
+                      "kind": null
+                    },
+                    {
+                      "_type": "Constant",
+                      "value": "leader-unit",
+                      "kind": null
+                    },
+                    {
+                      "_type": "Constant",
+                      "value": "support-unit",
+                      "kind": null
+                    }
+                  ],
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "body": [
+                  {
+                    "_type": "Assign",
+                    "targets": [
+                      {
+                        "_type": "Name",
+                        "id": "unit",
+                        "ctx": {
+                          "_type": "Store"
+                        }
+                      }
+                    ],
+                    "value": {
+                      "_type": "Subscript",
+                      "value": {
+                        "_type": "Name",
+                        "id": "units",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "slice": {
+                        "_type": "Name",
+                        "id": "key",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "type_comment": null
+                  },
+                  {
+                    "_type": "Assign",
+                    "targets": [
+                      {
+                        "_type": "Name",
+                        "id": "count",
+                        "ctx": {
+                          "_type": "Store"
+                        }
+                      }
+                    ],
+                    "value": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Name",
+                        "id": "len",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [
+                        {
+                          "_type": "Attribute",
+                          "value": {
+                            "_type": "Name",
+                            "id": "unit",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "attr": "own_models",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      ],
+                      "keywords": []
+                    },
+                    "type_comment": null
+                  },
+                  {
+                    "_type": "Assign",
+                    "targets": [
+                      {
+                        "_type": "Name",
+                        "id": "battlefield",
+                        "ctx": {
+                          "_type": "Store"
+                        }
+                      }
+                    ],
+                    "value": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "Name",
+                          "id": "battlefield",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "attr": "with_unit_placement",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [
+                        {
+                          "_type": "Call",
+                          "func": {
+                            "_type": "Name",
+                            "id": "_unit_placement_at",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "args": [
+                            {
+                              "_type": "Name",
+                              "id": "unit",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            }
+                          ],
+                          "keywords": [
+                            {
+                              "_type": "keyword",
+                              "arg": "army_id",
+                              "value": {
+                                "_type": "Constant",
+                                "value": "army-beta",
+                                "kind": null
+                              }
+                            },
+                            {
+                              "_type": "keyword",
+                              "arg": "player_id",
+                              "value": {
+                                "_type": "Constant",
+                                "value": "player-b",
+                                "kind": null
+                              }
+                            },
+                            {
+                              "_type": "keyword",
+                              "arg": "poses",
+                              "value": {
+                                "_type": "Subscript",
+                                "value": {
+                                  "_type": "Name",
+                                  "id": "poses",
+                                  "ctx": {
+                                    "_type": "Load"
+                                  }
+                                },
+                                "slice": {
+                                  "_type": "Slice",
+                                  "lower": {
+                                    "_type": "Name",
+                                    "id": "offset",
+                                    "ctx": {
+                                      "_type": "Load"
+                                    }
+                                  },
+                                  "upper": {
+                                    "_type": "BinOp",
+                                    "left": {
+                                      "_type": "Name",
+                                      "id": "offset",
+                                      "ctx": {
+                                        "_type": "Load"
+                                      }
+                                    },
+                                    "op": {
+                                      "_type": "Add"
+                                    },
+                                    "right": {
+                                      "_type": "Name",
+                                      "id": "count",
+                                      "ctx": {
+                                        "_type": "Load"
+                                      }
+                                    }
+                                  },
+                                  "step": null
+                                },
+                                "ctx": {
+                                  "_type": "Load"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "keywords": []
+                    },
+                    "type_comment": null
+                  },
+                  {
+                    "_type": "AugAssign",
+                    "target": {
+                      "_type": "Name",
+                      "id": "offset",
+                      "ctx": {
+                        "_type": "Store"
+                      }
+                    },
+                    "op": {
+                      "_type": "Add"
+                    },
+                    "value": {
+                      "_type": "Name",
+                      "id": "count",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    }
+                  }
+                ],
+                "orelse": [],
+                "type_comment": null
+              },
+              {
+                "_type": "Expr",
+                "value": {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "state",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "replace_battlefield_state",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [
+                    {
+                      "_type": "Name",
+                      "id": "battlefield",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    }
+                  ],
+                  "keywords": []
+                }
+              }
+            ],
+            "orelse": []
+          }
+        ]
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          114,
+          "body"
+        ],
+        "start": 6,
+        "end": 7,
+        "before": [
+          {
+            "_type": "Assign",
+            "targets": [
+              {
+                "_type": "Attribute",
+                "value": {
+                  "_type": "Name",
+                  "id": "state",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "attr": "battlefield_state",
+                "ctx": {
+                  "_type": "Store"
+                }
+              }
+            ],
+            "value": {
+              "_type": "Call",
+              "func": {
+                "_type": "Attribute",
+                "value": {
+                  "_type": "Name",
+                  "id": "battlefield",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "attr": "with_removed_models",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "args": [
+                {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Name",
+                    "id": "tuple",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [
+                    {
+                      "_type": "GeneratorExp",
+                      "elt": {
+                        "_type": "Attribute",
+                        "value": {
+                          "_type": "Name",
+                          "id": "model",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "attr": "model_instance_id",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "generators": [
+                        {
+                          "_type": "comprehension",
+                          "target": {
+                            "_type": "Name",
+                            "id": "model",
+                            "ctx": {
+                              "_type": "Store"
+                            }
+                          },
+                          "iter": {
+                            "_type": "Subscript",
+                            "value": {
+                              "_type": "Attribute",
+                              "value": {
+                                "_type": "Name",
+                                "id": "defender",
+                                "ctx": {
+                                  "_type": "Load"
+                                }
+                              },
+                              "attr": "own_models",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            },
+                            "slice": {
+                              "_type": "Slice",
+                              "lower": {
+                                "_type": "Constant",
+                                "value": 1,
+                                "kind": null
+                              },
+                              "upper": null,
+                              "step": null
+                            },
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "ifs": [],
+                          "is_async": 0
+                        }
+                      ]
+                    }
+                  ],
+                  "keywords": []
+                }
+              ],
+              "keywords": []
+            },
+            "type_comment": null
+          }
+        ],
+        "after": [
+          {
+            "_type": "Expr",
+            "value": {
+              "_type": "Call",
+              "func": {
+                "_type": "Name",
+                "id": "_reduce_unit_to_last_model_with_mortal_wounds",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "args": [
+                {
+                  "_type": "Name",
+                  "id": "lifecycle",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                }
+              ],
+              "keywords": [
+                {
+                  "_type": "keyword",
+                  "arg": "target_unit",
+                  "value": {
+                    "_type": "Name",
+                    "id": "defender",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                },
+                {
+                  "_type": "keyword",
+                  "arg": "source_unit",
+                  "value": {
+                    "_type": "Name",
+                    "id": "attacker",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                },
+                {
+                  "_type": "keyword",
+                  "arg": "application_id",
+                  "value": {
+                    "_type": "Constant",
+                    "value": "phase18b-damage-reroll-preexisting-casualties",
+                    "kind": null
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          116,
+          "body",
+          22,
+          "value",
+          "keywords",
+          3,
+          "value",
+          "elts"
+        ],
+        "start": 0,
+        "end": 1,
+        "before": [
+          {
+            "_type": "Attribute",
+            "value": {
+              "_type": "Name",
+              "id": "attacker",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "attr": "unit_instance_id",
+            "ctx": {
+              "_type": "Load"
+            }
+          }
+        ],
+        "after": []
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          215,
+          "body",
+          26,
+          "value",
+          "keywords",
+          3,
+          "value",
+          "elts"
+        ],
+        "start": 0,
+        "end": 1,
+        "before": [
+          {
+            "_type": "Attribute",
+            "value": {
+              "_type": "Name",
+              "id": "attacker",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "attr": "unit_instance_id",
+            "ctx": {
+              "_type": "Load"
+            }
+          }
+        ],
+        "after": []
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body",
+          3,
+          "orelse"
+        ],
+        "start": 1,
+        "end": 3,
+        "before": [
+          {
+            "_type": "Expr",
+            "value": {
+              "_type": "Call",
+              "func": {
+                "_type": "Name",
+                "id": "_replace_unit_instance_in_state",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "args": [],
+              "keywords": [
+                {
+                  "_type": "keyword",
+                  "arg": "state",
+                  "value": {
+                    "_type": "Name",
+                    "id": "state",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                },
+                {
+                  "_type": "keyword",
+                  "arg": "replacement",
+                  "value": {
+                    "_type": "Call",
+                    "func": {
+                      "_type": "Name",
+                      "id": "replace",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "args": [
+                      {
+                        "_type": "Name",
+                        "id": "defender",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      }
+                    ],
+                    "keywords": [
+                      {
+                        "_type": "keyword",
+                        "arg": "own_models",
+                        "value": {
+                          "_type": "Tuple",
+                          "elts": [
+                            {
+                              "_type": "Call",
+                              "func": {
+                                "_type": "Name",
+                                "id": "replace",
+                                "ctx": {
+                                  "_type": "Load"
+                                }
+                              },
+                              "args": [
+                                {
+                                  "_type": "Name",
+                                  "id": "target_model",
+                                  "ctx": {
+                                    "_type": "Load"
+                                  }
+                                }
+                              ],
+                              "keywords": [
+                                {
+                                  "_type": "keyword",
+                                  "arg": "wounds_remaining",
+                                  "value": {
+                                    "_type": "Constant",
+                                    "value": 1,
+                                    "kind": null
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "_type": "Starred",
+                              "value": {
+                                "_type": "Subscript",
+                                "value": {
+                                  "_type": "Attribute",
+                                  "value": {
+                                    "_type": "Name",
+                                    "id": "defender",
+                                    "ctx": {
+                                      "_type": "Load"
+                                    }
+                                  },
+                                  "attr": "own_models",
+                                  "ctx": {
+                                    "_type": "Load"
+                                  }
+                                },
+                                "slice": {
+                                  "_type": "Slice",
+                                  "lower": {
+                                    "_type": "Constant",
+                                    "value": 1,
+                                    "kind": null
+                                  },
+                                  "upper": null,
+                                  "step": null
+                                },
+                                "ctx": {
+                                  "_type": "Load"
+                                }
+                              },
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            }
+                          ],
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "_type": "Assign",
+            "targets": [
+              {
+                "_type": "Name",
+                "id": "target_model",
+                "ctx": {
+                  "_type": "Store"
+                }
+              }
+            ],
+            "value": {
+              "_type": "Call",
+              "func": {
+                "_type": "Name",
+                "id": "replace",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "args": [
+                {
+                  "_type": "Name",
+                  "id": "target_model",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                }
+              ],
+              "keywords": [
+                {
+                  "_type": "keyword",
+                  "arg": "wounds_remaining",
+                  "value": {
+                    "_type": "Constant",
+                    "value": 1,
+                    "kind": null
+                  }
+                }
+              ]
+            },
+            "type_comment": null
+          }
+        ],
+        "after": []
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          4,
+          "targets",
+          0,
+          "id"
+        ],
+        "before": "source",
+        "after": "current_defender"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          4,
+          "value"
+        ],
+        "before": {
+          "_type": "Call",
+          "func": {
+            "_type": "Name",
+            "id": "DestructionReactionSource",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "args": [],
+          "keywords": [
+            {
+              "_type": "keyword",
+              "arg": "source_id",
+              "value": {
+                "_type": "JoinedStr",
+                "values": [
+                  {
+                    "_type": "FormattedValue",
+                    "value": {
+                      "_type": "Name",
+                      "id": "fixture_id",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "conversion": -1,
+                    "format_spec": null
+                  },
+                  {
+                    "_type": "Constant",
+                    "value": "-source",
+                    "kind": null
+                  }
+                ]
+              }
+            },
+            {
+              "_type": "keyword",
+              "arg": "reaction_kind",
+              "value": {
+                "_type": "Attribute",
+                "value": {
+                  "_type": "Name",
+                  "id": "DestructionReactionKind",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "attr": "FIGHT_ON_DEATH",
+                "ctx": {
+                  "_type": "Load"
+                }
+              }
+            },
+            {
+              "_type": "keyword",
+              "arg": "source_rule_id",
+              "value": {
+                "_type": "JoinedStr",
+                "values": [
+                  {
+                    "_type": "FormattedValue",
+                    "value": {
+                      "_type": "Name",
+                      "id": "fixture_id",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "conversion": -1,
+                    "format_spec": null
+                  },
+                  {
+                    "_type": "Constant",
+                    "value": "-rule",
+                    "kind": null
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "after": {
+          "_type": "Attribute",
+          "value": {
+            "_type": "Subscript",
+            "value": {
+              "_type": "Attribute",
+              "value": {
+                "_type": "Call",
+                "func": {
+                  "_type": "Name",
+                  "id": "rules_unit_view_by_id",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "args": [],
+                "keywords": [
+                  {
+                    "_type": "keyword",
+                    "arg": "state",
+                    "value": {
+                      "_type": "Name",
+                      "id": "state",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    }
+                  },
+                  {
+                    "_type": "keyword",
+                    "arg": "unit_instance_id",
+                    "value": {
+                      "_type": "Attribute",
+                      "value": {
+                        "_type": "Name",
+                        "id": "defender",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "attr": "unit_instance_id",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    }
+                  }
+                ]
+              },
+              "attr": "components",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "slice": {
+              "_type": "Constant",
+              "value": 0,
+              "kind": null
+            },
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "attr": "unit",
+          "ctx": {
+            "_type": "Load"
+          }
+        }
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          5,
+          "value",
+          "func"
+        ],
+        "before": {
+          "_type": "Attribute",
+          "value": {
+            "_type": "Name",
+            "id": "state",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "attr": "record_model_destruction_reaction_sources",
+          "ctx": {
+            "_type": "Load"
+          }
+        },
+        "after": {
+          "_type": "Name",
+          "id": "_replace_unit_instance_in_state",
+          "ctx": {
+            "_type": "Load"
+          }
+        }
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          5,
+          "value",
+          "keywords",
+          0,
+          "arg"
+        ],
+        "before": "model_instance_id",
+        "after": "state"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          5,
+          "value",
+          "keywords",
+          0,
+          "value"
+        ],
+        "before": {
+          "_type": "Attribute",
+          "value": {
+            "_type": "Name",
+            "id": "target_model",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "attr": "model_instance_id",
+          "ctx": {
+            "_type": "Load"
+          }
+        },
+        "after": {
+          "_type": "Name",
+          "id": "state",
+          "ctx": {
+            "_type": "Load"
+          }
+        }
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          5,
+          "value",
+          "keywords",
+          1,
+          "arg"
+        ],
+        "before": "sources",
+        "after": "replacement"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          5,
+          "value",
+          "keywords",
+          1,
+          "value"
+        ],
+        "before": {
+          "_type": "Tuple",
+          "elts": [
+            {
+              "_type": "Name",
+              "id": "source",
+              "ctx": {
+                "_type": "Load"
+              }
+            }
+          ],
+          "ctx": {
+            "_type": "Load"
+          }
+        },
+        "after": {
+          "_type": "Call",
+          "func": {
+            "_type": "Name",
+            "id": "replace",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "args": [
+            {
+              "_type": "Name",
+              "id": "current_defender",
+              "ctx": {
+                "_type": "Load"
+              }
+            }
+          ],
+          "keywords": [
+            {
+              "_type": "keyword",
+              "arg": "own_models",
+              "value": {
+                "_type": "Call",
+                "func": {
+                  "_type": "Name",
+                  "id": "tuple",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "args": [
+                  {
+                    "_type": "GeneratorExp",
+                    "elt": {
+                      "_type": "IfExp",
+                      "test": {
+                        "_type": "Compare",
+                        "left": {
+                          "_type": "Attribute",
+                          "value": {
+                            "_type": "Name",
+                            "id": "model",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "attr": "model_instance_id",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "ops": [
+                          {
+                            "_type": "Eq"
+                          }
+                        ],
+                        "comparators": [
+                          {
+                            "_type": "Attribute",
+                            "value": {
+                              "_type": "Name",
+                              "id": "target_model",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            },
+                            "attr": "model_instance_id",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          }
+                        ]
+                      },
+                      "body": {
+                        "_type": "Call",
+                        "func": {
+                          "_type": "Name",
+                          "id": "replace",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "args": [
+                          {
+                            "_type": "Name",
+                            "id": "model",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          }
+                        ],
+                        "keywords": [
+                          {
+                            "_type": "keyword",
+                            "arg": "wounds_remaining",
+                            "value": {
+                              "_type": "Constant",
+                              "value": 1,
+                              "kind": null
+                            }
+                          }
+                        ]
+                      },
+                      "orelse": {
+                        "_type": "Name",
+                        "id": "model",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      }
+                    },
+                    "generators": [
+                      {
+                        "_type": "comprehension",
+                        "target": {
+                          "_type": "Name",
+                          "id": "model",
+                          "ctx": {
+                            "_type": "Store"
+                          }
+                        },
+                        "iter": {
+                          "_type": "Attribute",
+                          "value": {
+                            "_type": "Name",
+                            "id": "current_defender",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "attr": "own_models",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "ifs": [],
+                        "is_async": 0
+                      }
+                    ]
+                  }
+                ],
+                "keywords": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          6,
+          "targets",
+          0,
+          "id"
+        ],
+        "before": "weapon_profile",
+        "after": "target_model"
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body",
+          6,
+          "value",
+          "args"
+        ],
+        "start": 0,
+        "end": 1,
+        "before": [
+          {
+            "_type": "Call",
+            "func": {
+              "_type": "Name",
+              "id": "_first_weapon_profile",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "args": [
+              {
+                "_type": "Name",
+                "id": "lifecycle",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              {
+                "_type": "Name",
+                "id": "attacker",
+                "ctx": {
+                  "_type": "Load"
+                }
+              }
+            ],
+            "keywords": []
+          }
+        ],
+        "after": [
+          {
+            "_type": "Name",
+            "id": "target_model",
+            "ctx": {
+              "_type": "Load"
+            }
+          }
+        ]
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          6,
+          "value",
+          "keywords",
+          0,
+          "arg"
+        ],
+        "before": "damage_profile",
+        "after": "wounds_remaining"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          6,
+          "value",
+          "keywords",
+          0,
+          "value"
+        ],
+        "before": {
+          "_type": "Call",
+          "func": {
+            "_type": "Attribute",
+            "value": {
+              "_type": "Name",
+              "id": "DamageProfile",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "attr": "fixed",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "args": [
+            {
+              "_type": "Attribute",
+              "value": {
+                "_type": "Name",
+                "id": "target_model",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "attr": "current_wounds",
+              "ctx": {
+                "_type": "Load"
+              }
+            }
+          ],
+          "keywords": []
+        },
+        "after": {
+          "_type": "Constant",
+          "value": 1,
+          "kind": null
+        }
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          7,
+          "targets",
+          0,
+          "id"
+        ],
+        "before": "sequence",
+        "after": "source"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          7,
+          "value",
+          "func"
+        ],
+        "before": {
+          "_type": "Attribute",
+          "value": {
+            "_type": "Name",
+            "id": "AttackSequence",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "attr": "start",
+          "ctx": {
+            "_type": "Load"
+          }
+        },
+        "after": {
+          "_type": "Name",
+          "id": "DestructionReactionSource",
+          "ctx": {
+            "_type": "Load"
+          }
+        }
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          7,
+          "value",
+          "keywords",
+          0,
+          "arg"
+        ],
+        "before": "sequence_id",
+        "after": "source_id"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          7,
+          "value",
+          "keywords",
+          0,
+          "value",
+          "values",
+          2,
+          "value"
+        ],
+        "before": "-sequence",
+        "after": "-source"
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body",
+          7,
+          "value",
+          "keywords",
+          0,
+          "value",
+          "values"
+        ],
+        "start": 0,
+        "end": 1,
+        "before": [
+          {
+            "_type": "Constant",
+            "value": "attack-sequence:",
+            "kind": null
+          }
+        ],
+        "after": []
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          7,
+          "value",
+          "keywords",
+          1,
+          "arg"
+        ],
+        "before": "attacker_player_id",
+        "after": "reaction_kind"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          7,
+          "value",
+          "keywords",
+          1,
+          "value"
+        ],
+        "before": {
+          "_type": "Constant",
+          "value": "player-a",
+          "kind": null
+        },
+        "after": {
+          "_type": "Attribute",
+          "value": {
+            "_type": "Name",
+            "id": "DestructionReactionKind",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "attr": "FIGHT_ON_DEATH",
+          "ctx": {
+            "_type": "Load"
+          }
+        }
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          7,
+          "value",
+          "keywords",
+          2,
+          "arg"
+        ],
+        "before": "attacking_unit_instance_id",
+        "after": "source_rule_id"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          7,
+          "value",
+          "keywords",
+          2,
+          "value"
+        ],
+        "before": {
+          "_type": "Attribute",
+          "value": {
+            "_type": "Name",
+            "id": "attacker",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "attr": "unit_instance_id",
+          "ctx": {
+            "_type": "Load"
+          }
+        },
+        "after": {
+          "_type": "JoinedStr",
+          "values": [
+            {
+              "_type": "FormattedValue",
+              "value": {
+                "_type": "Name",
+                "id": "fixture_id",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "conversion": -1,
+              "format_spec": null
+            },
+            {
+              "_type": "Constant",
+              "value": "-rule",
+              "kind": null
+            }
+          ]
+        }
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body",
+          7,
+          "value",
+          "keywords"
+        ],
+        "start": 3,
+        "end": 4,
+        "before": [
+          {
+            "_type": "keyword",
+            "arg": "attack_pools",
+            "value": {
+              "_type": "Tuple",
+              "elts": [
+                {
+                  "_type": "Call",
+                  "func": {
+                    "_type": "Name",
+                    "id": "_attack_pool_for_test",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "args": [],
+                  "keywords": [
+                    {
+                      "_type": "keyword",
+                      "arg": "attacker",
+                      "value": {
+                        "_type": "Name",
+                        "id": "attacker",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      }
+                    },
+                    {
+                      "_type": "keyword",
+                      "arg": "defender",
+                      "value": {
+                        "_type": "Name",
+                        "id": "defender",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      }
+                    },
+                    {
+                      "_type": "keyword",
+                      "arg": "weapon_profile",
+                      "value": {
+                        "_type": "Name",
+                        "id": "weapon_profile",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      }
+                    },
+                    {
+                      "_type": "keyword",
+                      "arg": "attacks",
+                      "value": {
+                        "_type": "Constant",
+                        "value": 1,
+                        "kind": null
+                      }
+                    }
+                  ]
+                }
+              ],
+              "ctx": {
+                "_type": "Load"
+              }
+            }
+          }
+        ],
+        "after": []
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          8,
+          "targets",
+          0,
+          "id"
+        ],
+        "before": "selection_request",
+        "after": "weapon_profile"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          8,
+          "value",
+          "func",
+          "id"
+        ],
+        "before": "_decision_request",
+        "after": "_first_weapon_profile"
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body",
+          8,
+          "value",
+          "args"
+        ],
+        "start": 0,
+        "end": 1,
+        "before": [
+          {
+            "_type": "Call",
+            "func": {
+              "_type": "Attribute",
+              "value": {
+                "_type": "Name",
+                "id": "lifecycle",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "attr": "advance_until_decision_or_terminal",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "args": [],
+            "keywords": []
+          }
+        ],
+        "after": [
+          {
+            "_type": "Name",
+            "id": "lifecycle",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          {
+            "_type": "Name",
+            "id": "attacker",
+            "ctx": {
+              "_type": "Load"
+            }
+          }
+        ]
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          9,
+          "targets",
+          0,
+          "id"
+        ],
+        "before": "declaration_request",
+        "after": "selection_request"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          9,
+          "value",
+          "func",
+          "id"
+        ],
+        "before": "_select_shooting_unit_and_type",
+        "after": "_decision_request"
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body",
+          9,
+          "value",
+          "args"
+        ],
+        "start": 0,
+        "end": 1,
+        "before": [
+          {
+            "_type": "Name",
+            "id": "lifecycle",
+            "ctx": {
+              "_type": "Load"
+            }
+          }
+        ],
+        "after": [
+          {
+            "_type": "Call",
+            "func": {
+              "_type": "Attribute",
+              "value": {
+                "_type": "Name",
+                "id": "lifecycle",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "attr": "advance_until_decision_or_terminal",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "args": [],
+            "keywords": []
+          }
+        ]
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body",
+          9,
+          "value",
+          "keywords"
+        ],
+        "start": 0,
+        "end": 3,
+        "before": [
+          {
+            "_type": "keyword",
+            "arg": "selection_request",
+            "value": {
+              "_type": "Name",
+              "id": "selection_request",
+              "ctx": {
+                "_type": "Load"
+              }
+            }
+          },
+          {
+            "_type": "keyword",
+            "arg": "unit_instance_id",
+            "value": {
+              "_type": "Attribute",
+              "value": {
+                "_type": "Name",
+                "id": "attacker",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "attr": "unit_instance_id",
+              "ctx": {
+                "_type": "Load"
+              }
+            }
+          },
+          {
+            "_type": "keyword",
+            "arg": "selection_result_id",
+            "value": {
+              "_type": "JoinedStr",
+              "values": [
+                {
+                  "_type": "FormattedValue",
+                  "value": {
+                    "_type": "Name",
+                    "id": "fixture_id",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  },
+                  "conversion": -1,
+                  "format_spec": null
+                },
+                {
+                  "_type": "Constant",
+                  "value": "-selection",
+                  "kind": null
+                }
+              ]
+            }
+          }
+        ],
+        "after": []
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body",
+          11,
+          "targets"
+        ],
+        "start": 0,
+        "end": 1,
+        "before": [
+          {
+            "_type": "Attribute",
+            "value": {
+              "_type": "Name",
+              "id": "state",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "attr": "shooting_phase_state",
+            "ctx": {
+              "_type": "Store"
+            }
+          }
+        ],
+        "after": [
+          {
+            "_type": "Name",
+            "id": "weapon_profile",
+            "ctx": {
+              "_type": "Store"
+            }
+          }
+        ]
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          11,
+          "value"
+        ],
+        "before": {
+          "_type": "Call",
+          "func": {
+            "_type": "Name",
+            "id": "ShootingPhaseState",
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "args": [],
+          "keywords": [
+            {
+              "_type": "keyword",
+              "arg": "battle_round",
+              "value": {
+                "_type": "Attribute",
+                "value": {
+                  "_type": "Name",
+                  "id": "state",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "attr": "battle_round",
+                "ctx": {
+                  "_type": "Load"
+                }
+              }
+            },
+            {
+              "_type": "keyword",
+              "arg": "active_player_id",
+              "value": {
+                "_type": "Constant",
+                "value": "player-a",
+                "kind": null
+              }
+            },
+            {
+              "_type": "keyword",
+              "arg": "selected_unit_ids",
+              "value": {
+                "_type": "Tuple",
+                "elts": [
+                  {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "attacker",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "unit_instance_id",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                ],
+                "ctx": {
+                  "_type": "Load"
+                }
+              }
+            },
+            {
+              "_type": "keyword",
+              "arg": "shot_unit_ids",
+              "value": {
+                "_type": "Tuple",
+                "elts": [
+                  {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "attacker",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "unit_instance_id",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                ],
+                "ctx": {
+                  "_type": "Load"
+                }
+              }
+            },
+            {
+              "_type": "keyword",
+              "arg": "attack_pools",
+              "value": {
+                "_type": "Attribute",
+                "value": {
+                  "_type": "Name",
+                  "id": "sequence",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "attr": "attack_pools",
+                "ctx": {
+                  "_type": "Load"
+                }
+              }
+            },
+            {
+              "_type": "keyword",
+              "arg": "attack_sequence",
+              "value": {
+                "_type": "Name",
+                "id": "sequence",
+                "ctx": {
+                  "_type": "Load"
+                }
+              }
+            }
+          ]
+        },
+        "after": {
+          "_type": "Attribute",
+          "value": {
+            "_type": "Subscript",
+            "value": {
+              "_type": "Attribute",
+              "value": {
+                "_type": "Name",
+                "id": "sequence",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "attr": "attack_pools",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "slice": {
+              "_type": "Constant",
+              "value": 0,
+              "kind": null
+            },
+            "ctx": {
+              "_type": "Load"
+            }
+          },
+          "attr": "weapon_profile",
+          "ctx": {
+            "_type": "Load"
+          }
+        }
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          16,
+          "value",
+          "keywords",
+          5,
+          "value",
+          "keywords",
+          1,
+          "value",
+          "elts",
+          0,
+          "keywords",
+          0,
+          "value",
+          "values",
+          1,
+          "value"
+        ],
+        "before": "-hit",
+        "after": "-wound"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          16,
+          "value",
+          "keywords",
+          5,
+          "value",
+          "keywords",
+          1,
+          "value",
+          "elts",
+          0,
+          "keywords",
+          1,
+          "value",
+          "id"
+        ],
+        "before": "hit_spec",
+        "after": "wound_spec"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          16,
+          "value",
+          "keywords",
+          5,
+          "value",
+          "keywords",
+          1,
+          "value",
+          "elts",
+          1,
+          "keywords",
+          0,
+          "value",
+          "values",
+          1,
+          "value"
+        ],
+        "before": "-wound",
+        "after": "-save"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          16,
+          "value",
+          "keywords",
+          5,
+          "value",
+          "keywords",
+          1,
+          "value",
+          "elts",
+          1,
+          "keywords",
+          1,
+          "value",
+          "id"
+        ],
+        "before": "wound_spec",
+        "after": "save_spec"
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          217,
+          "body",
+          16,
+          "value",
+          "keywords",
+          5,
+          "value",
+          "keywords",
+          1,
+          "value",
+          "elts",
+          1,
+          "keywords",
+          2,
+          "value",
+          "value"
+        ],
+        "before": 6,
+        "after": 1
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body",
+          16,
+          "value",
+          "keywords",
+          5,
+          "value",
+          "keywords",
+          1,
+          "value",
+          "elts"
+        ],
+        "start": 2,
+        "end": 3,
+        "before": [
+          {
+            "_type": "Call",
+            "func": {
+              "_type": "Name",
+              "id": "_fixed_roll_result",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "args": [],
+            "keywords": [
+              {
+                "_type": "keyword",
+                "arg": "roll_id",
+                "value": {
+                  "_type": "JoinedStr",
+                  "values": [
+                    {
+                      "_type": "FormattedValue",
+                      "value": {
+                        "_type": "Name",
+                        "id": "fixture_id",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "conversion": -1,
+                      "format_spec": null
+                    },
+                    {
+                      "_type": "Constant",
+                      "value": "-save",
+                      "kind": null
+                    }
+                  ]
+                }
+              },
+              {
+                "_type": "keyword",
+                "arg": "spec",
+                "value": {
+                  "_type": "Name",
+                  "id": "save_spec",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                }
+              },
+              {
+                "_type": "keyword",
+                "arg": "value",
+                "value": {
+                  "_type": "Constant",
+                  "value": 1,
+                  "kind": null
+                }
+              }
+            ]
+          }
+        ],
+        "after": []
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body",
+          16,
+          "value",
+          "keywords",
+          5,
+          "value",
+          "keywords",
+          1,
+          "value",
+          "elts"
+        ],
+        "start": 0,
+        "end": 0,
+        "before": [],
+        "after": [
+          {
+            "_type": "Call",
+            "func": {
+              "_type": "Name",
+              "id": "_fixed_roll_result",
+              "ctx": {
+                "_type": "Load"
+              }
+            },
+            "args": [],
+            "keywords": [
+              {
+                "_type": "keyword",
+                "arg": "roll_id",
+                "value": {
+                  "_type": "JoinedStr",
+                  "values": [
+                    {
+                      "_type": "FormattedValue",
+                      "value": {
+                        "_type": "Name",
+                        "id": "fixture_id",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "conversion": -1,
+                      "format_spec": null
+                    },
+                    {
+                      "_type": "Constant",
+                      "value": "-hit",
+                      "kind": null
+                    }
+                  ]
+                }
+              },
+              {
+                "_type": "keyword",
+                "arg": "spec",
+                "value": {
+                  "_type": "Name",
+                  "id": "hit_spec",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                }
+              },
+              {
+                "_type": "keyword",
+                "arg": "value",
+                "value": {
+                  "_type": "Constant",
+                  "value": 6,
+                  "kind": null
+                }
+              }
+            ]
+          },
+          {
+            "_type": "Starred",
+            "value": {
+              "_type": "GeneratorExp",
+              "elt": {
+                "_type": "Call",
+                "func": {
+                  "_type": "Name",
+                  "id": "_fixed_roll_result",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "args": [],
+                "keywords": [
+                  {
+                    "_type": "keyword",
+                    "arg": "roll_id",
+                    "value": {
+                      "_type": "JoinedStr",
+                      "values": [
+                        {
+                          "_type": "FormattedValue",
+                          "value": {
+                            "_type": "Name",
+                            "id": "fixture_id",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "conversion": -1,
+                          "format_spec": null
+                        },
+                        {
+                          "_type": "Constant",
+                          "value": "-miss-",
+                          "kind": null
+                        },
+                        {
+                          "_type": "FormattedValue",
+                          "value": {
+                            "_type": "Name",
+                            "id": "index",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "conversion": -1,
+                          "format_spec": null
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "_type": "keyword",
+                    "arg": "spec",
+                    "value": {
+                      "_type": "Call",
+                      "func": {
+                        "_type": "Name",
+                        "id": "DiceRollSpec",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      },
+                      "args": [],
+                      "keywords": [
+                        {
+                          "_type": "keyword",
+                          "arg": "expression",
+                          "value": {
+                            "_type": "Call",
+                            "func": {
+                              "_type": "Name",
+                              "id": "DiceExpression",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            },
+                            "args": [],
+                            "keywords": [
+                              {
+                                "_type": "keyword",
+                                "arg": "quantity",
+                                "value": {
+                                  "_type": "Constant",
+                                  "value": 1,
+                                  "kind": null
+                                }
+                              },
+                              {
+                                "_type": "keyword",
+                                "arg": "sides",
+                                "value": {
+                                  "_type": "Constant",
+                                  "value": 6,
+                                  "kind": null
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "_type": "keyword",
+                          "arg": "reason",
+                          "value": {
+                            "_type": "JoinedStr",
+                            "values": [
+                              {
+                                "_type": "Constant",
+                                "value": "Hit roll for ",
+                                "kind": null
+                              },
+                              {
+                                "_type": "FormattedValue",
+                                "value": {
+                                  "_type": "Attribute",
+                                  "value": {
+                                    "_type": "Name",
+                                    "id": "weapon_profile",
+                                    "ctx": {
+                                      "_type": "Load"
+                                    }
+                                  },
+                                  "attr": "profile_id",
+                                  "ctx": {
+                                    "_type": "Load"
+                                  }
+                                },
+                                "conversion": -1,
+                                "format_spec": null
+                              },
+                              {
+                                "_type": "Constant",
+                                "value": " attack ",
+                                "kind": null
+                              },
+                              {
+                                "_type": "FormattedValue",
+                                "value": {
+                                  "_type": "Attribute",
+                                  "value": {
+                                    "_type": "Name",
+                                    "id": "sequence",
+                                    "ctx": {
+                                      "_type": "Load"
+                                    }
+                                  },
+                                  "attr": "sequence_id",
+                                  "ctx": {
+                                    "_type": "Load"
+                                  }
+                                },
+                                "conversion": -1,
+                                "format_spec": null
+                              },
+                              {
+                                "_type": "Constant",
+                                "value": ":pool-001:attack-",
+                                "kind": null
+                              },
+                              {
+                                "_type": "FormattedValue",
+                                "value": {
+                                  "_type": "Name",
+                                  "id": "index",
+                                  "ctx": {
+                                    "_type": "Load"
+                                  }
+                                },
+                                "conversion": -1,
+                                "format_spec": {
+                                  "_type": "JoinedStr",
+                                  "values": [
+                                    {
+                                      "_type": "Constant",
+                                      "value": "03d",
+                                      "kind": null
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "_type": "keyword",
+                          "arg": "roll_type",
+                          "value": {
+                            "_type": "Constant",
+                            "value": "attack_sequence.hit",
+                            "kind": null
+                          }
+                        },
+                        {
+                          "_type": "keyword",
+                          "arg": "actor_id",
+                          "value": {
+                            "_type": "Constant",
+                            "value": "player-a",
+                            "kind": null
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "_type": "keyword",
+                    "arg": "value",
+                    "value": {
+                      "_type": "Constant",
+                      "value": 1,
+                      "kind": null
+                    }
+                  }
+                ]
+              },
+              "generators": [
+                {
+                  "_type": "comprehension",
+                  "target": {
+                    "_type": "Name",
+                    "id": "index",
+                    "ctx": {
+                      "_type": "Store"
+                    }
+                  },
+                  "iter": {
+                    "_type": "Call",
+                    "func": {
+                      "_type": "Name",
+                      "id": "range",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "args": [
+                      {
+                        "_type": "Constant",
+                        "value": 2,
+                        "kind": null
+                      },
+                      {
+                        "_type": "BinOp",
+                        "left": {
+                          "_type": "Attribute",
+                          "value": {
+                            "_type": "Subscript",
+                            "value": {
+                              "_type": "Attribute",
+                              "value": {
+                                "_type": "Name",
+                                "id": "sequence",
+                                "ctx": {
+                                  "_type": "Load"
+                                }
+                              },
+                              "attr": "attack_pools",
+                              "ctx": {
+                                "_type": "Load"
+                              }
+                            },
+                            "slice": {
+                              "_type": "Constant",
+                              "value": 0,
+                              "kind": null
+                            },
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "attr": "attacks",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "op": {
+                          "_type": "Add"
+                        },
+                        "right": {
+                          "_type": "Constant",
+                          "value": 1,
+                          "kind": null
+                        }
+                      }
+                    ],
+                    "keywords": []
+                  },
+                  "ifs": [],
+                  "is_async": 0
+                }
+              ]
+            },
+            "ctx": {
+              "_type": "Load"
+            }
+          }
+        ]
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body"
+        ],
+        "start": 10,
+        "end": 11,
+        "before": [
+          {
+            "_type": "Expr",
+            "value": {
+              "_type": "Call",
+              "func": {
+                "_type": "Name",
+                "id": "_apply_shooting_declaration_without_advancing",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "args": [
+                {
+                  "_type": "Name",
+                  "id": "lifecycle",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                }
+              ],
+              "keywords": [
+                {
+                  "_type": "keyword",
+                  "arg": "request",
+                  "value": {
+                    "_type": "Name",
+                    "id": "declaration_request",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                },
+                {
+                  "_type": "keyword",
+                  "arg": "proposal",
+                  "value": {
+                    "_type": "Call",
+                    "func": {
+                      "_type": "Name",
+                      "id": "_proposal_from_request",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "args": [],
+                    "keywords": [
+                      {
+                        "_type": "keyword",
+                        "arg": "request",
+                        "value": {
+                          "_type": "Name",
+                          "id": "declaration_request",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      },
+                      {
+                        "_type": "keyword",
+                        "arg": "target_unit_id",
+                        "value": {
+                          "_type": "Attribute",
+                          "value": {
+                            "_type": "Name",
+                            "id": "defender",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "attr": "unit_instance_id",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      },
+                      {
+                        "_type": "keyword",
+                        "arg": "weapon_profile_id",
+                        "value": {
+                          "_type": "Attribute",
+                          "value": {
+                            "_type": "Name",
+                            "id": "weapon_profile",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "attr": "profile_id",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "_type": "keyword",
+                  "arg": "result_id",
+                  "value": {
+                    "_type": "JoinedStr",
+                    "values": [
+                      {
+                        "_type": "FormattedValue",
+                        "value": {
+                          "_type": "Name",
+                          "id": "fixture_id",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "conversion": -1,
+                        "format_spec": null
+                      },
+                      {
+                        "_type": "Constant",
+                        "value": "-sequence",
+                        "kind": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "after": [
+          {
+            "_type": "Assign",
+            "targets": [
+              {
+                "_type": "Name",
+                "id": "declaration_request",
+                "ctx": {
+                  "_type": "Store"
+                }
+              }
+            ],
+            "value": {
+              "_type": "Call",
+              "func": {
+                "_type": "Name",
+                "id": "_select_shooting_unit_and_type",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "args": [
+                {
+                  "_type": "Name",
+                  "id": "lifecycle",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                }
+              ],
+              "keywords": [
+                {
+                  "_type": "keyword",
+                  "arg": "selection_request",
+                  "value": {
+                    "_type": "Name",
+                    "id": "selection_request",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                },
+                {
+                  "_type": "keyword",
+                  "arg": "unit_instance_id",
+                  "value": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "attacker",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "unit_instance_id",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                },
+                {
+                  "_type": "keyword",
+                  "arg": "selection_result_id",
+                  "value": {
+                    "_type": "JoinedStr",
+                    "values": [
+                      {
+                        "_type": "FormattedValue",
+                        "value": {
+                          "_type": "Name",
+                          "id": "fixture_id",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "conversion": -1,
+                        "format_spec": null
+                      },
+                      {
+                        "_type": "Constant",
+                        "value": "-selection",
+                        "kind": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "type_comment": null
+          },
+          {
+            "_type": "Assign",
+            "targets": [
+              {
+                "_type": "Name",
+                "id": "sequence",
+                "ctx": {
+                  "_type": "Store"
+                }
+              }
+            ],
+            "value": {
+              "_type": "Call",
+              "func": {
+                "_type": "Name",
+                "id": "_apply_shooting_declaration_without_advancing",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "args": [
+                {
+                  "_type": "Name",
+                  "id": "lifecycle",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                }
+              ],
+              "keywords": [
+                {
+                  "_type": "keyword",
+                  "arg": "request",
+                  "value": {
+                    "_type": "Name",
+                    "id": "declaration_request",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                },
+                {
+                  "_type": "keyword",
+                  "arg": "proposal",
+                  "value": {
+                    "_type": "Call",
+                    "func": {
+                      "_type": "Name",
+                      "id": "_proposal_from_request",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "args": [],
+                    "keywords": [
+                      {
+                        "_type": "keyword",
+                        "arg": "request",
+                        "value": {
+                          "_type": "Name",
+                          "id": "declaration_request",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      },
+                      {
+                        "_type": "keyword",
+                        "arg": "target_unit_id",
+                        "value": {
+                          "_type": "Attribute",
+                          "value": {
+                            "_type": "Name",
+                            "id": "defender",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "attr": "unit_instance_id",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      },
+                      {
+                        "_type": "keyword",
+                        "arg": "weapon_profile_id",
+                        "value": {
+                          "_type": "Attribute",
+                          "value": {
+                            "_type": "Name",
+                            "id": "weapon_profile",
+                            "ctx": {
+                              "_type": "Load"
+                            }
+                          },
+                          "attr": "profile_id",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "_type": "keyword",
+                  "arg": "result_id",
+                  "value": {
+                    "_type": "JoinedStr",
+                    "values": [
+                      {
+                        "_type": "FormattedValue",
+                        "value": {
+                          "_type": "Name",
+                          "id": "fixture_id",
+                          "ctx": {
+                            "_type": "Load"
+                          }
+                        },
+                        "conversion": -1,
+                        "format_spec": null
+                      },
+                      {
+                        "_type": "Constant",
+                        "value": "-sequence",
+                        "kind": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "type_comment": null
+          },
+          {
+            "_type": "Assert",
+            "test": {
+              "_type": "Compare",
+              "left": {
+                "_type": "Call",
+                "func": {
+                  "_type": "Name",
+                  "id": "len",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "args": [
+                  {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "sequence",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "attack_pools",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                ],
+                "keywords": []
+              },
+              "ops": [
+                {
+                  "_type": "Eq"
+                }
+              ],
+              "comparators": [
+                {
+                  "_type": "Constant",
+                  "value": 1,
+                  "kind": null
+                }
+              ]
+            },
+            "msg": null
+          }
+        ]
+      },
+      {
+        "kind": "splice",
+        "at": [
+          "body",
+          217,
+          "body"
+        ],
+        "start": 8,
+        "end": 8,
+        "before": [],
+        "after": [
+          {
+            "_type": "Expr",
+            "value": {
+              "_type": "Call",
+              "func": {
+                "_type": "Attribute",
+                "value": {
+                  "_type": "Name",
+                  "id": "state",
+                  "ctx": {
+                    "_type": "Load"
+                  }
+                },
+                "attr": "record_model_destruction_reaction_sources",
+                "ctx": {
+                  "_type": "Load"
+                }
+              },
+              "args": [],
+              "keywords": [
+                {
+                  "_type": "keyword",
+                  "arg": "model_instance_id",
+                  "value": {
+                    "_type": "Attribute",
+                    "value": {
+                      "_type": "Name",
+                      "id": "target_model",
+                      "ctx": {
+                        "_type": "Load"
+                      }
+                    },
+                    "attr": "model_instance_id",
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                },
+                {
+                  "_type": "keyword",
+                  "arg": "sources",
+                  "value": {
+                    "_type": "Tuple",
+                    "elts": [
+                      {
+                        "_type": "Name",
+                        "id": "source",
+                        "ctx": {
+                          "_type": "Load"
+                        }
+                      }
+                    ],
+                    "ctx": {
+                      "_type": "Load"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "kind": "replace",
+        "at": [
+          "body",
+          222,
+          "body",
+          90,
+          "test",
+          "comparators",
+          0,
+          "value"
+        ],
+        "before": "end_of_turn",
+        "after": "until_cleared"
+      }
+    ],
+    "d09_stage": "d09-stages/tests/unit/test_phase13b_shooting_declarations.py.txt",
+    "d09_before_sha256": "03e0fe35297d74bdfa3e27b341e19c239a4ab945c277564b2b12583cfda6a6d6",
+    "d09_after_sha256": "7302211caf393b50454d2e69488a6470574df9266e91de740f9414d0c4cfafbf",
+    "d07_effective_sha256": "03e0fe35297d74bdfa3e27b341e19c239a4ab945c277564b2b12583cfda6a6d6",
+    "canonical_stage_blob": "820865494e150dca2c0596cae07bbf9e89a69694",
+    "stage_authority": "PR587-canonical-blob"
+  }
+}

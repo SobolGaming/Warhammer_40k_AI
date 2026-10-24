@@ -147,8 +147,16 @@ def _reserved_attack_damage_authority(
         state=state,
         cause_id=cause_id,
     )
-    if authority is None or authority.source_authority_finalized:
+    if authority is None:
         raise GameLifecycleError("Resumed attack destruction requires its pending cause authority.")
+    if authority.source_authority_finalized:
+        from warhammer40k_core.engine.retained_demise_removal import (
+            require_retained_attack_removed_cause,
+        )
+
+        return require_retained_attack_removed_cause(
+            state=state, attack_sequence=attack_sequence, damage=damage
+        )
     return authority
 
 

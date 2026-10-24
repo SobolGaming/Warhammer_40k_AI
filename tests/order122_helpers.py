@@ -81,6 +81,16 @@ def default_effect_session() -> LocalGameSession:
             battlefield_id="order122-battlefield", armies=tuple(state.army_definitions)
         ).battlefield_state
     )
+    from tests.support.coherent_attached_fixture_placements import (
+        coherent_attached_fixture_battlefield,
+    )
+
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        coherent_attached_fixture_battlefield(
+            armies=tuple(state.army_definitions), battlefield=state.battlefield_state
+        )
+    )
     for player in state.player_ids:
         state.record_secondary_mission_choice(
             secondary_choice(player_id=player, mode=SecondaryMissionMode.FIXED)

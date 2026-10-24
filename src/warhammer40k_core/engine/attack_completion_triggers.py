@@ -128,11 +128,26 @@ def attack_context_for_trigger(
             and isinstance(event.payload, dict)
             and event.payload.get("sequence_id") == sequence.sequence_id
         )
-        if len(participation) != 1 or not isinstance(participation[0].payload, dict):
+        if not participation or not isinstance(participation[0].payload, dict):
             raise GameLifecycleError(
                 "Attack completion trigger lacks model participation authority."
             )
         evidence = participation[0].payload
+        completed_ids: set[str] = set()
+        for event in participation:
+            if not isinstance(event.payload, dict) or {
+                key: value for key, value in event.payload.items() if key != "model_instance_ids"
+            } != {key: value for key, value in evidence.items() if key != "model_instance_ids"}:
+                raise GameLifecycleError("Attack completion model participation context drift.")
+            ids = event.payload.get("model_instance_ids")
+            if not isinstance(ids, list) or any(type(model_id) is not str for model_id in ids):
+                raise GameLifecycleError("Attack completion model participation IDs drift.")
+            for model_id in ids:
+                if type(model_id) is not str or model_id in completed_ids:
+                    raise GameLifecycleError("Attack completion model participation duplicates.")
+                completed_ids.add(model_id)
+        if completed_ids != {pool.attacker_model_instance_id for pool in sequence.attack_pools}:
+            raise GameLifecycleError("Attack completion model participation inventory drift.")
     if (
         payload["game_id"] != state.game_id
         or evidence.get("game_id") != state.game_id

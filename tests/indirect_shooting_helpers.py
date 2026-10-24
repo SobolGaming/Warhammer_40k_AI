@@ -148,7 +148,7 @@ def indirect_session(
         for unit in army.units:
             key = unit.unit_instance_id.split(":", 1)[1]
             x, y = (
-                (10.0, 45.0)
+                (11.5, 35.0 + cast(float, engager_distance))
                 if key == "engager" and engager_attached
                 else (10.0, 35.0 + engager_distance)
                 if key in {"engager", "engager-leader"} and engager_distance is not None
@@ -384,6 +384,8 @@ def assert_indirect_outcomes(
         attacks=36,
         hit_modifier=modifier,
         ballistic_skill=ballistic_skill,
+        # Fixed branch-coverage seed for this workload, not a probabilistic guarantee.
+        game_id="order33-outcome-faces-20261019",
     )
     pending_request(session)
     initial = session.lifecycle.to_payload()

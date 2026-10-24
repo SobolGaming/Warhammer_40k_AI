@@ -34,39 +34,26 @@
       }
     ]
   },
-  "content_hash": "a6794780f3e23f312ee76ddb5c925ac7724770674cea38190e0c2bdf812dd167",
+  "content_hash": "1cd0e7e5b462d69932226909084560bb27935b75e59c76cd885063fbebde0ac3",
   "cursor_codec": {
     "cursors": [
       {
         "cursor": {
-          "c": "player:player-b:0:0",
-          "h": "ec61e9a0266a7645e8165e7594c888e73689a3a08bfa0c3943bb9426487ae529",
+          "c": "administrator:shared:0:0",
+          "h": "20dd05066db4790ed79b4f9b46d9f39cfb43f330452498d88d79e02bb158d2eb",
           "o": 9,
-          "p": "principal-player-b",
-          "q": 8,
+          "p": "principal-administrator",
+          "q": 9,
           "r": 1,
           "s": "session-phase18l-contract-persistence",
           "v": 1
         },
-        "token": "3WEN4rAXEc9hEMbbm8gdc3msV9RN9e6egmPGMw25cWIy3d8FB8zTCdCVQ23ze4q2"
-      },
-      {
-        "cursor": {
-          "c": "administrator:shared:0:0",
-          "h": "b924c9378f0764a51748b2789f022ec4221776f66baf6bf8773be85a8b2e986d",
-          "o": 1,
-          "p": "principal-administrator",
-          "q": 1,
-          "r": 0,
-          "s": "session-phase18l-contract-persistence",
-          "v": 1
-        },
-        "token": "OaFTY-TrFLu0N0Uqqx3OIKpY4zBZxbBulzAoADIdUtx_X7NGItTnha38XDkvcOSt"
+        "token": "I5ZnfrwbmogwuOF2tpyy0Xpa2v7pgVcQDvhwFkBBHx7C0Ijr2sQh0JcReLVcyv5T"
       },
       {
         "cursor": {
           "c": "player:player-a:0:0",
-          "h": "2b2416eaf1fa04d234e36598fc5d0ae6e5a3b0564eb365f86b0769a65a2539ee",
+          "h": "777b455d7fba912e3260fa1dfe1693ccaa57b90c5c29733f096e939cdd1f12e4",
           "o": 9,
           "p": "principal-player-a",
           "q": 9,
@@ -74,25 +61,38 @@
           "s": "session-phase18l-contract-persistence",
           "v": 1
         },
-        "token": "eoHUF4tA2LbtuW3eCn0_QaMpbkLY0k9jWrir5ne6Aa6YdMveLxoLZ3guWFl_C2uD"
+        "token": "a1DAjDwuTHWiJt7eul5K8LHT-zBMlWEQa1_furDsJJYaF15HCRZWPdCsuVNWK56M"
       },
       {
         "cursor": {
           "c": "administrator:shared:0:0",
-          "h": "1e0d5378b0ad0362fe8f4bca0eb40a23ef71117ab5670e725def2da0fd3c87d3",
-          "o": 9,
+          "h": "b5bf8f018c63e93c96a6d24d2fde2c62502878ea9e0d7de55af48e1cfda722fc",
+          "o": 1,
           "p": "principal-administrator",
-          "q": 9,
+          "q": 1,
+          "r": 0,
+          "s": "session-phase18l-contract-persistence",
+          "v": 1
+        },
+        "token": "oTZ-cS5GsOL0DWc0vOQScaJtuJjU2QCSNUKXEsjgYwPRp1XwiCf9f1AmYlEiC0CZ"
+      },
+      {
+        "cursor": {
+          "c": "player:player-b:0:0",
+          "h": "e865dc239fc054f8aa932b9cbb686a46162ccdac1b0621d7c97e7d85c6f2c7b5",
+          "o": 9,
+          "p": "principal-player-b",
+          "q": 8,
           "r": 1,
           "s": "session-phase18l-contract-persistence",
           "v": 1
         },
-        "token": "lCFtFEl8gvZGYk-wj-H6j7aF5Ml0rBFFjlngIRVYJQWghWa8mTS1jUuvOQEjLjxn"
+        "token": "rmLhn5dRcdb3sxhj3lvtdBQSDs3OgFGOeM0KoLvwqmx82FTIjI8mhEHOwELvBbIm"
       }
     ],
     "secret_hex": "636f72652d76322d636f6e74726163742d70657273697374656e63652d637572736f722d6b6579"
   },
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
   "engine_version": "0.1.0",
   "event_retention_limit": 4096,
   "external_contract_version": "44.0.0",
@@ -106,9 +106,9 @@
   "sessions": [
     {
       "adapter_session": {
-        "content_hash": "f099b3cc50f659c90e812fd8b8d32c31073aec973e82b70a1dbf1df0fd3b6e9c",
+        "content_hash": "852df870de4c96e5e5c0059b336993b7af0097ed36082ee58a1467a07d04a8cc",
         "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "event_log_hash": "788b041bdc41c7302f4df95c69da375e1b2c43845e2821a192f0c5d37d1f04d0",
+        "event_log_hash": "0d15f64d60e629fbb38e466e875b4859668f00c0a15e034b5574b19969d829fa",
         "initial_replay_lifecycle": {
           "config": {
             "allow_legacy_non_strict_rosters": true,
@@ -1740,7 +1740,7 @@
                 "required_neighbors_large_unit": null,
                 "required_neighbors_small_unit": 1
               },
-              "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+              "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
               "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
               "engagement_policy": {
                 "horizontal_inches": 2.0,
@@ -1916,7 +1916,13 @@
                     "no_overhang_required": true,
                     "terrain_feature_kind": "armoured_containers",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -1927,7 +1933,13 @@
                     "no_overhang_required": false,
                     "terrain_feature_kind": "barricade_and_fuel_pipes",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -1938,7 +1950,13 @@
                     "no_overhang_required": false,
                     "terrain_feature_kind": "battlefield_debris_and_statuary",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -1949,7 +1967,13 @@
                     "no_overhang_required": false,
                     "terrain_feature_kind": "crater_and_rubble",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -1960,7 +1984,13 @@
                     "no_overhang_required": false,
                     "terrain_feature_kind": "debris_and_statuary",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -1971,7 +2001,13 @@
                     "no_overhang_required": true,
                     "terrain_feature_kind": "hills",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -1982,7 +2018,13 @@
                     "no_overhang_required": true,
                     "terrain_feature_kind": "hills_and_sealed_buildings",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -1993,7 +2035,13 @@
                     "no_overhang_required": true,
                     "terrain_feature_kind": "industrial_structures",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -2016,7 +2064,8 @@
                       "FLY",
                       "IMPERIUM_PRIMARCH",
                       "INFANTRY",
-                      "MONSTER"
+                      "MONSTER",
+                      "SWARM"
                     ]
                   },
                   {
@@ -2028,7 +2077,13 @@
                     "no_overhang_required": true,
                     "terrain_feature_kind": "sealed_buildings",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -2039,7 +2094,13 @@
                     "no_overhang_required": false,
                     "terrain_feature_kind": "woods",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   }
                 ],
                 "fly_traversal_mode": "air_path",
@@ -2302,7 +2363,7 @@
                     "fight"
                   ],
                   "game_id": "phase18l-contract-persistence",
-                  "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                  "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                   "setup_sequence": [
                     "muster_armies",
                     "select_mission",
@@ -4206,7 +4267,7 @@
                   "required_neighbors_large_unit": null,
                   "required_neighbors_small_unit": 1
                 },
-                "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                 "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                 "engagement_policy": {
                   "horizontal_inches": 2.0,
@@ -4382,7 +4443,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "armoured_containers",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -4393,7 +4460,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "barricade_and_fuel_pipes",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -4404,7 +4477,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "battlefield_debris_and_statuary",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -4415,7 +4494,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "crater_and_rubble",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -4426,7 +4511,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "debris_and_statuary",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -4437,7 +4528,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "hills",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -4448,7 +4545,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "hills_and_sealed_buildings",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -4459,7 +4562,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "industrial_structures",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -4482,7 +4591,8 @@
                         "FLY",
                         "IMPERIUM_PRIMARCH",
                         "INFANTRY",
-                        "MONSTER"
+                        "MONSTER",
+                        "SWARM"
                       ]
                     },
                     {
@@ -4494,7 +4604,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "sealed_buildings",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -4505,7 +4621,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "woods",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     }
                   ],
                   "fly_traversal_mode": "air_path",
@@ -4768,7 +4890,7 @@
                       "fight"
                     ],
                     "game_id": "phase18l-contract-persistence",
-                    "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                    "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                     "setup_sequence": [
                       "muster_armies",
                       "select_mission",
@@ -4916,7 +5038,7 @@
               "reserve_states": [],
               "return_on_death_consumed_keys": [],
               "rules_overlay_ids": [],
-              "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+              "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
               "scoring_window_states": [],
               "secondary_mission_card_states": [],
               "secondary_mission_choices": [],
@@ -4991,8 +5113,17 @@
               "generic:rule-ir"
             ],
             "ability_index_record_ids_by_player_id": {
-              "player-a": [],
-              "player-b": []
+              "player-a": [
+                "gw-11e-core-abilities:core:core-scouts",
+                "gw-11e-core-abilities:datasheet:core-deep-strike",
+                "gw-11e-core-abilities:keyword:keyword-infantry",
+                "gw-11e-core-abilities:keyword:keyword-monster",
+                "gw-11e-core-abilities:keyword:keyword-vehicle"
+              ],
+              "player-b": [
+                "gw-11e-core-abilities:core:core-scouts",
+                "gw-11e-core-abilities:keyword:keyword-infantry"
+              ]
             },
             "activation": {
               "activation_hash": "997d5e97b90e60eb5bc4a293d3f1924155233530de2f13a1823cc8577472f920",
@@ -5064,7 +5195,7 @@
             "battle_shock_hook_ids": [
               "catalog-ir:selected-target-test-roll-modifier"
             ],
-            "bundle_summary_hash": "a520b71738b8519718bd33a0b6767406babbe36ddc5b65226563aa282c504831",
+            "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
             "charge_declaration_hook_ids": [],
             "charge_roll_modifier_ids": [],
             "charge_target_restriction_hook_ids": [],
@@ -5087,7 +5218,8 @@
               "core-stratagem:crushing_impact_enemy:mortal-wound-continuation",
               "core-stratagem:crushing_impact_self:mortal-wound-continuation",
               "core-stratagem:explosives:mortal-wound-continuation",
-              "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation"
+              "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation",
+              "core:desperate-escape:hazard-mortals"
             ],
             "move_completion_rule_hook_ids": [
               "core-move-ability:super-heavy-walker:completion",
@@ -7415,7 +7547,7 @@
             "reserve_states": [],
             "return_on_death_consumed_keys": [],
             "rules_overlay_ids": [],
-            "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+            "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
             "scoring_window_states": [],
             "secondary_mission_card_states": [],
             "secondary_mission_choices": [],
@@ -9128,7 +9260,7 @@
                 "required_neighbors_large_unit": null,
                 "required_neighbors_small_unit": 1
               },
-              "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+              "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
               "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
               "engagement_policy": {
                 "horizontal_inches": 2.0,
@@ -9304,7 +9436,13 @@
                     "no_overhang_required": true,
                     "terrain_feature_kind": "armoured_containers",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -9315,7 +9453,13 @@
                     "no_overhang_required": false,
                     "terrain_feature_kind": "barricade_and_fuel_pipes",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -9326,7 +9470,13 @@
                     "no_overhang_required": false,
                     "terrain_feature_kind": "battlefield_debris_and_statuary",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -9337,7 +9487,13 @@
                     "no_overhang_required": false,
                     "terrain_feature_kind": "crater_and_rubble",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -9348,7 +9504,13 @@
                     "no_overhang_required": false,
                     "terrain_feature_kind": "debris_and_statuary",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -9359,7 +9521,13 @@
                     "no_overhang_required": true,
                     "terrain_feature_kind": "hills",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -9370,7 +9538,13 @@
                     "no_overhang_required": true,
                     "terrain_feature_kind": "hills_and_sealed_buildings",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -9381,7 +9555,13 @@
                     "no_overhang_required": true,
                     "terrain_feature_kind": "industrial_structures",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -9404,7 +9584,8 @@
                       "FLY",
                       "IMPERIUM_PRIMARCH",
                       "INFANTRY",
-                      "MONSTER"
+                      "MONSTER",
+                      "SWARM"
                     ]
                   },
                   {
@@ -9416,7 +9597,13 @@
                     "no_overhang_required": true,
                     "terrain_feature_kind": "sealed_buildings",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   },
                   {
                     "can_move_over": true,
@@ -9427,7 +9614,13 @@
                     "no_overhang_required": false,
                     "terrain_feature_kind": "woods",
                     "through_terrain_allowed_keywords": [],
-                    "upper_floor_allowed_keywords": []
+                    "upper_floor_allowed_keywords": [
+                      "BEAST",
+                      "FLY",
+                      "INFANTRY",
+                      "MONSTER",
+                      "SWARM"
+                    ]
                   }
                 ],
                 "fly_traversal_mode": "air_path",
@@ -9690,7 +9883,7 @@
                     "fight"
                   ],
                   "game_id": "phase18l-contract-persistence",
-                  "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                  "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                   "setup_sequence": [
                     "muster_armies",
                     "select_mission",
@@ -11594,7 +11787,7 @@
                   "required_neighbors_large_unit": null,
                   "required_neighbors_small_unit": 1
                 },
-                "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                 "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                 "engagement_policy": {
                   "horizontal_inches": 2.0,
@@ -11770,7 +11963,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "armoured_containers",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -11781,7 +11980,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "barricade_and_fuel_pipes",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -11792,7 +11997,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "battlefield_debris_and_statuary",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -11803,7 +12014,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "crater_and_rubble",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -11814,7 +12031,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "debris_and_statuary",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -11825,7 +12048,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "hills",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -11836,7 +12065,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "hills_and_sealed_buildings",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -11847,7 +12082,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "industrial_structures",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -11870,7 +12111,8 @@
                         "FLY",
                         "IMPERIUM_PRIMARCH",
                         "INFANTRY",
-                        "MONSTER"
+                        "MONSTER",
+                        "SWARM"
                       ]
                     },
                     {
@@ -11882,7 +12124,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "sealed_buildings",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -11893,7 +12141,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "woods",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     }
                   ],
                   "fly_traversal_mode": "air_path",
@@ -12156,7 +12410,7 @@
                       "fight"
                     ],
                     "game_id": "phase18l-contract-persistence",
-                    "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                    "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                     "setup_sequence": [
                       "muster_armies",
                       "select_mission",
@@ -12304,7 +12558,7 @@
               "reserve_states": [],
               "return_on_death_consumed_keys": [],
               "rules_overlay_ids": [],
-              "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+              "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
               "scoring_window_states": [],
               "secondary_mission_card_states": [],
               "secondary_mission_choices": [],
@@ -12379,8 +12633,17 @@
               "generic:rule-ir"
             ],
             "ability_index_record_ids_by_player_id": {
-              "player-a": [],
-              "player-b": []
+              "player-a": [
+                "gw-11e-core-abilities:core:core-scouts",
+                "gw-11e-core-abilities:datasheet:core-deep-strike",
+                "gw-11e-core-abilities:keyword:keyword-infantry",
+                "gw-11e-core-abilities:keyword:keyword-monster",
+                "gw-11e-core-abilities:keyword:keyword-vehicle"
+              ],
+              "player-b": [
+                "gw-11e-core-abilities:core:core-scouts",
+                "gw-11e-core-abilities:keyword:keyword-infantry"
+              ]
             },
             "activation": {
               "activation_hash": "997d5e97b90e60eb5bc4a293d3f1924155233530de2f13a1823cc8577472f920",
@@ -12452,7 +12715,7 @@
             "battle_shock_hook_ids": [
               "catalog-ir:selected-target-test-roll-modifier"
             ],
-            "bundle_summary_hash": "a520b71738b8519718bd33a0b6767406babbe36ddc5b65226563aa282c504831",
+            "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
             "charge_declaration_hook_ids": [],
             "charge_roll_modifier_ids": [],
             "charge_target_restriction_hook_ids": [],
@@ -12475,7 +12738,8 @@
               "core-stratagem:crushing_impact_enemy:mortal-wound-continuation",
               "core-stratagem:crushing_impact_self:mortal-wound-continuation",
               "core-stratagem:explosives:mortal-wound-continuation",
-              "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation"
+              "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation",
+              "core:desperate-escape:hazard-mortals"
             ],
             "move_completion_rule_hook_ids": [
               "core-move-ability:super-heavy-walker:completion",
@@ -14803,7 +15067,7 @@
             "reserve_states": [],
             "return_on_death_consumed_keys": [],
             "rules_overlay_ids": [],
-            "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+            "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
             "scoring_window_states": [],
             "secondary_mission_card_states": [],
             "secondary_mission_choices": [],
@@ -14885,7 +15149,7 @@
             ]
           }
         },
-        "lifecycle_hash": "b6c4393de556e73bc66bf2148e656111216911d8a258e0d58898b16be5b40140",
+        "lifecycle_hash": "825b9ffe88a0846f986372e2a8ba14c12eb529e8cd699d5ff220877942468d2b",
         "replay_artifact": {
           "artifact_id": "session-persistence:phase18l-contract-persistence",
           "decision_records": [],
@@ -16521,7 +16785,7 @@
                   "required_neighbors_large_unit": null,
                   "required_neighbors_small_unit": 1
                 },
-                "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                 "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                 "engagement_policy": {
                   "horizontal_inches": 2.0,
@@ -16697,7 +16961,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "armoured_containers",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -16708,7 +16978,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "barricade_and_fuel_pipes",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -16719,7 +16995,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "battlefield_debris_and_statuary",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -16730,7 +17012,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "crater_and_rubble",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -16741,7 +17029,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "debris_and_statuary",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -16752,7 +17046,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "hills",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -16763,7 +17063,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "hills_and_sealed_buildings",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -16774,7 +17080,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "industrial_structures",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -16797,7 +17109,8 @@
                         "FLY",
                         "IMPERIUM_PRIMARCH",
                         "INFANTRY",
-                        "MONSTER"
+                        "MONSTER",
+                        "SWARM"
                       ]
                     },
                     {
@@ -16809,7 +17122,13 @@
                       "no_overhang_required": true,
                       "terrain_feature_kind": "sealed_buildings",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     },
                     {
                       "can_move_over": true,
@@ -16820,7 +17139,13 @@
                       "no_overhang_required": false,
                       "terrain_feature_kind": "woods",
                       "through_terrain_allowed_keywords": [],
-                      "upper_floor_allowed_keywords": []
+                      "upper_floor_allowed_keywords": [
+                        "BEAST",
+                        "FLY",
+                        "INFANTRY",
+                        "MONSTER",
+                        "SWARM"
+                      ]
                     }
                   ],
                   "fly_traversal_mode": "air_path",
@@ -17083,7 +17408,7 @@
                       "fight"
                     ],
                     "game_id": "phase18l-contract-persistence",
-                    "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                    "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                     "setup_sequence": [
                       "muster_armies",
                       "select_mission",
@@ -18987,7 +19312,7 @@
                     "required_neighbors_large_unit": null,
                     "required_neighbors_small_unit": 1
                   },
-                  "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                  "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                   "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                   "engagement_policy": {
                     "horizontal_inches": 2.0,
@@ -19163,7 +19488,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "armoured_containers",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -19174,7 +19505,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "barricade_and_fuel_pipes",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -19185,7 +19522,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "battlefield_debris_and_statuary",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -19196,7 +19539,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "crater_and_rubble",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -19207,7 +19556,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "debris_and_statuary",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -19218,7 +19573,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "hills",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -19229,7 +19590,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "hills_and_sealed_buildings",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -19240,7 +19607,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "industrial_structures",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -19263,7 +19636,8 @@
                           "FLY",
                           "IMPERIUM_PRIMARCH",
                           "INFANTRY",
-                          "MONSTER"
+                          "MONSTER",
+                          "SWARM"
                         ]
                       },
                       {
@@ -19275,7 +19649,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "sealed_buildings",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -19286,7 +19666,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "woods",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       }
                     ],
                     "fly_traversal_mode": "air_path",
@@ -19549,7 +19935,7 @@
                         "fight"
                       ],
                       "game_id": "phase18l-contract-persistence",
-                      "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                      "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                       "setup_sequence": [
                         "muster_armies",
                         "select_mission",
@@ -19697,7 +20083,7 @@
                 "reserve_states": [],
                 "return_on_death_consumed_keys": [],
                 "rules_overlay_ids": [],
-                "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                 "scoring_window_states": [],
                 "secondary_mission_card_states": [],
                 "secondary_mission_choices": [],
@@ -19772,8 +20158,17 @@
                 "generic:rule-ir"
               ],
               "ability_index_record_ids_by_player_id": {
-                "player-a": [],
-                "player-b": []
+                "player-a": [
+                  "gw-11e-core-abilities:core:core-scouts",
+                  "gw-11e-core-abilities:datasheet:core-deep-strike",
+                  "gw-11e-core-abilities:keyword:keyword-infantry",
+                  "gw-11e-core-abilities:keyword:keyword-monster",
+                  "gw-11e-core-abilities:keyword:keyword-vehicle"
+                ],
+                "player-b": [
+                  "gw-11e-core-abilities:core:core-scouts",
+                  "gw-11e-core-abilities:keyword:keyword-infantry"
+                ]
               },
               "activation": {
                 "activation_hash": "997d5e97b90e60eb5bc4a293d3f1924155233530de2f13a1823cc8577472f920",
@@ -19845,7 +20240,7 @@
               "battle_shock_hook_ids": [
                 "catalog-ir:selected-target-test-roll-modifier"
               ],
-              "bundle_summary_hash": "a520b71738b8519718bd33a0b6767406babbe36ddc5b65226563aa282c504831",
+              "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
               "charge_declaration_hook_ids": [],
               "charge_roll_modifier_ids": [],
               "charge_target_restriction_hook_ids": [],
@@ -19868,7 +20263,8 @@
                 "core-stratagem:crushing_impact_enemy:mortal-wound-continuation",
                 "core-stratagem:crushing_impact_self:mortal-wound-continuation",
                 "core-stratagem:explosives:mortal-wound-continuation",
-                "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation"
+                "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation",
+                "core:desperate-escape:hazard-mortals"
               ],
               "move_completion_rule_hook_ids": [
                 "core-move-ability:super-heavy-walker:completion",
@@ -22196,7 +22592,7 @@
               "reserve_states": [],
               "return_on_death_consumed_keys": [],
               "rules_overlay_ids": [],
-              "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+              "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
               "scoring_window_states": [],
               "secondary_mission_card_states": [],
               "secondary_mission_choices": [],
@@ -22281,7 +22677,7 @@
           "initial_rng_state": {
             "draw_count": 0,
             "history": [
-              "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}",
+              "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}",
               "{\"event_id\":\"event-000002\",\"event_type\":\"army_mustered\",\"payload\":{\"army_id\":\"army-alpha\",\"game_id\":\"phase18l-contract-persistence\",\"player_id\":\"player-a\",\"roster_legality_report\":{\"battle_size\":\"strike_force\",\"is_legal\":false,\"violations\":[{\"message\":\"Roster requires one selected Warlord.\",\"source_id\":\"gw-11e-core-roster-models:warlord\",\"unit_selection_id\":null,\"violation_code\":\"missing_warlord_selection\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"deep-strike-unit\",\"violation_code\":\"source_awaiting_unit_points\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"scout-redeploy-unit\",\"violation_code\":\"source_awaiting_unit_points\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"strategic-reserve-unit\",\"violation_code\":\"source_awaiting_unit_points\"}]},\"setup_step\":\"muster_armies\",\"starting_attached_unit_records\":[],\"unit_count\":3}}",
               "{\"event_id\":\"event-000003\",\"event_type\":\"army_mustered\",\"payload\":{\"army_id\":\"army-beta\",\"game_id\":\"phase18l-contract-persistence\",\"player_id\":\"player-b\",\"roster_legality_report\":{\"battle_size\":\"strike_force\",\"is_legal\":false,\"violations\":[{\"message\":\"Roster requires one selected Warlord.\",\"source_id\":\"gw-11e-core-roster-models:warlord\",\"unit_selection_id\":null,\"violation_code\":\"missing_warlord_selection\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"scout-redeploy-unit\",\"violation_code\":\"source_awaiting_unit_points\"}]},\"setup_step\":\"muster_armies\",\"starting_attached_unit_records\":[],\"unit_count\":1}}",
               "{\"event_id\":\"event-000004\",\"event_type\":\"setup_step_completed\",\"payload\":{\"active_player_id\":null,\"battle_phase\":null,\"battle_round\":0,\"game_id\":\"phase18l-contract-persistence\",\"next_setup_step\":\"select_mission\",\"stage\":\"setup\",\"step\":\"muster_armies\"}}",
@@ -22299,12 +22695,12 @@
           "source_identity": {
             "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
             "catalog_id": "phase9a-canonical",
-            "game_config_hash": "3014c0f67d777f8d28d37feb22e64b19c313f90e1f02c47a2716d047661c1ce9",
+            "game_config_hash": "d652933853a26f123ef8da01c97a9022dbd093178dc36fae5951b185ec371125",
             "game_id": "phase18l-contract-persistence",
             "mission_pack_id": "11e-warhammer-event-companion-2026-07",
             "mission_source_package_hash": "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5",
             "rules_overlay_ids": [],
-            "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+            "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
             "source_ids": [
               "catalog:phase9a-canonical"
             ],
@@ -22314,7 +22710,7 @@
         "rng_state": {
           "draw_count": 0,
           "history": [
-            "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}",
+            "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}",
             "{\"event_id\":\"event-000002\",\"event_type\":\"army_mustered\",\"payload\":{\"army_id\":\"army-alpha\",\"game_id\":\"phase18l-contract-persistence\",\"player_id\":\"player-a\",\"roster_legality_report\":{\"battle_size\":\"strike_force\",\"is_legal\":false,\"violations\":[{\"message\":\"Roster requires one selected Warlord.\",\"source_id\":\"gw-11e-core-roster-models:warlord\",\"unit_selection_id\":null,\"violation_code\":\"missing_warlord_selection\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"deep-strike-unit\",\"violation_code\":\"source_awaiting_unit_points\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"scout-redeploy-unit\",\"violation_code\":\"source_awaiting_unit_points\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"strategic-reserve-unit\",\"violation_code\":\"source_awaiting_unit_points\"}]},\"setup_step\":\"muster_armies\",\"starting_attached_unit_records\":[],\"unit_count\":3}}",
             "{\"event_id\":\"event-000003\",\"event_type\":\"army_mustered\",\"payload\":{\"army_id\":\"army-beta\",\"game_id\":\"phase18l-contract-persistence\",\"player_id\":\"player-b\",\"roster_legality_report\":{\"battle_size\":\"strike_force\",\"is_legal\":false,\"violations\":[{\"message\":\"Roster requires one selected Warlord.\",\"source_id\":\"gw-11e-core-roster-models:warlord\",\"unit_selection_id\":null,\"violation_code\":\"missing_warlord_selection\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"scout-redeploy-unit\",\"violation_code\":\"source_awaiting_unit_points\"}]},\"setup_step\":\"muster_armies\",\"starting_attached_unit_records\":[],\"unit_count\":1}}",
             "{\"event_id\":\"event-000004\",\"event_type\":\"setup_step_completed\",\"payload\":{\"active_player_id\":null,\"battle_phase\":null,\"battle_round\":0,\"game_id\":\"phase18l-contract-persistence\",\"next_setup_step\":\"select_mission\",\"stage\":\"setup\",\"step\":\"muster_armies\"}}",
@@ -22327,17 +22723,17 @@
           ],
           "seed": "phase18l-contract-persistence"
         },
-        "rng_state_hash": "4556ffbbb2f3f7973c083e5dc22c1920ae63c7778d77ffdbd409247d8b3ffe40",
+        "rng_state_hash": "59ef282684971d0896cd909790e5849293560860d26379dfaefe64085f54e5d9",
         "schema_version": "local-game-session-persistence-v1",
         "source_identity": {
           "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
           "catalog_id": "phase9a-canonical",
-          "game_config_hash": "3014c0f67d777f8d28d37feb22e64b19c313f90e1f02c47a2716d047661c1ce9",
+          "game_config_hash": "d652933853a26f123ef8da01c97a9022dbd093178dc36fae5951b185ec371125",
           "game_id": "phase18l-contract-persistence",
           "mission_pack_id": "11e-warhammer-event-companion-2026-07",
           "mission_source_package_hash": "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5",
           "rules_overlay_ids": [],
-          "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+          "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
           "source_ids": [
             "catalog:phase9a-canonical"
           ],
@@ -22381,8 +22777,8 @@
           "response_payload": {
             "accepted": true,
             "checkpoint": {
-              "event_cursor": "lCFtFEl8gvZGYk-wj-H6j7aF5Ml0rBFFjlngIRVYJQWghWa8mTS1jUuvOQEjLjxn",
-              "projection_state_hash": "1e0d5378b0ad0362fe8f4bca0eb40a23ef71117ab5670e725def2da0fd3c87d3",
+              "event_cursor": "I5ZnfrwbmogwuOF2tpyy0Xpa2v7pgVcQDvhwFkBBHx7C0Ijr2sQh0JcReLVcyv5T",
+              "projection_state_hash": "20dd05066db4790ed79b4f9b46d9f39cfb43f330452498d88d79e02bb158d2eb",
               "session_revision": 1,
               "viewer_player_id": null,
               "visibility_role": "administrator"
@@ -22390,8 +22786,8 @@
             "command_id": "phase18l-contract-start-000001",
             "committed": true,
             "event_range": {
-              "from_cursor": "OaFTY-TrFLu0N0Uqqx3OIKpY4zBZxbBulzAoADIdUtx_X7NGItTnha38XDkvcOSt",
-              "to_cursor": "lCFtFEl8gvZGYk-wj-H6j7aF5Ml0rBFFjlngIRVYJQWghWa8mTS1jUuvOQEjLjxn"
+              "from_cursor": "oTZ-cS5GsOL0DWc0vOQScaJtuJjU2QCSNUKXEsjgYwPRp1XwiCf9f1AmYlEiC0CZ",
+              "to_cursor": "I5ZnfrwbmogwuOF2tpyy0Xpa2v7pgVcQDvhwFkBBHx7C0Ijr2sQh0JcReLVcyv5T"
             },
             "operation": "start_session",
             "outcome_code": "command_committed",
@@ -22399,9 +22795,9 @@
             "session": {
               "catalog_id": "phase9a-canonical",
               "created_at": "2026-08-21T16:00:00Z",
-              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
               "engine_version": "0.1.0",
-              "event_cursor": "lCFtFEl8gvZGYk-wj-H6j7aF5Ml0rBFFjlngIRVYJQWghWa8mTS1jUuvOQEjLjxn",
+              "event_cursor": "I5ZnfrwbmogwuOF2tpyy0Xpa2v7pgVcQDvhwFkBBHx7C0Ijr2sQh0JcReLVcyv5T",
               "game_id": "phase18l-contract-persistence",
               "last_activity_at": "2026-08-21T16:00:00Z",
               "lifecycle_status": {
@@ -22413,16 +22809,16 @@
                 "stage": "setup",
                 "status_kind": "waiting_for_decision"
               },
-              "projection_state_hash": "1e0d5378b0ad0362fe8f4bca0eb40a23ef71117ab5670e725def2da0fd3c87d3",
+              "projection_state_hash": "20dd05066db4790ed79b4f9b46d9f39cfb43f330452498d88d79e02bb158d2eb",
               "rules_overlay_ids": [],
-              "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+              "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
               "ruleset_id": {
                 "edition": "11e",
                 "game": "warhammer_40000",
                 "version": "core-v2-setup-prebattle-ui-smoke"
               },
               "schema_version": "session-metadata-v44-contract",
-              "server_contract_version": "44.3.33",
+              "server_contract_version": "44.5.0",
               "session_id": "session-phase18l-contract-persistence",
               "session_revision": 1,
               "session_state": "active",
@@ -22446,7 +22842,7 @@
       "cursor_registry_finalized": false,
       "event_retention_limit": 4096,
       "game_id": "phase18l-contract-persistence",
-      "history_head": "d054d7ddfef55e51a2d720ca8ef07ba8aaf1fa5aa0f92671787821efcc99d2fc",
+      "history_head": "348d1365df07037f9f150738c1225e94684907636c4feed852bd0560bda3d363",
       "last_activity_at": "2026-08-21T16:00:00Z",
       "lifecycle_status": {
         "decision_request": {
@@ -22517,14 +22913,14 @@
       ],
       "revision_history": [
         {
-          "authoritative_session_hash": "f58c9c80e4ce88adfda17ca50585c0ccab3b0d792d4529f6bf3c133b3020d35a",
-          "authoritative_state_hash": "826793b6c0dfe161b20a21747be665bffbe70ac9e96c38233e55a2a22bccb7d7",
-          "checkpoint_hash": "0a0954f6e2f36bdceb2287cce2e48db87e8574504435ca01ca6f4ffb1b571879",
+          "authoritative_session_hash": "ddd00a7cba13ccbd5321bd76c5050f104c12b5f4094da1e5d3b3fd108fb0277a",
+          "authoritative_state_hash": "71c2c9a248e1482f22cf4da512ca0641322a9b651ac75dffd6fd1088960bc936",
+          "checkpoint_hash": "bb26ec0ef7515ee0ed2c279277f41507eea6657fa6adeb3b70c20f5636a89ced",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
           "event_count": 1,
-          "event_records_hash": "56015699f56ed95341f7fa54da506c63e7f4bbcc10071e7d745237f4a55aa815",
+          "event_records_hash": "66e54047b64356ef7c830af9c085282228abd6061a3c4a3306c595269febd468",
           "from_cursor": null,
           "journal_entry_hash": null,
           "origin": {
@@ -22535,11 +22931,11 @@
           },
           "previous_revision_commitment": null,
           "response_hash": null,
-          "revision_commitment": "54972f6ae401cc4b6b6a9c3624ec27395ed81ca3fc5b0417e663994ee46aefee",
+          "revision_commitment": "ded2e7561be3e92512fd4f7c7ec7b237daeb31a1645ae7cfae0c5eafa210c8ac",
           "rng_draw_count": 0,
           "rng_history_count": 1,
-          "rng_history_hash": "376d601863e0b00863deae2085e4bea4fba94ff5c3f2179e1770933bffa99ca4",
-          "rng_state_hash": "f8895606da70075cc8a44b61fb7d88ff0b7878bdca5e0f470444ee6aeadc8f7e",
+          "rng_history_hash": "377e21c59b89d2ef484c26d8eb2766b4b105449d15ca905b972a8733722aab9c",
+          "rng_state_hash": "600e1f44ae7d3860c996627e3b731f72c9d32919e8ef309f9b7b84348cef79a6",
           "schema_version": "session-revision-commitment-v2",
           "session_id": "session-phase18l-contract-persistence",
           "session_revision": 0,
@@ -22548,17 +22944,17 @@
         },
         {
           "authoritative_session_hash": "8635775287d84aa963eb2c53bf0424b848dd9e8d1b5eb3e40fdc719f1dbb1ceb",
-          "authoritative_state_hash": "b6c4393de556e73bc66bf2148e656111216911d8a258e0d58898b16be5b40140",
-          "checkpoint_hash": "adfa69df7bbcef4ae00aeb2233dd4156423122076048ac47739b2a795d39ee78",
+          "authoritative_state_hash": "825b9ffe88a0846f986372e2a8ba14c12eb529e8cd699d5ff220877942468d2b",
+          "checkpoint_hash": "5bb1138197fb3bdbbe44f5defc35399ea218502b5e9aa66bf510cb11dd43d6d5",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
           "event_count": 9,
-          "event_records_hash": "f01ce42a31c9a08d2db627c4c8c3924c7b0a887e6fc6774be9d70112260cb27d",
+          "event_records_hash": "9f709ee955ba193870c23e5a1c7f69f71cc9741e958b105213a79d3c3365602d",
           "from_cursor": {
             "cursor": {
               "c": "administrator:shared:0:0",
-              "h": "b924c9378f0764a51748b2789f022ec4221776f66baf6bf8773be85a8b2e986d",
+              "h": "b5bf8f018c63e93c96a6d24d2fde2c62502878ea9e0d7de55af48e1cfda722fc",
               "o": 1,
               "p": "principal-administrator",
               "q": 1,
@@ -22566,9 +22962,9 @@
               "s": "session-phase18l-contract-persistence",
               "v": 1
             },
-            "token": "OaFTY-TrFLu0N0Uqqx3OIKpY4zBZxbBulzAoADIdUtx_X7NGItTnha38XDkvcOSt"
+            "token": "oTZ-cS5GsOL0DWc0vOQScaJtuJjU2QCSNUKXEsjgYwPRp1XwiCf9f1AmYlEiC0CZ"
           },
-          "journal_entry_hash": "2cc7b7dfb6ac99562ccae099d2a2f65ae4bb0c70e5cd072f16dfdcf51fbd2839",
+          "journal_entry_hash": "fcd36316f91ded26a241c5f21809b2beba7bdaf9c700b3e54488ec847b5f7892",
           "origin": {
             "command_envelope": {
               "command_id": "phase18l-contract-start-000001",
@@ -22585,13 +22981,13 @@
             "operation": "start_session",
             "origin_kind": "protocol_command"
           },
-          "previous_revision_commitment": "54972f6ae401cc4b6b6a9c3624ec27395ed81ca3fc5b0417e663994ee46aefee",
-          "response_hash": "e51a9e716ca3e0afcea9ac7c5b9f1f5d1f7d4954724827044dd458e305e473af",
-          "revision_commitment": "d054d7ddfef55e51a2d720ca8ef07ba8aaf1fa5aa0f92671787821efcc99d2fc",
+          "previous_revision_commitment": "ded2e7561be3e92512fd4f7c7ec7b237daeb31a1645ae7cfae0c5eafa210c8ac",
+          "response_hash": "38be11c4a6489b61a3deff247b2937b330e29e374937480c4efcd5338b7cd772",
+          "revision_commitment": "348d1365df07037f9f150738c1225e94684907636c4feed852bd0560bda3d363",
           "rng_draw_count": 0,
           "rng_history_count": 10,
-          "rng_history_hash": "b75d50e9efcbcc2de7c28c53aa927ce529749aa3637ab10a0949a624d8c0fad8",
-          "rng_state_hash": "5efc0314ecdf3c86b50c89e761984cfcb9cf69c974e9490e34fd574da8ac3203",
+          "rng_history_hash": "1a9ee08fc21e8e69edf35eb06fa2eac2c747d6b450f272be600aa2fdebca3305",
+          "rng_state_hash": "1ec2b8369bde4ffd2055f6f0e62ae0689d2a47c94f639f4a72d5f6addea933b2",
           "schema_version": "session-revision-commitment-v2",
           "session_id": "session-phase18l-contract-persistence",
           "session_revision": 1,
@@ -22599,7 +22995,7 @@
           "to_cursor": {
             "cursor": {
               "c": "administrator:shared:0:0",
-              "h": "1e0d5378b0ad0362fe8f4bca0eb40a23ef71117ab5670e725def2da0fd3c87d3",
+              "h": "20dd05066db4790ed79b4f9b46d9f39cfb43f330452498d88d79e02bb158d2eb",
               "o": 9,
               "p": "principal-administrator",
               "q": 9,
@@ -22607,7 +23003,7 @@
               "s": "session-phase18l-contract-persistence",
               "v": 1
             },
-            "token": "lCFtFEl8gvZGYk-wj-H6j7aF5Ml0rBFFjlngIRVYJQWghWa8mTS1jUuvOQEjLjxn"
+            "token": "I5ZnfrwbmogwuOF2tpyy0Xpa2v7pgVcQDvhwFkBBHx7C0Ijr2sQh0JcReLVcyv5T"
           }
         }
       ],
@@ -22615,9 +23011,9 @@
       "revision_snapshots": [
         {
           "adapter_session": {
-            "content_hash": "4b9c929ecf0e12b56edccef38be5f4b5973e01a24d1fcae1ebbd6e7c429ef160",
+            "content_hash": "cce5c30306c974eade37986af2c44f85f20a9383c4465b5d5d0d39f271fb4724",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-            "event_log_hash": "922b0de0ad394b851c8eb1a824bce27ebeda9b0f5e25bcf18004866c5beadfcd",
+            "event_log_hash": "8870eafd6b2187f1ace98b8ac3ea2fcd596eee8c0023e513dd4d63c113fec2fa",
             "initial_replay_lifecycle": null,
             "lifecycle": {
               "config": {
@@ -24250,7 +24646,7 @@
                     "required_neighbors_large_unit": null,
                     "required_neighbors_small_unit": 1
                   },
-                  "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                  "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                   "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                   "engagement_policy": {
                     "horizontal_inches": 2.0,
@@ -24426,7 +24822,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "armoured_containers",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -24437,7 +24839,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "barricade_and_fuel_pipes",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -24448,7 +24856,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "battlefield_debris_and_statuary",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -24459,7 +24873,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "crater_and_rubble",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -24470,7 +24890,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "debris_and_statuary",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -24481,7 +24907,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "hills",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -24492,7 +24924,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "hills_and_sealed_buildings",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -24503,7 +24941,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "industrial_structures",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -24526,7 +24970,8 @@
                           "FLY",
                           "IMPERIUM_PRIMARCH",
                           "INFANTRY",
-                          "MONSTER"
+                          "MONSTER",
+                          "SWARM"
                         ]
                       },
                       {
@@ -24538,7 +24983,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "sealed_buildings",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -24549,7 +25000,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "woods",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       }
                     ],
                     "fly_traversal_mode": "air_path",
@@ -24812,7 +25269,7 @@
                         "fight"
                       ],
                       "game_id": "phase18l-contract-persistence",
-                      "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                      "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                       "setup_sequence": [
                         "muster_armies",
                         "select_mission",
@@ -24960,7 +25417,7 @@
                 "reserve_states": [],
                 "return_on_death_consumed_keys": [],
                 "rules_overlay_ids": [],
-                "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                 "scoring_window_states": [],
                 "secondary_mission_card_states": [],
                 "secondary_mission_choices": [],
@@ -25013,7 +25470,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "826793b6c0dfe161b20a21747be665bffbe70ac9e96c38233e55a2a22bccb7d7",
+            "lifecycle_hash": "71c2c9a248e1482f22cf4da512ca0641322a9b651ac75dffd6fd1088960bc936",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -26649,7 +27106,7 @@
                       "required_neighbors_large_unit": null,
                       "required_neighbors_small_unit": 1
                     },
-                    "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                    "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                     "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                     "engagement_policy": {
                       "horizontal_inches": 2.0,
@@ -26825,7 +27282,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "armoured_containers",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -26836,7 +27299,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "barricade_and_fuel_pipes",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -26847,7 +27316,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "battlefield_debris_and_statuary",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -26858,7 +27333,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "crater_and_rubble",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -26869,7 +27350,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "debris_and_statuary",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -26880,7 +27367,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "hills",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -26891,7 +27384,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "hills_and_sealed_buildings",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -26902,7 +27401,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "industrial_structures",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -26925,7 +27430,8 @@
                             "FLY",
                             "IMPERIUM_PRIMARCH",
                             "INFANTRY",
-                            "MONSTER"
+                            "MONSTER",
+                            "SWARM"
                           ]
                         },
                         {
@@ -26937,7 +27443,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "sealed_buildings",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -26948,7 +27460,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "woods",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         }
                       ],
                       "fly_traversal_mode": "air_path",
@@ -27211,7 +27729,7 @@
                           "fight"
                         ],
                         "game_id": "phase18l-contract-persistence",
-                        "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                        "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                         "setup_sequence": [
                           "muster_armies",
                           "select_mission",
@@ -27359,7 +27877,7 @@
                   "reserve_states": [],
                   "return_on_death_consumed_keys": [],
                   "rules_overlay_ids": [],
-                  "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                  "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                   "scoring_window_states": [],
                   "secondary_mission_card_states": [],
                   "secondary_mission_choices": [],
@@ -27415,7 +27933,7 @@
               "initial_rng_state": {
                 "draw_count": 0,
                 "history": [
-                  "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}"
+                  "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}"
                 ],
                 "seed": "phase18l-contract-persistence"
               },
@@ -27424,12 +27942,12 @@
               "source_identity": {
                 "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
                 "catalog_id": "phase9a-canonical",
-                "game_config_hash": "3014c0f67d777f8d28d37feb22e64b19c313f90e1f02c47a2716d047661c1ce9",
+                "game_config_hash": "d652933853a26f123ef8da01c97a9022dbd093178dc36fae5951b185ec371125",
                 "game_id": "phase18l-contract-persistence",
                 "mission_pack_id": "11e-warhammer-event-companion-2026-07",
                 "mission_source_package_hash": "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5",
                 "rules_overlay_ids": [],
-                "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                 "source_ids": [
                   "catalog:phase9a-canonical"
                 ],
@@ -27439,21 +27957,21 @@
             "rng_state": {
               "draw_count": 0,
               "history": [
-                "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}"
+                "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}"
               ],
               "seed": "phase18l-contract-persistence"
             },
-            "rng_state_hash": "0d42e7005c985e64544ef18f99801f64ff967755eed89010ca2d7a15aba94edc",
+            "rng_state_hash": "e2eb70f41a29825a5e1362af70d1a5983cac9c132286589ac1fe66ed69e081be",
             "schema_version": "local-game-session-persistence-v1",
             "source_identity": {
               "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
               "catalog_id": "phase9a-canonical",
-              "game_config_hash": "3014c0f67d777f8d28d37feb22e64b19c313f90e1f02c47a2716d047661c1ce9",
+              "game_config_hash": "d652933853a26f123ef8da01c97a9022dbd093178dc36fae5951b185ec371125",
               "game_id": "phase18l-contract-persistence",
               "mission_pack_id": "11e-warhammer-event-companion-2026-07",
               "mission_source_package_hash": "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5",
               "rules_overlay_ids": [],
-              "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+              "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
               "source_ids": [
                 "catalog:phase9a-canonical"
               ],
@@ -27469,7 +27987,7 @@
             "payload": {
               "current_setup_step": "muster_armies",
               "game_id": "phase18l-contract-persistence",
-              "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce"
+              "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d"
             },
             "stage": "setup",
             "status_kind": "advanced"
@@ -27479,9 +27997,9 @@
         },
         {
           "adapter_session": {
-            "content_hash": "f099b3cc50f659c90e812fd8b8d32c31073aec973e82b70a1dbf1df0fd3b6e9c",
+            "content_hash": "852df870de4c96e5e5c0059b336993b7af0097ed36082ee58a1467a07d04a8cc",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-            "event_log_hash": "788b041bdc41c7302f4df95c69da375e1b2c43845e2821a192f0c5d37d1f04d0",
+            "event_log_hash": "0d15f64d60e629fbb38e466e875b4859668f00c0a15e034b5574b19969d829fa",
             "initial_replay_lifecycle": {
               "config": {
                 "allow_legacy_non_strict_rosters": true,
@@ -29113,7 +29631,7 @@
                     "required_neighbors_large_unit": null,
                     "required_neighbors_small_unit": 1
                   },
-                  "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                  "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                   "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                   "engagement_policy": {
                     "horizontal_inches": 2.0,
@@ -29289,7 +29807,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "armoured_containers",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -29300,7 +29824,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "barricade_and_fuel_pipes",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -29311,7 +29841,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "battlefield_debris_and_statuary",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -29322,7 +29858,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "crater_and_rubble",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -29333,7 +29875,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "debris_and_statuary",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -29344,7 +29892,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "hills",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -29355,7 +29909,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "hills_and_sealed_buildings",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -29366,7 +29926,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "industrial_structures",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -29389,7 +29955,8 @@
                           "FLY",
                           "IMPERIUM_PRIMARCH",
                           "INFANTRY",
-                          "MONSTER"
+                          "MONSTER",
+                          "SWARM"
                         ]
                       },
                       {
@@ -29401,7 +29968,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "sealed_buildings",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -29412,7 +29985,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "woods",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       }
                     ],
                     "fly_traversal_mode": "air_path",
@@ -29675,7 +30254,7 @@
                         "fight"
                       ],
                       "game_id": "phase18l-contract-persistence",
-                      "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                      "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                       "setup_sequence": [
                         "muster_armies",
                         "select_mission",
@@ -31579,7 +32158,7 @@
                       "required_neighbors_large_unit": null,
                       "required_neighbors_small_unit": 1
                     },
-                    "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                    "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                     "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                     "engagement_policy": {
                       "horizontal_inches": 2.0,
@@ -31755,7 +32334,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "armoured_containers",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -31766,7 +32351,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "barricade_and_fuel_pipes",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -31777,7 +32368,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "battlefield_debris_and_statuary",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -31788,7 +32385,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "crater_and_rubble",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -31799,7 +32402,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "debris_and_statuary",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -31810,7 +32419,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "hills",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -31821,7 +32436,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "hills_and_sealed_buildings",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -31832,7 +32453,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "industrial_structures",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -31855,7 +32482,8 @@
                             "FLY",
                             "IMPERIUM_PRIMARCH",
                             "INFANTRY",
-                            "MONSTER"
+                            "MONSTER",
+                            "SWARM"
                           ]
                         },
                         {
@@ -31867,7 +32495,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "sealed_buildings",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -31878,7 +32512,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "woods",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         }
                       ],
                       "fly_traversal_mode": "air_path",
@@ -32141,7 +32781,7 @@
                           "fight"
                         ],
                         "game_id": "phase18l-contract-persistence",
-                        "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                        "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                         "setup_sequence": [
                           "muster_armies",
                           "select_mission",
@@ -32289,7 +32929,7 @@
                   "reserve_states": [],
                   "return_on_death_consumed_keys": [],
                   "rules_overlay_ids": [],
-                  "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                  "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                   "scoring_window_states": [],
                   "secondary_mission_card_states": [],
                   "secondary_mission_choices": [],
@@ -32364,8 +33004,17 @@
                   "generic:rule-ir"
                 ],
                 "ability_index_record_ids_by_player_id": {
-                  "player-a": [],
-                  "player-b": []
+                  "player-a": [
+                    "gw-11e-core-abilities:core:core-scouts",
+                    "gw-11e-core-abilities:datasheet:core-deep-strike",
+                    "gw-11e-core-abilities:keyword:keyword-infantry",
+                    "gw-11e-core-abilities:keyword:keyword-monster",
+                    "gw-11e-core-abilities:keyword:keyword-vehicle"
+                  ],
+                  "player-b": [
+                    "gw-11e-core-abilities:core:core-scouts",
+                    "gw-11e-core-abilities:keyword:keyword-infantry"
+                  ]
                 },
                 "activation": {
                   "activation_hash": "997d5e97b90e60eb5bc4a293d3f1924155233530de2f13a1823cc8577472f920",
@@ -32437,7 +33086,7 @@
                 "battle_shock_hook_ids": [
                   "catalog-ir:selected-target-test-roll-modifier"
                 ],
-                "bundle_summary_hash": "a520b71738b8519718bd33a0b6767406babbe36ddc5b65226563aa282c504831",
+                "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
                 "charge_declaration_hook_ids": [],
                 "charge_roll_modifier_ids": [],
                 "charge_target_restriction_hook_ids": [],
@@ -32460,7 +33109,8 @@
                   "core-stratagem:crushing_impact_enemy:mortal-wound-continuation",
                   "core-stratagem:crushing_impact_self:mortal-wound-continuation",
                   "core-stratagem:explosives:mortal-wound-continuation",
-                  "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation"
+                  "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation",
+                  "core:desperate-escape:hazard-mortals"
                 ],
                 "move_completion_rule_hook_ids": [
                   "core-move-ability:super-heavy-walker:completion",
@@ -34788,7 +35438,7 @@
                 "reserve_states": [],
                 "return_on_death_consumed_keys": [],
                 "rules_overlay_ids": [],
-                "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                 "scoring_window_states": [],
                 "secondary_mission_card_states": [],
                 "secondary_mission_choices": [],
@@ -36501,7 +37151,7 @@
                     "required_neighbors_large_unit": null,
                     "required_neighbors_small_unit": 1
                   },
-                  "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                  "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                   "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                   "engagement_policy": {
                     "horizontal_inches": 2.0,
@@ -36677,7 +37327,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "armoured_containers",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -36688,7 +37344,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "barricade_and_fuel_pipes",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -36699,7 +37361,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "battlefield_debris_and_statuary",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -36710,7 +37378,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "crater_and_rubble",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -36721,7 +37395,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "debris_and_statuary",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -36732,7 +37412,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "hills",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -36743,7 +37429,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "hills_and_sealed_buildings",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -36754,7 +37446,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "industrial_structures",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -36777,7 +37475,8 @@
                           "FLY",
                           "IMPERIUM_PRIMARCH",
                           "INFANTRY",
-                          "MONSTER"
+                          "MONSTER",
+                          "SWARM"
                         ]
                       },
                       {
@@ -36789,7 +37488,13 @@
                         "no_overhang_required": true,
                         "terrain_feature_kind": "sealed_buildings",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       },
                       {
                         "can_move_over": true,
@@ -36800,7 +37505,13 @@
                         "no_overhang_required": false,
                         "terrain_feature_kind": "woods",
                         "through_terrain_allowed_keywords": [],
-                        "upper_floor_allowed_keywords": []
+                        "upper_floor_allowed_keywords": [
+                          "BEAST",
+                          "FLY",
+                          "INFANTRY",
+                          "MONSTER",
+                          "SWARM"
+                        ]
                       }
                     ],
                     "fly_traversal_mode": "air_path",
@@ -37063,7 +37774,7 @@
                         "fight"
                       ],
                       "game_id": "phase18l-contract-persistence",
-                      "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                      "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                       "setup_sequence": [
                         "muster_armies",
                         "select_mission",
@@ -38967,7 +39678,7 @@
                       "required_neighbors_large_unit": null,
                       "required_neighbors_small_unit": 1
                     },
-                    "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                    "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                     "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                     "engagement_policy": {
                       "horizontal_inches": 2.0,
@@ -39143,7 +39854,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "armoured_containers",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -39154,7 +39871,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "barricade_and_fuel_pipes",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -39165,7 +39888,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "battlefield_debris_and_statuary",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -39176,7 +39905,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "crater_and_rubble",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -39187,7 +39922,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "debris_and_statuary",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -39198,7 +39939,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "hills",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -39209,7 +39956,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "hills_and_sealed_buildings",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -39220,7 +39973,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "industrial_structures",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -39243,7 +40002,8 @@
                             "FLY",
                             "IMPERIUM_PRIMARCH",
                             "INFANTRY",
-                            "MONSTER"
+                            "MONSTER",
+                            "SWARM"
                           ]
                         },
                         {
@@ -39255,7 +40015,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "sealed_buildings",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -39266,7 +40032,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "woods",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         }
                       ],
                       "fly_traversal_mode": "air_path",
@@ -39529,7 +40301,7 @@
                           "fight"
                         ],
                         "game_id": "phase18l-contract-persistence",
-                        "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                        "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                         "setup_sequence": [
                           "muster_armies",
                           "select_mission",
@@ -39677,7 +40449,7 @@
                   "reserve_states": [],
                   "return_on_death_consumed_keys": [],
                   "rules_overlay_ids": [],
-                  "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                  "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                   "scoring_window_states": [],
                   "secondary_mission_card_states": [],
                   "secondary_mission_choices": [],
@@ -39752,8 +40524,17 @@
                   "generic:rule-ir"
                 ],
                 "ability_index_record_ids_by_player_id": {
-                  "player-a": [],
-                  "player-b": []
+                  "player-a": [
+                    "gw-11e-core-abilities:core:core-scouts",
+                    "gw-11e-core-abilities:datasheet:core-deep-strike",
+                    "gw-11e-core-abilities:keyword:keyword-infantry",
+                    "gw-11e-core-abilities:keyword:keyword-monster",
+                    "gw-11e-core-abilities:keyword:keyword-vehicle"
+                  ],
+                  "player-b": [
+                    "gw-11e-core-abilities:core:core-scouts",
+                    "gw-11e-core-abilities:keyword:keyword-infantry"
+                  ]
                 },
                 "activation": {
                   "activation_hash": "997d5e97b90e60eb5bc4a293d3f1924155233530de2f13a1823cc8577472f920",
@@ -39825,7 +40606,7 @@
                 "battle_shock_hook_ids": [
                   "catalog-ir:selected-target-test-roll-modifier"
                 ],
-                "bundle_summary_hash": "a520b71738b8519718bd33a0b6767406babbe36ddc5b65226563aa282c504831",
+                "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
                 "charge_declaration_hook_ids": [],
                 "charge_roll_modifier_ids": [],
                 "charge_target_restriction_hook_ids": [],
@@ -39848,7 +40629,8 @@
                   "core-stratagem:crushing_impact_enemy:mortal-wound-continuation",
                   "core-stratagem:crushing_impact_self:mortal-wound-continuation",
                   "core-stratagem:explosives:mortal-wound-continuation",
-                  "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation"
+                  "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation",
+                  "core:desperate-escape:hazard-mortals"
                 ],
                 "move_completion_rule_hook_ids": [
                   "core-move-ability:super-heavy-walker:completion",
@@ -42176,7 +42958,7 @@
                 "reserve_states": [],
                 "return_on_death_consumed_keys": [],
                 "rules_overlay_ids": [],
-                "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                 "scoring_window_states": [],
                 "secondary_mission_card_states": [],
                 "secondary_mission_choices": [],
@@ -42258,7 +43040,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "b6c4393de556e73bc66bf2148e656111216911d8a258e0d58898b16be5b40140",
+            "lifecycle_hash": "825b9ffe88a0846f986372e2a8ba14c12eb529e8cd699d5ff220877942468d2b",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -43894,7 +44676,7 @@
                       "required_neighbors_large_unit": null,
                       "required_neighbors_small_unit": 1
                     },
-                    "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                    "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                     "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                     "engagement_policy": {
                       "horizontal_inches": 2.0,
@@ -44070,7 +44852,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "armoured_containers",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -44081,7 +44869,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "barricade_and_fuel_pipes",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -44092,7 +44886,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "battlefield_debris_and_statuary",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -44103,7 +44903,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "crater_and_rubble",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -44114,7 +44920,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "debris_and_statuary",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -44125,7 +44937,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "hills",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -44136,7 +44954,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "hills_and_sealed_buildings",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -44147,7 +44971,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "industrial_structures",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -44170,7 +45000,8 @@
                             "FLY",
                             "IMPERIUM_PRIMARCH",
                             "INFANTRY",
-                            "MONSTER"
+                            "MONSTER",
+                            "SWARM"
                           ]
                         },
                         {
@@ -44182,7 +45013,13 @@
                           "no_overhang_required": true,
                           "terrain_feature_kind": "sealed_buildings",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         },
                         {
                           "can_move_over": true,
@@ -44193,7 +45030,13 @@
                           "no_overhang_required": false,
                           "terrain_feature_kind": "woods",
                           "through_terrain_allowed_keywords": [],
-                          "upper_floor_allowed_keywords": []
+                          "upper_floor_allowed_keywords": [
+                            "BEAST",
+                            "FLY",
+                            "INFANTRY",
+                            "MONSTER",
+                            "SWARM"
+                          ]
                         }
                       ],
                       "fly_traversal_mode": "air_path",
@@ -44456,7 +45299,7 @@
                           "fight"
                         ],
                         "game_id": "phase18l-contract-persistence",
-                        "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                        "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                         "setup_sequence": [
                           "muster_armies",
                           "select_mission",
@@ -46360,7 +47203,7 @@
                         "required_neighbors_large_unit": null,
                         "required_neighbors_small_unit": 1
                       },
-                      "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                      "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                       "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
                       "engagement_policy": {
                         "horizontal_inches": 2.0,
@@ -46536,7 +47379,13 @@
                             "no_overhang_required": true,
                             "terrain_feature_kind": "armoured_containers",
                             "through_terrain_allowed_keywords": [],
-                            "upper_floor_allowed_keywords": []
+                            "upper_floor_allowed_keywords": [
+                              "BEAST",
+                              "FLY",
+                              "INFANTRY",
+                              "MONSTER",
+                              "SWARM"
+                            ]
                           },
                           {
                             "can_move_over": true,
@@ -46547,7 +47396,13 @@
                             "no_overhang_required": false,
                             "terrain_feature_kind": "barricade_and_fuel_pipes",
                             "through_terrain_allowed_keywords": [],
-                            "upper_floor_allowed_keywords": []
+                            "upper_floor_allowed_keywords": [
+                              "BEAST",
+                              "FLY",
+                              "INFANTRY",
+                              "MONSTER",
+                              "SWARM"
+                            ]
                           },
                           {
                             "can_move_over": true,
@@ -46558,7 +47413,13 @@
                             "no_overhang_required": false,
                             "terrain_feature_kind": "battlefield_debris_and_statuary",
                             "through_terrain_allowed_keywords": [],
-                            "upper_floor_allowed_keywords": []
+                            "upper_floor_allowed_keywords": [
+                              "BEAST",
+                              "FLY",
+                              "INFANTRY",
+                              "MONSTER",
+                              "SWARM"
+                            ]
                           },
                           {
                             "can_move_over": true,
@@ -46569,7 +47430,13 @@
                             "no_overhang_required": false,
                             "terrain_feature_kind": "crater_and_rubble",
                             "through_terrain_allowed_keywords": [],
-                            "upper_floor_allowed_keywords": []
+                            "upper_floor_allowed_keywords": [
+                              "BEAST",
+                              "FLY",
+                              "INFANTRY",
+                              "MONSTER",
+                              "SWARM"
+                            ]
                           },
                           {
                             "can_move_over": true,
@@ -46580,7 +47447,13 @@
                             "no_overhang_required": false,
                             "terrain_feature_kind": "debris_and_statuary",
                             "through_terrain_allowed_keywords": [],
-                            "upper_floor_allowed_keywords": []
+                            "upper_floor_allowed_keywords": [
+                              "BEAST",
+                              "FLY",
+                              "INFANTRY",
+                              "MONSTER",
+                              "SWARM"
+                            ]
                           },
                           {
                             "can_move_over": true,
@@ -46591,7 +47464,13 @@
                             "no_overhang_required": true,
                             "terrain_feature_kind": "hills",
                             "through_terrain_allowed_keywords": [],
-                            "upper_floor_allowed_keywords": []
+                            "upper_floor_allowed_keywords": [
+                              "BEAST",
+                              "FLY",
+                              "INFANTRY",
+                              "MONSTER",
+                              "SWARM"
+                            ]
                           },
                           {
                             "can_move_over": true,
@@ -46602,7 +47481,13 @@
                             "no_overhang_required": true,
                             "terrain_feature_kind": "hills_and_sealed_buildings",
                             "through_terrain_allowed_keywords": [],
-                            "upper_floor_allowed_keywords": []
+                            "upper_floor_allowed_keywords": [
+                              "BEAST",
+                              "FLY",
+                              "INFANTRY",
+                              "MONSTER",
+                              "SWARM"
+                            ]
                           },
                           {
                             "can_move_over": true,
@@ -46613,7 +47498,13 @@
                             "no_overhang_required": true,
                             "terrain_feature_kind": "industrial_structures",
                             "through_terrain_allowed_keywords": [],
-                            "upper_floor_allowed_keywords": []
+                            "upper_floor_allowed_keywords": [
+                              "BEAST",
+                              "FLY",
+                              "INFANTRY",
+                              "MONSTER",
+                              "SWARM"
+                            ]
                           },
                           {
                             "can_move_over": true,
@@ -46636,7 +47527,8 @@
                               "FLY",
                               "IMPERIUM_PRIMARCH",
                               "INFANTRY",
-                              "MONSTER"
+                              "MONSTER",
+                              "SWARM"
                             ]
                           },
                           {
@@ -46648,7 +47540,13 @@
                             "no_overhang_required": true,
                             "terrain_feature_kind": "sealed_buildings",
                             "through_terrain_allowed_keywords": [],
-                            "upper_floor_allowed_keywords": []
+                            "upper_floor_allowed_keywords": [
+                              "BEAST",
+                              "FLY",
+                              "INFANTRY",
+                              "MONSTER",
+                              "SWARM"
+                            ]
                           },
                           {
                             "can_move_over": true,
@@ -46659,7 +47557,13 @@
                             "no_overhang_required": false,
                             "terrain_feature_kind": "woods",
                             "through_terrain_allowed_keywords": [],
-                            "upper_floor_allowed_keywords": []
+                            "upper_floor_allowed_keywords": [
+                              "BEAST",
+                              "FLY",
+                              "INFANTRY",
+                              "MONSTER",
+                              "SWARM"
+                            ]
                           }
                         ],
                         "fly_traversal_mode": "air_path",
@@ -46922,7 +47826,7 @@
                             "fight"
                           ],
                           "game_id": "phase18l-contract-persistence",
-                          "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                          "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                           "setup_sequence": [
                             "muster_armies",
                             "select_mission",
@@ -47070,7 +47974,7 @@
                     "reserve_states": [],
                     "return_on_death_consumed_keys": [],
                     "rules_overlay_ids": [],
-                    "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                    "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                     "scoring_window_states": [],
                     "secondary_mission_card_states": [],
                     "secondary_mission_choices": [],
@@ -47145,8 +48049,17 @@
                     "generic:rule-ir"
                   ],
                   "ability_index_record_ids_by_player_id": {
-                    "player-a": [],
-                    "player-b": []
+                    "player-a": [
+                      "gw-11e-core-abilities:core:core-scouts",
+                      "gw-11e-core-abilities:datasheet:core-deep-strike",
+                      "gw-11e-core-abilities:keyword:keyword-infantry",
+                      "gw-11e-core-abilities:keyword:keyword-monster",
+                      "gw-11e-core-abilities:keyword:keyword-vehicle"
+                    ],
+                    "player-b": [
+                      "gw-11e-core-abilities:core:core-scouts",
+                      "gw-11e-core-abilities:keyword:keyword-infantry"
+                    ]
                   },
                   "activation": {
                     "activation_hash": "997d5e97b90e60eb5bc4a293d3f1924155233530de2f13a1823cc8577472f920",
@@ -47218,7 +48131,7 @@
                   "battle_shock_hook_ids": [
                     "catalog-ir:selected-target-test-roll-modifier"
                   ],
-                  "bundle_summary_hash": "a520b71738b8519718bd33a0b6767406babbe36ddc5b65226563aa282c504831",
+                  "bundle_summary_hash": "ff5906c568b2038d8e32e04b2f3b664105c513a68cf25606f169da6506364219",
                   "charge_declaration_hook_ids": [],
                   "charge_roll_modifier_ids": [],
                   "charge_target_restriction_hook_ids": [],
@@ -47241,7 +48154,8 @@
                     "core-stratagem:crushing_impact_enemy:mortal-wound-continuation",
                     "core-stratagem:crushing_impact_self:mortal-wound-continuation",
                     "core-stratagem:explosives:mortal-wound-continuation",
-                    "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation"
+                    "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation",
+                    "core:desperate-escape:hazard-mortals"
                   ],
                   "move_completion_rule_hook_ids": [
                     "core-move-ability:super-heavy-walker:completion",
@@ -49569,7 +50483,7 @@
                   "reserve_states": [],
                   "return_on_death_consumed_keys": [],
                   "rules_overlay_ids": [],
-                  "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                  "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                   "scoring_window_states": [],
                   "secondary_mission_card_states": [],
                   "secondary_mission_choices": [],
@@ -49654,7 +50568,7 @@
               "initial_rng_state": {
                 "draw_count": 0,
                 "history": [
-                  "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}",
+                  "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}",
                   "{\"event_id\":\"event-000002\",\"event_type\":\"army_mustered\",\"payload\":{\"army_id\":\"army-alpha\",\"game_id\":\"phase18l-contract-persistence\",\"player_id\":\"player-a\",\"roster_legality_report\":{\"battle_size\":\"strike_force\",\"is_legal\":false,\"violations\":[{\"message\":\"Roster requires one selected Warlord.\",\"source_id\":\"gw-11e-core-roster-models:warlord\",\"unit_selection_id\":null,\"violation_code\":\"missing_warlord_selection\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"deep-strike-unit\",\"violation_code\":\"source_awaiting_unit_points\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"scout-redeploy-unit\",\"violation_code\":\"source_awaiting_unit_points\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"strategic-reserve-unit\",\"violation_code\":\"source_awaiting_unit_points\"}]},\"setup_step\":\"muster_armies\",\"starting_attached_unit_records\":[],\"unit_count\":3}}",
                   "{\"event_id\":\"event-000003\",\"event_type\":\"army_mustered\",\"payload\":{\"army_id\":\"army-beta\",\"game_id\":\"phase18l-contract-persistence\",\"player_id\":\"player-b\",\"roster_legality_report\":{\"battle_size\":\"strike_force\",\"is_legal\":false,\"violations\":[{\"message\":\"Roster requires one selected Warlord.\",\"source_id\":\"gw-11e-core-roster-models:warlord\",\"unit_selection_id\":null,\"violation_code\":\"missing_warlord_selection\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"scout-redeploy-unit\",\"violation_code\":\"source_awaiting_unit_points\"}]},\"setup_step\":\"muster_armies\",\"starting_attached_unit_records\":[],\"unit_count\":1}}",
                   "{\"event_id\":\"event-000004\",\"event_type\":\"setup_step_completed\",\"payload\":{\"active_player_id\":null,\"battle_phase\":null,\"battle_round\":0,\"game_id\":\"phase18l-contract-persistence\",\"next_setup_step\":\"select_mission\",\"stage\":\"setup\",\"step\":\"muster_armies\"}}",
@@ -49672,12 +50586,12 @@
               "source_identity": {
                 "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
                 "catalog_id": "phase9a-canonical",
-                "game_config_hash": "3014c0f67d777f8d28d37feb22e64b19c313f90e1f02c47a2716d047661c1ce9",
+                "game_config_hash": "d652933853a26f123ef8da01c97a9022dbd093178dc36fae5951b185ec371125",
                 "game_id": "phase18l-contract-persistence",
                 "mission_pack_id": "11e-warhammer-event-companion-2026-07",
                 "mission_source_package_hash": "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5",
                 "rules_overlay_ids": [],
-                "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+                "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
                 "source_ids": [
                   "catalog:phase9a-canonical"
                 ],
@@ -49687,7 +50601,7 @@
             "rng_state": {
               "draw_count": 0,
               "history": [
-                "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}",
+                "{\"event_id\":\"event-000001\",\"event_type\":\"lifecycle_started\",\"payload\":{\"battle_phase_sequence\":[\"command\",\"movement\",\"shooting\",\"charge\",\"fight\"],\"game_id\":\"phase18l-contract-persistence\",\"ruleset_descriptor_hash\":\"fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d\",\"setup_sequence\":[\"muster_armies\",\"select_mission\",\"create_battlefield\",\"determine_attacker_defender\",\"select_secondary_missions\",\"declare_battle_formations\",\"deploy_armies\",\"redeploy_units\",\"determine_first_turn\",\"resolve_prebattle_actions\"]}}",
                 "{\"event_id\":\"event-000002\",\"event_type\":\"army_mustered\",\"payload\":{\"army_id\":\"army-alpha\",\"game_id\":\"phase18l-contract-persistence\",\"player_id\":\"player-a\",\"roster_legality_report\":{\"battle_size\":\"strike_force\",\"is_legal\":false,\"violations\":[{\"message\":\"Roster requires one selected Warlord.\",\"source_id\":\"gw-11e-core-roster-models:warlord\",\"unit_selection_id\":null,\"violation_code\":\"missing_warlord_selection\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"deep-strike-unit\",\"violation_code\":\"source_awaiting_unit_points\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"scout-redeploy-unit\",\"violation_code\":\"source_awaiting_unit_points\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"strategic-reserve-unit\",\"violation_code\":\"source_awaiting_unit_points\"}]},\"setup_step\":\"muster_armies\",\"starting_attached_unit_records\":[],\"unit_count\":3}}",
                 "{\"event_id\":\"event-000003\",\"event_type\":\"army_mustered\",\"payload\":{\"army_id\":\"army-beta\",\"game_id\":\"phase18l-contract-persistence\",\"player_id\":\"player-b\",\"roster_legality_report\":{\"battle_size\":\"strike_force\",\"is_legal\":false,\"violations\":[{\"message\":\"Roster requires one selected Warlord.\",\"source_id\":\"gw-11e-core-roster-models:warlord\",\"unit_selection_id\":null,\"violation_code\":\"missing_warlord_selection\"},{\"message\":\"Roster path requires source-backed unit points.\",\"source_id\":\"phase16d:unit-points\",\"unit_selection_id\":\"scout-redeploy-unit\",\"violation_code\":\"source_awaiting_unit_points\"}]},\"setup_step\":\"muster_armies\",\"starting_attached_unit_records\":[],\"unit_count\":1}}",
                 "{\"event_id\":\"event-000004\",\"event_type\":\"setup_step_completed\",\"payload\":{\"active_player_id\":null,\"battle_phase\":null,\"battle_round\":0,\"game_id\":\"phase18l-contract-persistence\",\"next_setup_step\":\"select_mission\",\"stage\":\"setup\",\"step\":\"muster_armies\"}}",
@@ -49700,17 +50614,17 @@
               ],
               "seed": "phase18l-contract-persistence"
             },
-            "rng_state_hash": "4556ffbbb2f3f7973c083e5dc22c1920ae63c7778d77ffdbd409247d8b3ffe40",
+            "rng_state_hash": "59ef282684971d0896cd909790e5849293560860d26379dfaefe64085f54e5d9",
             "schema_version": "local-game-session-persistence-v1",
             "source_identity": {
               "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
               "catalog_id": "phase9a-canonical",
-              "game_config_hash": "3014c0f67d777f8d28d37feb22e64b19c313f90e1f02c47a2716d047661c1ce9",
+              "game_config_hash": "d652933853a26f123ef8da01c97a9022dbd093178dc36fae5951b185ec371125",
               "game_id": "phase18l-contract-persistence",
               "mission_pack_id": "11e-warhammer-event-companion-2026-07",
               "mission_source_package_hash": "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5",
               "rules_overlay_ids": [],
-              "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+              "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
               "source_ids": [
                 "catalog:phase9a-canonical"
               ],
@@ -49788,7 +50702,7 @@
         }
       ],
       "rules_overlay_ids": [],
-      "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+      "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
       "ruleset_id": {
         "edition": "11e",
         "game": "warhammer_40000",

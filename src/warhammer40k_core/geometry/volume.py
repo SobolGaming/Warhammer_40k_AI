@@ -7,7 +7,9 @@ from typing import NotRequired, Self, TypedDict
 from warhammer40k_core.geometry.base import (
     BaseShape,
     BaseShapePayload,
+    CircularBase,
     base_shape_from_payload,
+    bases_within_distance,
     validate_base_shape,
 )
 from warhammer40k_core.geometry.model_body import (
@@ -160,9 +162,44 @@ class Model:
                 for other_subject in other_model.rules_distance_subjects()
             )
         return (
-            self.base_distance_to(other_model) <= horizontal_limit
+            bases_within_distance(
+                self.base, self.pose, other_model.base, other_model.pose, horizontal_limit
+            )
             and self.volume.vertical_gap_to(self.pose, other_model.volume, other_model.pose)
             <= vertical_limit
+        )
+
+    def is_within_range(self, other: Model, inches: float) -> bool:
+        """Inclusive spatial range; preserve unrounded measurement scalars."""
+        other_model = _validate_model("other", other)
+        limit = _validate_non_negative_number("range inches", inches)
+        if self.measures_every_part or other_model.measures_every_part:
+            return any(
+                subject.is_within_range(other_subject, limit)
+                for subject in self.rules_distance_subjects()
+                for other_subject in other_model.rules_distance_subjects()
+            )
+        if type(self.base) is CircularBase and type(other_model.base) is CircularBase:
+            if self.pose.position.z == other_model.pose.position.z:
+                # Positive heights at the same elevation overlap exactly.
+                return bases_within_distance(
+                    self.base, self.pose, other_model.base, other_model.pose, limit
+                )
+            return _circular_volumes_within_range(
+                self.pose,
+                self.base.radius,
+                self.volume.height,
+                other_model.pose,
+                other_model.base.radius,
+                other_model.volume.height,
+                limit,
+            )
+        gap = self.volume.vertical_gap_to(self.pose, other_model.volume, other_model.pose)
+        if gap > limit:
+            return False
+        horizontal = math.sqrt(max(0.0, (limit - gap) * (limit + gap)))
+        return bases_within_distance(
+            self.base, self.pose, other_model.base, other_model.pose, horizontal
         )
 
     def to_payload(self) -> ModelPayload:
@@ -190,6 +227,53 @@ class Model:
             else (),
             measures_every_part=payload.get("measures_every_part", False),
         )
+
+
+def _circular_volumes_within_range(
+    first_pose: Pose,
+    first_radius: float,
+    first_height: float,
+    second_pose: Pose,
+    second_radius: float,
+    second_height: float,
+    inches: float,
+) -> bool:
+    """Exact inclusive distance between validated circular vertical prisms.
+
+    Scale binary inputs to a common power-of-two denominator. For disjoint
+    horizontal disks, S is squared center separation, R the summed radii and
+    V the exact vertical interval gap. The required inequality is
+    (sqrt(S) - R)**2 + V**2 <= L**2. After the overlap/sign guards, squaring
+    A = S + R**2 + V**2 - L**2 <= 2*R*sqrt(S) is equivalent and exact.
+    This is spatial range, not the separate cylindrical engagement predicate.
+    """
+    ratios = tuple(
+        value.as_integer_ratio()
+        for value in (
+            first_pose.position.x,
+            first_pose.position.y,
+            first_pose.position.z,
+            second_pose.position.x,
+            second_pose.position.y,
+            second_pose.position.z,
+            first_radius,
+            second_radius,
+            first_height,
+            second_height,
+            inches,
+        )
+    )
+    denominator = max(d for _, d in ratios)
+    ax, ay, az, bx, by, bz, ra, rb, ha, hb, limit = (n * (denominator // d) for n, d in ratios)
+    vertical = max(0, bz - az - ha, az - bz - hb)
+    if vertical > limit:
+        return False
+    squared_center = (ax - bx) ** 2 + (ay - by) ** 2
+    squared_radii = (ra + rb) ** 2
+    if squared_center <= squared_radii:
+        return True
+    residual = squared_center + squared_radii + vertical**2 - limit**2
+    return residual <= 0 or residual**2 <= 4 * squared_radii * squared_center
 
 
 def _validate_model_id(value: object) -> str:

@@ -1,0 +1,34 @@
+{
+  "semantic_policy": "Retain original finding and enabled assertions; record the established shared policy repair and native recovery resolution without whole-engine certification.",
+  "findings": [
+    {
+      "id": "SF08-001",
+      "title": "End-of-Command mission rules admitted alongside pending non-mission rules",
+      "source": "rule:08:08.05:1 blocks 1-3",
+      "consumer": "src/warhammer40k_core/engine/sequencing.py:SequencingConflictContext.sequence_exception_source_id,eligible_sequencing_participants",
+      "test": "tests/rules/section08/test_end_priority.py::test_command_end_exhausts_nonmission_rules_before_either_players_mission",
+      "case_count": 4,
+      "expected": "Both players exhaust non-mission rules before any mission rule is eligible.",
+      "observed": "The active player can select its mission participant while its non-mission participant remains pending.",
+      "scope": "Default production boundary/sequencer policy with constructed typed achieved occurrences, both active players and reversed incoming order. Native mission provider/formula is not certified.",
+      "disposition": "Resolved by bounded source-backed shared repair on 2026-10-20; fresh independent review required.",
+      "resolution": {
+        "status": "resolved in bounded candidate; fresh independent review required",
+        "date_utc": "2026-10-20",
+        "invariant": "At Command END_PHASE all non-mission rules of both players precede every mission rule. Other phase/start priorities retain their existing source policy.",
+        "before": "Exactly four original variants reproduce premature active mission offering at the shared builder. Native loaded Tormentors rules already finish before actual Command mission scoring; no premature native VP was observed.",
+        "native_reachability": "Chapter Approved 2026-27 Immovable Object/Unstoppable Force and loaded Tormentors Objective Defiled coexist at round-two Command end. Discovery emits two sticky player candidates and no mission candidate. Mission scoring commits later during phase advancement. The constructed four-participant overlap is not the shape of this selected native boundary.",
+        "repair": "SequencingConflictContext derives retained rule:08:08.05:1 only for Command END_PHASE. Native non-mission sequencing is additionally admitted to the existing Primary pending family; full batch/source/queue/event authority remains enforced.",
+        "native_recovery_defect": "Pre-fix save/restore of the engine-generated sticky ordering request rejected resolve_sequencing_order under turn_end_faction_rule_required. Missing family admission is repaired at the shared validator.",
+        "original_four_cases": "All remain enabled with the original first-offer assertion and complete four-participant continuation; both active players and input orders pass.",
+        "native_test": "tests/rules/section08/test_end_priority.py::test_native_command_end_finishes_loaded_rules_before_actual_mission_scoring",
+        "native_outcome": "Two loaded sticky mutations precede one actual active-player transaction: owner 5 VP, opponent 4 VP; other player 0 VP. Live/restored/fork/clean branches and 16 exact replays agree across four native variants.",
+        "negative_controls": "Wrong owner, stale request, malformed payload, invented early mission option and expired phase reject before whole-lifecycle mutation. Direct domain validation rejects wrong family and missing provenance. Legal continuation succeeds afterward.",
+        "qualification": "Retained adopted source evidence only; no fresh App/GW observation or source recertification. Native provider admission is selected component execution with non-strict small rosters, a post-setup round-two checkpoint and open fixture terrain; no complete army/setup/full-game certificate.",
+        "evidence": "task-20/checkpoint/REPORT.txt and task-20/evidence: baseline-four-relocated, native-maintained-before2, native-pending-before.json, repaired-focused, scoped-final",
+        "prior_corpus": "3495 pass/4 SF08 fail and 55.90998592% combined coverage remain historical complete-corpus measurements of cc06a27c...3115. This bounded repair neither replaces that run nor establishes the global 85% gate."
+      }
+    }
+  ],
+  "prior_six_groups": "Unchanged and outside Section08."
+}

@@ -527,19 +527,13 @@ class ShootingPhaseState:
                 raise GameLifecycleError("Shooting declaration attack_sequence pool drift.")
             if attack_sequence.attacking_unit_instance_id != self.active_selection.unit_instance_id:
                 raise GameLifecycleError("Shooting declaration attack_sequence unit drift.")
-        completed_unit_id = self.active_selection.unit_instance_id
-        shot_unit_ids = (
-            tuple(sorted({*self.shot_unit_ids, completed_unit_id}))
-            if attack_pools
-            else self.shot_unit_ids
-        )
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=False,
             mission_action_opportunity_declined=self.mission_action_opportunity_declined,
             selected_unit_ids=self.selected_unit_ids,
-            shot_unit_ids=shot_unit_ids,
+            shot_unit_ids=self.shot_unit_ids,
             skipped_unit_ids=self.skipped_unit_ids,
             active_selection=None,
             selected_shooting_type=None,
@@ -559,13 +553,29 @@ class ShootingPhaseState:
             attack_completion_continuation,
         )
 
+        shot_unit_ids = self.shot_unit_ids
+        from warhammer40k_core.engine.model_attack_completion import all_attacks_resolved
+
+        if (
+            self.attack_sequence is not None
+            and self.attack_sequence.attack_pools
+            and (attack_sequence is None or all_attacks_resolved(attack_sequence))
+        ):
+            shot_unit_ids = tuple(
+                sorted(
+                    {
+                        *shot_unit_ids,
+                        self.attack_sequence.attacking_unit_instance_id,
+                    }
+                )
+            )
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=self.phase_complete,
             mission_action_opportunity_declined=self.mission_action_opportunity_declined,
             selected_unit_ids=self.selected_unit_ids,
-            shot_unit_ids=self.shot_unit_ids,
+            shot_unit_ids=shot_unit_ids,
             skipped_unit_ids=self.skipped_unit_ids,
             active_selection=self.active_selection,
             selected_shooting_type=self.selected_shooting_type,

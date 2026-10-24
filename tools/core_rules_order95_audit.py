@@ -12,7 +12,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from tools.core_rules_40k_app_audit import roadmap_rows
 from tools.core_rules_order84_capture import capture_literals, fingerprint, source_inventory
@@ -87,8 +87,9 @@ def load_audit(*, payload: object | None = None) -> dict[str, Any]:
             raise AuditError("Order 95 audit is unavailable or malformed.") from exc
     if not isinstance(payload, dict):
         raise AuditError("Order 95 audit must be an object.")
-    validate_audit(payload)
-    return payload
+    audit = cast(dict[str, Any], payload)
+    validate_audit(audit)
+    return audit
 
 
 def validate_audit(audit: dict[str, Any], *, root: Path = ROOT, roadmap: str | None = None) -> None:
@@ -160,7 +161,7 @@ def validate_audit(audit: dict[str, Any], *, root: Path = ROOT, roadmap: str | N
     for reference in references:
         validate_owner_reference(reference, root)
     document = (
-        (root / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text()
+        (root / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text(encoding="utf-8")
         if roadmap is None
         else roadmap
     )
@@ -187,9 +188,12 @@ def changelog_versions(html: str) -> list[dict[str, Any]]:
         value, _ = json.JSONDecoder().raw_decode(flight.split(marker, 1)[1])
     except ValueError as exc:
         raise AuditError("Order 95 changelog version data is malformed.") from exc
-    if not isinstance(value, list) or not all(isinstance(item, dict) for item in value):
+    if not isinstance(value, list):
         raise AuditError("Order 95 changelog versions must be objects.")
-    return value
+    items = cast(list[object], value)
+    if not all(isinstance(item, dict) for item in items):
+        raise AuditError("Order 95 changelog versions must be objects.")
+    return cast(list[dict[str, Any]], items)
 
 
 def verify_captures(

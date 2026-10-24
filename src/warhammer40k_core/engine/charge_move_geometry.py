@@ -12,10 +12,8 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.charge_movement_source import ChargePlacement
-from warhammer40k_core.engine.charge_rule_effects import (
-    unit_has_vehicle_or_monster_keyword,
-)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.movement_model_blockers import vehicle_monster_model_ids_for_player
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.physical_engagement import (
     physical_geometry_models_for_rules_unit,
@@ -101,22 +99,12 @@ def _friendly_vehicle_monster_model_ids(
     player_id: str,
     moving_model_instance_id: str,
 ) -> tuple[str, ...]:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    model_ids: list[str] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != requested_player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            unit = scenario.unit_instance_for_placement(unit_placement)
-            if not unit_has_vehicle_or_monster_keyword(unit.keywords):
-                continue
-            model_ids.extend(
-                placement.model_instance_id
-                for placement in unit_placement.model_placements
-                if placement.model_instance_id != moving_model_id
-            )
-    return tuple(sorted(model_ids))
+    return vehicle_monster_model_ids_for_player(
+        scenario=scenario,
+        player_id=player_id,
+        friendly=True,
+        moving_model_instance_id=moving_model_instance_id,
+    )
 
 
 def _closest_distance_between_model_groups(

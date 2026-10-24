@@ -15,6 +15,10 @@ from pathlib import Path
 from typing import Any, cast
 
 from tests.category_migration_preservation import MIGRATED_PATHS, verify_migrated_test
+from tests.support.faction_layout_preservation import (
+    ORIGINALS as FACTION_LAYOUT_ORIGINALS,
+)
+from tests.support.faction_layout_preservation import verify_layout_original
 
 from tools.core_rules_40k_app_audit import roadmap_rows
 from tools.core_rules_order84_capture import fingerprint, source_inventory
@@ -35,6 +39,9 @@ def _path(reference: str, root: Path) -> Path:
     if reference in MIGRATED_PATHS:
         _, migration = verify_migrated_test(root, reference)
         path = root / migration["archive"]
+    elif reference in FACTION_LAYOUT_ORIGINALS:
+        _, relocation = verify_layout_original(root, reference)
+        path = root / relocation["archive"]
     else:
         path = root / reference
     if Path(reference).is_absolute() or not path.resolve().is_relative_to(root.resolve()):

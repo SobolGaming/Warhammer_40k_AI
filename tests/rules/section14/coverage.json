@@ -1,0 +1,1045 @@
+{
+  "schema": "section14-clause-corpus-v1",
+  "source_authority": "Previously adopted retained maintained mirror, not a fresh official GW observation",
+  "category_hierarchy": {
+    "number": "14",
+    "title": "Objectives",
+    "subsections": [
+      {
+        "ref": "14.01",
+        "title": "Terrain Objectives",
+        "text": [
+          "If a mission uses \u0005objectives\u0006, it will state where they are located on the battlefield. Typically, your mission will have a deployment map showing several points where \u0005objectives\u0006 should be placed. The location of each point should coincide with a \u0005terrain area\u0006 (13.01); that \u0005terrain area\u0006 is the \u0005objective\u0006, and is called a \u0005terrain objective\u0006.",
+          "When measuring distances to and from an \u0005objective\u0006, measure to and from the closest part of it."
+        ],
+        "accordions": [
+          {
+            "ref": "14.01.01",
+            "title": "Objectives Not Within A Terrain Area",
+            "text": [
+              "If the location point of an \u0005objective\u0006 does not coincide with a \u0005terrain area\u0006, you must denote the location of that \u0005objective\u0006 with a flat, circular marker, 40 mm in diameter, centred on that point \u2013 this is called an\u0005objective marker\u0006. Models can move through \u0005objective markers\u0006 and they can end a move on top of \u0005objective markers\u0006.",
+              "A model is within range of an \u0005objective marker\u0006 while it is within 3\" horizontally and 5\" vertically of that \u0005objective marker\u0006. When measuring distances to and from an \u0005objective marker\u0006, measure to and from the closest part of it."
+            ]
+          }
+        ]
+      },
+      {
+        "ref": "14.02",
+        "title": "Level Of Control",
+        "text": [
+          "At the start of the battle, no \u0005objective\u0006 on the battlefield is controlled by either player. To gain control of an \u0005objective\u0006, a player will need one or more models with an \u0005OC\u0006 characteristic of 1 or more within range of it. A model is within range of a \u0005terrain objective\u0006 while it is within that \u0005terrain area\u0006.",
+          "At the end of each phase and turn, to determine a player\u2019s \u0005level of control\u0006 over an \u0005objective\u0006, add together the \u0005OC\u0006 characteristics of all the models in that player\u2019s army that are within range of that \u0005objective\u0006:",
+          "\u2022 The player who has the highest \u0005level of control\u0006 over that \u0005objective\u0006 controls that \u0005objective\u0006.",
+          "\u2022 If both players have the same \u0005level of control\u0006 over that \u0005objective\u0006, unless that \u0005objective\u0006 is \u0005secured\u0006 (14.03), that \u0005objective\u0006 is not controlled by either player.",
+          "While one or more units from a player\u2019s army are within range of an \u0005objective\u0006 that player controls, for each of those units that contains one or more models with an \u0005OC\u0006 characteristic of 1 or more, that unit is said to be controlling that \u0005objective\u0006."
+        ],
+        "accordions": [
+          {
+            "ref": "14.02.01",
+            "title": "Controlling an Objective at the End of a Phase",
+            "text": [
+              "At the end of each phase and turn, the first thing players do (before any other 'at the end of the phase/end of the turn' rules or abilities) is determine which \u0005objectives\u0006 are controlled by which player."
+            ]
+          }
+        ]
+      },
+      {
+        "ref": "14.03",
+        "title": "Secured Objectives",
+        "text": [
+          "Some rules allow an \u0005objective\u0006 to be \u0005secured\u0006 by a player\u2019s army. When an \u0005objective\u0006 is \u0005secured\u0006 by a player\u2019s army, that \u0005objective\u0006 remains under their control \u2013 even once they no longer have any units within range of it \u2013 until their opponent\u2019s \u0005level of control\u0006 over that \u0005objective\u0006 is greater than theirs at the end of a phase.",
+          "\u000eControlling a Terrain Objective",
+          "\u0003Vehicle\u0004 \u0005\u0007A\b\u0006 has an \u0005\u0007OC\b\u0006 characteristic of 3, and it is within the \u0005\u0007terrain area\b\u0006.",
+          "\u0003Vehicle\u0004 \u0005\u0007B\b\u0006 has an \u0005\u0007OC\b\u0006 characteristic of 2, and it is wholly within the \u0005\u0007terrain area\b\u0006.",
+          "The models in unit \u0005\u0007C\b\u0006 each have an \u0005\u0007OC\b\u0006 characteristic of 1. Six of its models are within the \u0005\u0007terrain area\b\u0006.",
+          "Unit \u0005\u0007D\b\u0006 is currently \u0005\u0007battle-shocked\b\u0006, so the \u0005\u0007OC\b\u0006 characteristic of all of its models is \u2018-\u2019.",
+          "Both players add together the \u0005\u0007OC\b\u0006 characteristics of all their models that are within the \u0005\u0007terrain area\b\u0006. The BLUE player\u2019s \u0005\u0007level of control\b\u0006 is 5, and the RED player\u2019s \u0005\u0007level of control\b\u0006 is 6. The RED player therefore controls the \u0005\u0007objective\b\u0006."
+        ]
+      }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "rule:14:14.01:1",
+      "source_sha256": "0921728684a4a9985d553fad2aa61fe6c8c26c5122f9eda6f13de4b2eab06103",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "4d0b64c1e3e6d352e325bfc465aa988af7003d26b9c372956b79778f0048c0cc",
+          "value": "If a mission uses \u0005objectives\u0006, it will state where they are located on the battlefield. Typically, your mission will have a deployment map showing several points where \u0005objectives\u0006 should be placed. The location of each point should coincide with a \u0005terrain area\u0006 (13.01); that \u0005terrain area\u0006 is the \u0005objective\u0006, and is called a \u0005terrain objective\u0006."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "8feed21db6c375bc8acb7788c1de59e311824bbbc19ee7cae8430a646fa43f2b",
+          "value": "When measuring distances to and from an \u0005objective\u0006, measure to and from the closest part of it."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "14.01-04",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "Terrain scalar closest distance uses one physical part and reaches actual endpoint evidence.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_scalar.py::test_physical_distance_reaches_objective_endpoint_evidence",
+              "function_ast_sha256": "9a1ce072bc93494230a5df7e547d636265a48b4361d2147f1315df024c10c341",
+              "assertions": [
+                "assert path.validate().is_valid",
+                "assert terrain.validate().is_valid",
+                "assert rejection is None",
+                "assert row['range_status'] == 'satisfied'",
+                "assert row['distance_before_inches'] == 3.5",
+                "assert row['distance_after_inches'] == 3.25"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.01-07",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Mission location points on terrain resolve to the complete area; unmatched points retain markers.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_range.py::test_sources_resolve_point_on_terrain_and_keep_unmatched_forty_mm_marker",
+              "function_ast_sha256": "628ff6bb584b931574d3887965d78c819aeafc0fe6101ee49de34c0b4cb32deb",
+              "assertions": [
+                "assert markers == (outside,)",
+                "assert not linked",
+                "assert objectives == (Objective.terrain('inside', 'Inside', terrain.feature_id),)",
+                "assert markers[0].x_inches == outside.x_inches",
+                "assert markers[0].y_inches == outside.y_inches",
+                "assert markers[0].marker_diameter_mm == 40"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.01-08",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "Closest-part distances preserve boundaries, concavity and separate parts.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_range.py::test_terrain_concavity_and_separate_area_parts_do_not_fill_their_gap",
+              "function_ast_sha256": "1350cd621731f417990c137d4dc17956d3ea16777850959e122e28310a03e057",
+              "assertions": [
+                "assert not measure_model_to_objective(model=model, objective=terrain).within_control_range",
+                "assert not measure_model_to_objective(model=replace(model, pose=Pose.at(6, 3)), objective=terrain).within_control_range",
+                "assert measure_model_to_objective(model=replace(model, pose=Pose.at(8, 3, 12)), objective=terrain).within_control_range"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:14:14.01.01:1",
+      "source_sha256": "df740a4cf6fb3f6cbd4d3b0404b3a610e41c7303ac99b185e3c9b0bfc2034f5b",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "787272fe88c5fb976ae8434d4738fdbc94974745b49867bb6ecbd3a4a21698da",
+          "value": "If the location point of an \u0005objective\u0006 does not coincide with a \u0005terrain area\u0006, you must denote the location of that \u0005objective\u0006 with a flat, circular marker, 40 mm in diameter, centred on that point \u2013 this is called an\u0005objective marker\u0006. Models can move through \u0005objective markers\u0006 and they can end a move on top of \u0005objective markers\u0006."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "f70d890ffb2cd51a91c34f23388f0291e4e67f9a41414056b704ba113009c192",
+          "value": "A model is within range of an \u0005objective marker\u0006 while it is within 3\" horizontally and 5\" vertically of that \u0005objective marker\u0006. When measuring distances to and from an \u0005objective marker\u0006, measure to and from the closest part of it."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "14.01.01-01",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "The explicit user convention requires one physical point to satisfy both marker axes.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_marker_axes.py::test_user_convention_does_not_borrow_marker_axes_from_different_parts",
+              "function_ast_sha256": "7df15f54b0dbf526230f3b5c54a63e2f9d8032e3af4acf775be725869590da7a",
+              "assertions": [
+                "assert not geometric.within_axis_limits(3, 5)",
+                "assert not objective_goal(objective).contains(model)",
+                "assert measured.horizontal_distance_inches == 0",
+                "assert measured.vertical_gap_inches == 0",
+                "assert math.isclose(measured.closest_distance_inches, 5 - 0.5 - marker.marker_diameter_inches / 2, abs_tol=1e-12)",
+                "assert not measured.within_control_range"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.01.01-02",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "The adopted point predicate reaches actual control scoring, preserving native IDs/base/height with a labelled constructed FRAME supplement.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_marker_axes.py::test_declared_frame_point_policy_reaches_actual_control_scoring",
+              "function_ast_sha256": "0c32e1113e4c7a09a2f6d1ab85f077f9a56801a959a7d90e18a419a1121921d3",
+              "assertions": [
+                "assert physical.model_instance_id == original.model_instance_id",
+                "assert physical.base_size == original.base_size",
+                "assert replace(physical.geometry, body_parts=()) == original.geometry",
+                "assert bool(owned) is expected",
+                "assert result.controlled_by_player_id == ('owner' if expected else None)",
+                "assert sum((s.score for s in result.scores if s.player_id == 'owner')) == (original.characteristic(Characteristic.OBJECTIVE_CONTROL).final if expected else 0)",
+                "assert state.to_payload() == before",
+                "assert len(owned) == 1",
+                "assert owned[0].model_instance_id == original.model_instance_id",
+                "assert owned[0].unit_instance_id == unit.unit_instance_id"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.01.01-03",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "Scalar closest distance uses one physical part, separately from unresolved compound marker-axis membership.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_scalar.py::test_marker_closest_distance_does_not_combine_different_parts",
+              "function_ast_sha256": "d750656988551619f39dbadee26c81c27dc03e14b804576c732544f3388e21fe",
+              "assertions": [
+                "assert result.horizontal_distance_inches == 0",
+                "assert result.vertical_gap_inches == 0",
+                "assert math.isclose(result.closest_distance_inches, expected, rel_tol=0, abs_tol=1e-12)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.01.01-09",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Flat40mm circular markers remain centred and nonblocking.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_range.py::test_sources_resolve_point_on_terrain_and_keep_unmatched_forty_mm_marker",
+              "function_ast_sha256": "628ff6bb584b931574d3887965d78c819aeafc0fe6101ee49de34c0b4cb32deb",
+              "assertions": [
+                "assert markers == (outside,)",
+                "assert not linked",
+                "assert objectives == (Objective.terrain('inside', 'Inside', terrain.feature_id),)",
+                "assert markers[0].x_inches == outside.x_inches",
+                "assert markers[0].y_inches == outside.y_inches",
+                "assert markers[0].marker_diameter_mm == 40"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.01.01-10",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Native witnessed movement may traverse and end on a marker, with rejected attempt and retry.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_boundaries.py::test_native_marker_movement_accepts_crossing_and_on_top_after_invalid_retry",
+              "function_ast_sha256": "4e5c5ad3031ad3d80a3c9dfa6d453a51f4c83aa15a157811da5b6dfe0da49738",
+              "assertions": [
+                "assert state.mission_setup is not None",
+                "assert session.lifecycle.to_payload() == before",
+                "assert rejected.status_kind is LifecycleStatusKind.INVALID",
+                "assert retry.request_id != request.request_id",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements[0].pose == Pose.at(marker.x_inches - 2, marker.y_inches)",
+                "assert accepted.status_kind is not LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements[0].pose == Pose.at(marker.x_inches + endpoint_offset, marker.y_inches)",
+                "assert result.controlled_by_player_id == 'owner'",
+                "assert {c.model_instance_id for c in result.contributors} == set(unit.own_model_ids())",
+                "assert sum((e.event_type == 'movement_activation_completed' for e in session.lifecycle.decision_controller.event_log.records)) == 1",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.view(viewer_player_id='opponent')"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.01.01-11",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "Markers use inclusive nearest-edge3horizontal/5vertical limits.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_range.py::test_marker_horizontal_range_measures_closest_edges_inclusively",
+              "function_ast_sha256": "2789b19b2fd28a914d1832e8077de8c3fee18418f59fd9d062b33aeaf269bdbb",
+              "assertions": [
+                "assert (result.controlled_by_player_id == 'owner') is expected",
+                "assert marker.marker_diameter_mm == 40",
+                "assert marker.is_flat",
+                "assert not marker.blocks_movement",
+                "assert not marker.blocks_placement",
+                "assert math.isclose(result.contributors[0].horizontal_distance_inches, 3, rel_tol=0, abs_tol=1e-12)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.01.01-12",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "Marker five-inch vertical restriction survives terrain repair.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_range.py::test_fallback_marker_keeps_five_inch_vertical_limit",
+              "function_ast_sha256": "f0ecf358e20e64e7d99de683b92e0024158049aca16ee07f780d0fcb4dd8777e",
+              "assertions": [
+                "assert (result.results[0].controlled_by_player_id == 'owner') is expected"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:14:14.02:1",
+      "source_sha256": "fb293871a67b148d02932262508d7e6ae93d0d92a8e8573a14b2fa96021976dc",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "913f73b02e5fbdd64859fa8c7dce459135569c04304158fc20f9a956025e374c",
+          "value": "At the start of the battle, no \u0005objective\u0006 on the battlefield is controlled by either player. To gain control of an \u0005objective\u0006, a player will need one or more models with an \u0005OC\u0006 characteristic of 1 or more within range of it. A model is within range of a \u0005terrain objective\u0006 while it is within that \u0005terrain area\u0006."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "abb6307c37a6f7c43f5b470f2ef27494db3ddc10e40c6b4ba0c9ee396cdf787c",
+          "value": "At the end of each phase and turn, to determine a player\u2019s \u0005level of control\u0006 over an \u0005objective\u0006, add together the \u0005OC\u0006 characteristics of all the models in that player\u2019s army that are within range of that \u0005objective\u0006:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "b82c6f64503dccc74ae49e3b7311895fbf6fe1ba86ee58726a475074f2231da6",
+          "value": "\u2022 The player who has the highest \u0005level of control\u0006 over that \u0005objective\u0006 controls that \u0005objective\u0006."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "c7d40a5e75028e56a80b0038a5ee6fde8a36809d1e7638580092e0607d3844e4",
+          "value": "\u2022 If both players have the same \u0005level of control\u0006 over that \u0005objective\u0006, unless that \u0005objective\u0006 is \u0005secured\u0006 (14.03), that \u0005objective\u0006 is not controlled by either player."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "4c3d540e50f1fd2bd65a964a51ec9eb055a0f4ad8949b016137aa03da1d06801",
+          "value": "While one or more units from a player\u2019s army are within range of an \u0005objective\u0006 that player controls, for each of those units that contains one or more models with an \u0005OC\u0006 characteristic of 1 or more, that unit is said to be controlling that \u0005objective\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "14.02-05",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Terrain range agrees through mandatory movement goals and witnessed supported endpoints.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_goals.py::test_terrain_goal_has_a_validated_upper_floor_witness_and_keeps_finite_polygon_guard",
+              "function_ast_sha256": "91ff48ddcce9cc3d0acdff72831dc8ff201de986c21fbb14ca6e433dae84b022",
+              "assertions": [
+                "assert query.path_context.validate().is_valid",
+                "assert query.terrain_context.validate().is_valid",
+                "assert result.status is MovementReachabilityStatus.REACHABLE",
+                "assert result.witness is not None",
+                "assert not MovementGoal(polygons=terrain.footprint_polygons, vertical_inches=5).contains(model)",
+                "assert goal.distance_lower_bound(model) == 0",
+                "assert MovementGoal(polygons=terrain.footprint_polygons, vertical_inches=5).distance_lower_bound(model) == 7"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.02-13",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "No initial controller; positive native OC establishes player control; empty and tied cases do not.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_control.py::test_native_player_scores_gain_and_tie",
+              "function_ast_sha256": "984f7811a43391fcbead7960a26eefbc5591d35d5c82d2218f90ea5a85b31563",
+              "assertions": [
+                "assert state.objective_control_records == []",
+                "assert result.controlled_by_player_id == expected",
+                "assert ObjectiveControlRecord.from_payload(json.loads(json.dumps(record.to_payload()))) == record",
+                "assert state.to_payload() == before",
+                "assert result.status is ObjectiveControlStatus.CONTESTED",
+                "assert len(result.scores) == 2",
+                "assert result.scores[0].score == result.scores[1].score",
+                "assert contributor.unit_instance_id == physical.unit_instance_id",
+                "assert contributor.model_instance_id in physical.own_model_ids()",
+                "assert contributor.effective_objective_control == physical.own_models[0].characteristic(Characteristic.OBJECTIVE_CONTROL).final",
+                "assert result.status is ObjectiveControlStatus.UNCONTROLLED"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.02-14",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Terrain range is actual membership at every storey, without a3inch halo.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_range.py::test_terrain_membership_has_no_marker_vertical_cap",
+              "function_ast_sha256": "f07e73207498b15a7de568acec7cc24b33f31234902c97836cbd90fa9d230bf6",
+              "assertions": [
+                "assert distance.horizontal_distance_inches == 0",
+                "assert distance.vertical_gap_inches == z",
+                "assert result.controlled_by_player_id == 'owner'",
+                "assert {c.model_instance_id for c in result.contributors} == set(unit.own_model_ids())",
+                "assert result.scores[0].score == unit.own_models[0].characteristic(Characteristic.OBJECTIVE_CONTROL).final",
+                "assert distance.within_control_range"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.02-15",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Linked terrain uses the same membership owner.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_range.py::test_linked_terrain_upper_storey_scores_at_the_real_consumer",
+              "function_ast_sha256": "6320e3b991ed6c652eaf535279452c29c938574ba6ddd7abfe69669bfb7b254e",
+              "assertions": [
+                "assert result.controlled_by_player_id == 'owner'",
+                "assert len(result.contributors) == len(unit.own_models)",
+                "assert result.contributors[0].vertical_gap_inches == z"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.02-16",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Physical FRAME body membership follows FAQ34; declared geometry contract only.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_physical.py::test_constructed_frame_body_membership_matches_existing_area_rule",
+              "function_ast_sha256": "786194387069df55af842e7af999d7b2f52f0febbbede68b184b902680da77be",
+              "assertions": [
+                "assert not measure_model_to_objective(model=ordinary, objective=terrain).within_control_range",
+                "assert result.within_control_range",
+                "assert result.horizontal_distance_inches == 0"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.02-17",
+          "source_blocks": [
+            2,
+            3
+          ],
+          "obligation": "In-range physical models across units add their full OC per player.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_control.py::test_multiple_native_models_and_units_sum_only_in_range_members",
+              "function_ast_sha256": "5eec1b3a11b6b3a6f7d6a77062c11fc50c40c6d98a6d59cdbd0dab9915b426b0",
+              "assertions": [
+                "assert 1 < len(rows) < len(unit.own_models) + len(support.own_models)",
+                "assert {r.unit_instance_id for r in rows} == {unit.unit_instance_id, support.unit_instance_id}",
+                "assert next((s.score for s in result.scores if s.player_id == 'owner')) == sum((r.effective_objective_control for r in rows))",
+                "assert result.controlled_by_player_id == 'owner'"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.02-18",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "Control is captured at both end-phase and end-turn boundaries.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_boundaries.py::test_control_is_frozen_first_and_later_boundary_queries_do_not_recompute",
+              "function_ast_sha256": "ea8e3b9ae31204a87e4464d73261eb2574cfd7d46efa50548c4ba275442021ff",
+              "assertions": [
+                "assert not state.objective_control_records",
+                "assert prepare(state=state, decisions=decisions, runtime_modifier_registry=registry) is None",
+                "assert state.mission_setup is not None",
+                "assert record.result_by_objective_id(marker.objective_marker_id).controlled_by_player_id == 'owner'",
+                "assert len(decisions.event_log.records) == 1",
+                "assert decisions.event_log.records[0].event_type == 'end_boundary_objective_control_determined'",
+                "assert resolve_objective_control(ObjectiveControlContext.from_game_state(state, timing=timing, phase=phase, ruleset_descriptor=state.runtime_ruleset_descriptor())).result_by_objective_id(marker.objective_marker_id).controlled_by_player_id == 'opponent'",
+                "assert prepare(state=state, decisions=decisions, runtime_modifier_registry=registry) is None",
+                "assert record.to_payload() == frozen",
+                "assert len(decisions.event_log.records) == 1",
+                "assert sum((r.record_id == record.record_id for r in state.objective_control_records)) == 1"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.02-19",
+          "source_blocks": [
+            4
+          ],
+          "obligation": "Equal unsecured player totals have no controlling player.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_control.py::test_native_player_scores_gain_and_tie",
+              "function_ast_sha256": "984f7811a43391fcbead7960a26eefbc5591d35d5c82d2218f90ea5a85b31563",
+              "assertions": [
+                "assert state.objective_control_records == []",
+                "assert result.controlled_by_player_id == expected",
+                "assert ObjectiveControlRecord.from_payload(json.loads(json.dumps(record.to_payload()))) == record",
+                "assert state.to_payload() == before",
+                "assert result.status is ObjectiveControlStatus.CONTESTED",
+                "assert len(result.scores) == 2",
+                "assert result.scores[0].score == result.scores[1].score",
+                "assert contributor.unit_instance_id == physical.unit_instance_id",
+                "assert contributor.model_instance_id in physical.own_model_ids()",
+                "assert contributor.effective_objective_control == physical.own_models[0].characteristic(Characteristic.OBJECTIVE_CONTROL).final",
+                "assert result.status is ObjectiveControlStatus.UNCONTROLLED"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.02-20",
+          "source_blocks": [
+            5
+          ],
+          "obligation": "A controlling rules unit is in range and has a positive member; that member may be outside range and in an attached component.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_control.py::test_controlling_unit_can_use_positive_member_outside_range_and_attached_owner",
+              "function_ast_sha256": "27c2755936dd293aca7b2b252363b4abcf54e9f1ab5403431e336ed70bac6e9b",
+              "assertions": [
+                "assert result.controlled_by_player_id == 'owner'",
+                "assert all((c.effective_objective_control == 0 for c in result.contributors if c.unit_instance_id == body.unit_instance_id))",
+                "assert control.within_range(result)",
+                "assert control.controls(result) is positive_outside",
+                "assert not control.controls(replace(result, contributors=()))",
+                "assert current_unit_objective_control(state=state, unit_instance_id=support.unit_instance_id).controls(result)",
+                "assert other == control",
+                "assert other.controls(result)"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:14:14.02.01:1",
+      "source_sha256": "f2961e1fb6ce946d4acbaf0a24d5520a2ce32b50d1896357284899483cd0ece5",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "0dfffafb38f7cc67ec75b51b3143799659c15bab9797504935c38d2e9d92e559",
+          "value": "At the end of each phase and turn, the first thing players do (before any other 'at the end of the phase/end of the turn' rules or abilities) is determine which \u0005objectives\u0006 are controlled by which player."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "14.02.01-06",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Actual facade boundary freezes control before a nonempty end-rule dispatch.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_boundaries.py::test_public_movement_boundary_determines_control_before_nonempty_end_rule",
+              "function_ast_sha256": "4621a5e6a812c84a077c04b4be18399b5941d6a8319e1fdb1aed810e1395acce",
+              "assertions": [
+                "assert kinds.index('end_boundary_objective_control_determined') < kinds.index('catalog_ir_command_point_phase_gain_resolved')",
+                "assert state.mission_setup is not None",
+                "assert record.result_by_objective_id(marker.objective_marker_id).controlled_by_player_id == 'owner'",
+                "assert state.command_point_total('owner') == 1",
+                "assert request is not None"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.02.01-21",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Control is frozen first and cannot be recomputed by later rules.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_boundaries.py::test_control_is_frozen_first_and_later_boundary_queries_do_not_recompute",
+              "function_ast_sha256": "ea8e3b9ae31204a87e4464d73261eb2574cfd7d46efa50548c4ba275442021ff",
+              "assertions": [
+                "assert not state.objective_control_records",
+                "assert prepare(state=state, decisions=decisions, runtime_modifier_registry=registry) is None",
+                "assert state.mission_setup is not None",
+                "assert record.result_by_objective_id(marker.objective_marker_id).controlled_by_player_id == 'owner'",
+                "assert len(decisions.event_log.records) == 1",
+                "assert decisions.event_log.records[0].event_type == 'end_boundary_objective_control_determined'",
+                "assert resolve_objective_control(ObjectiveControlContext.from_game_state(state, timing=timing, phase=phase, ruleset_descriptor=state.runtime_ruleset_descriptor())).result_by_objective_id(marker.objective_marker_id).controlled_by_player_id == 'opponent'",
+                "assert prepare(state=state, decisions=decisions, runtime_modifier_registry=registry) is None",
+                "assert record.to_payload() == frozen",
+                "assert len(decisions.event_log.records) == 1",
+                "assert sum((r.record_id == record.record_id for r in state.objective_control_records)) == 1"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:14:14.03:1",
+      "source_sha256": "b296dff52199276d6165327c704d2c006f6ba60ce7ea86ee6e9724d80e594f6b",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "94ad9ed2c5c192ca84a4f950fe358a4235f5d87ea926c6b167884bfa2733114d",
+          "value": "Some rules allow an \u0005objective\u0006 to be \u0005secured\u0006 by a player\u2019s army. When an \u0005objective\u0006 is \u0005secured\u0006 by a player\u2019s army, that \u0005objective\u0006 remains under their control \u2013 even once they no longer have any units within range of it \u2013 until their opponent\u2019s \u0005level of control\u0006 over that \u0005objective\u0006 is greater than theirs at the end of a phase."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "c071d966949db12b816bb7325e26fb661454e092e0c9d9259b8ec9b866d1e673",
+          "value": "\u000eControlling a Terrain Objective"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "a114643a870598c9b51006e1528cea80ed8f593b632843f396fb96928c60b355",
+          "value": "\u0003Vehicle\u0004 \u0005\u0007A\b\u0006 has an \u0005\u0007OC\b\u0006 characteristic of 3, and it is within the \u0005\u0007terrain area\b\u0006."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "d5d112ca83fea2de3ebf32eff7504f9b271442359febbfba3b60af5d26c576cc",
+          "value": "\u0003Vehicle\u0004 \u0005\u0007B\b\u0006 has an \u0005\u0007OC\b\u0006 characteristic of 2, and it is wholly within the \u0005\u0007terrain area\b\u0006."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "d44ab604fc0a5423b69c9253b7a653bd46fd9397fffe9f67fc5248e611691984",
+          "value": "The models in unit \u0005\u0007C\b\u0006 each have an \u0005\u0007OC\b\u0006 characteristic of 1. Six of its models are within the \u0005\u0007terrain area\b\u0006."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "48bf7fa17f8818fae359de0e64089a804ff6752b1c724e421305093941777b58",
+          "value": "Unit \u0005\u0007D\b\u0006 is currently \u0005\u0007battle-shocked\b\u0006, so the \u0005\u0007OC\b\u0006 characteristic of all of its models is \u2018-\u2019."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "f1b42b8db88396721d5333b1f7b641b88c943f6cbcea511cfad000a1c803f294",
+          "value": "Both players add together the \u0005\u0007OC\b\u0006 characteristics of all their models that are within the \u0005\u0007terrain area\b\u0006. The BLUE player\u2019s \u0005\u0007level of control\b\u0006 is 5, and the RED player\u2019s \u0005\u0007level of control\b\u0006 is 6. The RED player therefore controls the \u0005\u0007objective\b\u0006."
+        },
+        {
+          "ordinal": 8,
+          "kind": "callout",
+          "sha256": "5468f597b38d5ad724e9dc06a52d47c061f46716b497ca98e393da7bbc3f09e0",
+          "value": {
+            "title": "Hold At All Costs",
+            "body": "Some units have abilities that are triggered when they control an objective, or when they secure an objective for your army."
+          }
+        }
+      ],
+      "requirements": [
+        {
+          "id": "14.03-22",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Secured control survives absence and ties; only a strictly greater enemy boundary total expires it.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_secured.py::test_secured_zero_tie_and_strictly_greater_enemy_control",
+              "function_ast_sha256": "5bd0f0d21adb4c2bbd3a96d399b43c555c352d7f559745efe52a02919876e08e",
+              "assertions": [
+                "assert state.mission_setup is not None",
+                "assert result.controlled_by_player_id == expected",
+                "assert sticky_objective_control_state_is_expired(state=sticky, record=raw, player_ids=state.player_ids) is expired",
+                "assert (result.retained_control_source_id is None) is expired",
+                "assert StickyObjectiveControlState.from_payload(json.loads(json.dumps(sticky.to_payload()))) == sticky",
+                "assert committed == retained",
+                "assert (sticky not in state.sticky_objective_control_states) is expired",
+                "assert all((r.retained_control_source_id is None for r in committed.results if r.objective_id != marker.objective_marker_id))"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "14.03-23",
+          "source_blocks": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "obligation": "Diagram arithmetic uses3+2against6x1, ignores shocked OC, and selects RED. Constructed contribution checkpoint.",
+          "engine_owners": [
+            "engine/objective_geometry.py",
+            "engine/objective_control.py",
+            "engine/unit_objective_control.py",
+            "engine/boundary_rule_flow.py",
+            "engine/sticky_objective_control.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section14/test_control.py::test_constructed_source_diagram_uses_five_against_six_and_shocked_dash",
+              "function_ast_sha256": "9feb5a4225a97a84310aeb953ffc4d25e9c9f6297fe12f6cf795cfd72496bbb1",
+              "assertions": [
+                "assert [(r.player_id, r.score) for r in result.scores] == [('BLUE', 5), ('RED', 6)]",
+                "assert result.controlled_by_player_id == 'RED'",
+                "assert sum((c.effective_objective_control for c in result.contributors if c.battle_shocked)) == 0"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            2
+          ],
+          "classification": "heading_or_nonoperative_callout",
+          "value": "\u000eControlling a Terrain Objective"
+        },
+        {
+          "source_blocks": [
+            8
+          ],
+          "classification": "heading_or_nonoperative_callout",
+          "value": {
+            "title": "Hold At All Costs",
+            "body": "Some units have abilities that are triggered when they control an objective, or when they secure an objective for your army."
+          }
+        }
+      ]
+    }
+  ],
+  "faq_ownership": {
+    "reviewed_current_faq_count": 64,
+    "locally_owned": [
+      {
+        "id": "a89dddb3-7930-4704-9f7a-0a7664da4d84",
+        "question": "If my unit has taken control of an objective at the end of my movement phase and that unit has as an ability that secures an objective they control, can they secure that objective?",
+        "answer": "Yes",
+        "ordinal": 19,
+        "source_sha256": "5ec36166d98fd4e9d6031f8f85a631801253c6a65f26008c6e58d8cec6e72b1c",
+        "semantic_assertions": [
+          {
+            "node": "tests/rules/section14/test_boundaries.py::test_faq19_newly_gained_movement_control_can_be_secured_by_permitted_boundary_rule",
+            "function_ast_sha256": "a8f7a14c4ee8f7f53eab9cc694e5407e3c9bf5886e4b443e4fcaa8a2af979fe7",
+            "assertions": [
+              "assert prepare_phase_end_boundary(state=state, decisions=decisions, runtime_modifier_registry=RuntimeModifierRegistry.empty()) is None",
+              "assert state.mission_setup is not None",
+              "assert record.result_by_objective_id(marker.objective_marker_id).controlled_by_player_id == 'owner'",
+              "assert result.controlled_by_player_id == 'owner'",
+              "assert result.retained_control_source_id == sticky.source_rule_id",
+              "assert not result.contributors"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e",
+        "question": "Is being within range of a terrain objective the same as being within range of an objective marker?",
+        "answer": "Yes.",
+        "ordinal": 43,
+        "source_sha256": "b071da95e8e4f7b784d6b56260bc20d1f99d1dee892c93e49694be55146a9f6e",
+        "semantic_assertions": [
+          {
+            "node": "tests/rules/section14/test_faqs.py::test_faq43_and_58_native_infractor_producer_reaches_actual_objective_reroll_gate",
+            "function_ast_sha256": "a8197ed0679afdd6af89b8b69b1bfb064bf1d4d68bbcf70fe4afef4ce89ac710",
+            "assertions": [
+              "assert state.mission_setup is not None",
+              "assert state.battlefield_state is not None",
+              "assert len(permissions) == 1",
+              "assert isinstance(conditional, dict)",
+              "assert conditional['full_reroll_if_target_within_objective_range'] is True",
+              "assert _conditional_wound_full_reroll_applies(state=state, conditional=conditional, target_unit_instance_id=enemy.unit_instance_id, attacker_keywords=unit.keywords) is within"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "dc9911da-e156-4b48-bf9b-18f9d96d037e",
+        "question": "If a rule refers to an 'objective marker', does this mean an 'objective'?",
+        "answer": "Yes (excluding rules in the Core Rules)'.",
+        "ordinal": 58,
+        "source_sha256": "f084d1e31353f70020957e67d0ad8821f406be29c8251048d27bf81e6664f4b3",
+        "semantic_assertions": [
+          {
+            "node": "tests/rules/section14/test_faqs.py::test_faq58_marker_alias_is_applied_only_at_non_core_source_boundary",
+            "function_ast_sha256": "0db803f966dfb415d8e0cdf403a216e664860334c64644dae48cadbc7a7ee24a",
+            "assertions": [
+              "assert ('objective marker' not in source.normalized_text) is (scope is ObjectiveRuleScope.NON_CORE_RULES)",
+              "assert source.raw_text == raw",
+              "assert RuleSourceText.from_payload(source.to_payload()) == source"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "db020803-7564-45c9-a6d4-e4cdf463da32",
+        "question": "Can a unit be controlling more than one objective at once?",
+        "answer": "Yes.",
+        "ordinal": 60,
+        "source_sha256": "8352b49b9fbfaceb630ac21dc45eac4d9fdf112bd15de3e50ec2f0fbd30ca36e",
+        "semantic_assertions": [
+          {
+            "node": "tests/rules/section14/test_control.py::test_faq60_and_61_same_native_model_and_unit_control_two_objectives",
+            "function_ast_sha256": "005b3c9d1fc3a71f3667e4770deceaa8bdc805d4540757265891c65bdd4fdf59",
+            "assertions": [
+              "assert len(results) == 2",
+              "assert all((r.controlled_by_player_id == 'owner' for r in results))",
+              "assert all(([(c.model_instance_id, c.effective_objective_control) for c in r.contributors] == [(unit.own_model_ids()[0], oc)] for r in results))",
+              "assert all((control.controls(r) for r in results))"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "8c51d370-70b2-46c7-abaa-228b55c830c3",
+        "question": "When determining control over an objective, can the same model's OC count towards more than one objective that model is within range of?",
+        "answer": "Yes.",
+        "ordinal": 61,
+        "source_sha256": "cda9f83e49d0006eef29aeb0e17f388472db9fa391be2ea4a96e6ce4850e80a6",
+        "semantic_assertions": [
+          {
+            "node": "tests/rules/section14/test_control.py::test_faq60_and_61_same_native_model_and_unit_control_two_objectives",
+            "function_ast_sha256": "005b3c9d1fc3a71f3667e4770deceaa8bdc805d4540757265891c65bdd4fdf59",
+            "assertions": [
+              "assert len(results) == 2",
+              "assert all((r.controlled_by_player_id == 'owner' for r in results))",
+              "assert all(([(c.model_instance_id, c.effective_objective_control) for c in r.contributors] == [(unit.own_model_ids()[0], oc)] for r in results))",
+              "assert all((control.controls(r) for r in results))"
+            ]
+          }
+        ]
+      }
+    ],
+    "cross_references": [
+      {
+        "ordinal": 34,
+        "owner": "Section13",
+        "reason": "elevated terrain membership reused by14"
+      },
+      {
+        "ordinal": 62,
+        "owner": "Section01",
+        "reason": "until-end duration boundary; existing expiry dependencies retained"
+      },
+      {
+        "ordinal": 4,
+        "owner": "Section03",
+        "reason": "mission destruction scoring is outside objective control geometry"
+      }
+    ]
+  },
+  "authenticated_inputs": {
+    "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+    "data/source_audits/v963_shock/captures/core-page.js": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
+    "data/source_audits/order97/categories/14.json": "d2476f0cd196013e0698b85c71430e54d111a1eeecb7bf13fc2587eb4b53b6ff",
+    "data/source_audits/section14/user-convention-20261018.json": "01312e66171ea3836d3f5a3b805866fc4197af376a94979952806a6f16d02351"
+  },
+  "semantic_assertions_missing": [],
+  "unresolved_source_interpretations": [],
+  "metadata_is_not_semantic_coverage": true,
+  "adopted_interpretations": [
+    {
+      "id": "S18-USER-CONVENTION-20261018",
+      "source_record": "data/source_audits/section14/user-convention-20261018.json",
+      "decision": {
+        "id": "S18-USER-CONVENTION-20261018",
+        "authority": "Explicit human interpretation supplied by parent in trusted transcript evidence; not an assertion of new official GW text.",
+        "user": "Sentinel_9282bc095b5c8191b730a760b467ebf6",
+        "date": "2026-10-18",
+        "literal": "`Objective range is 3\u2033 horizontally and 5\u2033 vertically. For a model measured using its body, could one part meet the horizontal limit and a different part meet the vertical limit, even though neither meets both?` - since we are using event companion all the objectives in our games/training will be Terrain Objectives. For completeness though, use same physical point to satisfy both limits.",
+        "adopted_predicate": "exists one physical point p with H(p,marker)<=3 AND V(p,marker)<=5",
+        "not_adopted": "Independent axis witnesses, or selecting only the Euclidean-nearest point.",
+        "primary_scenario_policy": "Terrain Objectives are primary for Event Companion games/training. This change concerns fallback marker completeness; terrain occupancy remains unchanged.",
+        "scope_qualification": "Declared compound FRAME typed geometry is supported; native catalog/body admission, legal setup and prior history remain unproved."
+      }
+    }
+  ]
+}

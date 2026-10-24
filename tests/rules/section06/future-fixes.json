@@ -1,0 +1,52 @@
+{
+  "section": "06",
+  "confirmed_rule_outcome_defects": [],
+  "retained_source_correct_failing_tests": [],
+  "execution_crash_repairs": [],
+  "diagnostics": [
+    {
+      "id": "S06-DIAG-01",
+      "classification": "incomplete performance diagnostic, not confirmed wrong rules result",
+      "clause": "FAQ63;06.01",
+      "entry_path": "TerrainVisibilityContext.resolve_line_of_sight with native circular support geometry and a constructed rectangular body overhang",
+      "expected": "Incoming overhang is visible; outgoing overhang is clipped at bounds. Full visibility remains false behind the wall.",
+      "actual": "Development batches6 and7 were manually interrupted while the compound-body FAQ63 unbounded case had not returned. No semantic outcome or engine crash established.",
+      "retained_input": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\diagnostic-native-compound-visibility.py.txt",
+      "retained_log": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\batch7.txt",
+      "disposition": "No production repair. Final corpus asserts the clauses using a cheaper explicit rational-prism contract at the same exact production authority. Compound geometry cost remains independent diagnostic/review work; no global performance closure."
+    }
+  ],
+  "preserved_prior_findings": [
+    {
+      "id": "SF01-001",
+      "owner": "01",
+      "status": "deferred",
+      "summary": "Stealth capitalization consumer defect; untouched"
+    },
+    {
+      "id": "SF03-001",
+      "owner": "03",
+      "status": "deferred",
+      "summary": "Coherency casualty choice must be controlling-player decision; untouched"
+    },
+    {
+      "id": "SF04-002",
+      "owner": "04",
+      "status": "deferred",
+      "summary": "Premature has-shot status; untouched"
+    },
+    {
+      "id": "SF05-001",
+      "owner": "05",
+      "status": "deferred",
+      "summary": "Epic Challenge retained CHARACTER eligibility; untouched"
+    },
+    {
+      "id": "SF05-002",
+      "owner": "05",
+      "status": "unresolved source-versus-prior-user-interpretation conflict, not a confirmed engine defect",
+      "summary": "Literal FAQ20 says after removal; prior approved interpretation says last step during removal. No supersession established; T26 and independent retention qualifications preserved."
+    }
+  ],
+  "policy": "Source-correct incorrect-outcome tests remain enabled where found. No rule fix, skip, xfail, or reinterpretation was introduced."
+}

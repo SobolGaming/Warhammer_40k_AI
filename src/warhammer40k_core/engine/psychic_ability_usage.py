@@ -119,12 +119,14 @@ def psychic_ability_unavailable_reason(
         return "psychic_ability_owner_drift"
     if "PSYKER" not in unit.keywords:
         return "psychic_ability_requires_psyker"
-    if not unit.alive_models():
+    # Retained physical members keep ability authority after logical destruction.
+    source_model_ids = {model.model_instance_id for model in unit.alive_models()} | set(
+        unit.retained_model_ids
+    )
+    if not source_model_ids:
         return "psychic_ability_source_unavailable"
     if context.source_model_instance_id is not None:
-        if context.source_model_instance_id not in {
-            model.model_instance_id for model in unit.alive_models()
-        }:
+        if context.source_model_instance_id not in source_model_ids:
             return "psychic_ability_source_model_drift"
         component_id = unit.component_unit_id_for_model(context.source_model_instance_id)
         if context.source_unit_instance_id not in (unit.unit_instance_id, component_id):

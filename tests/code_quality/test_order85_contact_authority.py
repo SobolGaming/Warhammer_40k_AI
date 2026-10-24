@@ -24,8 +24,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def test_contact_source_and_artifacts_are_pinned_and_reproducible() -> None:
     artifact, audit = build_payloads()
-    assert json.loads(ARTIFACT_PATH.read_text()) == artifact
-    assert json.loads(AUDIT_PATH.read_text()) == audit
+    assert json.loads(ARTIFACT_PATH.read_text(encoding="utf-8")) == artifact
+    assert json.loads(AUDIT_PATH.read_text(encoding="utf-8")) == audit
     assert hashlib.sha256(ARTIFACT_PATH.read_bytes()).hexdigest() == EXPECTED_ARTIFACT_SHA256
     assert source_package().evidence_required_source_ids == (DEEMED_BASE_CONTACT_SOURCE_ID,)
 

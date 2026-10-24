@@ -139,7 +139,8 @@ def _is_post_cleanup_scoring_checkpoint(
     cleanups = tuple(
         cleanup
         for cleanup in state.end_turn_cleanup_states
-        if cleanup.battle_round == checkpoint.battle_round
+        if cleanup.completes_boundary
+        and cleanup.battle_round == checkpoint.battle_round
         and cleanup.active_player_id == checkpoint.active_player_id
         and cleanup.phase == checkpoint.phase
     )

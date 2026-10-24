@@ -1,0 +1,288 @@
+{
+  "schema": "task18-design-only-review-v1",
+  "status": "DESIGN ONLY, STOPPED FOR INDEPENDENT REVIEW BEFORE IMPLEMENTATION",
+  "anchor": {
+    "baseline_commit": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "baseline_tree": "1fa709a167abb369932e651f89babbd0034941c5",
+    "candidate_commit": "65673dead8d763287c6e5f74467f338d2b357f0d",
+    "candidate_source_sha256": "4892160053d56dcde98c6b780497c0b1b956168af8d009fe22fd6dbd709989b9"
+  },
+  "files": {
+    "AELDARI-SOURCE-AND-CONSUMER-ADJUDICATION.json": {
+      "bytes": 22349,
+      "sha256": "ce36cf9efdbf60889cf20240411f6e9c775fc5db8d4fc10375a157409d69c689"
+    },
+    "BRIDGE-DESIGN.txt": {
+      "bytes": 15778,
+      "sha256": "aa523d009018c8d1acad372ca3aecda18585efb276ead8a59fbc9b1d670361fc"
+    },
+    "build_design_ledger.py": {
+      "bytes": 29483,
+      "sha256": "a9573d75f9f6c09b58be7144affbe165118912b2bbe980800ecda30319a4d88d"
+    },
+    "CHECKPOINT.txt": {
+      "bytes": 2585,
+      "sha256": "7a03b1f758ca54ac133baff68928970a778892bdd108f31df28e91a4d3ef56e5"
+    },
+    "collect_inputs.py": {
+      "bytes": 7366,
+      "sha256": "2c820ffa54c25e5a8855c9ccf44bc279852a16fab31cf21c62bae379a28c2b31"
+    },
+    "DESIGN-STATUS.json": {
+      "bytes": 2052,
+      "sha256": "eead21806d09eb9968ac6feea592e9471510f8f8bf9c359487222bb653717759"
+    },
+    "FINITE-UNRESOLVED-OWNERS.json": {
+      "bytes": 17243,
+      "sha256": "6836ab963213e31cdcf75de727ff57fef7c008f099300976fbb5fb58c753f1ba"
+    },
+    "FULL-723-INPUT-ROUTING-LEDGER.json": {
+      "bytes": 806808,
+      "sha256": "432074cc68eaf4b36bf52072c95d89d5d1514d4741c65be5f9af2bfd69b934b4"
+    },
+    "FULL-810-DELTA-AND-PREIMAGE-LEDGER.json": {
+      "bytes": 749382,
+      "sha256": "024115de5761ab29b648d912849f44fad322d351ee71ed9a2cfeab2d6ed297d7"
+    },
+    "INPUT-REFERENCES.json": {
+      "bytes": 152668,
+      "sha256": "eb385d3eeaa27e9f45af46a1c60148c74ffd91acee0d9fb30aa6d2fe7583ac0f"
+    },
+    "map_full_delta.py": {
+      "bytes": 3384,
+      "sha256": "999aaa69595c47a51f3abe4889ca404154b8c7ec977dae9bbda8d36feaec269a"
+    },
+    "owner-deltas--adapters__checkpoint_reconstruction.py.json": {
+      "bytes": 15774,
+      "sha256": "d5e2e4bc498e47b04ea2930a267d1c38e2f6be890aa383c44f46dadb5c4d9553"
+    },
+    "owner-deltas--adapters__projection.py.json": {
+      "bytes": 6702,
+      "sha256": "8a0cfb098820fc701afaf03137fc5817496a8b3aef99023851a8bec23bd95b95"
+    },
+    "owner-deltas--adapters__redaction.py.json": {
+      "bytes": 1561,
+      "sha256": "512358cd1249361be94e6ea0b2204d3a9bd12b57c38451f3d4e0e7e74a69aa17"
+    },
+    "owner-deltas--core__ruleset_descriptor.py.json": {
+      "bytes": 1194,
+      "sha256": "5181e8428df93ee0e1490d4814a05ecaea25be2f30375ea662e83e566ca3e343"
+    },
+    "owner-deltas--core__terrain_endpoint_policy.py.json": {
+      "bytes": 1980,
+      "sha256": "a81d4e8676dfb589f8dcd398d88425f12f29edbf6627184b3d1905ca9b614bce"
+    },
+    "owner-deltas--engine__activity_restriction_history.py.json": {
+      "bytes": 1846,
+      "sha256": "a633279c1b19547eba0f6620db969c7eb5c55ae337161a4fe7011a3f699befd5"
+    },
+    "owner-deltas--engine__activity_restriction_restore.py.json": {
+      "bytes": 1045,
+      "sha256": "ec45d3f69e413673dc0199ca64799660ebc8b8f82a516c08b1373da14e30d907"
+    },
+    "owner-deltas--engine__attack_completion_triggers.py.json": {
+      "bytes": 3033,
+      "sha256": "e7bc213774138361a3b24f5e7b33d417a4c2081ce0317ef5e6229c205cf03538"
+    },
+    "owner-deltas--engine__attack_destruction_reactions.py.json": {
+      "bytes": 3094,
+      "sha256": "c6731fd8d42b2432b0ab358675c7c30231810acc37ffd0f04a8ceedf6ccc8f56"
+    },
+    "owner-deltas--engine__attack_sequence_damage_resolution.py.json": {
+      "bytes": 2800,
+      "sha256": "ed946f973765f7268dd22e360fe9e16a6b6ee245053c9652a0889abf6618fabd"
+    },
+    "owner-deltas--engine__attack_sequence_destruction_boundary.py.json": {
+      "bytes": 7703,
+      "sha256": "7234c78fbd45b298fb9040572582c58444b1f8f66ca9c4a42594ba92efe33d6b"
+    },
+    "owner-deltas--engine__base_contact_authority.py.json": {
+      "bytes": 1304,
+      "sha256": "1761a67a2731de9ae3603f29c1bc6855c7287366057b4931570ae83a678d06aa"
+    },
+    "owner-deltas--engine__battle_shock_source_family_authority.py.json": {
+      "bytes": 5675,
+      "sha256": "3dd411dff4a599d192aba8aa02939647f72ce888a68da6af08f3b530eda0728f"
+    },
+    "owner-deltas--engine__catalog_conditional_leader_abilities.py.json": {
+      "bytes": 2485,
+      "sha256": "db5b87c80d6ef792e95bd6c44ec8ede7664c9de2b125cb83c472f500a1c624b0"
+    },
+    "owner-deltas--engine__catalog_lone_operative_grants.py.json": {
+      "bytes": 7808,
+      "sha256": "3439a9f7911067c9bed554462f24ebaf2b08f311e99c2a193ea31477827196ca"
+    },
+    "owner-deltas--engine__catalog_static_attack_modifier_runtime.py.json": {
+      "bytes": 2593,
+      "sha256": "8b828daff7cfc09bca89479ce14139d48b54833c34fa2e763ce2131d1bdfd270"
+    },
+    "owner-deltas--engine__charge_move_geometry.py.json": {
+      "bytes": 1474,
+      "sha256": "896aa4db0a17e92d7d4dea28906b4e7d372b755fae0e47609f312636ad1453f4"
+    },
+    "owner-deltas--engine__charge_targets.py.json": {
+      "bytes": 1180,
+      "sha256": "f7b9eef3d6c06d4994af9e98a9bba6330a145d4dd140fbe917d00fca909d81fb"
+    },
+    "owner-deltas--engine__coherency_cleanup_decisions.py.json": {
+      "bytes": 14229,
+      "sha256": "bff4e9f61765f5114dc358e25fd7b3cd1d3a38590f82eca9cf75719b08cfcbc8"
+    },
+    "owner-deltas--engine__desperate_escape_mortal_wounds.py.json": {
+      "bytes": 9708,
+      "sha256": "6d77524f5ce08afa1558293dd406c78b0f9a9b0ba795bd5da3cc6c7af9da28ee"
+    },
+    "owner-deltas--engine__faction_content__catalog_generic_hooks.py.json": {
+      "bytes": 2225,
+      "sha256": "588975c2261345ea251b88119b5bd970bc08fe060d629e272127d47d26e7dbfe"
+    },
+    "owner-deltas--engine__faction_content__runtime.py.json": {
+      "bytes": 961,
+      "sha256": "26186ca8be1fcf70aa9a013c401b9b00258e4b14a18d2408567ec322116681b6"
+    },
+    "owner-deltas--engine__faction_content__warhammer_40000_11th__aeldari__army_rule.py.json": {
+      "bytes": 10299,
+      "sha256": "5479ac8ae4956a7789b0a1075b0c2fe3a4e34e7c7e349ddb30292d1517d909a3"
+    },
+    "owner-deltas--engine__faction_content__warhammer_40000_11th__world_eaters__army_rule.py.json": {
+      "bytes": 3011,
+      "sha256": "cc817d44d926ff4f336a692a439584cf42b5fa5b982b139a3eac4b9c9feb5b0d"
+    },
+    "owner-deltas--engine__ingress_placement_restrictions.py.json": {
+      "bytes": 2867,
+      "sha256": "2e8caac081fc0864827977cf9782df72967f225806548ca914124383b2944354"
+    },
+    "owner-deltas--engine__mission_turn_end_sequencing.py.json": {
+      "bytes": 3564,
+      "sha256": "c9370ff35e3498cc5f8397624f6db27ddae33be705f7c87fb8a8916d25f8723a"
+    },
+    "owner-deltas--engine__model_attack_completion.py.json": {
+      "bytes": 15083,
+      "sha256": "4f4948d87d94cb2cec60adb6f4efc237acc8629d10fd7aad5ebd016366c1e6a4"
+    },
+    "owner-deltas--engine__model_attack_history.py.json": {
+      "bytes": 9803,
+      "sha256": "0dad32adfbacb81364aaad8cec20d836fbddec62ee4c3831f2f3781ec767119e"
+    },
+    "owner-deltas--engine__move_completion_triggers.py.json": {
+      "bytes": 1057,
+      "sha256": "e40be708265428260589a0d2c15573c9ddc57617e36ba9f1d9fc7bbcd0e4e64f"
+    },
+    "owner-deltas--engine__objective_geometry.py.json": {
+      "bytes": 5023,
+      "sha256": "04303a8acd3c26238937218bf04bfe79a172895d9020aa1d27647641b01f7879"
+    },
+    "owner-deltas--engine__phases__charge.py.json": {
+      "bytes": 1548,
+      "sha256": "e2d33bc65580e98f0d8b096149d5d396ea70dfa9fd9f269429073ce104d76658"
+    },
+    "owner-deltas--engine__phases__shooting_firing_deck.py.json": {
+      "bytes": 3810,
+      "sha256": "ccdecb1f2dd7fbaf9b46f6653f996f9de71e12f2abfb9860acc43f9917265786"
+    },
+    "owner-deltas--engine__phases__shooting_model.py.json": {
+      "bytes": 4499,
+      "sha256": "6eb0e4cb83597073db6c945fdff5572dc2132168c1879a5d8b4fc5d6116b0e59"
+    },
+    "owner-deltas--engine__phases__shooting_surge_candidates.py.json": {
+      "bytes": 4942,
+      "sha256": "638ac96f7748e50d3e66259613bc2e3bdfd79d3a57246a70ce03e45d4a5451fb"
+    },
+    "owner-deltas--engine__primary_historical_event_integrity.py.json": {
+      "bytes": 1819,
+      "sha256": "4481e462531d3cfef28fac257810c244601bfe93d672209c1e16f237ebc786be"
+    },
+    "owner-deltas--engine__primary_scoring_boundary_lifecycle.py.json": {
+      "bytes": 6962,
+      "sha256": "99ee49d5713fb65073d8c6290ae4226aa64007442c7630f5e8dc5368d9a0c407"
+    },
+    "owner-deltas--engine__psychic_ability_usage.py.json": {
+      "bytes": 1240,
+      "sha256": "a41bab6b799818cdfa9904276ce63013f137c069991c84785e12ff6fbb8fb373"
+    },
+    "owner-deltas--engine__retained_demise_removal.py.json": {
+      "bytes": 6338,
+      "sha256": "c860ee9a97e6d9bf5c65a94901a3a558ec88d10641b056e8869eb232df90ab6d"
+    },
+    "owner-deltas--engine__rule_model_destruction.py.json": {
+      "bytes": 13640,
+      "sha256": "d18b923da0072950b45654d5df93c02d9c3c662e3dac62324a5da69fd1bbd1a1"
+    },
+    "owner-deltas--engine__rule_model_destruction_removal.py.json": {
+      "bytes": 8655,
+      "sha256": "96bcfdcab99a6cb2326714b5ea8fbbbcf0c9a4c072b6e7c62ccde1ca61fcf48c"
+    },
+    "owner-deltas--engine__secondary_mission_action_resolution.py.json": {
+      "bytes": 8269,
+      "sha256": "6ce0f33090ff63c0b674762f2630b15297cb7a5d880016e6bc4058ae714dfb8d"
+    },
+    "owner-deltas--engine__secondary_scoring_state_evidence_authority.py.json": {
+      "bytes": 1986,
+      "sha256": "1985c3e67b9b7baf65223dd2116d2df431c6a846a2f82eb18daca4c273d8ab4c"
+    },
+    "owner-deltas--engine__sequencing.py.json": {
+      "bytes": 1576,
+      "sha256": "bd6e92f86c52efbc82f0f1cf9a049ec1bd7efb79b3c31bf3c892430c80e82ccf"
+    },
+    "owner-deltas--engine__shooting_end_surge_hooks.py.json": {
+      "bytes": 5608,
+      "sha256": "7e5096a4a56d6e9936c502811c4d65fd896e48de76af6ea7bc124960d9c2fe3f"
+    },
+    "owner-deltas--engine__shooting_target_replacement_authority.py.json": {
+      "bytes": 1032,
+      "sha256": "4f0ba3f3c0ab5c0b877eeb07d06c7331e44e33afc51cb2d72ab419cff5c1622e"
+    },
+    "owner-deltas--engine__static_rule_source_identity.py.json": {
+      "bytes": 1236,
+      "sha256": "ae737922ad52f7a94e6842252cce7635b362355d808f1ce924186af6b89565ab"
+    },
+    "owner-deltas--engine__turn_cleanup.py.json": {
+      "bytes": 13906,
+      "sha256": "e31b55b33e45d739fd0eb10b4e1f5d3bd34c6576ce1cd0573d343c43a05a3425"
+    },
+    "owner-deltas--engine__unit_coherency.py.json": {
+      "bytes": 2679,
+      "sha256": "4eacc92f2d52cc586c98bc5a380f47272cc4050875d232267150abbc181d7534"
+    },
+    "owner-deltas--rules__rule_parser_token_helpers.py.json": {
+      "bytes": 551,
+      "sha256": "d1da49fd0f9fead42df40b4e6fd9842fd20eadc1751d0e0078a920c41d9704bc"
+    },
+    "owner-deltas--rules__selected_source_index.py.json": {
+      "bytes": 11464,
+      "sha256": "4309bb508457ab22e8ec1172e77c4194dc6cdc9aa35f95bbd697cd7d055baff1"
+    },
+    "owner-deltas--rules__wahapedia_bridge.py.json": {
+      "bytes": 2355,
+      "sha256": "72d05c625957a21dbf0c5cf89dcd8afbba09f4205733c5beb05dce5fb6118042"
+    },
+    "owner-deltas--rules__wahapedia_bridge_rows.py.json": {
+      "bytes": 2177,
+      "sha256": "93334bb8ff4c9112d05646a9a7a4b05a07a3a700f0c12603adfd440537c103a3"
+    },
+    "PRIOR-EVIDENCE-REFERENCES.json": {
+      "bytes": 1586,
+      "sha256": "624df6be6fd02660c4f067b4e5697be1ff7ef0f259078cb401c371f0785b1a2a"
+    },
+    "PROPOSED-52-LITERAL-OPERATIONS.json": {
+      "bytes": 82022,
+      "sha256": "abf7e4b25101923a8a7409d6ae18f3da1937d54fa1f43352297b60d322d3766e"
+    },
+    "REQUIRED-GUARDS-BY-GROUP.json": {
+      "bytes": 26118,
+      "sha256": "e51969957be033c6b65dd464bfe9c23f2ce027440eaf9796234f060516766d67"
+    },
+    "REVIEW-CONTROLS.json": {
+      "bytes": 6149,
+      "sha256": "0771502d6e7c7ab5193ee69f78cd1833ec62f5e269071a9429228c3ef5396d60"
+    },
+    "seal_design.py": {
+      "bytes": 6680,
+      "sha256": "9a8b7c8760a7106d0b8a1c02e46f520526052207ed0d2fcd1f70d08bead532c5"
+    },
+    "UNMAPPED-153-OWNER-DISPOSITIONS.json": {
+      "bytes": 286660,
+      "sha256": "d04e7f1741d1c1ff066017d0f26e0f4ad7d2e8f0f2e13f2c8a5f8a146895e751"
+    }
+  }
+}

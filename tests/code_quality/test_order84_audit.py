@@ -16,8 +16,10 @@ from tools.core_rules_order84_capture import capture_literals
 
 def test_order84_inventory_and_generated_report_are_complete_and_negative() -> None:
     audit = load_audit()
-    validate_audit(audit, roadmap=(ROOT / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text())
-    assert REPORT.read_text() == markdown(audit)
+    validate_audit(
+        audit, roadmap=(ROOT / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text(encoding="utf-8")
+    )
+    assert REPORT.read_text(encoding="utf-8") == markdown(audit)
     duplicated_number = [r for r in audit["source_inventory"] if r["locator"] == "09.07.01"]
     assert len(duplicated_number) == 2
     assert len({r["row_id"] for r in duplicated_number}) == 2
@@ -145,7 +147,7 @@ def test_order84_preserves_nested_package_rule_identity_and_support_status(field
 
 
 def test_order84_rejects_missing_canonical_followup() -> None:
-    roadmap = (ROOT / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text()
+    roadmap = (ROOT / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text(encoding="utf-8")
     roadmap = roadmap.replace("| C01-07 |", "| C01-99 |", 1)
     with pytest.raises(ValueError, match="canonical roadmap owners"):
         validate_audit(load_audit(), roadmap=roadmap)

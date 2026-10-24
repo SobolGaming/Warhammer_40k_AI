@@ -1,0 +1,782 @@
+{
+  "status": "TEN_SEMANTIC_ROWS_INDEPENDENTLY_ACCEPTED_WITH_EXPLICIT_SCOPE_LIMITS",
+  "accepted_rows": 10,
+  "rejected_rows": 0,
+  "unresolved_semantics_within_current_supported_scope": [],
+  "inherited_guard_acceptance": 97,
+  "baseline_commit": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "baseline_tree": "1fa709a167abb369932e651f89babbd0034941c5",
+  "source_commit": "b75bfcf352e3e8bb5346e210a6b427a7af3a4242",
+  "source_identity": "12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb",
+  "rows": [
+    {
+      "row": 1,
+      "path": "src/warhammer40k_core/core/ruleset_descriptor.py",
+      "owner": "TerrainMovementPolicy.policy_for_feature_kind",
+      "decision": "ACCEPT",
+      "before_ast_sha256": "b6f71007896128873d7bfa622a9382c77a7c160cc71c8381a5589e0f8185d794",
+      "after_ast_sha256": "3f95fc09e69a2ae70f3ac3ab8935507740be708e83a494ecb5afa8d12c49d28a",
+      "authoritative_support": [
+        {
+          "source_id": "rule:13:13.06:1",
+          "source_sha256": "3dc8a7351ba5246eb1d88731dd743a87972d3a9aa85427564a778b4d6f34ea24",
+          "pointer": "SOURCE-RULES.json#/rules/rule:13:13.06:1",
+          "blocks": [
+            {
+              "ordinal": 12,
+              "sha256": "fc0055b2303b1cdd5f93b986012118f8bf4f6d6c8b1d9af24f811d0a8a29fd2b"
+            },
+            {
+              "ordinal": 13,
+              "sha256": "b450cfba1bfd206e034f24b04dfe08a9f602d7728278927917b17b8e5e9211bf"
+            },
+            {
+              "ordinal": 14,
+              "sha256": "b42331d3bce969e5e888085d84868e801fef9fd07014e8ffc2e73366a68b0bed"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:02:02.05.01:1",
+          "source_sha256": "48df8363e95ed138f1cf0af5f99b0cf159fc9a66d8141bae3c5e87ac2ad899ef",
+          "pointer": "SOURCE-RULES.json#/rules/rule:02:02.05.01:1",
+          "blocks": [
+            {
+              "ordinal": 2,
+              "sha256": "cd5a551d353de0b4c29ed46c31929eef51de2cf3b4bac652e856404e39ccc6f2"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "083913006c59b36c093ac2dcbdeaba990045375651a813fa6a431058777bfb60"
+            },
+            {
+              "ordinal": 7,
+              "sha256": "1443e3ef5f01968e29f55ef61df03f71e45b7347511db6e6bd8be5926e75ba67"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:19:19.03:1",
+          "source_sha256": "c201e92790ee6f6c67d64b1cce8559d1e07f62641c68d0df15d7aaefd6e51b79",
+          "pointer": "SOURCE-RULES.json#/rules/rule:19:19.03:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "d89c3900547a3439bda1d6489ccde0e1edd1b1f71ad68e2987114d2273be2c0a"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "path": "src/warhammer40k_core/core/terrain_endpoint_policy.py",
+      "owner": "@module",
+      "decision": "ACCEPT",
+      "before_ast_sha256": null,
+      "after_ast_sha256": "0241e71a89c7081b6860230e658a4e563503902a26afaad48f1d38e430255e53",
+      "authoritative_support": [
+        {
+          "source_id": "rule:13:13.06:1",
+          "source_sha256": "3dc8a7351ba5246eb1d88731dd743a87972d3a9aa85427564a778b4d6f34ea24",
+          "pointer": "SOURCE-RULES.json#/rules/rule:13:13.06:1",
+          "blocks": [
+            {
+              "ordinal": 12,
+              "sha256": "fc0055b2303b1cdd5f93b986012118f8bf4f6d6c8b1d9af24f811d0a8a29fd2b"
+            },
+            {
+              "ordinal": 13,
+              "sha256": "b450cfba1bfd206e034f24b04dfe08a9f602d7728278927917b17b8e5e9211bf"
+            },
+            {
+              "ordinal": 14,
+              "sha256": "b42331d3bce969e5e888085d84868e801fef9fd07014e8ffc2e73366a68b0bed"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:02:02.05.01:1",
+          "source_sha256": "48df8363e95ed138f1cf0af5f99b0cf159fc9a66d8141bae3c5e87ac2ad899ef",
+          "pointer": "SOURCE-RULES.json#/rules/rule:02:02.05.01:1",
+          "blocks": [
+            {
+              "ordinal": 2,
+              "sha256": "cd5a551d353de0b4c29ed46c31929eef51de2cf3b4bac652e856404e39ccc6f2"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "083913006c59b36c093ac2dcbdeaba990045375651a813fa6a431058777bfb60"
+            },
+            {
+              "ordinal": 7,
+              "sha256": "1443e3ef5f01968e29f55ef61df03f71e45b7347511db6e6bd8be5926e75ba67"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:19:19.03:1",
+          "source_sha256": "c201e92790ee6f6c67d64b1cce8559d1e07f62641c68d0df15d7aaefd6e51b79",
+          "pointer": "SOURCE-RULES.json#/rules/rule:19:19.03:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "d89c3900547a3439bda1d6489ccde0e1edd1b1f71ad68e2987114d2273be2c0a"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 3,
+      "path": "src/warhammer40k_core/core/terrain_endpoint_policy.py",
+      "owner": "classified_terrain_endpoint_policy",
+      "decision": "ACCEPT",
+      "before_ast_sha256": null,
+      "after_ast_sha256": "9df423afba7eadf48028d4db8df80ac65ab8aa9e55c59122407695523da075b9",
+      "authoritative_support": [
+        {
+          "source_id": "rule:13:13.06:1",
+          "source_sha256": "3dc8a7351ba5246eb1d88731dd743a87972d3a9aa85427564a778b4d6f34ea24",
+          "pointer": "SOURCE-RULES.json#/rules/rule:13:13.06:1",
+          "blocks": [
+            {
+              "ordinal": 12,
+              "sha256": "fc0055b2303b1cdd5f93b986012118f8bf4f6d6c8b1d9af24f811d0a8a29fd2b"
+            },
+            {
+              "ordinal": 13,
+              "sha256": "b450cfba1bfd206e034f24b04dfe08a9f602d7728278927917b17b8e5e9211bf"
+            },
+            {
+              "ordinal": 14,
+              "sha256": "b42331d3bce969e5e888085d84868e801fef9fd07014e8ffc2e73366a68b0bed"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:02:02.05.01:1",
+          "source_sha256": "48df8363e95ed138f1cf0af5f99b0cf159fc9a66d8141bae3c5e87ac2ad899ef",
+          "pointer": "SOURCE-RULES.json#/rules/rule:02:02.05.01:1",
+          "blocks": [
+            {
+              "ordinal": 2,
+              "sha256": "cd5a551d353de0b4c29ed46c31929eef51de2cf3b4bac652e856404e39ccc6f2"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "083913006c59b36c093ac2dcbdeaba990045375651a813fa6a431058777bfb60"
+            },
+            {
+              "ordinal": 7,
+              "sha256": "1443e3ef5f01968e29f55ef61df03f71e45b7347511db6e6bd8be5926e75ba67"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:19:19.03:1",
+          "source_sha256": "c201e92790ee6f6c67d64b1cce8559d1e07f62641c68d0df15d7aaefd6e51b79",
+          "pointer": "SOURCE-RULES.json#/rules/rule:19:19.03:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "d89c3900547a3439bda1d6489ccde0e1edd1b1f71ad68e2987114d2273be2c0a"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 4,
+      "path": "src/warhammer40k_core/engine/charge_move_geometry.py",
+      "owner": "_friendly_vehicle_monster_model_ids",
+      "decision": "ACCEPT",
+      "before_ast_sha256": "88b6cf5ad15855c8dea03b7fd61ef4f2253c10e38772501ef3af318f5ce0b214",
+      "after_ast_sha256": "098768193e41d4a144579036c8fb8a9e7f6213052f757b9c7284cf39f53b93f3",
+      "authoritative_support": [
+        {
+          "source_id": "rule:02:02.05.01:1",
+          "source_sha256": "48df8363e95ed138f1cf0af5f99b0cf159fc9a66d8141bae3c5e87ac2ad899ef",
+          "pointer": "SOURCE-RULES.json#/rules/rule:02:02.05.01:1",
+          "blocks": [
+            {
+              "ordinal": 2,
+              "sha256": "cd5a551d353de0b4c29ed46c31929eef51de2cf3b4bac652e856404e39ccc6f2"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "083913006c59b36c093ac2dcbdeaba990045375651a813fa6a431058777bfb60"
+            },
+            {
+              "ordinal": 7,
+              "sha256": "1443e3ef5f01968e29f55ef61df03f71e45b7347511db6e6bd8be5926e75ba67"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:19:19.03:1",
+          "source_sha256": "c201e92790ee6f6c67d64b1cce8559d1e07f62641c68d0df15d7aaefd6e51b79",
+          "pointer": "SOURCE-RULES.json#/rules/rule:19:19.03:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "d89c3900547a3439bda1d6489ccde0e1edd1b1f71ad68e2987114d2273be2c0a"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:17:17.01:1",
+          "source_sha256": "be5007c7f2cfab5021ee7d68a8b0afb9a6aadf1c2be1728a62c32ab59a715afe",
+          "pointer": "SOURCE-RULES.json#/rules/rule:17:17.01:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "35c581d8099a72626ba1fa4c6888e963f60bace836d953cddedb846ac668e3fc"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 5,
+      "path": "src/warhammer40k_core/engine/faction_content/catalog_generic_hooks.py",
+      "owner": "@module",
+      "decision": "ACCEPT",
+      "before_ast_sha256": "6f14422ce2e308aa76e6291e4306f29876330877e6c2c9b662859cf816b701f3",
+      "after_ast_sha256": "5b3a25d50e01bfa1e8b6a16944abf798cf48583590f797ad14e6244ef8fe2e6b",
+      "authoritative_support": [
+        {
+          "source_id": "rule:09:09.07:1",
+          "source_sha256": "9a2e9017949710717bf19fcd85f7e4ed9c33a4a3972ee35ee3896b8f084dafd0",
+          "pointer": "SOURCE-RULES.json#/rules/rule:09:09.07:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "efaed1ce5917becb5a59a864b6f6f305dd37eb47d2d57217515cd8c168194fa2"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "71b6143d5f310205f6d72379853a67a7f27f18983ba7f07ef42b7255d7fca1ee"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "722c861a2cd0778868be8bdb9cd90031b5806a6b8b946d1c59a658ecd24b506b"
+            },
+            {
+              "ordinal": 5,
+              "sha256": "68e48f9b4b50181952471f0e79f47da75d03158f8c4a8896eb8f68cedc26240c"
+            },
+            {
+              "ordinal": 6,
+              "sha256": "1637ad8e901a9990e52ecce687e39af56e3201c2039997ffb58140fafd5ddceb"
+            },
+            {
+              "ordinal": 7,
+              "sha256": "e71c12176330a1cb6bd961af93620cfe60c68b59704dac7bff9b61bc09d3c041"
+            },
+            {
+              "ordinal": 8,
+              "sha256": "e3b5a449861b5f4f87f60a8f39adefa149b4b3b5031e94b81656dba922688233"
+            },
+            {
+              "ordinal": 9,
+              "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d"
+            },
+            {
+              "ordinal": 10,
+              "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab"
+            },
+            {
+              "ordinal": 11,
+              "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315"
+            },
+            {
+              "ordinal": 12,
+              "sha256": "7ea44889c11182e5c1b5faa26f13f400d8ae6f5ea372a9efca05e54701bb363a"
+            },
+            {
+              "ordinal": 13,
+              "sha256": "a820d406efe9a5fa6b1c2a824a32c801971c78ea004febf6d2460318c472ac71"
+            },
+            {
+              "ordinal": 14,
+              "sha256": "fc57af5c41537c66c0fba008c2f3e38ff40e1bea3cd477f21503f57c5a2850d0"
+            },
+            {
+              "ordinal": 15,
+              "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4"
+            },
+            {
+              "ordinal": 16,
+              "sha256": "275c4cb105da303b08d54b28d2f1ac19f037f195e5e5426f9bf646c66fb34699"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:06:06.03:1",
+          "source_sha256": "0edce95045a10290c9b6f2f514bbcb7ba5b6ba35cb0585ff3bc0019f19d6b7fa",
+          "pointer": "SOURCE-RULES.json#/rules/rule:06:06.03:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "71086ccc653dc46bcf452dfbe889cd84a1dfee0df9279eb29bfbcad82f047bba"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "1b45ae7adcb5469e3731a8a06409558d4f34e0871248a92be8c9d0a728777eb2"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "dad1d89a431fd6190971f378a526e2dc24e6af305320376ac6d26d57d004e193"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "89575adcffe53a30475713213c60b8d8d97855b936917e325f1e721ef8b6ada5"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:06:06.02:1",
+          "source_sha256": "039064052b2edb0a33276d6f02fc4a3bca671f87b3a3af9799c6d86c8211cbba",
+          "pointer": "SOURCE-RULES.json#/rules/rule:06:06.02:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "359a2e17a5c0e028c5db5adb7d5ca8ee119647a916768f9d16bace019a2f6898"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "42b52d754de77338b18994dfb82885b4cf2889de9d419be0dda5aca0f196c886"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "251f67ca200527381f3664b98e297a8e31fb8920cbb43f3cab974e03cae246f4"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "170dd399b8e93994ad3668e40f048946432c068399195a46b528b31f9c9d1111"
+            },
+            {
+              "ordinal": 5,
+              "sha256": "287d5c94b43c121ab24214f9dfa512fdcf34617e7097ec3c5b4a18da3daa79ba"
+            },
+            {
+              "ordinal": 6,
+              "sha256": "e8f6627e74c012312b600ebb974ba9e6ca7f3b7cfa9fe938a0707a0e7053f445"
+            },
+            {
+              "ordinal": 7,
+              "sha256": "1d1077a1420904d164b7db440cd830105ee1e06cad5aeae07e78166f0293f46c"
+            },
+            {
+              "ordinal": 8,
+              "sha256": "969c572dd7eff3bd29ca395c4adeb481894c26a66a25e493045e6e27aefc48c4"
+            },
+            {
+              "ordinal": 9,
+              "sha256": "4a041dbf4661e64ce5dd071f3ed4f987f5bf13e529bcab2474ab9e68af8bd9c9"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:24:24.12:1",
+          "source_sha256": "f0ce151c8515e298e4c39be9538c5fbfb3a11001bb2698e0c7b4dce00aedf9e7",
+          "pointer": "SOURCE-RULES.json#/rules/rule:24:24.12:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "17d9142b438e7d1639fae5582967e789b522972a1f07e1810e05857b930b2994"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 6,
+      "path": "src/warhammer40k_core/engine/faction_content/catalog_generic_hooks.py",
+      "owner": "mortal_wound_feel_no_pain",
+      "decision": "ACCEPT",
+      "before_ast_sha256": "b82f434c4b36822773bac2fd6d26970b0caed2e21b0e54cb7eec148562ec2cd8",
+      "after_ast_sha256": "4b82c6412da6e19d0fd01035fac35e04f9c499f2e500f0c24472f9d88c506789",
+      "authoritative_support": [
+        {
+          "source_id": "rule:09:09.07:1",
+          "source_sha256": "9a2e9017949710717bf19fcd85f7e4ed9c33a4a3972ee35ee3896b8f084dafd0",
+          "pointer": "SOURCE-RULES.json#/rules/rule:09:09.07:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "efaed1ce5917becb5a59a864b6f6f305dd37eb47d2d57217515cd8c168194fa2"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "71b6143d5f310205f6d72379853a67a7f27f18983ba7f07ef42b7255d7fca1ee"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "722c861a2cd0778868be8bdb9cd90031b5806a6b8b946d1c59a658ecd24b506b"
+            },
+            {
+              "ordinal": 5,
+              "sha256": "68e48f9b4b50181952471f0e79f47da75d03158f8c4a8896eb8f68cedc26240c"
+            },
+            {
+              "ordinal": 6,
+              "sha256": "1637ad8e901a9990e52ecce687e39af56e3201c2039997ffb58140fafd5ddceb"
+            },
+            {
+              "ordinal": 7,
+              "sha256": "e71c12176330a1cb6bd961af93620cfe60c68b59704dac7bff9b61bc09d3c041"
+            },
+            {
+              "ordinal": 8,
+              "sha256": "e3b5a449861b5f4f87f60a8f39adefa149b4b3b5031e94b81656dba922688233"
+            },
+            {
+              "ordinal": 9,
+              "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d"
+            },
+            {
+              "ordinal": 10,
+              "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab"
+            },
+            {
+              "ordinal": 11,
+              "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315"
+            },
+            {
+              "ordinal": 12,
+              "sha256": "7ea44889c11182e5c1b5faa26f13f400d8ae6f5ea372a9efca05e54701bb363a"
+            },
+            {
+              "ordinal": 13,
+              "sha256": "a820d406efe9a5fa6b1c2a824a32c801971c78ea004febf6d2460318c472ac71"
+            },
+            {
+              "ordinal": 14,
+              "sha256": "fc57af5c41537c66c0fba008c2f3e38ff40e1bea3cd477f21503f57c5a2850d0"
+            },
+            {
+              "ordinal": 15,
+              "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4"
+            },
+            {
+              "ordinal": 16,
+              "sha256": "275c4cb105da303b08d54b28d2f1ac19f037f195e5e5426f9bf646c66fb34699"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:06:06.03:1",
+          "source_sha256": "0edce95045a10290c9b6f2f514bbcb7ba5b6ba35cb0585ff3bc0019f19d6b7fa",
+          "pointer": "SOURCE-RULES.json#/rules/rule:06:06.03:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "71086ccc653dc46bcf452dfbe889cd84a1dfee0df9279eb29bfbcad82f047bba"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "1b45ae7adcb5469e3731a8a06409558d4f34e0871248a92be8c9d0a728777eb2"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "dad1d89a431fd6190971f378a526e2dc24e6af305320376ac6d26d57d004e193"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "89575adcffe53a30475713213c60b8d8d97855b936917e325f1e721ef8b6ada5"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:06:06.02:1",
+          "source_sha256": "039064052b2edb0a33276d6f02fc4a3bca671f87b3a3af9799c6d86c8211cbba",
+          "pointer": "SOURCE-RULES.json#/rules/rule:06:06.02:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "359a2e17a5c0e028c5db5adb7d5ca8ee119647a916768f9d16bace019a2f6898"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "42b52d754de77338b18994dfb82885b4cf2889de9d419be0dda5aca0f196c886"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "251f67ca200527381f3664b98e297a8e31fb8920cbb43f3cab974e03cae246f4"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "170dd399b8e93994ad3668e40f048946432c068399195a46b528b31f9c9d1111"
+            },
+            {
+              "ordinal": 5,
+              "sha256": "287d5c94b43c121ab24214f9dfa512fdcf34617e7097ec3c5b4a18da3daa79ba"
+            },
+            {
+              "ordinal": 6,
+              "sha256": "e8f6627e74c012312b600ebb974ba9e6ca7f3b7cfa9fe938a0707a0e7053f445"
+            },
+            {
+              "ordinal": 7,
+              "sha256": "1d1077a1420904d164b7db440cd830105ee1e06cad5aeae07e78166f0293f46c"
+            },
+            {
+              "ordinal": 8,
+              "sha256": "969c572dd7eff3bd29ca395c4adeb481894c26a66a25e493045e6e27aefc48c4"
+            },
+            {
+              "ordinal": 9,
+              "sha256": "4a041dbf4661e64ce5dd071f3ed4f987f5bf13e529bcab2474ab9e68af8bd9c9"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:24:24.12:1",
+          "source_sha256": "f0ce151c8515e298e4c39be9538c5fbfb3a11001bb2698e0c7b4dce00aedf9e7",
+          "pointer": "SOURCE-RULES.json#/rules/rule:24:24.12:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "17d9142b438e7d1639fae5582967e789b522972a1f07e1810e05857b930b2994"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 7,
+      "path": "src/warhammer40k_core/engine/faction_content/runtime.py",
+      "owner": "@module",
+      "decision": "ACCEPT",
+      "before_ast_sha256": "0ff721df1b49210748463965a77294a74bff690ddf76d50f68a5486515ba7f6c",
+      "after_ast_sha256": "5f49bc482b893588551269632b145723002576030dec26b33609936483cb2748",
+      "authoritative_support": [
+        {
+          "source_id": "rule:24:24.01:1",
+          "source_sha256": "0ee649cb14a1556b93c22c87b354ab313e2c886afb7832f23c4fb7af216b99ee",
+          "pointer": "SOURCE-RULES.json#/rules/rule:24:24.01:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "d2b9678e0a62e8d054c804c11f5f01083ef73c2481d56f5a4ba7b6a4329742cd"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:02:02.05.01:1",
+          "source_sha256": "48df8363e95ed138f1cf0af5f99b0cf159fc9a66d8141bae3c5e87ac2ad899ef",
+          "pointer": "SOURCE-RULES.json#/rules/rule:02:02.05.01:1",
+          "blocks": [
+            {
+              "ordinal": 2,
+              "sha256": "cd5a551d353de0b4c29ed46c31929eef51de2cf3b4bac652e856404e39ccc6f2"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "083913006c59b36c093ac2dcbdeaba990045375651a813fa6a431058777bfb60"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 8,
+      "path": "src/warhammer40k_core/engine/primary_scoring_boundary_lifecycle.py",
+      "owner": "_pending_window_decision_types",
+      "decision": "ACCEPT",
+      "before_ast_sha256": "4b9f9e3c765484504e6d3b820f16cf611b38ca070c2a2ae86507cfb9f7b536d4",
+      "after_ast_sha256": "1143488a71c9c2a3ece78fbe141799265a7d83eb9e1535308eef600303b8bd7e",
+      "authoritative_support": [
+        {
+          "source_id": "rule:03:03.03:1",
+          "source_sha256": "ee032d7cd46298e9df65412aa2354d1fa13d7206e8b74b49566d48d8c9aeaf95",
+          "pointer": "SOURCE-RULES.json#/rules/rule:03:03.03:1",
+          "blocks": [
+            {
+              "ordinal": 5,
+              "sha256": "3565208bcdcb7d6d5a78e120c429e143822c1096221cd68927043242c77ee7aa"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:01:01.03.02:1",
+          "source_sha256": "e3cc8ad7ea3b02dd58abf3132a08aeca50160284022dde52379ef71bda806395",
+          "pointer": "SOURCE-RULES.json#/rules/rule:01:01.03.02:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "e4d78ed4e18bbc3cc9894414114fc1a8935abef1b058304637e0a1403925b1d3"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "854b2cb37279b7dd8bf61f4aea115c2e15ac17d35b1b0eb4e616dd08f8476b0b"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "3ddaf5318bc615f6aaa5479f2e3d0a258a3e2ee9b292d86054d56901cd4608de"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "92b854936b8fa89cbcd78adb791a325b01e6686993d4979bbd3f7089fdbc4171"
+            },
+            {
+              "ordinal": 5,
+              "sha256": "5a3ca6cb8661fe7c07c804388f9ce03a9533f656a9089fa81124581b4e3c7ace"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:08:08.05:1",
+          "source_sha256": "db92b5126df30b1378ae6be554d47cacee95a1960bd0b6bf8619decf6ef304dc",
+          "pointer": "SOURCE-RULES.json#/rules/rule:08:08.05:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "11e600ccdf406b6fe3eab995c7249b39228ad0663b38750474f31fd70d1a4405"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "4daa9aaf753cfe6b251b75f939e286d4a3e64b631ac0b592a47c360741fbcd16"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "abe8a15b9c744964daf9326485ef2f7b0cc7c892966b16ef7f30e6f47a210193"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 9,
+      "path": "src/warhammer40k_core/engine/sequencing.py",
+      "owner": "@module",
+      "decision": "ACCEPT",
+      "before_ast_sha256": "7c2e5c340effbe24ca7c2eed7bf64f3c5e3a75f644aa0bcbba26f6f1a010a8f6",
+      "after_ast_sha256": "93ec9b94843468752154c3db5e3a8ed585fbed4679d0013aa9ca861c50f53818",
+      "authoritative_support": [
+        {
+          "source_id": "rule:08:08.05:1",
+          "source_sha256": "db92b5126df30b1378ae6be554d47cacee95a1960bd0b6bf8619decf6ef304dc",
+          "pointer": "SOURCE-RULES.json#/rules/rule:08:08.05:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "11e600ccdf406b6fe3eab995c7249b39228ad0663b38750474f31fd70d1a4405"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "4daa9aaf753cfe6b251b75f939e286d4a3e64b631ac0b592a47c360741fbcd16"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "abe8a15b9c744964daf9326485ef2f7b0cc7c892966b16ef7f30e6f47a210193"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:01:01.03.02:1",
+          "source_sha256": "e3cc8ad7ea3b02dd58abf3132a08aeca50160284022dde52379ef71bda806395",
+          "pointer": "SOURCE-RULES.json#/rules/rule:01:01.03.02:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "e4d78ed4e18bbc3cc9894414114fc1a8935abef1b058304637e0a1403925b1d3"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "854b2cb37279b7dd8bf61f4aea115c2e15ac17d35b1b0eb4e616dd08f8476b0b"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "3ddaf5318bc615f6aaa5479f2e3d0a258a3e2ee9b292d86054d56901cd4608de"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "92b854936b8fa89cbcd78adb791a325b01e6686993d4979bbd3f7089fdbc4171"
+            },
+            {
+              "ordinal": 5,
+              "sha256": "5a3ca6cb8661fe7c07c804388f9ce03a9533f656a9089fa81124581b4e3c7ace"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 10,
+      "path": "src/warhammer40k_core/engine/sequencing.py",
+      "owner": "SequencingConflictContext.sequence_exception_source_id",
+      "decision": "ACCEPT",
+      "before_ast_sha256": "49a483c7f97cd0a6646d6d4cd3c8adfc4fb5e91655d2b27696ded76842443a9a",
+      "after_ast_sha256": "084c11f8bfc3b46fa3ed4860a973a3fe56093468af2d2a10757f30ee3455e911",
+      "authoritative_support": [
+        {
+          "source_id": "rule:08:08.05:1",
+          "source_sha256": "db92b5126df30b1378ae6be554d47cacee95a1960bd0b6bf8619decf6ef304dc",
+          "pointer": "SOURCE-RULES.json#/rules/rule:08:08.05:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "11e600ccdf406b6fe3eab995c7249b39228ad0663b38750474f31fd70d1a4405"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "4daa9aaf753cfe6b251b75f939e286d4a3e64b631ac0b592a47c360741fbcd16"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "abe8a15b9c744964daf9326485ef2f7b0cc7c892966b16ef7f30e6f47a210193"
+            }
+          ]
+        },
+        {
+          "source_id": "rule:01:01.03.02:1",
+          "source_sha256": "e3cc8ad7ea3b02dd58abf3132a08aeca50160284022dde52379ef71bda806395",
+          "pointer": "SOURCE-RULES.json#/rules/rule:01:01.03.02:1",
+          "blocks": [
+            {
+              "ordinal": 1,
+              "sha256": "e4d78ed4e18bbc3cc9894414114fc1a8935abef1b058304637e0a1403925b1d3"
+            },
+            {
+              "ordinal": 2,
+              "sha256": "854b2cb37279b7dd8bf61f4aea115c2e15ac17d35b1b0eb4e616dd08f8476b0b"
+            },
+            {
+              "ordinal": 3,
+              "sha256": "3ddaf5318bc615f6aaa5479f2e3d0a258a3e2ee9b292d86054d56901cd4608de"
+            },
+            {
+              "ordinal": 4,
+              "sha256": "92b854936b8fa89cbcd78adb791a325b01e6686993d4979bbd3f7089fdbc4171"
+            },
+            {
+              "ordinal": 5,
+              "sha256": "5a3ca6cb8661fe7c07c804388f9ce03a9533f656a9089fa81124581b4e3c7ace"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "bounded_claims": [
+    "No supported native mixed Command-END_PHASE mission/player batch; generic exception and native rules-before-scoring independently validated. Future provider requires real mixed-batch guard.",
+    "Charge collector is inactive in native Charge; query behavior accepted without gameplay fix or17.01 Charge grant.",
+    "FNP proof is an explicitly materialized native-source phase kernel, not full muster/lifecycle restoration.",
+    "Aeldari baseline already prescribes Normal MoveD6+1; no numeric rule change.",
+    "No aggregate, coverage, performance or CI gate is closed by focused tests."
+  ],
+  "blockers": [],
+  "cumulative_activation": false,
+  "publication": false
+}

@@ -193,7 +193,8 @@ def terrain_endpoint_placement_violation(
                 blocker_id=solid_blocker,
             )
         feature_policy = ruleset_descriptor.terrain_movement_policy.policy_for_feature_kind(
-            feature.feature_kind
+            feature.feature_kind,
+            endpoint_classification=feature.classification if feature.floors else None,
         )
         support_surfaces = feature.support_surfaces(
             no_overhang_required=feature_policy.no_overhang_required

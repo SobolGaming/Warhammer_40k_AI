@@ -9,6 +9,7 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.triggered_movement import TriggeredMovementKind
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -19,6 +20,7 @@ class ShootingEndSurgeGrantPayload(TypedDict):
     source_id: str
     unit_instance_id: str
     max_distance_bonus_inches: int
+    movement_kind: str
     replay_payload: JsonValue
     decision_effect_payload: JsonValue
     distance_reroll_permission: RerollPermissionPayload | None
@@ -84,6 +86,7 @@ class ShootingEndSurgeGrant:
     source_id: str
     unit_instance_id: str
     max_distance_bonus_inches: int = 0
+    movement_kind: TriggeredMovementKind = TriggeredMovementKind.SURGE
     replay_payload: JsonValue = None
     decision_effect_payload: JsonValue = None
     distance_reroll_permission: RerollPermission | None = None
@@ -104,6 +107,8 @@ class ShootingEndSurgeGrant:
                 self.max_distance_bonus_inches,
             ),
         )
+        if type(self.movement_kind) is not TriggeredMovementKind:
+            raise GameLifecycleError("Shooting-end movement kind must be TriggeredMovementKind.")
         object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
         object.__setattr__(
             self,
@@ -124,6 +129,7 @@ class ShootingEndSurgeGrant:
             "source_id": self.source_id,
             "unit_instance_id": self.unit_instance_id,
             "max_distance_bonus_inches": self.max_distance_bonus_inches,
+            "movement_kind": self.movement_kind.value,
             "replay_payload": self.replay_payload,
             "decision_effect_payload": self.decision_effect_payload,
             "distance_reroll_permission": (
@@ -184,7 +190,10 @@ class ShootingEndSurgeHookRegistry:
                     raise GameLifecycleError("Shooting-end surge handler returned source_id drift.")
                 from warhammer40k_core.engine.surge_movement import surge_ineligibility
 
-                if surge_ineligibility(context.state, grant.unit_instance_id) is not None:
+                if (
+                    grant.movement_kind is TriggeredMovementKind.SURGE
+                    and surge_ineligibility(context.state, grant.unit_instance_id) is not None
+                ):
                     continue
                 grants.append(grant)
         return tuple(sorted(grants, key=lambda grant: (grant.hook_id, grant.unit_instance_id)))

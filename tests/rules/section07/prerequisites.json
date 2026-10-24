@@ -1,0 +1,19 @@
+{
+  "scope": "Section07 only; boundary-specific real engine state",
+  "definition_fixture": "tests.support.section07_fixtures.section07_definitions",
+  "native_datasheet_ids": ["000004080", "000004078", "000000592"],
+  "preparation": "one session-scoped indexed source build; digest guard; fresh unit graphs via Section02Definitions.unit",
+  "mission": "one immutable source-complete Event Companion setup, used only where boundary/scoring consumers require mission policy and geometry; no mission setup traversal",
+  "minimal_boundaries": {
+    "progression": "fresh state at each tested phase/turn/round boundary; no previous phases",
+    "facade": "start of battle round, real handlers; two rounds are the behavior under test",
+    "mission_order": "typed nonempty source-occurrence contracts; policy derived by production sequencing, never passed as expected policy",
+    "mission_boundary": "fresh Fight/end-of-turn boundary with actual source layout, native units, and real achieved condition",
+    "round_effect": "constructed source permission on native supported body; actual named source consumer and DecisionController",
+    "trigger_effects": "compiled constructed unqualified Fight-start contract; four explicit boundary checkpoints with one history; no unrelated phases",
+    "out_of_phase": "native equipped Heavy profile and typed permission outcome; production shooting modifier consumer; no granting-provider claim"
+  },
+  "excluded_costs": ["army mustering", "pregame setup", "full-game startup", "unrelated prior phases", "replay reconstruction", "software installation"],
+  "timing_policy": "one stable shared-process complete Section07 correctness run; preparation, setup, calls and subprocess wall reported separately; filesystem caches not flushed; Windows/WSL userland are not hosted CI",
+  "isolation_limits": "explicit mutable-graph/payload and shared-definition digest checks are bounded evidence; universal fixture-order and process independence remain unproven"
+}

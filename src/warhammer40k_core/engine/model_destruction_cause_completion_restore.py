@@ -7,6 +7,7 @@ from warhammer40k_core.engine import mortal_wound_application_authority as _mwaa
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.model_destruction_cause_attack_restore import (
     active_attack_destruction_context_ids,
+    consumed_retained_attack_mortal_continuation,
     mortal_application_contains_damage,
     require_pending_attack_continuation,
     validate_pending_attack_destruction_boundary,
@@ -107,6 +108,30 @@ def validate_pending_model_destruction_cause_inventory(
             if authority is None:
                 raise GameLifecycleError("Pending attack destruction cause is missing.")
             if authority.source_authority_finalized:
+                mortal_requests = tuple(
+                    request
+                    for request in pending_decision_requests
+                    if is_mortal_wound_resolution_request(request)
+                    and isinstance(context := mortal_wound_resolution_source_context(request), dict)
+                    and context.get("source_kind") == DEADLY_DEMISE_SOURCE_KIND
+                    and context.get("sequence_id") == active_attack_sequence.sequence_id
+                    and context.get("damage_application") == pending.damage_application.to_payload()
+                )
+                if len(mortal_requests) == 1:
+                    context = mortal_wound_resolution_source_context(mortal_requests[0])
+                    if (
+                        not isinstance(context, dict)
+                        or consumed_retained_attack_mortal_continuation(
+                            state=state,
+                            attack_sequence=active_attack_sequence,
+                            source_context=context,
+                            request=mortal_requests[0],
+                            event_records=event_records,
+                        )
+                        != cause_id
+                    ):
+                        raise GameLifecycleError("Finalized retained attack mortal cause drift.")
+                    continue
                 if authority.model_destroyed_event is None or not any(
                     request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
                     and isinstance(request.payload, dict)
@@ -196,14 +221,22 @@ def validate_pending_model_destruction_cause_inventory(
                 or source_context.get("sequence_id") != active_attack_sequence.sequence_id
             ):
                 raise GameLifecycleError("Pending attack destruction continuation drift.")
-            expected_cause_ids.add(
-                require_pending_attack_continuation(
-                    state=state,
-                    attack_sequence=active_attack_sequence,
-                    event_records=event_records,
-                    damage_payload=source_context.get("damage_application"),
-                )
+            consumed = consumed_retained_attack_mortal_continuation(
+                state=state,
+                attack_sequence=active_attack_sequence,
+                source_context=source_context,
+                request=request,
+                event_records=event_records,
             )
+            if consumed is None:
+                expected_cause_ids.add(
+                    require_pending_attack_continuation(
+                        state=state,
+                        attack_sequence=active_attack_sequence,
+                        event_records=event_records,
+                        damage_payload=source_context.get("damage_application"),
+                    )
+                )
         elif source_kind == RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND:
             root_context = _mdcpv.json_object_value(
                 source_context.get("root_context"),

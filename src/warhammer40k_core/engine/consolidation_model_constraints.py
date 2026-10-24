@@ -25,12 +25,11 @@ from warhammer40k_core.engine.model_movement_permission import (
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest, ProposalKind
 from warhammer40k_core.engine.objective_geometry import (
-    ObjectiveGeometry,
     measure_model_to_objective,
 )
+from warhammer40k_core.engine.objective_movement_constraint import objective_goal
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
-from warhammer40k_core.geometry.base import CircularBase
 from warhammer40k_core.geometry.movement_reachability import (
     MovementGoal,
     MovementReachabilityQuery,
@@ -38,7 +37,6 @@ from warhammer40k_core.geometry.movement_reachability import (
     movement_reachability,
 )
 from warhammer40k_core.geometry.pathing import PathWitness
-from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model
 
 if TYPE_CHECKING:
@@ -96,7 +94,7 @@ def consolidation_model_violation(
             ).closest_distance_inches
             if after_distance >= before_distance - 1e-9:
                 return "objective_consolidation_model_not_closer"
-            goal = _objective_goal(objective)
+            goal = objective_goal(objective)
         else:
             distances = {
                 unit_id: min(start.range_to(model) for model in models)
@@ -144,20 +142,6 @@ def consolidation_model_violation(
                 else "consolidation_reachability_unresolved"
             )
     return None
-
-
-def _objective_goal(objective: ObjectiveGeometry) -> MovementGoal:
-    marker = objective.marker
-    if marker is None:
-        return MovementGoal(polygons=objective.footprint_polygons, vertical_inches=5.0)
-    return MovementGoal(
-        disk=(
-            Pose.at(marker.x_inches, marker.y_inches, marker.z_inches),
-            CircularBase(radius=marker.marker_diameter_inches / 2),
-        ),
-        horizontal_inches=marker.control_horizontal_inches,
-        vertical_inches=marker.control_vertical_inches,
-    )
 
 
 def _query(
@@ -299,4 +283,7 @@ def _query(
         else coherency.max_vertical_inches,
         coherency_max_span_inches=coherency.max_unit_span_inches,
         coherency_all_models_distance_inches=coherency.max_all_models_distance_inches,
+        # Objective fallback needs a continuous impossibility certificate;
+        # exhausting the bounded witness search cannot waive an obligation.
+        prove_coherent_endpoint_exclusion=goal.disk is not None,
     )

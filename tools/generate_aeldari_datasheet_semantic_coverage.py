@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING or __package__:
+    from tools.ability_support_sources import load_source_artifacts as _load_source_artifacts
     from tools.aeldari_datasheet_semantic_coverage import (
         GENERATED_BY,
         SCHEMA_VERSION,
@@ -24,11 +25,9 @@ if TYPE_CHECKING or __package__:
         DatasheetSourceTreatment,
         faction_pack_datasheet_review,
     )
-    from tools.generate_ability_support_matrix import (
-        DEFAULT_SOURCE_JSON_DIR,
-        _load_source_artifacts,
-    )
+    from tools.generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR
 else:
+    from ability_support_sources import load_source_artifacts as _load_source_artifacts
     from aeldari_datasheet_semantic_coverage import (
         GENERATED_BY,
         SCHEMA_VERSION,
@@ -45,7 +44,7 @@ else:
         DatasheetSourceTreatment,
         faction_pack_datasheet_review,
     )
-    from generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR, _load_source_artifacts
+    from generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,

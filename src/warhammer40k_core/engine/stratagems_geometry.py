@@ -266,7 +266,7 @@ def _epic_challenge_context_error(
         return "epic_challenge_unit_not_character"
     if "CHARACTER" not in unit.model_by_id(model_id).keywords:
         return "epic_challenge_model_not_character"
-    if not _model_is_alive_and_placed(state=state, model_instance_id=model_id):
+    if not model_is_present_on_battlefield(state=state, model_instance_id=model_id):
         return "epic_challenge_model_not_alive_and_placed"
     return None
 

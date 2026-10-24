@@ -49,13 +49,24 @@ def resolve_mandatory_destruction_reactions_before_removal(
 
     if damage is None or not damage.destroyed:
         return None
-    _asda.reserve_destroyed_attack_damage_authority(
-        state=state,
-        decisions=decisions,
-        attack_sequence=attack_sequence,
-        damage=damage,
-        parent_cause_ids=parent_cause_ids,
+    from warhammer40k_core.engine.attack_sequence_model import AttackSequenceHooks
+    from warhammer40k_core.engine.retained_demise_removal import (
+        finalize_attack_casualty,
+        retained_fight_is_completing,
+        retained_fight_removed_event,
     )
+
+    if (
+        retained_fight_removed_event(state=state, model_instance_id=damage.model_instance_id)
+        is None
+    ):
+        _asda.reserve_destroyed_attack_damage_authority(
+            state=state,
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            damage=damage,
+            parent_cause_ids=parent_cause_ids,
+        )
     controller_player_id = (
         attack_context["defender_player_id"]
         if destroyed_model_controller_player_id is None
@@ -116,6 +127,18 @@ def resolve_mandatory_destruction_reactions_before_removal(
         return choice_status
     for source_index, source in enumerate(mandatory_sources):
         if source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE:
+            if retained_fight_is_completing(
+                state=state, model_instance_id=damage.model_instance_id
+            ):
+                finalize_attack_casualty(
+                    state=state,
+                    decisions=decisions,
+                    attack_sequence=attack_sequence,
+                    damage=damage,
+                    saving_throw_payload=saving_throw_payload,
+                    feel_no_pain=feel_no_pain,
+                    hooks=AttackSequenceHooks.empty(),
+                )
             status = _resolve_deadly_demise_before_removal(
                 state=state,
                 decisions=decisions,

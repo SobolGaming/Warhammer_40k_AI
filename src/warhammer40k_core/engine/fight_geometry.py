@@ -246,6 +246,29 @@ def closest_fight_unit_distance_inches(
     return min(first.range_to(second) for first in first_models for second in second_models)
 
 
+def fight_units_within_distance(
+    *,
+    scenario: BattlefieldScenario,
+    first_unit_instance_id: str,
+    second_unit_instance_id: str,
+    distance_inches: float,
+    state: GameState | None = None,
+) -> bool:
+    first_models = geometry_models_for_fight_unit(
+        scenario=scenario, unit_instance_id=first_unit_instance_id, state=state
+    )
+    second_models = geometry_models_for_fight_unit(
+        scenario=scenario, unit_instance_id=second_unit_instance_id, state=state
+    )
+    if not first_models or not second_models:
+        raise GameLifecycleError("Fight unit distance requires placed models.")
+    return any(
+        first.is_within_range(second, distance_inches)
+        for first in first_models
+        for second in second_models
+    )
+
+
 def enemy_fight_unit_ids_within_distance(
     *,
     scenario: BattlefieldScenario,
@@ -262,13 +285,13 @@ def enemy_fight_unit_ids_within_distance(
             unit_placement.unit_instance_id,
             enemy_unit_ids_for_fight_placement(scenario=scenario, unit_placement=unit_placement),
         )
-        if closest_fight_unit_distance_inches(
+        if fight_units_within_distance(
             scenario=scenario,
             first_unit_instance_id=unit_placement.unit_instance_id,
             second_unit_instance_id=enemy_id,
+            distance_inches=distance_inches,
             state=state,
         )
-        <= distance_inches
     )
 
 

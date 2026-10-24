@@ -1,0 +1,44 @@
+{
+  "base": "d330382d40cd0487fec3b13e4ac315f817bad694",
+  "changes": {
+    "scripts/benchmark_order88_strength.py": {
+      "after_sha256": "c2d5d84ed6f56e9852046f6acf87214883f0236afe61a77210e0e9489fe0e762",
+      "before_sha256": "e216b66054625f434b62944f50c545f772af88610498b818b39f0c1d6c34abcb",
+      "edits": [
+        {
+          "after": "from tests.psychic_modifier_helpers import pending_request\n\nfrom scripts.measure_order65 import _host_inventory\n",
+          "before": "from tests.psychic_modifier_helpers import pending_request\n\n"
+        },
+        {
+          "after": "from time import perf_counter\n\n",
+          "before": "from time import perf_counter\n\nfrom scripts.measure_order65 import _host_inventory\n"
+        }
+      ]
+    },
+    "scripts/check_performance_policy.py": {
+      "after_sha256": "ce2c1e27152f0eb030b867078f543bb94472a7b3b0cf3cd0d5e2cc1102111209",
+      "before_sha256": "211658e8b50b0bb1f443b5389d815a221e1e218c1d475f909b32fa2959cb4d75",
+      "edits": [
+        {
+          "after": "    retained_tool_comparison_inputs,\n)\n\nfrom scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_SECONDS, WORKLOAD\n",
+          "before": "    retained_tool_comparison_inputs,\n)\n"
+        },
+        {
+          "after": "from typing import cast\n\n",
+          "before": "from typing import cast\n\nfrom scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_SECONDS, WORKLOAD\n"
+        }
+      ]
+    },
+    "scripts/performance_smoke.py": {
+      "after_sha256": "0380ba2c9ab5c1e045f281f810f0e6e582b0738a3db8eab7a18ecfc34fe6c4d8",
+      "before_sha256": "f3934ba9961ee31c80582ad1a2f8dc5a66cd56f1f05f4803f397f125f6502174",
+      "edits": [
+        {
+          "after": "        from scripts.measure_ingress_reconstruction import prepare\n",
+          "before": "        from scripts.measure_ingress_reconstruction import prepare\n\n"
+        }
+      ]
+    }
+  },
+  "schema": "exact-ci-successor-v1"
+}

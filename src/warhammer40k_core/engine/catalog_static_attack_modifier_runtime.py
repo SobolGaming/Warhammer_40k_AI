@@ -35,6 +35,7 @@ from warhammer40k_core.engine.rule_execution import (
     generic_rule_effect_payload,
     rule_ir_from_execution_payload,
 )
+from warhammer40k_core.engine.static_rule_source_identity import static_rule_source_keywords
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleClause, RuleEffectSpec, RuleIR
 
@@ -176,7 +177,7 @@ def _persisting_effect_for_source(
         active_player_id=None,
         source_unit_instance_id=source.unit.unit_instance_id,
         source_model_instance_id=source.source_model_instance_id,
-        source_keywords=tuple(sorted({*source.unit.keywords, *source.unit.faction_keywords})),
+        source_keywords=static_rule_source_keywords(source.unit),
         state=state,
         record_persisting_effects=False,
     )

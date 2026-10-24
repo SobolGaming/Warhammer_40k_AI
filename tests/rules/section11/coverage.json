@@ -1,0 +1,1597 @@
+{
+  "schema": "section11-clause-corpus-v1",
+  "source_authority": "Previously adopted maintained mirror; no new GW/App observation",
+  "observed_at": "2026-10-01T12:04:31.127429+00:00",
+  "qualification": "Timestamped retained maintained-mirror authority inherited from Sections01-10. No independent GW/App publication certification or new provider observation.",
+  "sources": [
+    {
+      "source_id": "rule:11:11.00:1",
+      "locator": "11.00",
+      "title": "Charge Phase",
+      "source_sha256": "d54cf3f43818910a068fd424bffc5000b76b8dd744faac855fd2b8668f96aba6",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "e4b91e0c36a15585f902237497d478483226f7530ab9419a4cf4f5bc940fb02d",
+          "value": "In the Charge phase, you will be able to make charge moves with your units. This represents your forces closing the distance with their foes in order to engage them in bloody close combat."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "c2426e7e26211792cfe10db50ad1e3da70bce9d8666c75698bc53f09980397ef",
+          "value": "The Charge phase is resolved by following these steps:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "521b3476ab81701bbc3a03512c2dee410760e6151ec588f928332502188d6013",
+          "value": "1. START OF CHARGE PHASE"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "2d644bb27bf831a566028d68d9941646d99ab9d218817242a46f84589a9b0aef",
+          "value": "2. CHARGE"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "fef155908fcebda9571e66f8b69bb8c6d63a67022f6a7e40944b9eebd744a89f",
+          "value": "3. END OF CHARGE PHASE"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "11.00-clause-01",
+          "source_blocks": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "obligation": "Start, optional individual charges, end in order",
+          "engine_owners": [
+            "engine/battle_round_flow.py",
+            "engine/boundary_rule_flow.py",
+            "engine/catalog_command_point_runtime.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_phase_flow.py::test_nonempty_compiled_charge_rules_surround_body_exactly_once",
+              "function_ast_sha256": "b4caffeeaa2ff7c75c89aed6dbb3aea62347061299f81001a0c3f05783fabb2c",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert types.count('charge_phase_completed') == 1",
+                "assert types.count('battle_phase_completed') == 1",
+                "assert request is not None",
+                "assert request.actor_id == active",
+                "assert request.decision_type == 'select_charging_unit'",
+                "assert gains[0]['passed'] is True",
+                "assert state.command_point_total('owner') == 1",
+                "assert effect < types.index('charging_unit_selection_requested') if position == 'start' else types.index('charge_phase_completed') < effect < types.index('battle_phase_completed')"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "heading or introductory explanatory prose"
+        }
+      ]
+    },
+    {
+      "source_id": "rule:11:11.01:1",
+      "locator": "11.01",
+      "title": "Start Of Charge Phase",
+      "source_sha256": "6284eb1525803e22213abccdc5a519b08bf700d78c890ae61051c24946c5d9ba",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "116b7cbc2cc6d83cb76c4c3b3b1f4e57dd805fe8e0cb5f8dbe905101763da09a",
+          "value": "Rules that are triggered at the start of the Charge phase are resolved now."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "11.01-clause-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Resolve nonempty start triggers now, once, for the correct turn",
+          "engine_owners": [
+            "engine/battle_round_flow.py",
+            "engine/boundary_rule_flow.py",
+            "engine/catalog_command_point_runtime.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_phase_flow.py::test_nonempty_compiled_charge_rules_surround_body_exactly_once",
+              "function_ast_sha256": "b4caffeeaa2ff7c75c89aed6dbb3aea62347061299f81001a0c3f05783fabb2c",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert types.count('charge_phase_completed') == 1",
+                "assert types.count('battle_phase_completed') == 1",
+                "assert request is not None",
+                "assert request.actor_id == active",
+                "assert request.decision_type == 'select_charging_unit'",
+                "assert gains[0]['passed'] is True",
+                "assert state.command_point_total('owner') == 1",
+                "assert effect < types.index('charging_unit_selection_requested') if position == 'start' else types.index('charge_phase_completed') < effect < types.index('battle_phase_completed')"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:11:11.02:1",
+      "locator": "11.02",
+      "title": "Charge Step",
+      "source_sha256": "931795a82a7613e529f0359cdc1223c0bc893e3138cc222251d88d569691c49b",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "7b4a4133cabc7c1d5c6a064b93bf7171b213276642d6da781ef7bbc0bd9cdc2e",
+          "value": "The active player resolves \u0005charges\u0006 with their eligible units one at a time, using the sequence below, until all of their units they choose to \u0005charge\u0006 with have \u0005declared a charge\u0006 and those \u0005charges\u0006 have been resolved."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "d940f6816a7dff7ae40f26662ddb1dce718dbd1a72774a8e1dac05e2bf627dea",
+          "value": "\u00051. Declare Charge\u0006: Select one friendly unit that has not \u0005declared a charge\u0006 this phase and is \u0005eligible to declare a charge\u0006 (see below). That unit \u0005declares a charge\u0006."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "762d41a2d3b35381616ae7757039c1adf5d61ffc9b5d17b8a13445fa2207aedc",
+          "value": "A unit is \u0005eligible to declare a charge\u0006 if it is on the battlefield, unless otherwise stated. Here are some rules that \u0001prevent\u0002 a unit from being \u0005eligible to declare a charge\u0006:"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "429bbf93db6163018233156e554588843ac27b7b3a917a650e975f329341c1ae",
+          "value": "• It is not within 12\" of one or more enemy units."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "c29ff584718d7afa4bcda686af1243109f1ad3bcdf6e417cab32a8f5b9e274fe",
+          "value": "• It is \u0005engaged\u0006."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "fe4720a15bddb0d312deba4c31067d14a920dbc0e5071baceb55389248cc3ca4",
+          "value": "• It made an \u0005advance\u0006 or \u0005fall-back move\u0006 this turn."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "3296ac17bc99b46680d4809c464e9235fdf6ebd55e864db1781e6cf99fc9ded4",
+          "value": "\u00052. Make Charge Roll\u0006: Make a \u0005charge roll\u0006 by rolling 2D6: the result is the \u0005maximum distance\u0006 for the \u0005charge move\u0006."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "dcf584e8077e5c75bb5ab0e477adc04fd134c61418bb3aeb4ea89c1259c87de3",
+          "value": "\u00053. Attempt Charge\u0006: If it is possible to make a \u0005charge move\u0006, and if you still want to, make a \u0005charge move\u0006 with that unit (11.04). Otherwise, your unit does not make a \u0005charge move\u0006. In either case, the \u0005charge\u0006 is then resolved."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "ccd1fce3f67a08713b7c2a2e6750ebd1bf5e9c23633cb5698a995a281d9fc501",
+          "value": "\u000eMaking a charge move"
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "38c426f225293178e573133e2b56eb7cf0be1b38f4c9e448679a2e7b0b943103",
+          "value": "The BLUE unit \u0005\u0007(A) declares a charge\b\u0006 and the \u0005\u0007charge roll\b\u0006 generates a \u0005\u0007maximum distance\b\u0006 of 7\". Unit \u0005\u0007B\b\u0006 is within this distance, so can be selected as a \u0005\u0007charge target\b\u0006, but the BLUE unit would not be able to end its \u0005\u0007charge move\b\u0006 \u0005\u0007engaged\b\u0006 with this unit after moving around the intervening terrain features."
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "35e3b3b5b652f0f7f6451fa312c068183ffc1492d3397ea955e0db73462797e1",
+          "value": "Unit \u0005\u0007C\b\u0006 is more than 7\" from the charging unit, so it cannot be selected as a \u0005\u0007charge target\b\u0006, even though the charging unit could end its \u0005\u0007charge move\b\u0006 within 2\" of this unit."
+        },
+        {
+          "ordinal": 12,
+          "kind": "text",
+          "sha256": "cbb80ed700c9d2812f2bee47b325f5178a2860a97f2ebfae77fb24fd017f0b47",
+          "value": "Units \u0005\u0007D\b\u0006 and \u0005\u0007E\b\u0006 are both within 7\", so can be selected as \u0005\u0007charge targets\b\u0006. The charging unit can end its \u0005\u0007charge move\b\u0006 \u0005\u0007engaged\b\u0006 with all of its \u0005\u0007charge targets\b\u0006, so this move can be made."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "11.02-clause-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Active player chooses and resolves friendly charges one at a time",
+          "engine_owners": [
+            "engine/charge_eligibility.py",
+            "engine/charge_phase_flow.py",
+            "engine/charge_targets.py",
+            "engine/rules_units.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_selection.py::test_native_charge_roll_follows_declaration_before_target_selection",
+              "function_ast_sha256": "4953c2fbb2d6d1761b4dc8da129e83f375a0146576014537fdff5fcd6d7cd756",
+              "assertions": [
+                "assert result.request.unit_instance_id == unit.unit_instance_id",
+                "assert result.request.spec.expression.quantity == 2",
+                "assert result.request.spec.expression.sides == 6",
+                "assert result.value == sum(result.roll_state.original_result.values)",
+                "assert result.movement_budget.maximum_distance_inches == result.value",
+                "assert state.charge_phase_state is not None",
+                "assert state.charge_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert request.actor_id == 'owner'",
+                "assert types.index('charging_unit_selected') < types.index('charge_roll_started') < types.index('charge_roll_resolved')",
+                "assert not events(session, 'charge_move_completed')",
+                "assert result.value >= 5",
+                "assert any((isinstance(o.payload, dict) and o.payload.get('target_ids') == [enemy.unit_instance_id] for o in request.options))",
+                "assert result.value < 5",
+                "assert request.decision_type == 'select_charging_unit'"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_optional_charge_move_consumes_declaration_without_fights_first",
+              "function_ast_sha256": "22e10df1fd8d49af13e67a3e85a2a84151248404734f771c782454d2825093ae",
+              "assertions": [
+                "assert state.battlefield_state == before",
+                "assert state.charge_phase_state is not None",
+                "assert state.charge_phase_state.active_selection is None",
+                "assert state.charge_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert not events(session, 'charge_move_completed')",
+                "assert not any((isinstance(e.effect_payload, dict) and e.effect_payload.get('effect_kind') == 'charge_grants_fights_first' for e in state.persisting_effects))",
+                "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_physical.py::test_canonical_attachment_public_reject_retry_moves_all_physical_owners_and_grants_bonus",
+              "function_ast_sha256": "d1e7f56a2b1687d5cec149da325b95cd0251e82a4cf888835de39e7af0abe0c2",
+              "assertions": [
+                "assert canonical in options",
+                "assert body.unit_instance_id not in options",
+                "assert leader.unit_instance_id not in options",
+                "assert status.status_kind is LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state == before",
+                "assert not events(session, 'charge_move_completed')",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert len(events(session, 'charge_move_completed')) == 1",
+                "assert state.battlefield_state is not None",
+                "assert set(present) == {*body.own_model_ids(), *leader.own_model_ids()}",
+                "assert {m for source, ids in grants if source.effect_kind == 'charge_grants_fights_first' for m in ids} == set(present)",
+                "assert FightsFirstRegistry.from_state(state).charged_unit_ids() == (canonical,)",
+                "assert pending(session).decision_type == 'select_charging_unit'",
+                "assert canonical not in {o.option_id for o in pending(session).options}",
+                "assert placed.model_placements[0].pose.position.x == 14.5",
+                "assert placed.model_placements[0].model_instance_id == unit.own_model_ids()[0]",
+                "assert placed.model_placements[0].unit_instance_id == unit.unit_instance_id"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.02-clause-02",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "Only eligible units that have not declared this phase may declare",
+          "engine_owners": [
+            "engine/charge_eligibility.py",
+            "engine/charge_phase_flow.py",
+            "engine/charge_targets.py",
+            "engine/rules_units.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_selection.py::test_native_declaration_exclusions_and_stale_turn_controls",
+              "function_ast_sha256": "ce5a0397ddc7084653bac3c25561cfe280baf43923376ad137c7cc9a6ef821fc",
+              "assertions": [
+                "assert request.actor_id == 'owner'",
+                "assert (unit.unit_instance_id in {o.option_id for o in request.options}) is (not current)",
+                "assert 'enemy:target' not in {o.option_id for o in request.options}",
+                "assert not events(session, 'charge_roll_started')"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_optional_charge_move_consumes_declaration_without_fights_first",
+              "function_ast_sha256": "22e10df1fd8d49af13e67a3e85a2a84151248404734f771c782454d2825093ae",
+              "assertions": [
+                "assert state.battlefield_state == before",
+                "assert state.charge_phase_state is not None",
+                "assert state.charge_phase_state.active_selection is None",
+                "assert state.charge_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert not events(session, 'charge_move_completed')",
+                "assert not any((isinstance(e.effect_payload, dict) and e.effect_payload.get('effect_kind') == 'charge_grants_fights_first' for e in state.persisting_effects))",
+                "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_public_rejects_bad_move_without_displacement_then_accepts_legal_retry",
+              "function_ast_sha256": "7336ab06547b5b17f7b88e957730520b41cdfa0a405a957e2db0583387488545",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.INVALID, status",
+                "assert state.battlefield_state == before",
+                "assert tuple(state.persisting_effects) == effects",
+                "assert not events(session, 'charge_move_completed')",
+                "assert retry.decision_type == 'submit_movement_proposal'",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert len(events(session, 'charge_move_completed')) == 1",
+                "assert pending(session).decision_type == 'select_charging_unit'",
+                "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_selection.py::test_native_double_one_fails_without_moving_and_cannot_declare_again",
+              "function_ast_sha256": "ea0ca83d035b5852ee9755dd2624738dbc3a58f6a1e63a123346c38302827e17",
+              "assertions": [
+                "assert result.roll_state.original_result.values == (1, 1)",
+                "assert result.value == 2",
+                "assert not result.move_available",
+                "assert state.battlefield_state == before",
+                "assert request.decision_type == 'select_charging_unit'",
+                "assert unit.unit_instance_id not in {o.option_id for o in request.options}",
+                "assert not events(session, 'charge_move_completed')"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.02-clause-03",
+          "source_blocks": [
+            3
+          ],
+          "obligation": "Ordinary charge declaration requires battlefield presence",
+          "engine_owners": [
+            "engine/charge_eligibility.py",
+            "engine/charge_phase_flow.py",
+            "engine/charge_targets.py",
+            "engine/rules_units.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_selection.py::test_native_declaration_exclusions_and_stale_turn_controls",
+              "function_ast_sha256": "ce5a0397ddc7084653bac3c25561cfe280baf43923376ad137c7cc9a6ef821fc",
+              "assertions": [
+                "assert request.actor_id == 'owner'",
+                "assert (unit.unit_instance_id in {o.option_id for o in request.options}) is (not current)",
+                "assert 'enemy:target' not in {o.option_id for o in request.options}",
+                "assert not events(session, 'charge_roll_started')"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.02-clause-04",
+          "source_blocks": [
+            4
+          ],
+          "obligation": "Declaration requires an enemy within inclusive12 inches",
+          "engine_owners": [
+            "engine/charge_eligibility.py",
+            "engine/charge_phase_flow.py",
+            "engine/charge_targets.py",
+            "engine/rules_units.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_selection.py::test_twelve_inch_declaration_boundary_is_inclusive",
+              "function_ast_sha256": "dc95be691683264237fdc6ef4025d2ef170499cbb0f69313500be204ec55ec0e",
+              "assertions": [
+                "assert (unit.unit_instance_id in {o.option_id for o in request.options}) is (gap <= 12)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.02-clause-05",
+          "source_blocks": [
+            5
+          ],
+          "obligation": "Engaged units cannot declare",
+          "engine_owners": [
+            "engine/charge_eligibility.py",
+            "engine/charge_phase_flow.py",
+            "engine/charge_targets.py",
+            "engine/rules_units.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_selection.py::test_native_declaration_exclusions_and_stale_turn_controls",
+              "function_ast_sha256": "ce5a0397ddc7084653bac3c25561cfe280baf43923376ad137c7cc9a6ef821fc",
+              "assertions": [
+                "assert request.actor_id == 'owner'",
+                "assert (unit.unit_instance_id in {o.option_id for o in request.options}) is (not current)",
+                "assert 'enemy:target' not in {o.option_id for o in request.options}",
+                "assert not events(session, 'charge_roll_started')"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_boundaries.py::test_inclusive_engagement_prevents_charge_at_translated_native_edge",
+              "function_ast_sha256": "f86990e35e6bc734a03d797f8fb521902c9a02c2399bbd0b4665c161e8f4d02b",
+              "assertions": [
+                "assert (unit.unit_instance_id in {o.option_id for o in request.options}) is (delta > 0)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.02-clause-06",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "A current-turn Advance or Fall Back prevents declaration",
+          "engine_owners": [
+            "engine/charge_eligibility.py",
+            "engine/charge_phase_flow.py",
+            "engine/charge_targets.py",
+            "engine/rules_units.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_selection.py::test_native_declaration_exclusions_and_stale_turn_controls",
+              "function_ast_sha256": "ce5a0397ddc7084653bac3c25561cfe280baf43923376ad137c7cc9a6ef821fc",
+              "assertions": [
+                "assert request.actor_id == 'owner'",
+                "assert (unit.unit_instance_id in {o.option_id for o in request.options}) is (not current)",
+                "assert 'enemy:target' not in {o.option_id for o in request.options}",
+                "assert not events(session, 'charge_roll_started')"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.02-clause-07",
+          "source_blocks": [
+            7
+          ],
+          "obligation": "Roll two physical D6; the result produces the charge maximum",
+          "engine_owners": [
+            "engine/charge_roll_flow.py",
+            "engine/charge_declaration.py",
+            "engine/charge_movement_budget.py",
+            "engine/charge_target_continuation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_selection.py::test_native_charge_roll_follows_declaration_before_target_selection",
+              "function_ast_sha256": "4953c2fbb2d6d1761b4dc8da129e83f375a0146576014537fdff5fcd6d7cd756",
+              "assertions": [
+                "assert result.request.unit_instance_id == unit.unit_instance_id",
+                "assert result.request.spec.expression.quantity == 2",
+                "assert result.request.spec.expression.sides == 6",
+                "assert result.value == sum(result.roll_state.original_result.values)",
+                "assert result.movement_budget.maximum_distance_inches == result.value",
+                "assert state.charge_phase_state is not None",
+                "assert state.charge_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert request.actor_id == 'owner'",
+                "assert types.index('charging_unit_selected') < types.index('charge_roll_started') < types.index('charge_roll_resolved')",
+                "assert not events(session, 'charge_move_completed')",
+                "assert result.value >= 5",
+                "assert any((isinstance(o.payload, dict) and o.payload.get('target_ids') == [enemy.unit_instance_id] for o in request.options))",
+                "assert result.value < 5",
+                "assert request.decision_type == 'select_charging_unit'"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_rolls.py::test_all_physical_two_d6_outcomes_consume_real_native_distance",
+              "function_ast_sha256": "ccfe9b8596de97c550c3454b9b09a9e8a32db166a41ab13135a806f7883103ea",
+              "assertions": [
+                "assert candidate.is_legal",
+                "assert result.value == a + b",
+                "assert result.movement_budget.maximum_distance_inches == a + b",
+                "assert result.move_available is (a + b > 2)",
+                "assert result.reachable_target_distances_inches == ({} if a + b == 2 else {enemy.unit_instance_id: candidate.closest_distance_inches})",
+                "assert result.roll_state.original_result.values == (a, b)"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_selection.py::test_native_double_one_fails_without_moving_and_cannot_declare_again",
+              "function_ast_sha256": "ea0ca83d035b5852ee9755dd2624738dbc3a58f6a1e63a123346c38302827e17",
+              "assertions": [
+                "assert result.roll_state.original_result.values == (1, 1)",
+                "assert result.value == 2",
+                "assert not result.move_available",
+                "assert state.battlefield_state == before",
+                "assert request.decision_type == 'select_charging_unit'",
+                "assert unit.unit_instance_id not in {o.option_id for o in request.options}",
+                "assert not events(session, 'charge_move_completed')"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.02-clause-08",
+          "source_blocks": [
+            8
+          ],
+          "obligation": "Attempt a possible witnessed move only if still wanted; either outcome resolves declaration",
+          "engine_owners": [
+            "engine/charge_move_resolution.py",
+            "engine/charge_endpoints.py",
+            "engine/charge_model_endpoints.py",
+            "engine/charge_path_contexts.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_moves.py::test_optional_charge_move_consumes_declaration_without_fights_first",
+              "function_ast_sha256": "22e10df1fd8d49af13e67a3e85a2a84151248404734f771c782454d2825093ae",
+              "assertions": [
+                "assert state.battlefield_state == before",
+                "assert state.charge_phase_state is not None",
+                "assert state.charge_phase_state.active_selection is None",
+                "assert state.charge_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert not events(session, 'charge_move_completed')",
+                "assert not any((isinstance(e.effect_payload, dict) and e.effect_payload.get('effect_kind') == 'charge_grants_fights_first' for e in state.persisting_effects))",
+                "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_public_rejects_bad_move_without_displacement_then_accepts_legal_retry",
+              "function_ast_sha256": "7336ab06547b5b17f7b88e957730520b41cdfa0a405a957e2db0583387488545",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.INVALID, status",
+                "assert state.battlefield_state == before",
+                "assert tuple(state.persisting_effects) == effects",
+                "assert not events(session, 'charge_move_completed')",
+                "assert retry.decision_type == 'submit_movement_proposal'",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert len(events(session, 'charge_move_completed')) == 1",
+                "assert pending(session).decision_type == 'select_charging_unit'",
+                "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_selection.py::test_pilot_public_target_and_move_boundary",
+              "function_ast_sha256": "9c04c4da7a39f1b97d1068fa165c8f7392622df62d86e7a8b46d48f7625bf844",
+              "assertions": [
+                "assert request.decision_type == 'select_charge_targets'",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert events(session, 'charge_move_completed')",
+                "assert pending(session).decision_type == 'select_charging_unit'"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.02-clause-09",
+          "source_blocks": [
+            10
+          ],
+          "obligation": "Within-range target behind intervening terrain may have no legal witnessed charge",
+          "engine_owners": [
+            "engine/charge_move_resolution.py",
+            "engine/charge_endpoints.py",
+            "engine/charge_model_endpoints.py",
+            "engine/charge_path_contexts.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_moves.py::test_real_solid_obstacle_rejects_charge_despite_short_target_range",
+              "function_ast_sha256": "6e84b4150adade482dde4dd0547eaaab7cac6ca000a63c88c046d06c6d0c0a02",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert any((v.violation_code == 'terrain_feature_transit_forbidden' for r in result.terrain_path_legality_results for v in r.violations))"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_long_detour_is_not_replaced_by_short_endpoint_distance",
+              "function_ast_sha256": "11e58e2a801d266ada0b8971f1250faa8bb2960cf0c4938ed4ae6a4141574375",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert not all((r.is_valid for r in result.path_validation_results))"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.02-clause-10",
+          "source_blocks": [
+            11
+          ],
+          "obligation": "A target beyond the rolled maximum is unavailable even if engagement could be reached",
+          "engine_owners": [
+            "engine/charge_roll_flow.py",
+            "engine/charge_declaration.py",
+            "engine/charge_movement_budget.py",
+            "engine/charge_target_continuation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_rolls.py::test_all_physical_two_d6_outcomes_consume_real_native_distance",
+              "function_ast_sha256": "ccfe9b8596de97c550c3454b9b09a9e8a32db166a41ab13135a806f7883103ea",
+              "assertions": [
+                "assert candidate.is_legal",
+                "assert result.value == a + b",
+                "assert result.movement_budget.maximum_distance_inches == a + b",
+                "assert result.move_available is (a + b > 2)",
+                "assert result.reachable_target_distances_inches == ({} if a + b == 2 else {enemy.unit_instance_id: candidate.closest_distance_inches})",
+                "assert result.roll_state.original_result.values == (a, b)"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_rolls.py::test_modified_roll_recomputes_public_target_distance_boundary",
+              "function_ast_sha256": "7fcc40086a5c61afe39ef8c6c6852cea46de9893784de09fb45586af7ce5102f",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert handler is not None",
+                "assert budget.maximum_distance_inches == max(0, original.value + delta)",
+                "assert (enemy.unit_instance_id in candidates) is (delta == 1 and original.value < 12)",
+                "assert roll(session).roll_state == original.roll_state"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.02-clause-11",
+          "source_blocks": [
+            12
+          ],
+          "obligation": "Multiple within-maximum targets can be charged only when all end engaged",
+          "engine_owners": [
+            "engine/charge_move_resolution.py",
+            "engine/charge_endpoints.py",
+            "engine/charge_model_endpoints.py",
+            "engine/charge_path_contexts.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_moves.py::test_every_selected_target_must_be_engaged_and_other_engagement_is_forbidden",
+              "function_ast_sha256": "de563f26de2fffbf58274f1ab566bcd0b994fad5ae6370248fad58af37de08e4",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert result.is_valid is select_both",
+                "assert result.endpoint_violation_code == (None if select_both else 'charge_non_target_engaged')",
+                "assert set(result.endpoint_witness.engaged_target_unit_instance_ids) == set(ids)",
+                "assert result.endpoint_witness.non_target_engaged_unit_instance_ids == (() if select_both else (other.unit_instance_id,))"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_approaching_one_target_does_not_excuse_missing_another_selected_target",
+              "function_ast_sha256": "a20ddb3749e26ec51a576c7f1d1e2567bcbd17fa80134288518758338065bf84",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert result.endpoint_violation_code == 'charge_target_not_engaged'",
+                "assert result.endpoint_witness.engaged_target_unit_instance_ids == (enemy.unit_instance_id,)"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            9
+          ],
+          "role": "heading or introductory explanatory prose"
+        }
+      ]
+    },
+    {
+      "source_id": "rule:11:11.02.01:1",
+      "locator": "11.02.01",
+      "title": "Failed Charges",
+      "source_sha256": "c3da4011572b09a3507b1124f666b3928fcb548544dcac5e29a4fa9a2d618a3a",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "15d3f2a70728fd1399252b23b1eca884d992010b8f900c4ce24af4066d8a0b38",
+          "value": "Note that in the absence of modifiers to the \u0005charge roll\u0006, a result of 2 (a double 1) is never sufficient for a unit to complete a \u0005charge move\u0006, as a unit cannot be within \u0005engagement range\u0006 (2\") when it attempts a \u0005charge\u0006. Such a roll would therefore result in a failed \u0005charge\u0006, and the unit would not move."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "11.02.01-clause-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Unmodified double-one cannot charge an initially unengaged unit; no movement",
+          "engine_owners": [
+            "engine/charge_roll_flow.py",
+            "engine/charge_declaration.py",
+            "engine/charge_movement_budget.py",
+            "engine/charge_target_continuation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_rolls.py::test_all_physical_two_d6_outcomes_consume_real_native_distance",
+              "function_ast_sha256": "ccfe9b8596de97c550c3454b9b09a9e8a32db166a41ab13135a806f7883103ea",
+              "assertions": [
+                "assert candidate.is_legal",
+                "assert result.value == a + b",
+                "assert result.movement_budget.maximum_distance_inches == a + b",
+                "assert result.move_available is (a + b > 2)",
+                "assert result.reachable_target_distances_inches == ({} if a + b == 2 else {enemy.unit_instance_id: candidate.closest_distance_inches})",
+                "assert result.roll_state.original_result.values == (a, b)"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_selection.py::test_native_double_one_fails_without_moving_and_cannot_declare_again",
+              "function_ast_sha256": "ea0ca83d035b5852ee9755dd2624738dbc3a58f6a1e63a123346c38302827e17",
+              "assertions": [
+                "assert result.roll_state.original_result.values == (1, 1)",
+                "assert result.value == 2",
+                "assert not result.move_available",
+                "assert state.battlefield_state == before",
+                "assert request.decision_type == 'select_charging_unit'",
+                "assert unit.unit_instance_id not in {o.option_id for o in request.options}",
+                "assert not events(session, 'charge_move_completed')"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:11:11.03:1",
+      "locator": "11.03",
+      "title": "End Of Charge Phase",
+      "source_sha256": "1d37f24881ae6a7e5885e8c8b511d3d22a7f5be7314be1500e695e6a33e257cf",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "ccd9650055ae8b4464fcf635add3bdbfc555d1b9c2e7ac87b19b8e03ab2719ac",
+          "value": "Rules that are triggered at the end of the Charge phase are resolved now."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "11.03-clause-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Resolve nonempty end triggers after Charge body, once",
+          "engine_owners": [
+            "engine/battle_round_flow.py",
+            "engine/boundary_rule_flow.py",
+            "engine/catalog_command_point_runtime.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_phase_flow.py::test_nonempty_compiled_charge_rules_surround_body_exactly_once",
+              "function_ast_sha256": "b4caffeeaa2ff7c75c89aed6dbb3aea62347061299f81001a0c3f05783fabb2c",
+              "assertions": [
+                "assert len(gains) == int(active == 'owner')",
+                "assert types.count('charge_phase_completed') == 1",
+                "assert types.count('battle_phase_completed') == 1",
+                "assert request is not None",
+                "assert request.actor_id == active",
+                "assert request.decision_type == 'select_charging_unit'",
+                "assert gains[0]['passed'] is True",
+                "assert state.command_point_total('owner') == 1",
+                "assert effect < types.index('charging_unit_selection_requested') if position == 'start' else types.index('charge_phase_completed') < effect < types.index('battle_phase_completed')"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:11:11.04:1",
+      "locator": "11.04",
+      "title": "Charge Move",
+      "source_sha256": "fe18c0b743bfae63faceb64d94b7522ea5ee4ff59a12eb8b7767448f7341025d",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "73b9089295846441240e1b7ad64612872f5f15fcf46c0645f03272169fcf53aa",
+          "value": "Your unit \u0005declared a charge\u0006 this phase."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "71b6143d5f310205f6d72379853a67a7f27f18983ba7f07ef42b7255d7fca1ee",
+          "value": "\u000eBefore Moving"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "1c283bb664f82bba70c2d45f3eab2806df5e9a8b3cafc831a3fa5f1312b86583",
+          "value": "Select one or more enemy units that are within 12\" of your unit and within the \u0005maximum distance\u0006 of your unit; until the end of this move, each of those enemy units is a \u0005charge target\u0006."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "e71c12176330a1cb6bd961af93620cfe60c68b59704dac7bff9b61bc09d3c041",
+          "value": "\u000eWhile Moving"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "b3094e38d641232fd7795c702f6c552125efdcdd126de437f6555d0bfe3dcb80",
+          "value": "• Each model must end its move closer to one or more \u0005charge targets\u0006."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "91a9c6b5775dd61ea95e194b5ee39bac18a7f790a129e77fb20f983cb7363f2e",
+          "value": "• Each model that can end its move within 1\" of one or more \u0005charge targets\u0006 must do so."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "aa0a9a5b8f9b3f3c38667c09139e948cb80952bdf6e834213ee93ceb8bddca38",
+          "value": "• Each model that can end its move \u0005engaged\u0006 with one or more \u0005charge targets\u0006 must do so."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab",
+          "value": "Your unit moves as described in Moving (03)."
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+          "value": "\u000eAfter Moving"
+        },
+        {
+          "ordinal": 12,
+          "kind": "text",
+          "sha256": "286d0a4e7dd8abd367944ea58776d372522ad6152606322f09b4c05e618aaafe",
+          "value": "• Your unit must be \u0005engaged\u0006 with \u0001all\u0002 of the \u0005charge targets\u0006."
+        },
+        {
+          "ordinal": 13,
+          "kind": "text",
+          "sha256": "e8e947d7b0c22a243e8ce8d1a5f0b2c7f226d9a3168bb310272ed274de8ee7a2",
+          "value": "• Your unit cannot be \u0005engaged\u0006 with one or more enemy units that are not \u0005charge targets\u0006."
+        },
+        {
+          "ordinal": 14,
+          "kind": "text",
+          "sha256": "42dabe5341a6690b407eee702834ba7b5c7d5bbaa2e34f32984352e8e9efe3ec",
+          "value": "• Until the end of the turn, each model in your unit has the \u0005Fights First\u0006 ability (24.13)."
+        },
+        {
+          "ordinal": 15,
+          "kind": "text",
+          "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4",
+          "value": "\u000eMaximum Distance"
+        },
+        {
+          "ordinal": 16,
+          "kind": "text",
+          "sha256": "89b93e0f30ed29bc16cd342b5652939ad9010cb3abcac383e1602d278138e7f4",
+          "value": "Charge roll."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "11.04-clause-01",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "A charge move follows a declaration this phase",
+          "engine_owners": [
+            "engine/charge_eligibility.py",
+            "engine/charge_phase_flow.py",
+            "engine/charge_targets.py",
+            "engine/rules_units.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_selection.py::test_native_charge_roll_follows_declaration_before_target_selection",
+              "function_ast_sha256": "4953c2fbb2d6d1761b4dc8da129e83f375a0146576014537fdff5fcd6d7cd756",
+              "assertions": [
+                "assert result.request.unit_instance_id == unit.unit_instance_id",
+                "assert result.request.spec.expression.quantity == 2",
+                "assert result.request.spec.expression.sides == 6",
+                "assert result.value == sum(result.roll_state.original_result.values)",
+                "assert result.movement_budget.maximum_distance_inches == result.value",
+                "assert state.charge_phase_state is not None",
+                "assert state.charge_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert request.actor_id == 'owner'",
+                "assert types.index('charging_unit_selected') < types.index('charge_roll_started') < types.index('charge_roll_resolved')",
+                "assert not events(session, 'charge_move_completed')",
+                "assert result.value >= 5",
+                "assert any((isinstance(o.payload, dict) and o.payload.get('target_ids') == [enemy.unit_instance_id] for o in request.options))",
+                "assert result.value < 5",
+                "assert request.decision_type == 'select_charging_unit'"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_selection.py::test_pilot_public_target_and_move_boundary",
+              "function_ast_sha256": "9c04c4da7a39f1b97d1068fa165c8f7392622df62d86e7a8b46d48f7625bf844",
+              "assertions": [
+                "assert request.decision_type == 'select_charge_targets'",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert events(session, 'charge_move_completed')",
+                "assert pending(session).decision_type == 'select_charging_unit'"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_public_rejects_bad_move_without_displacement_then_accepts_legal_retry",
+              "function_ast_sha256": "7336ab06547b5b17f7b88e957730520b41cdfa0a405a957e2db0583387488545",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.INVALID, status",
+                "assert state.battlefield_state == before",
+                "assert tuple(state.persisting_effects) == effects",
+                "assert not events(session, 'charge_move_completed')",
+                "assert retry.decision_type == 'submit_movement_proposal'",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert len(events(session, 'charge_move_completed')) == 1",
+                "assert pending(session).decision_type == 'select_charging_unit'",
+                "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.04-clause-02",
+          "source_blocks": [
+            4
+          ],
+          "obligation": "Select a nonempty enemy target set within12 and the current modified maximum",
+          "engine_owners": [
+            "engine/charge_roll_flow.py",
+            "engine/charge_declaration.py",
+            "engine/charge_movement_budget.py",
+            "engine/charge_target_continuation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_rolls.py::test_all_physical_two_d6_outcomes_consume_real_native_distance",
+              "function_ast_sha256": "ccfe9b8596de97c550c3454b9b09a9e8a32db166a41ab13135a806f7883103ea",
+              "assertions": [
+                "assert candidate.is_legal",
+                "assert result.value == a + b",
+                "assert result.movement_budget.maximum_distance_inches == a + b",
+                "assert result.move_available is (a + b > 2)",
+                "assert result.reachable_target_distances_inches == ({} if a + b == 2 else {enemy.unit_instance_id: candidate.closest_distance_inches})",
+                "assert result.roll_state.original_result.values == (a, b)"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_rolls.py::test_budget_shrink_after_selection_requests_new_targets_then_continues",
+              "function_ast_sha256": "1d819ab8d4ea1f1bd1731f4f801285bc288d7b3663b835e358543b66096f0daa",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.INVALID",
+                "assert request.decision_type == 'select_target_replacement', status",
+                "assert not events(session, 'charge_move_completed')",
+                "assert roll(session).roll_state == original.roll_state",
+                "assert pending(session).decision_type == 'submit_movement_proposal'",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert len(events(session, 'charge_move_completed')) == 1",
+                "assert len(events(session, 'charge_roll_resolved')) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_rolls.py::test_modified_roll_recomputes_public_target_distance_boundary",
+              "function_ast_sha256": "7fcc40086a5c61afe39ef8c6c6852cea46de9893784de09fb45586af7ce5102f",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert handler is not None",
+                "assert budget.maximum_distance_inches == max(0, original.value + delta)",
+                "assert (enemy.unit_instance_id in candidates) is (delta == 1 and original.value < 12)",
+                "assert roll(session).roll_state == original.roll_state"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_every_selected_target_must_be_engaged_and_other_engagement_is_forbidden",
+              "function_ast_sha256": "de563f26de2fffbf58274f1ab566bcd0b994fad5ae6370248fad58af37de08e4",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert result.is_valid is select_both",
+                "assert result.endpoint_violation_code == (None if select_both else 'charge_non_target_engaged')",
+                "assert set(result.endpoint_witness.engaged_target_unit_instance_ids) == set(ids)",
+                "assert result.endpoint_witness.non_target_engaged_unit_instance_ids == (() if select_both else (other.unit_instance_id,))"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.04-clause-03",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "Each physical model must end closer to at least one target",
+          "engine_owners": [
+            "engine/charge_move_resolution.py",
+            "engine/charge_endpoints.py",
+            "engine/charge_model_endpoints.py",
+            "engine/charge_path_contexts.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_moves.py::test_real_native_endpoint_producer_enforces_approach_and_engagement",
+              "function_ast_sha256": "97cf87a94d4c0bcd7a62229168fe009269b59437eeeda98c3b30b75044850098",
+              "assertions": [
+                "assert result.endpoint_violation_code == code",
+                "assert result.is_valid is (code is None)",
+                "assert state.to_payload() == before",
+                "assert row.model_instance_id == unit.own_model_ids()[0]",
+                "assert row.component_unit_instance_id == unit.unit_instance_id",
+                "assert row.ended_closer is (dx > 0)",
+                "assert ChargeModelEndpointWitness.from_payload(json.loads(json.dumps(row.to_payload()))) == row",
+                "assert row.preferred_reachability.status == 'satisfied'",
+                "assert row.engagement_reachability.status == 'satisfied'",
+                "assert batch.displacements"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_physical.py::test_every_attached_physical_model_must_approach_a_target",
+              "function_ast_sha256": "65b763ee193227d821cd8b51c59acf7d6c32e2eeba55bcef65dc7940fb8b1d2a",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert result.endpoint_violation_code == 'charge_not_closer_to_target'",
+                "assert {r.model_instance_id for r in rows} == {*body.own_model_ids(), *leader.own_model_ids()}",
+                "assert {r.component_unit_instance_id for r in rows} == {body.unit_instance_id, leader.unit_instance_id}",
+                "assert [r.model_instance_id for r in rows if not r.ended_closer] == (list(body.own_model_ids()) if stationary_component == 'body' else list(leader.own_model_ids()))"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.04-clause-04",
+          "source_blocks": [
+            7
+          ],
+          "obligation": "Each model able to reach one inch must do so subject to legal movement and coherency",
+          "engine_owners": [
+            "engine/charge_move_resolution.py",
+            "engine/charge_endpoints.py",
+            "engine/charge_model_endpoints.py",
+            "engine/charge_path_contexts.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_moves.py::test_reachable_one_inch_endpoint_is_required_by_real_query",
+              "function_ast_sha256": "3fa27c4022774df4460b74fa5abddb5ab31c93de4affe27820d3dc7d5c962372",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert result.endpoint_violation_code == 'charge_preferred_distance_not_reached'",
+                "assert row.preferred_reachability.status == 'reachable'",
+                "assert row.preferred_reachability.alternative_witness is not None",
+                "assert row.engagement_reachability.status == 'satisfied'"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_one_inch_obligation_is_unreachable_when_real_budget_stops_at_engagement",
+              "function_ast_sha256": "ec6b15e2938d5e20a96ae081b3eb2d6a9c41c3a63dae3032a12ade77e1d4eb64",
+              "assertions": [
+                "assert result.is_valid",
+                "assert row.preferred_reachability.status == 'unreachable'",
+                "assert row.engagement_reachability.status == 'satisfied'"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_physical.py::test_an_engaged_member_cannot_satisfy_another_members_reachable_obligations",
+              "function_ast_sha256": "6d0e7db7820aa485053a0c29657b62212e0b7f6176658ecc4be0decdc8a8a9d7",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert row.ended_closer",
+                "assert row.engaged_target_unit_instance_ids == ()",
+                "assert row.preferred_reachability.status == 'reachable'",
+                "assert row.engagement_reachability.status == 'reachable'",
+                "assert row.engagement_reachability.alternative_witness is not None"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.04-clause-05",
+          "source_blocks": [
+            8
+          ],
+          "obligation": "Each model able to end engaged with a target must do so",
+          "engine_owners": [
+            "engine/charge_move_resolution.py",
+            "engine/charge_endpoints.py",
+            "engine/charge_model_endpoints.py",
+            "engine/charge_path_contexts.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_physical.py::test_an_engaged_member_cannot_satisfy_another_members_reachable_obligations",
+              "function_ast_sha256": "6d0e7db7820aa485053a0c29657b62212e0b7f6176658ecc4be0decdc8a8a9d7",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert row.ended_closer",
+                "assert row.engaged_target_unit_instance_ids == ()",
+                "assert row.preferred_reachability.status == 'reachable'",
+                "assert row.engagement_reachability.status == 'reachable'",
+                "assert row.engagement_reachability.alternative_witness is not None"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_physical.py::test_canonical_attachment_public_reject_retry_moves_all_physical_owners_and_grants_bonus",
+              "function_ast_sha256": "d1e7f56a2b1687d5cec149da325b95cd0251e82a4cf888835de39e7af0abe0c2",
+              "assertions": [
+                "assert canonical in options",
+                "assert body.unit_instance_id not in options",
+                "assert leader.unit_instance_id not in options",
+                "assert status.status_kind is LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state == before",
+                "assert not events(session, 'charge_move_completed')",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert len(events(session, 'charge_move_completed')) == 1",
+                "assert state.battlefield_state is not None",
+                "assert set(present) == {*body.own_model_ids(), *leader.own_model_ids()}",
+                "assert {m for source, ids in grants if source.effect_kind == 'charge_grants_fights_first' for m in ids} == set(present)",
+                "assert FightsFirstRegistry.from_state(state).charged_unit_ids() == (canonical,)",
+                "assert pending(session).decision_type == 'select_charging_unit'",
+                "assert canonical not in {o.option_id for o in pending(session).options}",
+                "assert placed.model_placements[0].pose.position.x == 14.5",
+                "assert placed.model_placements[0].model_instance_id == unit.own_model_ids()[0]",
+                "assert placed.model_placements[0].unit_instance_id == unit.unit_instance_id"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.04-clause-06",
+          "source_blocks": [
+            10
+          ],
+          "obligation": "Use ordinary Moving rules: full path, physical ownership, coherency, obstacles and distance",
+          "engine_owners": [
+            "engine/charge_move_resolution.py",
+            "engine/charge_endpoints.py",
+            "engine/charge_model_endpoints.py",
+            "engine/charge_path_contexts.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_moves.py::test_long_detour_is_not_replaced_by_short_endpoint_distance",
+              "function_ast_sha256": "11e58e2a801d266ada0b8971f1250faa8bb2960cf0c4938ed4ae6a4141574375",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert not all((r.is_valid for r in result.path_validation_results))"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_real_solid_obstacle_rejects_charge_despite_short_target_range",
+              "function_ast_sha256": "6e84b4150adade482dde4dd0547eaaab7cac6ca000a63c88c046d06c6d0c0a02",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert any((v.violation_code == 'terrain_feature_transit_forbidden' for r in result.terrain_path_legality_results for v in r.violations))"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_physical.py::test_approach_requirements_cannot_excuse_incoherent_attached_endpoint",
+              "function_ast_sha256": "19edb3eef9d3d2259f30d47cfa68ee86c4ae9979581559acb6c446b8d0acfc8d",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert not result.coherency_result.is_coherent",
+                "assert all((r.ended_closer for r in result.endpoint_witness.model_endpoints))"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_physical.py::test_canonical_attachment_public_reject_retry_moves_all_physical_owners_and_grants_bonus",
+              "function_ast_sha256": "d1e7f56a2b1687d5cec149da325b95cd0251e82a4cf888835de39e7af0abe0c2",
+              "assertions": [
+                "assert canonical in options",
+                "assert body.unit_instance_id not in options",
+                "assert leader.unit_instance_id not in options",
+                "assert status.status_kind is LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state == before",
+                "assert not events(session, 'charge_move_completed')",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert len(events(session, 'charge_move_completed')) == 1",
+                "assert state.battlefield_state is not None",
+                "assert set(present) == {*body.own_model_ids(), *leader.own_model_ids()}",
+                "assert {m for source, ids in grants if source.effect_kind == 'charge_grants_fights_first' for m in ids} == set(present)",
+                "assert FightsFirstRegistry.from_state(state).charged_unit_ids() == (canonical,)",
+                "assert pending(session).decision_type == 'select_charging_unit'",
+                "assert canonical not in {o.option_id for o in pending(session).options}",
+                "assert placed.model_placements[0].pose.position.x == 14.5",
+                "assert placed.model_placements[0].model_instance_id == unit.own_model_ids()[0]",
+                "assert placed.model_placements[0].unit_instance_id == unit.unit_instance_id"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_public_rejects_bad_move_without_displacement_then_accepts_legal_retry",
+              "function_ast_sha256": "7336ab06547b5b17f7b88e957730520b41cdfa0a405a957e2db0583387488545",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.INVALID, status",
+                "assert state.battlefield_state == before",
+                "assert tuple(state.persisting_effects) == effects",
+                "assert not events(session, 'charge_move_completed')",
+                "assert retry.decision_type == 'submit_movement_proposal'",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert len(events(session, 'charge_move_completed')) == 1",
+                "assert pending(session).decision_type == 'select_charging_unit'",
+                "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.04-clause-07",
+          "source_blocks": [
+            12
+          ],
+          "obligation": "The unit must end engaged with every selected target",
+          "engine_owners": [
+            "engine/charge_move_resolution.py",
+            "engine/charge_endpoints.py",
+            "engine/charge_model_endpoints.py",
+            "engine/charge_path_contexts.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_moves.py::test_every_selected_target_must_be_engaged_and_other_engagement_is_forbidden",
+              "function_ast_sha256": "de563f26de2fffbf58274f1ab566bcd0b994fad5ae6370248fad58af37de08e4",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert result.is_valid is select_both",
+                "assert result.endpoint_violation_code == (None if select_both else 'charge_non_target_engaged')",
+                "assert set(result.endpoint_witness.engaged_target_unit_instance_ids) == set(ids)",
+                "assert result.endpoint_witness.non_target_engaged_unit_instance_ids == (() if select_both else (other.unit_instance_id,))"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_approaching_one_target_does_not_excuse_missing_another_selected_target",
+              "function_ast_sha256": "a20ddb3749e26ec51a576c7f1d1e2567bcbd17fa80134288518758338065bf84",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert result.endpoint_violation_code == 'charge_target_not_engaged'",
+                "assert result.endpoint_witness.engaged_target_unit_instance_ids == (enemy.unit_instance_id,)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.04-clause-08",
+          "source_blocks": [
+            13
+          ],
+          "obligation": "No endpoint engagement with unselected enemies",
+          "engine_owners": [
+            "engine/charge_move_resolution.py",
+            "engine/charge_endpoints.py",
+            "engine/charge_model_endpoints.py",
+            "engine/charge_path_contexts.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_moves.py::test_every_selected_target_must_be_engaged_and_other_engagement_is_forbidden",
+              "function_ast_sha256": "de563f26de2fffbf58274f1ab566bcd0b994fad5ae6370248fad58af37de08e4",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert result.is_valid is select_both",
+                "assert result.endpoint_violation_code == (None if select_both else 'charge_non_target_engaged')",
+                "assert set(result.endpoint_witness.engaged_target_unit_instance_ids) == set(ids)",
+                "assert result.endpoint_witness.non_target_engaged_unit_instance_ids == (() if select_both else (other.unit_instance_id,))"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.04-clause-09",
+          "source_blocks": [
+            14
+          ],
+          "obligation": "After moving every model gains Fights First through end of the current turn",
+          "engine_owners": [
+            "engine/phases/charge.py",
+            "engine/fights_first.py",
+            "engine/game_state.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_phase_flow.py::test_completed_charge_grants_every_physical_model_bonus_until_turn_end",
+              "function_ast_sha256": "3aa392fa17dc4d0478eba77ff515da9f99725123d5a35088ab9f0b7b5bb49919",
+              "assertions": [
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result",
+                "assert registry.charged_unit_ids() == (unit.unit_instance_id,)",
+                "assert present == unit.own_model_ids()",
+                "assert charge_grants == [unit.own_model_ids()]",
+                "assert effect.target_unit_instance_ids == (unit.unit_instance_id,)",
+                "assert effect.owner_player_id == 'owner'",
+                "assert state.expire_persisting_effects_at_boundary(EffectExpirationBoundary.phase_end(battle_round=1, phase=BattlePhase.CHARGE, player_id='owner')) != (effect,)",
+                "assert FightsFirstRegistry.from_state(state).charged_unit_ids() == (unit.unit_instance_id,)",
+                "assert effect not in state.expire_persisting_effects_at_boundary(EffectExpirationBoundary.turn_end(battle_round=1, player_id='opponent'))",
+                "assert effect in state.expire_persisting_effects_at_boundary(EffectExpirationBoundary.turn_end(battle_round=1, player_id='owner'))",
+                "assert FightsFirstRegistry.from_state(state).charged_unit_ids() == ()"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_physical.py::test_canonical_attachment_public_reject_retry_moves_all_physical_owners_and_grants_bonus",
+              "function_ast_sha256": "d1e7f56a2b1687d5cec149da325b95cd0251e82a4cf888835de39e7af0abe0c2",
+              "assertions": [
+                "assert canonical in options",
+                "assert body.unit_instance_id not in options",
+                "assert leader.unit_instance_id not in options",
+                "assert status.status_kind is LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state == before",
+                "assert not events(session, 'charge_move_completed')",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert len(events(session, 'charge_move_completed')) == 1",
+                "assert state.battlefield_state is not None",
+                "assert set(present) == {*body.own_model_ids(), *leader.own_model_ids()}",
+                "assert {m for source, ids in grants if source.effect_kind == 'charge_grants_fights_first' for m in ids} == set(present)",
+                "assert FightsFirstRegistry.from_state(state).charged_unit_ids() == (canonical,)",
+                "assert pending(session).decision_type == 'select_charging_unit'",
+                "assert canonical not in {o.option_id for o in pending(session).options}",
+                "assert placed.model_placements[0].pose.position.x == 14.5",
+                "assert placed.model_placements[0].model_instance_id == unit.own_model_ids()[0]",
+                "assert placed.model_placements[0].unit_instance_id == unit.unit_instance_id"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_moves.py::test_optional_charge_move_consumes_declaration_without_fights_first",
+              "function_ast_sha256": "22e10df1fd8d49af13e67a3e85a2a84151248404734f771c782454d2825093ae",
+              "assertions": [
+                "assert state.battlefield_state == before",
+                "assert state.charge_phase_state is not None",
+                "assert state.charge_phase_state.active_selection is None",
+                "assert state.charge_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert not events(session, 'charge_move_completed')",
+                "assert not any((isinstance(e.effect_payload, dict) and e.effect_payload.get('effect_kind') == 'charge_grants_fights_first' for e in state.persisting_effects))",
+                "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "11.04-clause-10",
+          "source_blocks": [
+            16
+          ],
+          "obligation": "Maximum movement distance comes from the charge roll",
+          "engine_owners": [
+            "engine/charge_roll_flow.py",
+            "engine/charge_declaration.py",
+            "engine/charge_movement_budget.py",
+            "engine/charge_target_continuation.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section11/test_moves.py::test_witnessed_charge_path_obeys_rolled_distance_limit",
+              "function_ast_sha256": "0a21b1b0d34b4f00135a6b2575c5cbc44863cbb544ae9d88fcb4ebfd3a7f40cb",
+              "assertions": [
+                "assert result.is_valid is (maximum >= 4.25)",
+                "assert all((r.is_valid for r in result.path_validation_results)) is (maximum >= 4.25)"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_rolls.py::test_all_physical_two_d6_outcomes_consume_real_native_distance",
+              "function_ast_sha256": "ccfe9b8596de97c550c3454b9b09a9e8a32db166a41ab13135a806f7883103ea",
+              "assertions": [
+                "assert candidate.is_legal",
+                "assert result.value == a + b",
+                "assert result.movement_budget.maximum_distance_inches == a + b",
+                "assert result.move_available is (a + b > 2)",
+                "assert result.reachable_target_distances_inches == ({} if a + b == 2 else {enemy.unit_instance_id: candidate.closest_distance_inches})",
+                "assert result.roll_state.original_result.values == (a, b)"
+              ]
+            },
+            {
+              "node": "tests/rules/section11/test_physical.py::test_native_flying_choice_precedes_charge_roll_and_penalizes_current_target_budget",
+              "function_ast_sha256": "e25d5a45ce8789bd54507d66062b36bfd5f261566b6422e547b233f86b5273f1",
+              "assertions": [
+                "assert request.decision_type == 'select_charge_targets'",
+                "assert result.request.take_to_the_skies is skies",
+                "assert result.movement_budget.maximum_distance_inches == result.value - (2 if skies else 0)",
+                "assert abs(result.reachable_target_distances_inches[enemy.unit_instance_id] - 3) < 1e-12",
+                "assert isinstance(records[0].result.payload, dict)",
+                "assert records[0].result.payload['take_to_the_skies'] is skies"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "heading or introductory explanatory prose"
+        },
+        {
+          "source_blocks": [
+            3
+          ],
+          "role": "heading or introductory explanatory prose"
+        },
+        {
+          "source_blocks": [
+            5
+          ],
+          "role": "heading or introductory explanatory prose"
+        },
+        {
+          "source_blocks": [
+            9
+          ],
+          "role": "heading or introductory explanatory prose"
+        },
+        {
+          "source_blocks": [
+            11
+          ],
+          "role": "heading or introductory explanatory prose"
+        },
+        {
+          "source_blocks": [
+            15
+          ],
+          "role": "heading or introductory explanatory prose"
+        }
+      ]
+    }
+  ],
+  "faq_ownership": {
+    "reviewed_current_faq_count": 64,
+    "locally_owned": [
+      {
+        "id": "fdefb262-1eb9-43fd-a2c8-70cf3bd2a621",
+        "question": "When a rule instructs you to perform a charge outside of the charge phase, do I resolve step 2 and 3 of the Charge step(11.02)?",
+        "answer": "Yes",
+        "ordinal": 27,
+        "source_sha256": "08639241469c28315db54217af96362204e61b52d0bd272d16a40bab54e25fe8",
+        "obligation": "Out-of-phase charge resolves Charge step2 and3",
+        "engine_owners": [
+          "engine/charge_roll_flow.py",
+          "engine/charge_declaration.py",
+          "engine/charge_movement_budget.py",
+          "engine/charge_target_continuation.py",
+          "engine/catalog_setup_reactive_shoot_charge.py",
+          "engine/catalog_setup_reactive_charge_move.py"
+        ],
+        "semantic_assertions": [
+          {
+            "node": "tests/rules/section11/test_reactive.py::test_constructed_out_of_phase_charge_roll_attempt_reject_retry_and_legal_continuation",
+            "function_ast_sha256": "7a2906e68c731e89f8a312d6e098110f8aa4f3f357a3920df5e68603239cad5d",
+            "assertions": [
+              "assert request.decision_type == 'select_catalog_setup_reactive_shoot_charge'",
+              "assert request.actor_id == 'owner'",
+              "assert state.active_player_id == 'opponent'",
+              "assert len(rolls) == 1",
+              "assert result.request.spec.expression.quantity == 2",
+              "assert result.request.spec.expression.sides == 6",
+              "assert result.request.player_id == 'owner'",
+              "assert result.move_available",
+              "assert state.current_battle_phase is BattlePhase.MOVEMENT",
+              "assert pending(session).decision_type == 'submit_movement_proposal'",
+              "assert bad.status_kind is LifecycleStatusKind.INVALID, bad",
+              "assert state.battlefield_state == before",
+              "assert not events(session, 'catalog_setup_reactive_charge_move_completed')",
+              "assert retry.actor_id == 'owner'",
+              "assert result_status.status_kind is not LifecycleStatusKind.INVALID, result_status",
+              "assert len(events(session, 'catalog_setup_reactive_charge_move_completed')) == int(not decline)",
+              "assert len(events(session, 'catalog_setup_reactive_charge_move_declined')) == int(decline)",
+              "assert session.lifecycle.state is not None",
+              "assert session.lifecycle.state.current_battle_phase is not BattlePhase.CHARGE",
+              "assert not any((isinstance(e.effect_payload, dict) and e.effect_payload.get('effect_kind') == 'charge_grants_fights_first' for e in state.persisting_effects))",
+              "assert len(events(session, 'catalog_setup_reactive_charge_roll_resolved')) == 1"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fb3b2776-c954-471b-b448-b70caa91929d",
+        "question": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?",
+        "answer": "A charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03). Example: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\". Example: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\".",
+        "ordinal": 59,
+        "source_sha256": "18f33a49e6d2f3f401aefb615c84a2d4d373c9b382b5bb38252504d517bc8662",
+        "obligation": "Modified charge roll and move maximum control targets; later loss requests replacement",
+        "engine_owners": [
+          "engine/charge_roll_flow.py",
+          "engine/charge_declaration.py",
+          "engine/charge_movement_budget.py",
+          "engine/charge_target_continuation.py",
+          "engine/catalog_setup_reactive_shoot_charge.py",
+          "engine/catalog_setup_reactive_charge_move.py"
+        ],
+        "semantic_assertions": [
+          {
+            "node": "tests/rules/section11/test_rolls.py::test_budget_shrink_after_selection_requests_new_targets_then_continues",
+            "function_ast_sha256": "1d819ab8d4ea1f1bd1731f4f801285bc288d7b3663b835e358543b66096f0daa",
+            "assertions": [
+              "assert status.status_kind is LifecycleStatusKind.INVALID",
+              "assert request.decision_type == 'select_target_replacement', status",
+              "assert not events(session, 'charge_move_completed')",
+              "assert roll(session).roll_state == original.roll_state",
+              "assert pending(session).decision_type == 'submit_movement_proposal'",
+              "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+              "assert len(events(session, 'charge_move_completed')) == 1",
+              "assert len(events(session, 'charge_roll_resolved')) == 1"
+            ]
+          }
+        ]
+      }
+    ],
+    "cross_references": [
+      {
+        "faq_ordinal": 5,
+        "id": "e5941469-5653-49b2-919e-9c9246e811d4",
+        "owner": "Section03",
+        "relation": "Transit engagement only at endpoint"
+      },
+      {
+        "faq_ordinal": 26,
+        "id": "ba488672-92ec-443d-9087-85a999342589",
+        "owner": "Sections01/03",
+        "relation": "If-able cannot break coherency; local Charge attachment consumer"
+      },
+      {
+        "faq_ordinal": 28,
+        "id": "a7ba0395-6635-45cd-aeec-1cc3c0607a0b",
+        "owner": "Sections01/03",
+        "relation": "Single contiguous coherent group"
+      },
+      {
+        "faq_ordinal": 39,
+        "id": "9b1c81f5-2ea0-40eb-9015-6a005367cd75",
+        "owner": "Section03",
+        "relation": "MONSTER/VEHICLE friendly transit for other move types"
+      },
+      {
+        "faq_ordinal": 58,
+        "id": "dc9911da-e156-4b48-bf9b-18f9d96d037e",
+        "owner": "Section03",
+        "relation": "Take to skies before Charge dice; local native FLY consumption"
+      },
+      {
+        "faq_ordinal": 63,
+        "id": "9638115f-b94b-4d05-ba62-df9fba2805ac",
+        "owner": "Section01",
+        "relation": "Through-end effect lifetime; local Charge bonus consumption"
+      },
+      {
+        "faq_ordinal": 64,
+        "id": "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+        "owner": "Section01",
+        "relation": "Model/unit attached ownership; local Charge physical model inventory"
+      }
+    ],
+    "other_faqs": "Reviewed all64; no other Section11-owned FAQ. FAQ02 Fight half remains Section12; FAQ10-12 pile-in/consolidate remain12/03."
+  },
+  "authenticated_inputs": {
+    "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+    "data/source_audits/v963_shock/captures/core-page.js": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026"
+  },
+  "constructed_scenarios": [
+    "Already-permitted attachment of native Lord Exultants; no named admission claim.",
+    "Generic compiled timing CP effect; no named faction claim.",
+    "Generic compiled setup-reactive source permission, constructed arrival boundary; no ingress or faction claim.",
+    "Effects modifying dice/move distance at exact consumer boundaries.",
+    "Native geometry/health/weapon/keyword definitions retained; immutable catalog and fresh mutable graph."
+  ],
+  "dependency_cross_references": [
+    "tests/rules/section03/test_movement_paths.py",
+    "tests/rules/section03/test_if_able.py",
+    "tests/rules/section09/test_restrictions.py",
+    "tests/rules/section10/test_boundaries.py"
+  ],
+  "limitations": [
+    "No whole-game replay or preceding phases certified.",
+    "No general solver performance bound.",
+    "Expected shared numerical engagement boundary defect and required-target optional-move failure remain enabled; see future-fixes.json."
+  ]
+}

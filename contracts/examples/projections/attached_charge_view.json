@@ -5988,7 +5988,122 @@
   },
   "primary_rules_unit_turn_start_snapshots": [],
   "projection_schema": "game-view-v13-random-profiles",
-  "projection_state_hash": "48be3ffbc6246a5e5650c79ade9a2d58f07b24ce3e23cabc0e1eac0d5e2a81b8",
+  "projection_state_hash": "f2b19727e449870e8dab084c712ab0a2699d302aa0ca0bf94d97c095542863bd",
+  "public_army_rosters": [
+    {
+      "army_id": "army-alpha",
+      "attachment_declarations": [
+        {
+          "bodyguard_unit_selection_id": "source",
+          "source_unit_selection_id": "leader"
+        }
+      ],
+      "battle_size": "strike_force",
+      "catalog_id": "phase9a-canonical",
+      "dedicated_transport_manifests": [],
+      "detachment_selection": {
+        "detachment_ids": [
+          "core-combined-arms"
+        ],
+        "enhancement_ids": [],
+        "faction_id": "core-marine-force",
+        "stratagem_ids": []
+      },
+      "enhancement_assignments": [],
+      "enhancement_point_values": [],
+      "force_disposition_id": "purge-the-foe",
+      "player_id": "player-a",
+      "points_source_package_id": null,
+      "ruleset_id": {
+        "edition": "11e",
+        "game": "warhammer_40000",
+        "version": "core-v2-phase9a"
+      },
+      "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+      "unit_points": [],
+      "unit_selections": [
+        {
+          "datasheet_id": "core-intercessor-like-infantry",
+          "model_profile_selections": [
+            {
+              "model_count": 5,
+              "model_profile_id": "core-intercessor-like"
+            }
+          ],
+          "mustering_option_selections": [],
+          "unit_selection_id": "source",
+          "wargear_selections": []
+        },
+        {
+          "datasheet_id": "core-character-leader",
+          "model_profile_selections": [
+            {
+              "model_count": 1,
+              "model_profile_id": "core-character-leader"
+            }
+          ],
+          "mustering_option_selections": [],
+          "unit_selection_id": "leader",
+          "wargear_selections": []
+        },
+        {
+          "datasheet_id": "core-intercessor-like-infantry",
+          "model_profile_selections": [
+            {
+              "model_count": 5,
+              "model_profile_id": "core-intercessor-like"
+            }
+          ],
+          "mustering_option_selections": [],
+          "unit_selection_id": "next",
+          "wargear_selections": []
+        }
+      ],
+      "warlord_selection": null
+    },
+    {
+      "army_id": "army-beta",
+      "attachment_declarations": [],
+      "battle_size": "strike_force",
+      "catalog_id": "phase9a-canonical",
+      "dedicated_transport_manifests": [],
+      "detachment_selection": {
+        "detachment_ids": [
+          "core-combined-arms"
+        ],
+        "enhancement_ids": [],
+        "faction_id": "core-marine-force",
+        "stratagem_ids": []
+      },
+      "enhancement_assignments": [],
+      "enhancement_point_values": [],
+      "force_disposition_id": "purge-the-foe",
+      "player_id": "player-b",
+      "points_source_package_id": null,
+      "ruleset_id": {
+        "edition": "11e",
+        "game": "warhammer_40000",
+        "version": "core-v2-phase9a"
+      },
+      "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+      "unit_points": [],
+      "unit_selections": [
+        {
+          "datasheet_id": "core-intercessor-like-infantry",
+          "model_profile_selections": [
+            {
+              "model_count": 5,
+              "model_profile_id": "core-intercessor-like"
+            }
+          ],
+          "mustering_option_selections": [],
+          "unit_selection_id": "enemy",
+          "wargear_selections": []
+        }
+      ],
+      "warlord_selection": null
+    }
+  ],
   "public_command_point_ledgers": [
     {
       "command_points": 1,

@@ -218,6 +218,13 @@
         "submission_kind": "finite"
       },
       {
+        "decision_type": "select_coherency_casualty",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
         "decision_type": "select_core_ability_instance",
         "interaction_kinds": [
           "finite_option_list"
@@ -1127,20 +1134,20 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "44.3.33",
+        "contract_version": "44.5.0",
         "identity_hash": "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d",
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "d9abc70c81eef9e242646d77abf96a6c8db4bf7f74dc73155218f705801725d3",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a"
+        "identity_hash": "6ed5d4c777e495f248f6b4793317b50f32ab6bce7bbc3d05955e0854bb57b921",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",
         "identity_id": "11e-warhammer-event-companion-2026-07"
       },
       "ruleset": {
-        "identity_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+        "identity_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
         "identity_id": "warhammer_40000:11e:core-v2-setup-prebattle-ui-smoke"
       },
       "source_packages": [
@@ -3647,6 +3654,13 @@
       "submission_kind": "finite"
     },
     {
+      "decision_type": "select_coherency_casualty",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
       "decision_type": "select_core_ability_instance",
       "interaction_kinds": [
         "finite_option_list"
@@ -4182,7 +4196,7 @@
     }
   ],
   "overall_status": "unsupported",
-  "ruleset_descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+  "ruleset_descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
   "schema_version": "support-profile-v4-directed-primary",
   "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
   "status_counts": {

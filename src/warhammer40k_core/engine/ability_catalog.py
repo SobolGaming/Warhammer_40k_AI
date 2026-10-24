@@ -8,6 +8,7 @@ from warhammer40k_core.core.datasheet import (
     CatalogAbilitySupport,
     DatasheetAbilityDescriptor,
 )
+from warhammer40k_core.core.keyword_membership import exclusive_name_keywords
 from warhammer40k_core.core.ruleset_descriptor import battle_phase_kind_from_token
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
@@ -760,15 +761,21 @@ def _record_keyword_gate_matches_player(
         return True
     if record.source_kind is AbilitySourceKind.WEAPON:
         return record.definition.keyword_gate.matches(tuple(selected_weapon_keywords))
-    return any(
-        record.definition.keyword_gate.matches(
-            (*unit.keywords, *unit.faction_keywords),
-            name_keywords=tuple(
-                name for name in unit.datasheet_name_keywords if name not in unit.faction_keywords
-            ),
-        )
-        for unit in army.units
-    )
+    # This is selected-content admission, shared by cached live bundles and
+    # fresh restore builds. Casualties do not deselect roster content. Runtime
+    # execution separately checks the current source's living keyword scope.
+    for unit in army.units:
+        keywords = {keyword for model in unit.own_models for keyword in model.keywords}
+        faction_keywords = {
+            keyword for model in unit.own_models for keyword in model.faction_keywords
+        }
+        names = exclusive_name_keywords(model.keyword_assignment for model in unit.own_models)
+        if record.definition.keyword_gate.matches(
+            tuple(sorted(keywords | faction_keywords)),
+            name_keywords=tuple(name for name in names if name not in faction_keywords),
+        ):
+            return True
+    return False
 
 
 def _selected_weapon_profile_ids(

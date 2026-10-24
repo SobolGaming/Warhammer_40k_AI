@@ -895,7 +895,7 @@
         "approval_reference": "data/source_audits/order135/b03-explicit-repair-approval.json",
         "documented_acceptance": "docs/ADAPTER_DECISION_CONTRACT.md:1904,1908",
         "scope": "Exact typed request context equality before queue/history/events for supported live submissions; valid target/effect choices and earlier authoritative checks preserved.",
-        "reproduced_original_impact": "records99→100/queue1→0/two acceptance-history events/exception, every game-state and CP/use/effect ledger unchanged CP5→5; malformed live-client input, no ordinary legal-play or edited-history claim, no executed BASE introduction claim.",
+        "reproduced_original_impact": "records99\u2192100/queue1\u21920/two acceptance-history events/exception, every game-state and CP/use/effect ledger unchanged CP5\u21925; malformed live-client input, no ordinary legal-play or edited-history claim, no executed BASE introduction claim.",
         "current_controls": "Both-direction native context invalid leaves complete lifecycle unchanged, followed by exact legal retry,2CP/FightsFirst/interrupt/actual-melee continuation, save/load/fork/allprincipalviews/events/exact replay. Constructed domain context/metadata/Carnival controls qualified; no whole-provider certification."
       },
       "approved_b03_json_kind_qualification": {
@@ -1621,6 +1621,21 @@
       ],
       "disposition": "Retained original requirement; bounded D12 normal no-usable-melee continuation.",
       "qualification_reference": "docs/D12_EPIC_CHALLENGE_SCOPE.md"
+    },
+    "18.05-battle-shock": {
+      "current_additional_owners": [
+        "src/warhammer40k_core/engine/emergency_disembark_battle_shock.py:apply_emergency_disembark_battle_shock",
+        "src/warhammer40k_core/engine/emergency_disembark_battle_shock.py:replay_emergency_disembark_battle_shock",
+        "src/warhammer40k_core/engine/battle_shock_state.py:apply_direct_battle_shock_state"
+      ],
+      "current_test_nodes": [
+        "tests/unit/test_order60_emergency_disembark.py::test_emergency_disembark_places_every_survivor_on_the_closest_ring",
+        "tests/unit/test_order60_emergency_disembark.py::test_emergency_disembark_restore_preserves_valid_resolution"
+      ],
+      "disposition": "Original Emergency setup Battle-shock obligation retained. Adopted source applies shared direct Battle-shock until source-authorized clearing; the former end_of_turn scalar expectation is archived, not current gameplay.",
+      "authority": "data/source_audits/v963_shock/source.audit.json",
+      "qualification_reference": "tests/rules/section18/coverage.json",
+      "qualification": "Static current owner/assertion binding only. No runtime pass, native provider admission or whole-faction certification. Exact earlier assertion and full test preimage remain authenticated separately."
     }
   },
   "source_supersessions": {

@@ -1,0 +1,51 @@
+{
+  "scope": "Adopted Section04 corpus complete; engine compliance differs while SF04-002 remains.",
+  "source_rows": 24,
+  "rule_rows": 18,
+  "faq_rows": 6,
+  "obligations": 63,
+  "passing_assertion_mapped_obligations": 62,
+  "visible_semantic_failure_mapped_obligations": 1,
+  "unimplemented_adopted_obligations": 0,
+  "unadopted_rows": 0,
+  "tests": {
+    "total": 112,
+    "passed": 111,
+    "failed": 1,
+    "skip": 0,
+    "xfail": 0,
+    "inventory_checks": 3,
+    "isolation_checks": 1,
+    "behavioral_cases": 108
+  },
+  "stable_junit": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-11\\section04-stable.xml",
+  "performance": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-11\\section04-complete-performance.json",
+  "quality": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-11\\quality-complete-receipt.json",
+  "direct_dependencies": {
+    "command": [
+      "C:\\Users\\nostr\\Documents\\Codex\\2026-10-15\\task\\behavior-rebuild\\.venv\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "tests/rules/section02/test_02_02_04_healing.py",
+      "tests/rules/section01/test_01_07_actions.py",
+      "tests/rules/section03/test_facade.py",
+      "--selected-army-source-index",
+      "C:/Users/nostr/Documents/Codex/2026-10-16/task-7/integration-source-index-v2",
+      "--no-cov",
+      "-q",
+      "-o",
+      "cache_dir=C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-11\\pytest-cache",
+      "--junitxml",
+      "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-11\\dependencies.xml"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 19.83112170000095,
+    "log": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-11\\dependencies-final.txt"
+  },
+  "source_capture_qualification": "Unversioned Core body. Changelog981 is contextual, not a body version. All24 adopted row fingerprints match retained current; no fresh network claim.",
+  "remaining_gates": [
+    "Future semantic fix SF04-002; preserve SF01-001 and SF03-001",
+    "Broader Linux integration and independent equivalence review before retiring predecessor corpora"
+  ],
+  "next": "Fresh Section05 only, then06; Section00 remains deferred."
+}

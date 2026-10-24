@@ -1,0 +1,20 @@
+{
+  "section": "07",
+  "confirmed_new_semantic_findings": [],
+  "policy": "Preserve source-correct failures enabled. No semantic engine repair, skip or xfail.",
+  "prior_groups_untouched": [
+    "Stealth",
+    "controlling-player coherency choice",
+    "premature unit has-shot",
+    "delayed model completion",
+    "Epic Challenge retained CHARACTER eligibility",
+    "Deadly Demise plus Fight on Death after-removal timing"
+  ],
+  "development_qualifications": [
+    "The WE source sheet rejected for missing representative height is a fixture admission limitation, not a crash repair request. Existing geometry guard preserved.",
+    "Initial mission helper stripped terrain and was correctly rejected at the source-layout guard. Final Section07 fixture retains full source geometry.",
+    "Prototype qualified Fight-start variants are outside the selected-target consumer's supported contract. No claim of native qualified-provider support or confirmed Core defect follows.",
+    "Development import/member/enum/identity mistakes and selecting an old sorted effect were corrected in new tests only; raw development evidence retained."
+  ],
+  "independent_review": "not performed; no universal Core compliance claim"
+}

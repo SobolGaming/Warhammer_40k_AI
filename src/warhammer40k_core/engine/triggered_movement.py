@@ -795,6 +795,34 @@ def invalid_triggered_movement_proposal_status(
         )
     proposal_validation = submission.validation_result_for_request(proposal_request)
     if proposal_validation.is_valid:
+        from warhammer40k_core.engine.triggered_movement_physical_authority import (
+            require_triggered_movement_source_model_placements,
+            triggered_movement_placement,
+            triggered_movement_witness_matches_source,
+        )
+
+        scenario = _battlefield_scenario(state)
+        placement = triggered_movement_placement(
+            scenario=scenario, unit_instance_id=proposal_request.unit_instance_id
+        )
+        source_models = require_triggered_movement_source_model_placements(
+            scenario=scenario, unit_placement=placement
+        )
+        if not triggered_movement_witness_matches_source(
+            witness=submission.witness, source_model_placements=source_models
+        ):
+            return _reject_invalid_triggered_movement_proposal(
+                state=state,
+                result=result,
+                proposal_validation=ProposalValidationResult.invalid(
+                    proposal_request_id=proposal_request.request_id,
+                    proposal_kind=proposal_request.proposal_kind,
+                    violation_code="movement_witness_model_inventory_mismatch",
+                    message="Triggered movement witness must match every placed living model.",
+                    field="witness",
+                ),
+                message="Triggered movement witness does not match the pending rules unit.",
+            )
         return None
     return _reject_invalid_triggered_movement_proposal(
         state=state,
@@ -1099,7 +1127,7 @@ def _request_payload_for_result(  # pyright: ignore[reportUnusedFunction]
     raise GameLifecycleError("DecisionResult does not match a known triggered movement request.")
 
 
-def _battlefield_scenario(state: GameState) -> BattlefieldScenario:  # pyright: ignore[reportUnusedFunction]
+def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
     return battlefield_scenario_for_state(state=state)
 
 

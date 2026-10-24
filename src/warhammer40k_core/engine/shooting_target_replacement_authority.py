@@ -88,6 +88,21 @@ def validate_sequence_authority(
     )
 
 
+def validate_recorded_sequence_authority(
+    *, event_records: tuple[EventRecord, ...], sequence: AttackSequence, result_id: str
+) -> None:
+    """Authenticate an executor snapshot at its exact historical event prefix."""
+    records = tuple(
+        DecisionRecord.from_payload(cast(DecisionRecordPayload, event.payload))
+        for event in event_records
+        if event.event_type == "decision_recorded"
+    )
+    declarations = tuple(record for record in records if record.result.result_id == result_id)
+    if len(declarations) != 1:
+        raise GameLifecycleError("Model attack history requires one declaration decision.")
+    _validate_sequence_history(event_records, records, declarations[0], sequence)
+
+
 def validate_completed_replacement_authority(
     *, event_records: tuple[EventRecord, ...], sequence: AttackSequence
 ) -> None:

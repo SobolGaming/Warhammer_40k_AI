@@ -349,7 +349,18 @@ class BattleRoundFlow:
             value.snapshot_id for value in state.primary_rules_unit_turn_start_snapshots
         )
         if _is_end_of_player_turn(state):
+            from warhammer40k_core.engine.coherency_cleanup_decisions import (
+                request_coherency_cleanup,
+            )
+
+            state.clear_turn_action_states(
+                player_id=_active_player_id(state), battle_round=state.battle_round
+            )
+            cleanup_status = request_coherency_cleanup(state=state, decisions=decisions)
+            if cleanup_status is not None:
+                return cleanup_status
             turn_end_record = state.prepare_current_turn_end_boundary(
+                decisions=decisions,
                 completed_phase=current_phase,
                 runtime_modifier_registry=self._runtime_modifier_registry,
             )

@@ -432,7 +432,8 @@ def test_order_30_cleanup_feel_no_pain_pauses_and_restores_before_source_removal
     state = session.lifecycle.state
     assert state is not None
     assert state.battlefield_state is not None
-    assert model_id in state.battlefield_state.placed_model_ids()
+    # FAQ20 removes the retained Fight casualty before its Deadly Demise.
+    assert model_id in state.battlefield_state.removed_model_ids
     restored = GameLifecycle.from_payload(session.lifecycle.to_payload())
     assert restored.to_payload() == session.lifecycle.to_payload()
     session = LocalGameSession(lifecycle=restored)
@@ -445,7 +446,10 @@ def test_order_30_cleanup_feel_no_pain_pauses_and_restores_before_source_removal
             GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
             == session.lifecycle.to_payload()
         )
-        if model_id in current.battlefield_state.removed_model_ids:
+        if any(
+            event.event_type == "fight_on_death_destruction_completed"
+            for event in session.lifecycle.decision_controller.event_log.records
+        ):
             break
     state = session.lifecycle.state
     assert state is not None

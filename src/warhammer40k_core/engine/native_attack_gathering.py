@@ -223,6 +223,27 @@ def native_gathered_attack_groups_for_target(
             target_unit_instance_id=target_unit_instance_id,
             target_has_character=target_has_character,
         )
+    from warhammer40k_core.engine.damage_allocation_targets import (
+        DamageAllocationTargetState,
+        damage_allocation_target_state,
+    )
+
+    # Exhausted targets have no live numeric applicability to gather. Preserve
+    # their declared physical contributions for the existing pool-cancellation
+    # owner, including this sequence's still-placed pending casualties.
+    if damage_allocation_target_state(
+        state=state,
+        target_unit_instance_id=target_unit_instance_id,
+        attack_sequence=attack_sequence,
+    ) in (
+        DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS,
+        DamageAllocationTargetState.DESTROYED_AND_REMOVED,
+    ):
+        return gathered_attack_groups_for_target(
+            attack_sequence=attack_sequence,
+            target_unit_instance_id=target_unit_instance_id,
+            target_has_character=target_has_character,
+        )
     snapshots: list[NativeAttackSnapshot] = []
     for index, pool in candidates:
         snapshot = native_attack_snapshot(

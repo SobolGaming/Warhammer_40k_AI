@@ -26,6 +26,7 @@ from warhammer40k_core.geometry.movement_envelope import (
 from warhammer40k_core.geometry.path_initial_constraints import initial_path_constraint_result
 from warhammer40k_core.geometry.path_measurement import (
     horizontal_section_transit_permitted,
+    path_is_horizontal,
 )
 from warhammer40k_core.geometry.path_measurement import (
     interpolate_pose as _interpolate_pose,
@@ -216,6 +217,8 @@ class TerrainPathLegalityContextPayload(TypedDict):
     contact_footprint_available: bool
     can_traverse_ruins_walls: bool
     can_move_through_terrain: bool
+    horizontal_terrain_feature_transit: bool
+    can_transit_all_terrain: bool
     terrain_as_if_absent_height_inches: float | None
     horizontal_terrain_transit_height_inches: float | None
     has_fly: bool
@@ -907,6 +910,8 @@ class TerrainPathLegalityContext:
     contact_footprint_available: bool = True
     can_traverse_ruins_walls: bool = False
     can_move_through_terrain: bool = False
+    horizontal_terrain_feature_transit: bool = False
+    can_transit_all_terrain: bool = False
     terrain_as_if_absent_height_inches: float | None = None
     horizontal_terrain_transit_height_inches: float | None = None
     has_fly: bool = False
@@ -959,6 +964,13 @@ class TerrainPathLegalityContext:
             "TerrainPathLegalityContext can_move_through_terrain",
             self.can_move_through_terrain,
         )
+        _validate_bool(
+            "TerrainPathLegalityContext horizontal_terrain_feature_transit",
+            self.horizontal_terrain_feature_transit,
+        )
+        _validate_bool(
+            "TerrainPathLegalityContext can_transit_all_terrain", self.can_transit_all_terrain
+        )
         object.__setattr__(
             self,
             "terrain_as_if_absent_height_inches",
@@ -1007,8 +1019,12 @@ class TerrainPathLegalityContext:
                 sampled_pose_count=len(sampled_path),
             )
 
-        floor_crossing = forbidden_dense_floor_crossing(
-            self.moving_model, path, self.terrain_features, self.movement_keywords
+        floor_crossing = (
+            None
+            if self.can_transit_all_terrain
+            else forbidden_dense_floor_crossing(
+                self.moving_model, path, self.terrain_features, self.movement_keywords
+            )
         )
         if floor_crossing is not None:
             return TerrainPathLegalityResult.invalid(
@@ -1202,7 +1218,15 @@ class TerrainPathLegalityContext:
         end_pose: Pose,
     ) -> TerrainTraversalViolation | None:
         if feature is None:
-            return None
+            if not self.can_transit_all_terrain or end_pose.position.z >= terrain.top_z_inches():
+                return None
+            if not terrain.intersects_model(_model_at_pose(self.moving_model, end_pose)):
+                return None
+            return TerrainTraversalViolation(
+                violation_code=TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value,
+                message="Model cannot end within a terrain volume.",
+                terrain_id=terrain.terrain_id,
+            )
         end_model = _model_at_pose(self.moving_model, end_pose)
         if not terrain.intersects_model(end_model):
             return None
@@ -1232,6 +1256,18 @@ class TerrainPathLegalityContext:
             and _path_reaches_or_clears_terrain_top(touching_poses, terrain)
         ):
             return self.terrain_movement_policy.fly_traversal_mode
+        # A selected physical flight grant supersedes terrain categories. Endpoint
+        # intersection, support and placement validation still run afterward.
+        if self.can_transit_all_terrain:
+            return TerrainTraversalMode.FREELY_TRAVERSABLE
+        # Source-backed horizontal permission supersedes feature categories;
+        # endpoint collision/support and vertical floor checks remain authoritative.
+        if (
+            self.horizontal_terrain_feature_transit
+            and feature is not None
+            and path_is_horizontal(touching_poses)
+        ):
+            return TerrainTraversalMode.FREELY_TRAVERSABLE
         if horizontal_section_transit_permitted(
             top_inches=terrain.top_z_inches(),
             maximum_height_inches=self.horizontal_terrain_transit_height_inches,
@@ -1302,6 +1338,10 @@ class TerrainPathLegalityContext:
         feature_policy: TerrainFeatureMovementPolicy,
         end_pose: Pose,
     ) -> TerrainTraversalViolation | None:
+        if feature.floors:
+            feature_policy = self.terrain_movement_policy.policy_for_feature_kind(
+                feature.feature_kind, endpoint_classification=feature.classification
+            )
         end_model = _model_at_pose(self.moving_model, end_pose)
         solid_blocker = solid_endpoint_intersection(end_model, feature)
         if solid_blocker is not None:
@@ -1411,6 +1451,8 @@ class TerrainPathLegalityContext:
             "contact_footprint_available": self.contact_footprint_available,
             "can_traverse_ruins_walls": self.can_traverse_ruins_walls,
             "can_move_through_terrain": self.can_move_through_terrain,
+            "horizontal_terrain_feature_transit": self.horizontal_terrain_feature_transit,
+            "can_transit_all_terrain": self.can_transit_all_terrain,
             "terrain_as_if_absent_height_inches": self.terrain_as_if_absent_height_inches,
             "horizontal_terrain_transit_height_inches": (
                 self.horizontal_terrain_transit_height_inches
@@ -1436,6 +1478,8 @@ class TerrainPathLegalityContext:
             contact_footprint_available=payload["contact_footprint_available"],
             can_traverse_ruins_walls=payload["can_traverse_ruins_walls"],
             can_move_through_terrain=payload["can_move_through_terrain"],
+            horizontal_terrain_feature_transit=payload["horizontal_terrain_feature_transit"],
+            can_transit_all_terrain=payload["can_transit_all_terrain"],
             terrain_as_if_absent_height_inches=payload["terrain_as_if_absent_height_inches"],
             horizontal_terrain_transit_height_inches=payload[
                 "horizontal_terrain_transit_height_inches"

@@ -248,11 +248,10 @@ def _has_supported_records(
         if index is None:
             continue
         for unit in army.units:
-            current_model_ids = tuple(
-                sorted(model.model_instance_id for model in unit.own_models if model.is_alive)
-            )
-            if not current_model_ids:
-                continue
+            # Registration describes admitted source capability, not current
+            # eligibility. Casualties must not change the reconstructed audit;
+            # _candidates owns live/placed/engagement gates for each trigger.
+            source_model_ids = tuple(sorted(unit.own_model_ids()))
             for record in index.records_for(TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE):
                 if not ability_record_is_active_generic_rule_ir(record):
                     continue
@@ -265,7 +264,7 @@ def _has_supported_records(
                 if not catalog_rule_record_source_matches_unit(
                     record=record,
                     unit=unit,
-                    current_model_instance_ids=current_model_ids,
+                    current_model_instance_ids=source_model_ids,
                 ):
                     continue
                 if any(

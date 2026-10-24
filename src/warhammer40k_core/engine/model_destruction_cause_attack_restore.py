@@ -284,6 +284,66 @@ def require_pending_attack_continuation(
     return cause_id
 
 
+def consumed_retained_attack_mortal_continuation(
+    *,
+    state: GameState,
+    attack_sequence: AttackSequence,
+    source_context: dict[str, JsonValue],
+    request: DecisionRequest,
+    event_records: tuple[EventRecord, ...],
+) -> str | None:
+    """A removed retained source remains authoritative only for its exact mortal request."""
+    from warhammer40k_core.engine.damage_allocation import DestructionReactionKind
+    from warhammer40k_core.engine.retained_demise_removal import (
+        require_retained_attack_removed_cause,
+    )
+
+    damage = _mdcpv.parse_damage_application(source_context.get("damage_application"))
+    cause_id = attack_damage_model_destruction_cause_id_for_context(
+        state=state,
+        sequence_id=attack_sequence.sequence_id,
+        attack_context_id=attack_sequence.attack_context_id(),
+        model_instance_id=damage.model_instance_id,
+    )
+    cause = model_destruction_cause_authority_by_id_or_none(state=state, cause_id=cause_id)
+    if cause is None or not cause.source_authority_finalized:
+        return None
+    cause = require_retained_attack_removed_cause(
+        state=state, attack_sequence=attack_sequence, damage=damage
+    )
+    pending = attack_sequence.current_pending_attack_destruction
+    request_events = tuple(
+        event
+        for event in event_records
+        if event.event_type == "decision_requested" and event.payload == request.to_payload()
+    )
+    indexes = {event.event_id: index for index, event in enumerate(event_records)}
+    removed = cause.model_destroyed_event
+    if (
+        pending is None
+        or source_context.get("source_kind") != "deadly_demise"
+        or source_context.get("sequence_id") != attack_sequence.sequence_id
+        or source_context.get("attack_context") != pending.attack_context
+        or source_context.get("saving_throw") != pending.saving_throw_payload
+        or source_context.get("feel_no_pain") != pending.feel_no_pain.to_payload()
+        or source_context.get("destroyed_model_controller_player_id")
+        != pending.destroyed_model_controller_player_id
+        or not any(
+            not source.optional
+            and source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE
+            and source.to_payload() == source_context.get("source")
+            for source in pending.destruction_sources
+        )
+        or len(request_events) != 1
+        or removed is None
+        or removed.event_id not in indexes
+        or event_records[indexes[removed.event_id]] != removed
+        or indexes[removed.event_id] >= indexes[request_events[0].event_id]
+    ):
+        raise GameLifecycleError("Retained attack consumed cause mortal request drift.")
+    return cause_id
+
+
 def _pending_attack_parent_cause_ids(
     *,
     state: GameState,

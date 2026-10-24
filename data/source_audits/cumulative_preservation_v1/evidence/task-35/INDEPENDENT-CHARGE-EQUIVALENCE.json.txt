@@ -1,0 +1,20 @@
+{
+  "decision": "ACCEPT_SCALAR_EQUIVALENCE_ONLY",
+  "exact_one_expression_transform": true,
+  "replacement": "mover.owner_player_id",
+  "historical_expression": "rules_unit_view_by_id(state=state, unit_instance_id=charging_unit_instance_id).owner_player_id",
+  "intervening_calls": [
+    "rules_unit_view_by_id",
+    "TargetRestriction",
+    "type",
+    "GameLifecycleError"
+  ],
+  "seven_dependency_raw_inputs_match": true,
+  "rejected_alternatives": [
+    "target.owner_player_id",
+    "state.active_player_id",
+    "'foreign-player'"
+  ],
+  "reviewed_authority_argument": "The first lookup obtains a frozen RulesUnitView.owner_player_id from ArmyDefinition.player_id. Target view construction, retained-presence membership and keyword access read domain fields and create local views/sets; none changes the state army inventory or player ownership. The only hook callback is restrictions_for after the changed expression is evaluated. Early aircraft return, None registry and wrong registry retain the same branches/errors. Split/attached component aliases resolve from the same army owner in both lookups. Dataclass initialization assigns only newly created local view objects. No intervening callback, source mutation or new cache can invalidate the immutable owner scalar.",
+  "excluded": "No ruling about mixed friendly Vehicle/Monster blocker semantics, terrain classification, source admission, or full CI."
+}

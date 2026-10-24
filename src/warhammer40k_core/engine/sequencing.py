@@ -5,6 +5,7 @@ from enum import StrEnum
 from itertools import permutations
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
@@ -162,6 +163,13 @@ class SequencingConflictContext:
     @property
     def sequence_exception_source_id(self) -> str | None:
         trigger = self.timing_window.descriptor.trigger_kind
+        # Retained Core 08.05, blocks 1-3: both players consult missions only
+        # after all non-mission rules at this Command-end boundary resolve.
+        if (
+            trigger is TimingTriggerKind.END_PHASE
+            and self.timing_window.phase is BattlePhaseKind.COMMAND
+        ):
+            return "rule:08:08.05:1"
         if trigger is TimingTriggerKind.END_TURN:
             return END_TURN_MISSION_ORDER_SOURCE_ID
         if trigger is TimingTriggerKind.END_BATTLE_ROUND:

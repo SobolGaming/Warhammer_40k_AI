@@ -20,6 +20,7 @@ from warhammer40k_core.engine import (
 )
 from warhammer40k_core.engine import charge_declaration_hooks as _cd
 from warhammer40k_core.engine import charge_roll_dispatch as _charge_rerolls
+from warhammer40k_core.engine import coherency_cleanup_decisions as _coherency_cleanup
 from warhammer40k_core.engine import combat_disembark_battle_shock as _combat_disembark_bs
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import core_stratagem_mortal_wound_continuation as _stratagem_mw
@@ -886,6 +887,9 @@ class GameLifecycle:
             ),
         )
         _history_origins.restore(lifecycle, payload)
+        _coherency_cleanup.validate_restored_coherency_choices(
+            state=lifecycle._require_state(), decisions=lifecycle.decision_controller
+        )
         validate_payload_consistency(
             state=lifecycle._require_state(),
             config=lifecycle._config,
@@ -1284,6 +1288,7 @@ class GameLifecycle:
                 ),
                 *_cmmd.decision_dispatch_handlers(self),
                 *_unit_split_dispatch.decision_dispatch_handlers(self),
+                *_coherency_cleanup.decision_dispatch_handlers(self),
                 *_target_replacement_dispatch.decision_dispatch_handlers(self),
                 *_melee_commitment_dispatch.decision_dispatch_handlers(self),
                 *(

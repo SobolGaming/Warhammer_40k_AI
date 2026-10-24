@@ -1,0 +1,174 @@
+RESUMED READ-ONLY RECOVERY — governing baseline identified
+
+This supersedes the first report's unresolved-baseline question and 24-missing-
+preimage finding. It does not supersede its unchanged qualification failures.
+
+GOVERNING BASELINE
+Commit: 5f509724da25a2f6ded0c2739a8e7c84bdf59c91
+Tree:   1fa709a167abb369932e651f89babbd0034941c5
+Parent: 22a12094cfe3839d8fe8c5296ec0a7e7d32abade
+
+This is the exact artifact-supported last approved checkpoint before the behavior
+test rebuild, applying the user's 2026-10-21 clarification. It is not assumed from
+the dirty original HEAD alone. Independent retained evidence agrees:
+
+1. 2026-10-14/task-5/publication-evidence/pr587-protected-merge-final records PR587
+   merged at 2026-10-15T15:14:48Z by a normal protected squash, commit/tree above.
+   USER_AUTHORIZATION.json records Sentinel_f0b6ab06cda08191a8853401ec5a44fe:
+   "yes, but as the next PR we need to fix the behavior tests by redoing all the
+   testing to meet the prescribed format I provided before". This unambiguously
+   places the requested behavior rebuild AFTER PR587, despite PR587 itself doing
+   earlier category restructuring. The record accepted the structural merge with
+   its unmet timing goal deferred. It does not claim the baseline was defect-free.
+2. next-behavior-rebuild-handoff/BASELINE.json names the same baseline_merge/tree.
+3. 2026-10-15/task/evidence/INITIAL_DESIGN.md begins with fetched main5f509724,
+   tree1fa709a1 and 6,442 entries. baseline-authentication.json agrees.
+4. Early movement handoff explicitly names baseline_head5f509724; foundations
+   handoff names base_main5f509724. Its separate base_commit55668d16... and
+   candidate tree653339e3... are worker freeze/construction identities, not the
+   approved original baseline.
+
+Fresh static authentication: merge SEAL.json SHA256 is
+98d78c6a40f75677268d7d8f97328bb72c6429cbf95bc2f5cc3d6777b0b241fe,
+the exact hash retained by the original baseline authenticator. Ten relevant
+payloads match their sealed sizes/hashes. The exported 6,442 path/mode/type/blob
+entries reconstruct Git tree1fa709a1 exactly. The canonical recursive inventory
+has SHA256 f31db4dbad303d8f852aa1a44d7f872028eb225e4fa4d911ef5c63b6df4ffc28
+and is byte-identical to both reviewed and merged canonical exports. No Git
+object was written. Thread/session payloads in the packet were not read.
+These are authenticated retained artifacts, not a fresh remote-state query.
+
+The user's belief that the rebuild was never committed/published is consistent
+with saved original HEAD remaining5f509724 through the later captures. It is not
+an exhaustive all-ref proof. Worker/local qualification commits do exist; current
+65673dead8d763287c6e5f74467f338d2b357f0d remains such an artifact and cannot be
+promoted to approved historical lineage. No later original rebuild PR/commit was
+established by this pass. No new user hash question is needed.
+
+EXCEPTION-AWARE CURRENT CONTENT INVENTORY
+Compared the authenticated baseline Git blob inventory against all task-11 ZIP
+bytes plus the exact three task-15 candidate overlays. All 7,039 current members
+are accounted for. Content comparison, without a fresh current file-mode audit:
+  exact: 6,239; changed:193; added:607; absent:10.
+  src/:  2,993 exact,97 changed,14 added,0 absent.
+  tests/:882 exact,40 changed,527 added,10 absent.
+  other changed/added files include generated contracts/runtime identities,
+  source/preservation records, shard inputs, docs and tooling.
+
+The ten absent paths are precisely the old flat faction army-rule modules, not
+ten unexplained source deletions. All ten have named original/successor entries
+in faction_test_layout/preservation.json. Four registry archive blobs equal the
+PR587 baseline blobs exactly (Death Guard, Grey Knights, Votann, World Eaters).
+Six differ (Custodes, Aeldari, Necrons, Orks, Tau, Tyranids), requiring a bridge
+through intervening documented fixture/source changes to the baseline. The later
+registry's internal validity alone is not whole-rebuild equivalence to PR587.
+The 527 additions include substantive section coverage as well as restructuring;
+they are not all called mechanical relocations or approved replacement tests.
+
+The machine-readable inventory distinguishes evidence, without treating change
+as error or documentation as approval of every byte:
+  31 runtime paths linked to documented defect/source-boundary families;
+   3 linked to definition preparation / selected-source indexing;
+   1 generated runtime identity;
+   9 with explicit document references but whole-delta adjudication outstanding;
+  67 not explained by this bounded per-path mapping, NOT claimed incorrect.
+Each path retains its baseline blob, exact current blob/SHA256, status, available
+baseline preimage, AST comparison and evidence links. All96 modified Python
+runtime files have recoverable baseline blob-matched preimages and differing ASTs;
+that measures actual source changes, not incorrectness. This is not a full
+semantic review of111 runtime paths.
+
+Concrete documented exceptions recovered include:
+- Recorded PRODUCTION_REPAIRS_AUTHORIZED_09/AUTHORIZATION.json, user
+  Sentinel_f29c4b1482588191853bdcf823883567 at2026-10-16 11:30UTC, authorizes five
+  bounded repair classes / eleven confirmed failures plus authentic Realm
+  admission. Earlier proposal evidence specifically reproduces ordered redeploy,
+  voluntary/forced Fall Back casualty restore authority, and loaded Deep Strike
+  cargo-route defects. Preserve their strict ownership/ordering/duplicate guards.
+- DELIVERY11_DIRECT_USER_APPROVAL_RECEIPT.json records direct user message
+  01a14521-79a9-70c5-af6a-99c55d8c4b1f approving the narrow four-field completion
+  RNG projection. This is a recorded approval for that subdelta in decision.py,
+  not blanket approval of the entire current file or later compatibility behavior.
+- Current source docs separately explain SF03 controlling-player coherency choice;
+  SF04 model/unit attack completion; the focused Stealth, retained destruction,
+  exact circular geometry, Desperate Escape mortal/retry and Fight fixes; Section18
+  emergency Battle-shock; Section25 public bearer disclosure; and World Eaters
+  initial Pile In timing. These are the intended exception candidates, not defects
+  inferred merely from a changed hash. Their exact current diffs still need the
+  already-required scoped preservation/acceptance review.
+
+D07/D09 RECOVERY
+The early 2026-10-15/task-6/parallel-base.zip contains exact expected normalized
+SHA256 preimages for ALL33 ordinary D07 mismatch entries. The previous24 missing
+preimages are now recovered; zero ordinary preimages remain missing in this set.
+Exact member/hash mappings are in TARGETED-PROVENANCE-RESUMED.json. The D09
+baseline archives were already available and remain exact. No source/proof pins
+were changed and no adapter was executed.
+
+The D07 whole-module geometry check compares against an older owner. Its two
+changed functions now route failures through begin_escape_mortals and restore
+completed casualty packets on legal movement retries. FOCUSED_DEFECT_CHECKPOINT
+SF09-002 explicitly documents this intended shared mortal/prevention/destruction
+and no-new-roll retry repair. Therefore this difference has a concrete defect-fix
+explanation; it must not be reverted merely to satisfy an old whole-module hash.
+Conversely, that explanation is not a preservation proof for every old geometry
+branch. Use the recovered original bytes to review the bounded changed owner.
+
+WHAT THIS RESOLVES FOR THE24 HISTORICAL-PROOF/RECEIPT FAILURES
+These24 test failures are distinct from the24 newly recovered predecessor files.
+HISTORICAL-24-DISPOSITION.json enumerates every node and its remaining obligation.
+
+21 migration tests: intended accepted baseline/content identity is now known.
+The protected merge was a squash, so internal measured/source commits must be
+assessed through legitimate reviewed content/merge provenance rather than
+synthetic ancestry. This does not erase the frozen22-file,694 policy-input,
+723 tool-input and93 operation-map differences or validate current external-read
+bytes. Independently review exact finite-cohort applicability, preserved controls
+and accepted squash lineage for the cumulative source. Do not just repin digests.
+
+2 D07 tests: missing ordinary predecessor bytes are fully resolved; the mortal/
+retry owner change has a documented fix rationale. Assertion/fixture/decorator
+preservation, the D09 successor prerequisite and bounded geometry-branch review
+remain required. No blanket exemption for all changed tests or owners is implied.
+
+1 current performance receipt test: the accepted base/tree is identified. A
+legitimate current cumulative head, reviewed exact-base diff assessment and actual
+current serial smoke are still required. Retained DELIVERY11 measurements/smokes
+describe their original source only and cannot become today's receipt.
+
+ZERO tests are relabeled PASS: no tests were run, no proofs regenerated and no
+receipt created. Edition-source evidence from the first report stands separately;
+the246-vs240 work-budget choice remains untouched and unanswered.
+
+ACCESS / EXECUTION STATUS
+The new clarification resolved baseline intent, not Wsl/E_ACCESSDENIED or the
+original Git "cannot change to ... Permission denied". Neither denied operation
+was retried. A genuinely separate source-main clone had a physical own .git,
+no commondir/object alternates/shallow metadata. Its first read-only Git commands
+also returned Permission denied for
+C:/Users/nostr/Documents/Codex/2026-10-15/task-2/source-main
+(rev-parse HEAD, show-ref, log --all -12 were submitted together). That route was
+stopped immediately; no alternate/raw-object access followed. The permitted
+independent exported publication/checkpoint artifacts supplied the result above.
+
+Direct Git history verification remains denied, known not executed; no action is
+pending or uncertain. These were OS/filesystem errors, not a surfaced automatic
+approval-review rejection. No session-log reads, original writes, source/check
+edits, tests, installs, publication, Git mutation or work-budget changes occurred.
+Only task-17 diagnostic/report files were written.
+
+NEXT CONCRETE ACTION
+Use baseline5f509724/tree1fa709a1 as the review anchor. Build the bounded exception
+ledger from the documented repairs, then review D07/D09 against their now-recovered
+preimages and bridge the six non-byte-identical faction archives to that baseline.
+Resolve remaining current-source/applicability entries before any proof work.
+Then qualify a legitimate cumulative base/head diff and fresh serial receipt in
+a permitted environment. Retain original historical measurements and controls.
+This report does not authorize source/proof changes or certify the old baseline
+as perfect or the whole current diff as correct.
+
+Deliverables:
+BASELINE-AND-SOURCE-INVENTORY.json — exact authenticated baseline, selected sealed
+payloads, complete810-path delta inventory,111 runtime path dispositions and links.
+TARGETED-PROVENANCE-RESUMED.json — all33 exact D07 predecessor mappings.
+HISTORICAL-24-DISPOSITION.json — evidence resolved / still required for every node.

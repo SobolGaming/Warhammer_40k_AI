@@ -68,7 +68,8 @@ def prepare_turn_end_boundary(
     completed_cleanup = tuple(
         cleanup
         for cleanup in state.end_turn_cleanup_states
-        if cleanup.battle_round == state.battle_round
+        if cleanup.completes_boundary
+        and cleanup.battle_round == state.battle_round
         and cleanup.active_player_id == state.active_player_id
         and cleanup.phase == completed_phase.value
     )
@@ -79,7 +80,11 @@ def prepare_turn_end_boundary(
     state.clear_turn_action_states(
         player_id=record.active_player_id, battle_round=state.battle_round
     )
-    state.resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)
+    pending = state.resolve_end_turn_cleanup_boundary(
+        completed_phase=completed_phase, decisions=decisions
+    )
+    if pending is not None:
+        raise GameLifecycleError("Turn-end boundary requires controlling-player coherency choices.")
     state.expire_persisting_effects_at_boundary(
         EffectExpirationBoundary.turn_end(
             battle_round=state.battle_round, player_id=record.active_player_id

@@ -20,8 +20,11 @@ from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_resolution import MeleeDeclarationProposalRequest
 from warhammer40k_core.engine.lifecycle import GameLifecycle
-from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
+from warhammer40k_core.engine.movement_proposals import MovementProposalRequest, ProposalKind
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 
 
@@ -214,16 +217,34 @@ def submit_fixture_request(session: LocalGameSession, request: DecisionRequest) 
     elif request.decision_type == "submit_movement_proposal":
         move = MovementProposalRequest.from_decision_request_payload(request.payload)
         context = cast(dict[str, JsonValue], move.context)
+        movement_payload: dict[str, JsonValue] = {
+            "proposal_request_id": move.request_id,
+            "proposal_kind": move.proposal_kind.value,
+            "unit_instance_id": move.unit_instance_id,
+            "movement_phase_action": move.movement_phase_action,
+            "movement_mode": context["movement_mode"],
+        }
+        # This drainer declines optional Fight movement with empty target selections.
+        # "No move" is derived from those selections, not from movement_mode.
+        if move.proposal_kind not in {ProposalKind.PILE_IN, ProposalKind.CONSOLIDATE}:
+            state = session.lifecycle.state
+            assert state is not None
+            assert state.battlefield_state is not None
+            view = rules_unit_view_by_id(state=state, unit_instance_id=move.unit_instance_id)
+            placement = RulesUnitPlacement.from_battlefield(
+                view=view, battlefield_state=state.battlefield_state
+            )
+            witness = PathWitness.for_paths(
+                tuple(
+                    (model.model_instance_id, (model.pose, model.pose))
+                    for model in placement.model_placements
+                )
+            )
+            movement_payload["witness"] = validate_json_value(witness.to_payload())
         status = session.submit_parameterized_payload(
             request_id=request.request_id,
             result_id=result_id,
-            payload={
-                "proposal_request_id": move.request_id,
-                "proposal_kind": move.proposal_kind.value,
-                "unit_instance_id": move.unit_instance_id,
-                "movement_phase_action": move.movement_phase_action,
-                "movement_mode": context["movement_mode"],
-            },
+            payload=movement_payload,
         )
     else:
         assert request.options, request.decision_type

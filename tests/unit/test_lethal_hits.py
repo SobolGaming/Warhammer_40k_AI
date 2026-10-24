@@ -65,9 +65,9 @@ def test_choices_devastating_sustained_restore_and_replay(phase: BattlePhase, ch
     result_identities = (
         {
             "attack-sequence:decision-request-000003:fixture-choice:pool-001:"
-            "attack-014:lethal-hit-wound": (
+            "attack-009:lethal-hit-wound": (
                 "attack-sequence:decision-request-000003:fixture-choice:pool-001:"
-                "attack-014:lethal-hit-wound:fixture-choice:d07-late:988073"
+                "attack-009:lethal-hit-wound:section24-original-critical:8"
             )
         }
         if phase is BattlePhase.SHOOTING and choice == "roll-to-wound"

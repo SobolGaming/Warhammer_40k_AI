@@ -1,0 +1,130 @@
+{
+  "base": "856b74a69676fdc1cc7a8d7e54ab6adb2fbfa2c3",
+  "changes": {
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "after_sha256": "fcde2b057946e9915403949209d2d39618aabdb09f8c3e5eafbc72c09d4ef061",
+      "before_sha256": "59d0624883ffa435a267416718d508a30994b175b7bf239ddce2ec235b07f7c5",
+      "edits": [
+        {
+          "after": "| 135 | PFINAL | CAUDIT-01 | Prior source selection retained345 observations but34 obligations lacked current assertion links and14 historical links had changed; physical LOS ignored body components and had no outgoing battlefield clipping. Order135 binds1078 original obligations and five added complete FAQs to exact live owners/assertions, explicit current successor and authority qualifications, September10/v931/v946/C12-04/C18-07 and cross-category consumers. Shared physical-union visibility clips only outgoing origins, retains incoming endpoints and same-point cover, with native reserve-ingress shooting, persistence/fork/viewer/event/replay regressions. Static inventory alone earns no runtime pass; complete current gates and both exact-final reviews govern closure. Conditional Core restrictions remain separate from faction granting providers; complete-game performance certification remains outstanding.  Explicitly approved typed unchanged-scalar LOS RNG projection preserves authentic legacy dice metadata while retaining current physical/bounds authority and identical live/save/replay validation; composite/clipped domains retain current RNG input.  Explicitly approved B01 shared boundary history repair counts only validated nonempty actual attack pools as shots; empty and selected-targetless accepted declarations retain completion without shot, preserving all causal guards and native save/fork/replay controls. The prior owner is BASE-identical; no regression-introduction claim.  Explicitly approved B02 Core Counter-offensive opponent-turn metadata repair through shared discovery/admission before CP spend, preserving generic ordering and unflagged Carnival. Native both-direction actual-fight, persistence/replay and continuation regressions; original source15.12-window unchanged, no same-handler redesign or granting-rule certification.  Explicitly approved B03 shared typed proposal-context equality rejects malformed live-client input before queue/history/events, retaining valid retry and all state/CP/source checks. Original observed impact was decisions99\u2192100/queue1\u21920 with every gameplay field unchanged CP5\u21925; no legal-play/introduction exaggeration.  Explicit subsequent B03 clarification authorizes same-boundary JSON-kind equality before queue/history, distinguishing bool/number while retaining valid numeric echoes; native malformed true-to1 observation and unchanged gameplay/CP impact retained.  Selected local D04 follow-up repairs surviving Combat passenger authoritative Battle-shock through the shared direct-state owner after completed hazard, with accepted setup/result/event-bound history. Charge turn expiry remains separate from shock retained until ordinary own Command success; failed tests retain status. Exact-final gates and independent reviews remain pending; Emergency and other postmerge repair families remain separate. See D04_COMBAT_BATTLE_SHOCK_SCOPE.md. CI qualification now imports the Aeldari source loader from its canonical public owner and sets process-local bytecode suppression before script/test engine imports, preserving strict detection of pre-existing unlisted files. Fresh exact-head local and hosted gates remain required. The quality-package initializer now applies pytest bytecode suppression before quality-module imports, restoring the root test initializer byte-for-byte; only the existing D07 historical initializer comparison admits the exact nested bootstrap. The symbolic-map validator is shared with focused controls after unchanged current-input authentication. Fresh exact-head gates remain required. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ \u2192 immutable source observation \u2192 engine owner \u2192 facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01\u201325 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All prior roadmap rows, including P15J and S-MIRRORS | FINAL-CERTIFICATION |\r\n",
+          "before": "| 135 | PFINAL | CAUDIT-01 | Prior source selection retained345 observations but34 obligations lacked current assertion links and14 historical links had changed; physical LOS ignored body components and had no outgoing battlefield clipping. Order135 binds1078 original obligations and five added complete FAQs to exact live owners/assertions, explicit current successor and authority qualifications, September10/v931/v946/C12-04/C18-07 and cross-category consumers. Shared physical-union visibility clips only outgoing origins, retains incoming endpoints and same-point cover, with native reserve-ingress shooting, persistence/fork/viewer/event/replay regressions. Static inventory alone earns no runtime pass; complete current gates and both exact-final reviews govern closure. Conditional Core restrictions remain separate from faction granting providers; complete-game performance certification remains outstanding.  Explicitly approved typed unchanged-scalar LOS RNG projection preserves authentic legacy dice metadata while retaining current physical/bounds authority and identical live/save/replay validation; composite/clipped domains retain current RNG input.  Explicitly approved B01 shared boundary history repair counts only validated nonempty actual attack pools as shots; empty and selected-targetless accepted declarations retain completion without shot, preserving all causal guards and native save/fork/replay controls. The prior owner is BASE-identical; no regression-introduction claim.  Explicitly approved B02 Core Counter-offensive opponent-turn metadata repair through shared discovery/admission before CP spend, preserving generic ordering and unflagged Carnival. Native both-direction actual-fight, persistence/replay and continuation regressions; original source15.12-window unchanged, no same-handler redesign or granting-rule certification.  Explicitly approved B03 shared typed proposal-context equality rejects malformed live-client input before queue/history/events, retaining valid retry and all state/CP/source checks. Original observed impact was decisions99\u2192100/queue1\u21920 with every gameplay field unchanged CP5\u21925; no legal-play/introduction exaggeration.  Explicit subsequent B03 clarification authorizes same-boundary JSON-kind equality before queue/history, distinguishing bool/number while retaining valid numeric echoes; native malformed true-to1 observation and unchanged gameplay/CP impact retained.  Selected local D04 follow-up repairs surviving Combat passenger authoritative Battle-shock through the shared direct-state owner after completed hazard, with accepted setup/result/event-bound history. Charge turn expiry remains separate from shock retained until ordinary own Command success; failed tests retain status. Exact-final gates and independent reviews remain pending; Emergency and other postmerge repair families remain separate. See D04_COMBAT_BATTLE_SHOCK_SCOPE.md. CI qualification now imports the Aeldari source loader from its canonical public owner and sets process-local bytecode suppression before script/test engine imports, preserving strict detection of pre-existing unlisted files. Fresh exact-head local and hosted gates remain required. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ \u2192 immutable source observation \u2192 engine owner \u2192 facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. Include the September 10 review dispositions, resolved C12-04/C18-07 evidence, Heavy movement history, and explicit Normal Move, objective-control-first and Action-interruption consumer checks. | All category 01\u201325 locators, every implementation source row, the September 10 clause review, and complete pinned v931/v946 observations. | All prior roadmap rows, including P15J and S-MIRRORS | FINAL-CERTIFICATION |\r\n"
+        }
+      ]
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "after_sha256": "d18e059bfde5abae9d9196cc16ebb46e417d0e8a4aa5fb810ee1b630c58c5b8f",
+      "before_sha256": "5323c1736433605c84d150bb43371a85db5ee8d726b57fbe1ec1df600a1012a0",
+      "edits": [
+        {
+          "after": "        \"tests/code_quality/__init__.py\"\n",
+          "before": "        \"tests/__init__.py\"\n"
+        }
+      ]
+    },
+    "tests/__init__.py": {
+      "after_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "before_sha256": "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
+      "edits": [
+        {
+          "after": "\n",
+          "before": "\"\"\"Keep validation imports from changing the exact source inventory.\"\"\"\n\nimport os\nimport sys\n\nsys.dont_write_bytecode = True\nos.environ[\"PYTHONDONTWRITEBYTECODE\"] = \"1\"\n"
+        }
+      ]
+    },
+    "tests/code_quality/__init__.py": {
+      "after_sha256": "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
+      "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "edits": [
+        {
+          "after": "\"\"\"Keep validation imports from changing the exact source inventory.\"\"\"\n\nimport os\nimport sys\n\nsys.dont_write_bytecode = True\nos.environ[\"PYTHONDONTWRITEBYTECODE\"] = \"1\"\n",
+          "before": ""
+        }
+      ]
+    },
+    "tests/code_quality/test_performance_preflight.py": {
+      "after_sha256": "b6924bdca684374749f2a86d7e086192de3ace2b6eac595aa558deb8117c57e6",
+      "before_sha256": "d313ad37d9836bd55d0e40026aca88445727b462f0e1b367781ffd4222114e31",
+      "edits": [
+        {
+          "after": "    for name in successor.PINS.keys() | successor.ANCHORS.keys() | {successor.SELF}:\n",
+          "before": "    for name in successor.PINS.keys() | {successor.SELF}:\n"
+        }
+      ]
+    },
+    "tests/code_quality/test_performance_static_successor.py": {
+      "after_sha256": "4aa98bd59b00a15f65efddd433d4b9c3fa2d748a6ff6fee1581cd7dad848e128",
+      "before_sha256": "e9c05fedb6a5aa657955b76115685daeb734af3500d06ed1df2543547749f050",
+      "edits": [
+        {
+          "after": "    row = copy.deepcopy(record[\"changes\"][name])\n    row[\"after_sha256\"] = hashlib.sha256(changed).hexdigest()\n    with pytest.raises(ValueError, match=\"outside the exact reviewed edits\"):\n        successor.assert_ci_transition(name, before, changed, row)\n\n\n@pytest.mark.parametrize(\"name\", sorted(successor.CI_COMPAT_BEFORE))\ndef test_ci_relocation_and_map_seam_match_exact_immutable_preimages(name: str) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_COMPAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_COMPAT_BASE + \":\" + name], cwd=ROOT\n    )\n    successor.assert_ci_compatibility_transition(\n        name, before, (ROOT / name).read_bytes(), record[\"changes\"][name]\n    )\n\n\n@pytest.mark.parametrize(\n    (\"name\", \"old\", \"new\"),\n    [\n        (\n            \"tests/code_quality/__init__.py\",\n            b\"dont_write_bytecode = True\",\n            b\"dont_write_bytecode = False\",\n        ),\n        (\"tests/__init__.py\", b\"\\n\", b\"UNREVIEWED = True\\n\"),\n        (\n            \"tools/performance_qualification_successor.py\",\n            b\"if json.loads(current) != mapping:\",\n            b\"if False:\",\n        ),\n    ],\n)\ndef test_ci_relocation_rejects_unreviewed_bootstrap_or_validation_even_if_repinned(\n    name: str, old: bytes, new: bytes\n) -> None:\n    record: dict[str, Any] = json.loads((ROOT / successor.CI_COMPAT_RECORD).read_bytes())\n    before = subprocess.check_output(\n        [\"git\", \"show\", successor.CI_COMPAT_BASE + \":\" + name], cwd=ROOT\n    )\n    current = (ROOT / name).read_bytes()\n    assert current.count(old) == 1\n    changed = current.replace(old, new, 1)\n    row = copy.deepcopy(record[\"changes\"][name])\n    row[\"after_sha256\"] = hashlib.sha256(changed).hexdigest()\n    with pytest.raises(ValueError, match=\"outside the exact reviewed edits\"):\n        successor.assert_ci_compatibility_transition(name, before, changed, row)\n\n\ndef test_quality_bootstrap_historical_view_rejects_unrelated_caller_bytes() -> None:\n    name = successor.QUALITY_BOOTSTRAP\n    current = (ROOT / name).read_bytes()\n    assert successor.static_predecessor(ROOT, name, current) == b\"\"\n    for supplied in (b\"\", current + b\"# unreviewed\\n\"):\n        with pytest.raises(ValueError, match=\"caller supplied unrelated\"):\n            successor.static_predecessor(ROOT, name, supplied)\n",
+          "before": "    row = copy.deepcopy(record[\"changes\"][name])\n    row[\"after_sha256\"] = hashlib.sha256(changed).hexdigest()\n    with pytest.raises(ValueError, match=\"outside the exact reviewed edits\"):\n        successor.assert_ci_transition(name, before, changed, row)\n"
+        },
+        {
+          "after": "        [sys.executable, \"-S\", \"-m\", module + \".probe\"],\n",
+          "before": "        [sys.executable, \"-S\", \"-m\", package + \".probe\"],\n"
+        },
+        {
+          "after": "    module = \"tests.code_quality\" if package == \"tests\" else package\n    relative = module.replace(\".\", \"/\")\n    directory = tmp_path / relative\n    directory.mkdir(parents=True)\n    if package == \"tests\":\n        (tmp_path / \"tests/__init__.py\").write_bytes((ROOT / \"tests/__init__.py\").read_bytes())\n    (directory / \"__init__.py\").write_bytes((ROOT / relative / \"__init__.py\").read_bytes())\n",
+          "before": "    directory = tmp_path / package\n    directory.mkdir()\n    (directory / \"__init__.py\").write_bytes((ROOT / package / \"__init__.py\").read_bytes())\n"
+        },
+        {
+          "after": "    )\n    raw = successor.ci_comparison(ROOT, name, (ROOT / name).read_bytes())\n",
+          "before": "    )\n    raw = (ROOT / name).read_bytes()\n"
+        },
+        {
+          "after": "    current = successor.ci_comparison(ROOT, name, (ROOT / name).read_bytes())\n    successor.assert_ci_transition(name, before, current, ci_transitions[name])\n",
+          "before": "    successor.assert_ci_transition(name, before, (ROOT / name).read_bytes(), ci_transitions[name])\n"
+        },
+        {
+          "after": "        name,\n        previous[name],\n        successor.ci_comparison(ROOT, name, (ROOT / name).read_bytes()),\n        transitions[name],\n",
+          "before": "        name, previous[name], (ROOT / name).read_bytes(), transitions[name]\n"
+        }
+      ]
+    },
+    "tests/code_quality/test_qualification40_successor.py": {
+      "after_sha256": "bc50d496af49cd36d88e33cea60c01bf64f5ad040ff41b1f66d1f6353fa7a890",
+      "before_sha256": "dbc224be55ff45ba4d86eef3648ba641f4e6c350f84a58c0e5a6751229c550bc",
+      "edits": [
+        {
+          "after": "    with pytest.raises(ValueError, match=\"actual input collector omitted current control bytes\"):\n",
+          "before": "    with pytest.raises(ValueError, match=\"symbolic\"):\n"
+        },
+        {
+          "after": "    raw = json.dumps(value).encode()\n    with pytest.raises(ValueError, match=\"symbolic\"):\n        stage.assert_symbolic_operation_map(before, raw)\n\n\ndef test_qualification_map_current_collector_rejects_forged_hash(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    raw = (ROOT / policy.MAP).read_bytes() + b\"\\n\"\n",
+          "before": "    raw = json.dumps(value).encode()\n"
+        },
+        {
+          "after": "    before = subprocess.check_output(\n        [\"git\", \"show\", stage.PRODUCING_COMMIT + \":\" + policy.MAP], cwd=ROOT\n    )\n    current = preflight.preceding_control(ROOT, policy.MAP, (ROOT / policy.MAP).read_bytes())\n    stage.assert_symbolic_operation_map(before, current)\n    value: dict[str, Any] = json.loads(current)\n",
+          "before": "    value: dict[str, Any] = json.loads((ROOT / policy.MAP).read_bytes())\n"
+        },
+        {
+          "after": "    mutation: str,\n",
+          "before": "    monkeypatch: pytest.MonkeyPatch, mutation: str\n"
+        },
+        {
+          "after": "from tools import performance_policy as policy\nfrom tools import performance_preflight_successor as preflight\n",
+          "before": "from tools import performance_policy as policy\n"
+        }
+      ]
+    },
+    "tools/performance_qualification_successor.py": {
+      "after_sha256": "45ba0c6dd10afb1f49f42e1cfe8ae77dab08b66436f2e9b4d8517415db28ed2a",
+      "before_sha256": "8306fec5f45dbddee62d899ff500a2d9d94799ad8ca2e6f09a23487b4c8f161c",
+      "edits": [
+        {
+          "after": "",
+          "before": "    return dict(measured)\n"
+        },
+        {
+          "after": "    if json.loads(current) != mapping:\n",
+          "before": "    if json.loads(raw[MAP]) != mapping:\n"
+        },
+        {
+          "after": "    assert_symbolic_operation_map(old[MAP], raw[MAP])\n    return dict(measured)\n\n\ndef assert_symbolic_operation_map(before: bytes, current: bytes) -> None:\n    \"\"\"Validate the original finite ID renaming after caller source admission.\"\"\"\n    mapping = json.loads(before)\n",
+          "before": "    mapping = json.loads(old[MAP])\n"
+        }
+      ]
+    }
+  },
+  "schema": "exact-ci-successor-v1"
+}
