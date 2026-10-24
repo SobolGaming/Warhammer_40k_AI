@@ -779,7 +779,10 @@ def _reconcile(b: _Builder) -> None:
         if row["after_sha256"] != q.PINS[name]:
             raise ValueError("History quality current pin changed.")
         p._assert_ci_edits(payload("plain60", q.BASE, name), current, row, before[name], False)
-    frozen = {name: payload("plain60", p.FREEZE_COMMIT, name) for name in p.PINS}
+    frozen = {
+        name: payload("plain60", p.FREEZE_COMMIT, name)
+        for name in p.PINS.keys() | p.ANCHORS.keys() | {p.SELF}
+    }
     comparison = dict(frozen)
     for base, path, pins, additions in (
         (p.CI_RUNTIME_BASE, p.CI_RUNTIME_RECORD, p.CI_RUNTIME_BEFORE, {p.CI_RUNTIME_NEW}),
@@ -837,7 +840,11 @@ def _reconcile(b: _Builder) -> None:
             )
         baseline = payload("safe60", c.CONTENT_BASE, name)
         accepted = payload("safe60", c.ACCEPTED, name)
-        current = stage_projection[name]
+        current = (
+            stage_projection[name]
+            if name in stage_projection
+            else payload("safe60", c.SOURCE_COMMIT, name)
+        )
         for data, key in (
             (historical, "legacy_sha256"),
             (baseline, "pr587_sha256"),

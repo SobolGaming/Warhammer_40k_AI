@@ -1167,7 +1167,7 @@ def test_history_published_operands_remain_stable_but_next_acquisition_is_fresh(
     restored.finish()
 
 
-@pytest.mark.parametrize("failure", ["timeout", "nonzero"])
+@pytest.mark.parametrize("failure", ["timeout", "nonzero", "cancellation"])
 def test_history_postflight_failure_replaces_successful_smoke_receipt(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: str
 ) -> None:
@@ -1186,6 +1186,8 @@ def test_history_postflight_failure_replaces_successful_smoke_receipt(
         if calls == 2:
             if failure == "timeout":
                 raise subprocess.TimeoutExpired(["git", "cat-file"], 60)
+            if failure == "cancellation":
+                raise KeyboardInterrupt
             raise subprocess.CalledProcessError(2, ["git", "cat-file"])
         return dict(binding)
 
@@ -1198,7 +1200,11 @@ def test_history_postflight_failure_replaces_successful_smoke_receipt(
     monkeypatch.setattr(gate, "ROOT", tmp_path)
     monkeypatch.setattr(gate, "validate_current", validate)
     monkeypatch.setattr(gate, "run_smoke", smoke)
-    error = subprocess.TimeoutExpired if failure == "timeout" else subprocess.CalledProcessError
+    error = {
+        "timeout": subprocess.TimeoutExpired,
+        "nonzero": subprocess.CalledProcessError,
+        "cancellation": KeyboardInterrupt,
+    }[failure]
     with pytest.raises(error):
         cast(Any, gate)._check_and_run("exact-base", None, output)
     receipt = json.loads(output.read_text())

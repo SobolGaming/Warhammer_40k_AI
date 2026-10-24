@@ -361,7 +361,14 @@ def _check_and_run(base_ref: str, pr_head: str | None, output: Path) -> dict[str
     try:
         with witnesses(records):
             after = validate_current(ROOT, base_ref, pr_head=pr_head)
-    except ValueError, TypeError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired:
+    except (
+        ValueError,
+        TypeError,
+        OSError,
+        subprocess.CalledProcessError,
+        subprocess.TimeoutExpired,
+        KeyboardInterrupt,
+    ):
         report["status"] = "failed"
         report["inputs_unchanged"] = False
         if records:

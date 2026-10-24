@@ -12,13 +12,13 @@ BASE = "5396b557fd90a67e0c097da1020959b58724a7ec"
 SELF = "tools/quality_runtime_successor.py"
 RECORD = "docs/performance/ci-quality-runtime54.json"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE: str | None = "c70c650a978a81d5773da58394a2440b80aa251f"
+FREEZE: str | None = None
 PINS: dict[str, str] = {
     ".github/workflows/ci.yml": (
         "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
     ),
     "ci/quality_shards/all.txt": (
-        "7d1475168f6ca407cf2aa27e039fdc603bd1f01c9bacd9276d98149aea82e088"
+        "c65af5732232fd91cb154bfa820d97fb8484513ac8ee282ebe819f9928b93490"
     ),
     "ci/quality_shards/baseline-ci53.txt": (
         "308870fb4095de8e263def2e75ac71687bc65c3b32f06f591fed848fc34b4ef3"
@@ -39,7 +39,7 @@ PINS: dict[str, str] = {
         "1677cbafcc8257c3803cd4bfa65f12a2d4293e622840bfb47c657893b0315344"
     ),
     "ci/quality_shards/shard-3.txt": (
-        "33c48982c63ba5a62901ce6b90a1205eeea1b85324885fefdb346a5430d7ab2b"
+        "fc358c9ee538f6fcaef8dc59b05adb446e684b028f2cdd89dbd68ed8ed931035"
     ),
     "ci/quality_shards/shard-4-modules.txt": (
         "e5ab009fc440840dac9717a0f05b64cd47f371664a9f838e5ca17fe1d210e7bd"
@@ -51,13 +51,13 @@ PINS: dict[str, str] = {
         "b627e0688559b1fc46307c8449d17095307dd1fdc7a969c20cf5378a34887a0a"
     ),
     "docs/performance/ci-quality-runtime54.json": (
-        "b0e2b87add484eb96b76cc15bf914832c33f9f25a61d8832afa5f2f91b33b898"
+        "3ec40d1ad513a3232b6caba71cab706a951506581a4a0b673696d0ae1495994d"
     ),
     "docs/performance/history-phase-snapshot.md": (
         "eff5ac4c71a42a547507bbba0713b33f89330fecaa1a931032395629f063e72a"
     ),
     "scripts/check_performance_policy.py": (
-        "2179ae2ef01777edf025960cb40c3a62564d7f6390aeb38cdc8781dd550ff2a1"
+        "a662c87aff61d5e49b7edbec93ac5109b2713f3269e4aff14db5a939aedd704a"
     ),
     "scripts/quality_evidence.py": (
         "923b8da16949a54a2d8e1b984aecce34e1e9d6de08bc698b54469dd920418808"
@@ -81,7 +81,7 @@ PINS: dict[str, str] = {
         "8494642f66f70ce0cc71d330e164eba067e90e9ebea3eb1f0c11fbb4dbc25c69"
     ),
     "tests/code_quality/test_performance_preflight.py": (
-        "6a47c37e512bbd06a2c0119da5fd755dabf30f53181b20602c9c0c846020cfea"
+        "bc4a5bf923471a7392bb8bcbf3616afcbd0b4f15593cf7827cb14ae0ce0026f2"
     ),
     "tests/code_quality/test_quality_runtime.py": (
         "0203134e35a15f7862bd51107684251d8ef741788eac47658e1e5b3d85070221"
@@ -93,7 +93,7 @@ PINS: dict[str, str] = {
         "cb32ce7c7986bc5eff74cae64707828fb192a684ecb8feb89fb8f24356c8882a"
     ),
     "tools/performance_history_snapshot.py": (
-        "741cfe627c295d5a0537fe6977bb7e83ff835e26b43f4936a6fef38b7caddbce"
+        "108f451110eac2162ca25bb68aa0e2610222a306db5ac04f5eb002f4e81c19c1"
     ),
     "tools/performance_policy.py": (
         "c110135e06b3ded99c69adc23d2571e610824a562ce0a7acc84dcb6955e2708d"
