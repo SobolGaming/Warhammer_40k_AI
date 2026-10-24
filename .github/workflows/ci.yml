@@ -137,6 +137,51 @@ jobs:
         run: npm run conformance
 
   code-quality:
+    name: code-quality
+    if: always()
+    needs: [quality-policy, quality-shards]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Download this complete quality attempt
+        if: always()
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          pattern: quality-${{ github.repository_id }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}-*
+          path: reports/quality-timing/downloads
+
+      - name: Reconcile all four exact-head producers
+        timeout-minutes: 10
+        id: reconcile
+        if: always()
+        env:
+          QUALITY_RESULTS: '{"quality-policy":"${{ needs.quality-policy.result }}","quality-shards":"${{ needs.quality-shards.result }}"}'
+        run: >-
+          python -B -m scripts.quality_evidence reports/quality-timing/downloads
+          --results "$QUALITY_RESULTS"
+
+      - name: Require successful producers and reconciliation
+        if: >-
+          ${{
+            always() &&
+            (
+              needs.quality-policy.result != 'success' ||
+              needs.quality-shards.result != 'success' ||
+              steps.reconcile.outcome != 'success'
+            )
+          }}
+        run: |
+          echo "Complete quality evidence or a required producer did not succeed."
+          exit 1
+
+  quality-policy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -151,6 +196,9 @@ jobs:
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Declare quality evidence before dependency setup
+        run: python -B -m scripts.quality_runner prepare --shard 2
 
       - name: Set up uv
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
@@ -173,21 +221,83 @@ jobs:
           fi
           uv run --no-sync python -m scripts.check_performance_policy "${args[@]}"
 
-      - name: Code-quality tests
+      - name: Code-quality shard 2
         timeout-minutes: 10
-        env:
-          TEST_TIMING_DIR: reports/quality-timing
         run: >-
-          uv run --no-sync pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
-          --durations=100 --junitxml=reports/code-quality.xml
+          uv run --no-sync python -B -m scripts.quality_runner run --shard 2
+          --scratch "$RUNNER_TEMP/quality-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT-2"
 
-      - name: Upload quality timing evidence
+      - name: Preserve original performance attempts after any failure
+        if: always()
+        run: |
+          out="reports/quality-timing/quality-$GITHUB_REPOSITORY_ID-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT-$GITHUB_SHA-2/performance"
+          if [ ! -d "$out" ]; then
+            mkdir -p "$out"
+            for source in reports/performance-smoke.json reports/performance-attempts; do
+              if [ -e "$source" ]; then cp -a "$source" "$out/"; fi
+            done
+          fi
+
+      - name: Upload quality evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: code-quality-report
-          path: reports/
-          if-no-files-found: warn
+          name: quality-${{ github.repository_id }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}-2
+          path: reports/quality-timing/quality-${{ github.repository_id }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}-2/
+          if-no-files-found: error
+          overwrite: false
+          retention-days: 30
+
+  quality-shards:
+    name: quality-shard-${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ["1", "3", "4"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Fetch original historical validation inputs
+        run: git fetch --no-tags --no-recurse-submodules origin 4a8fb3c10cbf9c6ce1766f048508b8a16f8f24e8
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Declare quality evidence before dependency setup
+        run: python -B -m scripts.quality_runner prepare --shard ${{ matrix.shard }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Sync test dependencies
+        run: uv sync --locked --no-default-groups --group test
+
+      - name: Code-quality shard
+        timeout-minutes: 10
+        env:
+          QUALITY_SHARD: ${{ matrix.shard }}
+        run: >-
+          uv run --no-sync python -B -m scripts.quality_runner run --shard "$QUALITY_SHARD"
+          --scratch "$RUNNER_TEMP/quality-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT-$QUALITY_SHARD"
+
+      - name: Upload quality evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: quality-${{ github.repository_id }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}-${{ matrix.shard }}
+          path: reports/quality-timing/quality-${{ github.repository_id }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}-${{ matrix.shard }}/
+          if-no-files-found: error
+          overwrite: false
+          retention-days: 30
 
   semantic-audit-macos:
     name: semantic-audit-macos

@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 import scripts.build_test_shards as sharding
 from scripts.check_shard_coverage import check_shard_coverage
+from tools import quality_runtime_successor as ci54
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW_PATH = ROOT / ".github" / "workflows" / "ci.yml"
@@ -241,7 +242,8 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
         assert f"needs.{lane}.result != 'success'" in aggregate
     assert "exit 1" in aggregate
     assert "run: npm run test:unit" in workflow
-    assert workflow.count("pytest tests/code_quality -q -n auto --dist=worksteal --no-cov") == 1
+    historical = ci54.previous(ROOT, ".github/workflows/ci.yml", workflow.encode()).decode()
+    assert historical.count("pytest tests/code_quality -q -n auto --dist=worksteal --no-cov") == 1
     behavior = workflow.partition("\n  behavior-tests:\n")[2].partition("\n  coverage-gate:\n")[0]
     assert "fail-fast: false" in behavior
     matrix = behavior.partition("      matrix:\n")[2].partition("    steps:\n")[0]

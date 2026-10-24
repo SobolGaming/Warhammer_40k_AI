@@ -424,6 +424,12 @@ def _read(root: Path, name: str) -> bytes:
     return read_owned_geometry_member(root, name)
 
 
+def _ci54_previous(root: Path, name: str, raw: bytes) -> bytes:
+    from tools.quality_runtime_successor import previous
+
+    return previous(root, name, raw)
+
+
 def preceding_control(root: Path, name: str, raw: bytes) -> bytes:
     """Exact byte projection; the complete successor freeze is admitted separately."""
     if name not in PINS and name != ASSESSMENT:
@@ -431,7 +437,7 @@ def preceding_control(root: Path, name: str, raw: bytes) -> bytes:
     actual = _read(root, name)
     if name == ASSESSMENT:
         _assessment(root, _freeze(root))
-    elif _sha(actual) != PINS[name]:
+    elif _sha(_ci54_previous(root, name, actual)) != PINS[name]:
         raise ValueError(
             "Reviewed migration source/data changed: "
             "Qualification / Perils successor / Preflight source: " + name
@@ -696,6 +702,9 @@ def static_predecessor(root: Path, name: str, raw: bytes) -> bytes:
 
 
 def _freeze(root: Path) -> str:
+    from tools.quality_runtime_successor import admit
+
+    admit(root)
     freeze = FREEZE_COMMIT
     if freeze is None or len(freeze) != 40 or set(freeze) - set("0123456789abcdef"):
         raise ValueError("Preflight successor awaits its exact source freeze.")
@@ -713,12 +722,15 @@ def _freeze(root: Path) -> str:
     frozen_members = _blobs(root, freeze, [SELF, *PINS, *ANCHORS])
     frozen = frozen_members[SELF]
     marker = b"\nFREEZE_COMMIT: str | None = None"
-    if frozen.count(marker) != 1 or _read(root, SELF) != frozen.replace(
+    if frozen.count(marker) != 1 or _ci54_previous(root, SELF, _read(root, SELF)) != frozen.replace(
         marker, f'\nFREEZE_COMMIT: str | None = "{freeze}"'.encode(), 1
     ):
         raise ValueError("Preflight successor activation changed.")
     for name, pin in PINS.items():
-        if _sha(_read(root, name)) != pin or _sha(frozen_members[name]) != pin:
+        if (
+            _sha(_ci54_previous(root, name, _read(root, name))) != pin
+            or _sha(frozen_members[name]) != pin
+        ):
             raise ValueError(
                 "Reviewed migration source/data changed: "
                 "Qualification / Perils successor / Preflight source: " + name
@@ -740,12 +752,12 @@ def _assessment(root: Path, freeze: str) -> bytes:
     from tools.performance_policy import owner_hashes
 
     assessment = json.loads(_git(root, "show", freeze + ":" + ASSESSMENT))
-    current = _read(root, SELF)
+    current = _ci54_previous(root, SELF, _read(root, SELF))
     change = assessment["changes"][SELF]
     change["after_sha256"] = _sha(current)
     change["owners"]["@module"]["after"] = owner_hashes(SELF, current)["@module"]
     raw_assessment = _read(root, ASSESSMENT)
-    if json.loads(raw_assessment) != assessment:
+    if json.loads(_ci54_previous(root, ASSESSMENT, raw_assessment)) != assessment:
         raise ValueError("Preflight assessment changed outside exact anchor derivation.")
     return raw_assessment
 
@@ -754,10 +766,13 @@ def current_source(root: Path, previous: dict[str, str]) -> dict[str, str]:
     if _sha(json.dumps(previous, sort_keys=True, separators=(",", ":")).encode()) != BASE_SOURCE:
         raise ValueError("Preflight successor preceding complete source changed.")
     freeze = _freeze(root)
-    return (
+    from tools.quality_runtime_successor import current_source as ci54_source
+
+    return ci54_source(
+        root,
         previous
         | PINS
-        | {SELF: _sha(_read(root, SELF)), ASSESSMENT: _sha(_assessment(root, freeze))}
+        | {SELF: _sha(_read(root, SELF)), ASSESSMENT: _sha(_assessment(root, freeze))},
     )
 
 
@@ -775,8 +790,10 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     Current collectors and a fresh smoke receipt still bind the actual source.
     """
     from tools import thousand_sons_perils_preservation as perils
+    from tools.quality_runtime_successor import measurement_inputs as ci54_inputs
 
     _freeze(root)
+    current = ci54_inputs(root, current)
     # The audit, proof records and CI workflow are outside runtime_inputs; their
     # bytes remain authenticated by _freeze and the complete live source scan.
     controls = (
@@ -799,7 +816,7 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     )
     if not controls <= current.keys():
         raise ValueError("Preflight actual input collector omitted current inputs.")
-    actual = {name: _sha(_read(root, name)) for name in controls}
+    actual = {name: _sha(_ci54_previous(root, name, _read(root, name))) for name in controls}
     projected = dict(current)
     prior_names = set(_git(root, "ls-tree", "-r", "--name-only", BASE).decode().splitlines())
     for name in controls:

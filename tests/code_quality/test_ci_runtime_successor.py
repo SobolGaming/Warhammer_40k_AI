@@ -11,6 +11,7 @@ from typing import Any
 
 import pytest
 from tools import performance_preflight_successor as successor
+from tools import quality_runtime_successor as ci54
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -30,7 +31,7 @@ def test_ci_runtime_edits_match_exact_independent_predecessor(name: str) -> None
             ["git", "show", successor.CI_RUNTIME_BASE + ":" + name], cwd=ROOT
         )
     )
-    current = (ROOT / name).read_bytes()
+    current = ci54.previous(ROOT, name, (ROOT / name).read_bytes())
     successor.assert_ci_runtime_transition(name, before, current, record["changes"][name])
     changed = current + b"\n# outside the finite runtime correction\n"
     row = copy.deepcopy(record["changes"][name])

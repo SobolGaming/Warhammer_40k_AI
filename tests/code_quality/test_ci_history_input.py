@@ -12,6 +12,7 @@ from tools import performance_policy as policy
 from tools import performance_preflight_successor as stage
 from tools import performance_reconstruction_campaign as reconstruction
 from tools import performance_tool_inputs as original_inputs
+from tools import quality_runtime_successor as ci54
 
 from tests import d07_geometry_containment as geometry
 from tests.code_quality.tool_input_history import REVISION as ARCHIVAL_REVISION
@@ -72,7 +73,7 @@ def test_history_fetch_is_the_only_workflow_change_before_validation() -> None:
         "      - name: Code-quality tests\n        timeout-minutes: 10\n        env:",
         1,
     )
-    current = (ROOT / WORKFLOW).read_text()
+    current = ci54.previous(ROOT, WORKFLOW, (ROOT / WORKFLOW).read_bytes()).decode()
     assert current == expected
     lane = current.split("  code-quality:\n", 1)[1].split("  semantic-audit-macos:\n", 1)[0]
     assert lane.index(FETCH_STEP) < lane.index("scripts.check_performance_policy")
@@ -83,7 +84,9 @@ def test_workflow_is_a_live_pinned_source_even_though_not_a_measured_runtime_inp
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     current = (ROOT / WORKFLOW).read_bytes()
-    assert stage.PINS[WORKFLOW] == hashlib.sha256(current).hexdigest()
+    assert (
+        stage.PINS[WORKFLOW] == hashlib.sha256(ci54.previous(ROOT, WORKFLOW, current)).hexdigest()
+    )
     assert WORKFLOW not in policy.runtime_inputs(ROOT)
     before = subprocess.check_output(["git", "show", stage.BASE + ":" + WORKFLOW], cwd=ROOT)
     assert stage.preceding_control(ROOT, WORKFLOW, current) == before

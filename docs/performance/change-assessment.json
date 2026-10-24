@@ -6,11 +6,111 @@
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
-      "after_sha256": "ee0d1a9d331a06195836847d291184b82b94a5d9cfc36bb7485cfabb6bd1c0fe",
+      "after_sha256": "0a93755b15c029086a9cbb77e85e6553f0c37d2db84f42603aab4207b220792b",
       "owners": {
         "@document": {
           "before": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
-          "after": "ee0d1a9d331a06195836847d291184b82b94a5d9cfc36bb7485cfabb6bd1c0fe"
+          "after": "0a93755b15c029086a9cbb77e85e6553f0c37d2db84f42603aab4207b220792b"
+        }
+      }
+    },
+    "ci/quality_shards/all.txt": {
+      "before_sha256": null,
+      "after_sha256": "5facde3469437959ee6afb90cf11dac66183444a52611feeead909667dba1ebb",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5facde3469437959ee6afb90cf11dac66183444a52611feeead909667dba1ebb"
+        }
+      }
+    },
+    "ci/quality_shards/baseline-ci53.txt": {
+      "before_sha256": null,
+      "after_sha256": "308870fb4095de8e263def2e75ac71687bc65c3b32f06f591fed848fc34b4ef3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "308870fb4095de8e263def2e75ac71687bc65c3b32f06f591fed848fc34b4ef3"
+        }
+      }
+    },
+    "ci/quality_shards/shard-1-modules.txt": {
+      "before_sha256": null,
+      "after_sha256": "6134b0b35c0072935aa1c215507f3877ca26911ef5b35df75089644685b5d2ab",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6134b0b35c0072935aa1c215507f3877ca26911ef5b35df75089644685b5d2ab"
+        }
+      }
+    },
+    "ci/quality_shards/shard-1.txt": {
+      "before_sha256": null,
+      "after_sha256": "a0e8077184b1a65546791f4b2cdeb66a472968a2ce2af0e5907668f5a10f9c32",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a0e8077184b1a65546791f4b2cdeb66a472968a2ce2af0e5907668f5a10f9c32"
+        }
+      }
+    },
+    "ci/quality_shards/shard-2-modules.txt": {
+      "before_sha256": null,
+      "after_sha256": "47cef6512f7f708a0303d903bb31865de214f7cc91a4889498e809bb4af7f74f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "47cef6512f7f708a0303d903bb31865de214f7cc91a4889498e809bb4af7f74f"
+        }
+      }
+    },
+    "ci/quality_shards/shard-2.txt": {
+      "before_sha256": null,
+      "after_sha256": "0d1792bce29af2037ebc23a2736baa3a695f9dcc5e5d054f241d9e77e0cea007",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0d1792bce29af2037ebc23a2736baa3a695f9dcc5e5d054f241d9e77e0cea007"
+        }
+      }
+    },
+    "ci/quality_shards/shard-3-modules.txt": {
+      "before_sha256": null,
+      "after_sha256": "1677cbafcc8257c3803cd4bfa65f12a2d4293e622840bfb47c657893b0315344",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1677cbafcc8257c3803cd4bfa65f12a2d4293e622840bfb47c657893b0315344"
+        }
+      }
+    },
+    "ci/quality_shards/shard-3.txt": {
+      "before_sha256": null,
+      "after_sha256": "4f832f0acbc04944e1a35b8030a5f5b51c55eb641af3745b4274d4b8f909b15f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4f832f0acbc04944e1a35b8030a5f5b51c55eb641af3745b4274d4b8f909b15f"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4-modules.txt": {
+      "before_sha256": null,
+      "after_sha256": "e5ab009fc440840dac9717a0f05b64cd47f371664a9f838e5ca17fe1d210e7bd",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e5ab009fc440840dac9717a0f05b64cd47f371664a9f838e5ca17fe1d210e7bd"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "before_sha256": null,
+      "after_sha256": "e29c4795b9668cbb14406e1ea4927edef9508df417e23b70538b4b15e409207a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e29c4795b9668cbb14406e1ea4927edef9508df417e23b70538b4b15e409207a"
         }
       }
     },
@@ -2336,11 +2436,11 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-      "after_sha256": "630b8a18ca865d40b0b0d31dcff2a9d6f551f6a62c62a3c1ec9e02dea514de4a",
+      "after_sha256": "c965819e71f0a7b6a3f1440fdb9721e7d88c0950175721318fb9712205ed40d7",
       "owners": {
         "@document": {
           "before": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-          "after": "630b8a18ca865d40b0b0d31dcff2a9d6f551f6a62c62a3c1ec9e02dea514de4a"
+          "after": "c965819e71f0a7b6a3f1440fdb9721e7d88c0950175721318fb9712205ed40d7"
         }
       }
     },
@@ -2604,6 +2704,16 @@
         }
       }
     },
+    "docs/performance/ci-quality-runtime54.json": {
+      "before_sha256": null,
+      "after_sha256": "441987719f7d7ae5be2301b3a2be4a03f69f7e017ea92c6cace2e46e7c060434",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "441987719f7d7ae5be2301b3a2be4a03f69f7e017ea92c6cace2e46e7c060434"
+        }
+      }
+    },
     "docs/performance/ci-runtime-successor51.json": {
       "before_sha256": null,
       "after_sha256": "b021fee4278a9cbba3cdcc63cde7dbfd9c8a8aaac401bdfdd4725746583d68f9",
@@ -2856,6 +2966,300 @@
       "before_sha256": "f3934ba9961ee31c80582ad1a2f8dc5a66cd56f1f05f4803f397f125f6502174",
       "after_sha256": "0380ba2c9ab5c1e045f281f810f0e6e582b0738a3db8eab7a18ecfc34fe6c4d8",
       "owners": {}
+    },
+    "scripts/quality_evidence.py": {
+      "before_sha256": null,
+      "after_sha256": "8f9423a3644ee8b7e80518558c9b1e492da7259fd255436d5f65d3f854e6c57d",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "ba386c9d05a9e5ddfbbf4319c72ceba8d5d58feaf67a4ff34a510db2bc8909a2"
+        },
+        "EvidenceError": {
+          "before": null,
+          "after": "10818340486e7a65544b85534fcfbec08cf81ce8dfc85aec45ebebfd870d3b7b"
+        },
+        "Journal": {
+          "before": null,
+          "after": "6e008699874f4a02c143ad145847c2b889ca868d0c0f6455147ca4895f76070a"
+        },
+        "Journal.__init__": {
+          "before": null,
+          "after": "6dc50dd7e67464b2639d6c521122576007883a4fb6dc0f361909ed8110ea1b06"
+        },
+        "Journal.active": {
+          "before": null,
+          "after": "1bb637ce2a7504badf9d506722ddc32856514ba811f4033d7de611c67a1b9497"
+        },
+        "Journal.emit": {
+          "before": null,
+          "after": "79d16492e2dbd8eca1f95b71404e49f7ead515a0932b10418caa7efd79baed9f"
+        },
+        "Journal.failure": {
+          "before": null,
+          "after": "a591db4b198c96f40990316bf1450790903d149d0512736375c5ef30f6562cf3"
+        },
+        "artifact_name": {
+          "before": null,
+          "after": "ad2393704a2f6d90653a9d48dc3781c32a473e968b95b53605821e8cd7690705"
+        },
+        "atomic_json": {
+          "before": null,
+          "after": "0a151086cd2f84db0723e11e9cb206d492358ab9d1be474044f6eafbe89bddae"
+        },
+        "context": {
+          "before": null,
+          "after": "3c515ff288b84286866c0f18928f3fa4ef02fd61e48e06cdff698e621fe434c4"
+        },
+        "dependency_identity": {
+          "before": null,
+          "after": "e5654cf78d8782544a9db8e4574cab3ae6612d4e1c87bfc8edd947c5143be583"
+        },
+        "encoded": {
+          "before": null,
+          "after": "43b106b572f5149efbd313c8259b6ab35a0e9bdd9ab2bb6df77a1b01c1c604c6"
+        },
+        "git": {
+          "before": null,
+          "after": "dfee32cd9164621b4a74cfa6f8b3852211d21db6affc19b4f3e6f797f81551a3"
+        },
+        "inventory": {
+          "before": null,
+          "after": "7ad114e8a7b81314ab332dba5f46c7b3674fb5f84ec896c6c6b17cdb3479da82"
+        },
+        "journal_events": {
+          "before": null,
+          "after": "58cf726cea9cef749ca2e2b572fa3a45f55b043838f28b70b115b316394d667a"
+        },
+        "lines": {
+          "before": null,
+          "after": "ad3e3e746b114c74533161f2c57a46953b1c3c75f30a8dd8d5faf49ded879730"
+        },
+        "main": {
+          "before": null,
+          "after": "232639611b7ff524d0ef7318f40bd207f9459304d9aa287a3a41a5c0ef5c2ff0"
+        },
+        "physical_dependencies": {
+          "before": null,
+          "after": "e177e65a673d3a5f5096b4d9cefc40a81108c58000b2ee0f4b04c77474102379"
+        },
+        "pytest_arguments": {
+          "before": null,
+          "after": "cdb67ee5cfd1389afcbc211122484d9d121c3dda24a995b44413aa15b673d1ef"
+        },
+        "read_json": {
+          "before": null,
+          "after": "41feed98393e97e11430276f11fa9f558c2299192e257c0eb5957a6bd75a136a"
+        },
+        "reconcile": {
+          "before": null,
+          "after": "35fa2d860b1f13f6bcc388361b157300db2405dd4802415c025d464943943f17"
+        },
+        "require": {
+          "before": null,
+          "after": "ce7ff521acfd6002d5e1f33b47e330e937e63ce06f6f18a7ef2f7b9cf420d6e2"
+        },
+        "seal": {
+          "before": null,
+          "after": "ff2b41e505d8816ef717c812da9ba7f6fd045be307d28290d7154de1f388af72"
+        },
+        "sha": {
+          "before": null,
+          "after": "d8b9c1548721dee6134073274c61f88261536f40ff5138074621a8e8f14a8a91"
+        },
+        "source_identity": {
+          "before": null,
+          "after": "808d52ba087bd28fbaa3eef03d445e60fc98d8669afd975f3c8d0f002b1320ea"
+        },
+        "sync_directory": {
+          "before": null,
+          "after": "48cd54178135aa462695ee2af7d2c14bc670161c697d99c57c81e1697e0ea7b7"
+        },
+        "unique_object": {
+          "before": null,
+          "after": "6cedb1b3b6ba34c07b9f4531d4c03bbc8284bbb943438e5a007738a2ed80260f"
+        },
+        "validate_execution": {
+          "before": null,
+          "after": "a27664310f09ed58a463c9678ce504a67e8688c0efe69d45bc9c751d7f7d9839"
+        },
+        "validate_invocations": {
+          "before": null,
+          "after": "37ed63e40b6f21bbc2400885b887292544e2ee9de033b3bac09689b059e2b8ba"
+        },
+        "validate_lane": {
+          "before": null,
+          "after": "f94b73d17cd112f99102482b5d56d9a6d0b9396031976f6e247a443922f6fa2d"
+        },
+        "validate_performance": {
+          "before": null,
+          "after": "58c26ca1409118911cb41d397f5245042378592cb5bdcb0087111b1bf059c9f3"
+        },
+        "verify_seal": {
+          "before": null,
+          "after": "04dfb1211577094365256f775c0bb157caa22115dd6e370fd733299d095b4e93"
+        }
+      }
+    },
+    "scripts/quality_reporter.py": {
+      "before_sha256": null,
+      "after_sha256": "3e0fdae7fabd9342a5350cde41cc5f678966851733d029e6ca36051174ccc014",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "565eb0e82b410825f3b20cc8a486f6c7c2203dc5b0aa2052af532e18466a056a"
+        },
+        "Reporter": {
+          "before": null,
+          "after": "60a451b79fcaf0814c9fa464c70ab4ed95f5a52f3069d520e062cf923373ae8b"
+        },
+        "Reporter.__init__": {
+          "before": null,
+          "after": "9abcdf1ce4b09e04ce3bcaa2cd94172cde90444c89b1ee1a39ce59c85d273a70"
+        },
+        "Reporter.problem": {
+          "before": null,
+          "after": "d5c2a301630e8ce9e841af6d34103781041cd5f62c1c2144441c4bd05fa4217b"
+        },
+        "phase_start": {
+          "before": null,
+          "after": "abbb826e765a020d8f2abb08da35504b7b6354b4511c43f1dc75f0603522c6f0"
+        },
+        "pytest_collection_finish": {
+          "before": null,
+          "after": "030e6f19b398c52abe8bf80d3259567e4c8e1607ca03e5a471069a5085cc6d56"
+        },
+        "pytest_collectreport": {
+          "before": null,
+          "after": "5b4c26588ff3c53f2355984695e962827666c35f3cc5b4cf53b62e53948abc49"
+        },
+        "pytest_configure": {
+          "before": null,
+          "after": "dddeb1892f8d96483feb6b6d7e1a015de2b46b0d045a61267dbecdb570db85fc"
+        },
+        "pytest_configure_node": {
+          "before": null,
+          "after": "f656a85adb871e452efbcacd515167e5a18398f5e2080b4289ae211d9dec9be8"
+        },
+        "pytest_deselected": {
+          "before": null,
+          "after": "527d34b45190be8b6a6e0cfec1a2ec6610a1ea0d66e93805c0688c2488636d13"
+        },
+        "pytest_runtest_call": {
+          "before": null,
+          "after": "13e35423960a00763938f81fcaf9ada57100ed6385b6dab9d1a2726258e44ce2"
+        },
+        "pytest_runtest_logreport": {
+          "before": null,
+          "after": "fb73db2f8fdc988522558c1f28358fa50f1af786909e21d581caacfa2c7319ce"
+        },
+        "pytest_runtest_makereport": {
+          "before": null,
+          "after": "262c70fa435ed4af57321218bfce215871b2a2604ac5c9d5204198f30f667a5a"
+        },
+        "pytest_runtest_protocol": {
+          "before": null,
+          "after": "d8f5b718f97e88a9f911e4af09fbd6c5f79ef402362aa619db3315955b53619f"
+        },
+        "pytest_runtest_setup": {
+          "before": null,
+          "after": "de4fa804f5589a3f3d1bbe3c42abbfc0418561c65687636414b9494ac7582fb7"
+        },
+        "pytest_runtest_teardown": {
+          "before": null,
+          "after": "7d67402f0ee6112db4ead9d4a87e90420889d6bb5948042da3e172fd1fa6cffa"
+        },
+        "pytest_sessionfinish": {
+          "before": null,
+          "after": "b565dcccecf2ccc933863f28aa7b09d888c9f2166f0133e9b1d75ccab65519d5"
+        },
+        "pytest_sessionstart": {
+          "before": null,
+          "after": "1a24508be76aea94e341e40ad7c07e30fbe79e4303a631b370ec442cebf0d1fe"
+        },
+        "pytest_testnodedown": {
+          "before": null,
+          "after": "be37de146e41d217e512e1ca99b4f23f6a22e67e6ff9f0789c97d1040e536247"
+        },
+        "pytest_xdist_node_collection_finished": {
+          "before": null,
+          "after": "a11a156793d501002f3eea8ce520295e226234f9d628e2f5202ccd0c2cf73d16"
+        },
+        "reporter": {
+          "before": null,
+          "after": "dce49a6fc0956ce65ffd8dfd7a926553d0878b53e1d034be9ea5940059c08b0d"
+        }
+      }
+    },
+    "scripts/quality_runner.py": {
+      "before_sha256": null,
+      "after_sha256": "51dfd0d535c0c3d8227653a50e7f1755b2181e717e12e71594e9f31f3d337517",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "5116a65ab63148c4a56d03fecb595e46916e2ec1c0b2e3ee928044cb142d9175"
+        },
+        "Deadlines": {
+          "before": null,
+          "after": "2a334db4c3ff04c958108b6732f0dadf96025a874d362e48546cde99d0edcfda"
+        },
+        "Deadlines.__post_init__": {
+          "before": null,
+          "after": "3ff70147c89bfd4188efcdc21d675fc21ce7bc8478beeb1d2ec5115f494442af"
+        },
+        "Supervisor": {
+          "before": null,
+          "after": "f9315d1b4819980c6c45729cef5e2b9991f4b344fcff897ed28385126e93a2fe"
+        },
+        "Supervisor.__init__": {
+          "before": null,
+          "after": "2b648c5a9376b89f2a8b9e3af257b0ed4ad50a8c19abbbbbfb807853b90205a5"
+        },
+        "Supervisor.acknowledge": {
+          "before": null,
+          "after": "3a19c30aace38798099d91701235b86e2f7e51b9fd306106d4a9a91940fdd7ac"
+        },
+        "Supervisor.cancel": {
+          "before": null,
+          "after": "5146e24b9ca6deade77197ab43cfc7957bce834e464b60cdcb2788ccd35958e3"
+        },
+        "Supervisor.close": {
+          "before": null,
+          "after": "50f5fd3578a8e0e17517f6d7eb9d94d93dea3a2f79aa64d632e0325283784c20"
+        },
+        "Supervisor.run": {
+          "before": null,
+          "after": "591a106994becf517424970e149cb1bb9f7450312bd39ba6cb791f140df17bd2"
+        },
+        "Supervisor.send": {
+          "before": null,
+          "after": "d2760a04b4c61f7dca010054db50d8d69b2f4a2fae72112cce673b2626f48317"
+        },
+        "main": {
+          "before": null,
+          "after": "8e2b47df3a958306e58d391588e9f35ab2c6f234f173fe661a4b6c2345d90869"
+        },
+        "prepare": {
+          "before": null,
+          "after": "7718e7579f368a3dbab1acc262f62605cb3a014028bdc0627e84cf7123b06344"
+        },
+        "resources": {
+          "before": null,
+          "after": "4ae4451484a0e1d669c45c6295cf8dc5530aa6fce446525955697d248efad581"
+        },
+        "run_lane": {
+          "before": null,
+          "after": "a373fd146c57432787e01a377969fd67adb035cb982a07d5d843fb5e7aa9038f"
+        },
+        "signal_group": {
+          "before": null,
+          "after": "ecb3b7f707c7a9bed8b534ccca19d2e49e00e09a86b2c713c0ac03b39ca16b9b"
+        },
+        "watchdog": {
+          "before": null,
+          "after": "ff8b075e99ab62930eca9d32168a66578ca075b0f7c41cf7a5a872897cb6c45a"
+        }
+      }
     },
     "scripts/reconstruct_local_checkpoint.py": {
       "before_sha256": null,
@@ -4815,11 +5219,11 @@
     },
     "tests/code_quality/test_ci_history_input.py": {
       "before_sha256": null,
-      "after_sha256": "762bfc9bd8d6094dc53205da38ecbbf11058dd8948a583d725e5b79b6fad4fcb",
+      "after_sha256": "204350bb9b037839d42c60975a35055d54aefbb0222f718b8937860464c18833",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a5641f6a8f8de8e44021467ae0650497ad3c57faf90b556928581818e7cfe72b"
+          "after": "0fc502d8f0b88f2a114eef96661fb67459ab5b64f55a55d2f16be79af1acb11a"
         },
         "test_all_five_original_snapshot_identities_and_ancestry_are_available": {
           "before": null,
@@ -4827,7 +5231,7 @@
         },
         "test_history_fetch_is_the_only_workflow_change_before_validation": {
           "before": null,
-          "after": "a765bb2385c41a84ba8647c79fc59d4c5da78643ca4e4b0b4f86b2d43f3c5ece"
+          "after": "a35d335232d3d6bd82aa171c89571d9df6ad7687b009b1e4a726fad16c214a24"
         },
         "test_missing_original_commit_fails_and_exact_original_object_restores_lookup": {
           "before": null,
@@ -4835,7 +5239,7 @@
         },
         "test_workflow_is_a_live_pinned_source_even_though_not_a_measured_runtime_input": {
           "before": null,
-          "after": "ccf50de2a9b8272966893a24420983584c75c692c8e0d805d5dab60438ea759e"
+          "after": "5fe27798480c0919038e6119435a82863bcceb69c9a6d911554d96701abcbb5b"
         }
       }
     },
@@ -4865,13 +5269,27 @@
         }
       }
     },
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "before_sha256": "23dc913cc9d2def5a1a0625f4acd95881fb06fa3561d54feb21c158446a25267",
+      "after_sha256": "843d9f8b18851ee99d34779b994714286d7e70f482a35e593b2f7ef1976730c3",
+      "owners": {
+        "@module": {
+          "before": "5f6e7450e2b71187ea696f4e6c5ec311062ec2e0645701c8e8e160a3506b7e6a",
+          "after": "7a648944df4d5709a8f321dee6c5f724fb251adfaedee9d9ffd1d16e207ed172"
+        },
+        "test_quality_gate_requires_every_independent_lane_even_when_skipped": {
+          "before": "a04ba3964d1301c10c945fc465d962352ee22a9add37872f6dae422c9491734c",
+          "after": "1d2d0718859cd17293f24fb5e6046c2184af714e10835f01e5f151d4d6888e9f"
+        }
+      }
+    },
     "tests/code_quality/test_ci_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "f0a91c3093e954287cbebb8e05b2c03bf03f9d827c69b6e1bc6906da60bd7c89",
+      "after_sha256": "e90ce2f38ae81cf82a7de6648d1482e0d6d23a81c449506fa2f3326633399f79",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e4cf31a3e24d5d13d97c603a3305c06d43cd92db5dac2b472a2b064e1f87f886"
+          "after": "f0b0198645872e1cdfdc8850e11af1b5f4376f8b71335a223764ccf0c3684f1b"
         },
         "test_ci_runtime_control_comparison_rejects_unrelated_caller_bytes": {
           "before": null,
@@ -4879,7 +5297,7 @@
         },
         "test_ci_runtime_edits_match_exact_independent_predecessor": {
           "before": null,
-          "after": "8c0a0267c0a4b0880ea4c5dbacd78e75e235e555ddddee02c6f835e73b93a1dc"
+          "after": "977070bcc70f19dd2d39f738a6272c6741185c1edbb1ad5760ba9a223af61328"
         },
         "test_ci_runtime_transition_rejects_unlisted_sources_and_changed_predecessors": {
           "before": null,
@@ -5286,6 +5704,20 @@
         "test_transport_proof_preserves_exact_immutable_preimage": {
           "before": null,
           "after": "f85198b9f5d9f0d9fe60e705e6b3c26a6a553650981d29f4f76d3f3bd2f39d81"
+        }
+      }
+    },
+    "tests/code_quality/test_performance_policy.py": {
+      "before_sha256": "f21c4726c30d75d7f8ddc534d0172d5a4485b98bdece6bac06bd2f64e349c6a3",
+      "after_sha256": "8494642f66f70ce0cc71d330e164eba067e90e9ebea3eb1f0c11fbb4dbc25c69",
+      "owners": {
+        "@module": {
+          "before": "a49efcea4924e5b6afbd931551030bde32122441c0f66fad7932722ea46c6c84",
+          "after": "46d9c9a9512bfc642d099339f3f4125f2e46e3002eec0d614c735b6c4cdd4e0d"
+        },
+        "test_current_smoke_is_in_the_required_serial_ci_lane": {
+          "before": "f501169ba91d2ef5faf1b099965630332381969d39bc671e511ee89e3fb4d3da",
+          "after": "dd47b6bf23c8497440101efe8241078b9d67422ce9b03fc632ba91e4b93c86db"
         }
       }
     },
@@ -5704,6 +6136,122 @@
         "test_qualification_rejects_live_fixture_source_evidence_or_control_drift": {
           "before": null,
           "after": "78d99c1ae12599491957f7041817b3a561e46df53cef06a5d24c0f3b9aa7e21d"
+        }
+      }
+    },
+    "tests/code_quality/test_quality_runtime.py": {
+      "before_sha256": null,
+      "after_sha256": "995038c8c4744f9850bda43b0e8db92ff21e827a1829546ce961c8bed19a6ef7",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "c7286a0fb5beb56d904e045d8ade9bd0f8b1b5fecf263bd2890f295d793ec364"
+        },
+        "execution": {
+          "before": null,
+          "after": "325b5435e75f95b0219a91df2d30a21e6e79b8a2c92111f108e044ca831e5102"
+        },
+        "lane": {
+          "before": null,
+          "after": "3190750748bb4586676bb69c3da039060a311809891d9edcb88e18db8cdd755d"
+        },
+        "performance_receipt": {
+          "before": null,
+          "after": "65157dd77540a62d84c5d0472715eb11ceac61f27b48c96158760e4bf119047d"
+        },
+        "test_aggregate_rejects_every_unsuccessful_upstream_result": {
+          "before": null,
+          "after": "3f010c7d8fb2732f1146acea7de2a54414b4ae89cfc8d2863c4fbb4b7432acd5"
+        },
+        "test_bootstrap_imports_no_engine_or_performance_admission_helpers": {
+          "before": null,
+          "after": "c69b419ddb40799099b30565def0c106340716610e5dcdfa7811e270dc8a6e32"
+        },
+        "test_complete_dependency_hash_detects_cached_bytecode_and_unlisted_inputs": {
+          "before": null,
+          "after": "a312af6dd07c18fe11e711c10e31ed0bdeee37e09dc91e553196694db1402e93"
+        },
+        "test_complete_execution_requires_teardown_and_exact_controller_mirrors": {
+          "before": null,
+          "after": "d26db3afe3f543d43e69bc1c0d69144f07555b121d1dd08d68dc3721eb5f895c"
+        },
+        "test_complete_inventory_preserves_every_ci53_case_and_whole_module": {
+          "before": null,
+          "after": "450c8beb87b744c841e23388bdda1c0cf1202955b885cff6542015b670740de8"
+        },
+        "test_complete_lane_admission_requires_authoritative_context_and_invocation": {
+          "before": null,
+          "after": "ace62d7cddb868eb8ce22a585e1ff674b912561f73e78bce8c8b8e93ee3f7900"
+        },
+        "test_evidence_write_failure_never_creates_a_referencing_event": {
+          "before": null,
+          "after": "4c8aad38730dff1af4311bfb61e9518e9c117735ed3d053969a5fd408344ef08"
+        },
+        "test_failure_payload_is_synced_before_the_reference": {
+          "before": null,
+          "after": "09ec7dadcde194cdfccaa91b763b9a0e0cdd718551dd4ec565e8d70e9e0d78c0"
+        },
+        "test_ignored_source_and_bytecode_cannot_escape_exact_checkout_admission": {
+          "before": null,
+          "after": "360e0e6b86d91f6b024ce1a9eff42952d9a0769239d6cbbd4956911b8a8651e5"
+        },
+        "test_incomplete_failed_or_mixed_execution_never_passes": {
+          "before": null,
+          "after": "1385a5a08008453507ea8efd9177490825641af369494df2f2d3299ec72cc205"
+        },
+        "test_lane_admission_rejects_wrong_identity_configuration_and_missing_evidence": {
+          "before": null,
+          "after": "6a08c4ad40146c05fb52972c4f3fc2531650bd13c109bdde0955ad137d42a1bf"
+        },
+        "test_live_workflow_preserves_required_names_and_all_four_producer_controls": {
+          "before": null,
+          "after": "9896cedcd20577cdb66e0ed5e0d4ccf9dddb2330f2d513d9db4487a88a90beaf"
+        },
+        "test_missing_files_cannot_disappear_from_the_uploaded_seal": {
+          "before": null,
+          "after": "29c8c7735d2772214040adb5104f00cd93d416d77601283d1c3aa395b16c77a5"
+        },
+        "test_missing_or_stale_upload_cannot_be_accepted": {
+          "before": null,
+          "after": "d2ba0aaf11f79935a5da83ce468ad0b76ed5711b1eb63fde50d2c0b73c74eec4"
+        },
+        "test_payload_names_are_exclusive_and_never_overwrite_earlier_failure": {
+          "before": null,
+          "after": "d7c5c41fbf936425d6675ff229a28439dd3e4ecaebc25704285674bdd548adf5"
+        },
+        "test_performance_receipt_rejects_stale_failed_missing_and_relabelled_attempts": {
+          "before": null,
+          "after": "5821d6cf1fc4c7363e794937b162e65fe9539fa57fe0aaf9cf7e701635fb7369"
+        },
+        "test_preserved_performance_receipt_is_validated_without_running_engine_admission": {
+          "before": null,
+          "after": "6a85457e293fe2e84fcd9f0ddb10b028eae7707833e402644494ef8fe7ffac2c"
+        }
+      }
+    },
+    "tests/code_quality/test_quality_runtime_process.py": {
+      "before_sha256": null,
+      "after_sha256": "8c19b977eefd4d587b8116f9af0c0ced4c2a1040cec9a1d5fe619014ac03e45d",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "379ba2d5118c42c3531734eac18e47169475649a074b45177079b89443a1e725"
+        },
+        "test_real_outer_group_cancel_and_parent_loss_cannot_release_unowned_work": {
+          "before": null,
+          "after": "df15b685507d104ee361dd4369279f3e57f80006fccb0f7c049177c30901a296"
+        },
+        "test_real_reporter_preserves_failures_and_rejects_incomplete_transport": {
+          "before": null,
+          "after": "a2e6d6705f03e4145a498a5055afed3ff0b4c32b10b023a5967f349ace508575"
+        },
+        "test_real_supervisor_bounds_soft_hard_timeout_and_cancellation": {
+          "before": null,
+          "after": "25f63f444067daf4c2a122c4626df7866760d4f8a69a8b322db0f339fa053b18"
+        },
+        "transport": {
+          "before": null,
+          "after": "20b4a909503e54457218bc36aae3ca2d54f90e0ed252c461a8af5c38a22d1a74"
         }
       }
     },
@@ -18545,7 +19093,7 @@
     },
     "tools/performance_policy.py": {
       "before_sha256": "cbc427774b6d8bb1e30af96310bd94d48eeffd28c99a87254aa9c90e9a0ee37d",
-      "after_sha256": "fb1bf3b9b983df3301edd047f5855efd1352507934f37bd88005e4b4eafe5a2e",
+      "after_sha256": "c110135e06b3ded99c69adc23d2571e610824a562ce0a7acc84dcb6955e2708d",
       "owners": {
         "@module": {
           "before": "ac784ef7f6a1db6326b5102add78a7434b1866cdadc45a9d358ecb09816d4685",
@@ -18553,7 +19101,7 @@
         },
         "_governance": {
           "before": "17fc3516b1b70de0265751c066ea4b96e974abc788cab3ab661baadb214c5a77",
-          "after": "5e46f1e1319d3cc7d3336338c2ed7038d259ae842d9caf8517b9ed608186b3f1"
+          "after": "bca1968236cdc2fa71a79388096437ccd96e2f15fcac2d040b8d622f80d5a22d"
         },
         "_validate_single_comparison": {
           "before": "a2dc06d1df9081b71ecceb81556842f3262626ee4615a7ac2328c32abe52054e",
@@ -18621,7 +19169,7 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": null,
-      "after_sha256": "d5eb85fb360283515f99beb3b01dd7f6351750f4b72c43e68bbf686981796dba",
+      "after_sha256": "947985c28fb1668d08f894d29dbdd8c839d5211ccd99d3f8c4ec40207baefbdc",
       "owners": {
         "@module": {
           "before": null,
@@ -18633,11 +19181,15 @@
         },
         "_assessment": {
           "before": null,
-          "after": "b540d37d8be59d07e1c1afea891ac8f9adfff56291ca006fb17616de2cac7f74"
+          "after": "a454107b0afd7e24c91e0dc1f6380075479bad679eea241f2ffc8e3f79954c7b"
         },
         "_blobs": {
           "before": null,
           "after": "b80c97d216075c8e75df6e1b8f1b13c19b437b3c206cc1096f05a0388f64debd"
+        },
+        "_ci54_previous": {
+          "before": null,
+          "after": "2bd58cf3c01607b35c40cf1798ff69905a783ca57aec6648a29867d3fe59b1c9"
         },
         "_ci_transitions": {
           "before": null,
@@ -18645,7 +19197,7 @@
         },
         "_freeze": {
           "before": null,
-          "after": "cd16549345436282b657fbb6683449302d65c6172a4f42c8ee2cc41fd4af724c"
+          "after": "35e55d0e98679c482ec038eb4950d6b4735c8f10aa408db12a7efebab0ab4d1a"
         },
         "_git": {
           "before": null,
@@ -18693,15 +19245,15 @@
         },
         "current_source": {
           "before": null,
-          "after": "0e04e84ca076fa94709f1cb9f16f40875d6f45bcbf0254c1d5a52b7388bc1f29"
+          "after": "1c9e045eba4ac35a7c4bc9e8fe7862ffc6d1df0a8f645c0e3486673853171a10"
         },
         "measurement_inputs": {
           "before": null,
-          "after": "051617c75069b70c11b2b64ea7dfc17dd656fa53eb66461edaec666d0a3224c8"
+          "after": "2bcf6c1063d3ad807e5ada47b31579111a2dc74952b1537e2c94dbdca6093376"
         },
         "preceding_control": {
           "before": null,
-          "after": "af91f8d177b8882e155f23280604fe834c5235bc58e2822ea1d99e8862daf414"
+          "after": "d9039d64481b807adf982186d93e930ba38498507ad3e193f3d9c425fdb4677b"
         },
         "read_frozen_blobs": {
           "before": null,
@@ -18829,6 +19381,44 @@
         }
       }
     },
+    "tools/quality_runtime_successor.py": {
+      "before_sha256": null,
+      "after_sha256": "a5bd5260c5e8293adeb5b0f66c4e2c8384322f96ca68e094489ec0747d679b2b",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "2dd7b814ff54ba2ee365357e627a9a58aff654aff0b34f2971559390116910ce"
+        },
+        "admit": {
+          "before": null,
+          "after": "371f5168956c31711f200209ba59b463e36af603f55a01729ee27698f12d52ab"
+        },
+        "current_source": {
+          "before": null,
+          "after": "7b52e561c14fd78013267863d0f1862f5fb7be0c1160e567a5fe19329de974ef"
+        },
+        "digest": {
+          "before": null,
+          "after": "d72f618c4bf81c2b39f5611c459bd8d3b197979c6bc7d317decc0d3e571a10de"
+        },
+        "git": {
+          "before": null,
+          "after": "3fa7a26a0d196e617b08291a9c558f8bfb3d811693d43c6cf2a7a19d6c18b0bc"
+        },
+        "measurement_inputs": {
+          "before": null,
+          "after": "43b66ba49063756aed0481854f8cea88a4e2aee5bf45d23574ea5638ab349d5f"
+        },
+        "owned": {
+          "before": null,
+          "after": "b727a04fb55bae3d5dd08c6709880c05e68f9b575e4b2b77a9f5919d2d99c53b"
+        },
+        "previous": {
+          "before": null,
+          "after": "c59948f5792172dea5cb6a19b686c6996cb0909a85ea3ba3c9e8eef5b4c9021f"
+        }
+      }
+    },
     "tools/thousand_sons_perils_preservation.py": {
       "before_sha256": null,
       "after_sha256": "2e9ef0110809dde8b380e04a7b608095672c10ea39b8cfc9aff8318002320894",
@@ -18873,9 +19463,89 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "The two faction manifest tests previously rebuilt the independent complete execution-record lookup for every row. Each affected test now builds one fresh local map and passes it to the same three semantic assertions, then compares the initial record tuple with a final fresh loader result. The explicitly selected lookup-only successor restores the migration helper, migration quality tests, cumulative adapter and transport guard to exact CI50 bytes after the broader candidate regressed whole-command validation time.",
-      "source_obligation": "Authenticate the narrowed current finite edits against immutable CI50 9746a372344322abd77a496d2b9621629b79e7be bytes before exposing predecessor inputs to unchanged historical recipes. Preserve independent record provenance, all row assertions, tuple ordering/multiplicity and persistent drift visible to the loader; the final reload is not a universal raw-byte guard. Historical compatibility positives still authenticate live roadmap/static-test bytes before selecting hash-checked CI50 after inputs. The workflow is exact frozen CI51F, retaining the existing ten-minute quality-step cap, original fetch/source checks, jobs, concurrency and every validation command.",
-      "unchanged_work": "All 1683 historical quality cases, their original assertions, the audited 244 assertions and 16 delegates, original source obligations, historical pins/recipes, all production code and 85/180/600 limits remain retained. Five explicitly new initializer-optimization cases and four current-member parameters are retired with that removed optimization; two unrelated-caller parameters now exercise retained faction/history owners, preserving both rejection controls. No cache, skipped validation or new comparison infrastructure is introduced. Expected collection is 1692 cases, pending actual collection. Exact restoration makes the changed migration input equal CI50 again; historical receipts remain historical and neither aggregate applicability nor a current runtime pass is inherited. A genuine current receipt, complete applicable local/hosted gates and both exact-head reviews remain required. No performance target, rules certification or publication is claimed."
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "ci/quality_shards/baseline-ci53.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "ci/quality_shards/shard-1-modules.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "ci/quality_shards/shard-1.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "ci/quality_shards/shard-2-modules.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "ci/quality_shards/shard-2.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "ci/quality_shards/shard-3-modules.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "ci/quality_shards/shard-3.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "ci/quality_shards/shard-4-modules.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
@@ -21201,9 +21871,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "The two faction manifest tests previously rebuilt the independent complete execution-record lookup for every row. Each affected test now builds one fresh local map and passes it to the same three semantic assertions, then compares the initial record tuple with a final fresh loader result. The explicitly selected lookup-only successor restores the migration helper, migration quality tests, cumulative adapter and transport guard to exact CI50 bytes after the broader candidate regressed whole-command validation time.",
-      "source_obligation": "Authenticate the narrowed current finite edits against immutable CI50 9746a372344322abd77a496d2b9621629b79e7be bytes before exposing predecessor inputs to unchanged historical recipes. Preserve independent record provenance, all row assertions, tuple ordering/multiplicity and persistent drift visible to the loader; the final reload is not a universal raw-byte guard. Historical compatibility positives still authenticate live roadmap/static-test bytes before selecting hash-checked CI50 after inputs. The workflow is exact frozen CI51F, retaining the existing ten-minute quality-step cap, original fetch/source checks, jobs, concurrency and every validation command.",
-      "unchanged_work": "All 1683 historical quality cases, their original assertions, the audited 244 assertions and 16 delegates, original source obligations, historical pins/recipes, all production code and 85/180/600 limits remain retained. Five explicitly new initializer-optimization cases and four current-member parameters are retired with that removed optimization; two unrelated-caller parameters now exercise retained faction/history owners, preserving both rejection controls. No cache, skipped validation or new comparison infrastructure is introduced. Expected collection is 1692 cases, pending actual collection. Exact restoration makes the changed migration input equal CI50 again; historical receipts remain historical and neither aggregate applicability nor a current runtime pass is inherited. A genuine current receipt, complete applicable local/hosted gates and both exact-head reviews remain required. No performance target, rules certification or publication is claimed."
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
     "docs/D11_ONE_SHOT_PHYSICAL_SCOPE.md": {
       "category": "governance",
@@ -21413,6 +22083,14 @@
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
     },
+    "docs/performance/ci-quality-runtime54.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
     "docs/performance/ci-runtime-successor51.json": {
       "category": "governance",
       "operations": [],
@@ -21618,6 +22296,30 @@
       "rationale": "Preserve the exact static and hosted-entry repairs, while relocating pytest bytecode suppression from the historically pinned root test initializer to the quality package before its module imports. Root tests/__init__.py is restored byte-for-byte and separately authenticated as an unchanged owned anchor. D07 geometry and category-migration readers remain unchanged. Cumulative integration-member transport now uses one fresh hardened immutable Git batch while retaining the same member/hash/control decisions. Only their existing finite predecessor boundary admits the exact quality initializer history after full current-source authentication. The original symbolic operation-map validator is extracted without changing its comparisons and remains called after every actual current-input check; focused tests exercise it independently and retain a real forged-collector rejection.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
+    },
+    "scripts/quality_evidence.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "scripts/quality_reporter.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "scripts/quality_runner.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
     "scripts/reconstruct_local_checkpoint.py": {
       "category": "measured_workload",
@@ -23141,9 +23843,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "The two faction manifest tests previously rebuilt the independent complete execution-record lookup for every row. Each affected test now builds one fresh local map and passes it to the same three semantic assertions, then compares the initial record tuple with a final fresh loader result. The explicitly selected lookup-only successor restores the migration helper, migration quality tests, cumulative adapter and transport guard to exact CI50 bytes after the broader candidate regressed whole-command validation time.",
-      "source_obligation": "Authenticate the narrowed current finite edits against immutable CI50 9746a372344322abd77a496d2b9621629b79e7be bytes before exposing predecessor inputs to unchanged historical recipes. Preserve independent record provenance, all row assertions, tuple ordering/multiplicity and persistent drift visible to the loader; the final reload is not a universal raw-byte guard. Historical compatibility positives still authenticate live roadmap/static-test bytes before selecting hash-checked CI50 after inputs. The workflow is exact frozen CI51F, retaining the existing ten-minute quality-step cap, original fetch/source checks, jobs, concurrency and every validation command.",
-      "unchanged_work": "All 1683 historical quality cases, their original assertions, the audited 244 assertions and 16 delegates, original source obligations, historical pins/recipes, all production code and 85/180/600 limits remain retained. Five explicitly new initializer-optimization cases and four current-member parameters are retired with that removed optimization; two unrelated-caller parameters now exercise retained faction/history owners, preserving both rejection controls. No cache, skipped validation or new comparison infrastructure is introduced. Expected collection is 1692 cases, pending actual collection. Exact restoration makes the changed migration input equal CI50 again; historical receipts remain historical and neither aggregate applicability nor a current runtime pass is inherited. A genuine current receipt, complete applicable local/hosted gates and both exact-head reviews remain required. No performance target, rules certification or publication is claimed."
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
     "tests/code_quality/test_ci_lookup_history.py": {
       "category": "governance",
@@ -23153,13 +23855,21 @@
       "source_obligation": "Keep the original D07 pin, archive, assertion, cumulative request and before/after live checks byte-exact. The new branch uses one existing full freeze, fresh physical current bytes, exact caller or normalized-byte equality, the existing immutable CI_RUNTIME_BASE/CI_RUNTIME_BEFORE pin and the existing normalized-return convention. Reject historical or extra caller bytes and physical file drift after successful admission; restore then re-admit. Preserve the two prior dispatcher branches and unchanged nonmember passthrough. The new guard owns only one temporary physical file, not a repository copy or mutation of shared source.",
       "unchanged_work": "All 1692 existing quality cases, all historical assertions including the audited244/16delegates, CI51 finite record and earlier source obligations/recipes/pins, production files, workflow/concurrency and85/180/600limits remain unchanged. Add four guard cases, expected1696pendingactualcollection. No cache, skipped validation, new per-family comparison, global reader projection or historical repin is introduced. Existing whole-source admission still binds the new guard through current PINS and the actual source freeze. Current performance, applicable final local/hosted gates and both exact-head reviews remain pending; no gameplay defect or performance success is claimed."
     },
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
     "tests/code_quality/test_ci_runtime_successor.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "The two faction manifest tests previously rebuilt the independent complete execution-record lookup for every row. Each affected test now builds one fresh local map and passes it to the same three semantic assertions, then compares the initial record tuple with a final fresh loader result. The explicitly selected lookup-only successor restores the migration helper, migration quality tests, cumulative adapter and transport guard to exact CI50 bytes after the broader candidate regressed whole-command validation time.",
-      "source_obligation": "Authenticate the narrowed current finite edits against immutable CI50 9746a372344322abd77a496d2b9621629b79e7be bytes before exposing predecessor inputs to unchanged historical recipes. Preserve independent record provenance, all row assertions, tuple ordering/multiplicity and persistent drift visible to the loader; the final reload is not a universal raw-byte guard. Historical compatibility positives still authenticate live roadmap/static-test bytes before selecting hash-checked CI50 after inputs. The workflow is exact frozen CI51F, retaining the existing ten-minute quality-step cap, original fetch/source checks, jobs, concurrency and every validation command.",
-      "unchanged_work": "All 1683 historical quality cases, their original assertions, the audited 244 assertions and 16 delegates, original source obligations, historical pins/recipes, all production code and 85/180/600 limits remain retained. Five explicitly new initializer-optimization cases and four current-member parameters are retired with that removed optimization; two unrelated-caller parameters now exercise retained faction/history owners, preserving both rejection controls. No cache, skipped validation or new comparison infrastructure is introduced. Expected collection is 1692 cases, pending actual collection. Exact restoration makes the changed migration input equal CI50 again; historical receipts remain historical and neither aggregate applicability nor a current runtime pass is inherited. A genuine current receipt, complete applicable local/hosted gates and both exact-head reviews remain required. No performance target, rules certification or publication is claimed."
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
     "tests/code_quality/test_cumulative_preservation.py": {
       "category": "governance",
@@ -23297,6 +24007,14 @@
       "source_obligation": "The proposed guard passed from an external copy against unchanged frozen bd94c174 before source editing. The preceding CI49E correction changed only that new guard and its exact SELF pin/freeze/assessment metadata; the production transport owner, hardened parser, public reader and 946-byte CI49D transition record remain byte-exact. All pre-D tests and STATIC48/CI49/CI49B/CI49C records remain byte-exact. Two erroneous D0 guard assertions are replaced with complete-map reconstruction and explicit control-scope assertions, preserving all other guard statements and all five case IDs. Every current-source, Git and historical comparison check remains mandatory.",
       "unchanged_work": "No production behavior, engine, gameplay input, measured workload, seed, operation map, family/case/sample selection, digest-retention limit, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The bd94 targeted 83-pass/1-fail result remains its original failed evidence. External-copy success proves the corrected assertion contract against that frozen source, not final-source qualification. Fresh exact-head default-launcher controls, static checks, performance, complete quality reconciliation and independent review remain required; no old timing or hosted acceptance is transferred."
     },
+    "tests/code_quality/test_performance_policy.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
     "tests/code_quality/test_performance_preflight.py": {
       "category": "governance",
       "operations": [],
@@ -23336,6 +24054,22 @@
       "rationale": "Preserve the exact static and hosted-entry repairs, while relocating pytest bytecode suppression from the historically pinned root test initializer to the quality package before its module imports. Root tests/__init__.py is restored byte-for-byte and separately authenticated as an unchanged owned anchor. D07 geometry and category-migration readers remain unchanged. Cumulative integration-member transport now uses one fresh hardened immutable Git batch while retaining the same member/hash/control decisions. Only their existing finite predecessor boundary admits the exact quality initializer history after full current-source authentication. The original symbolic operation-map validator is extracted without changing its comparisons and remains called after every actual current-input check; focused tests exercise it independently and retain a real forged-collector rejection.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
+    },
+    "tests/code_quality/test_quality_runtime.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+    },
+    "tests/code_quality/test_quality_runtime_process.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
     "tests/code_quality/test_s25_fixture_preservation.py": {
       "category": "governance",
@@ -29049,9 +29783,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Exact PR587-to-current owner changes: tools/performance_policy.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
     "tools/performance_preflight.py": {
       "category": "governance",
@@ -29065,9 +29799,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "The published lookup-only test changed its bytes while the existing shared D07 historical request returned those current bytes unchanged. The unchanged original D07 assertion therefore rejected the valid current source. Extend the existing static predecessor dispatcher for only that exact faction quality-test path, reusing complete current-source admission and fresh owned reads before returning the independently pinned CI50 predecessor.",
-      "source_obligation": "Keep the original D07 pin, archive, assertion, cumulative request and before/after live checks byte-exact. The new branch uses one existing full freeze, fresh physical current bytes, exact caller or normalized-byte equality, the existing immutable CI_RUNTIME_BASE/CI_RUNTIME_BEFORE pin and the existing normalized-return convention. Reject historical or extra caller bytes and physical file drift after successful admission; restore then re-admit. Preserve the two prior dispatcher branches and unchanged nonmember passthrough. The new guard owns only one temporary physical file, not a repository copy or mutation of shared source.",
-      "unchanged_work": "All 1692 existing quality cases, all historical assertions including the audited244/16delegates, CI51 finite record and earlier source obligations/recipes/pins, production files, workflow/concurrency and85/180/600limits remain unchanged. Add four guard cases, expected1696pendingactualcollection. No cache, skipped validation, new per-family comparison, global reader projection or historical repin is introduced. Existing whole-source admission still binds the new guard through current PINS and the actual source freeze. Current performance, applicable final local/hosted gates and both exact-head reviews remain pending; no gameplay defect or performance success is claimed."
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
     "tools/performance_qualification_measurements.py": {
       "category": "governance",
@@ -29100,6 +29834,14 @@
       "rationale": "Exact PR587-to-current owner changes: tools/performance_tool_inputs_v3.py. Versioned governance/evidence; no timed engine operation is changed by this document.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+    },
+    "tools/quality_runtime_successor.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
+      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
+      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
     "tools/thousand_sons_perils_preservation.py": {
       "category": "governance",
