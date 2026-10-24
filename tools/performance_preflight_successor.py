@@ -424,10 +424,10 @@ def _read(root: Path, name: str) -> bytes:
     return read_owned_geometry_member(root, name)
 
 
-def _ci54_previous(root: Path, name: str, raw: bytes) -> bytes:
+def _ci54_previous(root: Path, name: str, raw: bytes, *, predecessor: bytes | None = None) -> bytes:
     from tools.quality_runtime_successor import previous
 
-    return previous(root, name, raw)
+    return previous(root, name, raw, predecessor=predecessor)
 
 
 def preceding_control(root: Path, name: str, raw: bytes) -> bytes:
@@ -702,7 +702,7 @@ def static_predecessor(root: Path, name: str, raw: bytes) -> bytes:
 
 
 def _freeze(root: Path) -> str:
-    from tools.quality_runtime_successor import admit
+    from tools.quality_runtime_successor import BORROWED_PREDECESSORS, admit
 
     admit(root)
     freeze = FREEZE_COMMIT
@@ -728,8 +728,16 @@ def _freeze(root: Path) -> str:
         raise ValueError("Preflight successor activation changed.")
     for name, pin in PINS.items():
         if (
-            _sha(_ci54_previous(root, name, _read(root, name))) != pin
-            or _sha(frozen_members[name]) != pin
+            _sha(frozen_members[name]) != pin
+            or _sha(
+                _ci54_previous(
+                    root,
+                    name,
+                    _read(root, name),
+                    predecessor=frozen_members[name] if name in BORROWED_PREDECESSORS else None,
+                )
+            )
+            != pin
         ):
             raise ValueError(
                 "Reviewed migration source/data changed: "
@@ -819,20 +827,21 @@ def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     actual = {name: _sha(_ci54_previous(root, name, _read(root, name))) for name in controls}
     projected = dict(current)
     prior_names = set(_git(root, "ls-tree", "-r", "--name-only", BASE).decode().splitlines())
+    historical = _blobs(root, BASE, sorted((controls & prior_names) | perils.CHANGED))
     for name in controls:
         if name not in current:
             continue
         if current[name] != actual[name]:
             raise ValueError("Preflight actual input collector omitted current control bytes.")
         if name in prior_names:
-            projected[name] = _sha(_git(root, "show", BASE + ":" + name))
+            projected[name] = _sha(historical[name])
         else:
             del projected[name]
     # These five exact paths are already authenticated by the native Perils
     # admission. Its added test is not a measured driver or imported fixture.
     perils._freeze(root)
     for name in perils.CHANGED:
-        raw = _git(root, "show", BASE + ":" + name)
+        raw = historical[name]
         if projected.get(name) != _sha(raw):
             raise ValueError("Preflight Perils producing projection changed.")
         if name in {perils.SELF, perils.GUARD}:

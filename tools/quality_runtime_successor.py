@@ -12,13 +12,13 @@ BASE = "5396b557fd90a67e0c097da1020959b58724a7ec"
 SELF = "tools/quality_runtime_successor.py"
 RECORD = "docs/performance/ci-quality-runtime54.json"
 ASSESSMENT = "docs/performance/change-assessment.json"
-FREEZE: str | None = "49ae82b6732e56aa23c47d7fd70d788389728e7d"
+FREEZE: str | None = None
 PINS: dict[str, str] = {
     ".github/workflows/ci.yml": (
         "91d7b64dbed61e5fd959ef2db8d9dfff0d967ae0b0bfc4d22aabaccfb27f18f7"
     ),
     "ci/quality_shards/all.txt": (
-        "e5e705546c194844ccbd3b0af8189dab76d28af613dffac3632e5a96a98ace07"
+        "aef1b304d48f4beab0bc7761f048b134268fc0197de476eda6075c3abc2cbb4b"
     ),
     "ci/quality_shards/baseline-ci53.txt": (
         "308870fb4095de8e263def2e75ac71687bc65c3b32f06f591fed848fc34b4ef3"
@@ -45,13 +45,13 @@ PINS: dict[str, str] = {
         "e5ab009fc440840dac9717a0f05b64cd47f371664a9f838e5ca17fe1d210e7bd"
     ),
     "ci/quality_shards/shard-4.txt": (
-        "5bd58b7b717895f399f6176553551f5b9608ea61dce28e4b65794537adbe89cc"
+        "2d1526a0c56ab4c66423b22f916715e8b0fe098b140314368c50de4cbe2528ae"
     ),
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": (
         "c965819e71f0a7b6a3f1440fdb9721e7d88c0950175721318fb9712205ed40d7"
     ),
     "docs/performance/ci-quality-runtime54.json": (
-        "89e5636da4dbcbbad99e8cef28d4ab17e87f576b173ddb1588ef70896c53998b"
+        "924507379d3925af22d450feb8e2c9dce4c6ded98a7998beedfd7129c631ba2e"
     ),
     "scripts/quality_evidence.py": (
         "923b8da16949a54a2d8e1b984aecce34e1e9d6de08bc698b54469dd920418808"
@@ -75,7 +75,7 @@ PINS: dict[str, str] = {
         "8494642f66f70ce0cc71d330e164eba067e90e9ebea3eb1f0c11fbb4dbc25c69"
     ),
     "tests/code_quality/test_quality_runtime.py": (
-        "f8f304feb5078358da19ae32da7abb3314bf3ee72e2625bfdaea4693bb8ba877"
+        "396924784fcac3a47d5b69710e648b4243f16585da45a79a15ece70e7be6188a"
     ),
     "tests/code_quality/test_quality_runtime_process.py": (
         "8c19b977eefd4d587b8116f9af0c0ced4c2a1040cec9a1d5fe619014ac03e45d"
@@ -84,7 +84,7 @@ PINS: dict[str, str] = {
         "c110135e06b3ded99c69adc23d2571e610824a562ce0a7acc84dcb6955e2708d"
     ),
     "tools/performance_preflight_successor.py": (
-        "947985c28fb1668d08f894d29dbdd8c839d5211ccd99d3f8c4ec40207baefbdc"
+        "08b945f8b3c2c25b097aae5c930a634a20336761c35bf8b7e7d11c14aaa0055a"
     ),
 }
 BEFORE: dict[str, str] = {
@@ -118,6 +118,17 @@ BEFORE: dict[str, str] = {
 }
 
 
+BORROWED_PREDECESSORS = frozenset(
+    {
+        ".github/workflows/ci.yml",
+        "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
+        "tests/code_quality/test_ci_history_input.py",
+        "tests/code_quality/test_ci_runtime_successor.py",
+        "tools/performance_policy.py",
+    }
+)
+
+
 def digest(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
@@ -133,8 +144,13 @@ def owned(root: Path, name: str) -> bytes:
     return value
 
 
-def previous(root: Path, name: str, supplied: bytes) -> bytes:
-    """Fresh literal member admission, without changing any earlier frozen pin."""
+def previous(root: Path, name: str, supplied: bytes, *, predecessor: bytes | None = None) -> bytes:
+    """Fresh member admission; a caller may lend only five exact historical payloads."""
+    if predecessor is not None:
+        from tools.performance_preflight_successor import PINS as preflight_pins
+
+        if name not in BORROWED_PREDECESSORS or preflight_pins.get(name) != BEFORE.get(name):
+            raise ValueError("CI54 predecessor borrowing is not admitted for this path.")
     if name not in BEFORE:
         return supplied
     actual = owned(root, name)
@@ -144,7 +160,7 @@ def previous(root: Path, name: str, supplied: bytes) -> bytes:
         raise ValueError("CI54 Preflight source changed: " + name)
     if supplied != actual:
         raise ValueError("CI54 predecessor caller supplied unrelated bytes.")
-    old = git(root, "show", BASE + ":" + name)
+    old = git(root, "show", BASE + ":" + name) if predecessor is None else predecessor
     if digest(old) != BEFORE[name]:
         raise ValueError("CI54 immutable predecessor changed.")
     return old

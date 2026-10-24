@@ -6,10 +6,12 @@ import ast
 import copy
 import errno
 import json
+import os
 import subprocess
 import xml.etree.ElementTree as ET
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol, cast
 
 import pytest
 from scripts import quality_evidence as evidence
@@ -820,3 +822,286 @@ def test_performance_receipt_rejects_stale_failed_missing_and_relabelled_attempt
         admitted["performance"]["sha256"] = evidence.sha(path.read_bytes())
     with pytest.raises(evidence.EvidenceError):
         evidence.validate_performance(directory, admitted, expected, root)
+
+
+class _PreflightBatchProbe(Protocol):
+    def _git(self, root: Path, *args: str, payload: bytes | None = None) -> bytes: ...
+
+    def _blobs(self, root: Path, revision: str, names: list[str]) -> dict[str, bytes]: ...
+
+    def _freeze(self, root: Path) -> str: ...
+
+    def git_function(self) -> Callable[..., bytes]:
+        return self._git
+
+    def blobs_function(self) -> Callable[[Path, str, list[str]], dict[str, bytes]]:
+        return self._blobs
+
+    def freeze(self, root: Path) -> str:
+        return self._freeze(root)
+
+
+def test_predecessor_borrowing_matches_five_real_fallbacks_and_rejects_wrong_roles(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools import performance_preflight_successor as stage
+    from tools import quality_runtime_successor as successor
+
+    names = sorted(successor.BORROWED_PREDECESSORS)
+    assert set(names) == stage.PINS.keys() & successor.BEFORE.keys()
+    assert len(names) == 5
+    assert stage.FREEZE_COMMIT is not None
+    frozen = stage.read_frozen_blobs(ROOT, stage.FREEZE_COMMIT, names)
+    original_git = successor.git
+    calls: list[tuple[str, ...]] = []
+
+    def counted(root: Path, *args: str) -> bytes:
+        calls.append(args)
+        return original_git(root, *args)
+
+    monkeypatch.setattr(successor, "git", counted)
+    current = {name: successor.owned(ROOT, name) for name in names}
+    fallback = {name: successor.previous(ROOT, name, current[name]) for name in names}
+    assert calls == [("show", successor.BASE + ":" + name) for name in names]
+    assert fallback == frozen
+    calls.clear()
+    for name in names:
+        assert successor.digest(frozen[name]) == stage.PINS[name] == successor.BEFORE[name]
+        assert (
+            successor.previous(ROOT, name, current[name], predecessor=frozen[name])
+            == fallback[name]
+        )
+        for wrong in (b"", frozen[name] + b" ", frozen[names[(names.index(name) + 1) % 5]]):
+            with pytest.raises(ValueError, match="immutable predecessor changed"):
+                successor.previous(ROOT, name, current[name], predecessor=wrong)
+        with pytest.raises(ValueError, match="caller supplied unrelated bytes"):
+            successor.previous(ROOT, name, current[name] + b" ", predecessor=frozen[name])
+    for role in (successor.SELF, successor.ASSESSMENT, stage.SELF, "unsupported/path"):
+        with pytest.raises(ValueError, match="borrowing is not admitted"):
+            successor.previous(ROOT, role, b"caller", predecessor=frozen[names[0]])
+    assert successor.previous(ROOT, "unsupported/path", b"caller") == b"caller"
+    with monkeypatch.context() as changed:
+        changed.setitem(stage.PINS, names[0], "0" * 64)
+        with pytest.raises(ValueError, match="borrowing is not admitted"):
+            successor.previous(ROOT, names[0], current[names[0]], predecessor=frozen[names[0]])
+    assert calls == []
+    print("CI54 borrowed predecessor retrieval: five fallback Git shows; zero borrowed Git shows.")
+    print("The caller's existing authenticated frozen-member batch is outside this count.")
+
+
+def test_predecessor_borrowing_revalidates_distinct_roots_and_warm_same_size_mutation(
+    tmp_path: Path,
+) -> None:
+    from tools import performance_preflight as preflight
+    from tools import quality_runtime_successor as successor
+
+    name = "tests/code_quality/test_ci_history_input.py"
+    current = successor.owned(ROOT, name)
+    predecessor = successor.git(ROOT, "show", successor.BASE + ":" + name)
+    roots = [tmp_path / "first", tmp_path / "second"]
+    for root in roots:
+        target = root / name
+        target.parent.mkdir(parents=True)
+        target.write_bytes(current)
+        for args in (
+            ("init", "-q"),
+            ("add", "."),
+            (
+                "-c",
+                "user.name=quality-control",
+                "-c",
+                "user.email=quality-control@example.invalid",
+                "commit",
+                "-qm",
+                "owned current member fixture",
+            ),
+        ):
+            subprocess.run(
+                ["git", "-c", "gc.auto=0", *args], cwd=root, check=True, capture_output=True
+            )
+
+    @preflight.invocation
+    def admitted(root: Path, supplied: bytes, old: bytes) -> bytes:
+        return successor.previous(root, name, supplied, predecessor=old)
+
+    for root in roots:
+        assert admitted(root, current, predecessor) == predecessor
+        target = root / name
+        metadata = target.stat()
+        changed = bytes([current[0] ^ 1]) + current[1:]
+        assert len(changed) == len(current)
+        assert changed != current
+        target.write_bytes(changed)
+        os.utime(target, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+        for supplied in (current, changed):
+            with pytest.raises(ValueError, match="Preflight source changed"):
+                admitted(root, supplied, predecessor)
+        target.write_bytes(current)
+        os.utime(target, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+        assert admitted(root, current, predecessor) == predecessor
+        with pytest.raises(ValueError, match="immutable predecessor changed"):
+            admitted(root, current, predecessor + b" ")
+        assert admitted(root, current, predecessor) == predecessor
+    alias = tmp_path / "alias"
+    alias.symlink_to(roots[0], target_is_directory=True)
+    with pytest.raises(ValueError, match="owned regular file"):
+        admitted(alias, current, predecessor)
+    with pytest.raises(FileNotFoundError):
+        admitted(tmp_path / "absent", current, predecessor)
+    assert admitted(roots[1], current, predecessor) == predecessor
+
+
+def test_measurement_batch_matches_literal_projection_and_reads_each_invocation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools import performance_policy as policy
+    from tools import performance_preflight as preflight
+    from tools import performance_preflight_successor as stage
+    from tools import quality_runtime_successor as successor
+    from tools import thousand_sons_perils_preservation as perils
+
+    probe = cast(_PreflightBatchProbe, stage)
+    direct_git = _PreflightBatchProbe.git_function(probe)
+    direct_blobs = _PreflightBatchProbe.blobs_function(probe)
+    current = policy.runtime_inputs(ROOT)
+    projected_current = successor.measurement_inputs(ROOT, current)
+    controls = (
+        (
+            stage.PINS.keys()
+            - {
+                stage.INVENTORY,
+                stage.STATIC_RECORD,
+                stage.CI_RECORD,
+                stage.CI_FORMAT_RECORD,
+                stage.CI_COMPAT_RECORD,
+                stage.CI_TRANSPORT_RECORD,
+                stage.CI_RUNTIME_RECORD,
+                stage.CI_ROADMAP,
+                stage.CI_WORKFLOW,
+            }
+        )
+        | stage.ANCHORS.keys()
+        | {stage.SELF}
+    )
+    prior = set(direct_git(ROOT, "ls-tree", "-r", "--name-only", stage.BASE).decode().splitlines())
+    requested = [name for name in sorted(controls) if name in prior] + sorted(perils.CHANGED)
+    assert len(requested) == 24
+    literal = {name: direct_git(ROOT, "show", stage.BASE + ":" + name) for name in requested}
+    expected = dict(projected_current)
+    for name in controls:
+        actual = successor.previous(ROOT, name, successor.owned(ROOT, name))
+        assert projected_current[name] == evidence.sha(actual)
+        if name in prior:
+            expected[name] = evidence.sha(literal[name])
+        else:
+            del expected[name]
+    for name in perils.CHANGED:
+        assert expected.get(name) == evidence.sha(literal[name])
+        if name in {perils.SELF, perils.GUARD}:
+            del expected[name]
+        elif name == perils.TEST:
+            expected[name] = evidence.sha(
+                perils.preceding_test(ROOT, name, successor.owned(ROOT, name))
+            )
+        else:
+            expected[name] = evidence.sha(
+                perils.preceding_control(ROOT, name, successor.owned(ROOT, name))
+            )
+
+    selected = sorted(set(requested))
+    batches: list[tuple[Path, str, list[str]]] = []
+    retrievals: list[tuple[str, ...]] = []
+    in_measurement_batch = False
+
+    def counted_git(root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        if in_measurement_batch:
+            retrievals.append(args)
+        return direct_git(root, *args, payload=payload)
+
+    def counted_blobs(root: Path, revision: str, names: list[str]) -> dict[str, bytes]:
+        nonlocal in_measurement_batch
+        targeted = revision == stage.BASE and names == selected
+        if targeted:
+            batches.append((root, revision, list(names)))
+        previous = in_measurement_batch
+        in_measurement_batch = targeted
+        try:
+            result = direct_blobs(root, revision, names)
+        finally:
+            in_measurement_batch = previous
+        if targeted:
+            assert result == literal
+        return result
+
+    monkeypatch.setattr(stage, "_git", counted_git)
+    monkeypatch.setattr(stage, "_blobs", counted_blobs)
+
+    @preflight.invocation
+    def project(inputs: dict[str, str]) -> dict[str, str]:
+        return stage.measurement_inputs(ROOT, inputs)
+
+    assert project(current) == expected
+    assert project(dict(reversed(list(current.items())))) == expected
+    assert batches == [(ROOT, stage.BASE, selected), (ROOT, stage.BASE, selected)]
+    assert len(retrievals) == 4
+    assert retrievals[0] == retrievals[2]
+    assert retrievals[1] == retrievals[3] == ("cat-file", "--batch")
+    bad = dict(current)
+    bad[stage.SELF] = "0" * 64
+    with pytest.raises(ValueError, match="actual input collector"):
+        project(bad)
+    assert len(retrievals) == 4
+    assert project(current) == expected
+    assert len(retrievals) == 6
+    print(
+        "CI54 measurement historical projection: 24 literal Git shows versus two batch Git calls."
+    )
+    print("Three successful independent invocations each reread the exact canonical member union.")
+    print("Counts exclude unchanged ancestry, source admission, prior ls-tree and Perils checks.")
+
+
+def test_complete_preflight_freeze_forwards_only_five_authenticated_members(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools import performance_preflight_successor as stage
+    from tools import quality_runtime_successor as successor
+
+    assert stage.FREEZE_COMMIT is not None
+    names = sorted(successor.BORROWED_PREDECESSORS)
+    frozen = stage.read_frozen_blobs(ROOT, stage.FREEZE_COMMIT, names)
+    actual = {name: successor.owned(ROOT, name) for name in names}
+    original_previous = successor.previous
+    original_git = successor.git
+    borrowed: list[str] = []
+    fallback_shows: list[tuple[str, ...]] = []
+
+    def counted_previous(
+        root: Path, name: str, supplied: bytes, *, predecessor: bytes | None = None
+    ) -> bytes:
+        if predecessor is not None:
+            assert root == ROOT
+            assert name in names
+            assert supplied == actual[name]
+            assert predecessor == frozen[name]
+            borrowed.append(name)
+        return original_previous(root, name, supplied, predecessor=predecessor)
+
+    def counted_git(root: Path, *args: str) -> bytes:
+        if (
+            len(args) == 2
+            and args[0] == "show"
+            and args[1] in {successor.BASE + ":" + name for name in names}
+        ):
+            fallback_shows.append(args)
+        return original_git(root, *args)
+
+    monkeypatch.setattr(successor, "previous", counted_previous)
+    monkeypatch.setattr(successor, "git", counted_git)
+    probe = cast(_PreflightBatchProbe, stage)
+    assert _PreflightBatchProbe.freeze(probe, ROOT) == stage.FREEZE_COMMIT
+    assert sorted(borrowed) == names
+    assert fallback_shows == []
+    assert {name: successor.owned(ROOT, name) for name in names} == actual
+    print(
+        "CI54 complete preflight freeze: five authenticated borrowed members; zero redundant shows."
+    )

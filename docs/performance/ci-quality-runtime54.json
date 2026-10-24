@@ -102,7 +102,7 @@
     },
     "tools/performance_preflight_successor.py": {
       "before_sha256": "d5eb85fb360283515f99beb3b01dd7f6351750f4b72c43e68bbf686981796dba",
-      "after_sha256": "947985c28fb1668d08f894d29dbdd8c839d5211ccd99d3f8c4ec40207baefbdc",
+      "after_sha256": "08b945f8b3c2c25b097aae5c930a634a20336761c35bf8b7e7d11c14aaa0055a",
       "edits": [
         {
           "before": "    return read_owned_geometry_member(root, name)\n\n\ndef preceding_control(root: Path, name: str, raw: bytes) -> bytes:\n    \"\"\"Exact byte projection; the complete successor freeze is admitted separately.\"\"\"\n    if name not in PINS and name != ASSESSMENT:\n",
@@ -135,6 +135,22 @@
         {
           "before": "    )\n    if not controls <= current.keys():\n        raise ValueError(\"Preflight actual input collector omitted current inputs.\")\n    actual = {name: _sha(_read(root, name)) for name in controls}\n    projected = dict(current)\n    prior_names = set(_git(root, \"ls-tree\", \"-r\", \"--name-only\", BASE).decode().splitlines())\n    for name in controls:\n",
           "after": "    )\n    if not controls <= current.keys():\n        raise ValueError(\"Preflight actual input collector omitted current inputs.\")\n    actual = {name: _sha(_ci54_previous(root, name, _read(root, name))) for name in controls}\n    projected = dict(current)\n    prior_names = set(_git(root, \"ls-tree\", \"-r\", \"--name-only\", BASE).decode().splitlines())\n    for name in controls:\n"
+        },
+        {
+          "before": "    return read_owned_geometry_member(root, name)\n\n\ndef _ci54_previous(root: Path, name: str, raw: bytes) -> bytes:\n    from tools.quality_runtime_successor import previous\n\n    return previous(root, name, raw)\n\n\ndef preceding_control(root: Path, name: str, raw: bytes) -> bytes:\n",
+          "after": "    return read_owned_geometry_member(root, name)\n\n\ndef _ci54_previous(root: Path, name: str, raw: bytes, *, predecessor: bytes | None = None) -> bytes:\n    from tools.quality_runtime_successor import previous\n\n    return previous(root, name, raw, predecessor=predecessor)\n\n\ndef preceding_control(root: Path, name: str, raw: bytes) -> bytes:\n"
+        },
+        {
+          "before": "\n\ndef _freeze(root: Path) -> str:\n    from tools.quality_runtime_successor import admit\n\n    admit(root)\n    freeze = FREEZE_COMMIT\n",
+          "after": "\n\ndef _freeze(root: Path) -> str:\n    from tools.quality_runtime_successor import BORROWED_PREDECESSORS, admit\n\n    admit(root)\n    freeze = FREEZE_COMMIT\n"
+        },
+        {
+          "before": "        raise ValueError(\"Preflight successor activation changed.\")\n    for name, pin in PINS.items():\n        if (\n            _sha(_ci54_previous(root, name, _read(root, name))) != pin\n            or _sha(frozen_members[name]) != pin\n        ):\n            raise ValueError(\n                \"Reviewed migration source/data changed: \"\n",
+          "after": "        raise ValueError(\"Preflight successor activation changed.\")\n    for name, pin in PINS.items():\n        if (\n            _sha(frozen_members[name]) != pin\n            or _sha(\n                _ci54_previous(\n                    root,\n                    name,\n                    _read(root, name),\n                    predecessor=frozen_members[name] if name in BORROWED_PREDECESSORS else None,\n                )\n            )\n            != pin\n        ):\n            raise ValueError(\n                \"Reviewed migration source/data changed: \"\n"
+        },
+        {
+          "before": "    actual = {name: _sha(_ci54_previous(root, name, _read(root, name))) for name in controls}\n    projected = dict(current)\n    prior_names = set(_git(root, \"ls-tree\", \"-r\", \"--name-only\", BASE).decode().splitlines())\n    for name in controls:\n        if name not in current:\n            continue\n        if current[name] != actual[name]:\n            raise ValueError(\"Preflight actual input collector omitted current control bytes.\")\n        if name in prior_names:\n            projected[name] = _sha(_git(root, \"show\", BASE + \":\" + name))\n        else:\n            del projected[name]\n    # These five exact paths are already authenticated by the native Perils\n    # admission. Its added test is not a measured driver or imported fixture.\n    perils._freeze(root)\n    for name in perils.CHANGED:\n        raw = _git(root, \"show\", BASE + \":\" + name)\n        if projected.get(name) != _sha(raw):\n            raise ValueError(\"Preflight Perils producing projection changed.\")\n        if name in {perils.SELF, perils.GUARD}:\n",
+          "after": "    actual = {name: _sha(_ci54_previous(root, name, _read(root, name))) for name in controls}\n    projected = dict(current)\n    prior_names = set(_git(root, \"ls-tree\", \"-r\", \"--name-only\", BASE).decode().splitlines())\n    historical = _blobs(root, BASE, sorted((controls & prior_names) | perils.CHANGED))\n    for name in controls:\n        if name not in current:\n            continue\n        if current[name] != actual[name]:\n            raise ValueError(\"Preflight actual input collector omitted current control bytes.\")\n        if name in prior_names:\n            projected[name] = _sha(historical[name])\n        else:\n            del projected[name]\n    # These five exact paths are already authenticated by the native Perils\n    # admission. Its added test is not a measured driver or imported fixture.\n    perils._freeze(root)\n    for name in perils.CHANGED:\n        raw = historical[name]\n        if projected.get(name) != _sha(raw):\n            raise ValueError(\"Preflight Perils producing projection changed.\")\n        if name in {perils.SELF, perils.GUARD}:\n"
         }
       ]
     }
