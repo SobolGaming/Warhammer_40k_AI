@@ -1,0 +1,41 @@
+{
+  "schema": "ci60-original-supervised-receipt-v1",
+  "attempt": "watched88-movement-base",
+  "nonce": "dad9c21ba55041b2a69a8121dafd6014",
+  "command": [
+    "/tmp/task55-bytecode-launch/exact-locked-test-pristine/bin/python",
+    "-B",
+    "/tmp/task57-correctness/repo/reports/performance-attempts/ci60/measure_arm60.py",
+    "movement",
+    "base"
+  ],
+  "cwd": "/tmp/task57-correctness/repo",
+  "expected_head": "2702631a5b9406566cd4ea1e63f5db5f3a758511",
+  "exit_code": 0,
+  "timeout": false,
+  "source_drift": false,
+  "cap_seconds": 600,
+  "warning_seconds": 500,
+  "warning_emitted": false,
+  "process_group_closed": true,
+  "whole_before_terminal_journal_seconds": 63.04884069100001,
+  "elapsed_scope": "Original supervisor duration before terminal journal write; authentic status complete verifies whole invocation below600seconds.",
+  "started_utc": "2026-10-25T07:14:05.561803+00:00",
+  "finished_utc": "2026-10-25T07:15:08.360509+00:00",
+  "raw_entries_sha256": "04feb3bdb60a56405abc966e90ceb93d4fbc714e48f211584ef241a01d540804",
+  "dependency_physical_sha256": "a2a00c5e977c7a8dcbb2188efed485d69e924d20649bc637108e43914d201f39",
+  "original_artifacts": {
+    "request.json": {
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci60/watched88-movement-base/request.json",
+      "sha256": "fb41f1e2784b83beec75f44fa10b36506044a6c82cbc8e4675055cc86fba5db2"
+    },
+    "supervisor-result.json": {
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci60/watched88-movement-base/supervisor-result.json",
+      "sha256": "03789d5436b438d254d66ccbc3c1778d38c440c6110be281dcf6c86dff8dc5a4"
+    },
+    "worker-journal.json": {
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci60/watched88-movement-base/worker-journal.json",
+      "sha256": "6faa354b1a86440fd5d61e545779d50c210369bcf41f038c9ddc4047188a2d38"
+    }
+  }
+}

@@ -586,11 +586,11 @@
     },
     "data/source_audits/ci60_qualification_v1/changed-members.json": {
       "before_sha256": null,
-      "after_sha256": "fce8487949f12746ef33fd303caa190163f2424ea92519aff0e0bd18476fe56e",
+      "after_sha256": "9fb403f48694a6f7b6244c64b2af328057527797d0440032ee085e8aca67889b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "fce8487949f12746ef33fd303caa190163f2424ea92519aff0e0bd18476fe56e"
+          "after": "9fb403f48694a6f7b6244c64b2af328057527797d0440032ee085e8aca67889b"
         }
       }
     },
@@ -614,6 +614,16 @@
         }
       }
     },
+    "data/source_audits/ci60_qualification_v1/measurement-provenance.json": {
+      "before_sha256": null,
+      "after_sha256": "68b5b50d5b0df0d033714eda310323c6b6fc2af803d49592cd56d79a5ccd4801",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "68b5b50d5b0df0d033714eda310323c6b6fc2af803d49592cd56d79a5ccd4801"
+        }
+      }
+    },
     "data/source_audits/ci60_qualification_v1/producing-inputs.json": {
       "before_sha256": null,
       "after_sha256": "2ff29d9e1275220cd83b6c158622fe2419a1f6612d766aa0f34566864eacbdf2",
@@ -624,6 +634,406 @@
         }
       }
     },
+    "data/source_audits/ci60_qualification_v1/raw-dice-base.json": {
+      "before_sha256": null,
+      "after_sha256": "52920996ebb1f0c6b9f5b5bc42145bd7f925c1d85826eabdd5562af902801b8c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "52920996ebb1f0c6b9f5b5bc42145bd7f925c1d85826eabdd5562af902801b8c"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-dice-head.json": {
+      "before_sha256": null,
+      "after_sha256": "359eeff2619e44576d97f999860c10ef2f55328b4e07d88a547a5ebb78c8ac46",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "359eeff2619e44576d97f999860c10ef2f55328b4e07d88a547a5ebb78c8ac46"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-dice_sustained-base.json": {
+      "before_sha256": null,
+      "after_sha256": "23968b6af6450b7b85a96fd3f9b5ceb15cf9f09d9c57de7fb575bf695267ec6b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "23968b6af6450b7b85a96fd3f9b5ceb15cf9f09d9c57de7fb575bf695267ec6b"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-dice_sustained-head.json": {
+      "before_sha256": null,
+      "after_sha256": "88fc08be5f70d660b4f6696d31e38090ca25154d6e30b69e56c36ced849481d2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "88fc08be5f70d660b4f6696d31e38090ca25154d6e30b69e56c36ced849481d2"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-external_contract_source_reuse-base.json": {
+      "before_sha256": null,
+      "after_sha256": "1246fa2cca6ff35fd37c1f55daf9fadf09cf5dc0b29de94869dd9a850590d757",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1246fa2cca6ff35fd37c1f55daf9fadf09cf5dc0b29de94869dd9a850590d757"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-external_contract_source_reuse-head.json": {
+      "before_sha256": null,
+      "after_sha256": "175b30286ec380a54f138eceb8e407c8bc6975b560861c4ea5c80604dd070525",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "175b30286ec380a54f138eceb8e407c8bc6975b560861c4ea5c80604dd070525"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-fight-base.json": {
+      "before_sha256": null,
+      "after_sha256": "94eb923c6f0b992845a401eababafdef8dc43ae40ac4def485ea630d916c0fc3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "94eb923c6f0b992845a401eababafdef8dc43ae40ac4def485ea630d916c0fc3"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-fight-head.json": {
+      "before_sha256": null,
+      "after_sha256": "ec00806e3abccd16857b9d422d12db2dcef469791c8b1dc5f3eb354885328a67",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ec00806e3abccd16857b9d422d12db2dcef469791c8b1dc5f3eb354885328a67"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-movement-base.json": {
+      "before_sha256": null,
+      "after_sha256": "aaba3c2993578ce72e50457dcb79a4a58f34a336d6b3d6d03fb5aa02c3ab96ca",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "aaba3c2993578ce72e50457dcb79a4a58f34a336d6b3d6d03fb5aa02c3ab96ca"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-movement-head.json": {
+      "before_sha256": null,
+      "after_sha256": "575783290a74b3f9407bc26aee8b18a63c5647134f796b51cca4d8e3aa9195cd",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "575783290a74b3f9407bc26aee8b18a63c5647134f796b51cca4d8e3aa9195cd"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-reconstruction-base.json": {
+      "before_sha256": null,
+      "after_sha256": "56d6a1f20e596cd2287e9c3874d12ffa6c257114890bf9c6d893ae104b9d0f1f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "56d6a1f20e596cd2287e9c3874d12ffa6c257114890bf9c6d893ae104b9d0f1f"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-reconstruction-head.json": {
+      "before_sha256": null,
+      "after_sha256": "753d9891307d3a29fbe82eee32618ebe6c14eef54a2df2e2acd012484ea7f3fb",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "753d9891307d3a29fbe82eee32618ebe6c14eef54a2df2e2acd012484ea7f3fb"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-setup-base.json": {
+      "before_sha256": null,
+      "after_sha256": "907256c436f96dcbb5faa895071a721c4c60465f97f4f000526488e2aa727d46",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "907256c436f96dcbb5faa895071a721c4c60465f97f4f000526488e2aa727d46"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-setup-head.json": {
+      "before_sha256": null,
+      "after_sha256": "7ae5d88d89f1ef98b3d1117723197cdff8dd13b186f77ebda7a6ad388e51757c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "7ae5d88d89f1ef98b3d1117723197cdff8dd13b186f77ebda7a6ad388e51757c"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-shock_reconstruction-base.json": {
+      "before_sha256": null,
+      "after_sha256": "467812b1a69fd241e25e516aa220eb9a7098acd409b5edcb2c3706eb7b8806df",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "467812b1a69fd241e25e516aa220eb9a7098acd409b5edcb2c3706eb7b8806df"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-shock_reconstruction-head.json": {
+      "before_sha256": null,
+      "after_sha256": "dd528f58debf138df0934f004e120672d18386ae94cd6afa5a6b12eae405c1ce",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "dd528f58debf138df0934f004e120672d18386ae94cd6afa5a6b12eae405c1ce"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-strength-base.json": {
+      "before_sha256": null,
+      "after_sha256": "a22418ebec8aeb8e6c34bba39c712f14737179bb26d4d114c2852f898c9201fe",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a22418ebec8aeb8e6c34bba39c712f14737179bb26d4d114c2852f898c9201fe"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-strength-head.json": {
+      "before_sha256": null,
+      "after_sha256": "b9d5241eca7ef97d80c53d2483ee0922a171750230e69b1e9dbc31971ca9b09d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b9d5241eca7ef97d80c53d2483ee0922a171750230e69b1e9dbc31971ca9b09d"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-visibility-base.json": {
+      "before_sha256": null,
+      "after_sha256": "2a661848c28e4f2b9fb3eb2a66d70e1d39d47206e8e65cdc14c0ed42325f5b88",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2a661848c28e4f2b9fb3eb2a66d70e1d39d47206e8e65cdc14c0ed42325f5b88"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/raw-visibility-head.json": {
+      "before_sha256": null,
+      "after_sha256": "96197a0975980b0bbe68f231f2918cebed2a2132f58a5b5e78a5ee4943f97ed2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "96197a0975980b0bbe68f231f2918cebed2a2132f58a5b5e78a5ee4943f97ed2"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-dice-base.json": {
+      "before_sha256": null,
+      "after_sha256": "b550c2f4c3b4788ba36a03db014a94e1530cca0640c19f9d2a8ce221da44c400",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b550c2f4c3b4788ba36a03db014a94e1530cca0640c19f9d2a8ce221da44c400"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-dice-head.json": {
+      "before_sha256": null,
+      "after_sha256": "b1527da3be35700476591a740706cd2ce55b94a66415ae8a9daf1f923c1181ae",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b1527da3be35700476591a740706cd2ce55b94a66415ae8a9daf1f923c1181ae"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-dice_sustained-base.json": {
+      "before_sha256": null,
+      "after_sha256": "8444ab7a86ab244de3a65c099cbf56359354cb82e067a3008bfb27c72a32c956",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8444ab7a86ab244de3a65c099cbf56359354cb82e067a3008bfb27c72a32c956"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-dice_sustained-head.json": {
+      "before_sha256": null,
+      "after_sha256": "415b99fcec21b7e8797f54c1d9dae6e46dfde7e5b9a18d4bc30941503d94c0fe",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "415b99fcec21b7e8797f54c1d9dae6e46dfde7e5b9a18d4bc30941503d94c0fe"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-external_contract_source_reuse-base.json": {
+      "before_sha256": null,
+      "after_sha256": "a25e10e6746dbfef97640a3471ad7e11ee3ca672028d8db7c2fdf0945d266982",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a25e10e6746dbfef97640a3471ad7e11ee3ca672028d8db7c2fdf0945d266982"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-external_contract_source_reuse-head.json": {
+      "before_sha256": null,
+      "after_sha256": "9d81d7b0c24e3b85ea242f5004d1a533ac767300164e8dc3f0c6e7c02fdc3fdd",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9d81d7b0c24e3b85ea242f5004d1a533ac767300164e8dc3f0c6e7c02fdc3fdd"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-fight-base.json": {
+      "before_sha256": null,
+      "after_sha256": "77805db7274446da132721fbdfbb0777b42a86183ef607dd6644c5cf75c2c690",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "77805db7274446da132721fbdfbb0777b42a86183ef607dd6644c5cf75c2c690"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-fight-head.json": {
+      "before_sha256": null,
+      "after_sha256": "c677fe9e915db7d749347500ef9d8e52f200ef992161e9ae5e4fbc3ea8b1a4a4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c677fe9e915db7d749347500ef9d8e52f200ef992161e9ae5e4fbc3ea8b1a4a4"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-movement-base.json": {
+      "before_sha256": null,
+      "after_sha256": "c378f80d7493c7d43f6ed0fe2049df6d54d02efb8ec1b6b359c7a3bb06e14c45",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c378f80d7493c7d43f6ed0fe2049df6d54d02efb8ec1b6b359c7a3bb06e14c45"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-movement-head.json": {
+      "before_sha256": null,
+      "after_sha256": "662088a3494468ab0c233bad6f6e7b80f1b870fc9457086fd00d152e8bc011e8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "662088a3494468ab0c233bad6f6e7b80f1b870fc9457086fd00d152e8bc011e8"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-reconstruction-base.json": {
+      "before_sha256": null,
+      "after_sha256": "2858fffe74f44a4d78ce0eccf3499d7e78eb3115f4e6e11a624d239292af31de",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2858fffe74f44a4d78ce0eccf3499d7e78eb3115f4e6e11a624d239292af31de"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-reconstruction-head.json": {
+      "before_sha256": null,
+      "after_sha256": "6c442f838fa1ff2b9f24555a600a7c6e03464e3f20a47e032e6ef44b209e28d2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6c442f838fa1ff2b9f24555a600a7c6e03464e3f20a47e032e6ef44b209e28d2"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-setup-base.json": {
+      "before_sha256": null,
+      "after_sha256": "afd18d81a8192dca0d893d51f4de4a7755024aaddbe0867b4d78eb120ee486b0",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "afd18d81a8192dca0d893d51f4de4a7755024aaddbe0867b4d78eb120ee486b0"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-setup-head.json": {
+      "before_sha256": null,
+      "after_sha256": "40c1131bbc793720e86e5c16d1a828d88da5244330a4602009847f0494fca4b7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "40c1131bbc793720e86e5c16d1a828d88da5244330a4602009847f0494fca4b7"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-shock_reconstruction-base.json": {
+      "before_sha256": null,
+      "after_sha256": "624a348776303b5ac2eb216528444071b60cc3485bc33cabe1e73dcf5484176c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "624a348776303b5ac2eb216528444071b60cc3485bc33cabe1e73dcf5484176c"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-shock_reconstruction-head.json": {
+      "before_sha256": null,
+      "after_sha256": "846bfdca972a02f1db3bb6580ffe85559436a793c7c5f0cb6d85573d852f9341",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "846bfdca972a02f1db3bb6580ffe85559436a793c7c5f0cb6d85573d852f9341"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-strength-base.json": {
+      "before_sha256": null,
+      "after_sha256": "9a421f4e7020e047f720634e7c30fe5b03bad4521c0cd322093326bd33bb36fc",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9a421f4e7020e047f720634e7c30fe5b03bad4521c0cd322093326bd33bb36fc"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-strength-head.json": {
+      "before_sha256": null,
+      "after_sha256": "9ba8ef2db2fefdbd21df9fb36b8e5fc7e01f33c7123c4f5bec7ae0fff89e30be",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9ba8ef2db2fefdbd21df9fb36b8e5fc7e01f33c7123c4f5bec7ae0fff89e30be"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-visibility-base.json": {
+      "before_sha256": null,
+      "after_sha256": "57c1141b62720f0e0ee849cbc020e96974f6f91a7a19ed89ec2cc762df0ced5d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "57c1141b62720f0e0ee849cbc020e96974f6f91a7a19ed89ec2cc762df0ced5d"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-visibility-head.json": {
+      "before_sha256": null,
+      "after_sha256": "1cd6b53f0e1d8ed7e91ba8bea0d563b8a6306a4e2ca897cc1128ad3c634bb7f0",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1cd6b53f0e1d8ed7e91ba8bea0d563b8a6306a4e2ca897cc1128ad3c634bb7f0"
+        }
+      }
+    },
     "data/source_audits/ci60_qualification_v1/retained-role-proofs.json": {
       "before_sha256": null,
       "after_sha256": "10013198ea1eaaa939f1d06fcd59a664d8c8c88d263c3df0045a4caaa66376b6",
@@ -631,6 +1041,26 @@
         "@document": {
           "before": null,
           "after": "10013198ea1eaaa939f1d06fcd59a664d8c8c88d263c3df0045a4caaa66376b6"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/tool-input-inventories.json": {
+      "before_sha256": null,
+      "after_sha256": "13380b8acf8c1f2b8c7701426ac77ae16f9a1a3b8c9441952c1a057b2cb3586a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "13380b8acf8c1f2b8c7701426ac77ae16f9a1a3b8c9441952c1a057b2cb3586a"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/tool-input-roles.json": {
+      "before_sha256": null,
+      "after_sha256": "3475207a50fb3e639555195063b4677d3fb8c6fb27a09694554a017280adcec2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3475207a50fb3e639555195063b4677d3fb8c6fb27a09694554a017280adcec2"
         }
       }
     },
@@ -2831,6 +3261,106 @@
         "@document": {
           "before": null,
           "after": "b5ce1cda52ac28878942943c16f8e0db3f793560ae1c0c3d9b5af68231c3849d"
+        }
+      }
+    },
+    "docs/performance/current/ci60-dice.json": {
+      "before_sha256": null,
+      "after_sha256": "6d8fd010383901ec4a853daac45aab84a79e4ee244b7057ffffc57696ec15e8e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6d8fd010383901ec4a853daac45aab84a79e4ee244b7057ffffc57696ec15e8e"
+        }
+      }
+    },
+    "docs/performance/current/ci60-dice_sustained.json": {
+      "before_sha256": null,
+      "after_sha256": "a8bbdac5f0c49da74c6189d4440d896c326f4b30ae0fc82c8c3d7394a198ec95",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a8bbdac5f0c49da74c6189d4440d896c326f4b30ae0fc82c8c3d7394a198ec95"
+        }
+      }
+    },
+    "docs/performance/current/ci60-external_contract_source_reuse.json": {
+      "before_sha256": null,
+      "after_sha256": "71ed8f56225c81b161673685fa3010215601c6ad72bfa8b4552f7389d88a4c5b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "71ed8f56225c81b161673685fa3010215601c6ad72bfa8b4552f7389d88a4c5b"
+        }
+      }
+    },
+    "docs/performance/current/ci60-fight.json": {
+      "before_sha256": null,
+      "after_sha256": "70a746c1edffe86747ba18a69d750e6998d2367628d0abdfe56e96c44bfbcb37",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "70a746c1edffe86747ba18a69d750e6998d2367628d0abdfe56e96c44bfbcb37"
+        }
+      }
+    },
+    "docs/performance/current/ci60-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "3289f042642874383d108910e126989b17f54aac6e77466e9bf83ec175df5ef1",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3289f042642874383d108910e126989b17f54aac6e77466e9bf83ec175df5ef1"
+        }
+      }
+    },
+    "docs/performance/current/ci60-reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "4aaa1f15793a1240b40a627b0e7f56f4b58498be8c4b6a08f369602327ce4344",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4aaa1f15793a1240b40a627b0e7f56f4b58498be8c4b6a08f369602327ce4344"
+        }
+      }
+    },
+    "docs/performance/current/ci60-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "20e5fe0386d04a57b9929dfb9e1d6ae08972bf7016ec28e715194638100aad65",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "20e5fe0386d04a57b9929dfb9e1d6ae08972bf7016ec28e715194638100aad65"
+        }
+      }
+    },
+    "docs/performance/current/ci60-shock_reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "e511bf0c7c52de4e37d3d1ce35fa15bb93dc9e425e76200ea5c5a5c0af5e3ba8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e511bf0c7c52de4e37d3d1ce35fa15bb93dc9e425e76200ea5c5a5c0af5e3ba8"
+        }
+      }
+    },
+    "docs/performance/current/ci60-strength.json": {
+      "before_sha256": null,
+      "after_sha256": "2ff96033f8859142838b8d131b89a01362cf5347f764085d54bb94b89d9e8b2f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2ff96033f8859142838b8d131b89a01362cf5347f764085d54bb94b89d9e8b2f"
+        }
+      }
+    },
+    "docs/performance/current/ci60-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "5253a0edab3afde964ae9257a3decfbee7a4199e05c2d6140acd09046e32309c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5253a0edab3afde964ae9257a3decfbee7a4199e05c2d6140acd09046e32309c"
         }
       }
     },
@@ -21355,6 +21885,16 @@
       "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
       "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
+    "data/source_audits/ci60_qualification_v1/measurement-provenance.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-943028994a2dd48a3c2b3cb788a5ec2d5e996c9d9e58f4be7c30263ceef1a52e"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
     "data/source_audits/ci60_qualification_v1/producing-inputs.json": {
       "category": "measured_workload",
       "operations": [
@@ -21365,10 +21905,510 @@
       "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
       "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
+    "data/source_audits/ci60_qualification_v1/raw-dice-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-058b1405fea8b7a9c33d94755ec8af8e3fb59ccf0ee4853fd487433656ad91c8"
+      ],
+      "selected_families": [
+        "dice"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-dice-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-d81c4a3620f44ed8866a4e62c40791bb04b5f2d56d162970a26132fb4c65e5c4"
+      ],
+      "selected_families": [
+        "dice"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-dice_sustained-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-5ace4d70e7750d0c6d82f7c2f5a64f1801667672e633bb83105c0c3aa9730b02"
+      ],
+      "selected_families": [
+        "dice_sustained"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-dice_sustained-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-e8001c425c2486fb2ade04be916c930d9738e5a9322100141bc14af62f42aca9"
+      ],
+      "selected_families": [
+        "dice_sustained"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-external_contract_source_reuse-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-82be9b9fb6638396d78a99ae491e58ce7fa37b666c3aad00c69ab439042fa3db"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-external_contract_source_reuse-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-f31e4f5787ea6cb7e1d177f921168b5642612c3f7c66ec3030489565651134a9"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-fight-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-a90a5925b79a6f5b0f51394a42e8d0ed90cdea0d487a46a641bc09ea9797d982"
+      ],
+      "selected_families": [
+        "fight"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-fight-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-a83fca7a74d26eacc846be4e5b725cb54d1f7b7a0867b53857c8ce6121835c45"
+      ],
+      "selected_families": [
+        "fight"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-movement-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-dd741638e9abe42170a45f541597b4f553fbee1fa0f16c1225a4bb1114626526"
+      ],
+      "selected_families": [
+        "movement"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-movement-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-4b91bef3dd11324bfe5ffd7b4d8797ee67e33bc9ee146538dbd46df8f789c79b"
+      ],
+      "selected_families": [
+        "movement"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-reconstruction-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-6517a9ae3f9b6d13ef7c3721bc9d1871b5bba64f367fe64dae2a36c13be17351"
+      ],
+      "selected_families": [
+        "reconstruction"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-reconstruction-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-9d89ee7be8019f2bb0b903ed7f1f9236fe2287cb3362fbc043b611d6f22874ec"
+      ],
+      "selected_families": [
+        "reconstruction"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-setup-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-88cc126e2835a38d27781459c074455479fc476619d672f91030f14688d9c308"
+      ],
+      "selected_families": [
+        "setup"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-setup-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-ab72b6a9a4eca46daf5d776d4562dc14b38ba9be3c1fb51879aa64e92e79ee63"
+      ],
+      "selected_families": [
+        "setup"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-shock_reconstruction-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-178fc73b8b98d30a8e7177c2b352cf36919b43e1d860789624411f89734c0836"
+      ],
+      "selected_families": [
+        "shock_reconstruction"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-shock_reconstruction-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-e4a03657a8dd730b0ee79c2182527a5a6a54192e8ff5734e7fe3d5b18a111de3"
+      ],
+      "selected_families": [
+        "shock_reconstruction"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-strength-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-a16141ec33df3a1c375c84d2bc4521d18fa8e10f73a3c04dbe1853c13cd4b529"
+      ],
+      "selected_families": [
+        "strength"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-strength-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-b06b1d40e25f34ca3749d8ad4c786a3c656377b03edced052f79ff9ce5dd1f7a"
+      ],
+      "selected_families": [
+        "strength"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-visibility-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-ad2f1d13fd80ae21f2ef17505f95c6413e0a8198154bc32ec1a23e35b8130531"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/raw-visibility-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-4d115d4df2089deae0123db34802a92f543a959e9b910f0077314aba70513e4f"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-dice-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-d112dc95b82339e747fe8ddfed19d097f68da32bcf87deea372f73b2776291f8"
+      ],
+      "selected_families": [
+        "dice"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-dice-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-dd64f5e8b646160f1e00aa5df56970fedf3be1f61512984cf4de2c34def300b9"
+      ],
+      "selected_families": [
+        "dice"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-dice_sustained-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-f968b34a747fc499904c057611f52580fc99e0e2964b3c51e9f09117716d848d"
+      ],
+      "selected_families": [
+        "dice_sustained"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-dice_sustained-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-357863c2eceeaed034fb9f6cb6415cc577211e87c1563f28516ffb8b9aaa9e18"
+      ],
+      "selected_families": [
+        "dice_sustained"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-external_contract_source_reuse-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-501db7f20fa380760372465b291283bc75bdc24dbbed33cd5118c118568fc6bb"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-external_contract_source_reuse-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-6d1fa1bac8bd668481bf6bacf842ec4b381812f5025d4c89ec64c082f501424f"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-fight-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-dd29c065baad5f466d0c7866d4ae37056a96d564b50ae0a7898ff1cb4d990f97"
+      ],
+      "selected_families": [
+        "fight"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-fight-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-b65e27219e81cafa05166a6d51edbdb912bc4f8c085884f7b6234e423dbb6d0e"
+      ],
+      "selected_families": [
+        "fight"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-movement-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-795a11e839bf565e0be430a1da18713bcf1c689be6d26d0c66680843de9f35d6"
+      ],
+      "selected_families": [
+        "movement"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-movement-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-5f7ab7b75524d82178cad4d49371248441f1aeead9df2afea519402f6a4baff0"
+      ],
+      "selected_families": [
+        "movement"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-reconstruction-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-d4a6b44f654fcf026b8d8440708ceff0b74d97ee36f917380e95cd32b97d6597"
+      ],
+      "selected_families": [
+        "reconstruction"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-reconstruction-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-5908d1205b179a672d98e711af7af692808f984df2790c39f9d6ea77a61ed6b7"
+      ],
+      "selected_families": [
+        "reconstruction"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-setup-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-55763ea6b38210bbba26025036e72c0bb7da0d251053308d6dd09b235b7547f3"
+      ],
+      "selected_families": [
+        "setup"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-setup-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-7916efacce1fb193a98cc8286840ad27a1cab2a6f1df8cb999bce9a69d0fecd1"
+      ],
+      "selected_families": [
+        "setup"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-shock_reconstruction-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-02096177e05cd8bf855260725e748c391846ccaa75afb49c80188eb19d6d7494"
+      ],
+      "selected_families": [
+        "shock_reconstruction"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-shock_reconstruction-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-f26e994cb5359bd678c83f9ee7c60f6074c1f23b05f890615adc20681b25dc09"
+      ],
+      "selected_families": [
+        "shock_reconstruction"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-strength-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-6e58b0e0ee8ee14282dc35dbe317f742969d2846964304f957871a131fb87f3b"
+      ],
+      "selected_families": [
+        "strength"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-strength-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-7ade2951a040e3c729756876b23d600bb352d66677b69552fb3a5ab22233a4f2"
+      ],
+      "selected_families": [
+        "strength"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-visibility-base.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-f09af572048fdfbb5a1f5cda4e5cbb606f323ed97a259d08344c7e1f0f393aca"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/receipt-visibility-head.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-7a2a0d1d6660763b17966744ee3f16586c71f92c2ea16353d92856fdafac1fa2"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
     "data/source_audits/ci60_qualification_v1/retained-role-proofs.json": {
       "category": "measured_workload",
       "operations": [
         "ci60-evidence-768734f6eeb67dda37fda2f5100da74b694575941e899ae4587bc50f4d6485fd"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/tool-input-inventories.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-ac4bc970a6a92da1731f89667ced7fb96e4b6c7a06e4f5fd2a9c754d99c5b476"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/tool-input-roles.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-1ac5330d04effcc2ad1aa1ecd174326a903c0424a6a15373c82a70afe63b7bca"
       ],
       "selected_families": [],
       "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
@@ -23500,6 +24540,86 @@
       "rationale": "Repair the authentic CI49C whole-command budget failure by replacing only the cumulative expected-source loop's 83 individual immutable Git blob reads with one freshly authenticated batch. The public typed reader delegates to the existing unchanged hardened parser. Registry membership/order, eager hashing of all members, current control overrides and every downstream source check remain intact; no Git or filesystem success is cached.",
       "source_obligation": "The separate CI49D record admits exactly the immutable 599161cc cumulative preimage and two literal edits. Full current freeze, physical live bytes, membership and ancestry authenticate this transition before its exact historical comparison feeds unchanged prior records. STATIC48, CI49, CI49B and CI49C records, all prior assertions/delegates, operation map and roadmap remain byte-exact. Five new guards cover real original/new function member and override equivalence, actual fresh Git-object tamper, exact transition, repinned override removal, and malformed duplicate selection; existing hardened parser guards remain unchanged. All 83 blobs are read and hashed even where live control hashes override them.",
       "unchanged_work": "No engine, runtime build identity, gameplay function, fixture seed, measured workload, CI selection, operation/family/case/sample counts, 512 MiB digest retention cap, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The selected 3796-file historical inventory retains the prior 3795 raw-exact files and the single previously admitted Command-end export delta. The 83 immutable members total 15,619,849 bytes (maximum 1,879,442); batching adds bounded transient payload/slice retention without a success cache. The prior 188.799-second CI49C result remains a failed whole-budget receipt; paired transport measurements are diagnostic only. Fresh exact-source performance, full quality, static checks, integrity controls and independent review remain required; no prior timing, behavioral aggregate, coverage or hosted acceptance is transferred."
+    },
+    "docs/performance/current/ci60-dice.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/performance/current/ci60-dice_sustained.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/performance/current/ci60-external_contract_source_reuse.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/performance/current/ci60-fight.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/performance/current/ci60-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/performance/current/ci60-reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/performance/current/ci60-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/performance/current/ci60-shock_reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/performance/current/ci60-strength.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/performance/current/ci60-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
     "docs/performance/current/qualification40-dice.json": {
       "category": "governance",
