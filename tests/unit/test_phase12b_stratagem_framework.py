@@ -5,7 +5,10 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
-from tests.setup_completion_helpers import enter_battle_for_fixture
+from tests.setup_completion_helpers import (
+    enter_battle_for_fixture,
+    place_attached_components_coherently_for_fixture,
+)
 
 from warhammer40k_core.adapters.projection import project_game_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -2135,6 +2138,7 @@ def _battle_state(
         armies=armies,
     )
     state.record_battlefield_state(scenario.battlefield_state)
+    place_attached_components_coherently_for_fixture(state)
     enter_battle_for_fixture(state, decisions=decisions)
     assert state.stage is GameLifecycleStage.BATTLE
     return state

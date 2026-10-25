@@ -148,7 +148,7 @@
       "wounds_remaining": 2
     },
     "projection_schema": "game-view-v13-random-profiles",
-    "projection_state_hash": "f301a15ce8f62c8e332ca2cd19b16d3696756b86e24e95b5fc8a149d31e25503",
+    "projection_state_hash": "d4e9efef86776af89aeb6514b2cc51786b808b42663e73133eef75109ccf32ee",
     "rules_catalog": {
       "catalog_id": "phase9a-canonical",
       "projection_schema": "rules-catalog-view-v2",

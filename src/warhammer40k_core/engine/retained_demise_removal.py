@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.model_destruction_cause_authority import (
         ModelDestructionCauseAuthority,
     )
+    from warhammer40k_core.engine.retained_destruction_state import RetainedModelDestruction
 
 FAQ20_SOURCE_ID = "faq:ab92e97b-be2b-4125-9ded-fcfa6abe092e"
 
@@ -189,3 +190,69 @@ def finalize_attack_casualty(
     if emission is None:
         raise GameLifecycleError("Destroyed attack casualty did not emit its authority.")
     return emission
+
+
+def is_post_removal_deadly_demise_child(
+    *,
+    state: GameState,
+    parent: ModelDestructionCauseAuthority,
+    child: ModelDestructionCauseAuthority,
+    event_records: tuple[EventRecord, ...],
+    retained_history: tuple[RetainedModelDestruction, ...],
+) -> bool:
+    """Authenticate FAQ20's causal descendant, independent of parent cleanup."""
+    from warhammer40k_core.engine import model_destruction_cause_payload_validation as _mdcpv
+    from warhammer40k_core.engine.model_destruction_cause_authority import ModelDestructionCauseKind
+    from warhammer40k_core.engine.model_destruction_cause_completion_restore import (
+        attack_deadly_demise_parent_and_application,
+    )
+
+    removed = parent.model_destroyed_event
+    if (
+        removed is None
+        or child.cause_kind is not ModelDestructionCauseKind.ATTACK_DAMAGE
+        or not any(
+            record.cause_id == parent.cause_id
+            and record.model_instance_id == parent.model_instance_id
+            and record.selected_action is RetainedAttackAction.FIGHT
+            and record.stage is RetainedDestructionStage.REMOVED
+            for record in retained_history
+        )
+    ):
+        return False
+    authenticated_parent, parent_damage, applied = attack_deadly_demise_parent_and_application(
+        state=state,
+        authority=child,
+        damage_payload=child.producer_context.get("damage_application"),
+        event_records=event_records,
+        require_parent_finalized=True,
+    )
+    if authenticated_parent != parent:
+        raise GameLifecycleError("Post-removal Deadly Demise parent identity drift.")
+    applied_payload = _mdcpv.json_object_value(applied.payload, "post-removal Deadly Demise")
+    started = tuple(
+        event
+        for event in event_records
+        if event.event_type == "mortal_wound_application_started"
+        and isinstance(event.payload, dict)
+        and isinstance(context := event.payload.get("source_context"), dict)
+        and context.get("source_kind") == "deadly_demise"
+        and context.get("sequence_id") == child.producer_context.get("sequence_id")
+        and isinstance(attack_context := context.get("attack_context"), dict)
+        and attack_context.get("attack_context_id")
+        == child.producer_context.get("attack_context_id")
+        and context.get("damage_application") == parent_damage.to_payload()
+        and context.get("source") == applied_payload.get("source")
+        and event.payload.get("target_unit_instance_id")
+        == applied_payload.get("target_unit_instance_id")
+    )
+    if len(started) != 1:
+        raise GameLifecycleError("Post-removal Deadly Demise lacks one application start.")
+    if not (
+        _mdcpv.event_index(event_records, removed)
+        < _mdcpv.event_index(event_records, started[0])
+        < _mdcpv.event_index(event_records, child.logical_death_event)
+        < _mdcpv.event_index(event_records, applied)
+    ):
+        raise GameLifecycleError("Post-removal Deadly Demise causal chronology drift.")
+    return True

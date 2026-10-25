@@ -58,11 +58,15 @@ def validate_pending_model_destruction_cause_inventory(
         is_mortal_wound_resolution_request,
         mortal_wound_resolution_source_context,
     )
+    from warhammer40k_core.engine.retained_demise_removal import is_post_removal_deadly_demise_child
     from warhammer40k_core.engine.retained_destruction_history import (
         retained_attack_sequence_for_cause,
         validate_retained_destruction_history,
     )
-    from warhammer40k_core.engine.retained_destruction_state import RetainedDestructionStage
+    from warhammer40k_core.engine.retained_destruction_state import (
+        RetainedDestructionStage,
+        retained_destructions,
+    )
     from warhammer40k_core.engine.rule_deadly_demise_mortal_wound_routing import (
         RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND,
     )
@@ -71,12 +75,15 @@ def validate_pending_model_destruction_cause_inventory(
         rules_unit_view_by_id,
     )
 
-    retained = validate_retained_destruction_history(
+    retained_history = validate_retained_destruction_history(
         state=state,
         event_records=event_records,
         decision_records=decision_records,
         pending_decision_requests=pending_decision_requests,
+        include_completed=True,
     )
+    current_cause_ids = {record.cause_id for record in retained_destructions(state=state)}
+    retained = tuple(record for record in retained_history if record.cause_id in current_cause_ids)
     active_attack_sequence = active_attack_sequence_for_state(state)
     expected_cause_ids: set[str] = {
         record.cause_id
@@ -108,6 +115,28 @@ def validate_pending_model_destruction_cause_inventory(
             if authority is None:
                 raise GameLifecycleError("Pending attack destruction cause is missing.")
             if authority.source_authority_finalized:
+                offered_children = tuple(
+                    child
+                    for child in state.model_destruction_cause_authorities
+                    if child.parent_cause_ids == (cause_id,)
+                    and any(
+                        record.cause_id == child.cause_id
+                        and record.stage is RetainedDestructionStage.OFFERED
+                        and any(
+                            request.request_id == record.request_id
+                            for request in pending_decision_requests
+                        )
+                        for record in retained
+                    )
+                )
+                if len(offered_children) == 1 and is_post_removal_deadly_demise_child(
+                    state=state,
+                    parent=authority,
+                    child=offered_children[0],
+                    event_records=event_records,
+                    retained_history=retained_history,
+                ):
+                    continue
                 mortal_requests = tuple(
                     request
                     for request in pending_decision_requests
@@ -272,6 +301,17 @@ def validate_pending_model_destruction_cause_inventory(
             raise GameLifecycleError("Destruction continuation lacks its pending cause authority.")
         for parent_id in authority.parent_cause_ids:
             if parent_id not in pending_by_id:
+                parent = model_destruction_cause_authority_by_id_or_none(
+                    state=state, cause_id=parent_id
+                )
+                if parent is not None and is_post_removal_deadly_demise_child(
+                    state=state,
+                    parent=parent,
+                    child=authority,
+                    event_records=event_records,
+                    retained_history=retained_history,
+                ):
+                    continue
                 raise GameLifecycleError("Pending destruction cause has a finalized parent.")
             if parent_id not in pending_ancestor_ids:
                 pending_ancestor_ids.add(parent_id)
@@ -805,7 +845,7 @@ def _validate_attack_deadly_demise_collateral_finalization(
         "attack Deadly Demise collateral destruction",
     )
     damage = _mdcpv.parse_damage_application(authority.producer_context.get("damage_application"))
-    parent, parent_damage, applied_event = _attack_deadly_demise_parent_and_application(
+    parent, parent_damage, applied_event = attack_deadly_demise_parent_and_application(
         state=state,
         authority=authority,
         damage_payload=validate_json_value(damage.to_payload()),
@@ -962,7 +1002,7 @@ def _validate_pending_attack_deadly_demise_collateral_continuation(
         "pending attack Deadly Demise collateral destruction",
     )
     damage = _mdcpv.parse_damage_application(authority.producer_context.get("damage_application"))
-    _parent, parent_damage, applied_event = _attack_deadly_demise_parent_and_application(
+    _parent, parent_damage, applied_event = attack_deadly_demise_parent_and_application(
         state=state,
         authority=authority,
         damage_payload=validate_json_value(damage.to_payload()),
@@ -1086,7 +1126,7 @@ def _validate_pending_attack_deadly_demise_collateral_continuation(
         )
 
 
-def _attack_deadly_demise_parent_and_application(
+def attack_deadly_demise_parent_and_application(
     *,
     state: GameState,
     authority: ModelDestructionCauseAuthority,

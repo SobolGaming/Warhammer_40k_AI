@@ -41,6 +41,7 @@ def validate_retained_destruction_history(
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
+    include_completed: bool = False,
 ) -> tuple[RetainedModelDestruction, ...]:
     if any(
         isinstance(effect.effect_payload, dict)
@@ -55,6 +56,7 @@ def validate_retained_destruction_history(
             "Obsolete Fight On Death removal-and-restoration authority is unsupported."
         )
     records: dict[str, RetainedModelDestruction] = {}
+    completed: list[RetainedModelDestruction] = []
     opened: set[str] = set()
     decisions_by_result = {record.result.result_id: record for record in decision_records}
     causes = {cause.cause_id: cause for cause in state.model_destruction_cause_authorities}
@@ -377,6 +379,7 @@ def validate_retained_destruction_history(
                 }
             ):
                 raise GameLifecycleError("Fight On Death completion history drift.")
+            completed.append(record)
             del records[record.cause_id]
     current = retained_destructions(state=state)
     if {record.cause_id for record in current} != set(records):
@@ -459,7 +462,7 @@ def validate_retained_destruction_history(
             )
         ),
     )
-    return current
+    return (*current, *completed) if include_completed else current
 
 
 def retained_attack_sequence_for_cause(

@@ -30,8 +30,11 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
     DestructionReactionSource,
 )
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, validate_json_value
 from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.model_destruction_cause_authority import (
+    validate_model_destruction_cause_authority_restore,
+)
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
 from warhammer40k_core.engine.phases.shooting_targeting import _target_visible_to_friendly_unit
@@ -564,6 +567,7 @@ def test_order_30_collateral_retention_preserves_parent_cleanup_and_restores(
     accept_child: bool,
 ) -> None:
     session, model_id = pending_retained_attack(deadly_demise=True, collateral_retention=True)
+    initial = session.lifecycle.to_payload()
     request = pending_request(session)
     session.submit_option(
         request_id=request.request_id,
@@ -579,6 +583,61 @@ def test_order_30_collateral_retention_preserves_parent_cleanup_and_restores(
         submit_fixture_request(session, request)
     else:
         raise AssertionError("Collateral retention decision was not offered.")
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    parent = next(
+        cause
+        for cause in state.model_destruction_cause_authorities
+        if cause.model_instance_id == model_id
+    )
+    child = next(
+        cause
+        for cause in state.model_destruction_cause_authorities
+        if cause.parent_cause_ids == (parent.cause_id,)
+    )
+    assert parent.model_destroyed_event is not None
+    assert child.model_destroyed_event is None
+    assert model_id in state.battlefield_state.removed_model_ids
+    child_placement = state.battlefield_state.model_placement_by_id(child.model_instance_id)
+    events = session.lifecycle.decision_controller.event_log.records
+    parent_index = events.index(parent.model_destroyed_event)
+    child_index = events.index(child.logical_death_event)
+    applied_index = next(
+        index
+        for index, event in enumerate(events)
+        if event.event_type == "deadly_demise_mortal_wounds_applied"
+    )
+    assert parent_index < child_index < applied_index
+
+    # The exemption requires the actual emitted application and after-removal
+    # chronology; ordinary causal-order controls remain in Phase15D.
+    for corrupt_events in (
+        tuple(event for index, event in enumerate(events) if index != applied_index),
+        (
+            *events[:parent_index],
+            events[applied_index],
+            *events[parent_index:applied_index],
+            *events[applied_index + 1 :],
+        ),
+        tuple(
+            EventRecord(
+                event_id=event.event_id,
+                event_type=event.event_type,
+                payload={**event.payload, "source_rule_id": "unrelated-source"},
+            )
+            if index == applied_index and isinstance(event.payload, dict)
+            else event
+            for index, event in enumerate(events)
+        ),
+    ):
+        with pytest.raises(GameLifecycleError, match="Deadly Demise"):
+            validate_model_destruction_cause_authority_restore(
+                state=state,
+                event_records=corrupt_events,
+                decision_records=session.lifecycle.decision_controller.records,
+                pending_decision_requests=session.lifecycle.decision_controller.queue.pending_requests,
+            )
     restored = GameLifecycle.from_payload(session.lifecycle.to_payload())
     assert restored.to_payload() == session.lifecycle.to_payload()
     session = LocalGameSession(lifecycle=restored)
@@ -595,7 +654,10 @@ def test_order_30_collateral_retention_preserves_parent_cleanup_and_restores(
         assert state.battlefield_state is not None
         restored = GameLifecycle.from_payload(session.lifecycle.to_payload())
         assert restored.to_payload() == session.lifecycle.to_payload()
-        if model_id in state.battlefield_state.removed_model_ids:
+        if (
+            model_id in state.battlefield_state.removed_model_ids
+            and child.model_instance_id in state.battlefield_state.removed_model_ids
+        ):
             break
         submit_fixture_request(session, pending_request(session))
     state = session.lifecycle.state
@@ -608,6 +670,50 @@ def test_order_30_collateral_retention_preserves_parent_cleanup_and_restores(
         if event.event_type == "fight_on_death_destruction_completed"
     )
     assert len(completions) == (2 if accept_child else 1)
+    assert child.model_instance_id in state.battlefield_state.removed_model_ids
+    final_child = next(
+        cause
+        for cause in state.model_destruction_cause_authorities
+        if cause.cause_id == child.cause_id
+    )
+    assert final_child.model_destroyed_event is not None
+    assert isinstance(final_child.model_destroyed_event.payload, dict)
+    assert (
+        final_child.model_destroyed_event.payload["destroyed_model_placement"]
+        == child_placement.to_payload()
+    )
+    if accept_child:
+        # Accepting during phase-end cleanup can synchronously finish this child.
+        # Its own accepted retention and completion boundary must precede removal.
+        events = session.lifecycle.decision_controller.event_log.records
+        (selected,) = (
+            event
+            for event in events
+            if event.event_type == "fight_on_death_retention_selected"
+            and isinstance(event.payload, dict)
+            and event.payload.get("cause_id") == child.cause_id
+            and event.payload.get("selected_action") == "fight"
+        )
+        (ready,) = (
+            event
+            for event in events
+            if event.event_type == "fight_on_death_destruction_ready"
+            and isinstance(event.payload, dict)
+            and event.payload.get("cause_id") == child.cause_id
+        )
+        assert (
+            events.index(parent.model_destroyed_event)
+            < events.index(selected)
+            < events.index(ready)
+            < events.index(final_child.model_destroyed_event)
+        )
+    artifact = ReplayArtifact.capture(
+        artifact_id=f"ci57-collateral-retention:{accept_child}",
+        initial_lifecycle_payload=initial,
+        final_lifecycle=session.lifecycle,
+    )
+    replay = ReplayRunner.from_payload(artifact.to_payload()).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
 
 
 def test_order_30_retained_transport_defers_cargo_placement_and_restores_cleanup() -> None:
