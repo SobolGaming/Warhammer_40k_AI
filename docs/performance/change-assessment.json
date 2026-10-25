@@ -616,21 +616,21 @@
     },
     "data/source_audits/ci60_qualification_v1/producing-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "53292775c79558563b83b5d1e358fff9c33dd2b2245400e319a73d68d7daab1a",
+      "after_sha256": "2ff29d9e1275220cd83b6c158622fe2419a1f6612d766aa0f34566864eacbdf2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "53292775c79558563b83b5d1e358fff9c33dd2b2245400e319a73d68d7daab1a"
+          "after": "2ff29d9e1275220cd83b6c158622fe2419a1f6612d766aa0f34566864eacbdf2"
         }
       }
     },
     "data/source_audits/ci60_qualification_v1/retained-role-proofs.json": {
       "before_sha256": null,
-      "after_sha256": "d94c4e2a19f16d0c096831438a9d74bb3fc0d5b8a1ba00095419048b0ad6c3b3",
+      "after_sha256": "10013198ea1eaaa939f1d06fcd59a664d8c8c88d263c3df0045a4caaa66376b6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d94c4e2a19f16d0c096831438a9d74bb3fc0d5b8a1ba00095419048b0ad6c3b3"
+          "after": "10013198ea1eaaa939f1d06fcd59a664d8c8c88d263c3df0045a4caaa66376b6"
         }
       }
     },
