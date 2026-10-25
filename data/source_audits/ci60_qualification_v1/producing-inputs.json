@@ -3390,7 +3390,7 @@
   "tests/code_quality/test_performance_integration_batch.py": "eae7ee805f17598291f3fbafbecd2ecfc8df85b966e6e424e2fcefae9af1f574",
   "tests/code_quality/test_performance_order103_exception.py": "abcd574d240fcf98eacc1876885901afb2291babd16db0f100f1b9152a718d09",
   "tests/code_quality/test_performance_policy.py": "f45929b1d7138997e9bef8a390ca7fa1b1db467816cc6534871dd850222ddb98",
-  "tests/code_quality/test_performance_preflight.py": "9fdb3265cc12aace758de6691dae8e550625a71822839355a00405ff750d2e14",
+  "tests/code_quality/test_performance_preflight.py": "c6ea056c95a69a5d8e82870b61f0958ae74f498a4cde398424bc65b646d49893",
   "tests/code_quality/test_performance_reconstruction_campaign.py": "9e4ed11e92f06cfdea7b9967e9f018a2965d265a20ddbb3d2794259b6cd4cd2a",
   "tests/code_quality/test_performance_static_successor.py": "281a212d9371bc2d2cc3e5a769e8483d7d3523befdf78aeb92e38e25942eed8e",
   "tests/code_quality/test_performance_tool_inputs.py": "3847fc6a3db10414abde698c504d1b5a9b186f295fec3e3ff7b2fc0cb8baacf6",

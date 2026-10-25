@@ -596,11 +596,11 @@
     },
     "data/source_audits/ci60_qualification_v1/control-transitions.json": {
       "before_sha256": null,
-      "after_sha256": "c4ce447b7d1103edee256a4f91ad9697ec9738fb1cce7ce5b551645f32b7a3d6",
+      "after_sha256": "a1c8cbf8f07c7e803907ae180317822637b34e3f019732ae13b947e5b0d88312",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c4ce447b7d1103edee256a4f91ad9697ec9738fb1cce7ce5b551645f32b7a3d6"
+          "after": "a1c8cbf8f07c7e803907ae180317822637b34e3f019732ae13b947e5b0d88312"
         }
       }
     },
@@ -616,21 +616,21 @@
     },
     "data/source_audits/ci60_qualification_v1/producing-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "8f029871592922e19494976aca1de45d1fa182569fbfe5aaf2ae81027d599605",
+      "after_sha256": "53292775c79558563b83b5d1e358fff9c33dd2b2245400e319a73d68d7daab1a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8f029871592922e19494976aca1de45d1fa182569fbfe5aaf2ae81027d599605"
+          "after": "53292775c79558563b83b5d1e358fff9c33dd2b2245400e319a73d68d7daab1a"
         }
       }
     },
     "data/source_audits/ci60_qualification_v1/retained-role-proofs.json": {
       "before_sha256": null,
-      "after_sha256": "454b927fc08ea78f78d4835b834ecb1793b6b616a477505918a13c401fa9f33a",
+      "after_sha256": "d94c4e2a19f16d0c096831438a9d74bb3fc0d5b8a1ba00095419048b0ad6c3b3",
       "owners": {
         "@document": {
           "before": null,
-          "after": "454b927fc08ea78f78d4835b834ecb1793b6b616a477505918a13c401fa9f33a"
+          "after": "d94c4e2a19f16d0c096831438a9d74bb3fc0d5b8a1ba00095419048b0ad6c3b3"
         }
       }
     },
@@ -5971,7 +5971,7 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "9fdb3265cc12aace758de6691dae8e550625a71822839355a00405ff750d2e14",
+      "after_sha256": "c6ea056c95a69a5d8e82870b61f0958ae74f498a4cde398424bc65b646d49893",
       "owners": {
         "@module": {
           "before": null,
@@ -6223,11 +6223,11 @@
         },
         "test_generated_inventory_changes_only_reviewed_perils_metadata": {
           "before": null,
-          "after": "f269d78b5919c2d25163dcfb361d0831f1a1f12a0e6ffef8d286f34b4080b788"
+          "after": "c215f8aa88416471ac0fdef4553bebad9782a74c2dd8b69459b11ac350db6eb5"
         },
         "test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin": {
           "before": null,
-          "after": "1b68dd68954719493871e6bc4d7cb7637cee70fad82de842b95a849a955356cc"
+          "after": "7546b114d7fd08becac280a08355c7c68bd778b087d5a2a8fab8001e19a3413a"
         },
         "test_history_closed_process_requires_eof_zero_exit_and_reaps_child": {
           "before": null,
@@ -6275,7 +6275,7 @@
         },
         "test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelated_input": {
           "before": null,
-          "after": "f88d78e33292abe2a95d885fde29717ac5ccb502b8c6fc0a515087fe829fa939"
+          "after": "95b8babfb9c052ddcb92c12fd9dbd2775457729901e5eda50cdfc37c505aed1d"
         },
         "test_native_discovery_matches_original_ignored_and_symlink_membership": {
           "before": null,

@@ -504,7 +504,11 @@ def test_generated_inventory_changes_only_reviewed_perils_metadata() -> None:
         if reference.startswith(perils.TEST + "::"):
             record["file_sha256"] = live.files[perils.TEST]["sha256"]
     expected["tests"][node] = current
-    actual = (root / successor.INVENTORY).read_bytes()
+    from tools import performance_ci60_qualification as ci60
+
+    actual = ci60.preceding_control(
+        root, successor.INVENTORY, (root / successor.INVENTORY).read_bytes()
+    )
     assert (
         actual
         == (json.dumps(expected, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
@@ -522,7 +526,11 @@ def test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelat
 
     root = Path(__file__).resolve().parents[2]
     direct_git = _SuccessorMechanisms.git_function(successor_probe)
-    current = (root / successor.INVENTORY).read_bytes()
+    from tools import performance_ci60_qualification as ci60
+
+    current = ci60.preceding_control(
+        root, successor.INVENTORY, (root / successor.INVENTORY).read_bytes()
+    )
     old = direct_git(root, "show", successor.BASE + ":" + successor.INVENTORY)
     assert current != old
     target = tmp_path / successor.INVENTORY
@@ -564,6 +572,9 @@ def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
     root = Path(__file__).resolve().parents[2]
     direct_git = _SuccessorMechanisms.git_function(successor_probe)
     historical_members = ci60.control_projection(root)
+    historical_members[successor.INVENTORY] = ci60.preceding_control(
+        root, successor.INVENTORY, (root / successor.INVENTORY).read_bytes()
+    )
     historical_admit = ci60.historical_ci54_admission(root)
     historical_previous = ci60.historical_ci54_previous(root)
     owned = (
