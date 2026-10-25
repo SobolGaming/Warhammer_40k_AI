@@ -132,6 +132,8 @@ def reviewed_control_hashes(root: Path) -> dict[str, str]:
         raise ValueError("Reviewed compatibility archive membership changed.")
     marker = b"\nSOURCE_COMMIT: str | None = None"
     bound = f'\nSOURCE_COMMIT: str | None = "{SOURCE_COMMIT}"'.encode()
+    from tools import performance_ci60_qualification as ci60
+
     projection = successor.control_projection(root) if successor.enabled(root) else {}
     result = {}
     for name in sorted(CONTROLS | SOURCE_ARCHIVES):
@@ -142,6 +144,12 @@ def reviewed_control_hashes(root: Path) -> dict[str, str]:
             raw = raw.replace(marker, bound, 1)
         current = _read(root, name)
         preceding = projection.get(name, current)
+        if (
+            name == "tests/category_migration_preservation.py"
+            and successor.enabled(root)
+            and (root / ci60.NAMESPACE).is_dir()
+        ):
+            preceding = ci60.preceding_control(root, name, current)
         if preceding != raw:
             raise ValueError(
                 "Reviewed migration source/data changed; control bytes changed: " + name
@@ -299,6 +307,8 @@ def verify_owner_ledger(root: Path) -> None:
 
 def verify_control_transformations(root: Path) -> None:
     """Preserve seven authenticated control stages and all three exact changes."""
+    from tools import performance_ci60_qualification as ci60
+
     rows = _json(root, NAMESPACE + "/control-transformations.json")
     if {row["path"] for row in rows} != legacy.CONTROLS or len(rows) != len(legacy.CONTROLS):
         raise ValueError("Cumulative control admission membership changed.")
@@ -316,6 +326,12 @@ def verify_control_transformations(root: Path) -> None:
         baseline = _git(root, "show", CONTENT_BASE + ":" + name, historical=True)
         accepted = _git(root, "show", ACCEPTED + ":" + name, historical=True)
         current = _read(root, name)
+        if (
+            name == "tests/category_migration_preservation.py"
+            and successor.enabled(root)
+            and (root / ci60.NAMESPACE).is_dir()
+        ):
+            current = ci60.preceding_control(root, name, current)
         current = projection.get(name, current)
         for raw, key in (
             (historical, "legacy_sha256"),

@@ -596,11 +596,11 @@
     },
     "data/source_audits/ci60_qualification_v1/control-transitions.json": {
       "before_sha256": null,
-      "after_sha256": "bb8e129cbcba6064bb9ed13a1c397e414b697c8f151358e9732101ae0c73e8b8",
+      "after_sha256": "4887b31b09ae0a62349f005318176f86276d04cb88907013bd2a96c3adda452f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "bb8e129cbcba6064bb9ed13a1c397e414b697c8f151358e9732101ae0c73e8b8"
+          "after": "4887b31b09ae0a62349f005318176f86276d04cb88907013bd2a96c3adda452f"
         }
       }
     },
@@ -616,21 +616,21 @@
     },
     "data/source_audits/ci60_qualification_v1/producing-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "1ffeabe2022e1915f11629aec7f83a0e5a107b959a39e6de689791ba0054c9b5",
+      "after_sha256": "82571b8a4ca4c9229c0770042a975e85553d6b9a507613b6c8eb2308d7f3614b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1ffeabe2022e1915f11629aec7f83a0e5a107b959a39e6de689791ba0054c9b5"
+          "after": "82571b8a4ca4c9229c0770042a975e85553d6b9a507613b6c8eb2308d7f3614b"
         }
       }
     },
     "data/source_audits/ci60_qualification_v1/retained-role-proofs.json": {
       "before_sha256": null,
-      "after_sha256": "4913a558b851ef5588fc0016d73bf8aed212df2de65640e05fe1521adb2a356f",
+      "after_sha256": "818bc037290f42629c2e80f3c8f5fa331e4dbc0219977031b9491c25f3ad42f0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4913a558b851ef5588fc0016d73bf8aed212df2de65640e05fe1521adb2a356f"
+          "after": "818bc037290f42629c2e80f3c8f5fa331e4dbc0219977031b9491c25f3ad42f0"
         }
       }
     },
@@ -19507,7 +19507,7 @@
     },
     "tools/cumulative_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "51f346c03d3915e04740ef285a4977cbe5b6c2d5aaa05ca4eada360b8151b017",
+      "after_sha256": "4e28033fae27bd2e3871b015f33741f8b3bfae7f330abe55b2017a2b59ec1d6f",
       "owners": {
         "@module": {
           "before": null,
@@ -19579,7 +19579,7 @@
         },
         "reviewed_control_hashes": {
           "before": null,
-          "after": "a483f6025b3224e9c1b71810c961922e4a65bc9c8f403d0fb9383eba2e598371"
+          "after": "1b7048e3412ae4d4855971f20e32cc90cc3028c5a16bbcc99320af57d73b21e8"
         },
         "verify_baseline": {
           "before": null,
@@ -19587,7 +19587,7 @@
         },
         "verify_control_transformations": {
           "before": null,
-          "after": "752034ae611952247b8e69a11c4a356525950a139d796bf878d68b5d18024f7c"
+          "after": "cbf9934a48d6956c4deb382921fdd433d9be37770b5fe1d1498feb84f712257b"
         },
         "verify_current_inventory": {
           "before": null,

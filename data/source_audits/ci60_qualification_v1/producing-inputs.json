@@ -4806,7 +4806,7 @@
   "tools/core_rules_order97_models.py": "90023a2d04abd1bdac0542c40aa69784dbc4af9f3760b45d589ff4aa0832e9b2",
   "tools/core_stealth_catalog_overlay.py": "d631a0bd4d33ce7d4b06dc79686689837c159bdfc9abfc158c07ef4d2a10f9fa",
   "tools/cross_source_semantic_equivalence.py": "4d65a1661aa3d6b866a723fd3b57f901155a6aed06e2f6de63e7417e6a261919",
-  "tools/cumulative_preservation.py": "51f346c03d3915e04740ef285a4977cbe5b6c2d5aaa05ca4eada360b8151b017",
+  "tools/cumulative_preservation.py": "4e28033fae27bd2e3871b015f33741f8b3bfae7f330abe55b2017a2b59ec1d6f",
   "tools/emperors_children_39k_pro_audit.py": "f52931b084fdd9b106926cbc59226cea0efec02a771328733fcb08e89d46e4ca",
   "tools/emperors_children_support_report.py": "3f61891f9e933c289f937449957bd00369c6ff1ae112f35a1b273f453cd8a088",
   "tools/event_companion_battlefield_builder_catalog.py": "5a9f77b3a1de639af2d4abc96a92f77b45bb0c3357aa794d50aaa1c0288aebba",
