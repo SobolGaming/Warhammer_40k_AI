@@ -53,6 +53,9 @@ SUPERSEDED_REPORTS: dict[str, str] = {
 RETAINED = frozenset({"roster", "objective_control"})
 CONTROLS = frozenset(
     {
+        "ci/quality_shards/all.txt",
+        "ci/quality_shards/shard-1.txt",
+        "tools/core_rules_order97_inventory.py",
         "tests/category_migration_preservation.py",
         "tests/code_quality/test_category_migration_preservation.py",
         "tests/code_quality/test_cumulative_preservation.py",

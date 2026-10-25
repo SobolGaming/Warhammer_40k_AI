@@ -47,7 +47,10 @@ def test_static_edits_match_independent_immutable_whole_module_recipes(
     name: str, transitions: dict[str, Any], previous: dict[str, bytes]
 ) -> None:
     current = (ROOT / name).read_bytes()
-    if name == "tests/code_quality/test_cumulative_preservation.py":
+    if name in {
+        "tests/code_quality/test_cumulative_preservation.py",
+        "tools/core_rules_order97_inventory.py",
+    }:
         from tools import performance_ci60_qualification as ci60
 
         current = ci60.preceding_control(ROOT, name, current)

@@ -1,11 +1,11 @@
 {
   "roster": {
-    "current_input_digest": "e7ddb1fc73f0cac646bff1ddf842f916a7fce05fb2786d2c501997e8fec3f1f7",
+    "current_input_digest": "1c5af3acb23ae251c61301362133008ed35b502aa0505b3faf9e0d2272b52cfa",
     "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
     "changed_inputs": {
       "docs/performance/policy-v3/operation-map.json": {
         "before": "68adb04ccee41e21e899623bf8eff3c524f7d9985c8f52914b359d691f6a9db4",
-        "after": "50611268f0c34e8758d39900967097ddc49c9973ab23ff1c42f5a28287ee9316",
+        "after": "b66bb437efe6c32ba31b6cfd5be485bff48422219a2a361126abb37f348aa417",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -185,7 +185,7 @@
       },
       "tests/code_quality/test_performance_static_successor.py": {
         "before": null,
-        "after": "435766435a8f9207148bcec2cda4700b70f52f7c3868584a6e531be65025d932",
+        "after": "281a212d9371bc2d2cc3e5a769e8483d7d3523befdf78aeb92e38e25942eed8e",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -275,13 +275,13 @@
       },
       "tools/core_rules_order97_inventory.py": {
         "before": "a9fcf75cffde412df9bd0aea2bfa99fcb2b9deb2c1a1e88cd870c00a459a39e6",
-        "after": "a2244c13bb62a966807801bd21929b60004d4f89260c3e1a7fde852d0721f0b5",
+        "after": "3348c1f7b789e30cc8ffed5bd48c021fb3f41b1b0bfc1bd47375d42394eb660a",
         "role": "uncalled-owner",
         "reason": "This path belongs to lifecycle runtime-bundle/destruction, other test fixtures, generators or contract outputs. The declared core-catalog/GameState workload calls none of these changed owners; its called owners and full input differences are pinned."
       },
       "tools/cumulative_preservation.py": {
         "before": "98dae9a0fd0509d1478c81459c8fb5120954438f0fa5d1059b7415702a38333a",
-        "after": "77dcecf4d091069361227df813a97f82d71d2f53974f6d522db230430904cfeb",
+        "after": "03ce7fa0c640db37aadd566ad76ad5555e36b532f1fd3ed4852782f55ce82e3d",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -299,7 +299,7 @@
       },
       "tools/performance_ci60_qualification.py": {
         "before": null,
-        "after": "2270bcaa40a06ea465d98899fb71ab59900d24a4b21b46c8d7087e8457e8fd6b",
+        "after": "b2779c45f9b16a9e1c4f53733787b8587742aa8e085d4bf9f13e0db710dc9195",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -631,12 +631,12 @@
     "call_path": "The complete workload constructs ArmyCatalog.phase9a_canonical_content_pack and immutable roster requests, then times 100 validate_roster_legality calls. It constructs no GameLifecycle/runtime-content bundle and calls no changed destruction owner. Preserve all original samples, runtime, fixture and host identities; current applicability requires exact unchanged call owners and complete changed-input roles."
   },
   "objective_control": {
-    "current_input_digest": "e7ddb1fc73f0cac646bff1ddf842f916a7fce05fb2786d2c501997e8fec3f1f7",
+    "current_input_digest": "1c5af3acb23ae251c61301362133008ed35b502aa0505b3faf9e0d2272b52cfa",
     "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
     "changed_inputs": {
       "docs/performance/policy-v3/operation-map.json": {
         "before": "68adb04ccee41e21e899623bf8eff3c524f7d9985c8f52914b359d691f6a9db4",
-        "after": "50611268f0c34e8758d39900967097ddc49c9973ab23ff1c42f5a28287ee9316",
+        "after": "b66bb437efe6c32ba31b6cfd5be485bff48422219a2a361126abb37f348aa417",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -816,7 +816,7 @@
       },
       "tests/code_quality/test_performance_static_successor.py": {
         "before": null,
-        "after": "435766435a8f9207148bcec2cda4700b70f52f7c3868584a6e531be65025d932",
+        "after": "281a212d9371bc2d2cc3e5a769e8483d7d3523befdf78aeb92e38e25942eed8e",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -906,13 +906,13 @@
       },
       "tools/core_rules_order97_inventory.py": {
         "before": "a9fcf75cffde412df9bd0aea2bfa99fcb2b9deb2c1a1e88cd870c00a459a39e6",
-        "after": "a2244c13bb62a966807801bd21929b60004d4f89260c3e1a7fde852d0721f0b5",
+        "after": "3348c1f7b789e30cc8ffed5bd48c021fb3f41b1b0bfc1bd47375d42394eb660a",
         "role": "uncalled-owner",
         "reason": "This path belongs to lifecycle runtime-bundle/destruction, other test fixtures, generators or contract outputs. The declared core-catalog/GameState workload calls none of these changed owners; its called owners and full input differences are pinned."
       },
       "tools/cumulative_preservation.py": {
         "before": "98dae9a0fd0509d1478c81459c8fb5120954438f0fa5d1059b7415702a38333a",
-        "after": "77dcecf4d091069361227df813a97f82d71d2f53974f6d522db230430904cfeb",
+        "after": "03ce7fa0c640db37aadd566ad76ad5555e36b532f1fd3ed4852782f55ce82e3d",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -930,7 +930,7 @@
       },
       "tools/performance_ci60_qualification.py": {
         "before": null,
-        "after": "2270bcaa40a06ea465d98899fb71ab59900d24a4b21b46c8d7087e8457e8fd6b",
+        "after": "b2779c45f9b16a9e1c4f53733787b8587742aa8e085d4bf9f13e0db710dc9195",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },

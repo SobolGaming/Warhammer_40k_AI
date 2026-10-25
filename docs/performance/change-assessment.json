@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
-  "operation_map_sha256": "ce4a3f4d47f62fab2ee7a9f7d2f4f8e1fa637e2468062835c98733e6e00b8f70",
+  "operation_map_sha256": "00a04a28f7fbbc11fe00fd11a4093a8cadd02b61d38a255be739641b646d54e0",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "5506915b054481cb77748f68fe3e0bf3013184ab3dfd70c55696d17f7367f8a5",
+      "after_sha256": "1d5a9e4082795d6b7a0424b1716de826d39afa2bdc6ef3aeae726f1a70a95f3c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5506915b054481cb77748f68fe3e0bf3013184ab3dfd70c55696d17f7367f8a5"
+          "after": "1d5a9e4082795d6b7a0424b1716de826d39afa2bdc6ef3aeae726f1a70a95f3c"
         }
       }
     },
@@ -46,11 +46,11 @@
     },
     "ci/quality_shards/shard-1.txt": {
       "before_sha256": null,
-      "after_sha256": "a0e8077184b1a65546791f4b2cdeb66a472968a2ce2af0e5907668f5a10f9c32",
+      "after_sha256": "b227bbf0b5e6901bc56357561ea31da92201cf5efe70d8ffd77cd2e5e25415bc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a0e8077184b1a65546791f4b2cdeb66a472968a2ce2af0e5907668f5a10f9c32"
+          "after": "b227bbf0b5e6901bc56357561ea31da92201cf5efe70d8ffd77cd2e5e25415bc"
         }
       }
     },
@@ -576,31 +576,31 @@
     },
     "data/source_audits/ci60_qualification_v1/added-operations.json": {
       "before_sha256": null,
-      "after_sha256": "6532b6b9fe477ac107ac8c325483d9bddfd887ea55af9ddec9a5360410610aba",
+      "after_sha256": "d41d4c0323116311bf85602383ba368db07452bb93822fc1452495c0359f4142",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6532b6b9fe477ac107ac8c325483d9bddfd887ea55af9ddec9a5360410610aba"
+          "after": "d41d4c0323116311bf85602383ba368db07452bb93822fc1452495c0359f4142"
         }
       }
     },
     "data/source_audits/ci60_qualification_v1/changed-members.json": {
       "before_sha256": null,
-      "after_sha256": "bffa2d7b9f346b3e1b58636aa9881119a361b8c25389e01821917bf2c8b6c403",
+      "after_sha256": "fce8487949f12746ef33fd303caa190163f2424ea92519aff0e0bd18476fe56e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "bffa2d7b9f346b3e1b58636aa9881119a361b8c25389e01821917bf2c8b6c403"
+          "after": "fce8487949f12746ef33fd303caa190163f2424ea92519aff0e0bd18476fe56e"
         }
       }
     },
     "data/source_audits/ci60_qualification_v1/control-transitions.json": {
       "before_sha256": null,
-      "after_sha256": "c77151bfe79eb17729139815acea9b10f02f274fff404c9a2fbdff12c92288d2",
+      "after_sha256": "4d2d1371f2d97559f70ae75665d90106189ea10829806f2c2d8b2324616b6c54",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c77151bfe79eb17729139815acea9b10f02f274fff404c9a2fbdff12c92288d2"
+          "after": "4d2d1371f2d97559f70ae75665d90106189ea10829806f2c2d8b2324616b6c54"
         }
       }
     },
@@ -616,21 +616,21 @@
     },
     "data/source_audits/ci60_qualification_v1/producing-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "e0bcc7937c942ae8e6b2a59eb746f2828cae175defc4ab077f165581d9efb60d",
+      "after_sha256": "b500b9bc1ff68b2a2dbf53dcf4c68deaad2e15a54c350f57386dbf6cd8a3abaf",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e0bcc7937c942ae8e6b2a59eb746f2828cae175defc4ab077f165581d9efb60d"
+          "after": "b500b9bc1ff68b2a2dbf53dcf4c68deaad2e15a54c350f57386dbf6cd8a3abaf"
         }
       }
     },
     "data/source_audits/ci60_qualification_v1/retained-role-proofs.json": {
       "before_sha256": null,
-      "after_sha256": "6ceb5ef9ffcfc11e03af4e258c1454ccfa50aa9134fbc7708a44754d26ee2392",
+      "after_sha256": "ab15dc038a4ee38560b601bfb3ba66dd4907bd7be2f50236afc3a1f085a30c57",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6ceb5ef9ffcfc11e03af4e258c1454ccfa50aa9134fbc7708a44754d26ee2392"
+          "after": "ab15dc038a4ee38560b601bfb3ba66dd4907bd7be2f50236afc3a1f085a30c57"
         }
       }
     },
@@ -1736,11 +1736,11 @@
     },
     "data/source_audits/order135/current-inventory-category-migration.json": {
       "before_sha256": "d626c4e8aea03e1229f2da5986a7a88278cbbc611df037345cb79e0fbb3e7533",
-      "after_sha256": "c0460f930be48c49dcbef7568ea1af5e2319ca374d658b6abdb8eadd38869c16",
+      "after_sha256": "8817035cbe6581e8ac2f5a9f8d16afdaa67158bfcda022927737933ab95f3b74",
       "owners": {
         "@document": {
           "before": "d626c4e8aea03e1229f2da5986a7a88278cbbc611df037345cb79e0fbb3e7533",
-          "after": "c0460f930be48c49dcbef7568ea1af5e2319ca374d658b6abdb8eadd38869c16"
+          "after": "8817035cbe6581e8ac2f5a9f8d16afdaa67158bfcda022927737933ab95f3b74"
         }
       }
     },
@@ -3006,11 +3006,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "50611268f0c34e8758d39900967097ddc49c9973ab23ff1c42f5a28287ee9316",
+      "after_sha256": "b66bb437efe6c32ba31b6cfd5be485bff48422219a2a361126abb37f348aa417",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "50611268f0c34e8758d39900967097ddc49c9973ab23ff1c42f5a28287ee9316"
+          "after": "b66bb437efe6c32ba31b6cfd5be485bff48422219a2a361126abb37f348aa417"
         }
       }
     },
@@ -6341,7 +6341,7 @@
     },
     "tests/code_quality/test_performance_static_successor.py": {
       "before_sha256": null,
-      "after_sha256": "435766435a8f9207148bcec2cda4700b70f52f7c3868584a6e531be65025d932",
+      "after_sha256": "281a212d9371bc2d2cc3e5a769e8483d7d3523befdf78aeb92e38e25942eed8e",
       "owners": {
         "@module": {
           "before": null,
@@ -6397,7 +6397,7 @@
         },
         "test_static_edits_match_independent_immutable_whole_module_recipes": {
           "before": null,
-          "after": "f2b84c3e639a6f0cb30ae3c29ba8ff91f9dbe0a2b83b9c5d87c0e15a6d5d4b6e"
+          "after": "e255c45b3664720d2411c5d2f9081f2c3851fff32cbbb6cceb4c688502cb1716"
         },
         "test_static_historical_projection_rejects_unrelated_caller_bytes": {
           "before": null,
@@ -19501,7 +19501,7 @@
     },
     "tools/core_rules_order97_inventory.py": {
       "before_sha256": "e50a6dff0a66b81310c2799c939200fe76c186286b20eb9a70d9f90f8c038110",
-      "after_sha256": "a2244c13bb62a966807801bd21929b60004d4f89260c3e1a7fde852d0721f0b5",
+      "after_sha256": "3348c1f7b789e30cc8ffed5bd48c021fb3f41b1b0bfc1bd47375d42394eb660a",
       "owners": {
         "@module": {
           "before": "88c4ae62aeb22e12e0f6d37a8889f62cbba3bfea24a9c76e50bf75d44e8ff1d4",
@@ -19510,12 +19510,16 @@
         "_path": {
           "before": "fe6c42a989670e4f7af8b1b330365b51f522bb34716ab7a69eb22d95807042ce",
           "after": "96d53979e79db439fd938079cf14187a4eec0d11a30797ab7b51488640b910b0"
+        },
+        "validate_inventory": {
+          "before": "3f2c8791c8a631db95b47c22afba66b232320e6a09862d42bf256ea428b401aa",
+          "after": "05e4c200f6ca2ad238673806649ebf83fb5ced9b55e53b918cb9a40b6fb48627"
         }
       }
     },
     "tools/cumulative_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "77dcecf4d091069361227df813a97f82d71d2f53974f6d522db230430904cfeb",
+      "after_sha256": "03ce7fa0c640db37aadd566ad76ad5555e36b532f1fd3ed4852782f55ce82e3d",
       "owners": {
         "@module": {
           "before": null,
@@ -19587,7 +19591,7 @@
         },
         "reviewed_control_hashes": {
           "before": null,
-          "after": "0f2bdd045876ef9b361a01acba002d161adc56de32f3253a5ae133f631b29ee9"
+          "after": "d45c91d2e459f0def4d79af3c75b4e30f87b271472fe1a8a4ee5e88d6288e705"
         },
         "verify_baseline": {
           "before": null,
@@ -19655,11 +19659,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "2270bcaa40a06ea465d98899fb71ab59900d24a4b21b46c8d7087e8457e8fd6b",
+      "after_sha256": "b2779c45f9b16a9e1c4f53733787b8587742aa8e085d4bf9f13e0db710dc9195",
       "owners": {
         "@module": {
           "before": null,
-          "after": "fd8adcda84f04d533a12fca746e0a27e9b70d9401a7eeba45c1be5e943d6f2a7"
+          "after": "96f23c7f053cd3c27c900801f71176348be2f8cfb943cd3adbd6de91ee0d5240"
         },
         "_HistoricalPrevious": {
           "before": null,
@@ -31362,10 +31366,11 @@
     "tools/core_rules_order97_inventory.py": {
       "category": "measured_workload",
       "operations": [
+        "ci60-order97-historical-pin-validation",
         "shock-source-generation-and-audit"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact static and hosted-entry repairs, while relocating pytest bytecode suppression from the historically pinned root test initializer to the quality package before its module imports. Root tests/__init__.py is restored byte-for-byte and separately authenticated as an unchanged owned anchor. D07 geometry and category-migration readers remain unchanged. Cumulative integration-member transport now uses one fresh hardened immutable Git batch while retaining the same member/hash/control decisions. Only their existing finite predecessor boundary admits the exact quality initializer history after full current-source authentication. The original symbolic operation-map validator is extracted without changing its comparisons and remains called after every actual current-input check; focused tests exercise it independently and retain a real forged-collector rejection.",
+      "rationale": "The exact historical inventory file-pin loop authenticates two already-reviewed test preimages. This audit-only validator is not called by measured drivers; physical tool bytes remain producing inputs and untimed source-token setup inputs.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
     },

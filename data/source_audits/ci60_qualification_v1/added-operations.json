@@ -785,5 +785,16 @@
     ],
     "sensitive": true,
     "mandatory": true
+  },
+  "ci60-order97-historical-pin-validation": {
+    "paths": [
+      "tools/core_rules_order97_inventory.py"
+    ],
+    "owners": [
+      "validate_inventory"
+    ],
+    "families": [],
+    "sensitive": false,
+    "mandatory": true
   }
 }

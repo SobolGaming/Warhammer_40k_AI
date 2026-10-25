@@ -134,7 +134,10 @@ def reviewed_control_hashes(root: Path) -> dict[str, str]:
     bound = f'\nSOURCE_COMMIT: str | None = "{SOURCE_COMMIT}"'.encode()
     from tools import performance_ci60_qualification as ci60
 
-    projection = successor.control_projection(root) if successor.enabled(root) else {}
+    try:
+        projection = successor.control_projection(root) if successor.enabled(root) else {}
+    except ValueError as exc:
+        raise ValueError(f"Reviewed migration source/data changed: {exc}") from exc
     result = {}
     for name in sorted(CONTROLS | SOURCE_ARCHIVES):
         raw = _git(root, "show", SOURCE_COMMIT + ":" + name, historical=True)

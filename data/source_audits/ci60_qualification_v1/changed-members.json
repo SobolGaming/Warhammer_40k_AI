@@ -1,4 +1,6 @@
 [
+  "ci/quality_shards/all.txt",
+  "ci/quality_shards/shard-1.txt",
   "contracts/examples/persistence/session-persistence.json",
   "contracts/examples/sessions/session-command-outcome.json",
   "contracts/examples/sessions/session-command-started.json",
@@ -13,6 +15,7 @@
   "data/source_audits/ci60_qualification_v1/family-plan.json",
   "data/source_audits/ci60_qualification_v1/producing-inputs.json",
   "data/source_audits/ci60_qualification_v1/retained-role-proofs.json",
+  "data/source_audits/order135/current-inventory-category-migration.json",
   "docs/CI57_CORRECTNESS_SCOPE.md",
   "docs/CI58_RUNTIME_SCOPE.md",
   "docs/CI60_QUALIFICATION_SCOPE.md",
@@ -43,6 +46,7 @@
   "tests/shared/category_migration/phase11e_mission_scoring_cleanup_history_and_reserves.py",
   "tests/unit/test_phase12b_stratagem_framework.py",
   "tests/unit/test_phase17g_runtime_content.py",
+  "tools/core_rules_order97_inventory.py",
   "tools/cumulative_preservation.py",
   "tools/generate_faction_content_scaffold.py",
   "tools/performance_ci60_qualification.py",
