@@ -150,6 +150,10 @@ from tests.shared.category_migration.phase17g_runtime_content import (
 )
 
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th import generated_manifest
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_detachments_2026_27,
+    faction_subrules_2026_27,
+)
 
 
 def test_runtime_manifest_generation_merges_catalog_rows_and_generated_support() -> None:
@@ -724,34 +728,26 @@ def test_generated_manifest_rebuilds_from_current_tuple_and_recovers_source_fail
     assert generated_manifest.generated_runtime_content_rows() == baseline
 
     calls: list[str] = []
-    owners = generated_manifest.faction_detachments_2026_27
-    subrules = generated_manifest.faction_subrules_2026_27
+    owners = faction_detachments_2026_27
+    subrules = faction_subrules_2026_27
     faction_rows = owners.faction_rows
     detachment_rows = owners.detachment_rows
     enhancement_rows = subrules.enhancement_rows
     stratagem_rows = subrules.stratagem_rows
 
-    def current_factions() -> tuple[
-        generated_manifest.faction_detachments_2026_27.SourceFactionRow, ...
-    ]:
+    def current_factions() -> tuple[faction_detachments_2026_27.SourceFactionRow, ...]:
         calls.append("faction")
         return faction_rows()
 
-    def current_detachments() -> tuple[
-        generated_manifest.faction_detachments_2026_27.SourceDetachmentRow, ...
-    ]:
+    def current_detachments() -> tuple[faction_detachments_2026_27.SourceDetachmentRow, ...]:
         calls.append("detachment")
         return detachment_rows()
 
-    def current_enhancements() -> tuple[
-        generated_manifest.faction_subrules_2026_27.SourceEnhancementRow, ...
-    ]:
+    def current_enhancements() -> tuple[faction_subrules_2026_27.SourceEnhancementRow, ...]:
         calls.append("enhancement")
         return enhancement_rows()
 
-    def failed_stratagems() -> tuple[
-        generated_manifest.faction_subrules_2026_27.SourceStratagemRow, ...
-    ]:
+    def failed_stratagems() -> tuple[faction_subrules_2026_27.SourceStratagemRow, ...]:
         calls.append("stratagem")
         raise GameLifecycleError("ci58 source observation failed")
 
