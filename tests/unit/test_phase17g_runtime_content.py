@@ -149,6 +149,8 @@ from tests.shared.category_migration.phase17g_runtime_content import (
     sys,
 )
 
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th import generated_manifest
+
 
 def test_runtime_manifest_generation_merges_catalog_rows_and_generated_support() -> None:
     catalog = _catalog_with_runtime_detachment_selection(
@@ -531,6 +533,238 @@ def test_real_edition_index_loads_only_selected_pilot_faction_modules() -> None:
         .wargear_modules["plague-weapons"]
         .endswith(".death_guard.wargear.plague_weapons")
     )
+
+
+@pytest.mark.parametrize("order", ["original", "reversed", "duplicated"])
+def test_generated_manifest_index_matches_inventory_scan(order: str) -> None:
+    records = generated_manifest._EXECUTION_RECORDS  # pyright: ignore[reportPrivateUsage]
+    if order == "reversed":
+        records = tuple(reversed(records))
+    elif order == "duplicated":
+        records = (*records, records[0], records[-1])
+    index = generated_manifest._execution_record_index(records)  # pyright: ignore[reportPrivateUsage]
+    executable = {
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+    }
+    owners = {(record.faction_id, record.detachment_id) for record in records}
+    owners.add(("ci58:missing-owner", None))
+    for faction_id, detachment_id in owners:
+        matched = tuple(
+            record
+            for record in records
+            if record.faction_id == faction_id and record.detachment_id == detachment_id
+        )
+        assert generated_manifest._execution_ids_for(  # pyright: ignore[reportPrivateUsage]
+            index, faction_id=faction_id, detachment_id=detachment_id
+        ) == tuple(sorted(record.execution_id for record in matched))
+        assert generated_manifest._source_ids_for(  # pyright: ignore[reportPrivateUsage]
+            index, faction_id=faction_id, detachment_id=detachment_id
+        ) == tuple(sorted({source_id for record in matched for source_id in record.source_ids}))
+    rules = {
+        (record.faction_id, record.detachment_id, record.rule_id, record.coverage_kind.value)
+        for record in records
+        if record.rule_id is not None
+    }
+    rules.add(("ci58:missing-owner", None, "ci58:missing-rule", "detachment_stratagem"))
+    for faction_id, detachment_id, rule_id, coverage_kind in rules:
+        matched = tuple(
+            record
+            for record in records
+            if record.faction_id == faction_id
+            and record.detachment_id == detachment_id
+            and record.rule_id == rule_id
+            and record.coverage_kind.value == coverage_kind
+        )
+        assert generated_manifest._executable_execution_ids_for_rule(  # pyright: ignore[reportPrivateUsage]
+            index,
+            faction_id=faction_id,
+            detachment_id=detachment_id,
+            rule_id=rule_id,
+            coverage_kind=coverage_kind,
+        ) == tuple(
+            sorted(
+                record.execution_id for record in matched if record.execution_status in executable
+            )
+        )
+        assert generated_manifest._source_ids_for_rule(  # pyright: ignore[reportPrivateUsage]
+            index,
+            faction_id=faction_id,
+            detachment_id=detachment_id,
+            rule_id=rule_id,
+            coverage_kind=coverage_kind,
+        ) == tuple(sorted({source_id for record in matched for source_id in record.source_ids}))
+    for mapping in (index.by_owner, index.by_rule, index.by_execution_id):
+        with pytest.raises(TypeError):
+            cast(dict[object, object], mapping)["ci58:mutation"] = ()
+    for token in ("death-guard:datasheet-intake", "datasheet", "guard", "ci58:missing"):
+        original_records = generated_manifest._EXECUTION_RECORDS  # pyright: ignore[reportPrivateUsage]
+        assert generated_manifest._execution_ids_matching(token) == tuple(  # pyright: ignore[reportPrivateUsage]
+            sorted(
+                record.execution_id for record in original_records if token in record.execution_id
+            )
+        )
+
+
+def test_generated_manifest_index_preserves_semantic_record_multiplicity() -> None:
+    original = generated_manifest._EXECUTION_RECORDS[0]  # pyright: ignore[reportPrivateUsage]
+    statuses = faction_execution_2026_27.Phase17FExecutionStatus
+    reasons = faction_execution_2026_27.Phase17FExecutionBlockReason
+    generic = replace(
+        original,
+        execution_id="ci58:generic",
+        execution_status=statuses.EXECUTABLE_GENERIC_IR,
+        block_reason=None,
+        rule_ir_hash="a" * 64,
+    )
+    named = replace(
+        generic,
+        execution_id="ci58:named",
+        execution_status=statuses.EXECUTABLE_NAMED_HANDLER,
+        handler_id="ci58:handler",
+    )
+    blocked = replace(
+        named,
+        execution_id="ci58:blocked",
+        execution_status=statuses.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED,
+        block_reason=reasons.STRUCTURED_RULE_SEMANTICS_REQUIRED,
+    )
+    gap = replace(
+        blocked,
+        execution_id="ci58:gap",
+        execution_status=statuses.BLOCKED_APPROVED_UNSUPPORTED_SOURCE_GAP,
+        block_reason=reasons.APPROVED_PHASE17E_SOURCE_GAP,
+        phase17e_unsupported_reason="ci58:source-gap",
+    )
+    same_id_blocked = replace(blocked, execution_id=generic.execution_id)
+    cases = (
+        ((), ()),
+        ((generic,), ()),
+        ((generic,), (generic.execution_id,)),
+        ((named,), (named.execution_id,)),
+        ((blocked, gap), (blocked.execution_id, gap.execution_id)),
+        ((generic, blocked), (generic.execution_id, blocked.execution_id)),
+        ((generic,), (generic.execution_id, generic.execution_id)),
+        ((generic, generic), (generic.execution_id,)),
+        ((generic, generic), (generic.execution_id, generic.execution_id)),
+        ((generic, same_id_blocked), (generic.execution_id, generic.execution_id)),
+        ((generic,), ("ci58:missing",)),
+        ((generic,), (generic.execution_id, "ci58:missing")),
+    )
+    executable = {statuses.EXECUTABLE_GENERIC_IR, statuses.EXECUTABLE_NAMED_HANDLER}
+    for records, requested in cases:
+        index = generated_manifest._execution_record_index(records)  # pyright: ignore[reportPrivateUsage]
+        # The old scan counts records matching the requested SET, then compares
+        # against the raw requested tuple length. Duplicate IDs are not collapsed.
+        matched = tuple(record for record in records if record.execution_id in frozenset(requested))
+        if requested and len(matched) != len(requested):
+            with pytest.raises(GameLifecycleError, match="unknown Phase 17F execution IDs"):
+                generated_manifest._semantic_status_for_execution_ids(  # pyright: ignore[reportPrivateUsage]
+                    index, requested
+                )
+            continue
+        count = sum(record.execution_status in executable for record in matched)
+        expected = RuntimeContentSemanticStatus.PLACEHOLDER
+        if matched and count == len(matched):
+            expected = RuntimeContentSemanticStatus.IMPLEMENTED
+        elif count:
+            expected = RuntimeContentSemanticStatus.PARTIAL
+        assert (
+            generated_manifest._semantic_status_for_execution_ids(  # pyright: ignore[reportPrivateUsage]
+                index, requested
+            )
+            is expected
+        )
+
+
+def test_generated_manifest_rebuilds_from_current_tuple_and_recovers_source_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    records = generated_manifest._EXECUTION_RECORDS  # pyright: ignore[reportPrivateUsage]
+    baseline = generated_manifest.generated_runtime_content_rows()
+    chosen = next(
+        record
+        for record in records
+        if record.coverage_kind.value == "detachment_enhancement"
+        and record.execution_status
+        is faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    )
+    changed = replace(chosen, source_ids=(*chosen.source_ids, "ci58:changed-source"))
+    monkeypatch.setattr(
+        generated_manifest,
+        "_EXECUTION_RECORDS",
+        tuple(changed if record is chosen else record for record in records),
+    )
+    changed_rows = generated_manifest.generated_runtime_content_rows()
+    target = next(row for row in changed_rows if row.content_id == chosen.rule_id)
+    assert "ci58:changed-source" in target.source_ids
+    assert changed_rows != baseline
+    blocked = replace(
+        changed,
+        execution_status=(
+            faction_execution_2026_27.Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
+        ),
+        handler_id="ci58:blocked-handler",
+        block_reason=(
+            faction_execution_2026_27.Phase17FExecutionBlockReason.STRUCTURED_RULE_SEMANTICS_REQUIRED
+        ),
+    )
+    monkeypatch.setattr(
+        generated_manifest,
+        "_EXECUTION_RECORDS",
+        tuple(blocked if record is chosen else record for record in records),
+    )
+    blocked_rows = generated_manifest.generated_runtime_content_rows()
+    assert all(row.content_id != chosen.rule_id for row in blocked_rows)
+    monkeypatch.setattr(generated_manifest, "_EXECUTION_RECORDS", (*records, records[0]))
+    with pytest.raises(GameLifecycleError, match="must not contain duplicates"):
+        generated_manifest.generated_runtime_content_rows()
+    monkeypatch.setattr(generated_manifest, "_EXECUTION_RECORDS", records)
+    assert generated_manifest.generated_runtime_content_rows() == baseline
+
+    calls: list[str] = []
+    owners = generated_manifest.faction_detachments_2026_27
+    subrules = generated_manifest.faction_subrules_2026_27
+    faction_rows = owners.faction_rows
+    detachment_rows = owners.detachment_rows
+    enhancement_rows = subrules.enhancement_rows
+    stratagem_rows = subrules.stratagem_rows
+
+    def current_factions() -> tuple[
+        generated_manifest.faction_detachments_2026_27.SourceFactionRow, ...
+    ]:
+        calls.append("faction")
+        return faction_rows()
+
+    def current_detachments() -> tuple[
+        generated_manifest.faction_detachments_2026_27.SourceDetachmentRow, ...
+    ]:
+        calls.append("detachment")
+        return detachment_rows()
+
+    def current_enhancements() -> tuple[
+        generated_manifest.faction_subrules_2026_27.SourceEnhancementRow, ...
+    ]:
+        calls.append("enhancement")
+        return enhancement_rows()
+
+    def failed_stratagems() -> tuple[
+        generated_manifest.faction_subrules_2026_27.SourceStratagemRow, ...
+    ]:
+        calls.append("stratagem")
+        raise GameLifecycleError("ci58 source observation failed")
+
+    monkeypatch.setattr(owners, "faction_rows", current_factions)
+    monkeypatch.setattr(owners, "detachment_rows", current_detachments)
+    monkeypatch.setattr(subrules, "enhancement_rows", current_enhancements)
+    monkeypatch.setattr(subrules, "stratagem_rows", failed_stratagems)
+    with pytest.raises(GameLifecycleError, match="ci58 source observation failed"):
+        generated_manifest.generated_runtime_content_rows()
+    assert calls == ["faction", "detachment", "enhancement", "stratagem"]
+    monkeypatch.setattr(subrules, "stratagem_rows", stratagem_rows)
+    calls.clear()
+    assert generated_manifest.generated_runtime_content_rows() == baseline
+    assert calls == ["faction", "detachment", "enhancement"]
 
 
 __all__: list[str] = []

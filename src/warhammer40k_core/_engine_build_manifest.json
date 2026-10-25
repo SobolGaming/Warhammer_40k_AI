@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d9d701616f799f46da5e63ef0d7dbebf8af80ee1fc0f169c2f04939c0c3ca469",
-  "fingerprint": "d9d701616f799f46da5e63ef0d7dbebf8af80ee1fc0f169c2f04939c0c3ca469",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
+  "fingerprint": "c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
   "resource_count": 3130,
   "resources": [
     {
@@ -6485,9 +6485,9 @@
       "sha256": "ce2421b8151266c44cceb8df8154009eb6d0abc072fe6f6d77056ca2f4784525"
     },
     {
-      "byte_length": 14453,
+      "byte_length": 17919,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/generated_manifest.py",
-      "sha256": "82bd099f7bef7a5ac80250308f53a049679b3356e5f0440a2e7ce3c487b9ff05"
+      "sha256": "ac7cde842c7d205c45ec52a3ac245fdff5f47449c30d728f235f73c11fa45065"
     },
     {
       "byte_length": 172,

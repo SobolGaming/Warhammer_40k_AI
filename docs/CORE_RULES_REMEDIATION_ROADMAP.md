@@ -234,6 +234,14 @@ unresolved version 963 intake or newly required repairs.
 
 | D02 | ATTACK-STEP-ORDER | 05.00 / 05.03 Save step | Previously the shared grouped Save loop offered a legal reroll after one original Save, before later original Saves in the same selected pool. It now rolls/reuses the complete original batch before choices, preserving physical allocation, low-to-high damage, post-roll pool boundaries and journal-based native restore/fork/view/event/replay continuation. S25 ordinary Hit/Wound staging remains unchanged. See [source and scope](D02_SAVE_STEP_SCOPE.md). | Complete the selected pool Save step before reroll choices; retain legal CP/source permissions and every exact-head gate. | Complete retained 143 source rows, 34 primary and 453 supporting acceptance records; 05.00-obligation-01 with full 04.03/05 context. | Authenticated main b3b3ecd4; S25 PR585 delivered. | FINAL-GATES-PENDING |
 
+## CI58 local runtime follow-up
+
+[CI58 runtime scope](CI58_RUNTIME_SCOPE.md) bounds an invocation-local manifest
+index to the existing generated owner and generator. It preserves source/package
+observations, typed row validation, ordering, multiplicity and causal/JSON checks.
+Matched local measurements and exact payload equivalence are separate evidence;
+full exact-head gates, coverage, performance certification and publication remain pending.
+
 ## Compliance claim
 
 The project may claim Core Rules categories 01–25 compliant only after every implementation PR, `S-MIRRORS`, and `PFINAL` are merged, including any further PR the audit inserts, and a fresh 25-category audit on `main` finds no new gap. The claim names the selected snapshot, provider, and observation date, and it excludes factions and every scope `AGENTS.md` prohibits.
