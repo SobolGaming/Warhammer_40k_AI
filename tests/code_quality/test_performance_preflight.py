@@ -555,6 +555,7 @@ def test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelat
 def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, coordinated_pin: bool
 ) -> None:
+    from tools import performance_ci60_qualification as ci60
     from tools import performance_preflight_successor as successor
     from tools import quality_runtime_successor as ci54
 
@@ -562,6 +563,9 @@ def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
 
     root = Path(__file__).resolve().parents[2]
     direct_git = _SuccessorMechanisms.git_function(successor_probe)
+    historical_members = ci60.control_projection(root)
+    historical_admit = ci60.historical_ci54_admission(root)
+    historical_previous = ci60.historical_ci54_previous(root)
     owned = (
         successor.PINS.keys()
         | successor.ANCHORS.keys()
@@ -572,7 +576,7 @@ def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
     for name in owned:
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes((root / name).read_bytes())
+        target.write_bytes(historical_members.get(name, (root / name).read_bytes()))
     git_directory = (
         subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=root)
         .decode()
@@ -584,6 +588,8 @@ def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
         return direct_git(root, *args, payload=payload)
 
     monkeypatch.setattr(successor, "_git", original_git)
+    monkeypatch.setattr(ci54, "admit", historical_admit)
+    monkeypatch.setattr(ci54, "previous", historical_previous)
     assert _SuccessorMechanisms.freeze(successor_probe, tmp_path) == successor.FREEZE_COMMIT
     path = tmp_path / successor.INVENTORY
     payload = json.loads(path.read_bytes())

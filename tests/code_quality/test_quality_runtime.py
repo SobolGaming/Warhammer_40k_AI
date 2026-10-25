@@ -1140,6 +1140,12 @@ def test_fixture_compatibility_view_requires_fresh_authentic_module_owned_checko
 
     original_admit = ci60.historical_ci54_admission(ROOT)
     historical_members = ci60.control_projection(ROOT)
+    read = successor.owned
+
+    def historical_owned(r: Path, n: str) -> bytes:
+        return historical_members.get(n, read(r, n)) if r == ROOT else read(r, n)
+
+    monkeypatch.setattr(successor, "owned", historical_owned)
     original_previous = successor.previous
     admissions: list[Path] = []
     projections: list[tuple[Path, str, bytes | None]] = []

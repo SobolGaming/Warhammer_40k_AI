@@ -6,6 +6,7 @@ import ast
 import hashlib
 import json
 import subprocess
+from collections import Counter
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Protocol, cast
@@ -52,6 +53,10 @@ SUPERSEDED_REPORTS: dict[str, str] = {
 RETAINED = frozenset({"roster", "objective_control"})
 CONTROLS = frozenset(
     {
+        "tests/category_migration_preservation.py",
+        "tests/code_quality/test_cumulative_preservation.py",
+        "tests/code_quality/test_performance_preflight.py",
+        "tests/code_quality/test_performance_static_successor.py",
         "tools/quality_runtime_successor.py",
         "tools/cumulative_preservation.py",
         "tools/performance_policy.py",
@@ -211,7 +216,7 @@ def measurement_controls(root: Path, current: dict[str, str]) -> dict[str, str]:
 
 def _cohort(actual: dict[str, bytes]) -> dict[str, Any]:
     value: dict[str, Any] = json.loads(actual[NAMESPACE + "/family-plan.json"])
-    families = value["families"]
+    families: dict[str, Any] = value["families"]
     if (
         value["base"] != PR_BASE
         or len(families) != 12
@@ -526,16 +531,69 @@ def historical_ledger_owners(root: Path, path: str, current: dict[str, str]) -> 
     return current | {"@module": before}
 
 
-def historical_ci54_admission(root: Path) -> Callable[[Path], None]:
+HISTORICAL_TEST_PINS: dict[str, str] = {
+    "tests/integration/test_fight_on_death_presence.py": (
+        "c63c3b334a69aa742e86da70d61f602a4eaf5144a51da88c1837bbc228917123"
+    ),
+    "tests/setup_completion_helpers.py": (
+        "928c24e7775f97890720fee9619432029bed4821ff1a5c72871148af02c12c15"
+    ),
+    "tests/unit/test_phase12b_stratagem_framework.py": (
+        "4aace3168598f0a8f8d02f23ece82e611dfb73657629941be99fc5dc0e4c0a64"
+    ),
+    "tests/unit/test_phase17g_runtime_content.py": (
+        "e30343a5fceafc63e3c31f0228d3d3a555882920ea0260623123e9c9bf5fe5fd"
+    ),
+}
+HISTORICAL_DIRECT_TESTS = frozenset(HISTORICAL_TEST_PINS) - {
+    "tests/unit/test_phase17g_runtime_content.py"
+}
+
+
+def historical_test_preimage(root: Path, path: str, current: bytes) -> bytes:
+    """Exact historical assertion view; never a physical pytest or measured input."""
+    if path not in HISTORICAL_TEST_PINS:
+        return current
+    actual = admitted(root)
+    if current != actual[path]:
+        raise ValueError("CI60 historical test caller supplied unrelated current bytes.")
+    before = history(root, "show", BASE + ":" + path)
+    if digest(before) != HISTORICAL_TEST_PINS[path]:
+        raise ValueError("CI60 historical test native preimage changed.")
+
+    def assertions(raw: bytes) -> Counter[str]:
+        return Counter(
+            ast.dump(node, include_attributes=False)
+            for node in ast.walk(ast.parse(raw))
+            if isinstance(node, ast.Assert)
+        )
+
+    if assertions(before) - assertions(current):
+        raise ValueError("CI60 historical test lost an original assertion.")
+    return before
+
+
+class _HistoricalPrevious(Protocol):
+    def __call__(
+        self, root: Path, name: str, supplied: bytes, *, predecessor: bytes | None = None
+    ) -> bytes: ...
+
+
+def _historical_ci54_functions(root: Path) -> dict[str, Any]:
     """Original native CI54 function for its explicitly sparse historical test fixture."""
     from tools import quality_runtime_successor as original
 
     projection = control_projection(root)
     source = ast.parse(projection[original.SELF])
     functions: list[ast.stmt] = [
-        node for node in source.body if isinstance(node, ast.FunctionDef) and node.name == "admit"
+        node
+        for node in source.body
+        if isinstance(node, ast.FunctionDef) and node.name in {"admit", "previous"}
     ]
-    if len(functions) != 1:
+    if {node.name for node in functions if isinstance(node, ast.FunctionDef)} != {
+        "admit",
+        "previous",
+    } or len(functions) != 2:
         raise ValueError("CI60 original CI54 admission owner changed.")
     physical = original.owned
 
@@ -549,4 +607,12 @@ def historical_ci54_admission(root: Path) -> Callable[[Path], None]:
         compile(ast.Module(body=functions, type_ignores=[]), "authenticated-ci54-admit", "exec"),
         namespace,
     )
-    return cast(Callable[[Path], None], namespace["admit"])
+    return namespace
+
+
+def historical_ci54_admission(root: Path) -> Callable[[Path], None]:
+    return cast(Callable[[Path], None], _historical_ci54_functions(root)["admit"])
+
+
+def historical_ci54_previous(root: Path) -> _HistoricalPrevious:
+    return cast(_HistoricalPrevious, _historical_ci54_functions(root)["previous"])

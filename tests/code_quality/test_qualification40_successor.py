@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import json
 import shutil
 import subprocess
@@ -199,7 +200,6 @@ def test_qualification_producing_inputs_allows_only_anchor_literal(
         with pytest.raises(ValueError, match="exact unactivated frozen source"):
             ci60.producing_inputs(ROOT, actual)
 
-
     ledger_name = "src/warhammer40k_core/engine/retained_demise_removal.py"
     proof = ci60.admitted(ROOT)
     owners = policy.owner_hashes(ledger_name, proof[ledger_name])
@@ -219,10 +219,11 @@ def test_qualification_producing_inputs_allows_only_anchor_literal(
         (import_line.rstrip(b"\n") + b"  # altered\n", "sole reviewed type-only import"),
     ):
         changed_proof = proof | {
-            ledger_name: proof[ledger_name].replace(b"\r\n", b"\n").replace(
-                import_line, replacement, 1
-            )
+            ledger_name: proof[ledger_name]
+            .replace(b"\r\n", b"\n")
+            .replace(import_line, replacement, 1)
         }
+
         def changed_ledger_source(
             root: Path, value: dict[str, bytes] = changed_proof
         ) -> dict[str, bytes]:
@@ -245,6 +246,40 @@ def test_qualification_producing_inputs_allows_only_anchor_literal(
         with pytest.raises(ValueError, match="original retained-demise ledger owner"):
             ci60.historical_ledger_owners(ROOT, ledger_name, owners)
     assert ci60.historical_ledger_owners(ROOT, ledger_name, owners) == ledger
+
+    test_proof = ci60.admitted(ROOT)
+    for name, pin in ci60.HISTORICAL_TEST_PINS.items():
+        current_test = test_proof[name]
+        assert policy.digest(ci60.historical_test_preimage(ROOT, name, current_test)) == pin
+        with pytest.raises(ValueError, match="unrelated current bytes"):
+            ci60.historical_test_preimage(ROOT, name, current_test + b"\n")
+    test_name = "tests/integration/test_fight_on_death_presence.py"
+    original_test = ci60.historical_test_preimage(ROOT, test_name, test_proof[test_name])
+
+    def wrong_test_native(root: Path, *args: str) -> bytes:
+        if args == ("show", ci60.BASE + ":" + test_name):
+            return original_test + b"\n"
+        return native_history(root, *args)
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "history", wrong_test_native)
+        with pytest.raises(ValueError, match="native preimage changed"):
+            ci60.historical_test_preimage(ROOT, test_name, test_proof[test_name])
+    tree = ast.parse(original_test)
+    assertion = next(node for node in ast.walk(tree) if isinstance(node, ast.Assert))
+    assertion.test = ast.Constant(value=False)
+    dropped = ast.unparse(tree).encode()
+    changed_test_proof = test_proof | {test_name: dropped}
+
+    def dropped_test_source(root: Path) -> dict[str, bytes]:
+        assert root == ROOT
+        return changed_test_proof
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "admitted", dropped_test_source)
+        with pytest.raises(ValueError, match="lost an original assertion"):
+            ci60.historical_test_preimage(ROOT, test_name, dropped)
+    assert ci60.historical_test_preimage(ROOT, test_name, test_proof[test_name]) == original_test
 
 
 @pytest.mark.parametrize("mutation", ["owner", "path", "profile", "prior_operation"])

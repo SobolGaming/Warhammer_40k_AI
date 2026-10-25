@@ -320,12 +320,22 @@ def test_ci_formatting_cannot_absorb_changed_benchmark_samples() -> None:
 
 @pytest.mark.parametrize("name", sorted(successor.CI_COMPAT_BEFORE))
 def test_ci_relocation_and_map_seam_match_exact_immutable_preimages(name: str) -> None:
+    from tools import performance_ci60_qualification as ci60
+
     record: dict[str, Any] = json.loads((ROOT / successor.CI_COMPAT_RECORD).read_bytes())
     before = subprocess.check_output(
         ["git", "show", successor.CI_COMPAT_BASE + ":" + name], cwd=ROOT
     )
     current = (ROOT / name).read_bytes()
-    if name == "tools/performance_qualification_successor.py":
+    if name in {
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py",
+    }:
+        current = ci60.preceding_control(ROOT, name, current)
+    if name in {
+        "tools/performance_qualification_successor.py",
+        "tests/code_quality/test_performance_preflight.py",
+    }:
         ci54.admit(ROOT)
         current = ci54.previous(ROOT, name, current)
     if name in successor.CI_RUNTIME_BEFORE:

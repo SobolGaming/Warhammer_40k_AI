@@ -14,6 +14,7 @@ from typing import Any, Protocol, cast
 import pytest
 from tools import cumulative_preservation as cumulative
 from tools import performance_category_migration as legacy
+from tools import performance_ci60_qualification as ci60
 from tools import performance_policy as policy
 from tools import performance_qualification_successor as successor
 from tools import performance_reconstruction_campaign as reconstruction
@@ -248,7 +249,10 @@ def test_every_d07_recipe_is_independently_sensitive_to_extra_or_removed_asserti
     refused: list[str] = []
     for path, recipe in recipes.items():
         before = (ROOT / cumulative.NAMESPACE / "predecessors" / (path + ".txt")).read_bytes()
-        current = read_historical_test_bytes(ROOT, path).replace(b"\r\n", b"\n")
+        current = read_historical_test_bytes(ROOT, path)
+        if path in ci60.HISTORICAL_DIRECT_TESTS:
+            current = ci60.historical_test_preimage(ROOT, path, current)
+        current = current.replace(b"\r\n", b"\n")
         cumulative.assert_recipe(before, current, recipe)
         # Even a recomputed current hash cannot authorize another AST occurrence.
         forged = current + b"\nassert False, 'unreviewed assertion'\n"
@@ -362,7 +366,8 @@ def test_later_d07_successors_preserve_exact_separate_prerequisite_stages(path: 
     before = subprocess.check_output(
         ["git", "show", cumulative.CONTENT_BASE + ":" + path], cwd=ROOT
     )
-    current = (ROOT / path).read_bytes().replace(b"\r\n", b"\n")
+    current = ci60.historical_test_preimage(ROOT, path, (ROOT / path).read_bytes())
+    current = current.replace(b"\r\n", b"\n")
     current = static_predecessor(ROOT, path, current)
     assert hashlib.sha256(before).hexdigest() == recipe["before_sha256"]
     assert hashlib.sha256(current).hexdigest() == recipe["after_sha256"]

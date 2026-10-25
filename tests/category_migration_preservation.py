@@ -406,6 +406,10 @@ lifecycle.submit_decision(DecisionResult.for_request(
 
 
 def _integration_migration_predecessor(root: Path, path: str, current: bytes) -> bytes:
+    if path == "tests/unit/test_phase17g_runtime_content.py":
+        from tools.performance_ci60_qualification import historical_test_preimage
+
+        current = historical_test_preimage(root, path, current)
     if path not in INTEGRATION_PREIMAGES:
         return current
     archive, before_hash, current_hash = INTEGRATION_PREIMAGES[path]

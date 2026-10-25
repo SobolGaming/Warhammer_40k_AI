@@ -349,9 +349,13 @@ def d07_predecessors(root: Path) -> dict[str, bytes]:
     canonical = {row["path"]: row for row in _json(root, NAMESPACE + "/baseline.json")}
     d09 = _json(root, NAMESPACE + "/d09-recipes.json")
     originals = _json(root, "data/source_audits/d07/original-tests.json")
+    from tools import performance_ci60_qualification as ci60
+
     results = {}
     for path in originals:
         live = read_historical_test_bytes(root, path)
+        if path in ci60.HISTORICAL_DIRECT_TESTS:
+            live = ci60.historical_test_preimage(root, path, live)
         if path in {
             "tests/code_quality/test_ci_performance_gates.py",
             "tests/code_quality/test_performance_policy.py",
