@@ -31,7 +31,11 @@ def test_current_measurement_route_is_exact_base_and_new_namespace_only() -> Non
 def test_current_source_token_requires_complete_actual_generated_trees(mutation: str) -> None:
     path = ROOT / "docs/performance/current/qualification40-external_contract_source_reuse.json"
     report = policy.read_object(path)
-    current = stage.producing_inputs(ROOT, policy.runtime_inputs(ROOT))
+    from tools import performance_ci60_qualification as ci60
+
+    # This is an immutable historical generated-tree assertion, not current credit.
+    current = ci60.historical_inputs(ROOT)
+    assert policy.canonical_digest(current) == stage.PRODUCING_INPUT_DIGEST
     binding = roles.expected_binding(ROOT, input_digest=policy.canonical_digest(current))
     roles.validate_generated_evidence(report["generated_output_binding"], binding)
     observed = cast(

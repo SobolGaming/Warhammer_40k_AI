@@ -673,6 +673,27 @@ def test_prior_current_measurements_cannot_be_overwritten_as_fresh_evidence() ->
     with pytest.raises(ValueError, match="not an assessed obligation"):
         _validate(value, changes, mapping)
 
+    from tools import performance_ci60_qualification as ci60
+
+    for historical_path, pin in ci60.SUPERSEDED_REPORTS.items():
+        preserved, changes, mapping = _assessment(historical_path)
+        preserved["base"] = ci60.PR_BASE
+        change = object_value(changes[historical_path])
+        change["before_sha256"] = None
+        change["after_sha256"] = pin
+        assert _validate(preserved, changes, mapping, base=ci60.PR_BASE) == set()
+        change["after_sha256"] = "f" * 64
+        with pytest.raises(ValueError, match="not an assessed obligation"):
+            _validate(preserved, changes, mapping, base=ci60.PR_BASE)
+        change["after_sha256"] = pin
+        change["before_sha256"] = pin
+        with pytest.raises(ValueError, match="Existing measurement records are immutable"):
+            _validate(preserved, changes, mapping, base=ci60.PR_BASE)
+        change["before_sha256"] = None
+        preserved["base"] = BASE
+        with pytest.raises(ValueError, match="not an assessed obligation"):
+            _validate(preserved, changes, mapping)
+
 
 @pytest.mark.parametrize("field", ["lock_sha256", "workload_sha256", "fixture_sha256"])
 def test_equal_stale_measurement_hashes_do_not_authenticate_current_inputs(field: str) -> None:

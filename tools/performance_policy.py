@@ -497,7 +497,12 @@ def validate_assessment(
             if object_value(change)["before_sha256"] is not None:
                 raise ValueError("Existing measurement records are immutable; use a new path.")
             if path not in referenced:
-                raise ValueError("New current evidence is not an assessed obligation.")
+                from tools.performance_ci60_qualification import retained_historical_report
+
+                if not retained_historical_report(
+                    base=base, path=path, change=object_value(change)
+                ):
+                    raise ValueError("New current evidence is not an assessed obligation.")
     return selected
 
 

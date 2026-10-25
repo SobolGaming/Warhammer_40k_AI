@@ -734,6 +734,9 @@ def _catalog(root: Path, base: str) -> _Builder:
     b.authorities["qualification.accepted-source"] = s.SOURCE_SHA256
     b.authorities["qualification.producing-inputs"] = s.PRODUCING_INPUT_DIGEST
     _reconcile(b)
+    from tools.performance_ci60_qualification import extend_catalog
+
+    extend_catalog(b)
     return b
 
 
@@ -1014,15 +1017,17 @@ def phase(root: Path, base_ref: str, pr_head: str | None) -> Iterator[Snapshot]:
     runtime = verified_engine_build_identity().build_id
     assessment = json.loads(owned(root, ASSESSMENT))
     comparisons = assessment["comparisons"]
+    from tools.performance_ci60_qualification import PR_BASE, comparison_paths
+
+    expected_comparisons = comparison_paths(root)
+    original_comparisons = {
+        family: "docs/performance/current/qualification40-" + family + ".json"
+        for family in expected_comparisons
+    }
     if (
-        identity["base"] != "5f509724da25a2f6ded0c2739a8e7c84bdf59c91"
+        identity["base"] != PR_BASE
         or assessment["base"] != identity["base"]
-        or len(comparisons) != 12
-        or any(
-            not isinstance(path, str)
-            or not path.startswith("docs/performance/current/qualification40-")
-            for path in comparisons.values()
-        )
+        or comparisons not in (expected_comparisons, original_comparisons)
     ):
         raise ValueError("History snapshot does not support this assessment cohort.")
     cohort = source_hashes(root, set(comparisons.values()) | {ASSESSMENT})

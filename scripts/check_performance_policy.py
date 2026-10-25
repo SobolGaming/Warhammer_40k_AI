@@ -232,11 +232,18 @@ def _validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict
             migration_applies(base=base, runtime_id=runtime_id, family=family)
             and (root / "docs/performance/policy-v3/category-migration-20261015").exists()
         )
+        from tools import performance_ci60_qualification as ci60
         from tools import performance_qualification_measurements as qualification
 
-        qualified_current = qualification.applies(base=base, path=path)
+        successor_current = ci60.applies(root, base=base, family=family, path=path)
+        qualified_current = successor_current or qualification.applies(base=base, path=path)
+        comparison_runtime = runtime_id
         current_binding: dict[str, object] | None = None
-        if qualified_current:
+        if successor_current:
+            measured_inputs, current_binding, applicability_sha, comparison_runtime = (
+                ci60.measurement(root, current=inputs, report=comparison, family=family)
+            )
+        elif qualified_current:
             measured_inputs, current_binding, applicability_sha = qualification.retained_inputs(
                 root, current=inputs, report=comparison, family=family
             )
@@ -306,7 +313,7 @@ def _validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict
             validate_comparison(
                 comparison,
                 base=base,
-                runtime_id=runtime_id,
+                runtime_id=comparison_runtime,
                 input_digest=canonical_digest(measured_inputs),
                 family=family,
                 specification=specification,

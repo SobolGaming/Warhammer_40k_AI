@@ -208,13 +208,18 @@ def previous(root: Path, name: str, supplied: bytes, *, predecessor: bytes | Non
 
         if name not in BORROWED_PREDECESSORS or preflight_pins.get(name) != BEFORE.get(name):
             raise ValueError("CI54 predecessor borrowing is not admitted for this path.")
+    from tools import performance_ci60_qualification as ci60
+
     before_pins = BEFORE | SNAPSHOT_BEFORE
     if name not in before_pins:
-        return supplied
+        return ci60.preceding_control(root, name, supplied)
     actual = owned(root, name)
     if name == ASSESSMENT:
         admit(root)
-    elif digest(actual) != PINS[name]:
+    elif (
+        digest(actual) != PINS[name]
+        and digest(ci60.preceding_control(root, name, actual)) != PINS[name]
+    ):
         raise ValueError("CI54 Preflight source changed: " + name)
     if supplied != actual:
         raise ValueError("CI54 predecessor caller supplied unrelated bytes.")
@@ -226,8 +231,14 @@ def previous(root: Path, name: str, supplied: bytes, *, predecessor: bytes | Non
 
 def admit(root: Path) -> None:
     """Read the one bounded successor inventory afresh; no mutable admission cache."""
+    from tools import performance_ci60_qualification as ci60
     from tools.performance_policy import owner_hashes
     from tools.performance_preflight_successor import read_frozen_blobs
+
+    projection = ci60.control_projection(root)
+
+    def preceding(name: str) -> bytes:
+        return projection[name] if name in projection else owned(root, name)
 
     freeze = FREEZE
     if freeze is None or len(freeze) != 40:
@@ -240,10 +251,10 @@ def admit(root: Path) -> None:
     frozen = read_frozen_blobs(root, freeze, [SELF, ASSESSMENT, *PINS])
     marker = b"\nFREEZE: str | None = None"
     activated = frozen[SELF].replace(marker, f'\nFREEZE: str | None = "{freeze}"'.encode(), 1)
-    if frozen[SELF].count(marker) != 1 or owned(root, SELF) != activated:
+    if frozen[SELF].count(marker) != 1 or preceding(SELF) != activated:
         raise ValueError("CI54 source activation changed.")
     for name, pin in PINS.items():
-        if digest(frozen[name]) != pin or digest(owned(root, name)) != pin:
+        if digest(frozen[name]) != pin or digest(preceding(name)) != pin:
             raise ValueError("CI54 Preflight source changed: " + name)
     record: dict[str, Any] = json.loads(frozen[RECORD])
     if record.keys() != {"schema", "base", "changes"} or record["schema"] != "exact-ci-quality-v1":
@@ -279,30 +290,38 @@ def admit(root: Path) -> None:
     row = assessment["changes"][SELF]
     row["after_sha256"] = digest(activated)
     row["owners"]["@module"]["after"] = owner_hashes(SELF, activated)["@module"]
-    if json.loads(owned(root, ASSESSMENT)) != assessment:
+    if json.loads(preceding(ASSESSMENT)) != assessment:
         raise ValueError("CI54 assessment changed outside exact activation.")
 
 
 def current_source(root: Path, previous_source: dict[str, str]) -> dict[str, str]:
+    from tools import performance_ci60_qualification as ci60
+
     admit(root)
-    return (
+    projection = ci60.control_projection(root)
+    preceding = (
         previous_source
         | PINS
         | {
-            SELF: digest(owned(root, SELF)),
-            ASSESSMENT: digest(owned(root, ASSESSMENT)),
+            SELF: digest(projection[SELF]),
+            ASSESSMENT: digest(projection[ASSESSMENT]),
         }
     )
+    return ci60.current_source(root, preceding)
 
 
 def measurement_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     """Project only exact reviewed development controls, never engine/workload inputs."""
+    from tools import performance_ci60_qualification as ci60
+
     admit(root)
-    result = dict(current)
+    projection = ci60.control_projection(root)
+    result = ci60.measurement_controls(root, current)
     for name in PINS.keys() | {SELF}:
         if name not in result:
             continue
-        if result[name] != digest(owned(root, name)):
+        raw = projection[name] if name in projection else owned(root, name)
+        if result[name] != digest(raw):
             raise ValueError("CI54 actual input collector omitted current control bytes.")
         if name in BEFORE | SNAPSHOT_BEFORE:
             result[name] = (BEFORE | SNAPSHOT_BEFORE)[name]

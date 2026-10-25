@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
-  "operation_map_sha256": "1ceb2c0784d67c87e784ccc7f748a1a3389940d3d251ae4c3c5f09d7956d9ea9",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
+  "operation_map_sha256": "ce4a3f4d47f62fab2ee7a9f7d2f4f8e1fa637e2468062835c98733e6e00b8f70",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
@@ -336,11 +336,11 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "355a9fc20e53c1d675db0d8ef38e9da2b9fcab608d9ee601da7dc0d8b0ffaca7",
-      "after_sha256": "b606f3c9b4454819a71544f874e9b7f62d403a8dedb62a3ad4a9873850b5b5b0",
+      "after_sha256": "055aeee67663442b506c62e319a035e88f062c415eaec86098097e3d2565e1e0",
       "owners": {
         "@document": {
           "before": "355a9fc20e53c1d675db0d8ef38e9da2b9fcab608d9ee601da7dc0d8b0ffaca7",
-          "after": "b606f3c9b4454819a71544f874e9b7f62d403a8dedb62a3ad4a9873850b5b5b0"
+          "after": "055aeee67663442b506c62e319a035e88f062c415eaec86098097e3d2565e1e0"
         }
       }
     },
@@ -446,21 +446,21 @@
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "342ae97187046486c752cc04d42c0c4aff866ca6575a014f6606019c9aa238cb",
-      "after_sha256": "51eb853916a6418f19848814550b96332ea9298bf6d6cbbc3849116d0b6cc292",
+      "after_sha256": "ccac9315d07ec3abb1122f7a17a0275d16f3b1f1184de0d6a33c36fa2e016bcc",
       "owners": {
         "@document": {
           "before": "342ae97187046486c752cc04d42c0c4aff866ca6575a014f6606019c9aa238cb",
-          "after": "51eb853916a6418f19848814550b96332ea9298bf6d6cbbc3849116d0b6cc292"
+          "after": "ccac9315d07ec3abb1122f7a17a0275d16f3b1f1184de0d6a33c36fa2e016bcc"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "017f8429503c3f6fd11c9f747b8ff1f912dcebc253d8bebc26771dc3a9455a11",
-      "after_sha256": "5bcb6a9314fbbaec40b6a0c9a61b69abfefd483ea56763d422bc738e6734b72b",
+      "after_sha256": "fde4a82600715d6097c41c82ee373473fe69e658b4c6da8287584af560ec7b4f",
       "owners": {
         "@document": {
           "before": "017f8429503c3f6fd11c9f747b8ff1f912dcebc253d8bebc26771dc3a9455a11",
-          "after": "5bcb6a9314fbbaec40b6a0c9a61b69abfefd483ea56763d422bc738e6734b72b"
+          "after": "fde4a82600715d6097c41c82ee373473fe69e658b4c6da8287584af560ec7b4f"
         }
       }
     },
@@ -476,51 +476,51 @@
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "a8a644e288685ced32a004c9a0b38076b64419a7fd8ac2d620860fd4e41cdfd3",
-      "after_sha256": "d0dff6921c48ea9fb823c58c0110685434710fcb2ef338cdff98e1aeb279f7d8",
+      "after_sha256": "119019dd799f7ff89aefb491c51a4fa2e06d364d50fb7b3fcbb1574c40f6081b",
       "owners": {
         "@document": {
           "before": "a8a644e288685ced32a004c9a0b38076b64419a7fd8ac2d620860fd4e41cdfd3",
-          "after": "d0dff6921c48ea9fb823c58c0110685434710fcb2ef338cdff98e1aeb279f7d8"
+          "after": "119019dd799f7ff89aefb491c51a4fa2e06d364d50fb7b3fcbb1574c40f6081b"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "ba77342ecc7b585c87fc1671874f7b5795bfc77cc4ef950fdd1f8be181daaff6",
-      "after_sha256": "1cbe1672f90f93a8277bb9eb9280a6f4a6ef8bc410cbc4cce6348c53bc338faf",
+      "after_sha256": "176ac7e2f9a83f4765233b28e4efa5464f1a78c8d5cd1a4b6a24504eb1c60a83",
       "owners": {
         "@document": {
           "before": "ba77342ecc7b585c87fc1671874f7b5795bfc77cc4ef950fdd1f8be181daaff6",
-          "after": "1cbe1672f90f93a8277bb9eb9280a6f4a6ef8bc410cbc4cce6348c53bc338faf"
+          "after": "176ac7e2f9a83f4765233b28e4efa5464f1a78c8d5cd1a4b6a24504eb1c60a83"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "fd6ad8fa8c399f9d8b27fe53c3fb47f88d39870c016a07916ca4c795681ecf6d",
-      "after_sha256": "e890f9d6a6249613c344eb6929f495cd4e34d761cddf484f0df6ee7ee5a0d6a5",
+      "after_sha256": "a8a2cc04f6da4db27bd57e529c897ba20f554bd54e9524678f05963f65e96f0a",
       "owners": {
         "@document": {
           "before": "fd6ad8fa8c399f9d8b27fe53c3fb47f88d39870c016a07916ca4c795681ecf6d",
-          "after": "e890f9d6a6249613c344eb6929f495cd4e34d761cddf484f0df6ee7ee5a0d6a5"
+          "after": "a8a2cc04f6da4db27bd57e529c897ba20f554bd54e9524678f05963f65e96f0a"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "f950b2d52c18390246725039632ca0766004ec3ad90f5a06f892684bce4ac968",
-      "after_sha256": "0a0c416e94d6d13a909b7fb9960a2ac6165d148e2c482721e38c0f0682b1b25b",
+      "after_sha256": "f15382f4facebd95fbb2a16ff320580be35ec5c69881629a4fc1902554ae3922",
       "owners": {
         "@document": {
           "before": "f950b2d52c18390246725039632ca0766004ec3ad90f5a06f892684bce4ac968",
-          "after": "0a0c416e94d6d13a909b7fb9960a2ac6165d148e2c482721e38c0f0682b1b25b"
+          "after": "f15382f4facebd95fbb2a16ff320580be35ec5c69881629a4fc1902554ae3922"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "3723e0bf79cc163c521f6c7636d903aef987237431116cc128539366849d7e66",
-      "after_sha256": "e6138ef974d173afeb7819dd11a33224fd34c399b9903acff0d2d2ca726aa455",
+      "after_sha256": "45e51857d39f1133405bf610fb12b1a47c1ff84d8d57c244538772e9b07bd3ea",
       "owners": {
         "@document": {
           "before": "3723e0bf79cc163c521f6c7636d903aef987237431116cc128539366849d7e66",
-          "after": "e6138ef974d173afeb7819dd11a33224fd34c399b9903acff0d2d2ca726aa455"
+          "after": "45e51857d39f1133405bf610fb12b1a47c1ff84d8d57c244538772e9b07bd3ea"
         }
       }
     },
@@ -571,6 +571,66 @@
         "@document": {
           "before": "3214a0f3951b6fb921cd09e71bea7f741c06ba06a214db4f4573da5bd7d644e5",
           "after": "b19ad632479d97f4d0624bbdeb2bc8c9c42bc351fcfd4a0894b499791e149438"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/added-operations.json": {
+      "before_sha256": null,
+      "after_sha256": "6532b6b9fe477ac107ac8c325483d9bddfd887ea55af9ddec9a5360410610aba",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6532b6b9fe477ac107ac8c325483d9bddfd887ea55af9ddec9a5360410610aba"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/changed-members.json": {
+      "before_sha256": null,
+      "after_sha256": "1f7897c5048136b76bcee2dc68a0b0ce372a9f266ad9c8e0bdea84d623ee647c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1f7897c5048136b76bcee2dc68a0b0ce372a9f266ad9c8e0bdea84d623ee647c"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/control-transitions.json": {
+      "before_sha256": null,
+      "after_sha256": "2c3b3a0a57f59727b2800c3b61d67b63380175e9a1fc61957e34ea9368cf7531",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2c3b3a0a57f59727b2800c3b61d67b63380175e9a1fc61957e34ea9368cf7531"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/family-plan.json": {
+      "before_sha256": null,
+      "after_sha256": "46b9e4a1e85edcea41453e21afaeeda9162ddab0e43222bd47c507a04a2c85cb",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "46b9e4a1e85edcea41453e21afaeeda9162ddab0e43222bd47c507a04a2c85cb"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/producing-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "d1f450f582de7d65c93c8b8095b9f80c08f6e92154af9349781002c95b07abf7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d1f450f582de7d65c93c8b8095b9f80c08f6e92154af9349781002c95b07abf7"
+        }
+      }
+    },
+    "data/source_audits/ci60_qualification_v1/retained-role-proofs.json": {
+      "before_sha256": null,
+      "after_sha256": "5bb514116306f2de184d8733817139dc8181de5af0e05548c6bcd1a81dcfe4d3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5bb514116306f2de184d8733817139dc8181de5af0e05548c6bcd1a81dcfe4d3"
         }
       }
     },
@@ -2434,13 +2494,43 @@
         }
       }
     },
+    "docs/CI57_CORRECTNESS_SCOPE.md": {
+      "before_sha256": null,
+      "after_sha256": "9d9b5741486349c1b5e369f82403d466b13ad00f40e6f18a29acdeeba5e77f4c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9d9b5741486349c1b5e369f82403d466b13ad00f40e6f18a29acdeeba5e77f4c"
+        }
+      }
+    },
+    "docs/CI58_RUNTIME_SCOPE.md": {
+      "before_sha256": null,
+      "after_sha256": "7511ce556d73fe176f7951433e8fe2d3257107fe63aa8906abc4d412489ff889",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "7511ce556d73fe176f7951433e8fe2d3257107fe63aa8906abc4d412489ff889"
+        }
+      }
+    },
+    "docs/CI60_QUALIFICATION_SCOPE.md": {
+      "before_sha256": null,
+      "after_sha256": "d3bca5548dd0d0fe7ae7f5d1bfc582a46e6e27826e9d772ffdd52fbc51fe02de",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d3bca5548dd0d0fe7ae7f5d1bfc582a46e6e27826e9d772ffdd52fbc51fe02de"
+        }
+      }
+    },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-      "after_sha256": "8205271957c765766bfe08a1dd464cf230199d3acc30724705212b1929960445",
+      "after_sha256": "ea15fc520fdc6250c466f3c472cd7a6b6ff67d263b7625ade26b276572c4fcce",
       "owners": {
         "@document": {
           "before": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-          "after": "8205271957c765766bfe08a1dd464cf230199d3acc30724705212b1929960445"
+          "after": "ea15fc520fdc6250c466f3c472cd7a6b6ff67d263b7625ade26b276572c4fcce"
         }
       }
     },
@@ -2916,11 +3006,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "d18e059bfde5abae9d9196cc16ebb46e417d0e8a4aa5fb810ee1b630c58c5b8f",
+      "after_sha256": "50611268f0c34e8758d39900967097ddc49c9973ab23ff1c42f5a28287ee9316",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "d18e059bfde5abae9d9196cc16ebb46e417d0e8a4aa5fb810ee1b630c58c5b8f"
+          "after": "50611268f0c34e8758d39900967097ddc49c9973ab23ff1c42f5a28287ee9316"
         }
       }
     },
@@ -2960,7 +3050,7 @@
     },
     "scripts/check_performance_policy.py": {
       "before_sha256": "520da31556b55271ce74af77e553281d5974e6faf9b8baf23bcd8b5a76605b12",
-      "after_sha256": "a662c87aff61d5e49b7edbec93ac5109b2713f3269e4aff14db5a939aedd704a",
+      "after_sha256": "b7b189896c086175d54681716a50d0020a96e843978fb760546b1bccb86660f5",
       "owners": {
         "@module": {
           "before": "49fc81fc3951fdcedab7cb2b0f62867313d7828aae3a09bce8e55652b185957f",
@@ -2976,7 +3066,7 @@
         },
         "_validate_current": {
           "before": null,
-          "after": "d62cb94c20a6536700c5c4d90993d0ff4678756fac3f9d4cd58a92c33192369c"
+          "after": "ac389ad149c85eafb2e2a2d89e777f66156a4be8e00e9c068492863fd3096317"
         },
         "main": {
           "before": "5d57c4ed7db2a0ef34e71dc84c275bf90401ba2daacb4579864d0adb81acbcf1",
@@ -3303,11 +3393,11 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "b3f45468657d97f8242ecfb4f49e5fa8becfca8b2f6957721228fb44d04a1f6f",
-      "after_sha256": "b6b896a59ff7e2369a7b0f98d646959e52fe1f512aed81da5953e1dff3bccdc0",
+      "after_sha256": "de81bf5648c419d0aff27fa9b87e30b742ac3775d51ad3038f357abe247f241d",
       "owners": {
         "@document": {
           "before": "b3f45468657d97f8242ecfb4f49e5fa8becfca8b2f6957721228fb44d04a1f6f",
-          "after": "b6b896a59ff7e2369a7b0f98d646959e52fe1f512aed81da5953e1dff3bccdc0"
+          "after": "de81bf5648c419d0aff27fa9b87e30b742ac3775d51ad3038f357abe247f241d"
         }
       }
     },
@@ -3901,6 +3991,72 @@
         }
       }
     },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/generated_manifest.py": {
+      "before_sha256": "82bd099f7bef7a5ac80250308f53a049679b3356e5f0440a2e7ce3c487b9ff05",
+      "after_sha256": "ac7cde842c7d205c45ec52a3ac245fdff5f47449c30d728f235f73c11fa45065",
+      "owners": {
+        "@module": {
+          "before": "a790f8ff694739f275a26c831c8a81b92c6c0e5831def9dc5c136c93ac359a4f",
+          "after": "3a574ff3c65a31edaaedd4951591383e0746feac725593f19e63e789a11445bd"
+        },
+        "_ExecutionRecordIndex": {
+          "before": null,
+          "after": "9d380178b2f26920e27b1ec51979f39c687f6fb77ffc7b00ad6adaf99919ee51"
+        },
+        "_detachment_row": {
+          "before": "8ecbbec22923f897909720fb71812b42f48864dc91df1e8e3ddb07fec7a0ab58",
+          "after": "ea46c2a36bb9a55f14283a45f61101bac85a26299ef9036c11b6963df2894287"
+        },
+        "_enhancement_row": {
+          "before": "4eb48038d1cb479886268cff992611c2c06867010d6101e448e0587cfc32fac6",
+          "after": "2edf8ff98b74463a0ed11c13c7adbddf4c77d3bf68d4fb7578ba54bc82d122a3"
+        },
+        "_executable_execution_ids_for_rule": {
+          "before": "501edeb89c54daa92adb0b9855f5ed07a1e90983e4539b6d6bc3d1e9aa4afac8",
+          "after": "b7fb2027375cbd43acd9fce829fbfee5979ef72d9c4caf42b34c3303172899e4"
+        },
+        "_execution_ids_for": {
+          "before": "95f0d7eda2addc76412f2d4a372a34116f51a0fad4878b20aca1d2ef3b17e862",
+          "after": "c0d9b6774801afee0c51072b738813e69170ae08c07c026c2216388246e09855"
+        },
+        "_execution_record_index": {
+          "before": null,
+          "after": "770bca90765cdee914a4a03ee1ca300a27592b7b23c0bcebf6f7946747e687ce"
+        },
+        "_faction_row": {
+          "before": "848f8d0a456b612d3feaf10128519d00535fe0d29bf7278c1c4c699f83f7c8c9",
+          "after": "a84da8e9bd33e7a3b427f7c5988eb6b1cb081369aab679204ad064b3fd4aa958"
+        },
+        "_pilot_runtime_content_rows": {
+          "before": "3938377fc339f7c07d495fbeefacf8e015c3b278b006dff1233888df2593ecd5",
+          "after": "70b901633e9b042a9d88deada166ae7e9e76e62aba620301c12cc44bce1b027c"
+        },
+        "_row": {
+          "before": "83324febb97ea4bf45a24cf4118d41768173365357504734dabaaa522d41ace6",
+          "after": "d3c06a3ac28b7d749ab6b02120a9449a7810541602291a44377bb9b5b054d204"
+        },
+        "_semantic_status_for_execution_ids": {
+          "before": "2bad0e876d4c7c05af62b999b25c559d275dd9482630c8dd2c82246c718878e9",
+          "after": "d9870465f9bb64eb18fc2c8fc105336f6f7791317103eaf9a2207591420ccd03"
+        },
+        "_source_ids_for": {
+          "before": "c03083634f4c80400531e84e4221ab676f555ad72840ed1d78f06bfafbfe16a9",
+          "after": "cbd157ccbce14d0fce6ddfb845f70cd7e69372d69168d6f284400d716aab45d9"
+        },
+        "_source_ids_for_rule": {
+          "before": "cd3c7f56c9c4a33173449ce73e3d50374d8e9327450acbe9451d9c37d7c8bfaf",
+          "after": "dd7df8a9b0788c26dc39113a88319ed45352ecac25e5becd0db85050e3faaff1"
+        },
+        "_stratagem_row": {
+          "before": "ea655f706c17820aea3ee7ca4e8f024f38144f0b3ab94ad53f0a39b194c3a3e6",
+          "after": "6dab24f117692fbab8729341f40230e80118c8531c43cbe2d835aee20080e721"
+        },
+        "generated_runtime_content_rows": {
+          "before": "124c085fe8bfb0ea3425daf2df30d92f2a891fbc1c9ec1e26cb1b388b9e6d6e6",
+          "after": "c52634c8eb280bdd39f4fc0958b670119fcc35120a3c5ae7325aba64d87d20e1"
+        }
+      }
+    },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py": {
       "before_sha256": "252597486eb907fc2452c593bc181527a7c7e291c449581a34366c309d7036d2",
       "after_sha256": "4f7f5558470c3feb0d7cd53bd3c02df3791c9f94970e6e8b682a1940022ebf0b",
@@ -4173,17 +4329,57 @@
         }
       }
     },
+    "src/warhammer40k_core/engine/model_destruction_cause_authority.py": {
+      "before_sha256": "b4ec2cf988ee099490d10bd80d15faa23956e6a66b596dc117c1a7ed2224d83d",
+      "after_sha256": "89fd630f98562ca5c10cbeca1c0efe6cf224d8574ffcb8f1359a0986b7d4a93c",
+      "owners": {
+        "@module": {
+          "before": "e9da96f4e5c5e785f8b1c41fe20f1f3d8451586e5ed09009c63b597d00884eb6",
+          "after": "c4b1eb34ff02702c1ac120b9a00b673c6c54c53755aa146682dbcd42edd5450e"
+        },
+        "validate_model_destruction_cause_authority_restore": {
+          "before": "ce659df241c667972deb95b83ebf02040fb744b602d4b58c187bd4b4a6293722",
+          "after": "281c8922546d60ceaadc70c392e3b9abbf031b5bf0505e89f9cb55085a43e30e"
+        }
+      }
+    },
     "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py": {
       "before_sha256": "f9f6b0cc8a54398b1d26e3d7362eb8cafad9a9a2b8c7e221c4b80ac5fc87c14b",
-      "after_sha256": "39e899cc655836022c77d81558470755f3a754f5a7847283f641b2f74fc48452",
+      "after_sha256": "223241ff32ca0c0ab5fecb0a8816a875b5c3e6e121c8ad033fe7d79e91cff5e2",
       "owners": {
         "@module": {
           "before": "0bad98ddc14dbd16f5e08d2e0de09d2558c20cfd652f34e050b1047e5335dc2d",
           "after": "d347b2e90d8fabf9e2869823601ee1e9a0fc4b3055d27399830576ec35523823"
         },
+        "_attack_deadly_demise_parent_and_application": {
+          "before": "df4ab20ef7ca16ace88048e3c78c50905e38cd19d0747e4af474a51928fc8a44",
+          "after": null
+        },
+        "_validate_attack_deadly_demise_collateral_finalization": {
+          "before": "3dea1a495b9651d2f9943c313b5136dab08ffde615bedbb334cfd21ceb836047",
+          "after": "2d603437b43b84f1448083d62be881108622368cfde4be4508872773bbedacd8"
+        },
+        "_validate_pending_attack_deadly_demise_collateral_continuation": {
+          "before": "f3269dde9509119e32bb015c1b834b1a05223619b316504d77c0523e2a826ca9",
+          "after": "7bf9122d313c78a92a9b1ffadd95acdde09d277589adb8342c35be7e4e6f2bce"
+        },
+        "attack_deadly_demise_parent_and_application": {
+          "before": null,
+          "after": "cbb3d699be437e30ae3e6827121f25dc279a1e5abc6d8a3d1bb6dc49993ecdc0"
+        },
         "validate_pending_model_destruction_cause_inventory": {
           "before": "c975676c2b58e5f6c3d4fe9adf4da5d54a230078906850ac66238aa41d7ac67d",
-          "after": "296dd3e46a652dd647d21feb5df5225ce20fd9d4a2b45da36d98da3d9893662c"
+          "after": "f9ccac484443b192dbc11de910c82aa7f57c93e1ad047d9f5a72960ac5a4efe7"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/model_destruction_cause_producers.py": {
+      "before_sha256": "b4b2a2161bf241c4d0c64e44c542f649acf18b8989fe8c02a671d255b76ca139",
+      "after_sha256": "9542b0a0454ca2dc2265abf021406792aa6150b5f8a924aa50abe4675c9d2876",
+      "owners": {
+        "validate_model_destruction_cause_restore": {
+          "before": "1cae81c9d6aba49349d3bf7de18a2b8255f26799e284639cea30f2017d705796",
+          "after": "7d785266cddf057e0b0c8cf2fa78fcbcf316777909622598675629d28e6d74c8"
         }
       }
     },
@@ -4571,15 +4767,19 @@
     },
     "src/warhammer40k_core/engine/retained_demise_removal.py": {
       "before_sha256": null,
-      "after_sha256": "59e685da563e6cd0ed95bfe4d69e9c06e625a679f0f443ff3fc5c3bff5fad880",
+      "after_sha256": "48f911ed0726091b04dbd497dbab33f1952502578eed9d24dacf14b85d261c45",
       "owners": {
         "@module": {
           "before": null,
-          "after": "482b60427ede07c2ef519a7633aa53e463c05dc353290f26e34cfe62594ced83"
+          "after": "fde9ffe9f023bf0d1fcbfed6c10bdf62481d0915bbaeda34462525a28e51ec79"
         },
         "finalize_attack_casualty": {
           "before": null,
           "after": "a792b9a552aba3a8c820378569fb0ef9ac9d1a021d9a6d8f00b3551741401a6f"
+        },
+        "is_post_removal_deadly_demise_child": {
+          "before": null,
+          "after": "87daf629ed3279aa7e7829d35af4f8aa8f1f5620212aba41ad4317061afafb74"
         },
         "require_retained_attack_removed_cause": {
           "before": null,
@@ -4592,6 +4792,16 @@
         "retained_fight_removed_event": {
           "before": null,
           "after": "9ff81cf698e2ff2cebd6a23bbdd52c678e111db3868e824700023845da1878cb"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/retained_destruction_history.py": {
+      "before_sha256": "5a23f6af83cee991c0207073c43e58e13e1e2e80ac285acea07b1385102a5ead",
+      "after_sha256": "c1cd862e38ed2ad2aaefe829e5ffa29b11bc00fcfe3f0195923e65a0d31ce1ee",
+      "owners": {
+        "validate_retained_destruction_history": {
+          "before": "2d6806c533fc991dbad38f64289a92a10696b467dae9917b7a5a671f28c2275e",
+          "after": "f578947b93e8046fc425550d4b1dd7db3f4f7ba5ea166f067a05d9c6a530091c"
         }
       }
     },
@@ -5735,7 +5945,7 @@
     },
     "tests/code_quality/test_performance_policy.py": {
       "before_sha256": "f21c4726c30d75d7f8ddc534d0172d5a4485b98bdece6bac06bd2f64e349c6a3",
-      "after_sha256": "8494642f66f70ce0cc71d330e164eba067e90e9ebea3eb1f0c11fbb4dbc25c69",
+      "after_sha256": "f45929b1d7138997e9bef8a390ca7fa1b1db467816cc6534871dd850222ddb98",
       "owners": {
         "@module": {
           "before": "a49efcea4924e5b6afbd931551030bde32122441c0f66fad7932722ea46c6c84",
@@ -5744,6 +5954,10 @@
         "test_current_smoke_is_in_the_required_serial_ci_lane": {
           "before": "f501169ba91d2ef5faf1b099965630332381969d39bc671e511ee89e3fb4d3da",
           "after": "dd47b6bf23c8497440101efe8241078b9d67422ce9b03fc632ba91e4b93c86db"
+        },
+        "test_prior_current_measurements_cannot_be_overwritten_as_fresh_evidence": {
+          "before": "f56186af4b5a104494b73a69d7f195732aa5db3ebbb9e07dd2ec6946e2295808",
+          "after": "6db2527fcbdaa8e8517ab7959d4bc244963468eca198e712e123e652184dd98d"
         }
       }
     },
@@ -6223,7 +6437,7 @@
     },
     "tests/code_quality/test_qualification40_measurements.py": {
       "before_sha256": null,
-      "after_sha256": "17e8b554d54f3ccb7d94ab70b1ac686ce59e994adc428c904dcb5915042702ea",
+      "after_sha256": "b6f774971c06d7071f1acf0f5e41f256b97733cde3e1e4c51ea7f7540472badc",
       "owners": {
         "@module": {
           "before": null,
@@ -6239,13 +6453,13 @@
         },
         "test_current_source_token_requires_complete_actual_generated_trees": {
           "before": null,
-          "after": "14db8031cc573be77b6b03a53ba8fb9880280b82ad641b33266cb336871ff2ab"
+          "after": "0fa665a01f58e1d8f7446717f44ffbe0942458ad3362b7192cfc76a1565c4b6f"
         }
       }
     },
     "tests/code_quality/test_qualification40_successor.py": {
       "before_sha256": null,
-      "after_sha256": "bc50d496af49cd36d88e33cea60c01bf64f5ad040ff41b1f66d1f6353fa7a890",
+      "after_sha256": "086835709e553a7a22c7c240e71473dd5db26ec4364bc5503e9001dd260a0c1e",
       "owners": {
         "@module": {
           "before": null,
@@ -6293,7 +6507,7 @@
         },
         "test_qualification_producing_inputs_allows_only_anchor_literal": {
           "before": null,
-          "after": "fd427be33bea72af7ca29fa2d7f898abe62da8afcafd026e80a715fb0c996978"
+          "after": "94a20cf87134a22820aede1cc8989c0a69c886297047395d4faf8cae431a9a99"
         },
         "test_qualification_rejects_live_fixture_source_evidence_or_control_drift": {
           "before": null,
@@ -6303,7 +6517,7 @@
     },
     "tests/code_quality/test_quality_runtime.py": {
       "before_sha256": null,
-      "after_sha256": "7f6710fc78c0f81256f75aea97beb8991f6ea23c2f6f95a62be8fb4e9a1b85ca",
+      "after_sha256": "b7febd6a1a0d98a15b8675ae7f06b7e59725f1e6614f1cce52150e911f4787d2",
       "owners": {
         "@module": {
           "before": null,
@@ -6407,7 +6621,7 @@
         },
         "test_history_snapshot_preimages_extend_only_existing_native_bridge": {
           "before": null,
-          "after": "d135bad846edd42e9af96419236319940708504a6d41380d59b4eb635b08507a"
+          "after": "f97fc5f68263dd97294047bb12d7c6136a2ae205d5fd195900c9988d17aae95c"
         },
         "test_ignored_source_and_bytecode_cannot_escape_exact_checkout_admission": {
           "before": null,
@@ -9015,6 +9229,16 @@
         }
       }
     },
+    "tests/fixtures/phase18a_projection_join_sample.json": {
+      "before_sha256": "304d9e0de7571acb06c85bc6883774f058fd8f7e3c1b6230009c9b13287b43aa",
+      "after_sha256": "b6dfd67b835a5cc416ec27694ebc3ce562331f05acc13f1bd299cbee10b4d64b",
+      "owners": {
+        "@document": {
+          "before": "304d9e0de7571acb06c85bc6883774f058fd8f7e3c1b6230009c9b13287b43aa",
+          "after": "b6dfd67b835a5cc416ec27694ebc3ce562331f05acc13f1bd299cbee10b4d64b"
+        }
+      }
+    },
     "tests/indirect_shooting_helpers.py": {
       "before_sha256": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9",
       "after_sha256": "dbca147e17f121e989e9e558326aec85e7e550a3822a80efe8919dcf1c6bbf1b",
@@ -9045,11 +9269,19 @@
     },
     "tests/integration/test_fight_on_death_presence.py": {
       "before_sha256": "30104bd3e02a18b7ec23dcccad9d1a52836aef1d83c3df1312a5701fbeed0b56",
-      "after_sha256": "c63c3b334a69aa742e86da70d61f602a4eaf5144a51da88c1837bbc228917123",
+      "after_sha256": "d02fbce3f0f9828671328ede56d50d760dfb983d56c4cd524307847342838b82",
       "owners": {
+        "@module": {
+          "before": "ba13dd449d1fac1b3b91110bf7f06d9ae9f47e4021fb25d4109abaad0b4175a2",
+          "after": "66e59332e2ec14d06a8c2424dce9831cfbbf15c6dfb5f0de57f8a1bbe1312365"
+        },
         "test_order_30_cleanup_feel_no_pain_pauses_and_restores_before_source_removal": {
           "before": "44c87bcee660276b1974d744e41a8f84ca877470bd714c87b5b59bc58dd6de74",
           "after": "fde941a7a2f80563ccf939f580f5319495028ed5418add6cc93be7f3808a5ef2"
+        },
+        "test_order_30_collateral_retention_preserves_parent_cleanup_and_restores": {
+          "before": "19fdb3b341c02df1e514fa5624104a8ff3976b653c29c3ea3783426b540efff7",
+          "after": "33e7cb899d62a4a6b7bd304f1ab8245b382ea5d81a5b277fd91e073f15fd7422"
         }
       }
     },
@@ -16943,6 +17175,44 @@
         }
       }
     },
+    "tests/setup_completion_helpers.py": {
+      "before_sha256": "928c24e7775f97890720fee9619432029bed4821ff1a5c72871148af02c12c15",
+      "after_sha256": "c9017081c728c69471d3a08a8a127156f84e388303767dd18deda20dbfa34907",
+      "owners": {
+        "@module": {
+          "before": "05bd0056c52c5f69d1fb3a3fa04492b07c54692707f79d3854b155df08ca6fb4",
+          "after": "fc1cb1e0ad29e964507f52bb50df053d783c15e40f801635eebacfaf920ef513"
+        },
+        "place_attached_components_coherently_for_fixture": {
+          "before": null,
+          "after": "6098a4b471bc0dbe3a4324a892976603d4220194621b3a33b9f345ccb68d53e1"
+        }
+      }
+    },
+    "tests/shared/category_migration/phase11e_mission_scoring_cleanup_configuration.py": {
+      "before_sha256": "dcf42d1f5991ab5ced6061152472bc00e415117709c4c30846f8f709069a8553",
+      "after_sha256": "4d985f3b277590588dfce7cf86cf0d7912865b1243a7320be12614574469c22e",
+      "owners": {
+        "@module": {
+          "before": "866aec50589524d3e28dae06abe286be0fd8248781da56a28b8e6ee4cba87eef",
+          "after": "922e6ec961dcabff1db2a73eb223f075ee7e1a2bf54264112ee3e9fcfa3abab1"
+        },
+        "_battle_state_from_config": {
+          "before": "1fbc662577bd269831e491090559496a56c6c2381be1799734e17e7e07085829",
+          "after": "64ce30391c6cf16d3b6602ac9e41ab71a10f4c64b077a11aa564a2f600764a98"
+        }
+      }
+    },
+    "tests/shared/category_migration/phase11e_mission_scoring_cleanup_history_and_reserves.py": {
+      "before_sha256": "3f579830b668704ccbfd4b94da524df1c74e297ab52614ae0168ef298e6144da",
+      "after_sha256": "8baa9e74e80199b2a2b9698c97ad40b7ca5ee9162c24d063bc381142b3d8987b",
+      "owners": {
+        "_authentic_attached_unit_lifecycle_payload": {
+          "before": "3c3afb1e59cbebe05638d18f6d1b2f588542bee4ab64672806a661535020abe1",
+          "after": "8636ca003433836bdbe7d41e85c19b35cd43f719825519a1a38d5768368a10ce"
+        }
+      }
+    },
     "tests/support/a32_recovery.py": {
       "before_sha256": null,
       "after_sha256": "5c99e781862b44232ab62367d50511112875d1ef0cf21d91b198ce70c528737e",
@@ -18969,6 +19239,20 @@
         }
       }
     },
+    "tests/unit/test_phase12b_stratagem_framework.py": {
+      "before_sha256": "4aace3168598f0a8f8d02f23ece82e611dfb73657629941be99fc5dc0e4c0a64",
+      "after_sha256": "7631708adb90b444dc752f70e826dfb3898f8ec2e348d1a47e219a80091028c7",
+      "owners": {
+        "@module": {
+          "before": "e039bc0b014fa2ad1c3390af42c2c00e9a911e7b74d60ec20ed2debcacaeac26",
+          "after": "7266598389e04770f6b8c3f7d05588e6ea9928caa93e5e28f5b4127799b863b8"
+        },
+        "_battle_state": {
+          "before": "337e8a050944460bed59c04a98d421597263b8029e2e0030fff9c6b732ce6699",
+          "after": "8fe0c2fab7622823b48e493fa8b6eebb51ae5b7efd77c9363d23d597bb87a156"
+        }
+      }
+    },
     "tests/unit/test_phase13b_shooting_declarations.py": {
       "before_sha256": "7302211caf393b50454d2e69488a6470574df9266e91de740f9414d0c4cfafbf",
       "after_sha256": "6d009e0edd18ae45e003daa0a8a1a7a2c1ae242349eaf764d6f8fff01d87f991",
@@ -19050,6 +19334,28 @@
         "test_selected_source_index_round_trip_and_duplicate_order": {
           "before": null,
           "after": "fcc3f590f0ffaa14685d7b8cd62bd8217f2c2eb22acc9665d5cf6e92c9768df7"
+        }
+      }
+    },
+    "tests/unit/test_phase17g_runtime_content.py": {
+      "before_sha256": "0b01a4c693282ed72665844d6292bac1f02989fc0d2fa6451304245e339a55b0",
+      "after_sha256": "d7ad442bdf43abd315203b58be913a405524e54ca78d8b1ded03f62ec7ffb2be",
+      "owners": {
+        "@module": {
+          "before": "ccbc6b6474083568f6c1d1031ad979666bb0eb5ec504e841165f5abb4c17d9d7",
+          "after": "d1b0d44723f925253383044b9c2b61b4600f5f577f2f67b11e86783a1b2beffb"
+        },
+        "test_generated_manifest_index_matches_inventory_scan": {
+          "before": null,
+          "after": "302a3ba99b0b3501fc84864cacce6844e58595159b15900bbb55780b54c9195a"
+        },
+        "test_generated_manifest_index_preserves_semantic_record_multiplicity": {
+          "before": null,
+          "after": "f866610544c4ea0d43c6697cbcfb56c55d43c1015122d26ad506134513ed17e7"
+        },
+        "test_generated_manifest_rebuilds_from_current_tuple_and_recovers_source_failure": {
+          "before": null,
+          "after": "76bec5c010223aa5d98dc686ecf7dad8a7dcac1f73d70d31dab640d796874378"
         }
       }
     },
@@ -19329,9 +19635,141 @@
         }
       }
     },
+    "tools/generate_faction_content_scaffold.py": {
+      "before_sha256": "2e38e1fbb13a6339e2df32c5a5a79bef2c739447027704b1733d08460b665595",
+      "after_sha256": "508081b3422ded5b26fa2e4d07b0192b1c820c00b09d33031f142263a7661200",
+      "owners": {
+        "_generated_manifest_content": {
+          "before": "61f32ec4f9deeb2d6e8f74410c83a541889b9a675d133a1aaa2c6e58f15e18b4",
+          "after": "087af70195e24a5013f6b65095decf4174e7bb52080db1bc1272edeb224bf72b"
+        }
+      }
+    },
+    "tools/performance_ci60_qualification.py": {
+      "before_sha256": null,
+      "after_sha256": "03a18b82ad1331a63647e944f37660e326c93dac2a219f69a45310a489bb71e0",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "ced75c63839c096c1ac3a58f27954a477c1a74cb442c72093fa522b50bf43d2e"
+        },
+        "_HistoricalStage": {
+          "before": null,
+          "after": "f3896a606b2649be0a23d6c9b2143776b8c9c0774ed51f4a16a6885cd5619500"
+        },
+        "_HistoricalStage._freeze": {
+          "before": null,
+          "after": "fb22285067d449c47f5838ce84a3c4825cbd1f570eb4ba76527d6cadc8ab6b48"
+        },
+        "_HistoricalStage._member": {
+          "before": null,
+          "after": "afedac545adc37dcb36a46dd14c9992bc6ce263ee92fb0481e2b26bea5d26555"
+        },
+        "_HistoricalStage._read": {
+          "before": null,
+          "after": "ce903f3b904b078e7c47edececabd292c9a82600405734d167106c3098b60745"
+        },
+        "_HistoricalStage.freeze": {
+          "before": null,
+          "after": "9dac7254e1c7ef6422d8cf2bad952e725ebf89dd6e7c771c0686682360501b07"
+        },
+        "_HistoricalStage.member": {
+          "before": null,
+          "after": "d978f04f964f2c9f910e4886b1c152d907c5b21a5f02d57a8cdd7ab463bbe1c1"
+        },
+        "_HistoricalStage.read": {
+          "before": null,
+          "after": "91f1c82fa1e48818efd3faf4f548ff641b18f29e7db9cb7e6b1780e36a43df71"
+        },
+        "_cohort": {
+          "before": null,
+          "after": "211d4a31dd395fc6ea1839318b1620b30c8f5b4e708f4a1d5a6a64bf22a9593b"
+        },
+        "_producing_inputs": {
+          "before": null,
+          "after": "531f6d71edcea30e14fb7ae3fc357bf42094745a9f7f0a2fbb247fd801b8b17d"
+        },
+        "admitted": {
+          "before": null,
+          "after": "4599d5db21f74a4925d88a1d58493b201a13e4b6904ebda41545956c38642ede"
+        },
+        "applies": {
+          "before": null,
+          "after": "2e70a2d2feba38fe8fb05657b579eeb4bca2c35befeb18cbff05a5c2094e4c68"
+        },
+        "canonical": {
+          "before": null,
+          "after": "238d8d6df70ae04cef3727ff6ece25e444a36830ca04563eaf76adf1a9aaffb1"
+        },
+        "comparison_paths": {
+          "before": null,
+          "after": "db9f1424cc896c09ba457c0d8924831aa0ac6b3aaa586d143644801270080e89"
+        },
+        "control_projection": {
+          "before": null,
+          "after": "c58401e5fb3ee5728623c9a9752ca4859a27980548abc8bc133cd37c6bcab9c9"
+        },
+        "current_source": {
+          "before": null,
+          "after": "52322e961fde376a640bf29a03b77463ada8ac805041956d4673abd13201739d"
+        },
+        "digest": {
+          "before": null,
+          "after": "a70928ffcd1c4e38a8fa6046a7c0172d40dc6ec933885913ad4c6680675eb897"
+        },
+        "extend_catalog": {
+          "before": null,
+          "after": "6bf967bef8ea04d2f913afe248f6e7811513040b8414e78ee7cc29b5945272a3"
+        },
+        "git": {
+          "before": null,
+          "after": "032351e96e8ea08036feec970412bd66a45f4b8f5a6039e538a5e14d43183b21"
+        },
+        "historical_inputs": {
+          "before": null,
+          "after": "83300e4a3b202291505866398ea0f492822491ccc1143bf8da9e0e5a73b57868"
+        },
+        "history": {
+          "before": null,
+          "after": "b9a2268221646cd5c4af6b3cba5512941382c9af47f73323a5869e53f7775595"
+        },
+        "measurement": {
+          "before": null,
+          "after": "6cba6813999ddbfe2acbe7d1ee00d26cdea2df06995e18a0c006925acb58f6cc"
+        },
+        "measurement_controls": {
+          "before": null,
+          "after": "1440a0b29df1e549f40e713712c8d9cf264e5327c8fefe3ca96d9d2ed271599b"
+        },
+        "owned": {
+          "before": null,
+          "after": "896971bfc2161a887c31c543cdc88b316fc75f286fdc12b2a2b1709251f09df9"
+        },
+        "preceding_control": {
+          "before": null,
+          "after": "13ec72efed2092198cf294126e4a9eb875237d82c9a9345009ebe63949ddf2c2"
+        },
+        "producing_inputs": {
+          "before": null,
+          "after": "3779d988cc4b6e1128a13380ffeb80d88b5228fc04926edd7eb2ff82a17b9be5"
+        },
+        "retained_historical_report": {
+          "before": null,
+          "after": "a385e4a077efcf10d824ca9d953be6797b9f172aa14192672d8a3377e1830e0f"
+        },
+        "retained_role_proof": {
+          "before": null,
+          "after": "539624f25121b3174b5eb471245aaeb88af25f931a43c0bcfbb67d47f3c0527c"
+        },
+        "source_binding": {
+          "before": null,
+          "after": "0431c71fe613b1375e816577153eeac49be3304dc0018c9e2a5b4c63ef6f5997"
+        }
+      }
+    },
     "tools/performance_history_snapshot.py": {
       "before_sha256": null,
-      "after_sha256": "108f451110eac2162ca25bb68aa0e2610222a306db5ac04f5eb002f4e81c19c1",
+      "after_sha256": "a0c1f84d6c807a9766c13f2bc64e0c90fdfb62881ea9631dc519721fe8d056d0",
       "owners": {
         "@module": {
           "before": null,
@@ -19403,7 +19841,7 @@
         },
         "_catalog": {
           "before": null,
-          "after": "ba403045716030da149400271674bedd435ddb5e5fb2ef8be940829df8064138"
+          "after": "415943fb4309a44215a9e04da8be4b4d88ef211747f7b5e77e3d30b817208aa7"
         },
         "_closed": {
           "before": null,
@@ -19455,7 +19893,7 @@
         },
         "phase": {
           "before": null,
-          "after": "925ebdcfc8df3b92cca7884caf21b167548ff32816d3ffebc52f18e4e8071610"
+          "after": "9d187e9ab404599e5f4453878ccc800fbf0a8245a08b38c4d776bb761e63849f"
         },
         "witnesses": {
           "before": null,
@@ -19465,7 +19903,7 @@
     },
     "tools/performance_policy.py": {
       "before_sha256": "cbc427774b6d8bb1e30af96310bd94d48eeffd28c99a87254aa9c90e9a0ee37d",
-      "after_sha256": "c110135e06b3ded99c69adc23d2571e610824a562ce0a7acc84dcb6955e2708d",
+      "after_sha256": "904527376d6bf8096e9660c514d86fd738e0f5dbd5624f78324c780f97aaf92d",
       "owners": {
         "@module": {
           "before": "ac784ef7f6a1db6326b5102add78a7434b1866cdadc45a9d358ecb09816d4685",
@@ -19482,6 +19920,10 @@
         "owner_hashes": {
           "before": "924ec5df8f31ace704361cc7393c0333e0e444bbc7c0ff8c144e5ed9e63920c7",
           "after": "d87e53a01a9323ed45efadd5777aded19dee8be1169b80962eaf5adb735d0998"
+        },
+        "validate_assessment": {
+          "before": "53d590fecce950ad45ce0432739ba77a674c6f34326cde5e7494e259c5e9febb",
+          "after": "17d6a2dd6011422a137730700753d1e556c4979010ff18ba53117bd6c4c229bf"
         }
       }
     },
@@ -19763,7 +20205,7 @@
     },
     "tools/quality_runtime_successor.py": {
       "before_sha256": null,
-      "after_sha256": "40a2628a9330c270063ac55bd4fb0e92ff9343ebbb329c4ca304fb40a0458620",
+      "after_sha256": "de0d1a9ed29b0efe9dffa15667c03854204fe390588f81a55817acea841f2c80",
       "owners": {
         "@module": {
           "before": null,
@@ -19775,11 +20217,11 @@
         },
         "admit": {
           "before": null,
-          "after": "cf810fe9177e85add59bff4ff661d9c6210ba68501795824f899eda03f807532"
+          "after": "1ea63d31d5e9591444bbc3373099f9de30eb6dea7ea95366acf9130a5db4a33f"
         },
         "current_source": {
           "before": null,
-          "after": "7b52e561c14fd78013267863d0f1862f5fb7be0c1160e567a5fe19329de974ef"
+          "after": "ccec6777d333a10dc500dda75730cf42dda912e8ec72b0f5f2eeef96e37f72b7"
         },
         "digest": {
           "before": null,
@@ -19791,7 +20233,7 @@
         },
         "measurement_inputs": {
           "before": null,
-          "after": "9417363c0cf5b59e6966eb6bcf293d38652b4552d2b3c043bc9c946a1c28215a"
+          "after": "1c3c5af6b39d922a0811a0cbbbb8c54a8ceb6287e6e1d4fb57febf87a6e6d8cc"
         },
         "owned": {
           "before": null,
@@ -19799,7 +20241,7 @@
         },
         "previous": {
           "before": null,
-          "after": "228e58770ee218127e2b2aa50864f35423aa23f0d5306b8b127e077badf7041e"
+          "after": "babd32f953c516e90c211424f38dd9ce81c0cadefbd21c3cfa97319b2e5ff4b1"
         }
       }
     },
@@ -19938,7 +20380,14 @@
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/durations.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -19948,7 +20397,14 @@
     "ci/test_shards/shard-10.txt": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/shard-10.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -19958,7 +20414,14 @@
     "ci/test_shards/shard-11.txt": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/shard-11.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -19968,7 +20431,14 @@
     "ci/test_shards/shard-12.txt": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/shard-12.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -19978,7 +20448,14 @@
     "ci/test_shards/shard-2.txt": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/shard-2.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -19988,7 +20465,14 @@
     "ci/test_shards/shard-3.txt": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/shard-3.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -19998,7 +20482,14 @@
     "ci/test_shards/shard-4.txt": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/shard-4.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20008,7 +20499,14 @@
     "ci/test_shards/shard-5.txt": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/shard-5.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20018,7 +20516,14 @@
     "ci/test_shards/shard-6.txt": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/shard-6.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20028,7 +20533,14 @@
     "ci/test_shards/shard-7.txt": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/shard-7.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20038,7 +20550,14 @@
     "ci/test_shards/shard-8.txt": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/shard-8.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20048,7 +20567,14 @@
     "ci/test_shards/shard-9.txt": {
       "category": "measured_workload",
       "operations": [
-        "behavior-shard-inventory"
+        "behavior-shard-inventory",
+        "issue533-client-regressions",
+        "order104-client-regressions",
+        "order105-client-regressions",
+        "order106-client-regressions",
+        "order107-client-regressions",
+        "order108-client-regressions",
+        "order109-control-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: ci/test_shards/shard-9.txt. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20058,7 +20584,32 @@
     "conformance/typescript/src/contract.ts": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: conformance/typescript/src/contract.ts. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20068,7 +20619,8 @@
     "conformance/typescript/src/generated/openapi.ts": {
       "category": "measured_workload",
       "operations": [
-        "issue532-contract44-publication"
+        "issue532-contract44-publication",
+        "order103-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: conformance/typescript/src/generated/openapi.ts. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20078,7 +20630,18 @@
     "contracts/README.md": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/README.md. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20088,7 +20651,11 @@
     "contracts/compatibility-policy.md": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order110-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/compatibility-policy.md. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20108,7 +20675,8 @@
     "contracts/examples/decisions/interaction-conformance.json": {
       "category": "measured_workload",
       "operations": [
-        "d07-generated-current-contract-inventory"
+        "d07-generated-current-contract-inventory",
+        "order119-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/decisions/interaction-conformance.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20138,7 +20706,8 @@
     "contracts/examples/events/initial-player-a.json": {
       "category": "measured_workload",
       "operations": [
-        "issue532-contract44-publication"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/events/initial-player-a.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20148,7 +20717,8 @@
     "contracts/examples/events/initial-player-b.json": {
       "category": "measured_workload",
       "operations": [
-        "issue532-contract44-publication"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/events/initial-player-b.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20158,7 +20728,40 @@
     "contracts/examples/persistence/session-persistence.json": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/persistence/session-persistence.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20168,7 +20771,8 @@
     "contracts/examples/projections/attached_charge_view.json": {
       "category": "measured_workload",
       "operations": [
-        "issue532-contract44-publication"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/projections/attached_charge_view.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20178,7 +20782,8 @@
     "contracts/examples/projections/hidden_secondary_redaction_view.json": {
       "category": "measured_workload",
       "operations": [
-        "issue532-contract44-publication"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/projections/hidden_secondary_redaction_view.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20188,7 +20793,8 @@
     "contracts/examples/projections/initial_setup_view_player1.json": {
       "category": "measured_workload",
       "operations": [
-        "issue532-contract44-publication"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/projections/initial_setup_view_player1.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20198,7 +20804,8 @@
     "contracts/examples/projections/initial_setup_view_player2.json": {
       "category": "measured_workload",
       "operations": [
-        "issue532-contract44-publication"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/projections/initial_setup_view_player2.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20208,7 +20815,8 @@
     "contracts/examples/projections/post_deployment_view.json": {
       "category": "measured_workload",
       "operations": [
-        "issue532-contract44-publication"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/projections/post_deployment_view.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20218,7 +20826,8 @@
     "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_a.json": {
       "category": "measured_workload",
       "operations": [
-        "issue532-contract44-publication"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_a.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20228,7 +20837,8 @@
     "contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_b.json": {
       "category": "measured_workload",
       "operations": [
-        "issue532-contract44-publication"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/projections/terrain_snapshot_hidden_reserve_view_player_b.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20238,7 +20848,8 @@
     "contracts/examples/projections/visible_modifier_datacard_view.json": {
       "category": "measured_workload",
       "operations": [
-        "issue532-contract44-publication"
+        "issue532-contract44-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/projections/visible_modifier_datacard_view.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20248,7 +20859,9 @@
     "contracts/examples/replay-metadata.json": {
       "category": "measured_workload",
       "operations": [
-        "d07-generated-current-contract-inventory"
+        "d07-generated-current-contract-inventory",
+        "order103-contract-publication",
+        "order123-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/replay-metadata.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20268,7 +20881,40 @@
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/sessions/session-command-outcome.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20278,7 +20924,40 @@
     "contracts/examples/sessions/session-command-started.json": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/sessions/session-command-started.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20298,7 +20977,40 @@
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/sessions/session-metadata-created.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20308,7 +21020,40 @@
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/support-profile-player-a-redacted.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20318,7 +21063,40 @@
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/support-profile-player-b-redacted.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20328,7 +21106,40 @@
     "contracts/examples/support-profile.json": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/examples/support-profile.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20338,7 +21149,40 @@
     "contracts/manifest.json": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/manifest.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20361,7 +21205,33 @@
     "contracts/openapi.yaml": {
       "category": "measured_workload",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: contracts/openapi.yaml. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -20400,6 +21270,66 @@
       "rationale": "Exact PR587-to-current owner changes: data/source_audits/category_migration/preservation.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+    },
+    "data/source_audits/ci60_qualification_v1/added-operations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-cec129854c191f513a8b882db3b14ef167d0b8f58b7cffd897b4ebc8acd5b541"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/changed-members.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-8baad4e31ec88a54271964a3866f4718d5e16310c045b3431e31a521778d2396"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/control-transitions.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-c3bb7709f07c81fc0feb38f2e879c57044bc503c3a777b942e85998c71c87f2c"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/family-plan.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-316bff3f9a4bdb7ae918877e7a49c2875616b9355ab339b74729e178453de1dc"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/producing-inputs.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-389864828e84d4c2363daa7d4451e01f2417eed3f4d54232614386e0e46c3302"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci60_qualification_v1/retained-role-proofs.json": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-evidence-768734f6eeb67dda37fda2f5100da74b694575941e899ae4587bc50f4d6485fd"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
     "data/source_audits/cumulative_preservation_v1/accepted-source.json": {
       "category": "measured_workload",
@@ -22255,6 +23185,30 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "docs/CI57_CORRECTNESS_SCOPE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/CI58_RUNTIME_SCOPE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/CI60_QUALIFICATION_SCOPE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
@@ -22732,9 +23686,14 @@
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "order108-terrain-semantics"
+        "order108-terrain-semantics",
+        "order109-unit-control-semantics",
+        "order110-action-battle-shock-semantics",
+        "source-record"
       ],
-      "selected_families": [],
+      "selected_families": [
+        "setup"
+      ],
       "rationale": "Exact PR587-to-current owner changes: src/warhammer40k_core/_engine_build_manifest.json. Literal operations cover each changed owner; complete mapped family obligations retained.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
@@ -22754,7 +23713,33 @@
     "src/warhammer40k_core/adapters/external_contract.py": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication"
+        "contract-42-1-publication",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "order103-src-warhammer40k_core-adapters-external_contract",
+        "order110-action-battle-shock-semantics",
+        "order114-embark-permissions",
+        "order115-movement-permission",
+        "order116-movement-permission",
+        "order117-allocation-permission",
+        "order118-attack-source-lifetime",
+        "order120-ability-damage-classification",
+        "order121-command-abilities-timing",
+        "order122-default-effect-lifetimes",
+        "order123-datasheet-identity",
+        "order124-nested-conditions",
+        "order125-default-unit-subjects",
+        "order126-sequential-physical-movement",
+        "order127-redeploy-validation",
+        "order128-whole-model-setup",
+        "order129-flight-history",
+        "order130-model-mission-history",
+        "order131-objective-approach",
+        "order132-circular-containment",
+        "order133-keyword-number-identity",
+        "order134-conditional-deployment-restriction",
+        "order135-contract-publication",
+        "v963-snap-hit-semantics"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: src/warhammer40k_core/adapters/external_contract.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -22779,7 +23764,9 @@
       "category": "rule_semantics",
       "operations": [
         "cumulative-exact-003",
-        "order117-allocation-permission"
+        "order117-allocation-permission",
+        "order118-attack-source-lifetime",
+        "order123-datasheet-identity"
       ],
       "selected_families": [
         "external_contract_source_reuse",
@@ -22935,6 +23922,7 @@
     "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py": {
       "category": "rule_semantics",
       "operations": [
+        "order123-datasheet-identity",
         "order135-gathered-attack-steps"
       ],
       "selected_families": [
@@ -23107,7 +24095,9 @@
       "category": "rule_semantics",
       "operations": [
         "d07-model-owned-upper-floor-rule",
-        "fight-rule-branch"
+        "fight-rule-branch",
+        "order106-pile-in-authority",
+        "order115-movement-permission"
       ],
       "selected_families": [
         "fight"
@@ -23119,6 +24109,9 @@
     "src/warhammer40k_core/engine/decision.py": {
       "category": "rule_semantics",
       "operations": [
+        "order102-rng-event-classification",
+        "order117-live-neutral-audit-accounting",
+        "order118-live-neutral-audit-accounting",
         "order135-visibility-hot-consumers"
       ],
       "selected_families": [
@@ -23158,9 +24151,12 @@
     "src/warhammer40k_core/engine/emergency_disembark_placement.py": {
       "category": "rule_semantics",
       "operations": [
-        "d07-model-owned-upper-floor-rule"
+        "d07-model-owned-upper-floor-rule",
+        "transport-rule-branch"
       ],
-      "selected_families": [],
+      "selected_families": [
+        "setup"
+      ],
       "rationale": "Exact PR587-to-current owner changes: src/warhammer40k_core/engine/emergency_disembark_placement.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
@@ -23168,7 +24164,8 @@
     "src/warhammer40k_core/engine/endpoint_placement.py": {
       "category": "rule_semantics",
       "operations": [
-        "d07-model-owned-upper-floor-rule"
+        "d07-model-owned-upper-floor-rule",
+        "order108-terrain-semantics"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: src/warhammer40k_core/engine/endpoint_placement.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -23216,6 +24213,18 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/generated_manifest.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "ci60-exact-b5b81cf56a6c4619accd9bda00b453886e0f9e937a465efea255619ebd328a13"
+      ],
+      "selected_families": [
+        "reconstruction"
+      ],
+      "rationale": "CI58 deliberately replaces repeated execution-record scans with one invocation-local immutable index. The runtime and its generator template are hot data-structure changes requiring reconstruction/source-generator evidence, not a rule exemption.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py": {
       "category": "rule_semantics",
       "operations": [
@@ -23244,10 +24253,13 @@
     "src/warhammer40k_core/engine/fight_movement_mode_authority.py": {
       "category": "rule_semantics",
       "operations": [
-        "fight-rule-branch"
+        "fight-rule-branch",
+        "movement-rule-branch"
       ],
       "selected_families": [
-        "fight"
+        "fight",
+        "movement",
+        "setup"
       ],
       "rationale": "Exact PR587-to-current owner changes: src/warhammer40k_core/engine/fight_movement_mode_authority.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
@@ -23268,7 +24280,11 @@
     "src/warhammer40k_core/engine/fight_resolution.py": {
       "category": "rule_semantics",
       "operations": [
-        "fight-rule-branch"
+        "fight-rule-branch",
+        "order106-pile-in-authority",
+        "order107-fight-distance-window",
+        "order123-datasheet-identity",
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [
         "fight"
@@ -23280,10 +24296,13 @@
     "src/warhammer40k_core/engine/fight_rules_unit_movement.py": {
       "category": "rule_semantics",
       "operations": [
-        "fight-rule-branch"
+        "fight-rule-branch",
+        "movement-rule-branch"
       ],
       "selected_families": [
-        "fight"
+        "fight",
+        "movement",
+        "setup"
       ],
       "rationale": "Exact PR587-to-current owner changes: src/warhammer40k_core/engine/fight_rules_unit_movement.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
@@ -23292,6 +24311,7 @@
     "src/warhammer40k_core/engine/game_state.py": {
       "category": "rule_semantics",
       "operations": [
+        "order130-model-mission-history",
         "phase-rule-branch"
       ],
       "selected_families": [
@@ -23342,6 +24362,9 @@
       "category": "rule_semantics",
       "operations": [
         "d04-combat-lifecycle-continuation",
+        "order114-embark-permissions",
+        "order119-movement-source-permission",
+        "order121-command-abilities-timing",
         "order135-gathered-attack-steps",
         "serialization-replay"
       ],
@@ -23442,9 +24465,24 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "src/warhammer40k_core/engine/model_destruction_cause_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci60-exact-e269cf73ea32df73405f02ce8c87b16bb7dc427591ff0de774b2f8b42464880c"
+      ],
+      "selected_families": [
+        "dice",
+        "fight",
+        "reconstruction"
+      ],
+      "rationale": "CI57 preserves authenticated after-removal Deadly Demise parent/collateral continuations through shared restore authority. Original mandatory sensitive dice/Fight/reconstruction obligations and all current causal checks remain selected.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
     "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py": {
       "category": "rule_semantics",
       "operations": [
+        "ci60-exact-ffea4920fec33a5f4db66f9036e85ce9e36eb42d8cec14a35f284c5e0369efef",
         "qualification40-exact-ffea4920fec33a5f"
       ],
       "selected_families": [
@@ -23452,9 +24490,23 @@
         "fight",
         "reconstruction"
       ],
-      "rationale": "Exact PR587-to-current owner changes: src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
+      "rationale": "CI57 preserves authenticated after-removal Deadly Demise parent/collateral continuations through shared restore authority. Original mandatory sensitive dice/Fight/reconstruction obligations and all current causal checks remain selected.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+    },
+    "src/warhammer40k_core/engine/model_destruction_cause_producers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci60-exact-09ba6f2c92fffa94445c80d43e844100a6cc0f14e66f67f515ba00d0f1e433aa"
+      ],
+      "selected_families": [
+        "dice",
+        "fight",
+        "reconstruction"
+      ],
+      "rationale": "CI57 preserves authenticated after-removal Deadly Demise parent/collateral continuations through shared restore authority. Original mandatory sensitive dice/Fight/reconstruction obligations and all current causal checks remain selected.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
     "src/warhammer40k_core/engine/move_completion_triggers.py": {
       "category": "rule_semantics",
@@ -23472,7 +24524,8 @@
     "src/warhammer40k_core/engine/movement_legality.py": {
       "category": "rule_semantics",
       "operations": [
-        "movement-rule-branch"
+        "movement-rule-branch",
+        "order123-datasheet-identity"
       ],
       "selected_families": [
         "movement",
@@ -23522,7 +24575,8 @@
     "src/warhammer40k_core/engine/objective_movement_constraint.py": {
       "category": "rule_semantics",
       "operations": [
-        "movement-rule-branch"
+        "movement-rule-branch",
+        "order131-objective-approach"
       ],
       "selected_families": [
         "movement",
@@ -23561,7 +24615,8 @@
     "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": {
       "category": "rule_semantics",
       "operations": [
-        "movement-rule-branch"
+        "movement-rule-branch",
+        "order114-embark-permissions"
       ],
       "selected_families": [
         "movement",
@@ -23574,7 +24629,9 @@
     "src/warhammer40k_core/engine/phases/movement_geometry.py": {
       "category": "rule_semantics",
       "operations": [
-        "movement-rule-branch"
+        "movement-rule-branch",
+        "order123-datasheet-identity",
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [
         "movement",
@@ -23614,7 +24671,9 @@
       "category": "rule_semantics",
       "operations": [
         "d07-model-owned-upper-floor-rule",
-        "movement-rule-branch"
+        "movement-rule-branch",
+        "order115-movement-permission",
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [
         "movement",
@@ -23628,7 +24687,8 @@
       "category": "rule_semantics",
       "operations": [
         "movement-rule-branch",
-        "movement-witness-membership-validation"
+        "movement-witness-membership-validation",
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [
         "movement",
@@ -23733,6 +24793,7 @@
     "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py": {
       "category": "rule_semantics",
       "operations": [
+        "order129-flight-history",
         "order135-visibility-hot-consumers"
       ],
       "selected_families": [
@@ -23782,6 +24843,7 @@
     "src/warhammer40k_core/engine/retained_demise_removal.py": {
       "category": "rule_semantics",
       "operations": [
+        "ci60-exact-93d354756625daf0964ed6815eac07684298d940e72cc0a1def17710c92d1463",
         "cumulative-exact-038",
         "qualification40-exact-93d354756625daf0"
       ],
@@ -23790,9 +24852,23 @@
         "fight",
         "reconstruction"
       ],
-      "rationale": "Exact PR587-to-current owner changes: src/warhammer40k_core/engine/retained_demise_removal.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
+      "rationale": "CI57 preserves authenticated after-removal Deadly Demise parent/collateral continuations through shared restore authority. Original mandatory sensitive dice/Fight/reconstruction obligations and all current causal checks remain selected.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+    },
+    "src/warhammer40k_core/engine/retained_destruction_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci60-exact-d98ccdd9b0bb8fc54cb393406977a2f994c47407357a7da3829a47fad6f80b21"
+      ],
+      "selected_families": [
+        "dice",
+        "fight",
+        "reconstruction"
+      ],
+      "rationale": "CI57 preserves authenticated after-removal Deadly Demise parent/collateral continuations through shared restore authority. Original mandatory sensitive dice/Fight/reconstruction obligations and all current causal checks remain selected.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
     "src/warhammer40k_core/engine/rule_model_destruction.py": {
       "category": "rule_semantics",
@@ -23824,7 +24900,9 @@
       "category": "rule_semantics",
       "operations": [
         "d07-model-owned-upper-floor-rule",
-        "movement-rule-branch"
+        "movement-rule-branch",
+        "order115-movement-permission",
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [
         "movement",
@@ -23915,6 +24993,7 @@
     "src/warhammer40k_core/engine/shooting_targets.py": {
       "category": "rule_semantics",
       "operations": [
+        "order104-range-visibility-authority",
         "order135-visibility-hot-consumers"
       ],
       "selected_families": [
@@ -23965,10 +25044,12 @@
     "src/warhammer40k_core/engine/transport_disembark_state.py": {
       "category": "rule_semantics",
       "operations": [
-        "d04-combat-direct-status"
+        "d04-combat-direct-status",
+        "transport-rule-branch"
       ],
       "selected_families": [
-        "reconstruction"
+        "reconstruction",
+        "setup"
       ],
       "rationale": "Exact PR587-to-current owner changes: src/warhammer40k_core/engine/transport_disembark_state.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
@@ -24004,7 +25085,10 @@
       "category": "rule_semantics",
       "operations": [
         "d07-model-owned-upper-floor-rule",
-        "movement-rule-branch"
+        "movement-rule-branch",
+        "order115-movement-permission",
+        "order126-sequential-physical-movement",
+        "order131-objective-approach"
       ],
       "selected_families": [
         "movement",
@@ -24072,7 +25156,8 @@
     "src/warhammer40k_core/geometry/movement_endpoint_proof.py": {
       "category": "rule_semantics",
       "operations": [
-        "geometry-search"
+        "geometry-search",
+        "order131-objective-approach"
       ],
       "selected_families": [
         "movement",
@@ -24100,7 +25185,8 @@
     "src/warhammer40k_core/geometry/movement_reachability.py": {
       "category": "rule_semantics",
       "operations": [
-        "geometry-search"
+        "geometry-search",
+        "order131-objective-approach"
       ],
       "selected_families": [
         "movement",
@@ -24128,7 +25214,10 @@
     "src/warhammer40k_core/geometry/pathing.py": {
       "category": "rule_semantics",
       "operations": [
-        "geometry-search"
+        "geometry-search",
+        "order108-terrain-semantics",
+        "order115-movement-permission",
+        "order126-sequential-physical-movement"
       ],
       "selected_families": [
         "movement",
@@ -25010,6 +26099,17 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "tests/fixtures/phase18a_projection_join_sample.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue532-client-regressions",
+        "order123-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
     "tests/indirect_shooting_helpers.py": {
       "category": "measured_workload",
       "operations": [
@@ -25033,7 +26133,8 @@
     "tests/integration/test_fight_on_death_presence.py": {
       "category": "measured_workload",
       "operations": [
-        "d07-fixed-fixture-and-native-regressions"
+        "d07-fixed-fixture-and-native-regressions",
+        "order123-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: tests/integration/test_fight_on_death_presence.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -25071,7 +26172,8 @@
     "tests/phase13b_shooting_declaration_helpers.py": {
       "category": "measured_workload",
       "operations": [
-        "fixture-visibility"
+        "fixture-visibility",
+        "order135-regressions"
       ],
       "selected_families": [
         "visibility"
@@ -29277,6 +30379,41 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "tests/setup_completion_helpers.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-exact-d5f289c89b64b578b1242fec704077f45a4515df0712b7a6aefdc7f5fd2f1197"
+      ],
+      "selected_families": [
+        "dice",
+        "fight",
+        "reconstruction",
+        "setup"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "tests/shared/category_migration/phase11e_mission_scoring_cleanup_configuration.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci-restructure-tests-shared-category_migration-phase11e_mission_scoring_cleanup_configuration.py"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "tests/shared/category_migration/phase11e_mission_scoring_cleanup_history_and_reserves.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci-restructure-tests-shared-category_migration-phase11e_mission_scoring_cleanup_history_and_reserves.py"
+      ],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
     "tests/support/a32_recovery.py": {
       "category": "measured_workload",
       "operations": [
@@ -29940,7 +31077,9 @@
     "tests/unit/test_lethal_hits.py": {
       "category": "measured_workload",
       "operations": [
-        "d07-fixed-fixture-and-native-regressions"
+        "d07-fixed-fixture-and-native-regressions",
+        "order103-tests-unit-test_lethal_hits",
+        "order135-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: tests/unit/test_lethal_hits.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -29981,7 +31120,8 @@
       "category": "measured_workload",
       "operations": [
         "order112-extra-attacks-regressions",
-        "order123-regressions"
+        "order123-regressions",
+        "order135-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: tests/unit/test_order92_random_melee.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -30028,10 +31168,28 @@
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
+    "tests/unit/test_phase12b_stratagem_framework.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci60-exact-91705d712568bd1efa7c747d7a02994cbf03d186cb109ed4fd0498b92541d82c"
+      ],
+      "selected_families": [
+        "dice",
+        "fight",
+        "reconstruction",
+        "setup"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
     "tests/unit/test_phase13b_shooting_declarations.py": {
       "category": "measured_workload",
       "operations": [
-        "d07-fixed-fixture-and-native-regressions"
+        "d07-fixed-fixture-and-native-regressions",
+        "order113-regressions",
+        "order135-regressions",
+        "v963-snap-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: tests/unit/test_phase13b_shooting_declarations.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -30048,6 +31206,19 @@
       "rationale": "Exact PR587-to-current owner changes: tests/unit/test_phase17_source_overlays.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+    },
+    "tests/unit/test_phase17g_runtime_content.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci-restructure-tests-unit-test_phase17g_runtime_content.py",
+        "ci60-exact-224050f8083f3fd817be5dd025a2f6e7b09f2728c22699d8eab29e2048220639"
+      ],
+      "selected_families": [
+        "reconstruction"
+      ],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
     "tests/unit/test_phase17g_thousand_sons_army_rule.py": {
       "category": "measured_workload",
@@ -30072,7 +31243,8 @@
     "tests/unit/test_public_firing_deck_history.py": {
       "category": "measured_workload",
       "operations": [
-        "issue533-client-regressions"
+        "issue533-client-regressions",
+        "order123-regressions"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: tests/unit/test_public_firing_deck_history.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -30126,7 +31298,25 @@
       "category": "measured_workload",
       "operations": [
         "d07-order97-exact-historical-evidence",
-        "order135-current-source-audit"
+        "issue534-order97-history",
+        "issue535-order97-history",
+        "order104-historical-evidence",
+        "order107-historical-evidence",
+        "order108-historical-evidence",
+        "order110-source-evidence",
+        "order112-source-evidence",
+        "order113-source-evidence",
+        "order114-source-evidence",
+        "order117-source-evidence",
+        "order118-source-evidence",
+        "order119-immutable-inventory",
+        "order121-source-evidence",
+        "order122-source-evidence",
+        "order123-source-evidence",
+        "order126-source-evidence",
+        "order135-current-source-audit",
+        "shock-source-generation-and-audit",
+        "v963-snap-source-evidence"
       ],
       "selected_families": [],
       "rationale": "Exact PR587-to-current owner changes: tools/core_rules_order97_history.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
@@ -30174,6 +31364,26 @@
       "rationale": "Preserve the exact static and hosted-entry repairs, while relocating pytest bytecode suppression from the historically pinned root test initializer to the quality package before its module imports. Root tests/__init__.py is restored byte-for-byte and separately authenticated as an unchanged owned anchor. D07 geometry and category-migration readers remain unchanged. Cumulative integration-member transport now uses one fresh hardened immutable Git batch while retaining the same member/hash/control decisions. Only their existing finite predecessor boundary admits the exact quality initializer history after full current-source authentication. The original symbolic operation-map validator is extracted without changing its comparisons and remains called after every actual current-input check; focused tests exercise it independently and retain a real forged-collector rejection.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
+    },
+    "tools/generate_faction_content_scaffold.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "ci60-exact-9bf9b5e615e5dde679a2c0d75d3ff5dac984f1e62db6fcc45012aa5b15d6bc7a"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "CI58 deliberately replaces repeated execution-record scans with one invocation-local immutable index. The runtime and its generator template are hot data-structure changes requiring reconstruction/source-generator evidence, not a rule exemption.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "tools/performance_ci60_qualification.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
+      "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
     "tools/performance_history_snapshot.py": {
       "category": "governance",
@@ -30258,18 +31468,18 @@
   },
   "milestone": "ordinary",
   "comparisons": {
-    "dice": "docs/performance/current/qualification40-dice.json",
-    "dice_sustained": "docs/performance/current/qualification40-dice_sustained.json",
-    "external_contract_source_reuse": "docs/performance/current/qualification40-external_contract_source_reuse.json",
-    "fight": "docs/performance/current/qualification40-fight.json",
-    "movement": "docs/performance/current/qualification40-movement.json",
+    "dice": "docs/performance/current/ci60-dice.json",
+    "dice_sustained": "docs/performance/current/ci60-dice_sustained.json",
+    "external_contract_source_reuse": "docs/performance/current/ci60-external_contract_source_reuse.json",
+    "fight": "docs/performance/current/ci60-fight.json",
+    "movement": "docs/performance/current/ci60-movement.json",
     "objective_control": "docs/performance/current/qualification40-objective_control.json",
-    "reconstruction": "docs/performance/current/qualification40-reconstruction.json",
+    "reconstruction": "docs/performance/current/ci60-reconstruction.json",
     "roster": "docs/performance/current/qualification40-roster.json",
-    "setup": "docs/performance/current/qualification40-setup.json",
-    "shock_reconstruction": "docs/performance/current/qualification40-shock_reconstruction.json",
-    "strength": "docs/performance/current/qualification40-strength.json",
-    "visibility": "docs/performance/current/qualification40-visibility.json"
+    "setup": "docs/performance/current/ci60-setup.json",
+    "shock_reconstruction": "docs/performance/current/ci60-shock_reconstruction.json",
+    "strength": "docs/performance/current/ci60-strength.json",
+    "visibility": "docs/performance/current/ci60-visibility.json"
   },
   "full_game": null
 }

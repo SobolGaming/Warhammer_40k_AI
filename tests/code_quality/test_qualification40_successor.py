@@ -137,22 +137,67 @@ def test_qualification_map_mutation_cannot_inherit_historical_credit(
         addition_path.write_bytes(before)
 
 
-def test_qualification_producing_inputs_allows_only_anchor_literal() -> None:
-    current = policy.runtime_inputs(ROOT)
-    producing = stage.producing_inputs(ROOT, current)
-    from tools.performance_preflight_successor import measurement_inputs
+def test_qualification_producing_inputs_allows_only_anchor_literal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools import performance_ci60_qualification as ci60
 
-    current = measurement_inputs(ROOT, current)
-    assert {k for k in current if current[k] != producing[k]} == {
-        stage.SELF,
-        policy.MAP,
-        "tests/code_quality/test_qualification40_successor.py",
-    }
-    assert current.keys() == producing.keys()
-    wrong = policy.runtime_inputs(ROOT)
-    wrong.pop(stage.SELF)
-    with pytest.raises(ValueError, match="collector omitted"):
-        stage.producing_inputs(ROOT, wrong)
+    actual = policy.runtime_inputs(ROOT)
+    historical = ci60.historical_inputs(ROOT)
+    assert policy.canonical_digest(historical) == stage.PRODUCING_INPUT_DIGEST
+    historical = ci60.historical_inputs(ROOT, original_controls=True)
+
+    def historical_collector(root: Path) -> dict[str, str]:
+        assert root == ROOT
+        return dict(historical)
+
+    def historical_projection(root: Path, inputs: dict[str, str]) -> dict[str, str]:
+        assert root == ROOT
+        return dict(inputs)
+
+    with monkeypatch.context() as historical_context:
+        historical_context.setattr(policy, "runtime_inputs", historical_collector)
+        historical_context.setattr(preflight, "measurement_inputs", historical_projection)
+        current = policy.runtime_inputs(ROOT)
+        producing = stage.producing_inputs(ROOT, current)
+        from tools.performance_preflight_successor import measurement_inputs
+
+        current = measurement_inputs(ROOT, current)
+        assert {k for k in current if current[k] != producing[k]} == {
+            stage.SELF,
+            policy.MAP,
+            "tests/code_quality/test_qualification40_successor.py",
+        }
+        assert current.keys() == producing.keys()
+        wrong = policy.runtime_inputs(ROOT)
+        wrong.pop(stage.SELF)
+        with pytest.raises(ValueError, match="collector omitted"):
+            stage.producing_inputs(ROOT, wrong)
+
+    with pytest.raises(ValueError, match="cannot change workload inputs"):
+        stage.producing_inputs(ROOT, actual)
+    producing = ci60.producing_inputs(ROOT, actual)
+    assert producing.keys() == actual.keys()
+    assert all(producing[name] == pin for name, pin in actual.items() if name != ci60.SELF)
+    wrong = dict(actual)
+    wrong["src/warhammer40k_core/engine/retained_demise_removal.py"] = "f" * 64
+    with pytest.raises(ValueError, match="actual current collector"):
+        ci60.producing_inputs(ROOT, wrong)
+
+    proof = ci60.admitted(ROOT)
+    producing_path = ci60.NAMESPACE + "/producing-inputs.json"
+    forged = json.loads(proof[producing_path])
+    forged[ci60.SELF] = "f" * 64
+    proof[producing_path] = json.dumps(forged).encode()
+
+    def forged_producing_control(root: Path) -> dict[str, bytes]:
+        assert root == ROOT
+        return proof
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "admitted", forged_producing_control)
+        with pytest.raises(ValueError, match="exact unactivated frozen source"):
+            ci60.producing_inputs(ROOT, actual)
 
 
 @pytest.mark.parametrize("mutation", ["owner", "path", "profile", "prior_operation"])

@@ -1235,27 +1235,48 @@ def test_fixture_compatibility_view_requires_fresh_authentic_module_owned_checko
     print("Historical raw view: zero current admissions; failed current admission never projects.")
 
 
-def test_history_snapshot_preimages_extend_only_existing_native_bridge() -> None:
-    from tools import performance_preflight_successor as stage
-    from tools import quality_runtime_successor as successor
+def test_history_snapshot_preimages_extend_only_existing_native_bridge(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+    from tools import quality_runtime_successor as ci54
 
-    assert not successor.BEFORE.keys() & successor.SNAPSHOT_BEFORE.keys()
-    assert successor.SNAPSHOT_BEFORE.keys() <= successor.PINS.keys()
-    assert not successor.SNAPSHOT_BEFORE.keys() & successor.BORROWED_PREDECESSORS
-    assert stage.PINS.keys() & successor.BEFORE.keys() == successor.BORROWED_PREDECESSORS | {
-        "tests/code_quality/test_performance_preflight.py"
-    }
-    for name, pin in successor.SNAPSHOT_BEFORE.items():
-        old = subprocess.check_output(["git", "show", successor.BASE + ":" + name], cwd=ROOT)
-        assert evidence.sha(old) == pin
-        actual = successor.owned(ROOT, name)
-        assert evidence.sha(actual) == successor.PINS[name]
-        assert successor.previous(ROOT, name, actual) == old
-        with pytest.raises(ValueError, match="borrowing is not admitted"):
-            successor.previous(ROOT, name, actual, predecessor=old)
-        with pytest.raises(ValueError, match="unrelated bytes"):
-            successor.previous(ROOT, name, actual + b" ")
-    successor.admit(ROOT)
+    projection = ci60.control_projection(ROOT)
+    current_read = ci54.owned
+
+    def historical_read(root: Path, name: str) -> bytes:
+        assert root == ROOT
+        return projection[name] if name in projection else current_read(root, name)
+
+    # Original assertion bodies run on the authenticated CI54 control context.
+    # The actual current source is independently admitted before this view exists.
+    with monkeypatch.context() as historical_context:
+        historical_context.setattr(ci54, "owned", historical_read)
+        from tools import performance_preflight_successor as stage
+        from tools import quality_runtime_successor as successor
+
+        assert not successor.BEFORE.keys() & successor.SNAPSHOT_BEFORE.keys()
+        assert successor.SNAPSHOT_BEFORE.keys() <= successor.PINS.keys()
+        assert not successor.SNAPSHOT_BEFORE.keys() & successor.BORROWED_PREDECESSORS
+        assert stage.PINS.keys() & successor.BEFORE.keys() == successor.BORROWED_PREDECESSORS | {
+            "tests/code_quality/test_performance_preflight.py"
+        }
+        for name, pin in successor.SNAPSHOT_BEFORE.items():
+            old = subprocess.check_output(["git", "show", successor.BASE + ":" + name], cwd=ROOT)
+            assert evidence.sha(old) == pin
+            actual = successor.owned(ROOT, name)
+            assert evidence.sha(actual) == successor.PINS[name]
+            assert successor.previous(ROOT, name, actual) == old
+            with pytest.raises(ValueError, match="borrowing is not admitted"):
+                successor.previous(ROOT, name, actual, predecessor=old)
+            with pytest.raises(ValueError, match="unrelated bytes"):
+                successor.previous(ROOT, name, actual + b" ")
+        successor.admit(ROOT)
+
+    ci54.admit(ROOT)
+    for name in ci54.SNAPSHOT_BEFORE:
+        live = current_read(ROOT, name)
+        assert ci54.previous(ROOT, name, live) == ci54.git(ROOT, "show", ci54.BASE + ":" + name)
 
 
 def test_history_complete_current_protocol_resolves_every_actual_consumer(
