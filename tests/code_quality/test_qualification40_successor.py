@@ -281,6 +281,36 @@ def test_qualification_producing_inputs_allows_only_anchor_literal(
             ci60.historical_test_preimage(ROOT, test_name, dropped)
     assert ci60.historical_test_preimage(ROOT, test_name, test_proof[test_name]) == original_test
 
+    inventory_name = ci60.CURRENT_INVENTORY
+    inventory_raw = test_proof[inventory_name]
+    original_inventory = ci60.preceding_control(ROOT, inventory_name, inventory_raw)
+    assert policy.digest(original_inventory) == ci60.CURRENT_INVENTORY_BEFORE
+    with pytest.raises(ValueError, match="caller supplied unrelated bytes"):
+        ci60.preceding_control(ROOT, inventory_name, inventory_raw + b"\n")
+    wrong_inventory = json.loads(inventory_raw)
+    wrong_inventory["acceptance"] += " unreviewed"
+    wrong_inventory_raw = json.dumps(wrong_inventory).encode()
+
+    def forged_inventory_source(root: Path) -> dict[str, bytes]:
+        assert root == ROOT
+        return test_proof | {inventory_name: wrong_inventory_raw}
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "admitted", forged_inventory_source)
+        with pytest.raises(ValueError, match="outside fourteen source fields"):
+            ci60.preceding_control(ROOT, inventory_name, wrong_inventory_raw)
+
+    def wrong_inventory_native(root: Path, *args: str) -> bytes:
+        if args == ("show", ci60.BASE + ":" + inventory_name):
+            return inventory_raw
+        return native_history(root, *args)
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "history", wrong_inventory_native)
+        with pytest.raises(ValueError, match="native preimage changed"):
+            ci60.preceding_control(ROOT, inventory_name, inventory_raw)
+    assert ci60.preceding_control(ROOT, inventory_name, inventory_raw) == original_inventory
+
 
 @pytest.mark.parametrize("mutation", ["owner", "path", "profile", "prior_operation"])
 def test_qualification_map_identifier_requalification_rejects_semantic_drift(

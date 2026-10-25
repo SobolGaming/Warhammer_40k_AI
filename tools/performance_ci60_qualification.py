@@ -183,6 +183,8 @@ def control_projection(root: Path) -> dict[str, bytes]:
 
 
 def preceding_control(root: Path, name: str, supplied: bytes) -> bytes:
+    if name == CURRENT_INVENTORY and (root / NAMESPACE).is_dir():
+        return historical_inventory_preimage(root, supplied)
     if name not in CONTROLS:
         return supplied
     actual = owned(root, name)
@@ -190,6 +192,46 @@ def preceding_control(root: Path, name: str, supplied: bytes) -> bytes:
         raise ValueError("CI60 Qualification caller supplied unrelated bytes.")
     projection = control_projection(root)
     return projection[name]
+
+
+CURRENT_INVENTORY = "data/source_audits/order135/current-inventory-category-migration.json"
+CURRENT_INVENTORY_BEFORE = "c0460f930be48c49dcbef7568ea1af5e2319ca374d658b6abdb8eadd38869c16"
+INVENTORY_TEST_CASES = {
+    "tests/integration/test_fight_on_death_presence.py": (
+        "test_order_30_other_destruction_triggers_wait_for_retained_model_completion",
+        "test_order_30_retained_model_fights_from_original_base_then_is_removed",
+    ),
+    "tests/unit/test_phase12b_stratagem_framework.py": (
+        "test_attached_unit_components_share_one_stratagem_affected_key",
+        "test_different_stratagem_same_unit_same_phase_suppresses_options",
+        "test_finite_stratagem_use_round_trips_through_lifecycle_and_spends_cp",
+        "test_opponent_stratagem_targeting_unit_does_not_block_player_same_phase_stratagem",
+        "test_parameterized_stratagem_target_proposals_validate_before_queue_pop",
+        "test_same_phase_duplicate_and_battle_shocked_targeting_suppress_options",
+        "test_same_stratagem_restriction_uses_active_player_phase_instance",
+        "test_stratagem_spend_prevalidation_rejects_cp_drift_without_underflow",
+    ),
+}
+
+
+def historical_inventory_preimage(root: Path, supplied: bytes) -> bytes:
+    """Original DATA pin after exact current fourteen-field source refresh proof."""
+    actual = admitted(root)
+    if supplied != actual[CURRENT_INVENTORY]:
+        raise ValueError("CI60 historical inventory caller supplied unrelated bytes.")
+    before = history(root, "show", BASE + ":" + CURRENT_INVENTORY)
+    if digest(before) != CURRENT_INVENTORY_BEFORE:
+        raise ValueError("CI60 historical inventory native preimage changed.")
+    expected = json.loads(before)
+    for path, cases in INVENTORY_TEST_CASES.items():
+        raw = actual[path]
+        expected["current_files_observed"][path]["bytes"] = len(raw)
+        expected["current_files_observed"][path]["sha256"] = digest(raw)
+        for case in cases:
+            expected["tests"][path + "::" + case]["file_sha256"] = digest(raw)
+    if json.loads(supplied) != expected:
+        raise ValueError("CI60 current inventory changed outside fourteen source fields.")
+    return before
 
 
 def current_source(root: Path, previous: dict[str, str]) -> dict[str, str]:

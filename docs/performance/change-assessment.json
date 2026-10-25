@@ -596,11 +596,11 @@
     },
     "data/source_audits/ci60_qualification_v1/control-transitions.json": {
       "before_sha256": null,
-      "after_sha256": "4d2d1371f2d97559f70ae75665d90106189ea10829806f2c2d8b2324616b6c54",
+      "after_sha256": "c4ce447b7d1103edee256a4f91ad9697ec9738fb1cce7ce5b551645f32b7a3d6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4d2d1371f2d97559f70ae75665d90106189ea10829806f2c2d8b2324616b6c54"
+          "after": "c4ce447b7d1103edee256a4f91ad9697ec9738fb1cce7ce5b551645f32b7a3d6"
         }
       }
     },
@@ -616,21 +616,21 @@
     },
     "data/source_audits/ci60_qualification_v1/producing-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "b500b9bc1ff68b2a2dbf53dcf4c68deaad2e15a54c350f57386dbf6cd8a3abaf",
+      "after_sha256": "8f029871592922e19494976aca1de45d1fa182569fbfe5aaf2ae81027d599605",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b500b9bc1ff68b2a2dbf53dcf4c68deaad2e15a54c350f57386dbf6cd8a3abaf"
+          "after": "8f029871592922e19494976aca1de45d1fa182569fbfe5aaf2ae81027d599605"
         }
       }
     },
     "data/source_audits/ci60_qualification_v1/retained-role-proofs.json": {
       "before_sha256": null,
-      "after_sha256": "ab15dc038a4ee38560b601bfb3ba66dd4907bd7be2f50236afc3a1f085a30c57",
+      "after_sha256": "454b927fc08ea78f78d4835b834ecb1793b6b616a477505918a13c401fa9f33a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ab15dc038a4ee38560b601bfb3ba66dd4907bd7be2f50236afc3a1f085a30c57"
+          "after": "454b927fc08ea78f78d4835b834ecb1793b6b616a477505918a13c401fa9f33a"
         }
       }
     },
@@ -6467,7 +6467,7 @@
     },
     "tests/code_quality/test_qualification40_successor.py": {
       "before_sha256": null,
-      "after_sha256": "62e7cd57c43c7080e302e27a5d860842c3bbc7a2561aef89c7b33c61802181a4",
+      "after_sha256": "3ff6e268cdec93872d7a9993442989cffcb203581e681c916eeb618386330206",
       "owners": {
         "@module": {
           "before": null,
@@ -6515,7 +6515,7 @@
         },
         "test_qualification_producing_inputs_allows_only_anchor_literal": {
           "before": null,
-          "after": "6dbfccea38d3526fa98ede734f82c02c4ea466de0cafae28b80c29024ca630ea"
+          "after": "e9af85c3947b9d13bfd23afee917243894ce97de2c708acd7ec9571e1888223a"
         },
         "test_qualification_rejects_live_fixture_source_evidence_or_control_drift": {
           "before": null,
@@ -19659,11 +19659,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "b2779c45f9b16a9e1c4f53733787b8587742aa8e085d4bf9f13e0db710dc9195",
+      "after_sha256": "eab6a698581123b424172d5cf589e7dc155e26764c1fbc5842fcbe9fe91d7192",
       "owners": {
         "@module": {
           "before": null,
-          "after": "96f23c7f053cd3c27c900801f71176348be2f8cfb943cd3adbd6de91ee0d5240"
+          "after": "875a35215b3be3ca4b5519bd4baa40a288fe2cdb2db7c03dd8e3559f52e26153"
         },
         "_HistoricalPrevious": {
           "before": null,
@@ -19761,6 +19761,10 @@
           "before": null,
           "after": "83300e4a3b202291505866398ea0f492822491ccc1143bf8da9e0e5a73b57868"
         },
+        "historical_inventory_preimage": {
+          "before": null,
+          "after": "653fbff33c69f72c004393cb29be8c31a67e1527bf9b245ed30acf4c15457655"
+        },
         "historical_ledger_owners": {
           "before": null,
           "after": "46523be8d3253660779a40ed23e03d8945ba064ba1a3b1b829d1ff03e4b4027a"
@@ -19787,7 +19791,7 @@
         },
         "preceding_control": {
           "before": null,
-          "after": "13ec72efed2092198cf294126e4a9eb875237d82c9a9345009ebe63949ddf2c2"
+          "after": "360acc4805572806363532a5e3c32fad1937a399ef8a7602bae22c406374fcc6"
         },
         "producing_inputs": {
           "before": null,
