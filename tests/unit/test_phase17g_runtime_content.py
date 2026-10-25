@@ -677,6 +677,7 @@ def test_generated_manifest_index_preserves_semantic_record_multiplicity() -> No
         )
 
 
+@pytest.mark.stubbed
 def test_generated_manifest_rebuilds_from_current_tuple_and_recovers_source_failure(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
