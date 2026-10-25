@@ -20189,11 +20189,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "eab6a698581123b424172d5cf589e7dc155e26764c1fbc5842fcbe9fe91d7192",
+      "after_sha256": "731d2e2d2472e74fd59ca70d02bd56ba6f7dc03ffe77193c2eae7ae7db54312a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "875a35215b3be3ca4b5519bd4baa40a288fe2cdb2db7c03dd8e3559f52e26153"
+          "after": "eb84449e908f6828418b18dd1caf5cb32eeb70d4da55e70ba78afcf4f12985f2"
         },
         "_HistoricalPrevious": {
           "before": null,

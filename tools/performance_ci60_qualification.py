@@ -17,7 +17,7 @@ SELF = "tools/performance_ci60_qualification.py"
 NAMESPACE = "data/source_audits/ci60_qualification_v1"
 ASSESSMENT = "docs/performance/change-assessment.json"
 MAP = "docs/performance/policy-v3/operation-map.json"
-FREEZE: str | None = None
+FREEZE: str | None = "1cbbebf5e1a6a72d6e7a5c456ce24ff6770bd2b1"
 SUPERSEDED_REPORTS: dict[str, str] = {
     "docs/performance/current/qualification40-dice.json": (
         "84ba455e20996cbd1fdeb246fc5410ab183d61da2ca6e4d760879168d2ddcd2e"
