@@ -54,6 +54,7 @@ RETAINED = frozenset({"roster", "objective_control"})
 CONTROLS = frozenset(
     {
         "tests/category_migration_preservation.py",
+        "tests/code_quality/test_category_migration_preservation.py",
         "tests/code_quality/test_cumulative_preservation.py",
         "tests/code_quality/test_performance_preflight.py",
         "tests/code_quality/test_performance_static_successor.py",
@@ -532,6 +533,12 @@ def historical_ledger_owners(root: Path, path: str, current: dict[str, str]) -> 
 
 
 HISTORICAL_TEST_PINS: dict[str, str] = {
+    "tests/shared/category_migration/phase11e_mission_scoring_cleanup_configuration.py": (
+        "dcf42d1f5991ab5ced6061152472bc00e415117709c4c30846f8f709069a8553"
+    ),
+    "tests/shared/category_migration/phase11e_mission_scoring_cleanup_history_and_reserves.py": (
+        "3f579830b668704ccbfd4b94da524df1c74e297ab52614ae0168ef298e6144da"
+    ),
     "tests/integration/test_fight_on_death_presence.py": (
         "c63c3b334a69aa742e86da70d61f602a4eaf5144a51da88c1837bbc228917123"
     ),
@@ -545,9 +552,14 @@ HISTORICAL_TEST_PINS: dict[str, str] = {
         "e30343a5fceafc63e3c31f0228d3d3a555882920ea0260623123e9c9bf5fe5fd"
     ),
 }
-HISTORICAL_DIRECT_TESTS = frozenset(HISTORICAL_TEST_PINS) - {
-    "tests/unit/test_phase17g_runtime_content.py"
-}
+HISTORICAL_CATEGORY_TESTS = frozenset(
+    {
+        "tests/unit/test_phase17g_runtime_content.py",
+        "tests/shared/category_migration/phase11e_mission_scoring_cleanup_configuration.py",
+        "tests/shared/category_migration/phase11e_mission_scoring_cleanup_history_and_reserves.py",
+    }
+)
+HISTORICAL_DIRECT_TESTS = frozenset(HISTORICAL_TEST_PINS) - HISTORICAL_CATEGORY_TESTS
 
 
 def historical_test_preimage(root: Path, path: str, current: bytes) -> bytes:

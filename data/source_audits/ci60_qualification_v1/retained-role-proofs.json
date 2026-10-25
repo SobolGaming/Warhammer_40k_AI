@@ -1,6 +1,6 @@
 {
   "roster": {
-    "current_input_digest": "3159c2388c6340b8e9435346a9ff8c061bba21ff9f8e98a521f8f5563038a9ef",
+    "current_input_digest": "e7ddb1fc73f0cac646bff1ddf842f916a7fce05fb2786d2c501997e8fec3f1f7",
     "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
     "changed_inputs": {
       "docs/performance/policy-v3/operation-map.json": {
@@ -95,13 +95,19 @@
       },
       "tests/category_migration_preservation.py": {
         "before": "bb8fe47800cff5556d6b05d729224f3a4b22b099c8f07432012e6fa60e204519",
-        "after": "d9eb437c4f496bc0020471748d4b98d1e0b9ea514d2f8222d6a4a7894e7a9a98",
+        "after": "1b873d09ae0e2d63d85f90c804cacb742f4faf23c7f689964a17d2226e8ec355",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
       "tests/code_quality/__init__.py": {
         "before": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "after": "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
+        "role": "untimed-governance",
+        "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
+      },
+      "tests/code_quality/test_category_migration_preservation.py": {
+        "before": "341020dd1e9a8d6f64e5bfad83d444af19802b4a8eb04973755f75a2008c1fb5",
+        "after": "16175a80e71a256b3faa172ee6e582072fb9de98e3d080c9aa89429b65ba176d",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -179,7 +185,7 @@
       },
       "tests/code_quality/test_performance_static_successor.py": {
         "before": null,
-        "after": "43b9e9fcd8d8852836575e802ddbbe7ec534cb06f89a5ddf0da3ca7f099cba8e",
+        "after": "435766435a8f9207148bcec2cda4700b70f52f7c3868584a6e531be65025d932",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -275,7 +281,7 @@
       },
       "tools/cumulative_preservation.py": {
         "before": "98dae9a0fd0509d1478c81459c8fb5120954438f0fa5d1059b7415702a38333a",
-        "after": "4e28033fae27bd2e3871b015f33741f8b3bfae7f330abe55b2017a2b59ec1d6f",
+        "after": "77dcecf4d091069361227df813a97f82d71d2f53974f6d522db230430904cfeb",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -293,7 +299,7 @@
       },
       "tools/performance_ci60_qualification.py": {
         "before": null,
-        "after": "c7592dd6ffd82805c68eed2582d813ec27eecf6bf46c28bab9c19753b9e97300",
+        "after": "2270bcaa40a06ea465d98899fb71ab59900d24a4b21b46c8d7087e8457e8fd6b",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -625,7 +631,7 @@
     "call_path": "The complete workload constructs ArmyCatalog.phase9a_canonical_content_pack and immutable roster requests, then times 100 validate_roster_legality calls. It constructs no GameLifecycle/runtime-content bundle and calls no changed destruction owner. Preserve all original samples, runtime, fixture and host identities; current applicability requires exact unchanged call owners and complete changed-input roles."
   },
   "objective_control": {
-    "current_input_digest": "3159c2388c6340b8e9435346a9ff8c061bba21ff9f8e98a521f8f5563038a9ef",
+    "current_input_digest": "e7ddb1fc73f0cac646bff1ddf842f916a7fce05fb2786d2c501997e8fec3f1f7",
     "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
     "changed_inputs": {
       "docs/performance/policy-v3/operation-map.json": {
@@ -720,13 +726,19 @@
       },
       "tests/category_migration_preservation.py": {
         "before": "bb8fe47800cff5556d6b05d729224f3a4b22b099c8f07432012e6fa60e204519",
-        "after": "d9eb437c4f496bc0020471748d4b98d1e0b9ea514d2f8222d6a4a7894e7a9a98",
+        "after": "1b873d09ae0e2d63d85f90c804cacb742f4faf23c7f689964a17d2226e8ec355",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
       "tests/code_quality/__init__.py": {
         "before": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "after": "8d5e4e6f7bebd9df2e7c317a68f93d634913012d661987474a65739976b9b4ec",
+        "role": "untimed-governance",
+        "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
+      },
+      "tests/code_quality/test_category_migration_preservation.py": {
+        "before": "341020dd1e9a8d6f64e5bfad83d444af19802b4a8eb04973755f75a2008c1fb5",
+        "after": "16175a80e71a256b3faa172ee6e582072fb9de98e3d080c9aa89429b65ba176d",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -804,7 +816,7 @@
       },
       "tests/code_quality/test_performance_static_successor.py": {
         "before": null,
-        "after": "43b9e9fcd8d8852836575e802ddbbe7ec534cb06f89a5ddf0da3ca7f099cba8e",
+        "after": "435766435a8f9207148bcec2cda4700b70f52f7c3868584a6e531be65025d932",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -900,7 +912,7 @@
       },
       "tools/cumulative_preservation.py": {
         "before": "98dae9a0fd0509d1478c81459c8fb5120954438f0fa5d1059b7415702a38333a",
-        "after": "4e28033fae27bd2e3871b015f33741f8b3bfae7f330abe55b2017a2b59ec1d6f",
+        "after": "77dcecf4d091069361227df813a97f82d71d2f53974f6d522db230430904cfeb",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },
@@ -918,7 +930,7 @@
       },
       "tools/performance_ci60_qualification.py": {
         "before": null,
-        "after": "c7592dd6ffd82805c68eed2582d813ec27eecf6bf46c28bab9c19753b9e97300",
+        "after": "2270bcaa40a06ea465d98899fb71ab59900d24a4b21b46c8d7087e8457e8fd6b",
         "role": "untimed-governance",
         "reason": "Qualification/reporting control is absent from this family's canonical fixture and timed call path. Current control bytes remain independently source-authenticated."
       },

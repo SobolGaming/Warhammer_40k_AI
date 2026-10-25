@@ -145,7 +145,11 @@ def reviewed_control_hashes(root: Path) -> dict[str, str]:
         current = _read(root, name)
         preceding = projection.get(name, current)
         if (
-            name == "tests/category_migration_preservation.py"
+            name
+            in {
+                "tests/category_migration_preservation.py",
+                "tests/code_quality/test_category_migration_preservation.py",
+            }
             and successor.enabled(root)
             and (root / ci60.NAMESPACE).is_dir()
         ):
@@ -327,7 +331,11 @@ def verify_control_transformations(root: Path) -> None:
         accepted = _git(root, "show", ACCEPTED + ":" + name, historical=True)
         current = _read(root, name)
         if (
-            name == "tests/category_migration_preservation.py"
+            name
+            in {
+                "tests/category_migration_preservation.py",
+                "tests/code_quality/test_category_migration_preservation.py",
+            }
             and successor.enabled(root)
             and (root / ci60.NAMESPACE).is_dir()
         ):

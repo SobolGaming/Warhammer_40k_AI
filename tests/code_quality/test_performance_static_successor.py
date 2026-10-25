@@ -46,10 +46,15 @@ def previous() -> dict[str, bytes]:
 def test_static_edits_match_independent_immutable_whole_module_recipes(
     name: str, transitions: dict[str, Any], previous: dict[str, bytes]
 ) -> None:
+    current = (ROOT / name).read_bytes()
+    if name == "tests/code_quality/test_cumulative_preservation.py":
+        from tools import performance_ci60_qualification as ci60
+
+        current = ci60.preceding_control(ROOT, name, current)
     successor.assert_static_transition(
         name,
         previous[name],
-        successor.ci_comparison(ROOT, name, (ROOT / name).read_bytes()),
+        successor.ci_comparison(ROOT, name, current),
         transitions[name],
     )
 

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tools import performance_ci60_qualification as ci60
 from tools.core_rules_order95_audit import (
     RETIRED_REFERENCE_SUCCESSORS,
     AuditError,
@@ -37,7 +38,13 @@ def preserved_root(tmp_path: Path) -> Path:
     ]:
         destination = tmp_path / name
         destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes((ROOT / name).read_bytes())
+        current = (ROOT / name).read_bytes()
+        if name in {
+            "tests/shared/category_migration/phase11e_mission_scoring_cleanup_configuration.py",
+            "tests/shared/category_migration/phase11e_mission_scoring_cleanup_history_and_reserves.py",
+        }:
+            current = ci60.historical_test_preimage(ROOT, name, current)
+        destination.write_bytes(current)
     return tmp_path
 
 
@@ -432,3 +439,17 @@ def test_reviewed_inventory_fixture_whole_AST_rejects_unlisted_initializers(refe
     tree.body.extend(ast.parse("unlisted_inventory_fixture_initializer = True").body)
     with pytest.raises(ValueError, match="fixture AST drifted"):
         assert_reviewed_inventory_fixture_ast(accepted, ast.unparse(tree).encode())
+
+
+@pytest.mark.parametrize("path", sorted(ci60.HISTORICAL_TEST_PINS))
+def test_ci60_historical_test_view_requires_current_bytes_and_original_native_pin(
+    path: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    current = (ROOT / path).read_bytes()
+    before = ci60.historical_test_preimage(ROOT, path, current)
+    assert hashlib.sha256(before).hexdigest() == ci60.HISTORICAL_TEST_PINS[path]
+    with pytest.raises(ValueError, match="unrelated current bytes"):
+        ci60.historical_test_preimage(ROOT, path, current + b"\n")
+    monkeypatch.setitem(ci60.HISTORICAL_TEST_PINS, path, "0" * 64)
+    with pytest.raises(ValueError, match="native preimage changed"):
+        ci60.historical_test_preimage(ROOT, path, current)

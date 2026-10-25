@@ -39,10 +39,8 @@ warning; complete performance remains capped at 180 seconds. Required coverage
 remains 85 percent across twelve behavior shards. Preserve failed arms and
 transport/driver incompatibilities; no unrelated repairs are authorized.
 
-Apply docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md. Block reproduced incorrect
-rules, normal legal play, engine-generated valid-state persistence/replay and
-explicitly required trust boundaries with entry, impact, reachability and
-requirement. Queue unsupported hand-edited-history hardening separately.
+Apply `docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md`. Prioritize the complete playable behavior in this order. Block on incorrect rules, normal legal-play failures, engine-generated valid-state save/load/replay failures, and explicitly required trust-boundary failures. For each blocker provide the reproduced entry path, impact, normal reachability and violated acceptance requirement. Queue coordinated hand-edited-history hardening separately when no necessary supported input boundary or normal path is demonstrated. Keep scope within this order; expansion requires an explicit decision. Preserve positive controls, regression tests, source truthfulness and every required local/remote exact-head gate.
+
 No gameplay change, new optimization experiment, publication, cleanup, security
 configuration change or full-game certification is part of this qualification.
 

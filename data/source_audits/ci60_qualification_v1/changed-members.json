@@ -28,6 +28,7 @@
   "src/warhammer40k_core/engine/retained_demise_removal.py",
   "src/warhammer40k_core/engine/retained_destruction_history.py",
   "tests/category_migration_preservation.py",
+  "tests/code_quality/test_category_migration_preservation.py",
   "tests/code_quality/test_cumulative_preservation.py",
   "tests/code_quality/test_performance_policy.py",
   "tests/code_quality/test_performance_preflight.py",
