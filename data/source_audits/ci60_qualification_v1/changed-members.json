@@ -38,6 +38,7 @@
   "tests/shared/category_migration/phase11e_mission_scoring_cleanup_history_and_reserves.py",
   "tests/unit/test_phase12b_stratagem_framework.py",
   "tests/unit/test_phase17g_runtime_content.py",
+  "tools/cumulative_preservation.py",
   "tools/generate_faction_content_scaffold.py",
   "tools/performance_ci60_qualification.py",
   "tools/performance_history_snapshot.py",

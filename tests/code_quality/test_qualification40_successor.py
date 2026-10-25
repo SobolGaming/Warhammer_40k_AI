@@ -200,6 +200,53 @@ def test_qualification_producing_inputs_allows_only_anchor_literal(
             ci60.producing_inputs(ROOT, actual)
 
 
+    ledger_name = "src/warhammer40k_core/engine/retained_demise_removal.py"
+    proof = ci60.admitted(ROOT)
+    owners = policy.owner_hashes(ledger_name, proof[ledger_name])
+    ledger = ci60.historical_ledger_owners(ROOT, ledger_name, owners)
+    assert ledger["@module"] == "482b60427ede07c2ef519a7633aa53e463c05dc353290f26e34cfe62594ced83"
+    assert {k: v for k, v in ledger.items() if k != "@module"} == {
+        k: v for k, v in owners.items() if k != "@module"
+    }
+    with pytest.raises(ValueError, match="current retained-demise owner source"):
+        ci60.historical_ledger_owners(ROOT, ledger_name, owners | {"@module": "f" * 64})
+    import_line = (
+        b"    from warhammer40k_core.engine.retained_destruction_state "
+        b"import RetainedModelDestruction\n"
+    )
+    for replacement, message in (
+        (import_line * 2, "current retained-demise owner source"),
+        (import_line.rstrip(b"\n") + b"  # altered\n", "sole reviewed type-only import"),
+    ):
+        changed_proof = proof | {
+            ledger_name: proof[ledger_name].replace(b"\r\n", b"\n").replace(
+                import_line, replacement, 1
+            )
+        }
+        def changed_ledger_source(
+            root: Path, value: dict[str, bytes] = changed_proof
+        ) -> dict[str, bytes]:
+            assert root == ROOT
+            return value
+
+        with monkeypatch.context() as changed:
+            changed.setattr(ci60, "admitted", changed_ledger_source)
+            with pytest.raises(ValueError, match=message):
+                ci60.historical_ledger_owners(ROOT, ledger_name, owners)
+    native_history = ci60.history
+
+    def wrong_native_owner(root: Path, *args: str) -> bytes:
+        if args == ("show", ci60.BASE + ":" + ledger_name):
+            return proof[ledger_name]
+        return native_history(root, *args)
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "history", wrong_native_owner)
+        with pytest.raises(ValueError, match="original retained-demise ledger owner"):
+            ci60.historical_ledger_owners(ROOT, ledger_name, owners)
+    assert ci60.historical_ledger_owners(ROOT, ledger_name, owners) == ledger
+
+
 @pytest.mark.parametrize("mutation", ["owner", "path", "profile", "prior_operation"])
 def test_qualification_map_identifier_requalification_rejects_semantic_drift(
     mutation: str,

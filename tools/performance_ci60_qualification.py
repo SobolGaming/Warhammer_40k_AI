@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Protocol, cast
 
@@ -51,6 +53,7 @@ RETAINED = frozenset({"roster", "objective_control"})
 CONTROLS = frozenset(
     {
         "tools/quality_runtime_successor.py",
+        "tools/cumulative_preservation.py",
         "tools/performance_policy.py",
         "tools/performance_history_snapshot.py",
         "scripts/check_performance_policy.py",
@@ -493,3 +496,57 @@ def historical_inputs(root: Path, *, original_controls: bool = False) -> dict[st
         allowed = {old.SELF, MAP, "tests/code_quality/test_qualification40_successor.py"}
         result |= {name: digest(_HistoricalStage.read(stage, root, name)) for name in allowed}
     return result
+
+
+def historical_ledger_owners(root: Path, path: str, current: dict[str, str]) -> dict[str, str]:
+    """One historical module-import assertion; never a measurement-input projection."""
+    name = "src/warhammer40k_core/engine/retained_demise_removal.py"
+    if path != name:
+        return current
+    from tools.performance_policy import owner_hashes
+
+    before = "482b60427ede07c2ef519a7633aa53e463c05dc353290f26e34cfe62594ced83"
+    after = "fde9ffe9f023bf0d1fcbfed6c10bdf62481d0915bbaeda34462525a28e51ec79"
+    actual = admitted(root)
+    if current.get("@module") != after or owner_hashes(name, actual[name]) != current:
+        raise ValueError("CI60 current retained-demise owner source changed.")
+    raw = actual[name].replace(b"\r\n", b"\n")
+    import_line = (
+        b"    from warhammer40k_core.engine.retained_destruction_state "
+        b"import RetainedModelDestruction\n"
+    )
+    if (
+        raw.count(import_line) != 1
+        or owner_hashes(name, raw.replace(import_line, b"", 1)).get("@module") != before
+    ):
+        raise ValueError("CI60 ledger successor is not the sole reviewed type-only import.")
+    original = owner_hashes(name, history(root, "show", BASE + ":" + name))
+    if original.get("@module") != before:
+        raise ValueError("CI60 original retained-demise ledger owner changed.")
+    return current | {"@module": before}
+
+
+def historical_ci54_admission(root: Path) -> Callable[[Path], None]:
+    """Original native CI54 function for its explicitly sparse historical test fixture."""
+    from tools import quality_runtime_successor as original
+
+    projection = control_projection(root)
+    source = ast.parse(projection[original.SELF])
+    functions: list[ast.stmt] = [
+        node for node in source.body if isinstance(node, ast.FunctionDef) and node.name == "admit"
+    ]
+    if len(functions) != 1:
+        raise ValueError("CI60 original CI54 admission owner changed.")
+    physical = original.owned
+
+    def historical_read(selected: Path, name: str) -> bytes:
+        if selected == root and name in projection:
+            return projection[name]
+        return physical(selected, name)
+
+    namespace = dict(vars(original)) | {"owned": historical_read}
+    exec(
+        compile(ast.Module(body=functions, type_ignores=[]), "authenticated-ci54-admit", "exec"),
+        namespace,
+    )
+    return cast(Callable[[Path], None], namespace["admit"])

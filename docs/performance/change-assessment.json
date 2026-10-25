@@ -586,21 +586,21 @@
     },
     "data/source_audits/ci60_qualification_v1/changed-members.json": {
       "before_sha256": null,
-      "after_sha256": "1f7897c5048136b76bcee2dc68a0b0ce372a9f266ad9c8e0bdea84d623ee647c",
+      "after_sha256": "d5906cafae133b0d4ca947659114afb466d51a549b91d06f79bfcd38b1ca7bc6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1f7897c5048136b76bcee2dc68a0b0ce372a9f266ad9c8e0bdea84d623ee647c"
+          "after": "d5906cafae133b0d4ca947659114afb466d51a549b91d06f79bfcd38b1ca7bc6"
         }
       }
     },
     "data/source_audits/ci60_qualification_v1/control-transitions.json": {
       "before_sha256": null,
-      "after_sha256": "2c3b3a0a57f59727b2800c3b61d67b63380175e9a1fc61957e34ea9368cf7531",
+      "after_sha256": "a6aa1e2b18e782fe40b7465e17ab77dcf987851db507f7b76f002e98d377497c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2c3b3a0a57f59727b2800c3b61d67b63380175e9a1fc61957e34ea9368cf7531"
+          "after": "a6aa1e2b18e782fe40b7465e17ab77dcf987851db507f7b76f002e98d377497c"
         }
       }
     },
@@ -616,21 +616,21 @@
     },
     "data/source_audits/ci60_qualification_v1/producing-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "d1f450f582de7d65c93c8b8095b9f80c08f6e92154af9349781002c95b07abf7",
+      "after_sha256": "a872d3347eeee8cc041199b6b649490640839746db968a922aeac85a124de3a0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d1f450f582de7d65c93c8b8095b9f80c08f6e92154af9349781002c95b07abf7"
+          "after": "a872d3347eeee8cc041199b6b649490640839746db968a922aeac85a124de3a0"
         }
       }
     },
     "data/source_audits/ci60_qualification_v1/retained-role-proofs.json": {
       "before_sha256": null,
-      "after_sha256": "5bb514116306f2de184d8733817139dc8181de5af0e05548c6bcd1a81dcfe4d3",
+      "after_sha256": "4cea9d8958ff543a1b45a8342b39adb54c42419316af6408faffb60480f83574",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5bb514116306f2de184d8733817139dc8181de5af0e05548c6bcd1a81dcfe4d3"
+          "after": "4cea9d8958ff543a1b45a8342b39adb54c42419316af6408faffb60480f83574"
         }
       }
     },
@@ -6459,7 +6459,7 @@
     },
     "tests/code_quality/test_qualification40_successor.py": {
       "before_sha256": null,
-      "after_sha256": "086835709e553a7a22c7c240e71473dd5db26ec4364bc5503e9001dd260a0c1e",
+      "after_sha256": "b439b17ded13712d57dd3a356b1294e47126eb2a1fc45beaa339f4a9709a2afd",
       "owners": {
         "@module": {
           "before": null,
@@ -6507,7 +6507,7 @@
         },
         "test_qualification_producing_inputs_allows_only_anchor_literal": {
           "before": null,
-          "after": "94a20cf87134a22820aede1cc8989c0a69c886297047395d4faf8cae431a9a99"
+          "after": "ca81dc615c84c6c69066928a0b0769f985262b86898dc0d256efce13f2457989"
         },
         "test_qualification_rejects_live_fixture_source_evidence_or_control_drift": {
           "before": null,
@@ -6517,7 +6517,7 @@
     },
     "tests/code_quality/test_quality_runtime.py": {
       "before_sha256": null,
-      "after_sha256": "b7febd6a1a0d98a15b8675ae7f06b7e59725f1e6614f1cce52150e911f4787d2",
+      "after_sha256": "3126355183d049d183bed93aab39c7b4ce24a05b77ee5ee238c997feb983dff9",
       "owners": {
         "@module": {
           "before": null,
@@ -6613,7 +6613,7 @@
         },
         "test_fixture_compatibility_view_requires_fresh_authentic_module_owned_checkout": {
           "before": null,
-          "after": "253f5c9addbbd09c2124cac95d0cfabf7fc8490d83c7663182e873c09a69ddde"
+          "after": "dc586c81258ac2ee236933dffaa5555ec749bcf0e23874b4c2fb57fd960fa214"
         },
         "test_history_complete_current_protocol_resolves_every_actual_consumer": {
           "before": null,
@@ -19507,7 +19507,7 @@
     },
     "tools/cumulative_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "78322da20097309c580eba10deb70495490d4ec2c513f7861791101775653295",
+      "after_sha256": "d0891c2b78c63d6ae36fa184bdc19162bb7d0ff8481b7da89ec2643fef6ebc10",
       "owners": {
         "@module": {
           "before": null,
@@ -19603,7 +19603,7 @@
         },
         "verify_owner_ledger": {
           "before": null,
-          "after": "8c98721e2e8b66c070be04c6a018b911f3794c758997c1a72f2bcdb76f0900a7"
+          "after": "9a8cc351bf30ea2cb0fe51b182569ab0c313410c7dc6ccb03debfc3776f89fec"
         }
       }
     },
@@ -19647,11 +19647,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "03a18b82ad1331a63647e944f37660e326c93dac2a219f69a45310a489bb71e0",
+      "after_sha256": "d4b74fb2bb2b75dade66d432cb67eb5c7f406174332bc4ac32052b62f178130d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ced75c63839c096c1ac3a58f27954a477c1a74cb442c72093fa522b50bf43d2e"
+          "after": "74d5499ad87717792411f0430f67758ed0e05dbea5873c63d843ead0a85b9f1c"
         },
         "_HistoricalStage": {
           "before": null,
@@ -19725,9 +19725,17 @@
           "before": null,
           "after": "032351e96e8ea08036feec970412bd66a45f4b8f5a6039e538a5e14d43183b21"
         },
+        "historical_ci54_admission": {
+          "before": null,
+          "after": "f5f4b401b4e37cd52b3696819ed8cbc1aed90d19e3b652feb5b18a338da9bc72"
+        },
         "historical_inputs": {
           "before": null,
           "after": "83300e4a3b202291505866398ea0f492822491ccc1143bf8da9e0e5a73b57868"
+        },
+        "historical_ledger_owners": {
+          "before": null,
+          "after": "46523be8d3253660779a40ed23e03d8945ba064ba1a3b1b829d1ff03e4b4027a"
         },
         "history": {
           "before": null,

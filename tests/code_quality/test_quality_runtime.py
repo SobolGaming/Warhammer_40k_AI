@@ -1134,10 +1134,12 @@ def test_complete_preflight_freeze_forwards_only_five_authenticated_members(
 def test_fixture_compatibility_view_requires_fresh_authentic_module_owned_checkout(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    from tools import performance_ci60_qualification as ci60
     from tools import performance_preflight_successor as stage
     from tools import quality_runtime_successor as successor
 
-    original_admit = successor.admit
+    original_admit = ci60.historical_ci54_admission(ROOT)
+    historical_members = ci60.control_projection(ROOT)
     original_previous = successor.previous
     admissions: list[Path] = []
     projections: list[tuple[Path, str, bytes | None]] = []
@@ -1174,7 +1176,7 @@ def test_fixture_compatibility_view_requires_fresh_authentic_module_owned_checko
     for member in successor.PINS.keys() | {successor.SELF, successor.ASSESSMENT}:
         target = owned_root / member
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(successor.owned(ROOT, member))
+        target.write_bytes(historical_members.get(member, successor.owned(ROOT, member)))
     git_directory = (
         subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=ROOT)
         .decode()

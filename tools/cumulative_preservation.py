@@ -277,6 +277,7 @@ def assert_recipe(before: bytes, current: bytes, recipe: dict[str, Any]) -> None
 
 
 def verify_owner_ledger(root: Path) -> None:
+    from tools.performance_ci60_qualification import historical_ledger_owners
     from tools.performance_policy import owner_hashes
 
     ledger = _json(root, NAMESPACE + "/owner-ledger.json")
@@ -286,7 +287,9 @@ def verify_owner_ledger(root: Path) -> None:
     for row in ledger:
         path = row["path"]
         if path not in projections:
-            projections[path] = owner_hashes(path, _read(root, path))
+            projections[path] = historical_ledger_owners(
+                root, path, owner_hashes(path, _read(root, path))
+            )
         if projections[path].get(row["owner"]) != row["current_ast_sha256"]:
             raise ValueError("Cumulative owner binding changed: " + path + "::" + row["owner"])
         for evidence in row["source_documents"]:
