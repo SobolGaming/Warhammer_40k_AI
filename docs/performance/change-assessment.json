@@ -20891,11 +20891,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "78290361dad9bbd186dd0db927c808999155997467f06e0c21aa8f9477277e44",
+      "after_sha256": "06a67ff4484e7134ae631a86aa7de3ecbc1c09d2bc819da1544190455e69aa62",
       "owners": {
         "@module": {
           "before": null,
-          "after": "939d590f90123c3af9be603ba7d7aeb53153c3941ec993aff480f8eaff18bc63"
+          "after": "e2f29b826af29f85951c3ad468cdce2b45da720d6c0cfab1456a9168922e2eef"
         },
         "_HistoricalPrevious": {
           "before": null,
