@@ -25968,6 +25968,372 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci61-provenance-9c4f56cbaba3f95bae76c90a47e3d11aca9adbbf55fac30dd8d92761a95313ad": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/applicability.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-d569c759670c609baa84cce7d2b26b4821d4f70750802812bc20e6cdc96be157": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/changed-members.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-6a91e2d84312c380700680376fe75cb98924a63cabd51ed54c53beba8359bf05": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/control-transitions.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-67d91ce4c4fcb8be9e108eadb0ce3ca73478b631efe812ea4ba224a62486fdb2": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/measurement-provenance.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-f2ed842c8ef0187f23b89ce5e9d4b90c2e788920610e2fb1681191a82b98ee44": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/measurements/source-base.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-5a8f4a73e1556d028a8c6e3880d67775e4796c33dc2d6bdb325a101cd2b33fc3": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/measurements/source-head.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-62f9fed294fc0be1e26baba6329396cd2a971d549bac633446930956758acfdd": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/producing-inputs.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-c69f3b4234101df25375f2eee085cf7f0e4df9e21f8f63d78ad33ddd3aed9126": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/receipts/source-base-0.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-567ed10f6fadd8a7365257ba472b28e9a51d253247da11dae6f324e54cdf8532": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/receipts/source-base-1.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-dd81f7e275d2855ca27941646d00ef7f174d56c30b2c86a0357e1d1ebecef775": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/receipts/source-base-2.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-d7789f0f412028191ebbfdcdd213faaf4b3a0490e521ee9e2e582ae331a3b602": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/receipts/source-head-0.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-29af4908fb5bcd120ce4f02f24108c695adf894ca1511e2c66f0546badc2a14d": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/receipts/source-head-1.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-4eb0432bf14a66986aa05998a955c3c7f91a622fcb7a54788689002563d5a3f0": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/receipts/source-head-2.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-2a14fbf20104ffa51b90ff42a9c7a5a1c6f695e3497736ceb14ef5430212fc49": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/source-token-inventories.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-b50f68ea2128e773dc1123cdb70514b777635251afbf794f702266b22eea3a0c": {
+      "paths": [
+        "data/source_audits/ci61_provenance_v1/source-token-roles.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-b08ea3b287452f059f912a78f817b77173a3bebdef74f36947d8ac10ba9bb67f": {
+      "paths": [
+        "tests/code_quality/test_performance_provenance.py"
+      ],
+      "owners": [
+        "@module",
+        "_Ci60Mechanisms",
+        "_Ci60Mechanisms._admitted_derivation",
+        "_Ci60Mechanisms._current_applicability",
+        "_Ci60Mechanisms._derivation_transition",
+        "_Ci60Mechanisms.applicability",
+        "_Ci60Mechanisms.derive",
+        "_Ci60Mechanisms.transition",
+        "_Ci60Mechanisms.validators",
+        "_Mechanisms",
+        "_Mechanisms._Digests",
+        "_Mechanisms._same_read",
+        "_Mechanisms.read_validator",
+        "_Mechanisms.storage",
+        "_Storage",
+        "_Storage.admission",
+        "_Storage.digest",
+        "finite_derivation_operands",
+        "original_ci60_operands",
+        "test_activated_native_applicability_rejects_false_equivalence",
+        "test_activated_native_history_revokes_copied_phase_after_completion",
+        "test_admission_and_digest_share_the_existing_payload_limit",
+        "test_admission_identity_changes_require_independent_proof",
+        "test_admission_key_preserves_order_mode_bytes_and_multiplicity",
+        "test_admission_reuses_only_successful_complete_operands",
+        "test_admission_revokes_copied_context_after_success_or_cancellation",
+        "test_admission_validator_and_semantic_dependency_are_part_of_identity",
+        "test_finite_transition_preserves_existing_operation_budgets",
+        "test_finite_transition_rejects_changed_boundary_observations",
+        "test_finite_transition_reuses_only_complete_successful_bytes",
+        "test_fresh_members_preserve_requested_observation_order",
+        "test_fresh_members_read_changed_bytes_with_restored_mtime",
+        "test_fresh_members_recheck_ancestor_before_each_observation",
+        "test_fresh_members_reject_unowned_paths",
+        "test_independent_preflight_and_postflight_do_not_share_derivations",
+        "test_measurement_projection_includes_newly_changed_preflight_control",
+        "test_original_native_ci60_derivation_matches_reused_verdict",
+        "test_original_native_derivation_rejects_each_changed_observation",
+        "test_source_token_binding_rejects_changed_finite_provenance",
+        "test_superseded_source_report_requires_exact_native_bytes",
+        "test_unscoped_observations_do_not_reuse_derivations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-7e0cd098153fc0ae9cfa302c8e033685426c5727d175ff069ab75506cfe192b3": {
+      "paths": [
+        "tools/performance_ci60_qualification.py"
+      ],
+      "owners": [
+        "@module",
+        "_HistoricalPrevious",
+        "_HistoricalPrevious.__call__",
+        "_HistoricalStage",
+        "_HistoricalStage._freeze",
+        "_HistoricalStage._member",
+        "_HistoricalStage._read",
+        "_HistoricalStage.freeze",
+        "_HistoricalStage.member",
+        "_HistoricalStage.read",
+        "_admitted_derivation",
+        "_cohort",
+        "_current_applicability",
+        "_derivation_source",
+        "_derivation_transition",
+        "_historical_ci54_functions",
+        "_original_producing_inputs",
+        "_preceding_self",
+        "_producing_inputs",
+        "admitted",
+        "applies",
+        "canonical",
+        "comparison_paths",
+        "control_projection",
+        "current_source",
+        "digest",
+        "extend_catalog",
+        "git",
+        "historical_ci54_admission",
+        "historical_ci54_previous",
+        "historical_inputs",
+        "historical_inventory_preimage",
+        "historical_ledger_owners",
+        "historical_test_preimage",
+        "history",
+        "measurement",
+        "measurement_controls",
+        "owned",
+        "preceding_control",
+        "producing_inputs",
+        "retained_historical_report",
+        "retained_role_proof",
+        "source_binding"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-78f45c6c21cd6f8a6726f3bf7f54645943fffac053b5ca6e8226cf965a354b54": {
+      "paths": [
+        "tools/performance_history_snapshot.py"
+      ],
+      "owners": [
+        "@module",
+        "Member",
+        "Snapshot",
+        "Snapshot.blobs",
+        "_Builder",
+        "_Builder.__init__",
+        "_Builder.add",
+        "_Builder.all_paths",
+        "_Builder.bindings",
+        "_Builder.commit",
+        "_Builder.fact",
+        "_Builder.finish",
+        "_Builder.objects_for",
+        "_Builder.tree",
+        "_Lease",
+        "_activate",
+        "_argv",
+        "_catalog",
+        "_closed",
+        "_digest",
+        "_identity",
+        "_new_lease",
+        "_oid",
+        "_path",
+        "_reconcile",
+        "_seal",
+        "_sha",
+        "_unpinned",
+        "eligible_blobs",
+        "historical",
+        "phase",
+        "proof_identity",
+        "witnesses"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci61-provenance-3cacc2199960a29e392d67004401cdff9c1b806dd2e5493132e7b711e29e5faa": {
+      "paths": [
+        "tools/performance_preflight.py"
+      ],
+      "owners": [
+        "@module",
+        "_Digests",
+        "_Digests.__init__",
+        "_Digests.admission",
+        "_Digests.digest",
+        "_same_file",
+        "_same_read",
+        "_source_digest",
+        "_source_members",
+        "admission_proof",
+        "discovered_sources",
+        "invocation",
+        "owner_proof",
+        "recipe_proof",
+        "source_hashes",
+        "source_members"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

@@ -1,0 +1,742 @@
+"""Complete-byte provenance reuse keeps every live source observation fresh."""
+
+from __future__ import annotations
+
+import contextvars
+import os
+from collections.abc import Callable
+from pathlib import Path
+from typing import Any, Protocol, cast
+
+import pytest
+from tools import performance_preflight as preflight
+from tools.performance_preflight import AdmissionOperands, AdmissionValidator
+
+
+class _Storage(Protocol):
+    limit: int
+    retained: int
+    active: bool
+
+    def digest(self, path: str, raw: bytes) -> str: ...
+
+    def admission(
+        self,
+        validator: AdmissionValidator,
+        operands: AdmissionOperands,
+        identity: tuple[str, ...],
+        dependencies: tuple[Callable[..., Any], ...],
+    ) -> None: ...
+
+
+class _Mechanisms(Protocol):
+    def _Digests(self, limit: int) -> _Storage: ...
+
+    def _same_read(
+        self,
+        before: os.stat_result,
+        opened: os.stat_result,
+        closed: os.stat_result,
+        after: os.stat_result,
+        *,
+        windows: bool,
+    ) -> bool: ...
+
+    def storage(self, limit: int) -> _Storage:
+        return self._Digests(limit)
+
+    def read_validator(self) -> Callable[..., bool]:
+        return self._same_read
+
+
+_mechanisms = cast(_Mechanisms, preflight)
+IDENTITY: tuple[str, ...] = ("repository", "phase", "native-catalog", "plain60")
+
+
+def test_admission_reuses_only_successful_complete_operands() -> None:
+    calls: list[AdmissionOperands] = []
+
+    def check(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append(operands)
+        if operands != (("first", 0o100644, b"original"),):
+            raise ValueError("different source")
+
+    @preflight.invocation
+    def run() -> None:
+        original = (("first", 0o100644, b"original"),)
+        preflight.admission_proof(check, original, IDENTITY, ())
+        preflight.admission_proof(check, original, IDENTITY, ())
+        for _ in range(2):
+            with pytest.raises(ValueError, match="different source"):
+                preflight.admission_proof(check, (("first", 0o100644, b"modified"),), IDENTITY, ())
+        preflight.admission_proof(check, original, IDENTITY, ())
+
+    run()
+    run()
+    assert len(calls) == 8
+
+
+@pytest.mark.parametrize(
+    "changed",
+    [
+        (("second", 0o100644, b"same"), ("first", 0o100644, b"same")),
+        (("first", 0o100755, b"same"), ("second", 0o100644, b"same")),
+        (("first", 0o100644, b"same"), ("second", 0o100644, b"else")),
+        (("first", 0o100644, b"same"), ("first", 0o100644, b"same")),
+    ],
+    ids=["order", "mode", "bytes", "multiplicity"],
+)
+def test_admission_key_preserves_order_mode_bytes_and_multiplicity(
+    changed: AdmissionOperands,
+) -> None:
+    calls: list[AdmissionOperands] = []
+
+    def check(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append(operands)
+
+    @preflight.invocation
+    def run() -> None:
+        initial = (("first", 0o100644, b"same"), ("second", 0o100644, b"same"))
+        preflight.admission_proof(check, initial, IDENTITY, ())
+        preflight.admission_proof(check, changed, IDENTITY, ())
+
+    run()
+    assert len(calls) == 2
+
+
+@pytest.mark.parametrize("field", range(4), ids=["repository", "phase", "catalog", "domain"])
+def test_admission_identity_changes_require_independent_proof(field: int) -> None:
+    calls: list[tuple[str, ...]] = []
+
+    def check(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append(identity)
+
+    @preflight.invocation
+    def run() -> None:
+        changed = list(IDENTITY)
+        changed[field] += "-changed"
+        preflight.admission_proof(check, (), IDENTITY, ())
+        preflight.admission_proof(check, (), tuple(changed), ())
+
+    run()
+    assert len(calls) == 2
+
+
+def test_admission_validator_and_semantic_dependency_are_part_of_identity() -> None:
+    calls: list[str] = []
+
+    def first(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append("first")
+
+    def second(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append("second")
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.admission_proof(first, (), IDENTITY, (str,))
+        preflight.admission_proof(first, (), IDENTITY, (bytes,))
+        preflight.admission_proof(second, (), IDENTITY, (bytes,))
+
+    run()
+    assert calls == ["first", "first", "second"]
+
+
+@pytest.mark.parametrize("cancel", [False, True])
+def test_admission_revokes_copied_context_after_success_or_cancellation(cancel: bool) -> None:
+    contexts: list[contextvars.Context] = []
+    calls: list[AdmissionOperands] = []
+
+    def check(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append(operands)
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.admission_proof(check, (), IDENTITY, ())
+        contexts.append(contextvars.copy_context())
+        if cancel:
+            raise KeyboardInterrupt("cancelled")
+
+    if cancel:
+        with pytest.raises(KeyboardInterrupt, match="cancelled"):
+            run()
+    else:
+        run()
+    contexts[0].run(preflight.admission_proof, check, (), IDENTITY, ())
+    assert calls == [(), ()]
+
+
+def test_admission_and_digest_share_the_existing_payload_limit() -> None:
+    storage = _Mechanisms.storage(_mechanisms, 8)
+    calls: list[AdmissionOperands] = []
+
+    def check(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append(operands)
+
+    storage.digest("source", b"1234")
+    operands = (("proof", 0o100644, b"56789"),)
+    storage.admission(check, operands, IDENTITY, ())
+    storage.admission(check, operands, IDENTITY, ())
+    assert len(calls) == 2
+    assert storage.retained == 4
+    small = (("proof", 0o100644, b"5678"),)
+    storage.admission(check, small, IDENTITY, ())
+    storage.admission(check, small, IDENTITY, ())
+    assert len(calls) == 3
+    assert storage.retained == storage.limit == 8
+
+
+def test_fresh_members_read_changed_bytes_with_restored_mtime(tmp_path: Path) -> None:
+    path = tmp_path / "source.py"
+    path.write_bytes(b"before")
+    metadata = path.stat()
+    first = preflight.source_members(tmp_path, ["source.py"])
+    path.write_bytes(b"edited")
+    os.utime(path, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+    second = preflight.source_members(tmp_path, ["source.py"])
+    assert first[0][2] == b"before"
+    assert second[0][2] == b"edited"
+    assert first != second
+
+
+def test_fresh_members_preserve_requested_observation_order(tmp_path: Path) -> None:
+    for name in ("second.py", "first.py"):
+        (tmp_path / name).write_bytes(name.encode())
+    members = preflight.source_members(tmp_path, ["second.py", "first.py", "second.py"])
+    assert [name for name, _, _ in members] == ["second.py", "first.py", "second.py"]
+
+
+@pytest.mark.parametrize("kind", ["file", "ancestor", "hardlink", "root"])
+def test_fresh_members_reject_unowned_paths(tmp_path: Path, kind: str) -> None:
+    root = tmp_path / "root"
+    directory = root / "nested"
+    directory.mkdir(parents=True)
+    path = directory / "source.py"
+    path.write_bytes(b"source")
+    if kind == "file":
+        target = tmp_path / "target.py"
+        path.rename(target)
+        path.symlink_to(target)
+    elif kind == "ancestor":
+        target = tmp_path / "target"
+        directory.rename(target)
+        directory.symlink_to(target, target_is_directory=True)
+    elif kind == "hardlink":
+        os.link(path, tmp_path / "alias.py")
+    else:
+        alias = tmp_path / "alias"
+        alias.symlink_to(root, target_is_directory=True)
+        root = alias
+    with pytest.raises(ValueError, match=r"Aliased|owned regular"):
+        preflight.source_members(root, ["nested/source.py"])
+
+
+@pytest.mark.parametrize("above_root", [False, True], ids=["descendant", "absolute-ancestor"])
+def test_fresh_members_recheck_ancestor_before_each_observation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, above_root: bool
+) -> None:
+    parent = tmp_path / "parent"
+    root = parent / "root"
+    nested = root / "nested"
+    nested.mkdir(parents=True)
+    for name in ("first.py", "second.py"):
+        (nested / name).write_bytes(b"same")
+    original_read = _Mechanisms.read_validator(_mechanisms)
+    original_open = cast(Callable[..., Any], Path.open)
+    switched = False
+    second_file_opened = False
+
+    def observe_open(path: Path, *args: Any, **kwargs: Any) -> Any:
+        nonlocal second_file_opened
+        if path == nested / "second.py":
+            second_file_opened = True
+        return original_open(path, *args, **kwargs)
+
+    def observe_read(*args: Any, **kwargs: Any) -> bool:
+        nonlocal switched
+        result = original_read(*args, **kwargs)
+        if not switched:
+            selected = parent if above_root else nested
+            target = tmp_path / "saved"
+            selected.rename(target)
+            selected.symlink_to(target, target_is_directory=True)
+            switched = True
+        return result
+
+    monkeypatch.setattr(Path, "open", observe_open)
+    monkeypatch.setattr(preflight, "_same_read", observe_read)
+    with pytest.raises(ValueError, match=r"Aliased|owned regular"):
+        preflight.source_members(root, ["nested/first.py", "nested/second.py"])
+    assert switched
+    assert not second_file_opened
+
+
+class _Ci60Mechanisms(Protocol):
+    def _current_applicability(
+        self, actual: dict[str, bytes], current: dict[str, str], family: str
+    ) -> dict[str, Any]: ...
+
+    def applicability(
+        self, actual: dict[str, bytes], current: dict[str, str], family: str
+    ) -> dict[str, Any]:
+        return self._current_applicability(actual, current, family)
+
+    def validators(self) -> tuple[AdmissionValidator, AdmissionValidator]:
+        return self._admitted_derivation, self._derivation_transition
+
+    def _derivation_transition(
+        self, operands: AdmissionOperands, identity: tuple[str, ...]
+    ) -> None: ...
+
+    def transition(self, operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        return self._derivation_transition(operands, identity)
+
+    def _admitted_derivation(
+        self, operands: AdmissionOperands, identity: tuple[str, ...]
+    ) -> None: ...
+
+    def derive(self, operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        return self._admitted_derivation(operands, identity)
+
+
+@pytest.fixture(scope="module")
+def original_ci60_operands() -> AdmissionOperands:
+    """Actual native E/F objects exercise the preserved original proof unchanged."""
+    import json
+    import subprocess
+
+    from tools import performance_ci60_qualification as ci60
+    from tools.performance_preflight_successor import read_frozen_blobs
+
+    root = Path(__file__).resolve().parents[2]
+    names = (
+        subprocess.check_output(
+            ["git", "diff", "--name-only", ci60.BASE, str(ci60.FREEZE)], cwd=root
+        )
+        .decode()
+        .splitlines()
+    )
+    frozen = read_frozen_blobs(root, str(ci60.FREEZE), names)
+    previous = read_frozen_blobs(root, ci60.BASE, sorted(ci60.CONTROLS))
+    current = read_frozen_blobs(root, ci60.DERIVATION_BASE, names)
+    return (
+        ("freeze", 0, str(ci60.FREEZE).encode()),
+        ("selection", 0, json.dumps(names).encode()),
+        *(("frozen/" + name, 0, raw) for name, raw in frozen.items()),
+        *(("old/" + name, 0, raw) for name, raw in previous.items()),
+        ("assessment-first", 0, current[ci60.ASSESSMENT]),
+        ("assessment-second", 0, current[ci60.ASSESSMENT]),
+        *(("current/" + name, 0, raw) for name, raw in current.items()),
+    )
+
+
+def test_original_native_ci60_derivation_matches_reused_verdict(
+    original_ci60_operands: AdmissionOperands,
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+
+    stage = cast(_Ci60Mechanisms, ci60)
+    calls = 0
+
+    def validate(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        nonlocal calls
+        calls += 1
+        _Ci60Mechanisms.derive(stage, operands, identity)
+
+    # One independent direct derivation and then exactly one bounded reused proof.
+    _Ci60Mechanisms.derive(stage, original_ci60_operands, ())
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.admission_proof(validate, original_ci60_operands, IDENTITY, ())
+        preflight.admission_proof(validate, original_ci60_operands, IDENTITY, ())
+
+    run()
+    assert calls == 1
+
+
+@pytest.mark.parametrize(
+    "selected",
+    ["assessment-first", "assessment-second", "current/tools/performance_policy.py"],
+)
+def test_original_native_derivation_rejects_each_changed_observation(
+    original_ci60_operands: AdmissionOperands, selected: str
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+
+    stage = cast(_Ci60Mechanisms, ci60)
+    changed = tuple(
+        (name, mode, b"{}" if name == selected else raw)
+        for name, mode, raw in original_ci60_operands
+    )
+    assert changed != original_ci60_operands
+    with pytest.raises(ValueError, match=r"assessment|Preflight source"):
+        _Ci60Mechanisms.derive(stage, changed, ())
+
+
+def test_independent_preflight_and_postflight_do_not_share_derivations() -> None:
+    calls: list[str] = []
+
+    def validate(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append("proof")
+
+    @preflight.invocation
+    def phase() -> None:
+        preflight.admission_proof(validate, (), IDENTITY, ())
+        preflight.admission_proof(validate, (), IDENTITY, ())
+
+    phase()
+    phase()
+    assert calls == ["proof", "proof"]
+
+
+def test_unscoped_observations_do_not_reuse_derivations() -> None:
+    calls: list[str] = []
+
+    def validate(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append("proof")
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.admission_proof(validate, (), None, ())
+        preflight.admission_proof(validate, (), None, ())
+
+    run()
+    assert calls == ["proof", "proof"]
+
+
+@pytest.mark.parametrize("cancel", [False, True])
+def test_activated_native_history_revokes_copied_phase_after_completion(
+    cancel: bool, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+
+    from tools import performance_ci60_qualification as ci60
+    from tools import performance_history_snapshot as history
+
+    root = Path(__file__).resolve().parents[2]
+    copied: list[contextvars.Context] = []
+    observations: list[tuple[str, ...]] = []
+    source_members = preflight.source_members
+    computations: list[str] = []
+    original, transition = _Ci60Mechanisms.validators(cast(_Ci60Mechanisms, ci60))
+
+    def original_proof(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        computations.append("original")
+        original(operands, identity)
+
+    def transition_proof(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        computations.append("transition")
+        transition(operands, identity)
+
+    monkeypatch.setattr(ci60, "_admitted_derivation", original_proof)
+    monkeypatch.setattr(ci60, "_derivation_transition", transition_proof)
+
+    def observe(selected: Path, names: list[str]) -> AdmissionOperands:
+        result = source_members(selected, names)
+        observations.append(tuple(names))
+        return result
+
+    monkeypatch.setattr(preflight, "source_members", observe)
+
+    @preflight.invocation
+    def run() -> None:
+        with history.phase(root, ci60.PR_BASE, None):
+            computations.clear()  # Acquisition performs its own unscoped admission.
+            identity = history.proof_identity(root)
+            assert identity is not None
+            assert identity[0] == root.as_posix()
+            assert len(identity[1]) == 32
+            with pytest.raises(ValueError, match="another repository"):
+                history.proof_identity(root / "different")
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                wrong_thread = contextvars.copy_context()
+                with pytest.raises(ValueError, match="inactive"):
+                    pool.submit(wrong_thread.run, history.proof_identity, root).result(timeout=5)
+            start = len(observations)
+            first = ci60.admitted(root)
+            first_observations = observations[start:]
+            first[ci60.SELF] = b"caller-owned dictionary"
+            start = len(observations)
+            second = ci60.admitted(root)
+            assert observations[start:] == first_observations
+            assert computations == ["transition", "original"]
+            original_names = (
+                ci60.history(root, "diff", "--name-only", ci60.BASE, str(ci60.FREEZE))
+                .decode()
+                .splitlines()
+            )
+            assert first_observations[:3] == [
+                (ci60.ASSESSMENT,),
+                (ci60.ASSESSMENT,),
+                tuple(original_names),
+            ]
+            assert sum(map(len, first_observations[:3])) == 109
+            assert set(first_observations[3]) == ci60.DERIVATION_MEMBERS
+            assert len(first_observations) == 4
+            assert second[ci60.SELF] == (root / ci60.SELF).read_bytes()
+            copied.append(contextvars.copy_context())
+            if cancel:
+                raise KeyboardInterrupt("phase cancelled")
+
+    if cancel:
+        with pytest.raises(KeyboardInterrupt, match="phase cancelled"):
+            run()
+    else:
+        run()
+    with pytest.raises(ValueError, match="inactive"):
+        copied[0].run(history.proof_identity, root)
+
+
+@pytest.fixture(scope="module")
+def finite_derivation_operands() -> AdmissionOperands:
+    """Native predecessor bytes and an explicit synthetic activation exercise the recipe."""
+    import json
+
+    from tools import performance_ci60_qualification as ci60
+    from tools.performance_policy import owner_hashes
+    from tools.performance_preflight_successor import read_frozen_blobs
+
+    root = Path(__file__).resolve().parents[2]
+    previous = read_frozen_blobs(root, ci60.DERIVATION_BASE, sorted(ci60.DERIVATION_CONTROLS))
+    frozen = dict.fromkeys(sorted(ci60.DERIVATION_MEMBERS), b"{}\n")
+    frozen.update(previous)
+    frozen[ci60.SELF] = (root / ci60.SELF).read_bytes()
+    marker = b"\nDERIVATION_FREEZE: str | None = None"
+    active = f'\nDERIVATION_FREEZE: str | None = "{ci60.DERIVATION_FREEZE}"'.encode()
+    if marker not in frozen[ci60.SELF]:
+        frozen[ci60.SELF] = frozen[ci60.SELF].replace(active, marker, 1)
+    names = sorted(frozen)
+    frozen[ci60.DERIVATION_NAMESPACE + "/changed-members.json"] = json.dumps(names).encode()
+    transitions = {
+        "schema": "ci61-exact-provenance-v1",
+        "base": ci60.DERIVATION_BASE,
+        "changes": {
+            name: {
+                "before_sha256": ci60.digest(previous[name]),
+                "after_sha256": ci60.digest(frozen[name]),
+                "edits": [{"before": previous[name].decode(), "after": frozen[name].decode()}],
+            }
+            for name in sorted(previous.keys() - {ci60.ASSESSMENT})
+        },
+    }
+    frozen[ci60.DERIVATION_NAMESPACE + "/control-transitions.json"] = json.dumps(
+        transitions
+    ).encode()
+    freeze = "1" * 40
+    current = frozen | {
+        ci60.SELF: frozen[ci60.SELF].replace(
+            marker, f'\nDERIVATION_FREEZE: str | None = "{freeze}"'.encode(), 1
+        )
+    }
+    assessment = json.loads(frozen[ci60.ASSESSMENT])
+    assessment["changes"][ci60.SELF]["after_sha256"] = ci60.digest(current[ci60.SELF])
+    assessment["changes"][ci60.SELF]["owners"]["@module"]["after"] = owner_hashes(
+        ci60.SELF, current[ci60.SELF]
+    )["@module"]
+    current[ci60.ASSESSMENT] = json.dumps(assessment).encode()
+    return (
+        ("freeze", 0, freeze.encode()),
+        ("selection", 0, json.dumps(names).encode()),
+        *((f"frozen/{name}", 0, raw) for name, raw in frozen.items()),
+        *((f"previous/{name}", 0, raw) for name, raw in previous.items()),
+        *((f"current/{name}", 0o100644, raw) for name, raw in current.items()),
+        ("assessment-first", 0o100644, current[ci60.ASSESSMENT]),
+        ("assessment-second", 0o100644, current[ci60.ASSESSMENT]),
+        *((f"observed/{name}", 0o100644, current[name]) for name in sorted(previous)),
+    )
+
+
+def test_finite_transition_reuses_only_complete_successful_bytes(
+    finite_derivation_operands: AdmissionOperands,
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+
+    stage = cast(_Ci60Mechanisms, ci60)
+    calls: list[str] = []
+
+    def validate(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append("derive")
+        _Ci60Mechanisms.transition(stage, operands, identity)
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.admission_proof(validate, finite_derivation_operands, IDENTITY, ())
+        preflight.admission_proof(validate, finite_derivation_operands, IDENTITY, ())
+
+    run()
+    assert calls == ["derive"]
+
+
+@pytest.mark.parametrize(
+    "selected",
+    [
+        "selection",
+        "assessment-first",
+        "assessment-second",
+        "current/tools/performance_preflight.py",
+        "observed/tools/performance_history_snapshot.py",
+        "previous/tools/performance_preflight.py",
+    ],
+)
+def test_finite_transition_rejects_changed_boundary_observations(
+    finite_derivation_operands: AdmissionOperands, selected: str
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+
+    stage = cast(_Ci60Mechanisms, ci60)
+    changed = tuple(
+        (name, mode, b"[]" if name == "selection" else b"{}")
+        if name == selected
+        else (name, mode, raw)
+        for name, mode, raw in finite_derivation_operands
+    )
+    with pytest.raises(ValueError, match=r"membership|assessment|Preflight|source changed"):
+        _Ci60Mechanisms.transition(stage, changed, ())
+
+
+def test_measurement_projection_includes_newly_changed_preflight_control(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+
+    name = "tools/performance_preflight.py"
+    current = {name: b"actual-current-collector", ci60.SELF: b"actual-self"}
+    before = {name: b"native-E-collector"}
+
+    def admitted(root: Path) -> dict[str, bytes]:
+        assert root == tmp_path
+        return current.copy()
+
+    def projection(root: Path) -> dict[str, bytes]:
+        assert root == tmp_path
+        return before.copy()
+
+    monkeypatch.setattr(ci60, "admitted", admitted)
+    monkeypatch.setattr(ci60, "control_projection", projection)
+    supplied = {path: ci60.digest(raw) for path, raw in current.items()}
+    supplied["src/unchanged.py"] = "unchanged-runtime"
+    assert ci60.measurement_controls(tmp_path, supplied) == {
+        name: ci60.digest(before[name]),
+        "src/unchanged.py": "unchanged-runtime",
+    }
+    with pytest.raises(ValueError, match="omitted current control bytes"):
+        ci60.measurement_controls(tmp_path, supplied | {name: ci60.digest(before[name])})
+
+
+def test_finite_transition_preserves_existing_operation_budgets(
+    finite_derivation_operands: AdmissionOperands,
+) -> None:
+    import json
+
+    from tools import performance_ci60_qualification as ci60
+
+    values = {name: raw for name, _, raw in finite_derivation_operands}
+    mapping = json.loads(values["frozen/" + ci60.MAP])
+    mapping["families"]["external_contract_source_reuse"]["samples_per_case"] += 1
+    replacement = json.dumps(mapping).encode()
+    transition_name = ci60.DERIVATION_NAMESPACE + "/control-transitions.json"
+    transitions = json.loads(values["frozen/" + transition_name])
+    row = transitions["changes"][ci60.MAP]
+    row["after_sha256"] = ci60.digest(replacement)
+    row["edits"][0]["after"] = replacement.decode()
+    updates = {
+        "frozen/" + ci60.MAP: replacement,
+        "current/" + ci60.MAP: replacement,
+        "observed/" + ci60.MAP: replacement,
+        "frozen/" + transition_name: json.dumps(transitions).encode(),
+        "current/" + transition_name: json.dumps(transitions).encode(),
+    }
+    changed = tuple(
+        (name, mode, updates.get(name, raw)) for name, mode, raw in finite_derivation_operands
+    )
+    with pytest.raises(ValueError, match="existing operation, family or budget"):
+        _Ci60Mechanisms.transition(cast(_Ci60Mechanisms, ci60), changed, ())
+
+
+def test_superseded_source_report_requires_exact_native_bytes() -> None:
+    import hashlib
+    import subprocess
+
+    from tools import performance_ci60_qualification as ci60
+
+    root = Path(__file__).resolve().parents[2]
+    path = "docs/performance/current/ci60-external_contract_source_reuse.json"
+    raw = subprocess.check_output(["git", "show", ci60.DERIVATION_BASE + ":" + path], cwd=root)
+    change: dict[str, object] = {
+        "before_sha256": None,
+        "after_sha256": hashlib.sha256(raw).hexdigest(),
+    }
+    assert ci60.retained_historical_report(base=ci60.PR_BASE, path=path, change=change)
+    assert not ci60.retained_historical_report(
+        base=ci60.PR_BASE,
+        path=path,
+        change=change | {"after_sha256": hashlib.sha256(raw + b" ").hexdigest()},
+    )
+    assert not ci60.retained_historical_report(
+        base=ci60.PR_BASE, path="docs/performance/current/unrelated.json", change=change
+    )
+    assert not ci60.retained_historical_report(
+        base=ci60.PR_BASE, path=path, change=change | {"before_sha256": "existing"}
+    )
+
+
+@pytest.mark.parametrize("changed", ["inventories", "roles", "base"])
+def test_source_token_binding_rejects_changed_finite_provenance(changed: str) -> None:
+    import json
+
+    from tools import performance_ci60_qualification as ci60
+
+    root = Path(__file__).resolve().parents[2]
+    spec = json.loads((root / ci60.NAMESPACE / "tool-input-roles.json").read_bytes())
+    inventories = (root / spec["inventories_path"]).read_bytes()
+    spec_path = ci60.DERIVATION_NAMESPACE + "/source-token-roles.json"
+    spec["inventories_path"] = ci60.DERIVATION_NAMESPACE + "/source-token-inventories.json"
+    actual = {spec_path: json.dumps(spec).encode(), spec["inventories_path"]: inventories}
+    original = ci60.source_binding(actual, "test-producing-digest")
+    assert original["family"] == "external_contract_source_reuse"
+    if changed == "inventories":
+        altered = json.loads(inventories)
+        altered["head"]["tools/performance_preflight.py"] = "changed"
+        actual[spec["inventories_path"]] = json.dumps(altered).encode()
+    elif changed == "roles":
+        spec["roles"].pop(next(iter(spec["roles"])))
+        actual[spec_path] = json.dumps(spec).encode()
+    else:
+        spec["base_revision"] = "0" * 40
+        actual[spec_path] = json.dumps(spec).encode()
+    with pytest.raises(ValueError, match="complete source-token input roles changed"):
+        ci60.source_binding(actual, "test-producing-digest")
+
+
+@pytest.mark.parametrize("changed", ["runtime", "dependency", "startup-drop", "startup-pin"])
+def test_activated_native_applicability_rejects_false_equivalence(changed: str) -> None:
+    import json
+
+    from tools import performance_ci60_qualification as ci60
+
+    root = Path(__file__).resolve().parents[2]
+    actual = ci60.admitted(root)
+    producing_name = ci60.DERIVATION_NAMESPACE + "/producing-inputs.json"
+    proof_name = ci60.DERIVATION_NAMESPACE + "/applicability.json"
+    produced = json.loads(actual[producing_name])
+    current = produced | {ci60.SELF: ci60.digest(actual[ci60.SELF])}
+    stage = cast(_Ci60Mechanisms, ci60)
+    original = _Ci60Mechanisms.applicability(stage, actual, current, "dice")
+    assert len(original["families"]) == 11
+    proof = json.loads(actual[proof_name])
+    if changed in {"runtime", "dependency"}:
+        path = "src/warhammer40k_core/__init__.py" if changed == "runtime" else "uv.lock"
+        before = produced[path]
+        produced[path] = ci60.digest(b"coordinated changed input")
+        current[path] = produced[path]
+        proof["current_producing_input_digest"] = ci60.canonical(produced)
+        proof["changes"][path] = {"before": before, "after": produced[path]}
+        proof["unchanged_inputs"].pop(path)
+        actual[producing_name] = json.dumps(produced).encode()
+    elif changed == "startup-drop":
+        proof["families"]["dice"]["unchanged_startup"].pop("tests/conftest.py")
+    else:
+        proof["families"]["dice"]["unchanged_startup"]["tests/conftest.py"] = "altered"
+    actual[proof_name] = json.dumps(proof).encode()
+    with pytest.raises(ValueError, match=r"applicability changed|consumer/startup proof changed"):
+        _Ci60Mechanisms.applicability(stage, actual, current, "dice")

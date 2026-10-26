@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
-  "operation_map_sha256": "00a04a28f7fbbc11fe00fd11a4093a8cadd02b61d38a255be739641b646d54e0",
+  "operation_map_sha256": "86326b25ca92a6e38e84a7b6893612c4a530df7f8c36222e9b848323f7505891",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "1d5a9e4082795d6b7a0424b1716de826d39afa2bdc6ef3aeae726f1a70a95f3c",
+      "after_sha256": "9e07e6a3fc6a7ff5f4af8e29b48620e96a8850a8b3940bd35c3a815938a0e8af",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1d5a9e4082795d6b7a0424b1716de826d39afa2bdc6ef3aeae726f1a70a95f3c"
+          "after": "9e07e6a3fc6a7ff5f4af8e29b48620e96a8850a8b3940bd35c3a815938a0e8af"
         }
       }
     },
@@ -36,21 +36,21 @@
     },
     "ci/quality_shards/shard-1-modules.txt": {
       "before_sha256": null,
-      "after_sha256": "6134b0b35c0072935aa1c215507f3877ca26911ef5b35df75089644685b5d2ab",
+      "after_sha256": "9943de0ac1d9ca098a6ed9b5bc36268240aa51a8bf3a12566af4f993b940580f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6134b0b35c0072935aa1c215507f3877ca26911ef5b35df75089644685b5d2ab"
+          "after": "9943de0ac1d9ca098a6ed9b5bc36268240aa51a8bf3a12566af4f993b940580f"
         }
       }
     },
     "ci/quality_shards/shard-1.txt": {
       "before_sha256": null,
-      "after_sha256": "b227bbf0b5e6901bc56357561ea31da92201cf5efe70d8ffd77cd2e5e25415bc",
+      "after_sha256": "7618d53c130633785b6e4e6923059e5273d17aaebca3f6a59426db38af6d9033",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b227bbf0b5e6901bc56357561ea31da92201cf5efe70d8ffd77cd2e5e25415bc"
+          "after": "7618d53c130633785b6e4e6923059e5273d17aaebca3f6a59426db38af6d9033"
         }
       }
     },
@@ -1061,6 +1061,46 @@
         "@document": {
           "before": null,
           "after": "3475207a50fb3e639555195063b4677d3fb8c6fb27a09694554a017280adcec2"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/applicability.json": {
+      "before_sha256": null,
+      "after_sha256": "7a016781d380f7258ef498648de0f007462ae87458dba22112600d1fb5a1d99c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "7a016781d380f7258ef498648de0f007462ae87458dba22112600d1fb5a1d99c"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/changed-members.json": {
+      "before_sha256": null,
+      "after_sha256": "0be091cf5fe3f1582712b1a9333f74878e7a3bc7f0a05a3904d521851eac19c4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0be091cf5fe3f1582712b1a9333f74878e7a3bc7f0a05a3904d521851eac19c4"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/control-transitions.json": {
+      "before_sha256": null,
+      "after_sha256": "5d288469723e1640db3099bae44a68a10758d4be64105674c6196d29dace7168",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5d288469723e1640db3099bae44a68a10758d4be64105674c6196d29dace7168"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/producing-inputs.json": {
+      "before_sha256": null,
+      "after_sha256": "94fb96edde08d1b6cc392d41a7c01061c93bb68e5b055391ca41a2e4aaa5bc62",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "94fb96edde08d1b6cc392d41a7c01061c93bb68e5b055391ca41a2e4aaa5bc62"
         }
       }
     },
@@ -2954,13 +2994,23 @@
         }
       }
     },
+    "docs/CI61_PROVENANCE_SCOPE.md": {
+      "before_sha256": null,
+      "after_sha256": "9d955a4e0b8076b7b13e50e32fa7f11d081cda441758610b6221a15a130fd012",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9d955a4e0b8076b7b13e50e32fa7f11d081cda441758610b6221a15a130fd012"
+        }
+      }
+    },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-      "after_sha256": "ea15fc520fdc6250c466f3c472cd7a6b6ff67d263b7625ade26b276572c4fcce",
+      "after_sha256": "b639b4a188ec5f76698cfa655b38721e0f778e070592bb2247e245f5dd162516",
       "owners": {
         "@document": {
           "before": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-          "after": "ea15fc520fdc6250c466f3c472cd7a6b6ff67d263b7625ade26b276572c4fcce"
+          "after": "b639b4a188ec5f76698cfa655b38721e0f778e070592bb2247e245f5dd162516"
         }
       }
     },
@@ -3536,11 +3586,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "b66bb437efe6c32ba31b6cfd5be485bff48422219a2a361126abb37f348aa417",
+      "after_sha256": "813b3219639758c6d11976533147455b32492b58122bb2d0933e9660deff00cf",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "b66bb437efe6c32ba31b6cfd5be485bff48422219a2a361126abb37f348aa417"
+          "after": "813b3219639758c6d11976533147455b32492b58122bb2d0933e9660deff00cf"
         }
       }
     },
@@ -6866,6 +6916,176 @@
         "test_recipe_cache_is_local_exact_and_validator_specific": {
           "before": null,
           "after": "e256ebefe1d859316af81ca6a48dbdb5898d58598d4453d6fe5030164767acb3"
+        }
+      }
+    },
+    "tests/code_quality/test_performance_provenance.py": {
+      "before_sha256": null,
+      "after_sha256": "d41520a9beeb772db7fc4b65bcfd13fc7bd6cdf3b1ec2bf5fbcd89920ce94d71",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "9d5930155b8d1075e4fa3b3a5e1f4e3f0ebf1f80e0d231fa39c08647e1942d13"
+        },
+        "_Ci60Mechanisms": {
+          "before": null,
+          "after": "560f4d493312607448c9156472e8cfbf5d41982edab5ecae9160c4911fbbe029"
+        },
+        "_Ci60Mechanisms._admitted_derivation": {
+          "before": null,
+          "after": "29a0bf84155e375365d542a770ce9b79d8a8c0ac8da664e598b3602aa95349d5"
+        },
+        "_Ci60Mechanisms._current_applicability": {
+          "before": null,
+          "after": "575cd5df12cc57ef09130bd7b22c3a04382ce9ac65fa86f1e20599ea17d92b2e"
+        },
+        "_Ci60Mechanisms._derivation_transition": {
+          "before": null,
+          "after": "26b14df5a9032f6ce82cb0683b9aadd2a55bcdfcfb9d035dd06ec1e04a58b590"
+        },
+        "_Ci60Mechanisms.applicability": {
+          "before": null,
+          "after": "9562c14a027ccc98461580cce9d1ffb4f351447c665b3c6cac7dcc2b00e4c083"
+        },
+        "_Ci60Mechanisms.derive": {
+          "before": null,
+          "after": "f4681cdb0d1672278ebd524d0716b3767a53c3d05f489d87103cf99bbcac2cfa"
+        },
+        "_Ci60Mechanisms.transition": {
+          "before": null,
+          "after": "93086876480370058fddec89f0ea2cb6198ecc35957432bd16217e4dd849f64e"
+        },
+        "_Ci60Mechanisms.validators": {
+          "before": null,
+          "after": "4da601d8bdc028690891ee4032f3db2a5860e0809088cd08db91f7d52c963af6"
+        },
+        "_Mechanisms": {
+          "before": null,
+          "after": "d8969a8ea78b966af36ffd5e09ca41d2f536e9a91a9d5401488a3e13fef6a559"
+        },
+        "_Mechanisms._Digests": {
+          "before": null,
+          "after": "2c067dd9fdae88bf3d1ca87820ab9a01009af6ed8b66a0811f4df4a42d0fff15"
+        },
+        "_Mechanisms._same_read": {
+          "before": null,
+          "after": "615d9d53dbc3cc7d609e9fdca7bc5a803ea1bb79e3a2c7e98988df47e4ff4438"
+        },
+        "_Mechanisms.read_validator": {
+          "before": null,
+          "after": "0444b035505eaf035a342f7646583e49a1383012740bbeda80d5b6be50503adc"
+        },
+        "_Mechanisms.storage": {
+          "before": null,
+          "after": "2f6ddb24324e0e85330f1bc3c6ab1f0667ef190a04493fc9120a7c099d3b2e0e"
+        },
+        "_Storage": {
+          "before": null,
+          "after": "68bc7abd4729da92ed865d5f6d3a937a2dba82387c8d430a96751235c14dee01"
+        },
+        "_Storage.admission": {
+          "before": null,
+          "after": "373568bbe34c4643d7881e04c57611185e4ed8acdc4ccfe30e76008e131cb67a"
+        },
+        "_Storage.digest": {
+          "before": null,
+          "after": "6de92ee974b0ac48789a12148bb61a75f16fffa2516da9fa53d26df4e54f01cb"
+        },
+        "finite_derivation_operands": {
+          "before": null,
+          "after": "9f5f9ffb45fed08d85f5bc9c5e375bcf4808bf0c7abdd1c4ad13c04f7bf274c3"
+        },
+        "original_ci60_operands": {
+          "before": null,
+          "after": "6befb174a25073d9afa99f50c17fcd5e5458e76b71abcad11e93c12274ac5db1"
+        },
+        "test_activated_native_applicability_rejects_false_equivalence": {
+          "before": null,
+          "after": "10908751dbbebc8272de23288d969e1fa56f91b6179af11fc22bab0f94376621"
+        },
+        "test_activated_native_history_revokes_copied_phase_after_completion": {
+          "before": null,
+          "after": "da52af8e51bd656cec2a763b46b1ddca5fbeb786db00ad54afa3508fa2cd8e59"
+        },
+        "test_admission_and_digest_share_the_existing_payload_limit": {
+          "before": null,
+          "after": "3f9703085dcc4504e346f49e5ac14f6a315d650ce2d0fbdd0985febe377ab82d"
+        },
+        "test_admission_identity_changes_require_independent_proof": {
+          "before": null,
+          "after": "27ac3e37bcafbd1dbb7f466863aafaca92d95cfa26fcfba74151d5b87ccab618"
+        },
+        "test_admission_key_preserves_order_mode_bytes_and_multiplicity": {
+          "before": null,
+          "after": "d8dc2e1fdb5b6872cc61c40bb60212b8898f0d2148ba4a79364eeb638271dc6a"
+        },
+        "test_admission_reuses_only_successful_complete_operands": {
+          "before": null,
+          "after": "192a139ff44215b56f2c65738b139a2239b0812dead22c21403e96ccb911e07a"
+        },
+        "test_admission_revokes_copied_context_after_success_or_cancellation": {
+          "before": null,
+          "after": "0b42c2423a12d90726e9ceba3ba14683400dae4afcb35386a700e2ed9d33446d"
+        },
+        "test_admission_validator_and_semantic_dependency_are_part_of_identity": {
+          "before": null,
+          "after": "e180a50dafea840ff143528be2e4156ddfe18e0b09e9f46f9f93e3aa8b72b5c1"
+        },
+        "test_finite_transition_preserves_existing_operation_budgets": {
+          "before": null,
+          "after": "dd154daf6986b1e934eb9392e306dda37f2ff78f3954f3793be5df2fa48ef640"
+        },
+        "test_finite_transition_rejects_changed_boundary_observations": {
+          "before": null,
+          "after": "05a357db8aea68d241fce0b21bc6c945246416eb3640ec6e715b021acab960b6"
+        },
+        "test_finite_transition_reuses_only_complete_successful_bytes": {
+          "before": null,
+          "after": "a8b683fa71629201be372473eba08f2e5b14cefc682dfe587759b4e35a34158b"
+        },
+        "test_fresh_members_preserve_requested_observation_order": {
+          "before": null,
+          "after": "308b69eaed30d06c914bf6edabe39c2f2670239a191d42be8832b75b0eb2e7fe"
+        },
+        "test_fresh_members_read_changed_bytes_with_restored_mtime": {
+          "before": null,
+          "after": "5ac6534e425a9a391e3d3e2abbc8ec02212f3cc071b34d4a3478906da51f881f"
+        },
+        "test_fresh_members_recheck_ancestor_before_each_observation": {
+          "before": null,
+          "after": "6f33d5e4258bef443543c0875264ae2ac75c70a6cc1b3471124613946161dd04"
+        },
+        "test_fresh_members_reject_unowned_paths": {
+          "before": null,
+          "after": "5075ca5a2728a95d0bad794a25a2b0bbec9f87512cb4323e20b2e763520e8f69"
+        },
+        "test_independent_preflight_and_postflight_do_not_share_derivations": {
+          "before": null,
+          "after": "492f441d807bbb5601305939ea3b45c66294cc99b8b1fe7e56dfd6462a313c0d"
+        },
+        "test_measurement_projection_includes_newly_changed_preflight_control": {
+          "before": null,
+          "after": "0dec5bce65cb33382aeb8f9d068b2c93776e1b1eec788a06bcc6011bfd595846"
+        },
+        "test_original_native_ci60_derivation_matches_reused_verdict": {
+          "before": null,
+          "after": "7b9a59d5d5b909f114ec9ebf6caa179ed671eb423ae4ad37c2673d1fbb15c7ae"
+        },
+        "test_original_native_derivation_rejects_each_changed_observation": {
+          "before": null,
+          "after": "660260744a057a0b3390969bd757376a6a05cf33a73cd68dd30e5aff5d389b8b"
+        },
+        "test_source_token_binding_rejects_changed_finite_provenance": {
+          "before": null,
+          "after": "5d9560baf91f82cb05d60abcfe04abc3414693e29504617facc1dabacef98641"
+        },
+        "test_superseded_source_report_requires_exact_native_bytes": {
+          "before": null,
+          "after": "3c7ea3c2946e6e590a784b016acc3a460b22219bd23e2abddb172062b285d402"
+        },
+        "test_unscoped_observations_do_not_reuse_derivations": {
+          "before": null,
+          "after": "f28ae99ecde818710eec52634c88af9b270cb2a033d69d1b7168ed1e92a0686e"
         }
       }
     },
@@ -20189,11 +20409,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "731d2e2d2472e74fd59ca70d02bd56ba6f7dc03ffe77193c2eae7ae7db54312a",
+      "after_sha256": "d94b11e3bcb165bdaec0cd8bb3e4dce7a627d0df07d17028285fb71e9703493e",
       "owners": {
         "@module": {
           "before": null,
-          "after": "eb84449e908f6828418b18dd1caf5cb32eeb70d4da55e70ba78afcf4f12985f2"
+          "after": "25a6983d19a2c65f4f9f3f3bbe9e46e89f7d89be26abdb29520eee32a1e5f89b"
         },
         "_HistoricalPrevious": {
           "before": null,
@@ -20231,21 +20451,45 @@
           "before": null,
           "after": "91f1c82fa1e48818efd3faf4f548ff641b18f29e7db9cb7e6b1780e36a43df71"
         },
+        "_admitted_derivation": {
+          "before": null,
+          "after": "3b8b1b95a6d25390620e5025b3e060daad15c7b8fe9acace4e2f72117b47e958"
+        },
         "_cohort": {
           "before": null,
-          "after": "41134038ecaef80d29e4f9a2c092c587f80c445859efaf216c74291cfb5cf695"
+          "after": "07410824825615d9aa6be27e995e63d7f1f8ff05c0d82d40aa4c333ac0012aed"
+        },
+        "_current_applicability": {
+          "before": null,
+          "after": "38e14ec4e10d8325e3b6686e3f569de0a0e9673c035d0e64a564f40c25d809e1"
+        },
+        "_derivation_source": {
+          "before": null,
+          "after": "2f51f70008fb66c44cd9e2c5200b086dcf8bfd80f6b04dfdee5f9638639cfcf4"
+        },
+        "_derivation_transition": {
+          "before": null,
+          "after": "bfa1068490ad7c3063a1fc99699476c1e3a3c0497214f0682c40618287430864"
         },
         "_historical_ci54_functions": {
           "before": null,
           "after": "045c8dac021f27f1536a6e9403695b6d345a21b02b2b6ee0107cc78158d03b28"
         },
+        "_original_producing_inputs": {
+          "before": null,
+          "after": "0484dd912ba0895f29ea950261b140bbcc3506b3475364324426653107bd0052"
+        },
+        "_preceding_self": {
+          "before": null,
+          "after": "5cb98c54acaf574466e6f2cc2a8030fee0537a47584341fbd109ee8136c9d41d"
+        },
         "_producing_inputs": {
           "before": null,
-          "after": "531f6d71edcea30e14fb7ae3fc357bf42094745a9f7f0a2fbb247fd801b8b17d"
+          "after": "ff89b4ddba36b08eee4750691b5634bcb506a2e31638352a0e58eaa1fc65e581"
         },
         "admitted": {
           "before": null,
-          "after": "4599d5db21f74a4925d88a1d58493b201a13e4b6904ebda41545956c38642ede"
+          "after": "2e9283e5ecbe1a054d6ce0caa917e30b59458b2200cb6836667044e76b01b36c"
         },
         "applies": {
           "before": null,
@@ -20261,7 +20505,7 @@
         },
         "control_projection": {
           "before": null,
-          "after": "c58401e5fb3ee5728623c9a9752ca4859a27980548abc8bc133cd37c6bcab9c9"
+          "after": "c0544605444b01d45334f53779620ef1aea3bfb844106bba303b083be6c96dae"
         },
         "current_source": {
           "before": null,
@@ -20273,7 +20517,7 @@
         },
         "extend_catalog": {
           "before": null,
-          "after": "6bf967bef8ea04d2f913afe248f6e7811513040b8414e78ee7cc29b5945272a3"
+          "after": "ada38db9ff41d509059979a5c2a44052ccc7a9586448de87b412653e5b89b7f7"
         },
         "git": {
           "before": null,
@@ -20309,11 +20553,11 @@
         },
         "measurement": {
           "before": null,
-          "after": "6cba6813999ddbfe2acbe7d1ee00d26cdea2df06995e18a0c006925acb58f6cc"
+          "after": "870c43e1e92c1e91165354e345dfeef8ee531663fd8189f39d1bf72080dff931"
         },
         "measurement_controls": {
           "before": null,
-          "after": "1440a0b29df1e549f40e713712c8d9cf264e5327c8fefe3ca96d9d2ed271599b"
+          "after": "957626c651342a8b11c4400e9202431653c01b0088927e519ae6ecba07068c6d"
         },
         "owned": {
           "before": null,
@@ -20321,7 +20565,7 @@
         },
         "preceding_control": {
           "before": null,
-          "after": "360acc4805572806363532a5e3c32fad1937a399ef8a7602bae22c406374fcc6"
+          "after": "4eb33850c84d97bc4ec30e8eeade3fd7d606cdc3c10b59a5d5e83299945c74d1"
         },
         "producing_inputs": {
           "before": null,
@@ -20329,7 +20573,7 @@
         },
         "retained_historical_report": {
           "before": null,
-          "after": "a385e4a077efcf10d824ca9d953be6797b9f172aa14192672d8a3377e1830e0f"
+          "after": "7f45509afa31839649e6de30f7d25a0113003798f784cb100654065aad271f37"
         },
         "retained_role_proof": {
           "before": null,
@@ -20337,13 +20581,13 @@
         },
         "source_binding": {
           "before": null,
-          "after": "0431c71fe613b1375e816577153eeac49be3304dc0018c9e2a5b4c63ef6f5997"
+          "after": "3aa20697bf1d815585c116834fd58038510420fccdb9b1ff2876090ea9f28b88"
         }
       }
     },
     "tools/performance_history_snapshot.py": {
       "before_sha256": null,
-      "after_sha256": "a0c1f84d6c807a9766c13f2bc64e0c90fdfb62881ea9631dc519721fe8d056d0",
+      "after_sha256": "033896c722dcb38cb12040098ec253089e7d06ceb10d6aa9f6a6e58f41456dcf",
       "owners": {
         "@module": {
           "before": null,
@@ -20469,6 +20713,10 @@
           "before": null,
           "after": "9d187e9ab404599e5f4453878ccc800fbf0a8245a08b38c4d776bb761e63849f"
         },
+        "proof_identity": {
+          "before": null,
+          "after": "c74fb37ae6e332e2be91299286317fb399cb5524e6bae6ae952fa00bdf783b66"
+        },
         "witnesses": {
           "before": null,
           "after": "2297fe40a70fc3bdbd536afb133025d6c477cde9bde3544770672be02ab95962"
@@ -20503,11 +20751,11 @@
     },
     "tools/performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "68231d01c2be7c1a1c1951dd0a178acaf97738ddfc937e5aac88a921fd7048a8",
+      "after_sha256": "dc857922ba519ffc7b627f048458f448c82319723032c6889793bb496a359e36",
       "owners": {
         "@module": {
           "before": null,
-          "after": "af85906f3f6669e9ba2c8b2e3dac91a04f215e02a03495ee7a25a765c571d85e"
+          "after": "2d6d571a1752938c1234e35c37ffecbaf7cce7fcd4a03e88ceed409a06c6e778"
         },
         "_Digests": {
           "before": null,
@@ -20515,7 +20763,11 @@
         },
         "_Digests.__init__": {
           "before": null,
-          "after": "4d0a4feb5fa17add8c3a073509183f2fe4b77a50b96c3439849478bd11d64e8f"
+          "after": "ecfa8cf5f57d0775d458c2bf9cea120d90231fc6bdeaa0d42ea835c0bc93ba04"
+        },
+        "_Digests.admission": {
+          "before": null,
+          "after": "ecbc60518099c17e5fd758ee71bf33e87a7bc3192e8133859cef297db32e75ba"
         },
         "_Digests.digest": {
           "before": null,
@@ -20533,13 +20785,21 @@
           "before": null,
           "after": "09cc284b4ef7f73cdc185620920e18cc6754aae232ab3f354c389778ae2e065e"
         },
+        "_source_members": {
+          "before": null,
+          "after": "496b751bbf566886e6d8eccedf4be0b343f9222730d85fb2397e36faa9544632"
+        },
+        "admission_proof": {
+          "before": null,
+          "after": "72a819d55b98ced1ecbd22b4eb244ea5108e6597c74fd3825102cb800ed135f2"
+        },
         "discovered_sources": {
           "before": null,
           "after": "4cdb572eb8f721bee4dfae7d9b12bc6f808384d657f6ca682328f4a5d29a4476"
         },
         "invocation": {
           "before": null,
-          "after": "1d02d89962ffe207152783c4976aebe1abd0bde2abf72c46dc5ff5d7f71236d4"
+          "after": "586d7f5b4c4cdeb96863ab1bfebc0210006af58ff809eb0bee74e261385edd62"
         },
         "owner_proof": {
           "before": null,
@@ -20551,7 +20811,11 @@
         },
         "source_hashes": {
           "before": null,
-          "after": "8566e8eab074b6e08ba722b97f29b808169629ddfc22d42b5bd361950192ef9f"
+          "after": "ee8922de567a95e3e82ae0bb0152234c38c3816976673160a71fc69f7bfdec37"
+        },
+        "source_members": {
+          "before": null,
+          "after": "7bf182fa8687f67aaddcb760bf0e486b864ceff83154d33ac0c7c24c6e8a01ee"
         }
       }
     },
@@ -22414,6 +22678,46 @@
       "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
       "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
       "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "data/source_audits/ci61_provenance_v1/applicability.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-9c4f56cbaba3f95bae76c90a47e3d11aca9adbbf55fac30dd8d92761a95313ad"
+      ],
+      "selected_families": []
+    },
+    "data/source_audits/ci61_provenance_v1/changed-members.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-d569c759670c609baa84cce7d2b26b4821d4f70750802812bc20e6cdc96be157"
+      ],
+      "selected_families": []
+    },
+    "data/source_audits/ci61_provenance_v1/control-transitions.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-6a91e2d84312c380700680376fe75cb98924a63cabd51ed54c53beba8359bf05"
+      ],
+      "selected_families": []
+    },
+    "data/source_audits/ci61_provenance_v1/producing-inputs.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-62f9fed294fc0be1e26baba6329396cd2a971d549bac633446930956758acfdd"
+      ],
+      "selected_families": []
     },
     "data/source_audits/cumulative_preservation_v1/accepted-source.json": {
       "category": "measured_workload",
@@ -24292,6 +24596,14 @@
       "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
       "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
       "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/CI61_PROVENANCE_SCOPE.md": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "governance",
+      "operations": [],
+      "selected_families": []
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
@@ -26671,6 +26983,16 @@
       "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
+    },
+    "tests/code_quality/test_performance_provenance.py": {
+      "rationale": "CI61 deliberately reuses successful complete-byte pure provenance computation within one live invocation; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-b08ea3b287452f059f912a78f817b77173a3bebdef74f36947d8ac10ba9bb67f"
+      ],
+      "selected_families": []
     },
     "tests/code_quality/test_performance_static_successor.py": {
       "category": "governance",
@@ -32543,18 +32865,26 @@
       "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
     "tools/performance_ci60_qualification.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
+      "category": "cache_policy",
+      "operations": [
+        "ci61-provenance-7e0cd098153fc0ae9cfa302c8e033685426c5727d175ff069ab75506cfe192b3"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "CI61 deliberately reuses successful complete-byte pure provenance computation within one live invocation; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
       "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
       "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
     "tools/performance_history_snapshot.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "category": "cache_policy",
+      "operations": [
+        "ci61-provenance-78f45c6c21cd6f8a6726f3bf7f54645943fffac053b5ca6e8226cf965a354b54"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "CI61 deliberately reuses successful complete-byte pure provenance computation within one live invocation; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
@@ -32567,10 +32897,14 @@
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
     "tools/performance_preflight.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Preserve exact complete-byte source validation while comparing Windows creation/change timestamps only within their respective API channels. Windows retains its handle through the final path query and compares all seven handle metadata fields afterward. POSIX retains its original cross-API metadata checks and observation sequence; ten Windows guards cover stable differing times, every metadata field and changed/identical-byte writes at the final path query.",
+      "category": "cache_policy",
+      "operations": [
+        "ci61-provenance-3cacc2199960a29e392d67004401cdff9c1b806dd2e5493132e7b711e29e5faa"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "CI61 deliberately reuses successful complete-byte pure provenance computation within one live invocation; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
       "source_obligation": "Retain all seven metadata fields within each matching API channel, every other field across APIs, fresh complete-byte hashes, ownership and alias checks; reject real midread and final-path-query changes, including identical-byte writes with restored mtime.",
       "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     },
@@ -32635,7 +32969,7 @@
   "comparisons": {
     "dice": "docs/performance/current/ci60-dice.json",
     "dice_sustained": "docs/performance/current/ci60-dice_sustained.json",
-    "external_contract_source_reuse": "docs/performance/current/ci60-external_contract_source_reuse.json",
+    "external_contract_source_reuse": "docs/performance/current/ci61-external_contract_source_reuse.json",
     "fight": "docs/performance/current/ci60-fight.json",
     "movement": "docs/performance/current/ci60-movement.json",
     "objective_control": "docs/performance/current/qualification40-objective_control.json",

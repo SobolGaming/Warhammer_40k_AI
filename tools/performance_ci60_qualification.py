@@ -11,6 +11,8 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Protocol, cast
 
+from tools.performance_preflight import AdmissionOperands
+
 BASE = "d7b7650fa1c76ee5830a9ffc78522eba3a6a3209"
 PR_BASE = "5f509724da25a2f6ded0c2739a8e7c84bdf59c91"
 SELF = "tools/performance_ci60_qualification.py"
@@ -19,6 +21,9 @@ ASSESSMENT = "docs/performance/change-assessment.json"
 MAP = "docs/performance/policy-v3/operation-map.json"
 FREEZE: str | None = "1cbbebf5e1a6a72d6e7a5c456ce24ff6770bd2b1"
 SUPERSEDED_REPORTS: dict[str, str] = {
+    "docs/performance/current/ci60-external_contract_source_reuse.json": (
+        "71ed8f56225c81b161673685fa3010215601c6ad72bfa8b4552f7389d88a4c5b"
+    ),
     "docs/performance/current/qualification40-dice.json": (
         "84ba455e20996cbd1fdeb246fc5410ab183d61da2ca6e4d760879168d2ddcd2e"
     ),
@@ -103,19 +108,247 @@ def history(root: Path, *args: str) -> bytes:
     return historical(root, "plain60", args, lambda: git(root, *args))
 
 
-def admitted(root: Path) -> dict[str, bytes]:
-    """Re-read the complete finite transition; no mutable success cache."""
+DERIVATION_BASE = "eda94d97a85eea11cea87451c39198d26767e64f"
+DERIVATION_NAMESPACE = "data/source_audits/ci61_provenance_v1"
+DERIVATION_FREEZE: str | None = None
+DERIVATION_TEST = "tests/code_quality/test_performance_provenance.py"
+DERIVATION_CONTROLS = frozenset(
+    {
+        SELF,
+        "tools/performance_preflight.py",
+        "tools/performance_history_snapshot.py",
+        "ci/quality_shards/all.txt",
+        "ci/quality_shards/shard-1.txt",
+        "ci/quality_shards/shard-1-modules.txt",
+        "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
+        ASSESSMENT,
+        MAP,
+    }
+)
+DERIVATION_REPORT = "docs/performance/current/ci61-external_contract_source_reuse.json"
+DERIVATION_MEMBERS = DERIVATION_CONTROLS | {
+    DERIVATION_TEST,
+    "docs/CI61_PROVENANCE_SCOPE.md",
+    DERIVATION_REPORT,
+    *(
+        DERIVATION_NAMESPACE + "/" + name
+        for name in (
+            "changed-members.json",
+            "control-transitions.json",
+            "applicability.json",
+            "producing-inputs.json",
+            "source-token-roles.json",
+            "source-token-inventories.json",
+            "measurement-provenance.json",
+            "measurements/source-base.json",
+            "measurements/source-head.json",
+            "receipts/source-base-0.json",
+            "receipts/source-base-1.json",
+            "receipts/source-base-2.json",
+            "receipts/source-head-0.json",
+            "receipts/source-head-1.json",
+            "receipts/source-head-2.json",
+        )
+    ),
+}
+DERIVATION_INPUTS = frozenset(
+    {
+        SELF,
+        "tools/performance_preflight.py",
+        "tools/performance_history_snapshot.py",
+        DERIVATION_TEST,
+        MAP,
+    }
+)
+
+
+def _derivation_transition(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+    """Authenticate the finite E-to-CI61 source; original CI60 objects stay original."""
     from tools.performance_policy import owner_hashes
+
+    values = {name: raw for name, _, raw in operands}
+    freeze = values["freeze"].decode()
+    names = json.loads(values["selection"])
+    frozen = {name[7:]: raw for name, _, raw in operands if name.startswith("frozen/")}
+    previous = {name[9:]: raw for name, _, raw in operands if name.startswith("previous/")}
+    current = {name[8:]: raw for name, _, raw in operands if name.startswith("current/")}
+    observed = {name[9:]: raw for name, _, raw in operands if name.startswith("observed/")}
+    if (
+        set(names) != DERIVATION_MEMBERS
+        or len(names) != len(DERIVATION_MEMBERS)
+        or json.loads(frozen[DERIVATION_NAMESPACE + "/changed-members.json"]) != sorted(names)
+        or set(previous) != DERIVATION_CONTROLS
+        or set(current) != set(frozen)
+    ):
+        raise ValueError("CI61 finite source membership changed.")
+    record = json.loads(frozen[DERIVATION_NAMESPACE + "/control-transitions.json"])
+    if (
+        record.keys() != {"schema", "base", "changes"}
+        or record["schema"] != "ci61-exact-provenance-v1"
+        or record["base"] != DERIVATION_BASE
+        or record["changes"].keys() != DERIVATION_CONTROLS - {ASSESSMENT}
+    ):
+        raise ValueError("CI61 exact transition membership changed.")
+    for name, row in record["changes"].items():
+        if (
+            row.keys() != {"before_sha256", "after_sha256", "edits"}
+            or digest(previous[name]) != row["before_sha256"]
+            or digest(frozen[name]) != row["after_sha256"]
+        ):
+            raise ValueError("CI61 exact transition source changed.")
+        projected = previous[name]
+        for edit in row["edits"]:
+            if edit.keys() != {"before", "after"} or not all(
+                isinstance(value, str) and value for value in edit.values()
+            ):
+                raise ValueError("CI61 exact transition edit changed.")
+            before, after = edit["before"].encode(), edit["after"].encode()
+            if projected.count(before) != 1:
+                raise ValueError("CI61 exact transition lacks one preimage.")
+            projected = projected.replace(before, after, 1)
+        if projected != frozen[name]:
+            raise ValueError("CI61 source changed outside reviewed edits.")
+    marker = b"\nDERIVATION_FREEZE: str | None = None"
+    activated = f'\nDERIVATION_FREEZE: str | None = "{freeze}"'.encode()
+    if frozen[SELF].count(marker) != 1:
+        raise ValueError("CI61 original activation changed.")
+    expected = frozen | {SELF: frozen[SELF].replace(marker, activated, 1)}
+    assessment = json.loads(frozen[ASSESSMENT])
+    row = assessment["changes"][SELF]
+    row["after_sha256"] = digest(expected[SELF])
+    row["owners"]["@module"]["after"] = owner_hashes(SELF, expected[SELF])["@module"]
+    if (
+        json.loads(current[ASSESSMENT]) != assessment
+        or json.loads(values["assessment-first"]) != assessment
+        or values["assessment-second"] != current[ASSESSMENT]
+    ):
+        raise ValueError("CI61 assessment changed outside exact activation.")
+    expected[ASSESSMENT] = current[ASSESSMENT]
+    if current != expected:
+        raise ValueError("CI61 Preflight source changed.")
+    for name in observed.keys() & expected.keys():
+        if observed[name] != expected[name]:
+            raise ValueError("CI61 Preflight source changed between observations: " + name)
+    old_map = json.loads(previous[MAP])
+    new_map = json.loads(frozen[MAP])
+    if {key: value for key, value in old_map.items() if key != "operations"} != {
+        key: value for key, value in new_map.items() if key != "operations"
+    } or any(
+        new_map["operations"].get(key) != value for key, value in old_map["operations"].items()
+    ):
+        raise ValueError("CI61 changed an existing operation, family or budget.")
+    additions = new_map["operations"].keys() - old_map["operations"].keys()
+    for name in additions:
+        operation = new_map["operations"][name]
+        if (
+            not operation["mandatory"]
+            or len(operation["paths"]) != 1
+            or operation["paths"][0]
+            not in (
+                DERIVATION_INPUTS
+                | {
+                    name
+                    for name in DERIVATION_MEMBERS
+                    if name.startswith(DERIVATION_NAMESPACE + "/")
+                }
+            )
+            or any(
+                any(char in item for char in "*?[")
+                for item in operation["paths"] + operation["owners"]
+            )
+        ):
+            raise ValueError("CI61 new operation must be finite, literal and mandatory.")
+
+
+def _derivation_source(
+    root: Path,
+    observed: AdmissionOperands,
+    first: tuple[str, int, bytes],
+    second: tuple[str, int, bytes],
+) -> tuple[dict[str, bytes], dict[str, bytes]]:
+    from tools.performance_history_snapshot import proof_identity
+    from tools.performance_policy import owner_hashes
+    from tools.performance_preflight import admission_proof, source_members
     from tools.performance_preflight_successor import read_frozen_blobs
 
-    freeze = FREEZE
+    freeze = DERIVATION_FREEZE
     if freeze is None or len(freeze) != 40 or set(freeze) - set("0123456789abcdef"):
-        raise ValueError("CI60 Qualification source freeze is pending.")
-    history(root, "merge-base", "--is-ancestor", BASE, freeze)
+        raise ValueError("CI61 provenance source freeze is pending.")
+    history(root, "merge-base", "--is-ancestor", DERIVATION_BASE, freeze)
     git(root, "merge-base", "--is-ancestor", freeze, "HEAD")
-    names = history(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
-    declaration = NAMESPACE + "/changed-members.json"
+    names = history(root, "diff", "--name-only", DERIVATION_BASE, freeze).decode().splitlines()
+    if set(names) != DERIVATION_MEMBERS or len(names) != len(DERIVATION_MEMBERS):
+        raise ValueError("CI61 finite source membership changed.")
     frozen = read_frozen_blobs(root, freeze, names)
+    previous = read_frozen_blobs(root, DERIVATION_BASE, sorted(DERIVATION_CONTROLS))
+    current = source_members(root, list(frozen))
+    operands = (
+        ("freeze", 0, freeze.encode()),
+        ("selection", 0, json.dumps(names, separators=(",", ":")).encode()),
+        (
+            "selectors",
+            0,
+            json.dumps(
+                [
+                    DERIVATION_BASE,
+                    DERIVATION_NAMESPACE,
+                    SELF,
+                    ASSESSMENT,
+                    MAP,
+                    sorted(DERIVATION_MEMBERS),
+                    sorted(DERIVATION_CONTROLS),
+                    sorted(DERIVATION_INPUTS),
+                ],
+                separators=(",", ":"),
+            ).encode(),
+        ),
+        *(("frozen/" + name, 0, raw) for name, raw in frozen.items()),
+        *(("previous/" + name, 0, raw) for name, raw in previous.items()),
+        *(("current/" + name, mode, raw) for name, mode, raw in current),
+        *(("observed/" + name, mode, raw) for name, mode, raw in observed),
+        ("assessment-first", first[1], first[2]),
+        ("assessment-second", second[1], second[2]),
+    )
+    admission_proof(
+        _derivation_transition,
+        operands,
+        proof_identity(root),
+        (digest, hashlib.sha256, json.loads, owner_hashes),
+    )
+    return {name: raw for name, _, raw in current}, previous
+
+
+def _preceding_self(actual: dict[str, bytes]) -> bytes:
+    """Exact native E preimage already authenticated by the finite transition."""
+    record = json.loads(actual[DERIVATION_NAMESPACE + "/control-transitions.json"])
+    row = record["changes"][SELF]
+    activated = f'\nDERIVATION_FREEZE: str | None = "{DERIVATION_FREEZE}"'.encode()
+    marker = b"\nDERIVATION_FREEZE: str | None = None"
+    raw = actual[SELF]
+    if raw.count(activated) != 1:
+        raise ValueError("CI61 producing SELF is not the exact unactivated frozen source.")
+    raw = raw.replace(activated, marker, 1)
+    for edit in reversed(row["edits"]):
+        before, after = edit["before"].encode(), edit["after"].encode()
+        if not before or not after or raw.count(after) != 1:
+            raise ValueError("CI61 exact SELF transition changed.")
+        raw = raw.replace(after, before, 1)
+    if digest(raw) != row["before_sha256"]:
+        raise ValueError("CI61 original SELF preimage changed.")
+    return raw
+
+
+def _admitted_derivation(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+    """The complete original finite proof, with no filesystem or Git observation."""
+    from tools.performance_policy import owner_hashes
+
+    values = {name: raw for name, _, raw in operands}
+    freeze = values["freeze"].decode()
+    names = json.loads(values["selection"])
+    frozen = {name[7:]: raw for name, _, raw in operands if name.startswith("frozen/")}
+    old = {name[4:]: raw for name, _, raw in operands if name.startswith("old/")}
+    current = {name[8:]: raw for name, _, raw in operands if name.startswith("current/")}
+    declaration = NAMESPACE + "/changed-members.json"
     if json.loads(frozen[declaration]) != sorted(names) or len(names) != len(set(names)):
         raise ValueError("CI60 Qualification finite membership changed.")
     marker = b"\nFREEZE: str | None = None"
@@ -127,16 +360,17 @@ def admitted(root: Path) -> dict[str, bytes]:
     row = assessment["changes"][SELF]
     row["after_sha256"] = digest(actual[SELF])
     row["owners"]["@module"]["after"] = owner_hashes(SELF, actual[SELF])["@module"]
-    if json.loads(owned(root, ASSESSMENT)) != assessment:
+    if json.loads(values["assessment-first"]) != assessment:
         raise ValueError("CI60 Qualification assessment changed outside exact activation.")
-    actual[ASSESSMENT] = owned(root, ASSESSMENT)
+    actual[ASSESSMENT] = values["assessment-second"]
+    if current.keys() != actual.keys():
+        raise ValueError("CI60 Qualification finite membership changed.")
     for name, raw in actual.items():
-        if owned(root, name) != raw:
+        if current[name] != raw:
             raise ValueError("CI60 Qualification Preflight source changed: " + name)
     transitions = json.loads(frozen[NAMESPACE + "/control-transitions.json"])
     if set(transitions) != set(CONTROLS - {ASSESSMENT}):
         raise ValueError("CI60 Qualification control membership changed.")
-    old = read_frozen_blobs(root, BASE, sorted(CONTROLS))
     for name, row in transitions.items():
         if row.keys() != {"before_sha256", "after_sha256", "edits"}:
             raise ValueError("CI60 Qualification control recipe schema changed.")
@@ -172,20 +406,68 @@ def admitted(root: Path) -> dict[str, bytes]:
             )
         ):
             raise ValueError("CI60 Qualification operation must remain literal and mandatory.")
-    return actual
+
+
+def admitted(root: Path) -> dict[str, bytes]:
+    """Fresh complete observations precede invocation-local pure proof reuse."""
+    from tools.performance_history_snapshot import proof_identity
+    from tools.performance_policy import owner_hashes
+    from tools.performance_preflight import admission_proof, source_members
+    from tools.performance_preflight_successor import read_frozen_blobs
+
+    freeze = FREEZE
+    if freeze is None or len(freeze) != 40 or set(freeze) - set("0123456789abcdef"):
+        raise ValueError("CI60 Qualification source freeze is pending.")
+    history(root, "merge-base", "--is-ancestor", BASE, freeze)
+    git(root, "merge-base", "--is-ancestor", freeze, "HEAD")
+    names = history(root, "diff", "--name-only", BASE, freeze).decode().splitlines()
+    frozen = read_frozen_blobs(root, freeze, names)
+    first = source_members(root, [ASSESSMENT])[0]
+    second = source_members(root, [ASSESSMENT])[0]
+    current = source_members(root, list(frozen))
+    old = read_frozen_blobs(root, BASE, sorted(CONTROLS))
+    derived, preceding = _derivation_source(root, current, first, second)
+    projected = tuple((name, mode, preceding.get(name, raw)) for name, mode, raw in current)
+    first = first[0], first[1], preceding[ASSESSMENT]
+    second = second[0], second[1], preceding[ASSESSMENT]
+    selectors = json.dumps(
+        [BASE, SELF, NAMESPACE, ASSESSMENT, MAP, sorted(CONTROLS)], separators=(",", ":")
+    ).encode()
+    operands = (
+        ("freeze", 0, freeze.encode()),
+        ("selection", 0, json.dumps(names, separators=(",", ":")).encode()),
+        ("selectors", 0, selectors),
+        *((("frozen/" + name, 0, raw) for name, raw in frozen.items())),
+        *((("old/" + name, 0, raw) for name, raw in old.items())),
+        ("assessment-first", first[1], first[2]),
+        ("assessment-second", second[1], second[2]),
+        *((("current/" + name, mode, raw) for name, mode, raw in projected)),
+    )
+    identity = proof_identity(root)
+    admission_proof(
+        _admitted_derivation, operands, identity, (digest, hashlib.sha256, json.loads, owner_hashes)
+    )
+    return {name: raw for name, _, raw in current} | derived
 
 
 def control_projection(root: Path) -> dict[str, bytes]:
     from tools.performance_preflight_successor import read_frozen_blobs
 
     admitted(root)
-    return read_frozen_blobs(root, BASE, sorted(CONTROLS))
+    return read_frozen_blobs(root, BASE, sorted(CONTROLS)) | read_frozen_blobs(
+        root, DERIVATION_BASE, sorted(DERIVATION_CONTROLS - CONTROLS - {SELF})
+    )
 
 
 def preceding_control(root: Path, name: str, supplied: bytes) -> bytes:
     if name == CURRENT_INVENTORY and (root / NAMESPACE).is_dir():
         return historical_inventory_preimage(root, supplied)
     if name not in CONTROLS:
+        if name in DERIVATION_CONTROLS - {SELF}:
+            actual = owned(root, name)
+            if supplied != actual:
+                raise ValueError("CI61 predecessor caller supplied unrelated bytes.")
+            return control_projection(root)[name]
         return supplied
     actual = owned(root, name)
     if supplied != actual:
@@ -250,6 +532,10 @@ def measurement_controls(root: Path, current: dict[str, str]) -> dict[str, str]:
     actual = admitted(root)
     projected = control_projection(root)
     result = dict(current)
+    for name in (DERIVATION_CONTROLS - CONTROLS - {SELF}) & current.keys():
+        if current[name] != digest(actual[name]):
+            raise ValueError("CI61 actual input collector omitted current control bytes.")
+        result[name] = digest(projected[name])
     for name in (CONTROLS | {SELF}) & current.keys():
         if current[name] != digest(actual[name]):
             raise ValueError("CI60 actual input collector omitted current control bytes.")
@@ -272,6 +558,7 @@ def _cohort(actual: dict[str, bytes]) -> dict[str, Any]:
         or sum(len(row["cases"]) * row["samples_per_case"] for row in families.values()) != 247
     ):
         raise ValueError("CI60 Qualification family inventory changed.")
+    families["external_contract_source_reuse"]["comparison"] = DERIVATION_REPORT
     return families
 
 
@@ -287,18 +574,85 @@ def producing_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     return _producing_inputs(admitted(root), current)
 
 
-def _producing_inputs(actual: dict[str, bytes], current: dict[str, str]) -> dict[str, str]:
+def _original_producing_inputs(actual: dict[str, bytes]) -> dict[str, str]:
     measured: dict[str, str] = json.loads(actual[NAMESPACE + "/producing-inputs.json"])
     activated = f'\nFREEZE: str | None = "{FREEZE}"'.encode()
     marker = b"\nFREEZE: str | None = None"
+    original = _preceding_self(actual)
+    if original.count(activated) != 1 or measured.get(SELF) != digest(
+        original.replace(activated, marker, 1)
+    ):
+        raise ValueError("CI60 producing SELF is not the exact unactivated frozen source.")
+    return measured
+
+
+def _producing_inputs(actual: dict[str, bytes], current: dict[str, str]) -> dict[str, str]:
+    _original_producing_inputs(actual)
+    measured: dict[str, str] = json.loads(actual[DERIVATION_NAMESPACE + "/producing-inputs.json"])
+    activated = f'\nDERIVATION_FREEZE: str | None = "{DERIVATION_FREEZE}"'.encode()
+    marker = b"\nDERIVATION_FREEZE: str | None = None"
     if actual[SELF].count(activated) != 1 or measured.get(SELF) != digest(
         actual[SELF].replace(activated, marker, 1)
     ):
-        raise ValueError("CI60 producing SELF is not the exact unactivated frozen source.")
-    expected = measured | {SELF: digest(actual[SELF])}
-    if current != expected:
-        raise ValueError("CI60 complete producing inputs differ from the actual current collector.")
+        raise ValueError("CI61 producing SELF is not the exact unactivated frozen source.")
+    if current != measured | {SELF: digest(actual[SELF])}:
+        raise ValueError("CI61 complete producing inputs differ from the actual current collector.")
     return measured
+
+
+def _current_applicability(
+    actual: dict[str, bytes], current: dict[str, str], family: str
+) -> dict[str, Any]:
+    """Complete current inputs differ only in the finite uncalled provenance controls."""
+    produced = _producing_inputs(actual, current)
+    previous = _original_producing_inputs(actual)
+    proof: dict[str, Any] = json.loads(actual[DERIVATION_NAMESPACE + "/applicability.json"])
+    families = _cohort(actual)
+    selected = set(families) - {"external_contract_source_reuse"}
+    changed = {
+        name: {"before": previous.get(name), "after": produced.get(name)}
+        for name in previous.keys() | produced.keys()
+        if previous.get(name) != produced.get(name)
+    }
+    unchanged = {name: pin for name, pin in previous.items() if produced.get(name) == pin}
+    if (
+        proof.keys()
+        != {
+            "schema",
+            "original_input_digest",
+            "current_producing_input_digest",
+            "changes",
+            "unchanged_inputs",
+            "families",
+        }
+        or proof["schema"] != "ci61-finite-current-applicability-v1"
+        or proof["original_input_digest"] != canonical(previous)
+        or proof["current_producing_input_digest"] != canonical(produced)
+        or proof["changes"] != changed
+        or not changed.keys() <= DERIVATION_INPUTS
+        or proof["unchanged_inputs"] != unchanged
+        or set(proof["families"]) != selected
+        or family not in selected
+    ):
+        raise ValueError("CI61 complete current applicability changed.")
+    for name, row in proof["families"].items():
+        required = {
+            families[name]["driver"],
+            "tests/conftest.py",
+            "tests/__init__.py",
+            "tests/timing_plugin.py",
+            "pyproject.toml",
+            "uv.lock",
+        }
+        if (
+            row.keys() != {"driver", "unchanged_startup", "call_path"}
+            or row["driver"] != families[name]["driver"]
+            or row["unchanged_startup"] != {path: unchanged[path] for path in sorted(required)}
+            or not isinstance(row["call_path"], str)
+            or not row["call_path"]
+        ):
+            raise ValueError("CI61 timed consumer/startup proof changed.")
+    return proof
 
 
 def extend_catalog(builder: Any) -> None:
@@ -316,10 +670,31 @@ def extend_catalog(builder: Any) -> None:
     # current_source verifies the exact original predecessor for every existing member.
     existing = set(builder.all_paths("plain60", BASE)) & set(names)
     builder.add("plain60", BASE, dict.fromkeys(existing), "ci60.source-preimages")
+    derivation = DERIVATION_FREEZE
+    if derivation is None:
+        raise ValueError("CI61 provenance catalog freeze is pending.")
+    builder.fact(
+        "plain60",
+        ("merge-base", "--is-ancestor", DERIVATION_BASE, derivation),
+        "ci61.ancestry",
+    )
+    changed = (
+        builder.fact(
+            "plain60", ("diff", "--name-only", DERIVATION_BASE, derivation), "ci61.membership"
+        )
+        .decode()
+        .splitlines()
+    )
+    if set(changed) != DERIVATION_MEMBERS or len(changed) != len(DERIVATION_MEMBERS):
+        raise ValueError("CI61 native catalog membership changed.")
+    builder.add("plain60", derivation, dict.fromkeys(changed), "ci61.freeze")
+    builder.add("plain60", DERIVATION_BASE, dict.fromkeys(DERIVATION_CONTROLS), "ci61.preimages")
+    earlier = set(builder.all_paths("plain60", BASE)) & set(changed)
+    builder.add("plain60", BASE, dict.fromkeys(earlier), "ci61.source-preimages")
 
 
 def source_binding(actual: dict[str, bytes], input_digest: str) -> dict[str, Any]:
-    spec = json.loads(actual[NAMESPACE + "/tool-input-roles.json"])
+    spec = json.loads(actual[DERIVATION_NAMESPACE + "/source-token-roles.json"])
     inventories = json.loads(actual[spec["inventories_path"]])
     before, after = inventories["base"], inventories["head"]
     common = {name: pin for name, pin in before.items() if after.get(name) == pin}
@@ -416,6 +791,11 @@ def measurement(
     inputs = _producing_inputs(actual, current)
     families = _cohort(actual)
     plan = families[family]
+    applicability = None
+    if family != "external_contract_source_reuse":
+        applicability = _current_applicability(actual, current, family)
+        inputs = _original_producing_inputs(actual)
+    qualified_inputs = inputs
     binding = None
     proof: dict[str, Any] | None = None
     if family in RETAINED:
@@ -428,9 +808,7 @@ def measurement(
         )
         if canonical(inputs) != old.PRODUCING_INPUT_DIGEST:
             raise ValueError("CI60 original producing input authority changed.")
-        proof = retained_role_proof(
-            root, family, actual, _producing_inputs(actual, current), inputs
-        )
+        proof = retained_role_proof(root, family, actual, qualified_inputs, inputs)
         provenance = json.loads(
             _HistoricalStage.member(
                 historical_stage, root, old.NAMESPACE + "/measurement-provenance.json", freeze
@@ -450,6 +828,10 @@ def measurement(
         provenance = json.loads(actual[NAMESPACE + "/measurement-provenance.json"])
         if set(provenance) != set(families) - RETAINED:
             raise ValueError("CI60 fresh family provenance membership changed.")
+        if family == "external_contract_source_reuse":
+            provenance = json.loads(actual[DERIVATION_NAMESPACE + "/measurement-provenance.json"])
+            if set(provenance) != {"external_contract_source_reuse"}:
+                raise ValueError("CI61 fresh source-token provenance membership changed.")
         row = provenance[family]
         runtime = verified_engine_build_identity().build_id
 
@@ -502,13 +884,14 @@ def measurement(
             "producing_runtime": runtime,
             "raw_provenance": row,
             "retained_role_proof": proof,
+            "current_applicability": applicability,
         }
     )
     return inputs, binding, receipt, runtime
 
 
 def retained_historical_report(*, base: str, path: str, change: dict[str, object]) -> bool:
-    """Ten exact immutable former-current records remain historical obligations."""
+    """Exact immutable former-current records remain historical obligations."""
     return (
         base == PR_BASE
         and path in SUPERSEDED_REPORTS

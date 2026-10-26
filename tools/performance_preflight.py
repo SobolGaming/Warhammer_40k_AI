@@ -12,7 +12,7 @@ import hashlib
 import json
 import os
 import stat
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from contextvars import ContextVar
 from functools import wraps
 from pathlib import Path
@@ -21,12 +21,41 @@ from typing import Any, cast
 # Bound retained raw payload independently of the complete source/input corpus.
 _DIGEST_LIMIT = 512 * 1024 * 1024
 
+# Complete immutable operands for the one CI60 admission proof.
+AdmissionOperands = tuple[tuple[str, int, bytes], ...]
+AdmissionValidator = Callable[[AdmissionOperands, tuple[str, ...]], None]
+
 
 class _Digests:
     def __init__(self, limit: int = _DIGEST_LIMIT) -> None:
         self.limit = limit
         self.retained = 0
         self.entries: dict[tuple[Callable[..., Any], str], tuple[bytes, str]] = {}
+        self.active = True
+        self.admissions: dict[
+            tuple[AdmissionValidator, tuple[str, ...], tuple[Callable[..., Any], ...]],
+            AdmissionOperands,
+        ] = {}
+
+    def admission(
+        self,
+        validator: AdmissionValidator,
+        operands: AdmissionOperands,
+        identity: tuple[str, ...],
+        dependencies: tuple[Callable[..., Any], ...],
+    ) -> None:
+        key = validator, identity, dependencies
+        previous = self.admissions.get(key) if self.active else None
+        if previous is not None and previous == operands:
+            return
+        if previous is not None:
+            self.retained -= sum(len(raw) for _, _, raw in previous)
+            del self.admissions[key]
+        validator(operands, identity)
+        required = sum(len(raw) for _, _, raw in operands)
+        if self.active and required <= self.limit - self.retained:
+            self.admissions[key] = operands
+            self.retained += required
 
     def digest(self, path: str, raw: bytes) -> str:
         function = hashlib.sha256
@@ -73,6 +102,8 @@ def invocation[F: Callable[..., Any]](function: F) -> F:
         try:
             return function(*args, **kwargs)
         finally:
+            digests.active = False
+            digests.admissions.clear()
             digests.entries.clear()
             digests.retained = 0
             _DIGESTS.reset(digests_token)
@@ -80,6 +111,20 @@ def invocation[F: Callable[..., Any]](function: F) -> F:
             _PROOFS.reset(token)
 
     return cast(F, wrapped)
+
+
+def admission_proof(
+    validator: AdmissionValidator,
+    operands: AdmissionOperands,
+    identity: tuple[str, ...] | None,
+    dependencies: tuple[Callable[..., Any], ...],
+) -> None:
+    """Reuse only a successful complete-byte CI60 derivation in its live phase."""
+    digests = _DIGESTS.get()
+    if digests is None or identity is None or not digests.active:
+        validator(operands, () if identity is None else identity)
+    else:
+        digests.admission(validator, operands, identity, dependencies)
 
 
 def recipe_proof[F: Callable[..., None]](function: F) -> F:
@@ -146,8 +191,10 @@ def discovered_sources(root: Path) -> set[str]:
     return result
 
 
-def source_hashes(root: Path, names: set[str]) -> dict[str, str]:
-    """Read all owned files, checking each directory once per fresh scan.
+def _source_members(
+    root: Path, names: list[str], *, observe_ancestors: bool
+) -> Iterator[tuple[str, int, bytes]]:
+    """Read owned bytes; the CI60 caller also observes ancestors before each member.
 
     Directory and file identities are checked again after reading. Observed
     renames, links, replacements and concurrent writes fail even if bytes match.
@@ -156,8 +203,7 @@ def source_hashes(root: Path, names: set[str]) -> dict[str, str]:
         raise ValueError("Aliased cumulative root.")
     directories: dict[str, os.stat_result] = {}
     root_name = root.as_posix().rstrip("/") or "/"
-    result = {}
-    for name in sorted(names):
+    for name in names:
         relative = Path(name)
         if (
             relative.is_absolute()
@@ -170,14 +216,23 @@ def source_hashes(root: Path, names: set[str]) -> dict[str, str]:
         for component in ("", *relative.parts[:-1]):
             if component:
                 path = path.rstrip("/") + "/" + component
-            if path not in directories:
+            if observe_ancestors or path not in directories:
                 metadata = os.lstat(path)
                 if not stat.S_ISDIR(metadata.st_mode) or os.path.isjunction(path):
                     raise ValueError("Aliased D07 member: " + name)
+                previous = directories.get(path)
+                if previous is not None and (
+                    previous.st_dev,
+                    previous.st_ino,
+                    previous.st_mode,
+                ) != (metadata.st_dev, metadata.st_ino, metadata.st_mode):
+                    raise ValueError("Cumulative source directory changed during owned scan.")
                 directories[path] = metadata
         path = root_name.rstrip("/") + "/" + name
         before = os.lstat(path)
         if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or os.path.isjunction(path):
+            raise ValueError("D07 member must be an owned regular file: " + name)
+        if observe_ancestors and not Path(path).resolve(strict=True).is_relative_to(root):
             raise ValueError("D07 member must be an owned regular file: " + name)
         windows = os.name == "nt"
         with Path(path).open("rb") as stream:
@@ -195,7 +250,7 @@ def source_hashes(root: Path, names: set[str]) -> dict[str, str]:
             after = os.lstat(path)
         if not _same_read(before, opened, closed, after, windows=windows):
             raise ValueError("Cumulative source changed during owned read: " + name)
-        result[name] = _source_digest(name, raw)
+        yield name, before.st_mode, raw
     for path, before in directories.items():
         after = os.lstat(path)
         if (before.st_dev, before.st_ino, before.st_mode) != (
@@ -204,7 +259,19 @@ def source_hashes(root: Path, names: set[str]) -> dict[str, str]:
             after.st_mode,
         ) or os.path.isjunction(path):
             raise ValueError("Cumulative source directory changed during owned scan.")
-    return result
+
+
+def source_hashes(root: Path, names: set[str]) -> dict[str, str]:
+    """Fresh owned reads with the existing invocation-local digest budget."""
+    return {
+        name: _source_digest(name, raw)
+        for name, _, raw in _source_members(root, sorted(names), observe_ancestors=False)
+    }
+
+
+def source_members(root: Path, names: list[str]) -> AdmissionOperands:
+    """Complete ordered bytes with fresh ancestry at every member observation."""
+    return tuple(_source_members(root, names, observe_ancestors=True))
 
 
 def _same_read(

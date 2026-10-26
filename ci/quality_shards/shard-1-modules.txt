@@ -37,3 +37,4 @@ tests/code_quality/test_order40_smokescreen.py
 tests/code_quality/test_order134_source_authority.py
 tests/code_quality/test_phase17a1_transition_patch_docs.py
 tests/code_quality/test_package_smoke.py
+tests/code_quality/test_performance_provenance.py

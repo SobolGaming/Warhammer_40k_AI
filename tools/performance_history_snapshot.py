@@ -433,6 +433,18 @@ class Snapshot:
         return result
 
 
+def proof_identity(root: Path) -> tuple[str, ...] | None:
+    """A live owner-scoped phase identity for pure admission derivations."""
+    active = _ACTIVE.get()
+    if active is None:
+        return None
+    if not active._lease.valid():
+        raise ValueError("History phase capability is inactive or belongs to another owner.")
+    if root != active.root or root.absolute() != root.resolve(strict=True):
+        raise ValueError("History snapshot belongs to another repository.")
+    return root.as_posix(), active.phase_id, active.semantic_digest
+
+
 def eligible_blobs(root: Path, revision: str, names: list[str]) -> dict[str, bytes] | None:
     active = _ACTIVE.get()
     return None if active is None else active.blobs(root, "plain60", revision, names)
