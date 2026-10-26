@@ -443,6 +443,11 @@ def _ci54_previous(root: Path, name: str, raw: bytes, *, predecessor: bytes | No
 
 def preceding_control(root: Path, name: str, raw: bytes) -> bytes:
     """Exact byte projection; the complete successor freeze is admitted separately."""
+    if name == "tests/code_quality/test_performance_category_migration.py":
+        from tools import performance_ci60_qualification as ci60
+
+        if (root / ci60.NAMESPACE).is_dir():
+            return ci60.preceding_control(root, name, raw)
     if name not in PINS and name != ASSESSMENT:
         return raw
     actual = _read(root, name)

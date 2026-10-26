@@ -134,3 +134,46 @@ No publication or merge is authorized.
 Original direct admission retains its153 observations plus the new regression and two corrected shard ledgers:156owned members over the same five scans and three live HEAD ancestry checks. All20extra members are explicitly acquired and authenticated. Old153-count receipts remain prior-input evidence.
 
 Two original provenance fixture contexts are reconciled without changing any original assertion: the pure fixture supplies all20extra operands, and the native guard first verifies actual156/20/new-three observations before preserving old17/153 assertions over only their explicitly historical subset. Native post-activation execution remains required; these old assertions are not current153-count certification.
+
+
+## CI68 bounded quality fixture completion
+
+The CI67 activated head ba4a8b5f785c5129dee10d8aa25fb3344932a66a
+completed its unchanged whole performance command in150.771216177seconds.
+That receipt remains evidence for that head only. Its first full quality lane
+reported640passes, six existing Qualification40 fixture failures and twelve
+incomplete cases before the native watchdog interrupted it; it is not a full
+quality pass. One representative failure also reproduces on the exact E4
+predecessor. All original attempts and failed scratch remain preserved.
+
+The bounded correction keeps every original assertion, negative check and case.
+A private session-lifetime template reuses only fixed expected test-input data,
+returning independent dictionaries; every actual production validator, current
+read and warm-positive/tamper-negative call remains unchanged. The historical
+Qualification40 comparator receives exact authenticated native operands only
+while its three actual owned byte inputs remain equal; changed bytes still reach
+the original frozen-byte comparator. Current source admission is tested separately.
+The literal category predecessor dispatch requires the existing CI60 namespace
+and authentic current caller bytes; historical fixtures without that namespace
+retain their original behavior. No transaction or history-phase eligibility expands.
+
+The producing source/control scope has21paths and the finite catalog37members:
+19controls,13producing changes,18new members. The extra current batch reads22
+members, including the two newly required owned controls, for158observations.
+The complete current contract is checked first. Only those two literal additions
+are then projected away for all original156and153observation assertions.
+
+Eleven comparison families may retain their original244samples per arm only
+after renewed exact consumer, startup and dependency proof. The source-token
+family requires three fresh base and three fresh head samples: both arms overlay
+all current tests, and three required test-input hashes changed even though its
+one selected case did not. All twelve families,41cases and247samples per arm
+remain required. No old sample, producer identity or receipt is relabeled.
+
+The corrected candidate is unactivated and unqualified until its genuine source,
+measurement, native-control and current receipt gates complete. The180-second
+whole performance cap,600-second workload watchdog,500-second warning,85percent
+coverage gate and twelve behavior shards remain unchanged. The prior transaction
+freshness guarantee, including its explicitly approved restored-transient gap,
+also remains unchanged. Full quality, full behavior/coverage and hosted total
+runtime are separate gates; no publication or merge is authorized.

@@ -6,8 +6,11 @@ import hashlib
 import json
 import shutil
 import subprocess
+import sys
+from collections.abc import Iterator, Mapping
 from copy import deepcopy
 from pathlib import Path
+from types import MappingProxyType
 from typing import cast
 
 import pytest
@@ -35,6 +38,32 @@ def _controls() -> dict[str, str]:
 
 def _current(archive: dict[str, object]) -> tuple[dict[str, str], dict[str, str]]:
     return migration.expected_inputs(ROOT)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def private_expected_input_reference() -> Iterator[None]:
+    """Reuse only fixed expected test data; all production validation stays fresh."""
+    original_current = _current
+    reference: tuple[Mapping[str, str], Mapping[str, str]] | None = None
+
+    def reference_inputs(archive: dict[str, object]) -> tuple[dict[str, str], dict[str, str]]:
+        nonlocal reference
+        if reference is None:
+            current, tools = original_current(archive)
+            assert all(
+                isinstance(key, str) and isinstance(value, str)
+                for values in (current, tools)
+                for key, value in values.items()
+            )
+            reference = MappingProxyType(dict(current)), MappingProxyType(dict(tools))
+        return dict(reference[0]), dict(reference[1])
+
+    with pytest.MonkeyPatch.context() as private:
+        private.setattr(sys.modules[__name__], "_current", reference_inputs)
+        try:
+            yield
+        finally:
+            reference = None
 
 
 @pytest.fixture(scope="module")

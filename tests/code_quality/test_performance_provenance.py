@@ -486,8 +486,26 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
                 .decode()
                 .splitlines()
             )
-            # Check the complete current observation contract before preserving
-            # the original assertions over their exact historical153-member subset.
+            extra_observed = {
+                "tests/code_quality/test_performance_category_migration.py",
+                "tools/performance_preflight_successor.py",
+            }
+            assert len(extra_observed) == 2
+            assert len(first_observations) == 5
+            assert len(first_observations[4]) == 22
+            assert sum(map(len, first_observations)) == 158
+            assert first_observations[4] == tuple(
+                name for name in latest_names if name in ci60.PRELUDE_OBSERVED
+            )
+            assert all(first_observations[4].count(name) == 1 for name in extra_observed)
+            assert not extra_observed.intersection(
+                name for scan in first_observations[:4] for name in scan
+            )
+            first_observations = [
+                *first_observations[:4],
+                tuple(name for name in first_observations[4] if name not in extra_observed),
+            ]
+            latest_names = [name for name in latest_names if name not in extra_observed]
             added = {ci60.TRANSACTION_TEST} | ci60.TRANSACTION_SHARDS
             assert len(added) == 3
             assert len(first_observations) == 5

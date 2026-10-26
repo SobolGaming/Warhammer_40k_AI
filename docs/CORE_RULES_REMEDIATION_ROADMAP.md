@@ -241,6 +241,15 @@ proofs can transfer to their first authenticated phase. Its regenerated finite
 CI64 source, authentic affected source samples and exact-final gates are pending.
 No gameplay or compliance claim changes. See [CI64 provenance scope](CI64_PROVENANCE_SCOPE.md).
 
+
+CI68 corrects the bounded quality fixture/admission interaction and reuses only
+private immutable expected test data, preserving all real validators and mutation
+checks. CI67's150.771-second local performance receipt remains bound to its earlier
+head; its640pass/sixfail/twelveincomplete quality attempt remains failed.
+The new21-path producing scope and37-member finite catalog require genuine
+source-bound qualification. Full behavior,85percent coverage and hosted runtime
+remain open. See [CI64 provenance scope](CI64_PROVENANCE_SCOPE.md).
+
 ## Compliance claim
 
 The project may claim Core Rules categories 01–25 compliant only after every implementation PR, `S-MIRRORS`, and `PFINAL` are merged, including any further PR the audit inserts, and a fresh 25-category audit on `main` finds no new gap. The claim names the selected snapshot, provider, and observation date, and it excludes factions and every scope `AGENTS.md` prohibits.

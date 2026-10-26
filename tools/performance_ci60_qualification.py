@@ -168,12 +168,15 @@ DERIVATION_INPUTS = frozenset(
 
 PRELUDE_BASE = "620cbe91ae3ddd356eaf7effa7455b931882a39e"
 PRELUDE_NAMESPACE = "data/source_audits/ci64_provenance_v1"
-PRELUDE_FREEZE: str | None = "5b9aff865c423e7b612a2a92fd0684bd48abc43d"
+PRELUDE_FREEZE: str | None = None
 PRELUDE_REPORT = "docs/performance/current/ci64-external_contract_source_reuse.json"
 TRANSACTION_TEST = "tests/code_quality/test_performance_admission_transaction.py"
 TRANSACTION_SHARDS = frozenset({"ci/quality_shards/shard-2.txt", "ci/quality_shards/shard-3.txt"})
 PRELUDE_CONTROLS = frozenset(
     {
+        "tests/code_quality/test_qualification40_successor.py",
+        "tests/code_quality/test_performance_category_migration.py",
+        "tools/performance_preflight_successor.py",
         SELF,
         "tools/performance_policy.py",
         "tools/performance_preflight.py",
@@ -221,6 +224,9 @@ PRELUDE_NEW = frozenset(
 PRELUDE_MEMBERS = PRELUDE_CONTROLS | PRELUDE_NEW
 PRELUDE_INPUTS = frozenset(
     {
+        "tests/code_quality/test_qualification40_successor.py",
+        "tests/code_quality/test_performance_category_migration.py",
+        "tools/performance_preflight_successor.py",
         SELF,
         TRANSACTION_TEST,
         "tools/cumulative_preservation.py",
@@ -235,7 +241,16 @@ PRELUDE_INPUTS = frozenset(
 )
 
 
-PRELUDE_OBSERVED = PRELUDE_NEW | TRANSACTION_SHARDS
+PRELUDE_OBSERVED = (
+    PRELUDE_NEW
+    | TRANSACTION_SHARDS
+    | frozenset(
+        {
+            "tests/code_quality/test_performance_category_migration.py",
+            "tools/performance_preflight_successor.py",
+        }
+    )
+)
 
 
 def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
@@ -259,7 +274,13 @@ def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
         or len(names) != len(PRELUDE_MEMBERS)
         or set(frozen) != PRELUDE_MEMBERS
         or set(previous) != PRELUDE_CONTROLS
-        or PRELUDE_OBSERVED != PRELUDE_NEW | TRANSACTION_SHARDS
+        or PRELUDE_NEW
+        | TRANSACTION_SHARDS
+        | {
+            "tests/code_quality/test_performance_category_migration.py",
+            "tools/performance_preflight_successor.py",
+        }
+        != PRELUDE_OBSERVED
         or set(extra) != PRELUDE_OBSERVED
         or json.loads(frozen[PRELUDE_NAMESPACE + "/changed-members.json"]) != sorted(names)
     ):

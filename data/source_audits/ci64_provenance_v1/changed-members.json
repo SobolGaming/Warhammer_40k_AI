@@ -25,12 +25,15 @@
   "docs/performance/current/ci64-external_contract_source_reuse.json",
   "docs/performance/policy-v3/operation-map.json",
   "tests/code_quality/test_performance_admission_transaction.py",
+  "tests/code_quality/test_performance_category_migration.py",
   "tests/code_quality/test_performance_policy.py",
   "tests/code_quality/test_performance_preflight.py",
   "tests/code_quality/test_performance_provenance.py",
+  "tests/code_quality/test_qualification40_successor.py",
   "tools/cumulative_preservation.py",
   "tools/performance_ci60_qualification.py",
   "tools/performance_history_snapshot.py",
   "tools/performance_policy.py",
-  "tools/performance_preflight.py"
+  "tools/performance_preflight.py",
+  "tools/performance_preflight_successor.py"
 ]

@@ -1,16 +1,20 @@
 {
   "schema": "ci64-finite-current-applicability-v1",
   "original_input_digest": "e8e85f08af6a203f5c943fe55458d9541198c0fa4bcbcb70bb3ef5f998b85139",
-  "current_producing_input_digest": "22eb8fcaa398341a6491446a92b7c2cb42bd4943983ca02ad6a829ad5ee4a217",
+  "current_producing_input_digest": "119c6f74f65a9b1eb677b2cce3f97f88419c8075beb5f3da0fa300ad10bb34fb",
   "previous_applicability_sha256": "9f0d51de50c458a5caeaa1fe3eabefeab3e90d701ce1afb8bfd4dc0cc8744148",
   "changes": {
     "docs/performance/policy-v3/operation-map.json": {
       "before": "813b3219639758c6d11976533147455b32492b58122bb2d0933e9660deff00cf",
-      "after": "a441a24a066c5fcac06a23956a3b547095bd4d36d8ad7b5ad8a96c01746bde1b"
+      "after": "d98c36d5c7c92039e47802f1fb8df7d482b716b6700753ea92645f08ea8df810"
     },
     "tests/code_quality/test_performance_admission_transaction.py": {
       "before": null,
       "after": "3334949e5f8f89a3b07df5b3fe239d15a57fba2028e5fa4aa944941b110f09dd"
+    },
+    "tests/code_quality/test_performance_category_migration.py": {
+      "before": "df412bbc22e69eb6834b47b6aea8606fce20004d30876438eff13ced04344dfa",
+      "after": "8d4342d3febbab9aae589a6c902f66eaa1b3abf3576f9c7fe78203bba82258b7"
     },
     "tests/code_quality/test_performance_policy.py": {
       "before": "f45929b1d7138997e9bef8a390ca7fa1b1db467816cc6534871dd850222ddb98",
@@ -22,7 +26,11 @@
     },
     "tests/code_quality/test_performance_provenance.py": {
       "before": "d41520a9beeb772db7fc4b65bcfd13fc7bd6cdf3b1ec2bf5fbcd89920ce94d71",
-      "after": "239c0e74056bb3dd6704aa0417eb8b82b98a03250fcfc13c56eac835a79e4f81"
+      "after": "987f7ce3d21985de4ec1c151fdb5854b2f1d92cc4a971665cd67a7bebce7aa9c"
+    },
+    "tests/code_quality/test_qualification40_successor.py": {
+      "before": "3ff6e268cdec93872d7a9993442989cffcb203581e681c916eeb618386330206",
+      "after": "f7c6c8dbe2545a8c74be440a92fd8c2b5f894ffda12db51b0e501a89144b73b5"
     },
     "tools/cumulative_preservation.py": {
       "before": "03ce7fa0c640db37aadd566ad76ad5555e36b532f1fd3ed4852782f55ce82e3d",
@@ -30,7 +38,7 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before": "d94b11e3bcb165bdaec0cd8bb3e4dce7a627d0df07d17028285fb71e9703493e",
-      "after": "8f45cd4ac963acb92ded170810afb193f3c613c22e33509f282935466dac67e3"
+      "after": "a3f8a892bec800d6a62cfa6b38bf0fb19df872643fa3d0461312e237f3c68fd9"
     },
     "tools/performance_history_snapshot.py": {
       "before": "033896c722dcb38cb12040098ec253089e7d06ceb10d6aa9f6a6e58f41456dcf",
@@ -43,6 +51,10 @@
     "tools/performance_preflight.py": {
       "before": "dc857922ba519ffc7b627f048458f448c82319723032c6889793bb496a359e36",
       "after": "16817c05526b44de281b383d0d469ac0df3a6ee51cc57a772bf28fe671943bf1"
+    },
+    "tools/performance_preflight_successor.py": {
+      "before": "60e1e493fe3aaaf98e88c28c85b781c52c5355ece3be556ea33681819817df59",
+      "after": "416340209d306b6e1e4097670d3d15c3b83ebc1469a659d5c435aa1a410b858d"
     }
   },
   "unchanged_inputs": {
@@ -3432,7 +3444,6 @@
     "tests/code_quality/test_order97_inventory.py": "7b4ce6c6d14243afe9f08fedf616e867f9555a5101e98de45bad130f66f32a99",
     "tests/code_quality/test_package_smoke.py": "0ca457bf56c774938283a227bc77b71cae2e77bdbde890c834cb2a3e00bd73e7",
     "tests/code_quality/test_pathing_endpoint_evidence.py": "78ea99fddc26143a193aae34f41395988d982d728e520121a44378411cfa5f49",
-    "tests/code_quality/test_performance_category_migration.py": "df412bbc22e69eb6834b47b6aea8606fce20004d30876438eff13ced04344dfa",
     "tests/code_quality/test_performance_integration_batch.py": "eae7ee805f17598291f3fbafbecd2ecfc8df85b966e6e424e2fcefae9af1f574",
     "tests/code_quality/test_performance_order103_exception.py": "abcd574d240fcf98eacc1876885901afb2291babd16db0f100f1b9152a718d09",
     "tests/code_quality/test_performance_reconstruction_campaign.py": "9e4ed11e92f06cfdea7b9967e9f018a2965d265a20ddbb3d2794259b6cd4cd2a",
@@ -3454,7 +3465,6 @@
     "tests/code_quality/test_physical_proposal_prevalidation.py": "57a848f0aa95797da179fd78d0449a9976697a02943d936ac5a630eeb255f595",
     "tests/code_quality/test_proposal_source_index.py": "c0c7cdde98eb4d228147fabca586b18c65e7b27d886aec087030e0fc311345e8",
     "tests/code_quality/test_qualification40_measurements.py": "b6f774971c06d7071f1acf0f5e41f256b97733cde3e1e4c51ea7f7540472badc",
-    "tests/code_quality/test_qualification40_successor.py": "3ff6e268cdec93872d7a9993442989cffcb203581e681c916eeb618386330206",
     "tests/code_quality/test_quality_runtime.py": "25742229258f584950808228ae4678089ee43f7af4a1be1b596bf76840c5ca4d",
     "tests/code_quality/test_quality_runtime_process.py": "8c19b977eefd4d587b8116f9af0c0ced4c2a1040cec9a1d5fe619014ac03e45d",
     "tests/code_quality/test_random_profile_attack_authority.py": "c1dc055261e3936bbc37f17c9b2aeee25f2c7a8418ed8a16adf5415a4c49ba6f",
@@ -4891,7 +4901,6 @@
     "tools/maulerfiend_cross_faction_support.py": "25907bdf26c262a8f2b0e9a7b358496a6940697fe6e03b64d4d40f0dd40b5fd6",
     "tools/performance_category_migration.py": "c6fa7a7b40ba78f4fd91ae5be5b77475f05a2c2ddf5ce2471d72a07f6094684e",
     "tools/performance_order103_exception.py": "63b3736a27e83d5e063eab38a7db242651a4d45c9add27b6fb76be77b4b07e85",
-    "tools/performance_preflight_successor.py": "60e1e493fe3aaaf98e88c28c85b781c52c5355ece3be556ea33681819817df59",
     "tools/performance_qualification_measurements.py": "5cd2e2d462365ae6c362d8ed527b82be63206a0d2881d7c738a4505019f5a57b",
     "tools/performance_qualification_successor.py": "d5fccbb82ccce15700443eba27130f3e859d60f7b6b5b64294cd9619c9f1923b",
     "tools/performance_reconstruction_campaign.py": "9557ea09bc443eb1656a71f262f549539852d6daa9393da3a6e17a65a7dab5cf",

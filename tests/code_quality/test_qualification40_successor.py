@@ -6,8 +6,9 @@ import ast
 import json
 import shutil
 import subprocess
-from collections.abc import Callable
+from collections.abc import Callable, Iterator, Mapping
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Protocol, cast
 
 import pytest
@@ -54,6 +55,32 @@ def successor_copy(tmp_path_factory: pytest.TempPathFactory) -> Path:
     (root / ".git").write_text("gitdir: " + git_dir + "\n")
     assert len(prior.verify_live(root)) == 64
     return root
+
+
+@pytest.fixture(scope="module")
+def qualification_native_operands(
+    successor_copy: Path,
+) -> Iterator[tuple[Mapping[str, tuple[bytes, bytes]], bytes]]:
+    """Authenticate a finite historical comparator view, never a live admission result."""
+    from tools import performance_ci60_qualification as ci60
+
+    from tests.d07_geometry_containment import read_owned_geometry_member
+
+    ci60.fresh_admission(successor_copy)
+    expected = stage.prior_operation_map_bytes(successor_copy)
+    original_read = _QualificationMechanisms.read(_stage)
+    names = (stage.SELF, policy.MAP, stage.NAMESPACE + "/added-operations.json")
+    views = MappingProxyType(
+        {
+            name: (
+                read_owned_geometry_member(successor_copy, name),
+                original_read(successor_copy, name),
+            )
+            for name in names
+        }
+    )
+    yield views, expected
+    ci60.fresh_admission(successor_copy)
 
 
 def test_qualification_preserves_every_old_family_operation_and_assertion_stage() -> None:
@@ -106,8 +133,27 @@ def test_qualification_rejects_live_fixture_source_evidence_or_control_drift(
     ["drop_old", "relax_sensitive", "relax_budget", "drop_new", "wildcard", "repin_additions"],
 )
 def test_qualification_map_mutation_cannot_inherit_historical_credit(
-    successor_copy: Path, mutation: str
+    successor_copy: Path,
+    mutation: str,
+    qualification_native_operands: tuple[Mapping[str, tuple[bytes, bytes]], bytes],
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from tools import performance_ci60_qualification as ci60
+
+    from tests.d07_geometry_containment import read_owned_geometry_member
+
+    views, expected_prior = qualification_native_operands
+
+    def native_comparator_read(root: Path, name: str) -> bytes:
+        assert root == successor_copy
+        assert name in views
+        actual = read_owned_geometry_member(root, name)
+        current, native = views[name]
+        return native if actual == current else actual
+
+    with monkeypatch.context() as positive:
+        positive.setattr(stage, "_read", native_comparator_read)
+        assert stage.prior_operation_map_bytes(successor_copy) == expected_prior
     file = successor_copy / policy.MAP
     raw = file.read_bytes()
     addition_path = successor_copy / stage.NAMESPACE / "added-operations.json"
@@ -131,8 +177,12 @@ def test_qualification_map_mutation_cannot_inherit_historical_credit(
             additions = json.loads(before)
             additions[new_key] = value["operations"][new_key]
             addition_path.write_text(json.dumps(additions))
-        with pytest.raises(ValueError, match="Qualification"):
-            stage.prior_operation_map_bytes(successor_copy)
+        with pytest.raises(ValueError, match="CI64 Preflight source changed"):
+            ci60.fresh_admission(successor_copy)
+        with monkeypatch.context() as historical:
+            historical.setattr(stage, "_read", native_comparator_read)
+            with pytest.raises(ValueError, match="Qualification"):
+                stage.prior_operation_map_bytes(successor_copy)
     finally:
         file.write_bytes(raw)
         addition_path.write_bytes(before)

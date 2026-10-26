@@ -27667,6 +27667,111 @@
       ],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci68-quality-b9967ff3a58e5b467283dcf99e88f929db96605c02d44dbe23905f77ed577d4f": {
+      "paths": [
+        "tests/code_quality/test_performance_category_migration.py"
+      ],
+      "owners": [
+        "@module",
+        "_controls",
+        "_current",
+        "_inputs",
+        "_map_inputs",
+        "assessment_map_root",
+        "copied_migration",
+        "frozen_controls",
+        "private_expected_input_reference",
+        "read_archive",
+        "test_actual_current_and_original_git_inventories_match_finite_cohorts",
+        "test_anchor_cannot_select_a_missing_revision",
+        "test_any_frozen_control_edit_is_rejected",
+        "test_arbitrary_input_drift_is_not_a_migration",
+        "test_assessment_map_actual_input_hashes_cannot_be_omitted_or_forged",
+        "test_assessment_map_proof_preserves_every_nonmap_input_and_caller_dictionary",
+        "test_assessment_map_real_file_drift_rejects_even_with_reported_hashes_updated",
+        "test_direct_v2_api_still_rejects_migrated_current_source",
+        "test_exact_compatibility_archive_membership_is_required",
+        "test_exact_source_freeze_allows_only_the_declared_anchor_literal",
+        "test_external_proof_cannot_relabel_frozen_git_or_current_identities",
+        "test_external_proof_is_separately_pinned_without_repinning_old_measurement_maps",
+        "test_external_read_bytes_and_membership_are_live",
+        "test_measured_binding_rebuilds_without_using_report_exclusions",
+        "test_original_reconstruction_bridge_remains_separate",
+        "test_other_cohort_cannot_use_migration_applicability",
+        "test_real_file_tampering_is_rejected_after_warm_verification",
+        "test_report_supplied_exemptions_cannot_extend_the_cohort",
+        "test_unactivated_adapter_cannot_admit_evidence",
+        "test_unexpected_membership_cannot_hide_outside_selected_inputs",
+        "testread_archive_manifest_cannot_be_rewritten"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci68-quality-45794e1add81e9363e7b9a6ce63f2b0ac18c3fcb2121ce9875f054b918a51434": {
+      "paths": [
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "owners": [
+        "@module",
+        "_QualificationMechanisms",
+        "_QualificationMechanisms._member",
+        "_QualificationMechanisms._read",
+        "_QualificationMechanisms.member",
+        "_QualificationMechanisms.read",
+        "qualification_native_operands",
+        "successor_copy",
+        "test_qualification_map_current_collector_rejects_forged_hash",
+        "test_qualification_map_identifier_requalification_rejects_semantic_drift",
+        "test_qualification_map_mutation_cannot_inherit_historical_credit",
+        "test_qualification_preserves_every_old_family_operation_and_assertion_stage",
+        "test_qualification_producing_inputs_allows_only_anchor_literal",
+        "test_qualification_rejects_live_fixture_source_evidence_or_control_drift"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci68-quality-c9fdb2672c25247541c79bc85d14c086858708a542761ee88370be9240c51f5c": {
+      "paths": [
+        "tools/performance_preflight_successor.py"
+      ],
+      "owners": [
+        "@module",
+        "_assert_ci_edits",
+        "_assessment",
+        "_blobs",
+        "_ci54_previous",
+        "_ci_transitions",
+        "_freeze",
+        "_git",
+        "_history",
+        "_read",
+        "_runtime_transitions",
+        "_sha",
+        "_static_transitions",
+        "assert_ci_compatibility_transition",
+        "assert_ci_runtime_transition",
+        "assert_ci_transition",
+        "assert_ci_transport_transition",
+        "assert_static_transition",
+        "ci_comparison",
+        "current_source",
+        "measurement_inputs",
+        "preceding_control",
+        "read_frozen_blobs",
+        "static_predecessor"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
