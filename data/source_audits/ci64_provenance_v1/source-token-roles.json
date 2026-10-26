@@ -2,7 +2,7 @@
   "schema": "tool-input-roles-v3",
   "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "inventories_path": "data/source_audits/ci64_provenance_v1/source-token-inventories.json",
-  "inventories_sha256": "99386f7c996a0db54761b318efa872f6a6111c6b004e5f9cb24521cd7a2c4415",
+  "inventories_sha256": "0bf97fd26180caa2d5f97a4003f24cc8529e6466ae17a9518619f6adbe27353e",
   "roles": {
     ".github/workflows/ci.yml": "untimed-governance",
     "ci/quality_shards/all.txt": "untimed-governance",
@@ -540,7 +540,7 @@
     "tools/quality_runtime_successor.py": "runtime-or-generator-treatment",
     "tools/thousand_sons_perils_preservation.py": "runtime-or-generator-treatment"
   },
-  "common_sha256": "7e167f41de88bf09a5d3a38bef8cf816f58edd6b121a45c58f4420a05a778666",
+  "common_sha256": "89aeecfe4f0d9ae6f04aba8d88162623cba25cc6f0cbcd3b7eabeb1e71d0fa49",
   "contract_trees": {
     "base": {
       "README.md": "f8bc470b0b2cc63503964bda1121092eb781371d48dc6ae92e5ef53676aafcce",
@@ -1023,5 +1023,5 @@
     "head": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6"
   },
   "shared_dependencies_sha256": "a2a00c5e977c7a8dcbb2188efed485d69e924d20649bc637108e43914d201f39",
-  "shared_workload_sha256": "6986608ff176a5c20d0c75aa158a1c62620f105833316f8520a425c6395b9f91"
+  "shared_workload_sha256": "afa16b5b00666d506ebf2040626d38add2846b5f6d6b352c364b1cfc56c1d9a7"
 }
