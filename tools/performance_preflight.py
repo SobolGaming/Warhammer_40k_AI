@@ -12,7 +12,9 @@ import hashlib
 import json
 import os
 import stat
+import threading
 from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from contextvars import ContextVar
 from functools import wraps
 from pathlib import Path
@@ -32,6 +34,8 @@ class _Digests:
         self.retained = 0
         self.entries: dict[tuple[Callable[..., Any], str], tuple[bytes, str]] = {}
         self.active = True
+        self.owner = (os.getpid(), threading.get_ident())
+        self.ci60_handoff: _Ci60AdmissionHandoff | None = None
         self.admissions: dict[
             tuple[AdmissionValidator, tuple[str, ...], tuple[Callable[..., Any], ...]],
             AdmissionOperands,
@@ -103,6 +107,9 @@ def invocation[F: Callable[..., Any]](function: F) -> F:
             return function(*args, **kwargs)
         finally:
             digests.active = False
+            if digests.ci60_handoff is not None:
+                digests.ci60_handoff.revoke(digests)
+                digests.ci60_handoff = None
             digests.admissions.clear()
             digests.entries.clear()
             digests.retained = 0
@@ -113,14 +120,144 @@ def invocation[F: Callable[..., Any]](function: F) -> F:
     return cast(F, wrapped)
 
 
+class _Ci60AdmissionHandoff:
+    """Single-use ownership for the two audited CI60 pure proofs."""
+
+    def __init__(
+        self, root: Path, validators: tuple[AdmissionValidator, AdmissionValidator]
+    ) -> None:
+        self.root = root
+        self.repository = self._repository(root)
+        self.owner = (os.getpid(), threading.get_ident())
+        self.validators = validators
+        self.bootstrap_identity = ("ci60-bootstrap", *self.repository, str(id(self)))
+        self.capturing = False
+        self.used = False
+        self.revoked = False
+        self.phase_identity: tuple[str, ...] | None = None
+
+    @staticmethod
+    def _repository(root: Path) -> tuple[str, ...]:
+        if root.absolute() != root.resolve(strict=True):
+            raise ValueError("CI60 admission handoff requires a physical repository.")
+        metadata = root.stat()
+        return root.as_posix(), str(metadata.st_dev), str(metadata.st_ino)
+
+    def check(self, root: Path) -> None:
+        if self.owner != (os.getpid(), threading.get_ident()):
+            raise ValueError("CI60 admission handoff belongs to another owner.")
+        if root != self.root or self._repository(root) != self.repository:
+            raise ValueError("CI60 admission handoff belongs to another repository.")
+
+    def discard(self, digests: _Digests, identity: tuple[str, ...]) -> None:
+        for key, operands in tuple(digests.admissions.items()):
+            if key[0] in self.validators and key[1] == identity:
+                digests.retained -= sum(len(raw) for _, _, raw in operands)
+                del digests.admissions[key]
+
+    def revoke(self, digests: _Digests) -> None:
+        self.capturing = False
+        self.revoked = True
+        self.discard(digests, self.bootstrap_identity)
+        if self.phase_identity is not None:
+            self.discard(digests, self.phase_identity)
+
+
+@contextmanager
+def ci60_bootstrap_admission[T](
+    root: Path,
+    validators: tuple[AdmissionValidator, AdmissionValidator],
+    acquire: Callable[[], T],
+) -> Iterator[T]:
+    """Keep bootstrap proofs private through acquisition and revoke on every exit."""
+    digests = _DIGESTS.get()
+    if digests is None or not digests.active:
+        yield acquire()
+        return
+    if digests.owner != (os.getpid(), threading.get_ident()):
+        raise ValueError("CI60 admission invocation belongs to another owner.")
+    if digests.ci60_handoff is not None or len(set(validators)) != 2:
+        raise ValueError("CI60 admission requires one bootstrap and two validators.")
+    state = _Ci60AdmissionHandoff(root, validators)
+    digests.ci60_handoff = state
+    try:
+        state.capturing = True
+        try:
+            result = acquire()
+        finally:
+            state.capturing = False
+        yield result
+    finally:
+        state.revoke(digests)
+        digests.ci60_handoff = None
+
+
+@contextmanager
+def ci60_phase_admission(root: Path, identity: tuple[str, ...] | None) -> Iterator[None]:
+    """Promote only the pending bootstrap into its first authenticated phase."""
+    digests = _DIGESTS.get()
+    state = None if digests is None else digests.ci60_handoff
+    if digests is None or not digests.active or state is None:
+        yield
+        return
+    state.check(root)
+    from tools.performance_history_snapshot import proof_identity
+
+    if identity is None or identity != proof_identity(root):
+        raise ValueError("CI60 admission promotion requires its authenticated history phase.")
+    if state.used or state.revoked:
+        yield
+        return
+    state.used = True
+    state.phase_identity = identity
+    try:
+        for key, operands in tuple(digests.admissions.items()):
+            if key[0] in state.validators and key[1] == state.bootstrap_identity:
+                promoted = key[0], identity, key[2]
+                if promoted in digests.admissions:
+                    raise ValueError("CI60 admission phase already has a proof.")
+                del digests.admissions[key]
+                digests.admissions[promoted] = operands
+        yield
+    finally:
+        state.revoke(digests)
+
+
 def admission_proof(
     validator: AdmissionValidator,
     operands: AdmissionOperands,
     identity: tuple[str, ...] | None,
     dependencies: tuple[Callable[..., Any], ...],
+    *,
+    repository: Path | None = None,
 ) -> None:
-    """Reuse only a successful complete-byte CI60 derivation in its live phase."""
+    """Reuse a complete pure proof only in its phase or explicit CI60 bootstrap."""
     digests = _DIGESTS.get()
+    state = None if digests is None else digests.ci60_handoff
+    if (
+        digests is not None
+        and digests.active
+        and state is not None
+        and not state.revoked
+        and identity is not None
+        and identity == state.phase_identity
+        and validator in state.validators
+        and repository is not None
+    ):
+        state.check(repository)
+    if (
+        digests is not None
+        and digests.active
+        and identity is None
+        and state is not None
+        and state.capturing
+        and not state.revoked
+        and validator in state.validators
+        and repository is not None
+    ):
+        state.check(repository)
+        digests.admission(validator, operands, state.bootstrap_identity, dependencies)
+        return
     if digests is None or identity is None or not digests.active:
         validator(operands, () if identity is None else identity)
     else:

@@ -1530,3 +1530,80 @@ def test_ci64_posix_containment_parts_equal_path_semantics(candidate: str) -> No
     resolved = PurePosixPath(candidate)
     for root in map(PurePosixPath, ["/", "//", "/tmp", "/tmp/root", "/tmp/ü"]):
         assert (resolved.parts[: len(root.parts)] == root.parts) == resolved.is_relative_to(root)
+
+
+@pytest.mark.parametrize("outcome", ["complete", "error", "cancel"])
+def test_ci65_handoff_uses_real_native_phase_lease(tmp_path: Path, outcome: str) -> None:
+    """Small native Git fixture; this is a lease control, not current-cohort admission."""
+    import contextvars
+
+    from tools import performance_history_snapshot as history
+    from tools.performance_preflight import AdmissionOperands
+
+    mechanisms = cast(_HistoryMechanisms, history)
+    root, revision, contents = _history_fixture(tmp_path, packed=False)
+    builder = _HistoryMechanisms.builder(mechanisms, root)
+    pins = {name: hashlib.sha256(raw).hexdigest() for name, raw in contents.items()}
+    builder.add("plain60", revision, pins, "ci65-native-lease-control")
+    builder.finish()
+    snapshot = _HistoryMechanisms.seal(mechanisms, builder, {}, "runtime", "ci65-lease")
+    calls: list[str] = []
+    copied: list[contextvars.Context] = []
+    operands: AdmissionOperands = (("source", 0o100644, b"same"),)
+
+    def first(raw: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        assert raw == operands
+        calls.append("first")
+
+    def second(raw: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        assert raw == operands
+        calls.append("second")
+
+    validators = first, second
+
+    def acquire() -> None:
+        for validator in validators:
+            preflight.admission_proof(validator, operands, None, (), repository=root)
+
+    def finish_body() -> None:
+        if outcome == "error":
+            raise RuntimeError("native lease body")
+        if outcome == "cancel":
+            raise KeyboardInterrupt("native lease body")
+
+    @preflight.invocation
+    def run() -> None:
+        try:
+            with preflight.ci60_bootstrap_admission(root, validators, acquire):
+                with (
+                    pytest.raises(ValueError, match="authenticated history phase"),
+                    preflight.ci60_phase_admission(root, ("forged",)),
+                ):
+                    raise AssertionError("Preactivation promotion must reject.")
+                with _HistoryMechanisms.activate(mechanisms, snapshot):
+                    identity = history.proof_identity(root)
+                    assert identity is not None
+                    with (
+                        pytest.raises(ValueError, match="authenticated history phase"),
+                        preflight.ci60_phase_admission(root, ("forged",)),
+                    ):
+                        raise AssertionError("Wrong phase must reject.")
+                    with preflight.ci60_phase_admission(root, identity):
+                        for validator in validators:
+                            preflight.admission_proof(
+                                validator, operands, identity, (), repository=root
+                            )
+                        assert calls == ["first", "second"]
+                        copied.append(contextvars.copy_context())
+                        finish_body()
+        except RuntimeError, KeyboardInterrupt:
+            if outcome == "complete":
+                raise
+        assert history.proof_identity(root) is None
+        with pytest.raises(ValueError, match="inactive"):
+            copied[0].run(history.proof_identity, root)
+        # An expired copied context cannot promote or reuse the old bootstrap.
+        copied[0].run(preflight.admission_proof, first, operands, None, (), repository=root)
+        assert calls == ["first", "second", "first"]
+
+    run()

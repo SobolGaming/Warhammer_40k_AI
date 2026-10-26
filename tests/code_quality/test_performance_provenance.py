@@ -438,11 +438,21 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
         return result
 
     monkeypatch.setattr(preflight, "source_members", observe)
+    live_head_checks: list[tuple[str, ...]] = []
+    original_git = ci60.git
+
+    def observe_git(selected: Path, *args: str) -> bytes:
+        if args[:2] == ("merge-base", "--is-ancestor") and args[-1] == "HEAD":
+            live_head_checks.append(args)
+        return original_git(selected, *args)
+
+    monkeypatch.setattr(ci60, "git", observe_git)
 
     @preflight.invocation
     def run() -> None:
+        computations.clear()  # Include the original bootstrap computation.
         with history.phase(root, ci60.PR_BASE, None):
-            computations.clear()  # Acquisition performs its own unscoped admission.
+            assert computations == ["transition", "original"]
             identity = history.proof_identity(root)
             assert identity is not None
             assert identity[0] == root.as_posix()
@@ -454,11 +464,19 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
                 with pytest.raises(ValueError, match="inactive"):
                     pool.submit(wrong_thread.run, history.proof_identity, root).result(timeout=5)
             start = len(observations)
+            head_start = len(live_head_checks)
             first = ci60.admitted(root)
             first_observations = observations[start:]
+            first_head_checks = live_head_checks[head_start:]
+            assert first_head_checks == [
+                ("merge-base", "--is-ancestor", str(freeze), "HEAD")
+                for freeze in (ci60.FREEZE, ci60.DERIVATION_FREEZE, ci60.PRELUDE_FREEZE)
+            ]
             first[ci60.SELF] = b"caller-owned dictionary"
             start = len(observations)
+            head_start = len(live_head_checks)
             second = ci60.admitted(root)
+            assert live_head_checks[head_start:] == first_head_checks
             assert observations[start:] == first_observations
             assert computations == ["transition", "original"]
             latest_names = (
@@ -980,8 +998,8 @@ def test_activated_native_ci64_two_entry_budget_and_reuse(
 
     @preflight.invocation
     def run() -> None:
+        calls.clear()  # Bootstrap and first active requests share one complete proof.
         with history.phase(root, ci60.PR_BASE, None):
-            calls.clear()
             scope = vars(preflight)["_DIGESTS"]
             storage = cast(_Storage, scope.get())
             held.append(storage)
@@ -1005,3 +1023,353 @@ def test_activated_native_ci64_two_entry_budget_and_reuse(
     assert not held[0].active
     assert held[0].retained == 0
     assert not held[0].admissions
+
+
+def _ci65_storage() -> _Storage:
+    scope = cast(contextvars.ContextVar[_Storage | None], vars(preflight)["_DIGESTS"])
+    storage = scope.get()
+    assert storage is not None
+    return storage
+
+
+def _ci65_validators(
+    calls: list[str],
+) -> tuple[AdmissionValidator, AdmissionValidator]:
+    def first(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append("first")
+        if any(raw == b"reject" for _, _, raw in operands):
+            raise ValueError("rejected complete operand")
+
+    def second(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append("second")
+
+    return first, second
+
+
+def test_ci65_handoff_preserves_default_none_and_standalone_behavior(tmp_path: Path) -> None:
+    calls: list[str] = []
+    validators = _ci65_validators(calls)
+    operands: AdmissionOperands = (("source", 0o100644, b"same"),)
+
+    def acquire() -> str:
+        for validator in validators:
+            preflight.admission_proof(validator, operands, None, (), repository=tmp_path)
+        return "cohort"
+
+    with preflight.ci60_bootstrap_admission(tmp_path, validators, acquire) as result:
+        assert result == "cohort"
+        with preflight.ci60_phase_admission(tmp_path, None):
+            acquire()
+    assert calls == ["first", "second", "first", "second"]
+
+    @preflight.invocation
+    def no_opt_in() -> None:
+        acquire()
+        acquire()
+        assert _ci65_storage().admissions == {}
+
+    calls.clear()
+    no_opt_in()
+    assert calls == ["first", "second", "first", "second"]
+
+
+def test_ci65_handoff_promotes_once_and_revokes_at_phase_exit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tools import performance_history_snapshot as history
+
+    phase: list[tuple[str, ...] | None] = [None]
+
+    def current_identity(root: Path) -> tuple[str, ...] | None:
+        return phase[0]
+
+    monkeypatch.setattr(history, "proof_identity", current_identity)
+    calls: list[str] = []
+    validators = _ci65_validators(calls)
+    operands: AdmissionOperands = (("source", 0o100644, b"same"),)
+    held: list[_Storage] = []
+
+    def acquire() -> str:
+        for validator in validators:
+            preflight.admission_proof(validator, operands, None, (), repository=tmp_path)
+        return "cohort"
+
+    @preflight.invocation
+    def run() -> None:
+        storage = _ci65_storage()
+        held.append(storage)
+        with preflight.ci60_bootstrap_admission(tmp_path, validators, acquire):
+            assert len(storage.admissions) == 2
+            retained = storage.retained
+            assert calls == ["first", "second"]
+            phase[0] = ("repository", "phase-one")
+            with preflight.ci60_phase_admission(tmp_path, phase[0]):
+                for validator in validators:
+                    preflight.admission_proof(
+                        validator, operands, phase[0], (), repository=tmp_path
+                    )
+                assert calls == ["first", "second"]
+                assert storage.retained == retained
+                assert len(storage.admissions) == 2
+            assert storage.admissions == {}
+            assert storage.retained == 0
+            phase[0] = None
+            acquire()
+            assert calls == ["first", "second", "first", "second"]
+            assert storage.admissions == {}
+            phase[0] = ("repository", "phase-two")
+            with preflight.ci60_phase_admission(tmp_path, phase[0]):
+                for validator in validators:
+                    preflight.admission_proof(
+                        validator, operands, phase[0], (), repository=tmp_path
+                    )
+            assert calls == ["first", "second"] * 3
+
+    run()
+    assert held[0].active is False
+    assert held[0].admissions == {}
+    assert held[0].retained == 0
+
+
+@pytest.mark.parametrize("change", ["bytes", "mode", "order", "multiplicity", "dependency"])
+def test_ci65_handoff_first_active_use_compares_every_operand(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
+    from tools import performance_history_snapshot as history
+
+    def current_identity(root: Path) -> tuple[str, ...] | None:
+        return IDENTITY
+
+    monkeypatch.setattr(history, "proof_identity", current_identity)
+    calls: list[str] = []
+    validators = _ci65_validators(calls)
+    original: AdmissionOperands = (("a", 0o100644, b"a"), ("b", 0o100644, b"b"))
+    changed = original
+    dependencies: tuple[Callable[..., Any], ...] = ()
+    if change == "bytes":
+        changed = (("a", 0o100644, b"changed"), original[1])
+    elif change == "mode":
+        changed = (("a", 0o100755, b"a"), original[1])
+    elif change == "order":
+        changed = tuple(reversed(original))
+    elif change == "multiplicity":
+        changed = (*original, original[0])
+    else:
+        dependencies = (bytes,)
+
+    def acquire() -> None:
+        for validator in validators:
+            preflight.admission_proof(validator, original, None, (), repository=tmp_path)
+
+    @preflight.invocation
+    def run() -> None:
+        with (
+            preflight.ci60_bootstrap_admission(tmp_path, validators, acquire),
+            preflight.ci60_phase_admission(tmp_path, IDENTITY),
+        ):
+            preflight.admission_proof(
+                validators[0], changed, IDENTITY, dependencies, repository=tmp_path
+            )
+            preflight.admission_proof(validators[1], original, IDENTITY, (), repository=tmp_path)
+        assert calls == ["first", "second", "first"]
+
+    run()
+
+
+@pytest.mark.parametrize("stage", ["bootstrap", "catalog", "seal", "activation", "body", "cancel"])
+def test_ci65_handoff_revokes_pending_and_promoted_on_every_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, stage: str
+) -> None:
+    from tools import performance_history_snapshot as history
+
+    def current_identity(root: Path) -> tuple[str, ...] | None:
+        return IDENTITY
+
+    monkeypatch.setattr(history, "proof_identity", current_identity)
+    calls: list[str] = []
+    validators = _ci65_validators(calls)
+    operands: AdmissionOperands = (("source", 0o100644, b"same"),)
+    copied: list[contextvars.Context] = []
+
+    def acquire() -> None:
+        for validator in validators:
+            preflight.admission_proof(validator, operands, None, (), repository=tmp_path)
+        copied.append(contextvars.copy_context())
+        if stage == "bootstrap":
+            raise RuntimeError("bootstrap failure")
+
+    @preflight.invocation
+    def run() -> None:
+        storage = _ci65_storage()
+
+        def fail_in_scope() -> None:
+            with preflight.ci60_bootstrap_admission(tmp_path, validators, acquire):
+                if stage in {"catalog", "seal", "activation"}:
+                    raise RuntimeError(stage + " failure")
+                with preflight.ci60_phase_admission(tmp_path, IDENTITY):
+                    if stage == "cancel":
+                        raise KeyboardInterrupt
+                    raise RuntimeError("body failure")
+
+        with pytest.raises((RuntimeError, KeyboardInterrupt)):
+            fail_in_scope()
+        assert storage.admissions == {}
+        assert storage.retained == 0
+
+    run()
+    count = len(calls)
+    copied[0].run(preflight.admission_proof, validators[0], operands, None, (), repository=tmp_path)
+    assert len(calls) == count + 1
+
+
+@pytest.mark.parametrize("identity", [None, ("forged",), IDENTITY])
+def test_ci65_handoff_requires_actual_live_phase(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, identity: tuple[str, ...] | None
+) -> None:
+    from tools import performance_history_snapshot as history
+
+    def current_identity(root: Path) -> tuple[str, ...] | None:
+        return None
+
+    monkeypatch.setattr(history, "proof_identity", current_identity)
+    calls: list[str] = []
+    validators = _ci65_validators(calls)
+
+    @preflight.invocation
+    def run() -> None:
+        with (
+            preflight.ci60_bootstrap_admission(tmp_path, validators, lambda: None),
+            pytest.raises(ValueError, match="authenticated history phase"),
+            preflight.ci60_phase_admission(tmp_path, identity),
+        ):
+            raise AssertionError("Unauthenticated phase must never enter.")
+
+    run()
+    assert calls == []
+
+
+@pytest.mark.parametrize("owner_change", ["thread", "pid", "repository"])
+def test_ci65_handoff_rejects_other_owner_or_repository(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, owner_change: str
+) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+
+    calls: list[str] = []
+    validators = _ci65_validators(calls)
+    operands: AdmissionOperands = (("source", 0o100644, b"same"),)
+    other = tmp_path / "other"
+    other.mkdir()
+
+    def request() -> None:
+        preflight.admission_proof(
+            validators[0],
+            operands,
+            None,
+            (),
+            repository=other if owner_change == "repository" else tmp_path,
+        )
+
+    def acquire() -> None:
+        if owner_change == "thread":
+            copied = contextvars.copy_context()
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                executor.submit(copied.run, request).result()
+        elif owner_change == "pid":
+            pid = os.getpid()
+            with monkeypatch.context() as scope:
+                scope.setattr(os, "getpid", lambda: pid + 1)
+                request()
+        else:
+            request()
+
+    @preflight.invocation
+    def run() -> None:
+        with (
+            pytest.raises(ValueError, match=r"another owner|another repository"),
+            preflight.ci60_bootstrap_admission(tmp_path, validators, acquire),
+        ):
+            raise AssertionError("Wrong owner must never publish bootstrap.")
+        assert _ci65_storage().admissions == {}
+
+    run()
+    assert calls == []
+
+
+@pytest.mark.parametrize("limit", [0, 3, 100])
+def test_ci65_handoff_obeys_shared_budget_and_uncached_fallback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, limit: int
+) -> None:
+    from tools import performance_history_snapshot as history
+
+    def current_identity(root: Path) -> tuple[str, ...] | None:
+        return IDENTITY
+
+    monkeypatch.setattr(history, "proof_identity", current_identity)
+    calls: list[str] = []
+    validators = _ci65_validators(calls)
+    operands: AdmissionOperands = (("source", 0o100644, b"same"),)
+
+    def acquire() -> None:
+        for validator in validators:
+            preflight.admission_proof(validator, operands, None, (), repository=tmp_path)
+
+    @preflight.invocation
+    def run() -> None:
+        storage = _ci65_storage()
+        storage.limit = limit
+        with preflight.ci60_bootstrap_admission(tmp_path, validators, acquire):
+            assert storage.retained <= limit
+            with preflight.ci60_phase_admission(tmp_path, IDENTITY):
+                for validator in validators:
+                    preflight.admission_proof(
+                        validator, operands, IDENTITY, (), repository=tmp_path
+                    )
+                assert storage.retained <= limit
+                assert len(storage.admissions) <= 2
+        assert storage.retained == 0
+
+    run()
+    assert calls == ["first", "second"] * (1 if limit >= 8 else 2)
+
+
+@pytest.mark.parametrize("stage", ["catalog", "seal", "activation"])
+def test_activated_native_ci65_acquisition_failure_revokes_pending(
+    monkeypatch: pytest.MonkeyPatch, stage: str
+) -> None:
+    """The current admitted cohort must revoke bootstrap entries before publication."""
+    from tools import performance_ci60_qualification as ci60
+    from tools import performance_history_snapshot as history
+
+    root = Path(__file__).resolve().parents[2]
+    held: list[_Storage] = []
+    copied: list[contextvars.Context] = []
+    other_retained: list[int] = []
+
+    def fail(*args: object, **kwargs: object) -> Any:
+        storage = _ci65_storage()
+        assert len(storage.admissions) == 2
+        other_retained.append(
+            storage.retained
+            - sum(len(raw) for operands in storage.admissions.values() for _, _, raw in operands)
+        )
+        held.append(storage)
+        copied.append(contextvars.copy_context())
+        raise RuntimeError("ci65 acquisition failure: " + stage)
+
+    target = {"catalog": "_catalog", "seal": "_seal", "activation": "_activate"}[stage]
+    monkeypatch.setattr(history, target, fail)
+
+    @preflight.invocation
+    def run() -> None:
+        with (
+            pytest.raises(RuntimeError, match="ci65 acquisition failure"),
+            history.phase(root, ci60.PR_BASE, None),
+        ):
+            raise AssertionError("Failed acquisition must never publish.")
+        assert history.proof_identity(root) is None
+        assert held[0].admissions == {}
+        assert held[0].retained == other_retained[0]
+
+    run()
+    assert not held[0].active
+    assert copied[0].run(history.proof_identity, root) is None

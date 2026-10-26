@@ -11,7 +11,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Protocol, cast
 
-from tools.performance_preflight import AdmissionOperands
+from tools.performance_preflight import AdmissionOperands, AdmissionValidator
 
 BASE = "d7b7650fa1c76ee5830a9ffc78522eba3a6a3209"
 PR_BASE = "5f509724da25a2f6ded0c2739a8e7c84bdf59c91"
@@ -167,13 +167,14 @@ DERIVATION_INPUTS = frozenset(
 
 PRELUDE_BASE = "620cbe91ae3ddd356eaf7effa7455b931882a39e"
 PRELUDE_NAMESPACE = "data/source_audits/ci64_provenance_v1"
-PRELUDE_FREEZE: str | None = "2452dfc68f0428c1451526f136dd9f103b1c85b9"
+PRELUDE_FREEZE: str | None = None
 PRELUDE_REPORT = "docs/performance/current/ci64-external_contract_source_reuse.json"
 PRELUDE_CONTROLS = frozenset(
     {
         SELF,
         "tools/performance_policy.py",
         "tools/performance_preflight.py",
+        "tools/performance_history_snapshot.py",
         "tests/code_quality/test_performance_policy.py",
         "tests/code_quality/test_performance_preflight.py",
         DERIVATION_TEST,
@@ -216,6 +217,7 @@ PRELUDE_INPUTS = frozenset(
         SELF,
         "tools/performance_policy.py",
         "tools/performance_preflight.py",
+        "tools/performance_history_snapshot.py",
         "tests/code_quality/test_performance_policy.py",
         "tests/code_quality/test_performance_preflight.py",
         DERIVATION_TEST,
@@ -556,6 +558,7 @@ def _derivation_source(
             _prelude_transition,
             _derivation_transition,
         ),
+        repository=root,
     )
     return (
         {name: raw for name, _, raw in current + extra},
@@ -653,6 +656,11 @@ def _admitted_derivation(operands: AdmissionOperands, identity: tuple[str, ...])
             raise ValueError("CI60 Qualification operation must remain literal and mandatory.")
 
 
+def admission_validators() -> tuple[AdmissionValidator, AdmissionValidator]:
+    """The two identity-independent pure proofs admitted for bootstrap handoff."""
+    return _current_derivation_transition, _admitted_derivation
+
+
 def admitted(root: Path) -> dict[str, bytes]:
     """Fresh complete observations precede invocation-local pure proof reuse."""
     from tools.performance_history_snapshot import proof_identity
@@ -690,7 +698,11 @@ def admitted(root: Path) -> dict[str, bytes]:
     )
     identity = proof_identity(root)
     admission_proof(
-        _admitted_derivation, operands, identity, (digest, hashlib.sha256, json.loads, owner_hashes)
+        _admitted_derivation,
+        operands,
+        identity,
+        (digest, hashlib.sha256, json.loads, owner_hashes),
+        repository=root,
     )
     return {name: raw for name, _, raw in current} | derived
 

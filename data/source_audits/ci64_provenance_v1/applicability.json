@@ -1,12 +1,12 @@
 {
   "schema": "ci64-finite-current-applicability-v1",
   "original_input_digest": "e8e85f08af6a203f5c943fe55458d9541198c0fa4bcbcb70bb3ef5f998b85139",
-  "current_producing_input_digest": "3e6970b35316493f003f507248577cbb54b23f2ad4643f61ab25e34fb97df511",
+  "current_producing_input_digest": "494ea801c6b744a7b34866c13d65fcd7557e23a0d88d63d278db40353d80c40f",
   "previous_applicability_sha256": "9f0d51de50c458a5caeaa1fe3eabefeab3e90d701ce1afb8bfd4dc0cc8744148",
   "changes": {
     "docs/performance/policy-v3/operation-map.json": {
       "before": "813b3219639758c6d11976533147455b32492b58122bb2d0933e9660deff00cf",
-      "after": "5caf2a03d6efa93b2afc52fabc3537da814a7dd560f7c80bd25e94c9e7426360"
+      "after": "45f89ad2cf45b307f9cdcafba45154a0e92867ecdee97c3c8e8f57dc559920ca"
     },
     "tests/code_quality/test_performance_policy.py": {
       "before": "f45929b1d7138997e9bef8a390ca7fa1b1db467816cc6534871dd850222ddb98",
@@ -14,15 +14,19 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before": "c6ea056c95a69a5d8e82870b61f0958ae74f498a4cde398424bc65b646d49893",
-      "after": "a857caaed3b1442cfe2659aa89dedee2a94f59105c300339181e4f8f829a05df"
+      "after": "ddd2754d628c508b4e3d0c24988a778137ba1041e3fbaec293c7d3fa91138c95"
     },
     "tests/code_quality/test_performance_provenance.py": {
       "before": "d41520a9beeb772db7fc4b65bcfd13fc7bd6cdf3b1ec2bf5fbcd89920ce94d71",
-      "after": "ec5f10bc0c8659ec34ec13e900d15ccee40526ca0d753414c8dc9f3e86e420d1"
+      "after": "e0b9ca9add818278f8a7806607462c2a8ecd3e6b4b281db4fa13a424085148b4"
     },
     "tools/performance_ci60_qualification.py": {
       "before": "d94b11e3bcb165bdaec0cd8bb3e4dce7a627d0df07d17028285fb71e9703493e",
-      "after": "25565db18918264266714f6be6e24d889de45c91057e79f5140ee0fbb527973e"
+      "after": "78290361dad9bbd186dd0db927c808999155997467f06e0c21aa8f9477277e44"
+    },
+    "tools/performance_history_snapshot.py": {
+      "before": "033896c722dcb38cb12040098ec253089e7d06ceb10d6aa9f6a6e58f41456dcf",
+      "after": "5bb0ec6efad6ab240b786ffa47cea757a4458b15374b8b3b92b1b28b481c8c98"
     },
     "tools/performance_policy.py": {
       "before": "904527376d6bf8096e9660c514d86fd738e0f5dbd5624f78324c780f97aaf92d",
@@ -30,7 +34,7 @@
     },
     "tools/performance_preflight.py": {
       "before": "dc857922ba519ffc7b627f048458f448c82319723032c6889793bb496a359e36",
-      "after": "9457798acda39954c397980cc2ea3e9eb0b7595b41a6cb6c7a8c231d7414beec"
+      "after": "fa358671ab095028bb0723f4e65686b37b9152bda8f42a4bd32c09c1f735397b"
     }
   },
   "unchanged_inputs": {
@@ -4879,7 +4883,6 @@
     "tools/lookup_39k_reference.py": "ceba19999c3098555527e07cb9be081978771d03de0f42d720f9bb2f8bbaa238",
     "tools/maulerfiend_cross_faction_support.py": "25907bdf26c262a8f2b0e9a7b358496a6940697fe6e03b64d4d40f0dd40b5fd6",
     "tools/performance_category_migration.py": "c6fa7a7b40ba78f4fd91ae5be5b77475f05a2c2ddf5ce2471d72a07f6094684e",
-    "tools/performance_history_snapshot.py": "033896c722dcb38cb12040098ec253089e7d06ceb10d6aa9f6a6e58f41456dcf",
     "tools/performance_order103_exception.py": "63b3736a27e83d5e063eab38a7db242651a4d45c9add27b6fb76be77b4b07e85",
     "tools/performance_preflight_successor.py": "60e1e493fe3aaaf98e88c28c85b781c52c5355ece3be556ea33681819817df59",
     "tools/performance_qualification_measurements.py": "5cd2e2d462365ae6c362d8ed527b82be63206a0d2881d7c738a4505019f5a57b",
@@ -4909,7 +4912,7 @@
         "tests/timing_plugin.py": "69387b39047c641ea0a4f96eb29a56b834242d1c2cd34a5fa7797e0c01ec4d59",
         "uv.lock": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa"
       },
-      "call_path": "benchmark_order96_rerolls.measure constructs strength_session, times complete_optional_attack, and separately checks fork restoration. All runtime and helper bytes are equal; none of the three provenance tools is imported by its source closure."
+      "call_path": "benchmark_order96_rerolls.measure constructs strength_session, times complete_optional_attack, and separately checks fork restoration. All runtime and helper bytes are equal; none of the four provenance tools is imported by its source closure."
     },
     "dice_sustained": {
       "driver": "scripts/benchmark_order96_rerolls.py",

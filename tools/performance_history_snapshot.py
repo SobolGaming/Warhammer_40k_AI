@@ -1029,49 +1029,55 @@ def phase(root: Path, base_ref: str, pr_head: str | None) -> Iterator[Snapshot]:
     runtime = verified_engine_build_identity().build_id
     assessment = json.loads(owned(root, ASSESSMENT))
     comparisons = assessment["comparisons"]
+    from tools import performance_ci60_qualification as ci60
     from tools.performance_ci60_qualification import PR_BASE, comparison_paths
+    from tools.performance_preflight import ci60_bootstrap_admission, ci60_phase_admission
 
-    expected_comparisons = comparison_paths(root)
-    original_comparisons = {
-        family: "docs/performance/current/qualification40-" + family + ".json"
-        for family in expected_comparisons
-    }
-    if (
-        identity["base"] != PR_BASE
-        or assessment["base"] != identity["base"]
-        or comparisons not in (expected_comparisons, original_comparisons)
-    ):
-        raise ValueError("History snapshot does not support this assessment cohort.")
-    cohort = source_hashes(root, set(comparisons.values()) | {ASSESSMENT})
-    builder = _catalog(root, str(identity["base"]))
-    builder.finish()
-    if (
-        identity != _identity(root, base_ref, pr_head, domain_state=True)
-        or runtime != verified_engine_build_identity().build_id
-        or cohort != source_hashes(root, set(comparisons.values()) | {ASSESSMENT})
-    ):
-        raise ValueError("History acquisition boundary changed.")
-    snapshot = _seal(builder, identity, runtime, phase_id)
-    del builder
-    live_identity = {
-        key: value
-        for key, value in identity.items()
-        if key not in {"environment", "configuration", "replacements"}
-    }
-    witness.update(
-        {
-            "domain_identity": _digest(identity),
-            "semantic_digest": snapshot.semantic_digest,
-            "catalog": json.loads(snapshot.certificate),
+    with ci60_bootstrap_admission(
+        root,
+        ci60.admission_validators(),
+        lambda: comparison_paths(root),
+    ) as expected_comparisons:
+        original_comparisons = {
+            family: "docs/performance/current/qualification40-" + family + ".json"
+            for family in expected_comparisons
         }
-    )
-    completed = False
-    try:
-        with _activate(snapshot):
-            yield snapshot
-        completed = True
-    finally:
-        if live_identity != _identity(root, base_ref, pr_head, domain_state=False):
-            raise ValueError("History live repository identity changed during phase.")
-        if completed:
-            witness["status"] = "completed"
+        if (
+            identity["base"] != PR_BASE
+            or assessment["base"] != identity["base"]
+            or comparisons not in (expected_comparisons, original_comparisons)
+        ):
+            raise ValueError("History snapshot does not support this assessment cohort.")
+        cohort = source_hashes(root, set(comparisons.values()) | {ASSESSMENT})
+        builder = _catalog(root, str(identity["base"]))
+        builder.finish()
+        if (
+            identity != _identity(root, base_ref, pr_head, domain_state=True)
+            or runtime != verified_engine_build_identity().build_id
+            or cohort != source_hashes(root, set(comparisons.values()) | {ASSESSMENT})
+        ):
+            raise ValueError("History acquisition boundary changed.")
+        snapshot = _seal(builder, identity, runtime, phase_id)
+        del builder
+        live_identity = {
+            key: value
+            for key, value in identity.items()
+            if key not in {"environment", "configuration", "replacements"}
+        }
+        witness.update(
+            {
+                "domain_identity": _digest(identity),
+                "semantic_digest": snapshot.semantic_digest,
+                "catalog": json.loads(snapshot.certificate),
+            }
+        )
+        completed = False
+        try:
+            with _activate(snapshot), ci60_phase_admission(root, proof_identity(root)):
+                yield snapshot
+            completed = True
+        finally:
+            if live_identity != _identity(root, base_ref, pr_head, domain_state=False):
+                raise ValueError("History live repository identity changed during phase.")
+            if completed:
+                witness["status"] = "completed"

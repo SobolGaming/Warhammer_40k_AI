@@ -25,6 +25,7 @@
   "tests/code_quality/test_performance_preflight.py",
   "tests/code_quality/test_performance_provenance.py",
   "tools/performance_ci60_qualification.py",
+  "tools/performance_history_snapshot.py",
   "tools/performance_policy.py",
   "tools/performance_preflight.py"
 ]

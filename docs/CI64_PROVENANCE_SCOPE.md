@@ -24,7 +24,7 @@ revocation remain mandatory. The composed operand must fit the declared128MiB
 authoring condition; actual duplicated operand bytes are recorded before final
 qualification.
 
-The seven collector changes are the three provenance tools, three existing quality
+The eight collector changes are four provenance tools, three existing quality
 test modules and operation map. The complete current4870-entry map must equal the
 new producer, except its prescribed activation scalar. Eleven families retain
 authentic earlier producer labels only through complete unchanged-consumer and
@@ -33,7 +33,7 @@ three original base samples and three original head samples must be fresh. No
 report or failed sample is relabeled.
 
 All408 original historical assertions, all assertions in touched test modules and
-all1861 prior quality case identities remain required. New cases append to shard1
+all1912 prior quality case identities remain required. New cases append to shard1
 without changing old shard/order. Original malformed-input rejection, mandatory
 obligations, shared-dict distinct keys, owner hash ordering, ancestry mutation,
 Windows metadata and independent validation-phase controls remain in force.
@@ -46,3 +46,21 @@ warning, and records actual child terminal state before slow postchecks. A final
 pass requires all source/dependency checks and process closure; an incomplete
 terminal checkpoint cannot certify it. Dependent quality and all exact-head local
 and remote gates remain pending. No publication or merge is authorized.
+
+The first CI64 candidate E2 `9231bcb8fd800af90f1704e4adfa9bc5a8bcc49a`
+failed its genuine complete command at the unchanged180-second deadline (attempt058).
+Its source commits, authentic measurements, native failed receipt and independent
+review remain preserved. This regenerated finite CI64 candidate adds the existing
+history-snapshot owner to the literal control set:29members,12controls,eight
+producing inputs and the same17new paths. It creates no nested successor layer.
+
+The original comparison admission still precedes catalog acquisition and both
+cohort observations retain their original boundaries. A private bootstrap context
+retains only the two audited successful pure proofs in the existing512MiB budget.
+A real first-phase capability, owner PID/thread and physical repository binding
+permit one-way promotion. Every hit compares all complete ordered operands and
+dependencies; all current reads and three mutable HEAD checks remain fresh.
+Pending and promoted proofs revoke on every failure/cancellation/phase exit, and
+ordinary no-phase callers remain uncached. Independent preflight/postflight calls
+start empty. Early proof retention may displace digest retention; the fallback
+still computes and no deadline benefit is assumed before the complete command.
