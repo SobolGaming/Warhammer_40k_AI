@@ -1094,6 +1094,36 @@
         }
       }
     },
+    "data/source_audits/ci61_provenance_v1/measurement-provenance.json": {
+      "before_sha256": null,
+      "after_sha256": "4c942bbfa9b21f0ec06167204b20ea3825af34bb351e2ff2cd4a73d652c059ae",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4c942bbfa9b21f0ec06167204b20ea3825af34bb351e2ff2cd4a73d652c059ae"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/measurements/source-base.json": {
+      "before_sha256": null,
+      "after_sha256": "8293a490d9265da594415cbe3f60dbd8da1c7bc4600e32c2ded5a789c3eca9ae",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8293a490d9265da594415cbe3f60dbd8da1c7bc4600e32c2ded5a789c3eca9ae"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/measurements/source-head.json": {
+      "before_sha256": null,
+      "after_sha256": "8e2f8e1afbdccab186b7243dec8459a358ed5325e80b5ef3609b05395b3364ce",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8e2f8e1afbdccab186b7243dec8459a358ed5325e80b5ef3609b05395b3364ce"
+        }
+      }
+    },
     "data/source_audits/ci61_provenance_v1/producing-inputs.json": {
       "before_sha256": null,
       "after_sha256": "94fb96edde08d1b6cc392d41a7c01061c93bb68e5b055391ca41a2e4aaa5bc62",
@@ -1101,6 +1131,86 @@
         "@document": {
           "before": null,
           "after": "94fb96edde08d1b6cc392d41a7c01061c93bb68e5b055391ca41a2e4aaa5bc62"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-base-0.json": {
+      "before_sha256": null,
+      "after_sha256": "abf546d4cc24429a241fdc6f37bdb75e01064fb65311084d74e097ca1cd79db3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "abf546d4cc24429a241fdc6f37bdb75e01064fb65311084d74e097ca1cd79db3"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-base-1.json": {
+      "before_sha256": null,
+      "after_sha256": "f7ee1caa78007c1f450700378da69d1098ca30000c35ebb3f51d86f254c98faf",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f7ee1caa78007c1f450700378da69d1098ca30000c35ebb3f51d86f254c98faf"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-base-2.json": {
+      "before_sha256": null,
+      "after_sha256": "ccf75305e1b6ca723406b8c2e1c7e3833caa5c8ec633956c1fb09bb65e8cd6ed",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ccf75305e1b6ca723406b8c2e1c7e3833caa5c8ec633956c1fb09bb65e8cd6ed"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-head-0.json": {
+      "before_sha256": null,
+      "after_sha256": "34f78e63921478262d12b669921e414b1331926a3559cfb23b8e1e79ad8bacde",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "34f78e63921478262d12b669921e414b1331926a3559cfb23b8e1e79ad8bacde"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-head-1.json": {
+      "before_sha256": null,
+      "after_sha256": "9bb48621188522cf8b9267819282d31b02a42b3fd6107946e24e04d112c0c515",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9bb48621188522cf8b9267819282d31b02a42b3fd6107946e24e04d112c0c515"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-head-2.json": {
+      "before_sha256": null,
+      "after_sha256": "2f42fd4cbba419049a94d4fb9a8320fdd1bdfd3df95a2add4a2971e91f57730c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2f42fd4cbba419049a94d4fb9a8320fdd1bdfd3df95a2add4a2971e91f57730c"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/source-token-inventories.json": {
+      "before_sha256": null,
+      "after_sha256": "64c928e3248d0910dcf2a27909f3aa6840baf583bef3ae88e8fbc854c4a8ed23",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "64c928e3248d0910dcf2a27909f3aa6840baf583bef3ae88e8fbc854c4a8ed23"
+        }
+      }
+    },
+    "data/source_audits/ci61_provenance_v1/source-token-roles.json": {
+      "before_sha256": null,
+      "after_sha256": "1f0ebd6b11ef27cd1a2c2db02157ada8526e2de9fec7dc2594cd4781087448eb",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1f0ebd6b11ef27cd1a2c2db02157ada8526e2de9fec7dc2594cd4781087448eb"
         }
       }
     },
@@ -3411,6 +3521,16 @@
         "@document": {
           "before": null,
           "after": "5253a0edab3afde964ae9257a3decfbee7a4199e05c2d6140acd09046e32309c"
+        }
+      }
+    },
+    "docs/performance/current/ci61-external_contract_source_reuse.json": {
+      "before_sha256": null,
+      "after_sha256": "a0fcf49e675f1d0ce978ea67ee93e08d44d2bcf475a45b904d28a6871a13fab2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a0fcf49e675f1d0ce978ea67ee93e08d44d2bcf475a45b904d28a6871a13fab2"
         }
       }
     },
@@ -22709,6 +22829,42 @@
       ],
       "selected_families": []
     },
+    "data/source_audits/ci61_provenance_v1/measurement-provenance.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-67d91ce4c4fcb8be9e108eadb0ce3ca73478b631efe812ea4ba224a62486fdb2"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
+    },
+    "data/source_audits/ci61_provenance_v1/measurements/source-base.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-f2ed842c8ef0187f23b89ce5e9d4b90c2e788920610e2fb1681191a82b98ee44"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
+    },
+    "data/source_audits/ci61_provenance_v1/measurements/source-head.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-5a8f4a73e1556d028a8c6e3880d67775e4796c33dc2d6bdb325a101cd2b33fc3"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
+    },
     "data/source_audits/ci61_provenance_v1/producing-inputs.json": {
       "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
       "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
@@ -22718,6 +22874,102 @@
         "ci61-provenance-62f9fed294fc0be1e26baba6329396cd2a971d549bac633446930956758acfdd"
       ],
       "selected_families": []
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-base-0.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-c69f3b4234101df25375f2eee085cf7f0e4df9e21f8f63d78ad33ddd3aed9126"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-base-1.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-567ed10f6fadd8a7365257ba472b28e9a51d253247da11dae6f324e54cdf8532"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-base-2.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-dd81f7e275d2855ca27941646d00ef7f174d56c30b2c86a0357e1d1ebecef775"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-head-0.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-d7789f0f412028191ebbfdcdd213faaf4b3a0490e521ee9e2e582ae331a3b602"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-head-1.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-29af4908fb5bcd120ce4f02f24108c695adf894ca1511e2c66f0546badc2a14d"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
+    },
+    "data/source_audits/ci61_provenance_v1/receipts/source-head-2.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-4eb0432bf14a66986aa05998a955c3c7f91a622fcb7a54788689002563d5a3f0"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
+    },
+    "data/source_audits/ci61_provenance_v1/source-token-inventories.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-2a14fbf20104ffa51b90ff42a9c7a5a1c6f695e3497736ceb14ef5430212fc49"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
+    },
+    "data/source_audits/ci61_provenance_v1/source-token-roles.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "measured_workload",
+      "operations": [
+        "ci61-provenance-b50f68ea2128e773dc1123cdb70514b777635251afbf794f702266b22eea3a0c"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
     },
     "data/source_audits/cumulative_preservation_v1/accepted-source.json": {
       "category": "measured_workload",
@@ -24932,6 +25184,14 @@
       "rationale": "Finite CI60 source and evidence admission preserves historical assertions and binds the actual current base, source and original workload contracts.",
       "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
       "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
+    },
+    "docs/performance/current/ci61-external_contract_source_reuse.json": {
+      "rationale": "Finite CI61 provenance evidence preserves complete live source observations and authentic producing identities; complete qualification remains separately required.",
+      "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
+      "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
+      "category": "governance",
+      "operations": [],
+      "selected_families": []
     },
     "docs/performance/current/qualification40-dice.json": {
       "category": "governance",
