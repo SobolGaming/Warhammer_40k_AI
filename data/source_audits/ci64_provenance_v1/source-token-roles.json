@@ -2,7 +2,7 @@
   "schema": "tool-input-roles-v3",
   "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "inventories_path": "data/source_audits/ci64_provenance_v1/source-token-inventories.json",
-  "inventories_sha256": "44185d455000d767fcb4236a0e37d88fb29114f09d423ad12f361de953100d07",
+  "inventories_sha256": "658669464685d9f7975f6718d03282507f0c1015da548ddcc36391f0a4c5838b",
   "roles": {
     ".github/workflows/ci.yml": "untimed-governance",
     "ci/quality_shards/all.txt": "untimed-governance",
@@ -128,7 +128,18 @@
     "data/source_audits/ci64_provenance_v1/applicability.json": "untimed-governance",
     "data/source_audits/ci64_provenance_v1/changed-members.json": "untimed-governance",
     "data/source_audits/ci64_provenance_v1/control-transitions.json": "untimed-governance",
+    "data/source_audits/ci64_provenance_v1/measurement-provenance.json": "untimed-governance",
+    "data/source_audits/ci64_provenance_v1/measurements/source-base.json": "untimed-governance",
+    "data/source_audits/ci64_provenance_v1/measurements/source-head.json": "untimed-governance",
     "data/source_audits/ci64_provenance_v1/producing-inputs.json": "untimed-governance",
+    "data/source_audits/ci64_provenance_v1/receipts/source-base-0.json": "untimed-governance",
+    "data/source_audits/ci64_provenance_v1/receipts/source-base-1.json": "untimed-governance",
+    "data/source_audits/ci64_provenance_v1/receipts/source-base-2.json": "untimed-governance",
+    "data/source_audits/ci64_provenance_v1/receipts/source-head-0.json": "untimed-governance",
+    "data/source_audits/ci64_provenance_v1/receipts/source-head-1.json": "untimed-governance",
+    "data/source_audits/ci64_provenance_v1/receipts/source-head-2.json": "untimed-governance",
+    "data/source_audits/ci64_provenance_v1/source-token-inventories.json": "untimed-governance",
+    "data/source_audits/ci64_provenance_v1/source-token-roles.json": "untimed-governance",
     "data/source_audits/cumulative_preservation_v1/accepted-source.json": "untimed-governance",
     "data/source_audits/cumulative_preservation_v1/baseline.json": "untimed-governance",
     "data/source_audits/cumulative_preservation_v1/control-transformations.json": "untimed-governance",
@@ -362,6 +373,7 @@
     "docs/performance/current/ci60-strength.json": "untimed-governance",
     "docs/performance/current/ci60-visibility.json": "untimed-governance",
     "docs/performance/current/ci61-external_contract_source_reuse.json": "untimed-governance",
+    "docs/performance/current/ci64-external_contract_source_reuse.json": "untimed-governance",
     "docs/performance/current/qualification40-dice.json": "untimed-governance",
     "docs/performance/current/qualification40-dice_sustained.json": "untimed-governance",
     "docs/performance/current/qualification40-external_contract_source_reuse.json": "untimed-governance",
@@ -528,7 +540,7 @@
     "tools/quality_runtime_successor.py": "runtime-or-generator-treatment",
     "tools/thousand_sons_perils_preservation.py": "runtime-or-generator-treatment"
   },
-  "common_sha256": "ddfb9b924fd760ac8405abdd73c192f2af9819427516c1dcbdf1d1a9a54b5d14",
+  "common_sha256": "71255a815f14597796eefef710e211fe647d4e08b6843a24dd04903625213092",
   "contract_trees": {
     "base": {
       "README.md": "f8bc470b0b2cc63503964bda1121092eb781371d48dc6ae92e5ef53676aafcce",
@@ -1011,5 +1023,5 @@
     "head": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6"
   },
   "shared_dependencies_sha256": "a2a00c5e977c7a8dcbb2188efed485d69e924d20649bc637108e43914d201f39",
-  "shared_workload_sha256": "95fc3012c5f9ed8bd714e74410d653902170a6f908514a855b70ff1281d12f9e"
+  "shared_workload_sha256": "a16b015ccb63b4336dd0d78f3aab900e07563f75ff7f17dd70778582b38fc078"
 }

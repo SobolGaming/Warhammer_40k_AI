@@ -4,17 +4,17 @@
   "workload_id": "external-contract-orphan-write-independent-check-v1",
   "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
-  "head_input_digest": "3e6970b35316493f003f507248577cbb54b23f2ad4643f61ab25e34fb97df511",
+  "head_input_digest": "494ea801c6b744a7b34866c13d65fcd7557e23a0d88d63d278db40353d80c40f",
   "budget_profile": "current-change-relative-v1",
   "historical_failures": [
     "Original CI60 complete CLI122 remains a failed180second invocation with incomplete postflight; no physical check converts it into a pass.",
-    "CI61 complete CLI045 remains a failed180second invocation and CI63 standalone preflight remains incomplete. These six original source-token samples bind native M288a4dfe; all prior source reports and eleven other families retain their actual producer identities. Final current admission and complete gates remain pending."
+    "CI61 complete CLI045 remains a failed180second invocation and CI63 standalone preflight remains incomplete. CI64 E2 complete CLI058 also remains a failed180second invocation. These six new original source-token samples bind native M3 9b445d5c6c0d1dae4c3f044bdd8086e932996d24; all prior source reports and eleven other families retain their actual producer identities. Final current admission and complete gates remain pending."
   ],
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359399936,
+      "memory_bytes": 67359404032,
       "logical_cpus": 64,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -22,12 +22,12 @@
     },
     "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be",
-    "fixture_sha256": "ddfb9b924fd760ac8405abdd73c192f2af9819427516c1dcbdf1d1a9a54b5d14",
+    "fixture_sha256": "71255a815f14597796eefef710e211fe647d4e08b6843a24dd04903625213092",
     "samples": {
       "orphan-write-independent-check": [
-        146.365,
-        147.719,
-        145.418
+        147.895,
+        147.794,
+        147.395
       ]
     },
     "completed": true,
@@ -38,7 +38,7 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359399936,
+      "memory_bytes": 67359404032,
       "logical_cpus": 64,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -46,12 +46,12 @@
     },
     "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be",
-    "fixture_sha256": "ddfb9b924fd760ac8405abdd73c192f2af9819427516c1dcbdf1d1a9a54b5d14",
+    "fixture_sha256": "71255a815f14597796eefef710e211fe647d4e08b6843a24dd04903625213092",
     "samples": {
       "orphan-write-independent-check": [
-        134.014,
-        133.735,
-        134.785
+        135.575,
+        133.963,
+        133.39
       ]
     },
     "completed": true,
@@ -62,10 +62,10 @@
     "schema": "tool-input-roles-v3",
     "family": "external_contract_source_reuse",
     "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
-    "head_input_digest": "3e6970b35316493f003f507248577cbb54b23f2ad4643f61ab25e34fb97df511",
-    "role_spec_sha256": "e1d7a6639fd4718502f0817119b6842cf1e03f5dfa240830421b48f45d0546c4",
-    "complete_inventories_sha256": "44185d455000d767fcb4236a0e37d88fb29114f09d423ad12f361de953100d07",
-    "common_sha256": "ddfb9b924fd760ac8405abdd73c192f2af9819427516c1dcbdf1d1a9a54b5d14",
+    "head_input_digest": "494ea801c6b744a7b34866c13d65fcd7557e23a0d88d63d278db40353d80c40f",
+    "role_spec_sha256": "ee9cb05e0164cf700680df6f690d3f4e5db8204628d556030efe50b51ce427f7",
+    "complete_inventories_sha256": "658669464685d9f7975f6718d03282507f0c1015da548ddcc36391f0a4c5838b",
+    "common_sha256": "71255a815f14597796eefef710e211fe647d4e08b6843a24dd04903625213092",
     "contract_trees": {
       "base": {
         "README.md": "f8bc470b0b2cc63503964bda1121092eb781371d48dc6ae92e5ef53676aafcce",
@@ -548,7 +548,7 @@
       "head": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6"
     },
     "shared_dependencies_sha256": "a2a00c5e977c7a8dcbb2188efed485d69e924d20649bc637108e43914d201f39",
-    "shared_workload_sha256": "95fc3012c5f9ed8bd714e74410d653902170a6f908514a855b70ff1281d12f9e"
+    "shared_workload_sha256": "a16b015ccb63b4336dd0d78f3aab900e07563f75ff7f17dd70778582b38fc078"
   },
   "generated_output_binding": {
     "base": [
