@@ -4,11 +4,11 @@
   "workload_id": "external-contract-orphan-write-independent-check-v1",
   "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
-  "head_input_digest": "22eb8fcaa398341a6491446a92b7c2cb42bd4943983ca02ad6a829ad5ee4a217",
+  "head_input_digest": "119c6f74f65a9b1eb677b2cce3f97f88419c8075beb5f3da0fa300ad10bb34fb",
   "budget_profile": "current-change-relative-v1",
   "historical_failures": [
     "Original CI60 complete CLI122 remains a failed180second invocation with incomplete postflight; no physical check converts it into a pass.",
-    "CI61 complete CLI045 remains a failed180second invocation and CI63 standalone preflight remains incomplete. CI64 E2 complete CLI058 also remains a failed180second invocation. CI65 E3 complete CLI051 remains a failed180second invocation; standalone diagnostic052 is component evidence only. Historical CI66 source-token samples retain their native M4 71e5f3bf45de47730bde9516aeb5680634120e54 binding. CI66 E4 complete CLI052 remains failed at180.210501606seconds and diagnostic057 remains a censored180.268147208second attempt; the current six authentic CI67 source-token samples bind native M987f9a5464763879c97bc5e14fdbeffb1f04bf22; all prior source reports and eleven other families retain their actual producer identities. Final current admission and complete gates remain pending."
+    "CI61 complete CLI045 remains a failed180second invocation and CI63 standalone preflight remains incomplete. CI64 E2 complete CLI058 also remains a failed180second invocation. CI65 E3 complete CLI051 remains a failed180second invocation; standalone diagnostic052 is component evidence only. Historical CI66 source-token samples retain their native M4 71e5f3bf45de47730bde9516aeb5680634120e54 binding. CI66 E4 complete CLI052 remains failed at180.210501606seconds and diagnostic057 remains a censored180.268147208second attempt; the historical six authentic CI67 source-token samples retain native M987f9a5464763879c97bc5e14fdbeffb1f04bf22. The current six authentic CI68 source-token samples bind native M0b439e38dfba78b627e2910e605ec295c1af1f5f; prior CI67 E complete150.771216177second success remains predecessor evidence, and its quality098 remains failed/incomplete; all prior source reports and eleven other families retain their actual producer identities. Final current admission and complete gates remain pending."
   ],
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
@@ -22,12 +22,12 @@
     },
     "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be",
-    "fixture_sha256": "89aeecfe4f0d9ae6f04aba8d88162623cba25cc6f0cbcd3b7eabeb1e71d0fa49",
+    "fixture_sha256": "8af1e7abd051eca641bf4456e91502903e2f2ec9256acd855bef36120e197a86",
     "samples": {
       "orphan-write-independent-check": [
-        148.151,
-        147.125,
-        148.618
+        152.877,
+        153.276,
+        153.797
       ]
     },
     "completed": true,
@@ -46,12 +46,12 @@
     },
     "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be",
-    "fixture_sha256": "89aeecfe4f0d9ae6f04aba8d88162623cba25cc6f0cbcd3b7eabeb1e71d0fa49",
+    "fixture_sha256": "8af1e7abd051eca641bf4456e91502903e2f2ec9256acd855bef36120e197a86",
     "samples": {
       "orphan-write-independent-check": [
-        134.748,
-        136.322,
-        134.7
+        139.975,
+        138.946,
+        138.805
       ]
     },
     "completed": true,
@@ -62,10 +62,10 @@
     "schema": "tool-input-roles-v3",
     "family": "external_contract_source_reuse",
     "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
-    "head_input_digest": "22eb8fcaa398341a6491446a92b7c2cb42bd4943983ca02ad6a829ad5ee4a217",
-    "role_spec_sha256": "0a4fad07ddc9976205245a9e80978800eedf4590b449097abc3acdf4df4d9086",
-    "complete_inventories_sha256": "0bf97fd26180caa2d5f97a4003f24cc8529e6466ae17a9518619f6adbe27353e",
-    "common_sha256": "89aeecfe4f0d9ae6f04aba8d88162623cba25cc6f0cbcd3b7eabeb1e71d0fa49",
+    "head_input_digest": "119c6f74f65a9b1eb677b2cce3f97f88419c8075beb5f3da0fa300ad10bb34fb",
+    "role_spec_sha256": "a90911c4e558753297ecd693369ca6d144d3ec887292d0d9b113e4648a0598f5",
+    "complete_inventories_sha256": "39a585277aa11363a0c88a7b11c70a2831f7e83f72bada0807d761e78f775496",
+    "common_sha256": "8af1e7abd051eca641bf4456e91502903e2f2ec9256acd855bef36120e197a86",
     "contract_trees": {
       "base": {
         "README.md": "f8bc470b0b2cc63503964bda1121092eb781371d48dc6ae92e5ef53676aafcce",
@@ -548,7 +548,7 @@
       "head": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6"
     },
     "shared_dependencies_sha256": "a2a00c5e977c7a8dcbb2188efed485d69e924d20649bc637108e43914d201f39",
-    "shared_workload_sha256": "afa16b5b00666d506ebf2040626d38add2846b5f6d6b352c364b1cfc56c1d9a7"
+    "shared_workload_sha256": "237fbbe23285a2d2e8d5d047b200c9a9e8ce7849804343af420ff4bae35c120c"
   },
   "generated_output_binding": {
     "base": [

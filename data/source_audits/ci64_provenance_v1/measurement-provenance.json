@@ -1,25 +1,25 @@
 {
   "external_contract_source_reuse": {
     "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
-    "head_input_digest": "22eb8fcaa398341a6491446a92b7c2cb42bd4943983ca02ad6a829ad5ee4a217",
-    "producing_head": "987f9a5464763879c97bc5e14fdbeffb1f04bf22",
+    "head_input_digest": "119c6f74f65a9b1eb677b2cce3f97f88419c8075beb5f3da0fa300ad10bb34fb",
+    "producing_head": "0b439e38dfba78b627e2910e605ec295c1af1f5f",
     "base": {
       "path": "data/source_audits/ci64_provenance_v1/measurements/source-base.json",
-      "sha256": "fc9cafe520b7b87d93f8713d96b255b032f2c300749b93648b93c7915eaef96e",
-      "canonical_sha256": "ccb8d20dab91233c8813b3536aa196b375f03bdcf27eb4258bf537e021ddf721",
+      "sha256": "0d12e902cefaddb2b4dab2488de0f483bc8fec7e69a100630284ce2a233dabf9",
+      "canonical_sha256": "83fa475d96886139edc0c030858d68781fbeda0155cb98f1f23b1a16a15c88e3",
       "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
       "samples": {
         "orphan-write-independent-check": [
-          148.151,
-          147.125,
-          148.618
+          152.877,
+          153.276,
+          153.797
         ]
       },
       "completed": true,
       "native_attempt_names": [
-        "060-source-base-0",
-        "062-source-base-1",
-        "064-source-base-2"
+        "113-ci68-source-base-0",
+        "115-ci68-source-base-1",
+        "117-ci68-source-base-2"
       ],
       "receipt_paths": [
         "data/source_audits/ci64_provenance_v1/receipts/source-base-0.json",
@@ -37,21 +37,21 @@
     },
     "head": {
       "path": "data/source_audits/ci64_provenance_v1/measurements/source-head.json",
-      "sha256": "a940c114af400c4d991f6dc858c91d8e01056c137ed338ac98096c7a37dd3918",
-      "canonical_sha256": "eb4f2164fab81f62abf1bfd9dc9f6ab03adf5059c44e685d34dfd7edf8ab0560",
+      "sha256": "9df9e6d0ef8002ac3b1f357b77166fe918add4adef49d681cfac0acb8c107cad",
+      "canonical_sha256": "2e6f8794069ef32a30d835ae71516812470e8234d64661bb97fc0c3b8e3d67be",
       "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
       "samples": {
         "orphan-write-independent-check": [
-          134.748,
-          136.322,
-          134.7
+          139.975,
+          138.946,
+          138.805
         ]
       },
       "completed": true,
       "native_attempt_names": [
-        "061-source-head-0",
-        "063-source-head-1",
-        "065-source-head-2"
+        "114-ci68-source-head-0",
+        "116-ci68-source-head-1",
+        "118-ci68-source-head-2"
       ],
       "receipt_paths": [
         "data/source_audits/ci64_provenance_v1/receipts/source-head-0.json",
