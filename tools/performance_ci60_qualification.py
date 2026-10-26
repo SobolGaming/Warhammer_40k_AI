@@ -21,6 +21,9 @@ ASSESSMENT = "docs/performance/change-assessment.json"
 MAP = "docs/performance/policy-v3/operation-map.json"
 FREEZE: str | None = "1cbbebf5e1a6a72d6e7a5c456ce24ff6770bd2b1"
 SUPERSEDED_REPORTS: dict[str, str] = {
+    "docs/performance/current/ci61-external_contract_source_reuse.json": (
+        "a0fcf49e675f1d0ce978ea67ee93e08d44d2bcf475a45b904d28a6871a13fab2"
+    ),
     "docs/performance/current/ci60-external_contract_source_reuse.json": (
         "71ed8f56225c81b161673685fa3010215601c6ad72bfa8b4552f7389d88a4c5b"
     ),
@@ -162,6 +165,199 @@ DERIVATION_INPUTS = frozenset(
 )
 
 
+PRELUDE_BASE = "620cbe91ae3ddd356eaf7effa7455b931882a39e"
+PRELUDE_NAMESPACE = "data/source_audits/ci64_provenance_v1"
+PRELUDE_FREEZE: str | None = None
+PRELUDE_REPORT = "docs/performance/current/ci64-external_contract_source_reuse.json"
+PRELUDE_CONTROLS = frozenset(
+    {
+        SELF,
+        "tools/performance_policy.py",
+        "tools/performance_preflight.py",
+        "tests/code_quality/test_performance_policy.py",
+        "tests/code_quality/test_performance_preflight.py",
+        DERIVATION_TEST,
+        "ci/quality_shards/all.txt",
+        "ci/quality_shards/shard-1.txt",
+        "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
+        ASSESSMENT,
+        MAP,
+    }
+)
+PRELUDE_NEW = frozenset(
+    {
+        "docs/CI64_PROVENANCE_SCOPE.md",
+        PRELUDE_REPORT,
+        *(
+            PRELUDE_NAMESPACE + "/" + name
+            for name in (
+                "changed-members.json",
+                "control-transitions.json",
+                "applicability.json",
+                "producing-inputs.json",
+                "source-token-roles.json",
+                "source-token-inventories.json",
+                "measurement-provenance.json",
+                "measurements/source-base.json",
+                "measurements/source-head.json",
+                "receipts/source-base-0.json",
+                "receipts/source-base-1.json",
+                "receipts/source-base-2.json",
+                "receipts/source-head-0.json",
+                "receipts/source-head-1.json",
+                "receipts/source-head-2.json",
+            )
+        ),
+    }
+)
+PRELUDE_MEMBERS = PRELUDE_CONTROLS | PRELUDE_NEW
+PRELUDE_INPUTS = frozenset(
+    {
+        SELF,
+        "tools/performance_policy.py",
+        "tools/performance_preflight.py",
+        "tests/code_quality/test_performance_policy.py",
+        "tests/code_quality/test_performance_preflight.py",
+        DERIVATION_TEST,
+        MAP,
+    }
+)
+
+
+def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
+    """One exact CI64 proof over already acquired bytes; no observation or cache."""
+    from tools.performance_policy import owner_hashes
+
+    values = {name: raw for name, _, raw in operands}
+    freeze = values["next-freeze"].decode()
+    names = json.loads(values["next-selection"])
+    frozen = {name[12:]: raw for name, _, raw in operands if name.startswith("next-frozen/")}
+    previous = {name[14:]: raw for name, _, raw in operands if name.startswith("next-previous/")}
+    extra = {name[13:]: raw for name, _, raw in operands if name.startswith("next-current/")}
+    observations = [
+        (name.split("/", 1)[1], raw)
+        for name, _, raw in operands
+        if name.startswith(("current/", "observed/"))
+    ]
+    actual = dict(observations) | extra
+    if (
+        set(names) != PRELUDE_MEMBERS
+        or len(names) != len(PRELUDE_MEMBERS)
+        or set(frozen) != PRELUDE_MEMBERS
+        or set(previous) != PRELUDE_CONTROLS
+        or set(extra) != PRELUDE_NEW
+        or json.loads(frozen[PRELUDE_NAMESPACE + "/changed-members.json"]) != sorted(names)
+    ):
+        raise ValueError("CI64 finite source membership changed.")
+    record = json.loads(frozen[PRELUDE_NAMESPACE + "/control-transitions.json"])
+    if (
+        record.keys() != {"schema", "base", "changes"}
+        or record["schema"] != "ci64-exact-provenance-v1"
+        or record["base"] != PRELUDE_BASE
+        or record["changes"].keys() != PRELUDE_CONTROLS - {ASSESSMENT}
+    ):
+        raise ValueError("CI64 exact transition membership changed.")
+    for name, row in record["changes"].items():
+        if (
+            row.keys() != {"before_sha256", "after_sha256", "edits"}
+            or digest(previous[name]) != row["before_sha256"]
+            or digest(frozen[name]) != row["after_sha256"]
+        ):
+            raise ValueError("CI64 exact transition source changed.")
+        projected = previous[name]
+        for edit in row["edits"]:
+            if edit.keys() != {"before", "after"} or not all(
+                isinstance(value, str) and value for value in edit.values()
+            ):
+                raise ValueError("CI64 exact transition edit changed.")
+            before, after = edit["before"].encode(), edit["after"].encode()
+            if projected.count(before) != 1:
+                raise ValueError("CI64 exact transition lacks one preimage.")
+            projected = projected.replace(before, after, 1)
+        if projected != frozen[name]:
+            raise ValueError("CI64 source changed outside reviewed edits.")
+    marker = b"\nPRELUDE_FREEZE: str | None = None"
+    activated = f'\nPRELUDE_FREEZE: str | None = "{freeze}"'.encode()
+    if frozen[SELF].count(marker) != 1:
+        raise ValueError("CI64 original activation changed.")
+    expected = frozen | {SELF: frozen[SELF].replace(marker, activated, 1)}
+    assessment = json.loads(frozen[ASSESSMENT])
+    row = assessment["changes"][SELF]
+    row["after_sha256"] = digest(expected[SELF])
+    row["owners"]["@module"]["after"] = owner_hashes(SELF, expected[SELF])["@module"]
+    if (
+        json.loads(actual[ASSESSMENT]) != assessment
+        or json.loads(values["assessment-first"]) != assessment
+        or values["assessment-second"] != actual[ASSESSMENT]
+    ):
+        raise ValueError("CI64 assessment changed outside exact activation.")
+    expected[ASSESSMENT] = actual[ASSESSMENT]
+    if {name: actual[name] for name in PRELUDE_MEMBERS} != expected:
+        raise ValueError("CI64 Preflight source changed.")
+    for name, raw in observations:
+        if name in expected and raw != expected[name]:
+            raise ValueError("CI64 Preflight source changed between observations: " + name)
+    old_map, new_map = json.loads(previous[MAP]), json.loads(frozen[MAP])
+    if {key: value for key, value in old_map.items() if key != "operations"} != {
+        key: value for key, value in new_map.items() if key != "operations"
+    } or any(
+        new_map["operations"].get(key) != value for key, value in old_map["operations"].items()
+    ):
+        raise ValueError("CI64 changed an existing operation, family or budget.")
+    for name in new_map["operations"].keys() - old_map["operations"].keys():
+        operation = new_map["operations"][name]
+        if (
+            operation["mandatory"] is not True
+            or len(operation["paths"]) != 1
+            or operation["paths"][0] not in PRELUDE_INPUTS | PRELUDE_NEW
+            or any(
+                any(char in item for char in "*?[")
+                for item in operation["paths"] + operation["owners"]
+            )
+        ):
+            raise ValueError("CI64 new operation must be finite, literal and mandatory.")
+    return previous
+
+
+def _current_derivation_transition(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+    """Compose two finite pure proofs in the existing single admission entry."""
+    previous = _prelude_transition(operands)
+    projected = []
+    for name, mode, raw in operands:
+        if name.startswith(("current/", "observed/")):
+            raw = previous.get(name.split("/", 1)[1], raw)
+        elif name in {"assessment-first", "assessment-second"}:
+            raw = previous[ASSESSMENT]
+        if not name.startswith("next-"):
+            projected.append((name, mode, raw))
+    _derivation_transition(tuple(projected), identity)
+
+
+def _prelude_preimage(actual: dict[str, bytes], name: str) -> bytes:
+    """Reverse only an already authenticated exact control recipe to native E61."""
+    if name not in PRELUDE_CONTROLS - {ASSESSMENT}:
+        return actual[name]
+    record = json.loads(actual[PRELUDE_NAMESPACE + "/control-transitions.json"])
+    row = record["changes"][name]
+    raw = actual[name]
+    if name == SELF:
+        activated = f'\nPRELUDE_FREEZE: str | None = "{PRELUDE_FREEZE}"'.encode()
+        marker = b"\nPRELUDE_FREEZE: str | None = None"
+        if raw.count(activated) != 1:
+            raise ValueError("CI64 producing SELF is not the exact unactivated frozen source.")
+        raw = raw.replace(activated, marker, 1)
+    if digest(raw) != row["after_sha256"]:
+        raise ValueError("CI64 authenticated control source changed.")
+    for edit in reversed(row["edits"]):
+        before, after = edit["before"].encode(), edit["after"].encode()
+        if not before or not after or raw.count(after) != 1:
+            raise ValueError("CI64 exact control transition changed.")
+        raw = raw.replace(after, before, 1)
+    if digest(raw) != row["before_sha256"]:
+        raise ValueError("CI64 native predecessor changed.")
+    return raw
+
+
 def _derivation_transition(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
     """Authenticate the finite E-to-CI61 source; original CI60 objects stay original."""
     from tools.performance_policy import owner_hashes
@@ -282,7 +478,46 @@ def _derivation_source(
     frozen = read_frozen_blobs(root, freeze, names)
     previous = read_frozen_blobs(root, DERIVATION_BASE, sorted(DERIVATION_CONTROLS))
     current = source_members(root, list(frozen))
+    # Preserve the complete original fourth scan, including its final directory
+    # observations, before acquiring the seventeen genuinely new live members.
+    next_freeze = PRELUDE_FREEZE
+    if next_freeze is None or len(next_freeze) != 40 or set(next_freeze) - set("0123456789abcdef"):
+        raise ValueError("CI64 provenance source freeze is pending.")
+    history(root, "merge-base", "--is-ancestor", PRELUDE_BASE, next_freeze)
+    git(root, "merge-base", "--is-ancestor", next_freeze, "HEAD")
+    next_names = (
+        history(root, "diff", "--name-only", PRELUDE_BASE, next_freeze).decode().splitlines()
+    )
+    if set(next_names) != PRELUDE_MEMBERS or len(next_names) != len(PRELUDE_MEMBERS):
+        raise ValueError("CI64 finite source membership changed.")
+    next_frozen = read_frozen_blobs(root, next_freeze, next_names)
+    next_previous = read_frozen_blobs(root, PRELUDE_BASE, sorted(PRELUDE_CONTROLS))
+    extra_names = [name for name in next_frozen if name in PRELUDE_NEW]
+    extra = source_members(root, extra_names)
     operands = (
+        ("next-freeze", 0, next_freeze.encode()),
+        ("next-selection", 0, json.dumps(next_names, separators=(",", ":")).encode()),
+        (
+            "next-selectors",
+            0,
+            json.dumps(
+                [
+                    PRELUDE_BASE,
+                    PRELUDE_NAMESPACE,
+                    SELF,
+                    ASSESSMENT,
+                    MAP,
+                    sorted(PRELUDE_CONTROLS),
+                    sorted(PRELUDE_MEMBERS),
+                    sorted(PRELUDE_NEW),
+                    sorted(PRELUDE_INPUTS),
+                ],
+                separators=(",", ":"),
+            ).encode(),
+        ),
+        *(("next-frozen/" + name, 0, raw) for name, raw in next_frozen.items()),
+        *(("next-previous/" + name, 0, raw) for name, raw in next_previous.items()),
+        *(("next-current/" + name, mode, raw) for name, mode, raw in extra),
         ("freeze", 0, freeze.encode()),
         ("selection", 0, json.dumps(names, separators=(",", ":")).encode()),
         (
@@ -310,21 +545,31 @@ def _derivation_source(
         ("assessment-second", second[1], second[2]),
     )
     admission_proof(
-        _derivation_transition,
+        _current_derivation_transition,
         operands,
         proof_identity(root),
-        (digest, hashlib.sha256, json.loads, owner_hashes),
+        (
+            digest,
+            hashlib.sha256,
+            json.loads,
+            owner_hashes,
+            _prelude_transition,
+            _derivation_transition,
+        ),
     )
-    return {name: raw for name, _, raw in current}, previous
+    return (
+        {name: raw for name, _, raw in current + extra},
+        next_previous | previous,
+    )
 
 
-def _preceding_self(actual: dict[str, bytes]) -> bytes:
+def _preceding_self(actual: dict[str, bytes], *, historical_ci61: bool = False) -> bytes:
     """Exact native E preimage already authenticated by the finite transition."""
     record = json.loads(actual[DERIVATION_NAMESPACE + "/control-transitions.json"])
     row = record["changes"][SELF]
     activated = f'\nDERIVATION_FREEZE: str | None = "{DERIVATION_FREEZE}"'.encode()
     marker = b"\nDERIVATION_FREEZE: str | None = None"
-    raw = actual[SELF]
+    raw = actual[SELF] if historical_ci61 else _prelude_preimage(actual, SELF)
     if raw.count(activated) != 1:
         raise ValueError("CI61 producing SELF is not the exact unactivated frozen source.")
     raw = raw.replace(activated, marker, 1)
@@ -454,8 +699,10 @@ def control_projection(root: Path) -> dict[str, bytes]:
     from tools.performance_preflight_successor import read_frozen_blobs
 
     admitted(root)
-    return read_frozen_blobs(root, BASE, sorted(CONTROLS)) | read_frozen_blobs(
-        root, DERIVATION_BASE, sorted(DERIVATION_CONTROLS - CONTROLS - {SELF})
+    return (
+        read_frozen_blobs(root, PRELUDE_BASE, sorted(PRELUDE_CONTROLS - {SELF}))
+        | read_frozen_blobs(root, BASE, sorted(CONTROLS))
+        | read_frozen_blobs(root, DERIVATION_BASE, sorted(DERIVATION_CONTROLS - CONTROLS - {SELF}))
     )
 
 
@@ -463,7 +710,7 @@ def preceding_control(root: Path, name: str, supplied: bytes) -> bytes:
     if name == CURRENT_INVENTORY and (root / NAMESPACE).is_dir():
         return historical_inventory_preimage(root, supplied)
     if name not in CONTROLS:
-        if name in DERIVATION_CONTROLS - {SELF}:
+        if name in (DERIVATION_CONTROLS | PRELUDE_CONTROLS) - {SELF}:
             actual = owned(root, name)
             if supplied != actual:
                 raise ValueError("CI61 predecessor caller supplied unrelated bytes.")
@@ -532,7 +779,7 @@ def measurement_controls(root: Path, current: dict[str, str]) -> dict[str, str]:
     actual = admitted(root)
     projected = control_projection(root)
     result = dict(current)
-    for name in (DERIVATION_CONTROLS - CONTROLS - {SELF}) & current.keys():
+    for name in ((DERIVATION_CONTROLS | PRELUDE_CONTROLS) - CONTROLS - {SELF}) & current.keys():
         if current[name] != digest(actual[name]):
             raise ValueError("CI61 actual input collector omitted current control bytes.")
         result[name] = digest(projected[name])
@@ -558,7 +805,7 @@ def _cohort(actual: dict[str, bytes]) -> dict[str, Any]:
         or sum(len(row["cases"]) * row["samples_per_case"] for row in families.values()) != 247
     ):
         raise ValueError("CI60 Qualification family inventory changed.")
-    families["external_contract_source_reuse"]["comparison"] = DERIVATION_REPORT
+    families["external_contract_source_reuse"]["comparison"] = PRELUDE_REPORT
     return families
 
 
@@ -574,11 +821,13 @@ def producing_inputs(root: Path, current: dict[str, str]) -> dict[str, str]:
     return _producing_inputs(admitted(root), current)
 
 
-def _original_producing_inputs(actual: dict[str, bytes]) -> dict[str, str]:
+def _original_producing_inputs(
+    actual: dict[str, bytes], *, historical_ci61: bool = False
+) -> dict[str, str]:
     measured: dict[str, str] = json.loads(actual[NAMESPACE + "/producing-inputs.json"])
     activated = f'\nFREEZE: str | None = "{FREEZE}"'.encode()
     marker = b"\nFREEZE: str | None = None"
-    original = _preceding_self(actual)
+    original = _preceding_self(actual, historical_ci61=historical_ci61)
     if original.count(activated) != 1 or measured.get(SELF) != digest(
         original.replace(activated, marker, 1)
     ):
@@ -586,8 +835,8 @@ def _original_producing_inputs(actual: dict[str, bytes]) -> dict[str, str]:
     return measured
 
 
-def _producing_inputs(actual: dict[str, bytes], current: dict[str, str]) -> dict[str, str]:
-    _original_producing_inputs(actual)
+def _ci61_producing_inputs(actual: dict[str, bytes], current: dict[str, str]) -> dict[str, str]:
+    _original_producing_inputs(actual, historical_ci61=True)
     measured: dict[str, str] = json.loads(actual[DERIVATION_NAMESPACE + "/producing-inputs.json"])
     activated = f'\nDERIVATION_FREEZE: str | None = "{DERIVATION_FREEZE}"'.encode()
     marker = b"\nDERIVATION_FREEZE: str | None = None"
@@ -600,12 +849,97 @@ def _producing_inputs(actual: dict[str, bytes], current: dict[str, str]) -> dict
     return measured
 
 
+def _ci61_view(actual: dict[str, bytes]) -> dict[str, bytes]:
+    """Exact E61 control bytes for the original pure CI61 producing proof."""
+    return actual | {
+        name: _prelude_preimage(actual, name) for name in PRELUDE_CONTROLS - {ASSESSMENT}
+    }
+
+
+def _producing_inputs(actual: dict[str, bytes], current: dict[str, str]) -> dict[str, str]:
+    historical = _ci61_view(actual)
+    previous: dict[str, str] = json.loads(actual[DERIVATION_NAMESPACE + "/producing-inputs.json"])
+    _ci61_producing_inputs(historical, previous | {SELF: digest(historical[SELF])})
+    measured: dict[str, str] = json.loads(actual[PRELUDE_NAMESPACE + "/producing-inputs.json"])
+    activated = f'\nPRELUDE_FREEZE: str | None = "{PRELUDE_FREEZE}"'.encode()
+    marker = b"\nPRELUDE_FREEZE: str | None = None"
+    if actual[SELF].count(activated) != 1 or measured.get(SELF) != digest(
+        actual[SELF].replace(activated, marker, 1)
+    ):
+        raise ValueError("CI64 producing SELF is not the exact unactivated frozen source.")
+    if current != measured | {SELF: digest(actual[SELF])}:
+        raise ValueError("CI64 complete producing inputs differ from the actual current collector.")
+    return measured
+
+
+def _prelude_applicability(
+    actual: dict[str, bytes], current: dict[str, str], family: str
+) -> dict[str, Any]:
+    """The seven current collector changes compose with authenticated CI61 applicability."""
+    produced = _producing_inputs(actual, current)
+    previous: dict[str, str] = json.loads(actual[DERIVATION_NAMESPACE + "/producing-inputs.json"])
+    historical = _ci61_view(actual)
+    old_proof = _current_applicability(
+        historical, previous | {SELF: digest(historical[SELF])}, family
+    )
+    proof: dict[str, Any] = json.loads(actual[PRELUDE_NAMESPACE + "/applicability.json"])
+    families = _cohort(actual)
+    selected = set(families) - {"external_contract_source_reuse"}
+    changed = {
+        name: {"before": previous.get(name), "after": produced.get(name)}
+        for name in previous.keys() | produced.keys()
+        if previous.get(name) != produced.get(name)
+    }
+    unchanged = {name: pin for name, pin in previous.items() if produced.get(name) == pin}
+    if (
+        proof.keys()
+        != {
+            "schema",
+            "original_input_digest",
+            "current_producing_input_digest",
+            "previous_applicability_sha256",
+            "changes",
+            "unchanged_inputs",
+            "families",
+        }
+        or proof["schema"] != "ci64-finite-current-applicability-v1"
+        or proof["original_input_digest"] != canonical(previous)
+        or proof["current_producing_input_digest"] != canonical(produced)
+        or proof["previous_applicability_sha256"] != canonical(old_proof)
+        or proof["changes"] != changed
+        or changed.keys() != PRELUDE_INPUTS
+        or previous.keys() != produced.keys()
+        or proof["unchanged_inputs"] != unchanged
+        or set(proof["families"]) != selected
+        or family not in selected
+    ):
+        raise ValueError("CI64 complete current applicability changed.")
+    for name, row in proof["families"].items():
+        required = {
+            families[name]["driver"],
+            "tests/conftest.py",
+            "tests/__init__.py",
+            "tests/timing_plugin.py",
+            "pyproject.toml",
+            "uv.lock",
+        }
+        if (
+            row.keys() != {"driver", "unchanged_startup", "call_path"}
+            or row["driver"] != families[name]["driver"]
+            or row["unchanged_startup"] != {path: unchanged[path] for path in sorted(required)}
+            or not isinstance(row["call_path"], str)
+            or not row["call_path"]
+        ):
+            raise ValueError("CI64 timed consumer/startup proof changed.")
+    return proof
+
+
 def _current_applicability(
     actual: dict[str, bytes], current: dict[str, str], family: str
 ) -> dict[str, Any]:
     """Complete current inputs differ only in the finite uncalled provenance controls."""
-    produced = _producing_inputs(actual, current)
-    previous = _original_producing_inputs(actual)
+    produced = _ci61_producing_inputs(actual, current)
+    previous = _original_producing_inputs(actual, historical_ci61=True)
     proof: dict[str, Any] = json.loads(actual[DERIVATION_NAMESPACE + "/applicability.json"])
     families = _cohort(actual)
     selected = set(families) - {"external_contract_source_reuse"}
@@ -692,9 +1026,29 @@ def extend_catalog(builder: Any) -> None:
     earlier = set(builder.all_paths("plain60", BASE)) & set(changed)
     builder.add("plain60", BASE, dict.fromkeys(earlier), "ci61.source-preimages")
 
+    prelude = PRELUDE_FREEZE
+    if prelude is None:
+        raise ValueError("CI64 provenance catalog freeze is pending.")
+    builder.fact("plain60", ("merge-base", "--is-ancestor", PRELUDE_BASE, prelude), "ci64.ancestry")
+    changed = (
+        builder.fact("plain60", ("diff", "--name-only", PRELUDE_BASE, prelude), "ci64.membership")
+        .decode()
+        .splitlines()
+    )
+    if set(changed) != PRELUDE_MEMBERS or len(changed) != len(PRELUDE_MEMBERS):
+        raise ValueError("CI64 native catalog membership changed.")
+    builder.add("plain60", prelude, dict.fromkeys(changed), "ci64.freeze")
+    builder.add("plain60", PRELUDE_BASE, dict.fromkeys(PRELUDE_CONTROLS), "ci64.preimages")
+    earlier = set(builder.all_paths("plain60", BASE)) & set(changed)
+    builder.add("plain60", BASE, dict.fromkeys(earlier), "ci64.source-preimages")
 
-def source_binding(actual: dict[str, bytes], input_digest: str) -> dict[str, Any]:
-    spec = json.loads(actual[DERIVATION_NAMESPACE + "/source-token-roles.json"])
+
+def source_binding(
+    actual: dict[str, bytes], input_digest: str, *, namespace: str = PRELUDE_NAMESPACE
+) -> dict[str, Any]:
+    if namespace not in {DERIVATION_NAMESPACE, PRELUDE_NAMESPACE}:
+        raise ValueError("Source-token namespace is not an admitted finite cohort.")
+    spec = json.loads(actual[namespace + "/source-token-roles.json"])
     inventories = json.loads(actual[spec["inventories_path"]])
     before, after = inventories["base"], inventories["head"]
     common = {name: pin for name, pin in before.items() if after.get(name) == pin}
@@ -793,7 +1147,7 @@ def measurement(
     plan = families[family]
     applicability = None
     if family != "external_contract_source_reuse":
-        applicability = _current_applicability(actual, current, family)
+        applicability = _prelude_applicability(actual, current, family)
         inputs = _original_producing_inputs(actual)
     qualified_inputs = inputs
     binding = None
@@ -829,7 +1183,7 @@ def measurement(
         if set(provenance) != set(families) - RETAINED:
             raise ValueError("CI60 fresh family provenance membership changed.")
         if family == "external_contract_source_reuse":
-            provenance = json.loads(actual[DERIVATION_NAMESPACE + "/measurement-provenance.json"])
+            provenance = json.loads(actual[PRELUDE_NAMESPACE + "/measurement-provenance.json"])
             if set(provenance) != {"external_contract_source_reuse"}:
                 raise ValueError("CI61 fresh source-token provenance membership changed.")
         row = provenance[family]
@@ -867,7 +1221,7 @@ def measurement(
             if receipt["exit_code"] != 0 or receipt["timeout"] or receipt["source_drift"]:
                 raise ValueError("CI60 measured arm failed or changed source.")
     if family == "external_contract_source_reuse":
-        binding = source_binding(actual, canonical(inputs))
+        binding = source_binding(actual, canonical(inputs), namespace=PRELUDE_NAMESPACE)
         if report["input_binding"] != binding:
             raise ValueError("CI60 source-token report has unrelated complete roles.")
         roles.validate_generated_evidence(report["generated_output_binding"], binding)

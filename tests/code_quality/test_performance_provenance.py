@@ -17,6 +17,7 @@ class _Storage(Protocol):
     limit: int
     retained: int
     active: bool
+    admissions: dict[tuple[Any, ...], AdmissionOperands]
 
     def digest(self, path: str, raw: bytes) -> str: ...
 
@@ -460,6 +461,19 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
             second = ci60.admitted(root)
             assert observations[start:] == first_observations
             assert computations == ["transition", "original"]
+            latest_names = (
+                ci60.history(
+                    root, "diff", "--name-only", ci60.PRELUDE_BASE, str(ci60.PRELUDE_FREEZE)
+                )
+                .decode()
+                .splitlines()
+            )
+            expected_new = tuple(name for name in latest_names if name in ci60.PRELUDE_NEW)
+            assert len(first_observations) == 5
+            assert len(expected_new) == 17
+            assert first_observations[4] == expected_new
+            assert sum(map(len, first_observations)) == 153
+            first_observations = first_observations[:4]
             original_names = (
                 ci60.history(root, "diff", "--name-only", ci60.BASE, str(ci60.FREEZE))
                 .decode()
@@ -692,7 +706,9 @@ def test_source_token_binding_rejects_changed_finite_provenance(changed: str) ->
     spec_path = ci60.DERIVATION_NAMESPACE + "/source-token-roles.json"
     spec["inventories_path"] = ci60.DERIVATION_NAMESPACE + "/source-token-inventories.json"
     actual = {spec_path: json.dumps(spec).encode(), spec["inventories_path"]: inventories}
-    original = ci60.source_binding(actual, "test-producing-digest")
+    original = ci60.source_binding(
+        actual, "test-producing-digest", namespace=ci60.DERIVATION_NAMESPACE
+    )
     assert original["family"] == "external_contract_source_reuse"
     if changed == "inventories":
         altered = json.loads(inventories)
@@ -705,7 +721,7 @@ def test_source_token_binding_rejects_changed_finite_provenance(changed: str) ->
         spec["base_revision"] = "0" * 40
         actual[spec_path] = json.dumps(spec).encode()
     with pytest.raises(ValueError, match="complete source-token input roles changed"):
-        ci60.source_binding(actual, "test-producing-digest")
+        ci60.source_binding(actual, "test-producing-digest", namespace=ci60.DERIVATION_NAMESPACE)
 
 
 @pytest.mark.parametrize("changed", ["runtime", "dependency", "startup-drop", "startup-pin"])
@@ -716,6 +732,10 @@ def test_activated_native_applicability_rejects_false_equivalence(changed: str) 
 
     root = Path(__file__).resolve().parents[2]
     actual = ci60.admitted(root)
+    from tools.performance_preflight_successor import read_frozen_blobs
+
+    # Preserve the original CI61 negative fixture explicitly as native E61 data.
+    actual = read_frozen_blobs(root, ci60.PRELUDE_BASE, sorted(actual.keys() - ci60.PRELUDE_NEW))
     producing_name = ci60.DERIVATION_NAMESPACE + "/producing-inputs.json"
     proof_name = ci60.DERIVATION_NAMESPACE + "/applicability.json"
     produced = json.loads(actual[producing_name])
@@ -740,3 +760,248 @@ def test_activated_native_applicability_rejects_false_equivalence(changed: str) 
     actual[proof_name] = json.dumps(proof).encode()
     with pytest.raises(ValueError, match=r"applicability changed|consumer/startup proof changed"):
         _Ci60Mechanisms.applicability(stage, actual, current, "dice")
+
+
+class _Ci64Mechanisms(Protocol):
+    def _prelude_transition(self, operands: AdmissionOperands) -> dict[str, bytes]: ...
+    def _prelude_applicability(
+        self, actual: dict[str, bytes], current: dict[str, str], family: str
+    ) -> dict[str, Any]: ...
+    def _producing_inputs(
+        self, actual: dict[str, bytes], current: dict[str, str]
+    ) -> dict[str, str]: ...
+
+    def transition(self, operands: AdmissionOperands) -> dict[str, bytes]:
+        return self._prelude_transition(operands)
+
+    def applicability(
+        self, actual: dict[str, bytes], current: dict[str, str], family: str
+    ) -> dict[str, Any]:
+        return self._prelude_applicability(actual, current, family)
+
+    def producing(self, actual: dict[str, bytes], current: dict[str, str]) -> dict[str, str]:
+        return self._producing_inputs(actual, current)
+
+
+@pytest.fixture(scope="module")
+def ci64_pure_transition_operands() -> AdmissionOperands:
+    """Native E61 preimages and explicitly synthetic records test the pure proof only."""
+    import json
+
+    from tools import performance_ci60_qualification as ci60
+    from tools.performance_policy import owner_hashes
+    from tools.performance_preflight_successor import read_frozen_blobs
+
+    root = Path(__file__).resolve().parents[2]
+    previous = read_frozen_blobs(root, ci60.PRELUDE_BASE, sorted(ci60.PRELUDE_CONTROLS))
+    frozen = dict.fromkeys(sorted(ci60.PRELUDE_MEMBERS), b"{}\n") | previous
+    frozen[ci60.SELF] = (root / ci60.SELF).read_bytes()
+    marker = b"\nPRELUDE_FREEZE: str | None = None"
+    active = f'\nPRELUDE_FREEZE: str | None = "{ci60.PRELUDE_FREEZE}"'.encode()
+    if marker not in frozen[ci60.SELF]:
+        frozen[ci60.SELF] = frozen[ci60.SELF].replace(active, marker, 1)
+    names = sorted(frozen)
+    frozen[ci60.PRELUDE_NAMESPACE + "/changed-members.json"] = json.dumps(names).encode()
+    transitions = {
+        "schema": "ci64-exact-provenance-v1",
+        "base": ci60.PRELUDE_BASE,
+        "changes": {
+            name: {
+                "before_sha256": ci60.digest(previous[name]),
+                "after_sha256": ci60.digest(frozen[name]),
+                "edits": [{"before": previous[name].decode(), "after": frozen[name].decode()}],
+            }
+            for name in sorted(previous.keys() - {ci60.ASSESSMENT})
+        },
+    }
+    frozen[ci60.PRELUDE_NAMESPACE + "/control-transitions.json"] = json.dumps(transitions).encode()
+    freeze = "2" * 40
+    current = frozen | {
+        ci60.SELF: frozen[ci60.SELF].replace(
+            marker, f'\nPRELUDE_FREEZE: str | None = "{freeze}"'.encode(), 1
+        )
+    }
+    assessment = json.loads(frozen[ci60.ASSESSMENT])
+    assessment["changes"][ci60.SELF]["after_sha256"] = ci60.digest(current[ci60.SELF])
+    assessment["changes"][ci60.SELF]["owners"]["@module"]["after"] = owner_hashes(
+        ci60.SELF, current[ci60.SELF]
+    )["@module"]
+    current[ci60.ASSESSMENT] = json.dumps(assessment).encode()
+    return (
+        ("next-freeze", 0, freeze.encode()),
+        ("next-selection", 0, json.dumps(names).encode()),
+        *((f"next-frozen/{name}", 0, raw) for name, raw in frozen.items()),
+        *((f"next-previous/{name}", 0, raw) for name, raw in previous.items()),
+        *((f"current/{name}", 0o100644, current[name]) for name in sorted(previous)),
+        *((f"next-current/{name}", 0o100644, current[name]) for name in sorted(ci60.PRELUDE_NEW)),
+        ("assessment-first", 0o100644, current[ci60.ASSESSMENT]),
+        ("assessment-second", 0o100644, current[ci60.ASSESSMENT]),
+        *((f"observed/{name}", 0o100644, current[name]) for name in sorted(previous)),
+    )
+
+
+def test_ci64_pure_transition_preserves_exact_native_preimages(
+    ci64_pure_transition_operands: AdmissionOperands,
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+
+    result = _Ci64Mechanisms.transition(cast(_Ci64Mechanisms, ci60), ci64_pure_transition_operands)
+    assert result == {
+        name.removeprefix("next-previous/"): raw
+        for name, _, raw in ci64_pure_transition_operands
+        if name.startswith("next-previous/")
+    }
+
+
+@pytest.mark.parametrize(
+    "selected",
+    [
+        "next-selection",
+        "assessment-first",
+        "assessment-second",
+        "current/tools/performance_policy.py",
+        "observed/tools/performance_policy.py",
+        "next-previous/tools/performance_policy.py",
+        "next-current/docs/CI64_PROVENANCE_SCOPE.md",
+    ],
+)
+def test_ci64_pure_transition_rejects_changed_observations(
+    ci64_pure_transition_operands: AdmissionOperands, selected: str
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+
+    changed = tuple(
+        (name, mode, raw + b"\nchanged" if name == selected else raw)
+        for name, mode, raw in ci64_pure_transition_operands
+    )
+    assert changed != ci64_pure_transition_operands
+    with pytest.raises(ValueError, match=r"CI64|Extra data"):
+        _Ci64Mechanisms.transition(cast(_Ci64Mechanisms, ci60), changed)
+
+
+@pytest.mark.parametrize("mandatory", [False, 1, "yes"])
+def test_ci64_pure_transition_rejects_nonboolean_mandatory_operation(
+    ci64_pure_transition_operands: AdmissionOperands, mandatory: object
+) -> None:
+    import json
+
+    from tools import performance_ci60_qualification as ci60
+
+    values = {name: raw for name, _, raw in ci64_pure_transition_operands}
+    mapping = json.loads(values["next-frozen/" + ci60.MAP])
+    mapping["operations"]["ci64-test-addition"] = {
+        "paths": ["tools/performance_policy.py"],
+        "owners": ["owner_hashes"],
+        "families": [],
+        "mandatory": mandatory,
+        "sensitive": False,
+    }
+    raw = json.dumps(mapping).encode()
+    key = "next-frozen/" + ci60.PRELUDE_NAMESPACE + "/control-transitions.json"
+    record = json.loads(values[key])
+    record["changes"][ci60.MAP]["after_sha256"] = ci60.digest(raw)
+    record["changes"][ci60.MAP]["edits"][0]["after"] = raw.decode()
+    replacements = {
+        "next-frozen/" + ci60.MAP: raw,
+        "current/" + ci60.MAP: raw,
+        "observed/" + ci60.MAP: raw,
+        key: json.dumps(record).encode(),
+        "next-current/" + ci60.PRELUDE_NAMESPACE + "/control-transitions.json": json.dumps(
+            record
+        ).encode(),
+    }
+    changed = tuple(
+        (name, mode, replacements.get(name, raw))
+        for name, mode, raw in ci64_pure_transition_operands
+    )
+    with pytest.raises(ValueError, match="finite, literal and mandatory"):
+        _Ci64Mechanisms.transition(cast(_Ci64Mechanisms, ci60), changed)
+
+
+@pytest.mark.parametrize(
+    "changed", ["runtime", "dependency", "startup-drop", "startup-pin", "old-map"]
+)
+def test_activated_native_ci64_applicability_rejects_false_equivalence(changed: str) -> None:
+    import json
+
+    from tools import performance_ci60_qualification as ci60
+
+    root = Path(__file__).resolve().parents[2]
+    actual = ci60.admitted(root)
+    name = ci60.PRELUDE_NAMESPACE + "/producing-inputs.json"
+    proof_name = ci60.PRELUDE_NAMESPACE + "/applicability.json"
+    produced = json.loads(actual[name])
+    current = produced | {ci60.SELF: ci60.digest(actual[ci60.SELF])}
+    stage = cast(_Ci64Mechanisms, ci60)
+    original = _Ci64Mechanisms.applicability(stage, actual, current, "dice")
+    assert len(original["families"]) == 11
+    proof = json.loads(actual[proof_name])
+    if changed == "old-map":
+        previous = json.loads(actual[ci60.DERIVATION_NAMESPACE + "/producing-inputs.json"])
+        with pytest.raises(ValueError, match="complete producing inputs differ"):
+            _Ci64Mechanisms.producing(stage, actual, previous)
+        return
+    if changed in {"runtime", "dependency"}:
+        path = "src/warhammer40k_core/__init__.py" if changed == "runtime" else "uv.lock"
+        before = produced[path]
+        produced[path] = ci60.digest(b"coordinated changed input")
+        current[path] = produced[path]
+        proof["current_producing_input_digest"] = ci60.canonical(produced)
+        proof["changes"][path] = {"before": before, "after": produced[path]}
+        proof["unchanged_inputs"].pop(path)
+        actual[name] = json.dumps(produced).encode()
+    elif changed == "startup-drop":
+        proof["families"]["dice"]["unchanged_startup"].pop("tests/conftest.py")
+    else:
+        proof["families"]["dice"]["unchanged_startup"]["tests/conftest.py"] = "altered"
+    actual[proof_name] = json.dumps(proof).encode()
+    with pytest.raises(ValueError, match=r"applicability changed|consumer/startup proof changed"):
+        _Ci64Mechanisms.applicability(stage, actual, current, "dice")
+
+
+def test_activated_native_ci64_two_entry_budget_and_reuse(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+    from tools import performance_history_snapshot as history
+
+    root = Path(__file__).resolve().parents[2]
+    original = cast(
+        Callable[[AdmissionOperands], dict[str, bytes]], vars(ci60)["_prelude_transition"]
+    )
+    calls: list[int] = []
+    held: list[_Storage] = []
+
+    def observed(operands: AdmissionOperands) -> dict[str, bytes]:
+        calls.append(sum(len(raw) for _, _, raw in operands))
+        return original(operands)
+
+    monkeypatch.setattr(ci60, "_prelude_transition", observed)
+
+    @preflight.invocation
+    def run() -> None:
+        with history.phase(root, ci60.PR_BASE, None):
+            calls.clear()
+            scope = vars(preflight)["_DIGESTS"]
+            storage = cast(_Storage, scope.get())
+            held.append(storage)
+            ci60.admitted(root)
+            retained = storage.retained
+            entries = dict(storage.admissions)
+            ci60.admitted(root)
+            assert len(calls) == 1
+            assert calls[0] <= 128 * 1024 * 1024
+            assert len(storage.admissions) == 2
+            assert storage.admissions == entries
+            assert storage.retained == retained <= storage.limit == 512 * 1024 * 1024
+            sizes = {
+                key[0].__name__: sum(len(raw) for _, _, raw in operands)
+                for key, operands in entries.items()
+            }
+            assert sizes["_current_derivation_transition"] <= 128 * 1024 * 1024
+            assert sizes["_admitted_derivation"] == 74_279_914
+
+    run()
+    assert not held[0].active
+    assert held[0].retained == 0
+    assert not held[0].admissions

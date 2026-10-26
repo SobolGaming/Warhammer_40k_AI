@@ -1479,3 +1479,54 @@ class _ReceiptWriter(Protocol):
     def _write_receipt(self, output: Path, report: dict[str, object]) -> None: ...
     def write(self, output: Path, report: dict[str, object]) -> None:
         self._write_receipt(output, report)
+
+
+@pytest.mark.parametrize("root_kind", ["absolute", "double-slash", "relative"])
+def test_ci64_owned_scan_preserves_native_root_flavours(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, root_kind: str
+) -> None:
+    if os.name != "posix":
+        pytest.skip("POSIX root equivalence; Windows tests remain independently required.")
+    raw = subprocess.check_output(
+        ["git", "show", "620cbe91ae3ddd356eaf7effa7455b931882a39e:tools/performance_preflight.py"],
+        cwd=Path(__file__).resolve().parents[2],
+    )
+    nodes = [
+        node
+        for node in ast.parse(raw).body
+        if isinstance(node, ast.FunctionDef) and node.name == "_source_members"
+    ]
+    assert len(nodes) == 1
+    namespace: dict[str, Any] = dict(vars(preflight))
+    body: list[ast.stmt] = list(nodes)
+    exec(compile(ast.Module(body=body, type_ignores=[]), "<native-E61-scan>", "exec"), namespace)
+    original = cast(Callable[..., Any], namespace["_source_members"])
+    root = tmp_path / "root"
+    root.mkdir()
+    (root / "child.py").write_bytes(b"original\n")
+    if root_kind == "double-slash":
+        root = Path("//" + str(root).lstrip("/"))
+    elif root_kind == "relative":
+        monkeypatch.chdir(tmp_path)
+        root = Path("root")
+
+    def observe(function: Callable[..., Any]) -> tuple[object, ...]:
+        try:
+            return (
+                "returned",
+                tuple(function(root, ["child.py", "child.py"], observe_ancestors=True)),
+            )
+        except (ValueError, OSError) as error:
+            return (type(error), str(error))
+
+    current = cast(Callable[..., Any], vars(preflight)["_source_members"])
+    assert observe(current) == observe(original)
+
+
+@pytest.mark.parametrize("candidate", ["/", "//", "/tmp", "/tmp/root", "/tmp/rootish", "/tmp/ü"])
+def test_ci64_posix_containment_parts_equal_path_semantics(candidate: str) -> None:
+    from pathlib import PurePosixPath
+
+    resolved = PurePosixPath(candidate)
+    for root in map(PurePosixPath, ["/", "//", "/tmp", "/tmp/root", "/tmp/ü"]):
+        assert (resolved.parts[: len(root.parts)] == root.parts) == resolved.is_relative_to(root)

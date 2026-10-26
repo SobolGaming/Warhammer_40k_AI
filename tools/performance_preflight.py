@@ -203,6 +203,7 @@ def _source_members(
         raise ValueError("Aliased cumulative root.")
     directories: dict[str, os.stat_result] = {}
     root_name = root.as_posix().rstrip("/") or "/"
+    root_parts = root.parts
     for name in names:
         relative = Path(name)
         if (
@@ -232,10 +233,18 @@ def _source_members(
         before = os.lstat(path)
         if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or os.path.isjunction(path):
             raise ValueError("D07 member must be an owned regular file: " + name)
-        if observe_ancestors and not Path(path).resolve(strict=True).is_relative_to(root):
-            raise ValueError("D07 member must be an owned regular file: " + name)
+        member = Path(path)
+        if observe_ancestors:
+            resolved = member.resolve(strict=True)
+            contained = (
+                resolved.parts[: len(root_parts)] == root_parts
+                if os.name == "posix" and root.is_absolute()
+                else resolved.is_relative_to(root)
+            )
+            if not contained:
+                raise ValueError("D07 member must be an owned regular file: " + name)
         windows = os.name == "nt"
-        with Path(path).open("rb") as stream:
+        with member.open("rb") as stream:
             opened = os.fstat(stream.fileno())
             raw = stream.read()
             closed = os.fstat(stream.fileno())

@@ -104,7 +104,8 @@ def owner_hashes(path: str, content: bytes | None) -> dict[str, str]:
             ]
             for method in methods:
                 owners[f"{node.name}.{method.name}"] = digest(ast.dump(method).encode())
-            node.body = [n for n in node.body if n not in methods]
+            method_identities = {id(method) for method in methods}
+            node.body = [n for n in node.body if id(n) not in method_identities]
             owners[node.name] = digest(ast.dump(node).encode())
         else:
             module.append(node)
@@ -371,6 +372,12 @@ def validate_assessment(
     if rows.keys() != changes.keys():
         raise ValueError("Every changed input needs exactly one reviewed assessment.")
     selected: set[str] = set()
+    # Prepared only at the first row's original matching boundary. Empty rows
+    # retain the original lazy handling of operation fields.
+    prepared: dict[str, tuple[int, dict[str, object]]] = {}
+    literal_paths: dict[str, list[str]] = {}
+    glob_paths: list[tuple[str, tuple[str, ...]]] = []
+    owner_patterns: dict[str, tuple[str, ...]] = {}
     for path, raw in rows.items():
         row = object_value(raw)
         _keys(
@@ -390,19 +397,49 @@ def validate_assessment(
         if not isinstance(row["rationale"], str) or len(row["rationale"].strip()) < 30:
             raise ValueError(f"Missing bounded assessment rationale: {path}")
         owner_names = object_value(object_value(changes[path])["owners"])
-        matching = {
-            key: object_value(value)
-            for key, value in operations.items()
-            if any(
-                fnmatch.fnmatchcase(path, pattern)
-                for pattern in _strings(object_value(value)["paths"])
+        matching: dict[str, dict[str, object]] = {}
+        if not prepared:
+            # Keep the first complete traversal in original operation order,
+            # including each path/owner validation's conditional boundary.
+            for ordinal, (key, value) in enumerate(operations.items()):
+                operation = object_value(value)
+                paths = _strings(operation["paths"])
+                if any(fnmatch.fnmatchcase(path, pattern) for pattern in paths):
+                    patterns = tuple(_strings(operation["owners"]))
+                    owner_patterns[key] = patterns
+                    if any(
+                        fnmatch.fnmatchcase(owner, pattern)
+                        for owner in owner_names or {"@text": None}
+                        for pattern in patterns
+                    ):
+                        matching[key] = operation
+                prepared[key] = ordinal, operation
+                globs = []
+                for pattern in paths:
+                    if any(character in pattern for character in "*?["):
+                        globs.append(pattern)
+                    else:
+                        literal_paths.setdefault(pattern, []).append(key)
+                if globs:
+                    glob_paths.append((key, tuple(globs)))
+        else:
+            candidates = set(literal_paths.get(path, ()))
+            candidates.update(
+                key
+                for key, patterns in glob_paths
+                if any(fnmatch.fnmatchcase(path, pattern) for pattern in patterns)
             )
-            and any(
-                fnmatch.fnmatchcase(owner, pattern)
-                for owner in owner_names or {"@text": None}
-                for pattern in _strings(object_value(value)["owners"])
-            )
-        }
+            # Distinct keys remain distinct even when their values share a dict.
+            for key in sorted(candidates, key=lambda name: prepared[name][0]):
+                operation = prepared[key][1]
+                if key not in owner_patterns:
+                    owner_patterns[key] = tuple(_strings(operation["owners"]))
+                if any(
+                    fnmatch.fnmatchcase(owner, pattern)
+                    for owner in owner_names or {"@text": None}
+                    for pattern in owner_patterns[key]
+                ):
+                    matching[key] = operation
         chosen_operations = _strings(row["operations"])
         chosen_families = set(_strings(row["selected_families"]))
         if category == "governance":

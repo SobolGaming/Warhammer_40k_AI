@@ -5,8 +5,9 @@ from __future__ import annotations
 import copy
 import json
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from scripts.check_performance_policy import validate_current, validate_smoke_report
@@ -776,3 +777,198 @@ def test_operation_map_uses_real_driver_and_owner_paths() -> None:
         for pattern in cast(list[object], patterns):
             assert isinstance(pattern, str)
             assert any(fnmatch.fnmatchcase(path, pattern) for path in paths), pattern
+
+
+@pytest.fixture(scope="module")
+def ci64_original_policy() -> dict[str, Callable[..., Any]]:
+    """Independent native E61 functions, with original validation order intact."""
+    import ast
+
+    from tools import performance_policy as policy
+
+    source = subprocess.check_output(
+        ["git", "show", "620cbe91ae3ddd356eaf7effa7455b931882a39e:tools/performance_policy.py"],
+        cwd=ROOT,
+    )
+    names = {"owner_hashes", "validate_assessment"}
+    nodes = [
+        node
+        for node in ast.parse(source).body
+        if isinstance(node, ast.FunctionDef) and node.name in names
+    ]
+    assert {node.name for node in nodes} == names
+    for node in nodes:
+        node.decorator_list = []
+    namespace: dict[str, Any] = dict(vars(policy))
+    body: list[ast.stmt] = list(nodes)
+    exec(compile(ast.Module(body=body, type_ignores=[]), "<native-E61-policy>", "exec"), namespace)
+    return {name: cast(Callable[..., Any], namespace[name]) for name in names}
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        b"class Empty: pass\n",
+        b"class Values:\n 'doc'\n value = 1\n class Inner: pass\n",
+        b"class Mixed:\n value = 1\n def a(self): pass\n other = 2\n async def b(self): pass\n",
+        b"class Duplicate:\n def f(self): return 1\n value = 2\n def f(self): return 3\n",
+        (
+            b"class Decorated:\n @staticmethod\n def a(): return 1\n"
+            b" @classmethod\n async def b(cls): pass\n"
+        ),
+        (
+            b"class Nested:\n class Child:\n  def f(self): pass\n"
+            b" def g(self):\n  def local(): pass\n  return local\n"
+        ),
+        b"async def top(): pass\ndef other(): pass\nconstant = 2\n",
+        b"class Many:\n"
+        + b"".join(f" def method_{index}(self): return {index}\n".encode() for index in range(64)),
+    ],
+    ids=[
+        "empty",
+        "nonmethods",
+        "interleaved",
+        "duplicate-name",
+        "decorated",
+        "nested",
+        "module",
+        "many",
+    ],
+)
+def test_ci64_owner_identity_filter_preserves_native_outputs(
+    source: bytes, ci64_original_policy: dict[str, Callable[..., Any]]
+) -> None:
+    from tools.performance_policy import owner_hashes
+
+    assert owner_hashes("fixture.py", source) == ci64_original_policy["owner_hashes"](
+        "fixture.py", source
+    )
+
+
+@pytest.mark.parametrize(
+    "variant",
+    [
+        "ordinary",
+        "shared-values",
+        "empty-rows",
+        "unmatched-owners",
+        "matched-owners",
+        "late-path-error",
+        "early-owner-error",
+        "duplicate-paths",
+        "partial-owner-coverage",
+        "glob-overlap",
+        "mandatory-omission",
+    ],
+)
+def test_ci64_operation_index_matches_native_lazy_validation(
+    variant: str, ci64_original_policy: dict[str, Callable[..., Any]]
+) -> None:
+    operation: dict[str, object] = {
+        "paths": ["tests/x.py", "tests/y.py"],
+        "owners": ["*"],
+        "families": [],
+        "mandatory": True,
+        "sensitive": False,
+    }
+    operations: dict[str, object] = {"literal": operation}
+    value, changes, mapping = _assessment(
+        "tests/x.py", owner="owner", category="measured_workload", operations=("literal",)
+    )
+    rows = object_value(value["rows"])
+    changes["tests/y.py"] = copy.deepcopy(changes["tests/x.py"])
+    rows["tests/y.py"] = copy.deepcopy(rows["tests/x.py"])
+    mapping = {"operations": operations, "families": {}}
+    if variant == "shared-values":
+        operations["second"] = operation
+        for raw in rows.values():
+            object_value(raw)["operations"] = ["literal", "second"]
+    elif variant == "empty-rows":
+        rows.clear()
+        changes.clear()
+        operations["unused"] = {"paths": None, "owners": None}
+    elif variant == "unmatched-owners":
+        operations["unused"] = {"paths": ["unmatched.py"], "owners": None}
+    elif variant == "matched-owners":
+        operations["bad"] = {"paths": ["tests/y.py"], "owners": None}
+    elif variant == "late-path-error":
+        operations["bad"] = {"paths": None, "owners": []}
+    elif variant == "early-owner-error":
+        operation["owners"] = ["owner", "owner"]
+        operations["later"] = {"paths": None, "owners": []}
+    elif variant == "duplicate-paths":
+        operation["paths"] = ["tests/x.py", "tests/x.py"]
+    elif variant == "partial-owner-coverage":
+        operation["owners"] = ["different"]
+    elif variant == "glob-overlap":
+        operation["paths"] = ["tests/x.py", "tests/[xy].py", "tests/?.py"]
+    elif variant == "mandatory-omission":
+        object_value(rows["tests/y.py"])["operations"] = []
+    value["operation_map_sha256"] = canonical_digest(mapping)
+
+    def outcome(function: Callable[..., Any]) -> tuple[object, ...]:
+        try:
+            return (
+                "returned",
+                function(
+                    value, base=BASE, changes=changes, runtime_id=BUILD, operation_map=mapping
+                ),
+            )
+        except (ValueError, TypeError, KeyError) as error:
+            return (type(error), str(error))
+
+    assert outcome(validate_assessment) == outcome(ci64_original_policy["validate_assessment"])
+    # A separate public call must prepare from the new complete map again.
+    operation["owners"] = ["*"]
+    operations.pop("bad", None)
+    operations.pop("later", None)
+    value["operation_map_sha256"] = canonical_digest(mapping)
+    assert outcome(validate_assessment) == outcome(ci64_original_policy["validate_assessment"])
+
+
+@pytest.mark.parametrize(
+    ("pattern", "path"),
+    [
+        ("tests/*.py", "tests/nested/x.py"),
+        ("tests/[x].py", "tests/x.py"),
+        ("tests/?.py", "tests/x.py"),
+        ("tests/X.py", "tests/x.py"),
+        ("tests/[.py", "tests/[.py"),
+        ("tests/ü.py", "tests/ü.py"),
+    ],
+)
+def test_ci64_operation_index_preserves_case_glob_and_literal_paths(
+    pattern: str, path: str, ci64_original_policy: dict[str, Callable[..., Any]]
+) -> None:
+    mapping: dict[str, object]
+    value, changes, mapping = _assessment(
+        path, category="measured_workload", operations=("candidate",)
+    )
+    rows = object_value(value["rows"])
+    changes["tests/first.py"] = copy.deepcopy(changes[path])
+    rows["tests/first.py"] = copy.deepcopy(rows[path])
+    # The first inserted row exercises preparation; the second exercises lookup.
+    value["rows"] = {"tests/first.py": rows["tests/first.py"], path: rows[path]}
+    mapping = {
+        "families": {},
+        "operations": {
+            "candidate": {
+                "paths": ["tests/first.py", pattern],
+                "owners": ["*"],
+                "families": [],
+                "mandatory": True,
+                "sensitive": False,
+            }
+        },
+    }
+    value["operation_map_sha256"] = canonical_digest(mapping)
+    expected = ci64_original_policy["validate_assessment"]
+    try:
+        result = expected(
+            value, base=BASE, changes=changes, runtime_id=BUILD, operation_map=mapping
+        )
+    except ValueError as error:
+        with pytest.raises(ValueError, match=str(error)):
+            _validate(value, changes, mapping)
+    else:
+        assert _validate(value, changes, mapping) == result
