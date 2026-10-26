@@ -110,7 +110,7 @@ def history(root: Path, *args: str) -> bytes:
 
 DERIVATION_BASE = "eda94d97a85eea11cea87451c39198d26767e64f"
 DERIVATION_NAMESPACE = "data/source_audits/ci61_provenance_v1"
-DERIVATION_FREEZE: str | None = None
+DERIVATION_FREEZE: str | None = "9e6d2cabbdbef9c7320a1c1f9a0fe0fc17ef61ab"
 DERIVATION_TEST = "tests/code_quality/test_performance_provenance.py"
 DERIVATION_CONTROLS = frozenset(
     {

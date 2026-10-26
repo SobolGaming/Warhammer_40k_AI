@@ -20529,11 +20529,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "d94b11e3bcb165bdaec0cd8bb3e4dce7a627d0df07d17028285fb71e9703493e",
+      "after_sha256": "a4f5a557a195a19f6db87ca997c97a2232a16bbe8d81022ad6b7b7d16bba2615",
       "owners": {
         "@module": {
           "before": null,
-          "after": "25a6983d19a2c65f4f9f3f3bbe9e46e89f7d89be26abdb29520eee32a1e5f89b"
+          "after": "71d26dde5af199c41cc60ae77ad94fcaae7e4084da0139b70c76199fb85f3386"
         },
         "_HistoricalPrevious": {
           "before": null,
