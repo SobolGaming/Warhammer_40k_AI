@@ -1,12 +1,12 @@
 {
   "schema": "ci64-finite-current-applicability-v1",
   "original_input_digest": "e8e85f08af6a203f5c943fe55458d9541198c0fa4bcbcb70bb3ef5f998b85139",
-  "current_producing_input_digest": "494ea801c6b744a7b34866c13d65fcd7557e23a0d88d63d278db40353d80c40f",
+  "current_producing_input_digest": "e0a99340ba3208723e7a3bcd3501c64fa8a8ef903191a366e222e0d488f91127",
   "previous_applicability_sha256": "9f0d51de50c458a5caeaa1fe3eabefeab3e90d701ce1afb8bfd4dc0cc8744148",
   "changes": {
     "docs/performance/policy-v3/operation-map.json": {
       "before": "813b3219639758c6d11976533147455b32492b58122bb2d0933e9660deff00cf",
-      "after": "45f89ad2cf45b307f9cdcafba45154a0e92867ecdee97c3c8e8f57dc559920ca"
+      "after": "48e6ca8be7141e048ef13b6bf5f9817e89da54db3d6d7007222144169e9c8388"
     },
     "tests/code_quality/test_performance_policy.py": {
       "before": "f45929b1d7138997e9bef8a390ca7fa1b1db467816cc6534871dd850222ddb98",
@@ -14,11 +14,11 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before": "c6ea056c95a69a5d8e82870b61f0958ae74f498a4cde398424bc65b646d49893",
-      "after": "ddd2754d628c508b4e3d0c24988a778137ba1041e3fbaec293c7d3fa91138c95"
+      "after": "039bc637714f8c3b9077afc60e8380dfe9c7deb7f2be0d97b85525b34834ef3a"
     },
     "tests/code_quality/test_performance_provenance.py": {
       "before": "d41520a9beeb772db7fc4b65bcfd13fc7bd6cdf3b1ec2bf5fbcd89920ce94d71",
-      "after": "e0b9ca9add818278f8a7806607462c2a8ecd3e6b4b281db4fa13a424085148b4"
+      "after": "205c5f4deada8f172630b929862e2b3b44417833cb22b1fe8331c5d94916efd9"
     },
     "tools/performance_ci60_qualification.py": {
       "before": "d94b11e3bcb165bdaec0cd8bb3e4dce7a627d0df07d17028285fb71e9703493e",
@@ -34,7 +34,7 @@
     },
     "tools/performance_preflight.py": {
       "before": "dc857922ba519ffc7b627f048458f448c82319723032c6889793bb496a359e36",
-      "after": "fa358671ab095028bb0723f4e65686b37b9152bda8f42a4bd32c09c1f735397b"
+      "after": "5421e70030df8532019ff8a62cdb1c809cead6b2a31c94ae4c75ffeed26e4de8"
     }
   },
   "unchanged_inputs": {

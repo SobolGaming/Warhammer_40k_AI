@@ -167,7 +167,7 @@ DERIVATION_INPUTS = frozenset(
 
 PRELUDE_BASE = "620cbe91ae3ddd356eaf7effa7455b931882a39e"
 PRELUDE_NAMESPACE = "data/source_audits/ci64_provenance_v1"
-PRELUDE_FREEZE: str | None = "466bf63ffa6cc9d7a488ede6473c0943baab0612"
+PRELUDE_FREEZE: str | None = None
 PRELUDE_REPORT = "docs/performance/current/ci64-external_contract_source_reuse.json"
 PRELUDE_CONTROLS = frozenset(
     {

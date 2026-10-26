@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
-  "operation_map_sha256": "fae8c9fe6d054bd2142262a6f84fcc7e87634bd5fe53d542da90461872db51a2",
+  "operation_map_sha256": "7329621b63d8b941b76c7f41fedb60397f36f46fbfcd35021678f8ddae01089d",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "53cfe6cc89999f4a8d687b97a2e75bf2614e66b3f01abfd46232ab7a24f7121b",
+      "after_sha256": "34627f28417338f9c2d75e77f08c358c8a51f7c41a7239058b65367f38c7aafb",
       "owners": {
         "@document": {
           "before": null,
-          "after": "53cfe6cc89999f4a8d687b97a2e75bf2614e66b3f01abfd46232ab7a24f7121b"
+          "after": "34627f28417338f9c2d75e77f08c358c8a51f7c41a7239058b65367f38c7aafb"
         }
       }
     },
@@ -46,11 +46,11 @@
     },
     "ci/quality_shards/shard-1.txt": {
       "before_sha256": null,
-      "after_sha256": "7f5fdcbb609fd8ae52fc15ca85dd6ed64547f415c0f29a70db15d82505571a61",
+      "after_sha256": "b317b4807182b70cf5eb8995370ceaaa4f8afa52424cdc841086a105c0edf9c2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "7f5fdcbb609fd8ae52fc15ca85dd6ed64547f415c0f29a70db15d82505571a61"
+          "after": "b317b4807182b70cf5eb8995370ceaaa4f8afa52424cdc841086a105c0edf9c2"
         }
       }
     },
@@ -1216,11 +1216,11 @@
     },
     "data/source_audits/ci64_provenance_v1/applicability.json": {
       "before_sha256": null,
-      "after_sha256": "b9423b3aabcdef1c430099b50f8177b4d31917ba15daaeb1ddfd05dfdd60bafd",
+      "after_sha256": "b7e448981aefe1649f7d712ccddae5d22611a22608b79decd95ab578b7985d19",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b9423b3aabcdef1c430099b50f8177b4d31917ba15daaeb1ddfd05dfdd60bafd"
+          "after": "b7e448981aefe1649f7d712ccddae5d22611a22608b79decd95ab578b7985d19"
         }
       }
     },
@@ -1236,11 +1236,11 @@
     },
     "data/source_audits/ci64_provenance_v1/control-transitions.json": {
       "before_sha256": null,
-      "after_sha256": "4e5f9110f86b692844c805daf18e9a4bcc336edd6da3e6d0928240599314c2b6",
+      "after_sha256": "930d5456c718b051652066ccb9ff812b2d25c3fc519e187a8fbb43c3f1e7bea9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4e5f9110f86b692844c805daf18e9a4bcc336edd6da3e6d0928240599314c2b6"
+          "after": "930d5456c718b051652066ccb9ff812b2d25c3fc519e187a8fbb43c3f1e7bea9"
         }
       }
     },
@@ -1276,11 +1276,11 @@
     },
     "data/source_audits/ci64_provenance_v1/producing-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "5b0f12c40f6b70d73a9aaa5727a8ceb9152cb58db2effffbd3308dca9338cc86",
+      "after_sha256": "b8b902a826fb9a6b3ac52883bb0dcdae0415064613e6a5d1d39b4d919ea8c3de",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5b0f12c40f6b70d73a9aaa5727a8ceb9152cb58db2effffbd3308dca9338cc86"
+          "after": "b8b902a826fb9a6b3ac52883bb0dcdae0415064613e6a5d1d39b4d919ea8c3de"
         }
       }
     },
@@ -3266,21 +3266,21 @@
     },
     "docs/CI64_PROVENANCE_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "9f1ba955dee0512c67f187d5646394fb7f2ffb5bd7d3e38f50c9c6d67055dc1f",
+      "after_sha256": "9db05bf3fb205cbbc135e4b90cbe011c066853cbe81171bfe5ec8fe353d13416",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9f1ba955dee0512c67f187d5646394fb7f2ffb5bd7d3e38f50c9c6d67055dc1f"
+          "after": "9db05bf3fb205cbbc135e4b90cbe011c066853cbe81171bfe5ec8fe353d13416"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-      "after_sha256": "8fa5aea5b3e0790ee37f9a3948dee85e3c9f728a50ebe425d2b792ab4f78eade",
+      "after_sha256": "78163bc1d2e3e3596877e3f008c9d1a6738515594e8ed7417ccbcd7e5afa049f",
       "owners": {
         "@document": {
           "before": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-          "after": "8fa5aea5b3e0790ee37f9a3948dee85e3c9f728a50ebe425d2b792ab4f78eade"
+          "after": "78163bc1d2e3e3596877e3f008c9d1a6738515594e8ed7417ccbcd7e5afa049f"
         }
       }
     },
@@ -3876,11 +3876,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "45f89ad2cf45b307f9cdcafba45154a0e92867ecdee97c3c8e8f57dc559920ca",
+      "after_sha256": "48e6ca8be7141e048ef13b6bf5f9817e89da54db3d6d7007222144169e9c8388",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "45f89ad2cf45b307f9cdcafba45154a0e92867ecdee97c3c8e8f57dc559920ca"
+          "after": "48e6ca8be7141e048ef13b6bf5f9817e89da54db3d6d7007222144169e9c8388"
         }
       }
     },
@@ -6857,11 +6857,15 @@
     },
     "tests/code_quality/test_performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "ddd2754d628c508b4e3d0c24988a778137ba1041e3fbaec293c7d3fa91138c95",
+      "after_sha256": "039bc637714f8c3b9077afc60e8380dfe9c7deb7f2be0d97b85525b34834ef3a",
       "owners": {
         "@module": {
           "before": null,
           "after": "806da2b9f3cc6987b3faa18d6315570acf4ab713930ff38d9159f200201095b6"
+        },
+        "_Ci66Storage": {
+          "before": null,
+          "after": "415fc40b73ed1308cc7dfc2c97241aac132e34315593b4b2ae97c3c34110aba7"
         },
         "_ClosedHistory": {
           "before": null,
@@ -7087,6 +7091,14 @@
           "before": null,
           "after": "5db6934cb2f2e6d102328f6e765275680a88f2daf6d5fc3f59a154729aebce39"
         },
+        "_ci66_original_reader": {
+          "before": null,
+          "after": "6eb3ae40817ee74fb467a806c54235d9bff0bd775f3fcae0bb80ae2484718dc3"
+        },
+        "_ci66_storage": {
+          "before": null,
+          "after": "f49bbaae75dff4c4a3f723a75f8d9b8685bcc937eb61c5a2becb61a26d12a33d"
+        },
         "_history_fixture": {
           "before": null,
           "after": "59de9676234987a971669971e2ce50b6acf97cda4a94e63b14eb4ca1d23455e4"
@@ -7106,6 +7118,58 @@
         "test_ci65_handoff_uses_real_native_phase_lease": {
           "before": null,
           "after": "aa2e123d314b5364033124f4c5aaba60ddf554eefc31c93ccb2e3e6132677ce1"
+        },
+        "test_ci66_changed_is_absolute_uses_original_lazy_fallback": {
+          "before": null,
+          "after": "77d70253eb953dcfe712319e81f6e3ee808bb6a7eb9ed7b69687e4ce9d4f7876"
+        },
+        "test_ci66_changed_path_dependencies_rebuild_without_retention": {
+          "before": null,
+          "after": "cf63dbbac2addc32a088480ede35493e2d2b8dd4096df7a5c5efec31ca09c48b"
+        },
+        "test_ci66_dependency_change_between_warm_members_keeps_lazy_rejection": {
+          "before": null,
+          "after": "9ba558775d9f5a125c1e2868b22a23fe32e938903b4593aba350a1f5fad004c3"
+        },
+        "test_ci66_ineligible_path_plans_keep_original_uncached_semantics": {
+          "before": null,
+          "after": "1631f6f7da2c7b9328d2ab3977ec55166021e5bdb549ec20c8681e7a0f30bf71"
+        },
+        "test_ci66_invalid_plan_is_not_retained_and_root_spellings_remain_distinct": {
+          "before": null,
+          "after": "1e1d1c61062093a8a6583bec69d308377cc0e4ce660dadc4e20fe558d188d15c"
+        },
+        "test_ci66_nested_invocations_and_active_other_thread_keep_plans_isolated": {
+          "before": null,
+          "after": "2d6e006567f8d1a878ca9287fd9c8a76e05d55debd1bc4bd00721c4d5bcb871a"
+        },
+        "test_ci66_path_plan_charge_and_full_budget_fallback": {
+          "before": null,
+          "after": "00ed552de4db1cdeae89fa129d9fec072e072aa086690d29868d5d1b60bcb393"
+        },
+        "test_ci66_path_plan_root_spelling_and_relative_fallback": {
+          "before": null,
+          "after": "2a586deec4ab87a664e0e91afd88e2bca676bf869d6d6616c64b4368559989d0"
+        },
+        "test_ci66_path_plans_revoke_with_invocation_and_copied_context": {
+          "before": null,
+          "after": "45ebe05c863c107ca4eafd32e52c1b4465d94abd8fba8022a3367cdfd3f4721f"
+        },
+        "test_ci66_warm_plan_keeps_same_size_restored_mtime_read_fresh": {
+          "before": null,
+          "after": "b153eb2a0b7aca80bcac35ef4881b862138740c73c42ab63c63770e5e43ef052"
+        },
+        "test_ci66_warm_plan_rejects_above_root_alias_between_members": {
+          "before": null,
+          "after": "4cab7adbef7e257c38f0bd990ee9e0ab12b24273c06792829721341d94a7f859"
+        },
+        "test_ci66_warm_plans_preserve_original_observation_order": {
+          "before": null,
+          "after": "cd9e516f57ea943af0f983cadc937adb820f861641fc8800dc30dcdae25a80f5"
+        },
+        "test_ci66_wrong_owner_bypasses_path_plan_retention": {
+          "before": null,
+          "after": "28fea869dedf150cc4f2e7f0a23b75717272f53ba9ac29d243a39a13e6574b74"
         },
         "test_frozen_blob_batch_matches_git_show_and_revalidates_each_call": {
           "before": null,
@@ -7239,7 +7303,7 @@
     },
     "tests/code_quality/test_performance_provenance.py": {
       "before_sha256": null,
-      "after_sha256": "e0b9ca9add818278f8a7806607462c2a8ecd3e6b4b281db4fa13a424085148b4",
+      "after_sha256": "205c5f4deada8f172630b929862e2b3b44417833cb22b1fe8331c5d94916efd9",
       "owners": {
         "@module": {
           "before": null,
@@ -7367,7 +7431,7 @@
         },
         "test_activated_native_ci64_two_entry_budget_and_reuse": {
           "before": null,
-          "after": "1a3a7b7b7afc5679913a341bcec7dd7fa933bc5bc2a08d9a0117b9d08aa6ab62"
+          "after": "0a44b8baf19571db9777005c5f4df6e83c50074c8027dd50cb2ab9431237899b"
         },
         "test_activated_native_ci65_acquisition_failure_revokes_pending": {
           "before": null,
@@ -7440,6 +7504,14 @@
         "test_ci65_handoff_revokes_pending_and_promoted_on_every_failure": {
           "before": null,
           "after": "e5be33102d6c3bf18f0216eec927a017f6fe94293532a3e6e43bbdea59521cc3"
+        },
+        "test_ci66_equal_admission_refreshes_references_without_new_proof_or_charge": {
+          "before": null,
+          "after": "1f78f9ff97627bc4dea0fe0bf3e991c917e58f9054ae0aa005b272253cc3b02e"
+        },
+        "test_ci66_refreshed_admission_still_checks_every_operand_and_key": {
+          "before": null,
+          "after": "8bd6f09d2b47b188030c6b438a821dba3736e9a40cdb7fe1ef412e267e02ed07"
         },
         "test_finite_transition_preserves_existing_operation_budgets": {
           "before": null,
@@ -20819,11 +20891,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "e757ab8a0876ff4668a03c4b756ac274c99794c2a68440e8865361a305353f2c",
+      "after_sha256": "78290361dad9bbd186dd0db927c808999155997467f06e0c21aa8f9477277e44",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7e6d4446b3f375651ca7d80af788b67df40a4ad253d9be5a7cd8bcd5fb08f12f"
+          "after": "939d590f90123c3af9be603ba7d7aeb53153c3941ec993aff480f8eaff18bc63"
         },
         "_HistoricalPrevious": {
           "before": null,
@@ -21189,11 +21261,11 @@
     },
     "tools/performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "fa358671ab095028bb0723f4e65686b37b9152bda8f42a4bd32c09c1f735397b",
+      "after_sha256": "5421e70030df8532019ff8a62cdb1c809cead6b2a31c94ae4c75ffeed26e4de8",
       "owners": {
         "@module": {
           "before": null,
-          "after": "39ffb691b5c93386800e10e9fa841048a6211f45cc6858fd7de9cf4f1fb0ea59"
+          "after": "44cbdeb0768817d74df4238cf13ff49df4bb180f236f1e2b79e9566c7f975233"
         },
         "_Ci60AdmissionHandoff": {
           "before": null,
@@ -21225,15 +21297,35 @@
         },
         "_Digests.__init__": {
           "before": null,
-          "after": "9e721ccd0fa21a0c0396e7ab67b95c1df2ccaa633c7dca54c891ce24270de7d7"
+          "after": "245d4b37be77d5012f63b45c356927c0111d72e635ee0f7580ec52929c8df332"
         },
         "_Digests.admission": {
           "before": null,
-          "after": "ecbc60518099c17e5fd758ee71bf33e87a7bc3192e8133859cef297db32e75ba"
+          "after": "dc9048ce5d9206dc3c98c942f304087576d8a027f5556a30bd61b9a6927cfb50"
         },
         "_Digests.digest": {
           "before": null,
           "after": "78c24a71f69b9d1101b7e6d1b4dd492ea37254648aca2768e473ce36d91f6809"
+        },
+        "_Digests.member_plan": {
+          "before": null,
+          "after": "c1cc711c1f1c487ac5d1592fa30cc193362ab4c6c598ed21f5969e9b86b0a2d0"
+        },
+        "_literal_member_plan": {
+          "before": null,
+          "after": "443746b82fd1cbe547f2de4011bb99d4df445a352d0d6377175e1874512d6650"
+        },
+        "_member_plan": {
+          "before": null,
+          "after": "5dc999ccd8cd6a3d2fffe10c871f9804bc39b70dca7f9507c15aac7d61b18272"
+        },
+        "_path_plan_size": {
+          "before": null,
+          "after": "4d78c1d419d09187132e6cceae8c3cb85a82e17639ffb5001df65225d895e8cf"
+        },
+        "_posix_path_dependencies": {
+          "before": null,
+          "after": "4d69ce08d42ec506109cabc0450b74bf911ef0f8e6140689581f5361d90a9235"
         },
         "_same_file": {
           "before": null,
@@ -21249,7 +21341,7 @@
         },
         "_source_members": {
           "before": null,
-          "after": "32090e08f7fdd23e397b654d73c8dad3512d8979e97978190b77c74eaf8153df"
+          "after": "a1b6aa912aad378a2810ddb0dc882fdaca72d7f52a9cdc8369a959dab927d0af"
         },
         "admission_proof": {
           "before": null,
@@ -21269,7 +21361,7 @@
         },
         "invocation": {
           "before": null,
-          "after": "1f9b4de0901961a78234bd616dcd3ab14971fd3b8320e33346817271c2cb6b4a"
+          "after": "16d495fe86633eb1b893577e5a7097d957dacf7902df69ca2217453d7f30b93f"
         },
         "owner_proof": {
           "before": null,
@@ -27773,7 +27865,7 @@
         "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "CI64 retains the three pure bookkeeping reductions and hands off only two complete bootstrap proofs into their first authenticated phase; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
+      "rationale": "CI64 retains the pure bookkeeping reductions and authenticated bootstrap handoff, adds bounded immutable POSIX lexical plans, and refreshes fully equal admission operand references; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
@@ -27783,12 +27875,12 @@
         "ci64-provenance-68a42866e64b03909939024b6c5ec3cc50a32a88ce2ba4097ebbeab0f1dc6772"
       ],
       "selected_families": [],
-      "rationale": "CI64 retains the three pure bookkeeping reductions and hands off only two complete bootstrap proofs into their first authenticated phase; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
+      "rationale": "CI64 retains the pure bookkeeping reductions and authenticated bootstrap handoff, adds bounded immutable POSIX lexical plans, and refreshes fully equal admission operand references; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tests/code_quality/test_performance_provenance.py": {
-      "rationale": "CI64 retains the three pure bookkeeping reductions and hands off only two complete bootstrap proofs into their first authenticated phase; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
+      "rationale": "CI64 retains the pure bookkeeping reductions and authenticated bootstrap handoff, adds bounded immutable POSIX lexical plans, and refreshes fully equal admission operand references; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
       "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
       "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
       "category": "measured_workload",
@@ -33677,7 +33769,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI64 retains the three pure bookkeeping reductions and hands off only two complete bootstrap proofs into their first authenticated phase; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
+      "rationale": "CI64 retains the pure bookkeeping reductions and authenticated bootstrap handoff, adds bounded immutable POSIX lexical plans, and refreshes fully equal admission operand references; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
       "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
       "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
@@ -33690,7 +33782,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI64 retains the three pure bookkeeping reductions and hands off only two complete bootstrap proofs into their first authenticated phase; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
+      "rationale": "CI64 retains the pure bookkeeping reductions and authenticated bootstrap handoff, adds bounded immutable POSIX lexical plans, and refreshes fully equal admission operand references; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
@@ -33708,7 +33800,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI64 retains the three pure bookkeeping reductions and hands off only two complete bootstrap proofs into their first authenticated phase; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
+      "rationale": "CI64 retains the pure bookkeeping reductions and authenticated bootstrap handoff, adds bounded immutable POSIX lexical plans, and refreshes fully equal admission operand references; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
@@ -33721,7 +33813,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI64 retains the three pure bookkeeping reductions and hands off only two complete bootstrap proofs into their first authenticated phase; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
+      "rationale": "CI64 retains the pure bookkeeping reductions and authenticated bootstrap handoff, adds bounded immutable POSIX lexical plans, and refreshes fully equal admission operand references; fresh acquisition and independent preflight/postflight remain mandatory. Current inputs stay authenticated.",
       "source_obligation": "Retain all seven metadata fields within each matching API channel, every other field across APIs, fresh complete-byte hashes, ownership and alias checks; reject real midread and final-path-query changes, including identical-byte writes with restored mtime.",
       "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     },

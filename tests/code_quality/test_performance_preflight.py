@@ -1607,3 +1607,512 @@ def test_ci65_handoff_uses_real_native_phase_lease(tmp_path: Path, outcome: str)
         assert calls == ["first", "second", "first"]
 
     run()
+
+
+# CI66 reuses only pure lexical construction; every physical observation stays live.
+class _Ci66Storage(Protocol):
+    limit: int
+    retained: int
+    active: bool
+    owner: tuple[int, int]
+    path_plan_charge: int
+    path_plans: dict[tuple[Any, ...], tuple[tuple[str, ...], str]] | None
+
+
+def _ci66_storage() -> _Ci66Storage:
+    scope = cast(ContextVar[_Ci66Storage | None], vars(preflight)["_DIGESTS"])
+    value = scope.get()
+    assert value is not None
+    return value
+
+
+def _ci66_original_reader() -> Callable[..., Any]:
+    source = subprocess.check_output(
+        ["git", "show", "1ef132beb50518bc727a6bf134eb3ab44f3d94e7:tools/performance_preflight.py"],
+        cwd=Path(__file__).resolve().parents[2],
+        env=os.environ | {"GIT_OPTIONAL_LOCKS": "0"},
+        text=True,
+    )
+    node = next(
+        node
+        for node in ast.parse(source).body
+        if isinstance(node, ast.FunctionDef) and node.name == "_source_members"
+    )
+    namespace = dict(vars(preflight))
+    exec(
+        compile(ast.Module(body=[node], type_ignores=[]), "<ci66-original-reader>", "exec"),
+        namespace,
+    )
+    return cast(Callable[..., Any], namespace["_source_members"])
+
+
+@pytest.mark.parametrize(
+    "names",
+    [
+        ["d/ü.bin", "other", "d/ü.bin"],
+        ["d/ü.bin", "../bad"],
+        ["d/ü.bin", "/absolute"],
+        ["d/ü.bin", "d//bad"],
+        ["d/ü.bin", "d/./bad"],
+        ["d/ü.bin", ""],
+    ],
+)
+def test_ci66_warm_plans_preserve_original_observation_order(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    names: list[str],
+) -> None:
+    (tmp_path / "d").mkdir()
+    (tmp_path / "d/ü.bin").write_bytes(b"first")
+    (tmp_path / "other").write_bytes(b"second")
+    original = _ci66_original_reader()
+    events: list[tuple[str, str]] = []
+    lstat, fstat, junction, resolve, opened = (
+        os.lstat,
+        os.fstat,
+        os.path.isjunction,
+        Path.resolve,
+        Path.open,
+    )
+
+    def observed_lstat(path: Any, *args: Any, **kwargs: Any) -> os.stat_result:
+        events.append(("lstat", cast(str, os.fspath(path))))
+        return lstat(path, *args, **kwargs)
+
+    def observed_fstat(fd: int) -> os.stat_result:
+        events.append(("fstat", ""))
+        return fstat(fd)
+
+    def observed_junction(path: Any) -> bool:
+        events.append(("junction", cast(str, os.fspath(path))))
+        return junction(path)
+
+    def observed_resolve(path: Path, *args: Any, **kwargs: Any) -> Path:
+        events.append(("resolve", str(path)))
+        return resolve(path, *args, **kwargs)
+
+    class Stream:
+        def __init__(self, stream: Any) -> None:
+            self.stream = stream
+
+        def __enter__(self) -> Stream:
+            self.stream.__enter__()
+            return self
+
+        def __exit__(self, *args: Any) -> Any:
+            return self.stream.__exit__(*args)
+
+        def fileno(self) -> int:
+            return cast(int, self.stream.fileno())
+
+        def read(self) -> bytes:
+            events.append(("read", ""))
+            return cast(bytes, self.stream.read())
+
+    def observed_open(path: Path, *args: Any, **kwargs: Any) -> Stream:
+        events.append(("open", str(path)))
+        return Stream(opened(path, *args, **kwargs))
+
+    with monkeypatch.context() as patch:
+        patch.setattr(os, "lstat", observed_lstat)
+        patch.setattr(os, "fstat", observed_fstat)
+        patch.setattr(os.path, "isjunction", observed_junction)
+        patch.setattr(Path, "resolve", observed_resolve)
+        patch.setattr(Path, "open", observed_open)
+
+        def observe(
+            reader: Callable[..., Any],
+        ) -> tuple[list[Any], tuple[str, str] | None, list[Any]]:
+            events.clear()
+            values: list[Any] = []
+            error = None
+            try:
+                values.extend(reader(tmp_path, names, observe_ancestors=True))
+            except ValueError as exc:
+                error = type(exc).__name__, str(exc)
+            return values, error, list(events)
+
+        expected = observe(original)
+
+        @preflight.invocation
+        def run() -> None:
+            current = cast(Callable[..., Any], vars(preflight)["_source_members"])
+            assert observe(current) == expected
+            before = _ci66_storage().path_plan_charge
+            assert before > 0
+            assert observe(current) == expected
+            assert _ci66_storage().path_plan_charge == before
+
+        run()
+
+
+def test_ci66_path_plan_charge_and_full_budget_fallback(tmp_path: Path) -> None:
+    import sys
+
+    for index in range(12):
+        (tmp_path / str(index)).write_bytes(b"owned")
+
+    @preflight.invocation
+    def run() -> None:
+        storage = _ci66_storage()
+        for index in range(11):
+            preflight.source_members(tmp_path, [str(index)])
+        plans = storage.path_plans
+        assert plans is not None
+        assert len(plans) == 11
+        charge = sys.getsizeof(plans)
+        for key, plan in plans.items():
+            assert all(type(value) is str for value in (*plan[0], plan[1]))
+            charge += (
+                sys.getsizeof(key)
+                + sys.getsizeof(key[1])
+                + sys.getsizeof(key[2])
+                + sys.getsizeof(key[3])
+                + sys.getsizeof(plan)
+                + sys.getsizeof(plan[0])
+                + sum(sys.getsizeof(value) for value in plan[0])
+                + sys.getsizeof(plan[1])
+            )
+        assert storage.path_plan_charge == storage.retained == charge
+        storage.limit = charge
+        assert preflight.source_members(tmp_path, ["11"])[0][2] == b"owned"
+        assert storage.path_plans is plans
+        assert storage.retained == storage.path_plan_charge == charge
+        assert len(plans) == 11
+        assert preflight.source_members(tmp_path, ["0"])[0][2] == b"owned"
+        assert storage.retained == charge
+
+    run()
+
+
+@pytest.mark.parametrize("cancel", [False, True])
+def test_ci66_path_plans_revoke_with_invocation_and_copied_context(
+    tmp_path: Path,
+    cancel: bool,
+) -> None:
+    import contextvars
+
+    (tmp_path / "source").write_bytes(b"before")
+    contexts: list[contextvars.Context] = []
+    held: list[_Ci66Storage] = []
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.source_members(tmp_path, ["source"])
+        held.append(_ci66_storage())
+        contexts.append(contextvars.copy_context())
+        assert held[-1].path_plans
+        if cancel:
+            raise KeyboardInterrupt("ci66 cancellation")
+
+    if cancel:
+        with pytest.raises(KeyboardInterrupt, match="ci66 cancellation"):
+            run()
+    else:
+        run()
+    assert not held[0].active
+    assert held[0].path_plans is None
+    assert held[0].retained == held[0].path_plan_charge == 0
+    (tmp_path / "source").write_bytes(b"edited")
+    assert contexts[0].run(preflight.source_members, tmp_path, ["source"])[0][2] == b"edited"
+    assert held[0].path_plans is None
+    assert held[0].retained == 0
+
+
+@pytest.mark.parametrize("wrong", ["pid", "thread"])
+def test_ci66_wrong_owner_bypasses_path_plan_retention(tmp_path: Path, wrong: str) -> None:
+    (tmp_path / "source").write_bytes(b"owned")
+
+    @preflight.invocation
+    def run() -> None:
+        storage = _ci66_storage()
+        owner = storage.owner
+        storage.owner = (owner[0] + 1, owner[1]) if wrong == "pid" else (owner[0], owner[1] + 1)
+        assert preflight.source_members(tmp_path, ["source"])[0][2] == b"owned"
+        assert storage.path_plans is None
+        assert storage.retained == 0
+
+    run()
+
+
+def test_ci66_warm_plan_keeps_same_size_restored_mtime_read_fresh(tmp_path: Path) -> None:
+    path = tmp_path / "source"
+    path.write_bytes(b"before")
+
+    @preflight.invocation
+    def run() -> None:
+        assert preflight.source_members(tmp_path, ["source"])[0][2] == b"before"
+        plans = _ci66_storage().path_plans
+        metadata = path.stat()
+        path.write_bytes(b"edited")
+        os.utime(path, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+        assert preflight.source_members(tmp_path, ["source"])[0][2] == b"edited"
+        assert _ci66_storage().path_plans is plans
+
+    run()
+
+
+def test_ci66_warm_plan_rejects_above_root_alias_between_members(tmp_path: Path) -> None:
+    container, alternate = tmp_path / "container", tmp_path / "alternate"
+    root = container / "repo"
+    root.mkdir(parents=True)
+    (alternate / "repo").mkdir(parents=True)
+    for directory in [root, alternate / "repo"]:
+        for name in ["a", "b"]:
+            (directory / name).write_bytes(b"same")
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.source_members(root, ["a", "b"])
+        reader = cast(Callable[..., Any], vars(preflight)["_source_members"])
+        scan = reader(root, ["a", "b"], observe_ancestors=True)
+        assert next(scan)[2] == b"same"
+        retained = tmp_path / "retained"
+        container.rename(retained)
+        container.symlink_to(alternate, target_is_directory=True)
+        try:
+            with pytest.raises(ValueError, match=r"owned regular file|directory changed"):
+                next(scan)
+        finally:
+            container.unlink()
+            retained.rename(container)
+
+    run()
+
+
+def test_ci66_changed_is_absolute_uses_original_lazy_fallback(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (tmp_path / "source").write_bytes(b"same")
+    original = Path.is_absolute
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.source_members(tmp_path, ["source"])
+        storage = _ci66_storage()
+        plans = storage.path_plans
+        observed: list[str] = []
+
+        def changed(path: Path) -> bool:
+            observed.append(str(path))
+            if path == tmp_path:
+                raise AssertionError("extra eligibility call")
+            return original(path)
+
+        patch.setattr(Path, "is_absolute", changed)
+        # Exercise the pure seam: the physical scanner legitimately uses Path methods too.
+        member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+        assert member(tmp_path, str(tmp_path), "source", owned=True)[1] == str(tmp_path / "source")
+        assert observed == ["source"]
+        assert storage.path_plans is plans
+
+    with monkeypatch.context() as patch:
+        run()
+        member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+        assert member(tmp_path, str(tmp_path), "source", owned=True)[1] == str(tmp_path / "source")
+
+
+@pytest.mark.parametrize("changed", ["constructor", "parts", "splitroot", "fspath"])
+def test_ci66_changed_path_dependencies_rebuild_without_retention(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    changed: str,
+) -> None:
+    from pathlib import PosixPath
+
+    (tmp_path / "source").write_bytes(b"same")
+    member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+    builder = cast(Callable[..., Any], vars(preflight)["_literal_member_plan"])
+    built: list[str] = []
+
+    def observed(root_name: str, name: str) -> Any:
+        built.append(name)
+        return builder(root_name, name)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(preflight, "_literal_member_plan", observed)
+
+        @preflight.invocation
+        def run() -> None:
+            first = member(tmp_path, str(tmp_path), "source", owned=True)
+            assert member(tmp_path, str(tmp_path), "source", owned=True) is first
+            assert built == ["source"]
+            storage = _ci66_storage()
+            plans, charge = storage.path_plans, storage.retained
+            if changed == "constructor":
+
+                def constructor(*args: Any, **kwargs: Any) -> Path:
+                    return Path(*args, **kwargs)
+
+                patch.setattr(preflight, "Path", constructor)
+            elif changed == "parts":
+                descriptor = Path.parts
+
+                def parts(value: Path) -> tuple[str, ...]:
+                    result: tuple[str, ...] = descriptor.__get__(value)
+                    return result
+
+                patch.setattr(PosixPath, "parts", property(parts))
+            elif changed == "splitroot":
+                parser = cast(Any, PosixPath).parser
+                splitroot = parser.splitroot
+
+                def split(path: Any) -> Any:
+                    return splitroot(path)
+
+                patch.setattr(parser, "splitroot", split)
+            else:
+                fspath = os.fspath
+
+                def filesystem_path(path: Any) -> str | bytes:
+                    return cast(str | bytes, fspath(path))
+
+                patch.setattr(os, "fspath", filesystem_path)
+            assert member(tmp_path, str(tmp_path), "source", owned=True) == first
+            assert built == ["source", "source"]
+            assert storage.path_plans is plans
+            assert storage.retained == charge
+
+        run()
+
+
+@pytest.mark.parametrize("root", ["/", "//", "relative"])
+def test_ci66_path_plan_root_spelling_and_relative_fallback(root: str) -> None:
+    member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+
+    @preflight.invocation
+    def run() -> None:
+        path = Path(root)
+        member(path, path.as_posix().rstrip("/") or "/", "source", owned=True)
+        plans = _ci66_storage().path_plans
+        if root == "relative":
+            assert plans is None
+        else:
+            assert plans is not None
+            assert next(iter(plans))[1] == root
+
+    run()
+
+
+@pytest.mark.parametrize("kind", ["windows", "relative", "subclass", "hash-scan"])
+def test_ci66_ineligible_path_plans_keep_original_uncached_semantics(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    kind: str,
+) -> None:
+    from pathlib import PosixPath
+
+    member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+    builder = cast(Callable[..., Any], vars(preflight)["_literal_member_plan"])
+
+    class DerivedPath(PosixPath):
+        pass
+
+    @preflight.invocation
+    def run() -> None:
+        root = Path("relative") if kind == "relative" else tmp_path
+        if kind == "subclass":
+            root = DerivedPath(root)
+        root_name = root.as_posix().rstrip("/") or "/"
+        expected = builder(root_name, "dir/source")
+        with monkeypatch.context() as patch:
+            if kind == "windows":
+                patch.setattr(preflight, "os", SimpleNamespace(name="nt"))
+            assert member(root, root_name, "dir/source", owned=kind != "hash-scan") == expected
+            assert member(root, root_name, "dir/source", owned=kind != "hash-scan") == expected
+        assert _ci66_storage().path_plans is None
+        assert _ci66_storage().retained == 0
+
+    run()
+
+
+def test_ci66_nested_invocations_and_active_other_thread_keep_plans_isolated(
+    tmp_path: Path,
+) -> None:
+    import contextvars
+    from concurrent.futures import ThreadPoolExecutor
+
+    for name in ["outer", "inner", "thread"]:
+        (tmp_path / name).write_bytes(name.encode())
+    held: list[_Ci66Storage] = []
+
+    @preflight.invocation
+    def inner() -> None:
+        storage = _ci66_storage()
+        held.append(storage)
+        assert storage.path_plans is None
+        assert storage.retained == 0
+        preflight.source_members(tmp_path, ["inner"])
+        assert storage.path_plans
+
+    @preflight.invocation
+    def outer() -> None:
+        preflight.source_members(tmp_path, ["outer"])
+        storage = _ci66_storage()
+        plans, charge = storage.path_plans, storage.retained
+        inner()
+        assert held[0] is not storage
+        assert not held[0].active
+        assert held[0].path_plans is None
+        assert held[0].retained == 0
+        assert storage.path_plans is plans
+        assert storage.retained == charge
+        copied = contextvars.copy_context()
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            result = executor.submit(copied.run, preflight.source_members, tmp_path, ["thread"])
+            assert result.result()[0][2] == b"thread"
+        assert storage.path_plans is plans
+        assert storage.retained == charge
+
+    outer()
+
+
+def test_ci66_dependency_change_between_warm_members_keeps_lazy_rejection(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    for name in ["first", "second"]:
+        (tmp_path / name).write_bytes(b"same")
+    reader = cast(Callable[..., Any], vars(preflight)["_source_members"])
+    original = Path.as_posix
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.source_members(tmp_path, ["first", "second"])
+        plans = _ci66_storage().path_plans
+        scan = reader(tmp_path, ["first", "second"], observe_ancestors=True)
+        assert next(scan)[0] == "first"
+
+        def changed(path: Path) -> str:
+            value = original(path)
+            return "altered" if value == "second" else value
+
+        with monkeypatch.context() as patch:
+            patch.setattr(Path, "as_posix", changed)
+            with pytest.raises(ValueError, match="Noncanonical D07 member: second"):
+                next(scan)
+        assert _ci66_storage().path_plans is plans
+
+    run()
+
+
+def test_ci66_invalid_plan_is_not_retained_and_root_spellings_remain_distinct() -> None:
+    member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+
+    @preflight.invocation
+    def run() -> None:
+        storage = _ci66_storage()
+        with pytest.raises(ValueError, match="Noncanonical D07 member"):
+            member(Path("/"), "/", "../bad", owned=True)
+        assert storage.path_plans is None
+        assert storage.retained == 0
+        first = member(Path("/"), "/", "source", owned=True)
+        second = member(Path("//"), "/", "source", owned=True)
+        assert first == second
+        plans = _ci66_storage().path_plans
+        assert plans is not None
+        assert len(plans) == 2
+        assert {key[1] for key in plans} == {"/", "//"}
+
+    run()

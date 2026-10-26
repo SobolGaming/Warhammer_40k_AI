@@ -1003,7 +1003,29 @@ def test_activated_native_ci64_two_entry_budget_and_reuse(
             scope = vars(preflight)["_DIGESTS"]
             storage = cast(_Storage, scope.get())
             held.append(storage)
+            bootstrap_entries = dict(storage.admissions)
             ci60.admitted(root)
+            assert storage.admissions == bootstrap_entries
+            assert all(
+                storage.admissions[key] is not value for key, value in bootstrap_entries.items()
+            )
+            snapshot = vars(history)["_ACTIVE"].get()
+            assert snapshot is not None
+            current_operands = next(
+                operands
+                for key, operands in storage.admissions.items()
+                if key[0].__name__ == "_current_derivation_transition"
+            )
+            historical = [
+                (name.removeprefix("next-frozen/"), raw)
+                for name, _, raw in current_operands
+                if name.startswith("next-frozen/")
+            ]
+            assert historical
+            assert all(
+                raw is snapshot.contents["plain60", ci60.PRELUDE_FREEZE, name]
+                for name, raw in historical
+            )
             retained = storage.retained
             entries = dict(storage.admissions)
             ci60.admitted(root)
@@ -1373,3 +1395,67 @@ def test_activated_native_ci65_acquisition_failure_revokes_pending(
     run()
     assert not held[0].active
     assert copied[0].run(history.proof_identity, root) is None
+
+
+def test_ci66_equal_admission_refreshes_references_without_new_proof_or_charge() -> None:
+    storage = _Mechanisms.storage(_mechanisms, 1024)
+    calls: list[AdmissionOperands] = []
+
+    def check(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append(operands)
+        if operands[0][2] == b"changed":
+            raise ValueError("changed bytes")
+
+    first: AdmissionOperands = (("member", 0o100644, bytes(bytearray(b"equal"))),)
+    latest: AdmissionOperands = (("member", 0o100644, bytes(bytearray(b"equal"))),)
+    assert first == latest
+    assert first is not latest
+    assert first[0][2] is not latest[0][2]
+    key = check, IDENTITY, ()
+    storage.admission(check, first, IDENTITY, ())
+    charge = storage.retained
+    storage.admission(check, latest, IDENTITY, ())
+    assert storage.admissions[key] is latest
+    assert storage.retained == charge == 5
+    assert calls == [first]
+    third: AdmissionOperands = (("member", 0o100644, latest[0][2]),)
+    storage.admission(check, third, IDENTITY, ())
+    assert storage.admissions[key] is third
+    assert storage.admissions[key][0][2] is latest[0][2]
+    assert storage.retained == charge
+    assert calls == [first]
+    with pytest.raises(ValueError, match="changed bytes"):
+        storage.admission(check, (("member", 0o100644, b"changed"),), IDENTITY, ())
+    assert key not in storage.admissions
+    assert storage.retained == 0
+    assert len(calls) == 2
+
+
+@pytest.mark.parametrize("changed", ["mode", "order", "multiplicity", "dependency", "phase"])
+def test_ci66_refreshed_admission_still_checks_every_operand_and_key(changed: str) -> None:
+    storage = _Mechanisms.storage(_mechanisms, 1024)
+    calls: list[AdmissionOperands] = []
+
+    def check(operands: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        calls.append(operands)
+
+    first: AdmissionOperands = (("a", 1, b"a"), ("b", 2, b"b"))
+    latest: AdmissionOperands = tuple((n, m, bytes(bytearray(raw))) for n, m, raw in first)
+    storage.admission(check, first, IDENTITY, ())
+    storage.admission(check, latest, IDENTITY, ())
+    assert storage.admissions[check, IDENTITY, ()] is latest
+    altered = latest
+    identity = IDENTITY
+    dependencies: tuple[Callable[..., Any], ...] = ()
+    if changed == "mode":
+        altered = (("a", 2, b"a"), latest[1])
+    elif changed == "order":
+        altered = tuple(reversed(latest))
+    elif changed == "multiplicity":
+        altered = (latest[0], latest[0])
+    elif changed == "dependency":
+        dependencies = (str,)
+    else:
+        identity = (*IDENTITY[:-1], "second-phase")
+    storage.admission(check, altered, identity, dependencies)
+    assert len(calls) == 2

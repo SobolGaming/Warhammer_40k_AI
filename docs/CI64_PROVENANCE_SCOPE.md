@@ -33,7 +33,7 @@ three original base samples and three original head samples must be fresh. No
 report or failed sample is relabeled.
 
 All408 original historical assertions, all assertions in touched test modules and
-all1912 prior quality case identities remain required. New cases append to shard1
+all1940 prior quality case identities remain required. New cases append to shard1
 without changing old shard/order. Original malformed-input rejection, mandatory
 obligations, shared-dict distinct keys, owner hash ordering, ancestry mutation,
 Windows metadata and independent validation-phase controls remain in force.
@@ -64,3 +64,22 @@ Pending and promoted proofs revoke on every failure/cancellation/phase exit, and
 ordinary no-phase callers remain uncached. Independent preflight/postflight calls
 start empty. Early proof retention may displace digest retention; the fallback
 still computes and no deadline benefit is assumed before the complete command.
+
+The following sealed candidate E3 1ef132beb50518bc727a6bf134eb3ab44f3d94e7
+also failed its genuine180-second command (attempt051). Diagnostic052 on that
+exact failed checkout completed one observed preflight in120.444seconds, without
+smoke or postflight. Its fresh owned scans and the full admission-method span
+were material measured costs; their avoidable shares remain unknown. Both pure
+validators executed only once. Neither diagnostic success nor an interrupted
+stack establishes a complete qualification pass.
+
+This regenerated candidate retains bounded immutable POSIX ancestor/member
+strings inside the existing invocation and512MiB shared budget, while preserving
+lazy canonical validation and every physical observation. Ineligible roots,
+changed path dependencies and expired or foreign-owner contexts use the original
+uncached construction. No metadata, resolution, handle or current byte read is
+cached by a path plan. A fully equal admission hit adopts the latest immutable
+operand references, allowing authenticated historical snapshot bytes to compare
+by identity on later calls; complete equality, payload charge and proof lifecycle
+remain unchanged. All prior failed attempts and authentic source cohorts remain
+historical evidence. No further cache or timing-budget change is included.

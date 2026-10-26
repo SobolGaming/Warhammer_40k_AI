@@ -12,12 +12,13 @@ import hashlib
 import json
 import os
 import stat
+import sys
 import threading
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from functools import wraps
-from pathlib import Path
+from pathlib import Path, PosixPath, PurePath
 from typing import Any, cast
 
 # Bound retained raw payload independently of the complete source/input corpus.
@@ -28,12 +29,91 @@ AdmissionOperands = tuple[tuple[str, int, bytes], ...]
 AdmissionValidator = Callable[[AdmissionOperands, tuple[str, ...]], None]
 
 
+_PathPlan = tuple[tuple[str, ...], str]
+_PathKey = tuple[type[Path], str, str, tuple[object, ...]]
+
+
+def _posix_path_dependencies() -> tuple[object, ...]:
+    """Only the pure constructor/parser operations skipped by an owned plan."""
+    parser = cast(Any, PosixPath).parser
+    methods = (
+        "__new__",
+        "__init__",
+        "is_absolute",
+        "drive",
+        "root",
+        "parts",
+        "_raw_path",
+        "_tail",
+        "__str__",
+        "as_posix",
+        "_parse_path",
+        "_format_parsed_parts",
+    )
+    return (
+        Path,
+        PosixPath,
+        PurePath,
+        *(
+            getattr(value, "__func__", value)
+            for name in methods
+            for value in (getattr(PosixPath, name),)
+        ),
+        parser,
+        parser.sep,
+        parser.altsep,
+        parser.splitroot,
+        parser.splitdrive,
+        parser.join,
+        os.fspath,
+        os.name,
+    )
+
+
+_POSIX_PATH_DEPENDENCIES = _posix_path_dependencies()
+
+
+def _literal_member_plan(root_name: str, name: str) -> _PathPlan:
+    relative = Path(name)
+    if (
+        relative.is_absolute()
+        or relative.drive
+        or relative.as_posix() != name
+        or ".." in relative.parts
+    ):
+        raise ValueError("Noncanonical D07 member: " + name)
+    parents = []
+    path = root_name
+    for component in ("", *relative.parts[:-1]):
+        if component:
+            path = path.rstrip("/") + "/" + component
+        parents.append(path)
+    return tuple(parents), root_name.rstrip("/") + "/" + name
+
+
+def _path_plan_size(key: _PathKey, plan: _PathPlan) -> int:
+    # Strings/tuples are the only newly retained objects. Count shared strings
+    # conservatively more than once; existing global classes/callables are not copied.
+    return (
+        sys.getsizeof(key)
+        + sys.getsizeof(key[1])
+        + sys.getsizeof(key[2])
+        + sys.getsizeof(key[3])
+        + sys.getsizeof(plan)
+        + sys.getsizeof(plan[0])
+        + sum(sys.getsizeof(value) for value in plan[0])
+        + sys.getsizeof(plan[1])
+    )
+
+
 class _Digests:
     def __init__(self, limit: int = _DIGEST_LIMIT) -> None:
         self.limit = limit
         self.retained = 0
         self.entries: dict[tuple[Callable[..., Any], str], tuple[bytes, str]] = {}
         self.active = True
+        self.path_plans: dict[_PathKey, _PathPlan] | None = None
+        self.path_plan_charge = 0
         self.owner = (os.getpid(), threading.get_ident())
         self.ci60_handoff: _Ci60AdmissionHandoff | None = None
         self.admissions: dict[
@@ -51,6 +131,8 @@ class _Digests:
         key = validator, identity, dependencies
         previous = self.admissions.get(key) if self.active else None
         if previous is not None and previous == operands:
+            # Adopt equal active-snapshot byte objects after the complete comparison.
+            self.admissions[key] = operands
             return
         if previous is not None:
             self.retained -= sum(len(raw) for _, _, raw in previous)
@@ -60,6 +142,21 @@ class _Digests:
         if self.active and required <= self.limit - self.retained:
             self.admissions[key] = operands
             self.retained += required
+
+    def member_plan(self, root: Path, root_name: str, name: str) -> _PathPlan:
+        key = type(root), root.as_posix(), name, _POSIX_PATH_DEPENDENCIES
+        if self.path_plans is not None and key in self.path_plans:
+            return self.path_plans[key]
+        plan = _literal_member_plan(root_name, name)
+        prospective = {} if self.path_plans is None else dict(self.path_plans)
+        prospective[key] = plan
+        old_dictionary = 0 if self.path_plans is None else sys.getsizeof(self.path_plans)
+        required = _path_plan_size(key, plan) + sys.getsizeof(prospective) - old_dictionary
+        if required <= self.limit - self.retained:
+            self.path_plans = prospective
+            self.path_plan_charge += required
+            self.retained += required
+        return plan
 
     def digest(self, path: str, raw: bytes) -> str:
         function = hashlib.sha256
@@ -112,6 +209,8 @@ def invocation[F: Callable[..., Any]](function: F) -> F:
                 digests.ci60_handoff = None
             digests.admissions.clear()
             digests.entries.clear()
+            digests.path_plans = None
+            digests.path_plan_charge = 0
             digests.retained = 0
             _DIGESTS.reset(digests_token)
             _OWNERS.reset(owners_token)
@@ -328,6 +427,23 @@ def discovered_sources(root: Path) -> set[str]:
     return result
 
 
+def _member_plan(root: Path, root_name: str, name: str, *, owned: bool) -> _PathPlan:
+    storage = _DIGESTS.get()
+    if (
+        owned
+        and os.name == "posix"
+        and type(root) is PosixPath
+        and type(name) is str
+        and storage is not None
+        and storage.active
+        and storage.owner == (os.getpid(), threading.get_ident())
+        and _posix_path_dependencies() == _POSIX_PATH_DEPENDENCIES
+        and root.is_absolute()
+    ):
+        return storage.member_plan(root, root_name, name)
+    return _literal_member_plan(root_name, name)
+
+
 def _source_members(
     root: Path, names: list[str], *, observe_ancestors: bool
 ) -> Iterator[tuple[str, int, bytes]]:
@@ -342,18 +458,8 @@ def _source_members(
     root_name = root.as_posix().rstrip("/") or "/"
     root_parts = root.parts
     for name in names:
-        relative = Path(name)
-        if (
-            relative.is_absolute()
-            or relative.drive
-            or relative.as_posix() != name
-            or ".." in relative.parts
-        ):
-            raise ValueError("Noncanonical D07 member: " + name)
-        path = root_name
-        for component in ("", *relative.parts[:-1]):
-            if component:
-                path = path.rstrip("/") + "/" + component
+        parents, member_name = _member_plan(root, root_name, name, owned=observe_ancestors)
+        for path in parents:
             if observe_ancestors or path not in directories:
                 metadata = os.lstat(path)
                 if not stat.S_ISDIR(metadata.st_mode) or os.path.isjunction(path):
@@ -366,7 +472,7 @@ def _source_members(
                 ) != (metadata.st_dev, metadata.st_ino, metadata.st_mode):
                     raise ValueError("Cumulative source directory changed during owned scan.")
                 directories[path] = metadata
-        path = root_name.rstrip("/") + "/" + name
+        path = member_name
         before = os.lstat(path)
         if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or os.path.isjunction(path):
             raise ValueError("D07 member must be an owned regular file: " + name)
