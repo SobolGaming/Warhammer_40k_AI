@@ -1,12 +1,16 @@
 {
   "schema": "ci64-finite-current-applicability-v1",
   "original_input_digest": "e8e85f08af6a203f5c943fe55458d9541198c0fa4bcbcb70bb3ef5f998b85139",
-  "current_producing_input_digest": "e0a99340ba3208723e7a3bcd3501c64fa8a8ef903191a366e222e0d488f91127",
+  "current_producing_input_digest": "22eb8fcaa398341a6491446a92b7c2cb42bd4943983ca02ad6a829ad5ee4a217",
   "previous_applicability_sha256": "9f0d51de50c458a5caeaa1fe3eabefeab3e90d701ce1afb8bfd4dc0cc8744148",
   "changes": {
     "docs/performance/policy-v3/operation-map.json": {
       "before": "813b3219639758c6d11976533147455b32492b58122bb2d0933e9660deff00cf",
-      "after": "48e6ca8be7141e048ef13b6bf5f9817e89da54db3d6d7007222144169e9c8388"
+      "after": "a441a24a066c5fcac06a23956a3b547095bd4d36d8ad7b5ad8a96c01746bde1b"
+    },
+    "tests/code_quality/test_performance_admission_transaction.py": {
+      "before": null,
+      "after": "3334949e5f8f89a3b07df5b3fe239d15a57fba2028e5fa4aa944941b110f09dd"
     },
     "tests/code_quality/test_performance_policy.py": {
       "before": "f45929b1d7138997e9bef8a390ca7fa1b1db467816cc6534871dd850222ddb98",
@@ -18,11 +22,15 @@
     },
     "tests/code_quality/test_performance_provenance.py": {
       "before": "d41520a9beeb772db7fc4b65bcfd13fc7bd6cdf3b1ec2bf5fbcd89920ce94d71",
-      "after": "205c5f4deada8f172630b929862e2b3b44417833cb22b1fe8331c5d94916efd9"
+      "after": "239c0e74056bb3dd6704aa0417eb8b82b98a03250fcfc13c56eac835a79e4f81"
+    },
+    "tools/cumulative_preservation.py": {
+      "before": "03ce7fa0c640db37aadd566ad76ad5555e36b532f1fd3ed4852782f55ce82e3d",
+      "after": "150a737ef58b8ea4b398e5b9f2014f38d44dd07376ead5198eaabff05fbc9cc5"
     },
     "tools/performance_ci60_qualification.py": {
       "before": "d94b11e3bcb165bdaec0cd8bb3e4dce7a627d0df07d17028285fb71e9703493e",
-      "after": "78290361dad9bbd186dd0db927c808999155997467f06e0c21aa8f9477277e44"
+      "after": "8f45cd4ac963acb92ded170810afb193f3c613c22e33509f282935466dac67e3"
     },
     "tools/performance_history_snapshot.py": {
       "before": "033896c722dcb38cb12040098ec253089e7d06ceb10d6aa9f6a6e58f41456dcf",
@@ -34,7 +42,7 @@
     },
     "tools/performance_preflight.py": {
       "before": "dc857922ba519ffc7b627f048458f448c82319723032c6889793bb496a359e36",
-      "after": "5421e70030df8532019ff8a62cdb1c809cead6b2a31c94ae4c75ffeed26e4de8"
+      "after": "16817c05526b44de281b383d0d469ac0df3a6ee51cc57a772bf28fe671943bf1"
     }
   },
   "unchanged_inputs": {
@@ -4842,7 +4850,6 @@
     "tools/core_rules_order97_models.py": "90023a2d04abd1bdac0542c40aa69784dbc4af9f3760b45d589ff4aa0832e9b2",
     "tools/core_stealth_catalog_overlay.py": "d631a0bd4d33ce7d4b06dc79686689837c159bdfc9abfc158c07ef4d2a10f9fa",
     "tools/cross_source_semantic_equivalence.py": "4d65a1661aa3d6b866a723fd3b57f901155a6aed06e2f6de63e7417e6a261919",
-    "tools/cumulative_preservation.py": "03ce7fa0c640db37aadd566ad76ad5555e36b532f1fd3ed4852782f55ce82e3d",
     "tools/emperors_children_39k_pro_audit.py": "f52931b084fdd9b106926cbc59226cea0efec02a771328733fcb08e89d46e4ca",
     "tools/emperors_children_support_report.py": "3f61891f9e933c289f937449957bd00369c6ff1ae112f35a1b273f453cd8a088",
     "tools/event_companion_battlefield_builder_catalog.py": "5a9f77b3a1de639af2d4abc96a92f77b45bb0c3357aa794d50aaa1c0288aebba",
@@ -4912,7 +4919,7 @@
         "tests/timing_plugin.py": "69387b39047c641ea0a4f96eb29a56b834242d1c2cd34a5fa7797e0c01ec4d59",
         "uv.lock": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa"
       },
-      "call_path": "benchmark_order96_rerolls.measure constructs strength_session, times complete_optional_attack, and separately checks fork restoration. All runtime and helper bytes are equal; none of the four provenance tools is imported by its source closure."
+      "call_path": "benchmark_order96_rerolls.measure constructs strength_session, times complete_optional_attack, and separately checks fork restoration. All runtime and helper bytes are equal; none of the changed provenance and quality owners is imported by its source closure."
     },
     "dice_sustained": {
       "driver": "scripts/benchmark_order96_rerolls.py",

@@ -486,7 +486,25 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
                 .decode()
                 .splitlines()
             )
-            expected_new = tuple(name for name in latest_names if name in ci60.PRELUDE_NEW)
+            # Check the complete current observation contract before preserving
+            # the original assertions over their exact historical153-member subset.
+            added = {ci60.TRANSACTION_TEST} | ci60.TRANSACTION_SHARDS
+            assert len(added) == 3
+            assert len(first_observations) == 5
+            assert len(first_observations[4]) == 20
+            assert sum(map(len, first_observations)) == 156
+            assert first_observations[4] == tuple(
+                name for name in latest_names if name in ci60.PRELUDE_OBSERVED
+            )
+            assert all(first_observations[4].count(name) == 1 for name in added)
+            assert not added.intersection(name for scan in first_observations[:4] for name in scan)
+            first_observations = [
+                *first_observations[:4],
+                tuple(name for name in first_observations[4] if name not in added),
+            ]
+            expected_new = tuple(
+                name for name in latest_names if name in ci60.PRELUDE_NEW - {ci60.TRANSACTION_TEST}
+            )
             assert len(first_observations) == 5
             assert len(expected_new) == 17
             assert first_observations[4] == expected_new
@@ -851,7 +869,10 @@ def ci64_pure_transition_operands() -> AdmissionOperands:
         *((f"next-frozen/{name}", 0, raw) for name, raw in frozen.items()),
         *((f"next-previous/{name}", 0, raw) for name, raw in previous.items()),
         *((f"current/{name}", 0o100644, current[name]) for name in sorted(previous)),
-        *((f"next-current/{name}", 0o100644, current[name]) for name in sorted(ci60.PRELUDE_NEW)),
+        *(
+            (f"next-current/{name}", 0o100644, current[name])
+            for name in sorted(ci60.PRELUDE_OBSERVED)
+        ),
         ("assessment-first", 0o100644, current[ci60.ASSESSMENT]),
         ("assessment-second", 0o100644, current[ci60.ASSESSMENT]),
         *((f"observed/{name}", 0o100644, current[name]) for name in sorted(previous)),

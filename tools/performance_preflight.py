@@ -1,17 +1,20 @@
-"""Invocation-local pure proof reuse and fresh, owned source scans.
+"""Invocation-local proof reuse, fresh scans and explicit admission transactions.
 
-No filesystem or Git result is cached. Each scan reads every byte again and checks
-ownership afresh. Pure hashes may reuse identical complete bytes within one bounded
-invocation; only checked ancestors within the current scan share ownership checks.
+Default scans read every byte and ownership afresh. An explicit verify_live
+transaction may lend one complete CI60 result between fresh start/end admissions;
+a reverted transient mutation inside that boundary may be unobserved. Transactions
+never cross invocations or independent preflight/postflight history phases.
 """
 
 from __future__ import annotations
 
 import fnmatch
 import hashlib
+import io
 import json
 import os
 import stat
+import subprocess
 import sys
 import threading
 from collections.abc import Callable, Iterator
@@ -19,10 +22,12 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from functools import wraps
 from pathlib import Path, PosixPath, PurePath
+from types import FunctionType
 from typing import Any, cast
 
 # Bound retained raw payload independently of the complete source/input corpus.
 _DIGEST_LIMIT = 512 * 1024 * 1024
+_GIT_POINTER_LIMIT = 64 * 1024
 
 # Complete immutable operands for the one CI60 admission proof.
 AdmissionOperands = tuple[tuple[str, int, bytes], ...]
@@ -203,6 +208,11 @@ def invocation[F: Callable[..., Any]](function: F) -> F:
         try:
             return function(*args, **kwargs)
         finally:
+            transaction = _ADMISSION_TRANSACTION.get() or _ADMISSION_GUARD.get()
+            if transaction is not None and transaction.storage is digests:
+                transaction.revoke()
+                _ADMISSION_TRANSACTION.set(None)
+                _ADMISSION_GUARD.set(None)
             digests.active = False
             if digests.ci60_handoff is not None:
                 digests.ci60_handoff.revoke(digests)
@@ -363,6 +373,392 @@ def admission_proof(
         digests.admission(validator, operands, identity, dependencies)
 
 
+class _AdmissionTransaction:
+    """Private complete CI60 result for one explicitly bounded verification."""
+
+    def __init__(
+        self,
+        root: Path,
+        storage: _Digests,
+        phase: tuple[str, ...],
+        fresh: Callable[[Path], dict[str, bytes]],
+        bindings: Callable[[], tuple[object, ...]],
+    ) -> None:
+        self.root = root
+        self.storage = storage
+        self.phase = phase
+        self.fresh = fresh
+        self.bindings = bindings
+        self.dependencies = bindings()
+        self.owner = (os.getpid(), threading.get_ident())
+        self.repository = self.repository_identity(root)
+        self.active = True
+        self.result: dict[str, bytes] = {}
+        self.charge = 0
+
+    @staticmethod
+    def repository_identity(root: Path) -> tuple[object, ...]:
+        if root.absolute() != root.resolve(strict=True):
+            raise ValueError("Admission transaction requires a physical repository.")
+        result: list[object] = [root.as_posix()]
+        for path in (root, root / ".git"):
+            value = path.lstat()
+            if path.is_symlink() or path.is_junction():
+                raise ValueError("Admission transaction metadata became aliased.")
+            result.extend(
+                (path.resolve(strict=True).as_posix(), value.st_dev, value.st_ino, value.st_mode)
+            )
+            if path != root and stat.S_ISREG(value.st_mode):
+                if value.st_size > _GIT_POINTER_LIMIT:
+                    raise ValueError("Admission transaction metadata pointer became oversized.")
+                pointer = tuple(
+                    _source_members(
+                        root, [".git"], observe_ancestors=True, read_limit=_GIT_POINTER_LIMIT
+                    )
+                )
+                if (
+                    type(pointer) is not tuple
+                    or len(pointer) != 1
+                    or len(pointer[0]) != 3
+                    or pointer[0][0] != ".git"
+                    or type(pointer[0][1]) is not int
+                    or type(pointer[0][2]) is not bytes
+                    or len(pointer[0][2]) > _GIT_POINTER_LIMIT
+                ):
+                    raise ValueError("Admission transaction metadata pointer observation changed.")
+                result.append(pointer)
+        result.append(
+            tuple(
+                sorted(
+                    (name, value)
+                    for name, value in os.environ.items()
+                    if name.startswith(("GIT_", "LC_"))
+                    or name in {"PATH", "HOME", "XDG_CONFIG_HOME", "LANG", "SYSTEMROOT"}
+                )
+            )
+        )
+        return tuple(result)
+
+    def check(self, root: Path, *, closing: bool = False) -> None:
+        from tools.performance_history_snapshot import proof_identity
+
+        if (
+            self.active == closing
+            or self.owner != (os.getpid(), threading.get_ident())
+            or not self.storage.active
+            or self.storage.owner != self.owner
+            or _DIGESTS.get() is not self.storage
+            or root != self.root
+            or self.repository_identity(root) != self.repository
+            or proof_identity(root) != self.phase
+            or self.bindings() != self.dependencies
+        ):
+            raise ValueError("Admission transaction identity or dependencies changed.")
+
+    def retain(self, values: dict[str, bytes]) -> bool:
+        if type(values) is not dict or any(
+            type(name) is not str or type(raw) is not bytes for name, raw in values.items()
+        ):
+            raise ValueError("Admission transaction requires an immutable byte result.")
+        # Charge copied keys/mapping and every retained payload conservatively,
+        # including bytes already retained by another independent pure proof.
+        required = (
+            sys.getsizeof(self)
+            + sys.getsizeof(values)
+            + sum(sys.getsizeof(name) + sys.getsizeof(raw) for name, raw in values.items())
+        )
+        required += _transaction_payload_size((self.repository, self.phase, self.dependencies))
+        for key, (raw, _) in tuple(self.storage.entries.items()):
+            if required <= self.storage.limit - self.storage.retained:
+                break
+            self.storage.retained -= len(raw)
+            del self.storage.entries[key]
+        if required > self.storage.limit - self.storage.retained:
+            return False
+        self.result = dict(values)
+        self.charge = required
+        self.storage.retained += required
+        return True
+
+    def revoke(self) -> None:
+        self.active = False
+        self.result.clear()
+        self.repository = ()
+        self.phase = ()
+        self.dependencies = ()
+        self.storage.retained -= self.charge
+        self.charge = 0
+
+
+def _transaction_payload_size(value: object) -> int:
+    """Charge the immutable tuple/string/byte data owned by this finite lease."""
+    if isinstance(value, tuple):
+        return sys.getsizeof(value) + sum(_transaction_payload_size(item) for item in value)
+    if isinstance(value, (str, bytes)):
+        return sys.getsizeof(value)
+    return 0
+
+
+_ADMISSION_TRANSACTION: ContextVar[_AdmissionTransaction | None] = ContextVar(
+    "admission_transaction", default=None
+)
+_ADMISSION_GUARD: ContextVar[_AdmissionTransaction | None] = ContextVar(
+    "admission_transaction_guard", default=None
+)
+
+
+def grouped_admission(
+    root: Path,
+    fresh: Callable[[Path], dict[str, bytes]],
+) -> dict[str, bytes]:
+    """Default calls remain fresh; only a live explicit transaction may lend bytes."""
+    state = _ADMISSION_TRANSACTION.get()
+    if state is None:
+        if _ADMISSION_GUARD.get() is not None:
+            raise ValueError("Admission transaction boundary acquisition cannot borrow.")
+        return fresh(root)
+    state.check(root)
+    if fresh is not state.fresh:
+        raise ValueError("Admission transaction entry point changed.")
+    return dict(state.result)
+
+
+@contextmanager
+def ci60_transaction(
+    root: Path,
+    fresh: Callable[[Path], dict[str, bytes]],
+    bindings: Callable[[], tuple[object, ...]],
+) -> Iterator[None]:
+    """Fresh complete start/end checks bound reuse to one verify_live body.
+
+    A reverted transient mutation wholly inside this boundary may be unobserved.
+    Insufficient capacity publishes no transaction: the original fully fresh
+    nested calls remain authoritative, without a grouped equality guarantee.
+    """
+    from tools.performance_history_snapshot import proof_identity
+
+    if _ADMISSION_TRANSACTION.get() is not None or _ADMISSION_GUARD.get() is not None:
+        raise ValueError("Nested admission transactions are not admitted.")
+    storage = _DIGESTS.get()
+    if storage is None or not storage.active:
+        yield
+        return
+    if storage.owner != (os.getpid(), threading.get_ident()):
+        raise ValueError("Admission transaction invocation identity changed.")
+    phase = proof_identity(root)
+    if phase is None:
+        yield
+        return
+    metadata = (root / ".git").lstat()
+    if (
+        (root / ".git").is_symlink()
+        or (root / ".git").is_junction()
+        or not (
+            stat.S_ISDIR(metadata.st_mode)
+            or (
+                stat.S_ISREG(metadata.st_mode)
+                and metadata.st_nlink == 1
+                and metadata.st_size <= _GIT_POINTER_LIMIT
+            )
+        )
+    ):
+        yield
+        return
+    state = _AdmissionTransaction(root, storage, phase, fresh, bindings)
+    cleanup_state: _AdmissionTransaction | None = state
+    token = None
+    guard_token = _ADMISSION_GUARD.set(state)
+    guard_active = True
+    try:
+        values = fresh(root)
+        state.check(root)
+        if not state.retain(values):
+            del values
+            state.revoke()
+            cleanup_state = None
+            del state
+            _ADMISSION_GUARD.reset(guard_token)
+            guard_active = False
+            yield
+            return
+        del values
+        token = _ADMISSION_TRANSACTION.set(state)
+        try:
+            yield
+        finally:
+            # Disable dispatch before complete end acquisition. On a body error,
+            # a passing end preserves that exact exception; a failed end retains
+            # it as Python's explicit exception context rather than swallowing it.
+            state.check(root)
+            state.active = False
+            previous_token, token = token, None
+            _ADMISSION_TRANSACTION.reset(previous_token)
+            observed = fresh(root)
+            state.check(root, closing=True)
+            if observed != state.result:
+                raise ValueError("Admission transaction complete result changed.")
+    finally:
+        if cleanup_state is not None:
+            cleanup_state.revoke()
+        try:
+            if token is not None:
+                _ADMISSION_TRANSACTION.reset(token)
+        finally:
+            if guard_active:
+                _ADMISSION_GUARD.reset(guard_token)
+
+
+def _admission_binding(value: object) -> object:
+    """Snapshot definitions/defaults of the finite declared binding objects."""
+    if isinstance(value, FunctionType):
+        defaults = value.__defaults__ or ()
+        keywords = tuple(sorted((value.__kwdefaults__ or {}).items()))
+        if any(
+            type(item) not in (type(None), bool, int, float, str, bytes)
+            for item in (*defaults, *(item for _, item in keywords))
+        ):
+            raise ValueError("Admission transaction function defaults changed.")
+        return value, value.__code__, defaults, keywords
+    if isinstance(value, tuple):
+        return tuple(_admission_binding(item) for item in value)
+    return value
+
+
+def ci60_admission_bindings() -> tuple[object, ...]:
+    """Finite bindings used by the complete admission path, not mutable results."""
+    import ast
+
+    from tools import performance_ci60_qualification as q
+    from tools import performance_history_snapshot as history
+    from tools import performance_policy as policy
+    from tools import performance_preflight_successor as successor
+
+    owner = policy.owner_hashes
+    if not isinstance(owner, FunctionType) or "__wrapped__" not in vars(owner):
+        raise ValueError("Admission transaction owner dependency changed.")
+    functions = (
+        *(
+            getattr(q, name)
+            for name in (
+                "fresh_admission",
+                "_derivation_source",
+                "_transaction_absence",
+                "_current_derivation_transition",
+                "_admitted_derivation",
+                "_prelude_transition",
+                "_derivation_transition",
+                "_preceding_self",
+                "_prelude_preimage",
+                "digest",
+                "git",
+                "history",
+            )
+        ),
+        owner,
+        vars(owner)["__wrapped__"],
+        policy.digest,
+        history.proof_identity,
+        history.historical,
+        history.eligible_blobs,
+        *(getattr(history, name) for name in ("_oid", "_path")),
+        history.Snapshot.blobs,
+        *(getattr(successor, name) for name in ("read_frozen_blobs", "_blobs", "_git")),
+        admission_proof,
+        source_members,
+        _source_members,
+        _member_plan,
+        _literal_member_plan,
+        _posix_path_dependencies,
+        _same_read,
+        _same_file,
+        _Digests.admission,
+        _Digests.member_plan,
+        _path_plan_size,
+        _Ci60AdmissionHandoff.check,
+        _Ci60AdmissionHandoff._repository,
+    )
+    if any(not isinstance(function, FunctionType) for function in functions):
+        raise ValueError("Admission transaction function dependency changed.")
+    selectors = (
+        q.BASE,
+        q.FREEZE,
+        q.SELF,
+        q.NAMESPACE,
+        q.ASSESSMENT,
+        q.MAP,
+        q.CONTROLS,
+        q.DERIVATION_BASE,
+        q.DERIVATION_FREEZE,
+        q.DERIVATION_NAMESPACE,
+        q.DERIVATION_MEMBERS,
+        q.DERIVATION_CONTROLS,
+        q.DERIVATION_INPUTS,
+        q.PRELUDE_BASE,
+        q.PRELUDE_FREEZE,
+        q.PRELUDE_NAMESPACE,
+        q.PRELUDE_MEMBERS,
+        q.PRELUDE_CONTROLS,
+        q.PRELUDE_NEW,
+        q.PRELUDE_INPUTS,
+        q.TRANSACTION_TEST,
+        q.TRANSACTION_SHARDS,
+        q.PRELUDE_OBSERVED,
+    )
+    if any(
+        type(value) not in (str, type(None), frozenset)
+        or (type(value) is frozenset and any(type(name) is not str for name in value))
+        for value in selectors
+    ):
+        raise ValueError("Admission transaction selector dependency changed.")
+    objects = (
+        *functions,
+        *selectors,
+        _GIT_POINTER_LIMIT,
+        ci60_admission_bindings,
+        _admission_binding,
+        _transaction_payload_size,
+        _DIGESTS,
+        _OWNERS,
+        _ADMISSION_GUARD,
+        _POSIX_PATH_DEPENDENCIES,
+        json.loads,
+        json.dumps,
+        hashlib.sha256,
+        hashlib.sha1,
+        ast.parse,
+        ast.dump,
+        ast.iter_fields,
+        ast.FunctionDef,
+        ast.AsyncFunctionDef,
+        ast.ClassDef,
+        ast.Module,
+        os.getpid,
+        threading.get_ident,
+        os.lstat,
+        os.fstat,
+        os.fspath,
+        os.path.isjunction,
+        stat.S_ISDIR,
+        stat.S_ISREG,
+        os.name,
+        Path,
+        PosixPath,
+        PurePath,
+        Path.resolve,
+        Path.absolute,
+        Path.lstat,
+        Path.open,
+        Path.as_posix,
+        Path.is_absolute,
+        Path.is_relative_to,
+        Path.parts,
+        io.open,
+        subprocess.check_output,
+        _posix_path_dependencies(),
+    )
+    return tuple(_admission_binding(value) for value in objects)
+
+
 def recipe_proof[F: Callable[..., None]](function: F) -> F:
     """Reuse a successful pure whole-AST comparison only for identical inputs."""
 
@@ -445,7 +841,7 @@ def _member_plan(root: Path, root_name: str, name: str, *, owned: bool) -> _Path
 
 
 def _source_members(
-    root: Path, names: list[str], *, observe_ancestors: bool
+    root: Path, names: list[str], *, observe_ancestors: bool, read_limit: int | None = None
 ) -> Iterator[tuple[str, int, bytes]]:
     """Read owned bytes; the CI60 caller also observes ancestors before each member.
 
@@ -489,7 +885,14 @@ def _source_members(
         windows = os.name == "nt"
         with member.open("rb") as stream:
             opened = os.fstat(stream.fileno())
-            raw = stream.read()
+            if read_limit is None:
+                raw = stream.read()
+            else:
+                if type(read_limit) is not int or read_limit < 0:
+                    raise ValueError("Owned read limit must be a nonnegative integer.")
+                raw = stream.read(read_limit + 1)
+                if len(raw) > read_limit:
+                    raise ValueError("Admission transaction metadata pointer exceeded read limit.")
             closed = os.fstat(stream.fileno())
             if windows:
                 # Keep ChangeTime observable through the final path query;

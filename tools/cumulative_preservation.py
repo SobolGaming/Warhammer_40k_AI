@@ -200,7 +200,17 @@ def expected_inputs(root: Path) -> tuple[dict[str, str], dict[str, str]]:
 
 
 def verify_live(root: Path) -> str:
-    """No success cache: every request rechecks physical source and collector bytes."""
+    """Keep source scans fresh while grouping nested CI60 admission boundaries."""
+    from tools import performance_ci60_qualification as ci60
+
+    if (root / ci60.NAMESPACE).is_dir():
+        with ci60.admission_transaction(root):
+            return _verify_live(root)
+    return _verify_live(root)
+
+
+def _verify_live(root: Path) -> str:
+    """Original complete membership, byte, owner and transformation checks."""
     if root.is_symlink() or root.is_junction():
         raise ValueError("Aliased cumulative root.")
     expected = expected_source(root)

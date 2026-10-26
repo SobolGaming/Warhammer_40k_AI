@@ -26944,6 +26944,729 @@
       ],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci67-transaction-086e0ec548886f1e506700aadba0fbe8bbde4d75b60e501a4ad13c488142c506": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/applicability.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-9b8afe6ff2599166e925f2560851594ea569a9ad1188ac8a0f9cf6a9dc430568": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/changed-members.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-c961dcb86fc47581d1ef9326c7d07cc233366dabd0cd7ef42191f586d05a8f5f": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/control-transitions.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-9a57e7ba771702ef011c710c2c2c6782cddce5b6c624906f73d85785d034c70b": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/measurement-provenance.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-bd178c732b4d38ec91f0f846c1dd67b8d1ffe0a86e944c45bd245b73d56b44f5": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/measurements/source-base.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-4761aad00f8e48364f63bdabbf76b2b784d41b692360fc07c7fe5fb5a0fa8709": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/measurements/source-head.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-af1df08f92143df58bb9289d45684aaa2305496e5cd456e33ae0432959d6782b": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/producing-inputs.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-0d4b03e207646fe04c57f81c961c3d1820555d13402040915335a9ad5ad85c9c": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/receipts/source-base-0.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-8975170c14b7589512aaf07dada1daf4d65f58a82fa4139070a3ab13e2197c19": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/receipts/source-base-1.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-e0433cb4982d4f3220dc3f1040789790e6c700b44147b9a9364f44ea9cec308d": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/receipts/source-base-2.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-dbb2fc219db15ea0d7098f29fddaaf57b97418b73b69ee77108892578dde760c": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/receipts/source-head-0.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-a5c3320ffa36870b28fec03f49088c4a45ceacdb55e33dba5afe1f14b8dc64af": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/receipts/source-head-1.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-4e1ac3acd338a1d7221b5844a1dc66ba99e7ea1861406f47898b6b7de121765b": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/receipts/source-head-2.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-c112aeb16e37c9f5db6012edff10016ade661b63b1e86a9dad882cf476f89f6f": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/source-token-inventories.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-7d1e0f3d07ea628ae05cae46129501e426c216d58fc2a9838c46e48f75e5d870": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/source-token-roles.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-51d8e1a1c6f47c28af7f0870d6dcd16b4bfa2eee92437c2439a207bf2f594b92": {
+      "paths": [
+        "tests/code_quality/test_performance_admission_transaction.py"
+      ],
+      "owners": [
+        "@module",
+        "_Internals",
+        "_Internals._Digests",
+        "_Internals._source_members",
+        "_Internals.bind_storage",
+        "_Internals.current_storage",
+        "_Internals.current_transaction",
+        "_Internals.members",
+        "_Internals.new_storage",
+        "_Internals.reset_storage",
+        "_Lease",
+        "_Lease.revoke",
+        "_Storage",
+        "_Storage.digest",
+        "inactive_identity",
+        "original",
+        "other_identity",
+        "phase_identity",
+        "root",
+        "storage",
+        "test_active_lease_rejects_identity_drift",
+        "test_actual_finite_binding_closure_rejects_callable_and_selector_drift",
+        "test_body_failure_preserves_exception_and_always_checks_end",
+        "test_complete_result_reservation_evicts_only_digest_entries",
+        "test_copied_context_is_revoked_before_fresh_end_acquisition",
+        "test_cross_context_exit_error_still_revokes_result_and_charge",
+        "test_cross_owner_context_cannot_use_lease",
+        "test_default_calls_remain_fresh",
+        "test_dual_failure_keeps_original_exception_context",
+        "test_escaped_manager_is_revoked_before_invocation_storage_is_cleared",
+        "test_exact_historical_absence_rejects_any_nonempty_native_result",
+        "test_exit_rejects_persistent_change",
+        "test_expired_phase_cannot_inherit_transaction_result",
+        "test_invalid_entry_never_publishes_result",
+        "test_mutable_payload_cannot_be_published_as_immutable_lease",
+        "test_mutable_selector_before_entry_is_rejected_without_retaining_alias",
+        "test_only_the_exact_declared_transaction_input_addition_is_admitted",
+        "test_original_default_reader_matches_explicit_none_with_real_owned_bytes",
+        "test_oversized_pointer_falls_back_before_any_pointer_read",
+        "test_pointer_growth_after_stat_is_rejected_by_bounded_actual_read",
+        "test_repository_selector_environment_cannot_borrow_old_result",
+        "test_reverted_transient_change_is_explicitly_allowed_within_one_boundary",
+        "test_same_owner_copy_participates_but_revoked_copy_cannot_escape",
+        "test_tiny_capacity_retains_original_fresh_calls_and_allows_later_fit",
+        "test_transaction_reentry_is_rejected_during_full_boundary_acquisition",
+        "test_transaction_rejects_storage_owned_by_another_context",
+        "test_transaction_uses_complete_start_end_and_defensive_results",
+        "test_unsupported_metadata_uses_original_fresh_path",
+        "test_unsupported_mutable_function_default_fails_closed",
+        "test_worktree_pointer_bytes_are_bound_with_protected_reads",
+        "test_worktree_pointer_complete_bytes_contribute_to_retained_charge"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960": {
+      "paths": [
+        "tests/code_quality/test_performance_policy.py"
+      ],
+      "owners": [
+        "@module",
+        "_assessment",
+        "_comparison",
+        "_smoke_receipt",
+        "_validate",
+        "ci64_original_policy",
+        "test_a_recognized_neighbor_cannot_cover_an_unknown_changed_owner",
+        "test_assessment_rejects_missing_stale_or_unmapped_claims",
+        "test_ci64_operation_index_matches_native_lazy_validation",
+        "test_ci64_operation_index_preserves_case_glob_and_literal_paths",
+        "test_ci64_owner_identity_filter_preserves_native_outputs",
+        "test_comparison_cannot_ignore_a_stricter_family_profile_or_host_qualification",
+        "test_current_comparison_requires_actual_matched_complete_evidence",
+        "test_current_smoke_is_in_the_required_serial_ci_lane",
+        "test_dependency_assessment_uses_the_reviewed_role_and_preserves_runtime_triggers",
+        "test_diff_binding_includes_untracked_and_deleted_files_and_only_excludes_assessment",
+        "test_each_lifecycle_sensitive_operation_remains_mandatory",
+        "test_equal_stale_measurement_hashes_do_not_authenticate_current_inputs",
+        "test_full_game_evidence_rejects_null_qualification_and_stale_workload",
+        "test_governance_and_ordinary_rule_changes_do_not_refresh_all_history",
+        "test_historical_evidence_is_immutable_and_unknown_inputs_never_fall_back",
+        "test_operation_map_uses_real_driver_and_owner_paths",
+        "test_order108_scope_preserves_other_assessment_obligations",
+        "test_order108_smoke_scope_authenticates_complete_semantic_rows",
+        "test_prior_current_measurements_cannot_be_overwritten_as_fresh_evidence",
+        "test_required_current_receipt_matches_this_checkout_and_assessment",
+        "test_rules_complete_milestone_fails_closed_without_full_game_profiling",
+        "test_sensitive_operations_cannot_be_downgraded_or_omitted",
+        "test_smoke_outputs_do_not_change_assessed_inputs_or_hide_unrelated_reports",
+        "test_smoke_validation_rejects_incomplete_stale_or_slow_attempts"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-68a42866e64b03909939024b6c5ec3cc50a32a88ce2ba4097ebbeab0f1dc6772": {
+      "paths": [
+        "tests/code_quality/test_performance_preflight.py"
+      ],
+      "owners": [
+        "@module",
+        "_Ci66Storage",
+        "_ClosedHistory",
+        "_ClosedHistory.__call__",
+        "_DigestProbe",
+        "_DigestProbe.digest",
+        "_DigestProbe.entries",
+        "_DigestProbe.limit",
+        "_DigestProbe.retained",
+        "_DigestScope",
+        "_DigestScope.get",
+        "_GateMechanisms",
+        "_GateMechanisms._check_and_run",
+        "_GateMechanisms.check_and_run",
+        "_GitCommand",
+        "_GitCommand.__call__",
+        "_HistoryBuilder",
+        "_HistoryBuilder.add",
+        "_HistoryBuilder.all_paths",
+        "_HistoryBuilder.finish",
+        "_HistoryIdentity",
+        "_HistoryIdentity.__call__",
+        "_HistoryMechanisms",
+        "_HistoryMechanisms.activate",
+        "_HistoryMechanisms.builder",
+        "_HistoryMechanisms.closed",
+        "_HistoryMechanisms.identity",
+        "_HistoryMechanisms.records",
+        "_HistoryMechanisms.seal",
+        "_LeaseState",
+        "_LeaseState.valid",
+        "_LeasedSnapshot",
+        "_LeasedSnapshot.valid",
+        "_PolicyMechanisms",
+        "_PolicyMechanisms._governance",
+        "_PolicyMechanisms.governance",
+        "_PreflightMechanisms",
+        "_PreflightMechanisms._DIGESTS",
+        "_PreflightMechanisms._DIGEST_LIMIT",
+        "_PreflightMechanisms._Digests",
+        "_PreflightMechanisms._same_read",
+        "_PreflightMechanisms._source_digest",
+        "_PreflightMechanisms.digest_limit",
+        "_PreflightMechanisms.digest_scope",
+        "_PreflightMechanisms.digests",
+        "_PreflightMechanisms.same_read",
+        "_PreflightMechanisms.source_digest",
+        "_ReceiptWriter",
+        "_ReceiptWriter._write_receipt",
+        "_ReceiptWriter.write",
+        "_SuccessorMechanisms",
+        "_SuccessorMechanisms._blobs",
+        "_SuccessorMechanisms._freeze",
+        "_SuccessorMechanisms._git",
+        "_SuccessorMechanisms.blobs",
+        "_SuccessorMechanisms.freeze",
+        "_SuccessorMechanisms.git",
+        "_SuccessorMechanisms.git_function",
+        "_ci66_original_reader",
+        "_ci66_storage",
+        "_history_fixture",
+        "_read_metadata",
+        "test_ci64_owned_scan_preserves_native_root_flavours",
+        "test_ci64_posix_containment_parts_equal_path_semantics",
+        "test_ci65_handoff_uses_real_native_phase_lease",
+        "test_ci66_changed_is_absolute_uses_original_lazy_fallback",
+        "test_ci66_changed_path_dependencies_rebuild_without_retention",
+        "test_ci66_dependency_change_between_warm_members_keeps_lazy_rejection",
+        "test_ci66_ineligible_path_plans_keep_original_uncached_semantics",
+        "test_ci66_invalid_plan_is_not_retained_and_root_spellings_remain_distinct",
+        "test_ci66_nested_invocations_and_active_other_thread_keep_plans_isolated",
+        "test_ci66_path_plan_charge_and_full_budget_fallback",
+        "test_ci66_path_plan_root_spelling_and_relative_fallback",
+        "test_ci66_path_plans_revoke_with_invocation_and_copied_context",
+        "test_ci66_warm_plan_keeps_same_size_restored_mtime_read_fresh",
+        "test_ci66_warm_plan_rejects_above_root_alias_between_members",
+        "test_ci66_warm_plans_preserve_original_observation_order",
+        "test_ci66_wrong_owner_bypasses_path_plan_retention",
+        "test_frozen_blob_batch_matches_git_show_and_revalidates_each_call",
+        "test_frozen_blob_batch_rejects_changed_members_and_malformed_payloads",
+        "test_frozen_blob_batch_rejects_nonliteral_or_ambiguous_selection",
+        "test_generated_inventory_changes_only_reviewed_perils_metadata",
+        "test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin",
+        "test_history_closed_process_requires_eof_zero_exit_and_reaps_child",
+        "test_history_closed_protocol_rejects_synthetic_malformed_native_response",
+        "test_history_cumulative_transport_requires_explicit_opt_in_and_preserves_live_calls",
+        "test_history_native_acquisition_rejects_wrong_authority_or_member",
+        "test_history_native_completion_detects_missing_object_after_acquisition",
+        "test_history_native_domains_preserve_complete_commit_tree_blob_bindings",
+        "test_history_phase_owns_immutable_bytes_revokes_copied_context_and_reacquires",
+        "test_history_portable_digest_ignores_local_clone_and_pytest_identity",
+        "test_history_postflight_failure_replaces_successful_smoke_receipt",
+        "test_history_publication_reconciles_native_members_and_original_declarations",
+        "test_history_published_operands_remain_stable_but_next_acquisition_is_fresh",
+        "test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelated_input",
+        "test_native_discovery_matches_original_ignored_and_symlink_membership",
+        "test_owned_read_compares_windows_ctime_within_each_api_channel",
+        "test_owned_read_rejects_cross_api_metadata_drift",
+        "test_owned_read_rejects_ctime_drift_in_either_api_channel",
+        "test_owned_scan_matches_independent_original_reader",
+        "test_owned_scan_reads_new_bytes_even_with_restored_mtime",
+        "test_owned_scan_rejects_aliases",
+        "test_owned_scan_rejects_midread_change",
+        "test_owned_windows_scan_rejects_write_at_final_path_query",
+        "test_owner_cache_uses_exact_inputs_defensive_copies_and_exception_cleanup",
+        "test_perils_admission_has_only_an_exact_governance_exception",
+        "test_public_smoke_gate_revalidates_and_refuses_midrun_change",
+        "test_pure_source_hash_memo_is_exact_bounded_and_validator_specific",
+        "test_pure_source_hash_memo_resets_after_nested_exceptions_and_new_invocations",
+        "test_recipe_cache_is_local_exact_and_validator_specific"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-b08ea3b287452f059f912a78f817b77173a3bebdef74f36947d8ac10ba9bb67f": {
+      "paths": [
+        "tests/code_quality/test_performance_provenance.py"
+      ],
+      "owners": [
+        "@module",
+        "_Ci60Mechanisms",
+        "_Ci60Mechanisms._admitted_derivation",
+        "_Ci60Mechanisms._current_applicability",
+        "_Ci60Mechanisms._derivation_transition",
+        "_Ci60Mechanisms.applicability",
+        "_Ci60Mechanisms.derive",
+        "_Ci60Mechanisms.transition",
+        "_Ci60Mechanisms.validators",
+        "_Ci64Mechanisms",
+        "_Ci64Mechanisms._prelude_applicability",
+        "_Ci64Mechanisms._prelude_transition",
+        "_Ci64Mechanisms._producing_inputs",
+        "_Ci64Mechanisms.applicability",
+        "_Ci64Mechanisms.producing",
+        "_Ci64Mechanisms.transition",
+        "_Mechanisms",
+        "_Mechanisms._Digests",
+        "_Mechanisms._same_read",
+        "_Mechanisms.read_validator",
+        "_Mechanisms.storage",
+        "_Storage",
+        "_Storage.admission",
+        "_Storage.digest",
+        "_ci65_storage",
+        "_ci65_validators",
+        "ci64_pure_transition_operands",
+        "finite_derivation_operands",
+        "original_ci60_operands",
+        "test_activated_native_applicability_rejects_false_equivalence",
+        "test_activated_native_ci64_applicability_rejects_false_equivalence",
+        "test_activated_native_ci64_two_entry_budget_and_reuse",
+        "test_activated_native_ci65_acquisition_failure_revokes_pending",
+        "test_activated_native_history_revokes_copied_phase_after_completion",
+        "test_admission_and_digest_share_the_existing_payload_limit",
+        "test_admission_identity_changes_require_independent_proof",
+        "test_admission_key_preserves_order_mode_bytes_and_multiplicity",
+        "test_admission_reuses_only_successful_complete_operands",
+        "test_admission_revokes_copied_context_after_success_or_cancellation",
+        "test_admission_validator_and_semantic_dependency_are_part_of_identity",
+        "test_ci64_pure_transition_preserves_exact_native_preimages",
+        "test_ci64_pure_transition_rejects_changed_observations",
+        "test_ci64_pure_transition_rejects_nonboolean_mandatory_operation",
+        "test_ci65_handoff_first_active_use_compares_every_operand",
+        "test_ci65_handoff_obeys_shared_budget_and_uncached_fallback",
+        "test_ci65_handoff_preserves_default_none_and_standalone_behavior",
+        "test_ci65_handoff_promotes_once_and_revokes_at_phase_exit",
+        "test_ci65_handoff_rejects_other_owner_or_repository",
+        "test_ci65_handoff_requires_actual_live_phase",
+        "test_ci65_handoff_revokes_pending_and_promoted_on_every_failure",
+        "test_ci66_equal_admission_refreshes_references_without_new_proof_or_charge",
+        "test_ci66_refreshed_admission_still_checks_every_operand_and_key",
+        "test_finite_transition_preserves_existing_operation_budgets",
+        "test_finite_transition_rejects_changed_boundary_observations",
+        "test_finite_transition_reuses_only_complete_successful_bytes",
+        "test_fresh_members_preserve_requested_observation_order",
+        "test_fresh_members_read_changed_bytes_with_restored_mtime",
+        "test_fresh_members_recheck_ancestor_before_each_observation",
+        "test_fresh_members_reject_unowned_paths",
+        "test_independent_preflight_and_postflight_do_not_share_derivations",
+        "test_measurement_projection_includes_newly_changed_preflight_control",
+        "test_original_native_ci60_derivation_matches_reused_verdict",
+        "test_original_native_derivation_rejects_each_changed_observation",
+        "test_source_token_binding_rejects_changed_finite_provenance",
+        "test_superseded_source_report_requires_exact_native_bytes",
+        "test_unscoped_observations_do_not_reuse_derivations"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-b8a07a50d2ab636b02a11559f104152dcc612c9b40acd7764ba17db66a02fef8": {
+      "paths": [
+        "tools/cumulative_preservation.py"
+      ],
+      "owners": [
+        "@module",
+        "_ast",
+        "_git",
+        "_json",
+        "_read",
+        "_registry",
+        "_sha",
+        "_verify_live",
+        "applies",
+        "assert_recipe",
+        "assessment_map_inputs",
+        "current_tool_inventory",
+        "d07_predecessors",
+        "expected_inputs",
+        "expected_source",
+        "measured_snapshot",
+        "read_archive",
+        "retained_inputs",
+        "reviewed_control_hashes",
+        "verify_baseline",
+        "verify_control_transformations",
+        "verify_current_inventory",
+        "verify_external_reads",
+        "verify_live",
+        "verify_owner_ledger"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-7e0cd098153fc0ae9cfa302c8e033685426c5727d175ff069ab75506cfe192b3": {
+      "paths": [
+        "tools/performance_ci60_qualification.py"
+      ],
+      "owners": [
+        "@module",
+        "_HistoricalPrevious",
+        "_HistoricalPrevious.__call__",
+        "_HistoricalStage",
+        "_HistoricalStage._freeze",
+        "_HistoricalStage._member",
+        "_HistoricalStage._read",
+        "_HistoricalStage.freeze",
+        "_HistoricalStage.member",
+        "_HistoricalStage.read",
+        "_admitted_derivation",
+        "_ci61_producing_inputs",
+        "_ci61_view",
+        "_cohort",
+        "_current_applicability",
+        "_current_derivation_transition",
+        "_derivation_source",
+        "_derivation_transition",
+        "_historical_ci54_functions",
+        "_original_producing_inputs",
+        "_preceding_self",
+        "_prelude_applicability",
+        "_prelude_preimage",
+        "_prelude_transition",
+        "_producing_inputs",
+        "_transaction_absence",
+        "_transaction_inputs_match",
+        "admission_transaction",
+        "admission_validators",
+        "admitted",
+        "applies",
+        "canonical",
+        "comparison_paths",
+        "control_projection",
+        "current_source",
+        "digest",
+        "extend_catalog",
+        "fresh_admission",
+        "git",
+        "historical_ci54_admission",
+        "historical_ci54_previous",
+        "historical_inputs",
+        "historical_inventory_preimage",
+        "historical_ledger_owners",
+        "historical_test_preimage",
+        "history",
+        "measurement",
+        "measurement_controls",
+        "owned",
+        "preceding_control",
+        "producing_inputs",
+        "retained_historical_report",
+        "retained_role_proof",
+        "source_binding"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-78f45c6c21cd6f8a6726f3bf7f54645943fffac053b5ca6e8226cf965a354b54": {
+      "paths": [
+        "tools/performance_history_snapshot.py"
+      ],
+      "owners": [
+        "@module",
+        "Member",
+        "Snapshot",
+        "Snapshot.blobs",
+        "_Builder",
+        "_Builder.__init__",
+        "_Builder.add",
+        "_Builder.all_paths",
+        "_Builder.bindings",
+        "_Builder.commit",
+        "_Builder.fact",
+        "_Builder.finish",
+        "_Builder.objects_for",
+        "_Builder.tree",
+        "_Lease",
+        "_activate",
+        "_argv",
+        "_catalog",
+        "_closed",
+        "_digest",
+        "_identity",
+        "_new_lease",
+        "_oid",
+        "_path",
+        "_reconcile",
+        "_seal",
+        "_sha",
+        "_unpinned",
+        "eligible_blobs",
+        "historical",
+        "phase",
+        "proof_identity",
+        "witnesses"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334": {
+      "paths": [
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "@module",
+        "_d04_smoke_operations",
+        "_governance",
+        "_keys",
+        "_order108_smoke_operations",
+        "_order115_smoke_operations",
+        "_order116_smoke_operations",
+        "_order126_smoke_operations",
+        "_order128_smoke_operations",
+        "_order131_smoke_operations",
+        "_order132_smoke_operations",
+        "_strings",
+        "_validate_host",
+        "_validate_single_comparison",
+        "canonical_digest",
+        "changed_inputs",
+        "d02_rule_semantics_smoke_operations",
+        "d12_rule_semantics_smoke_operations",
+        "digest",
+        "git",
+        "object_value",
+        "owner_hashes",
+        "read_object",
+        "runtime_inputs",
+        "validate_assessment",
+        "validate_comparison",
+        "validate_full_game"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci67-transaction-3cacc2199960a29e392d67004401cdff9c1b806dd2e5493132e7b711e29e5faa": {
+      "paths": [
+        "tools/performance_preflight.py"
+      ],
+      "owners": [
+        "@module",
+        "_AdmissionTransaction",
+        "_AdmissionTransaction.__init__",
+        "_AdmissionTransaction.check",
+        "_AdmissionTransaction.repository_identity",
+        "_AdmissionTransaction.retain",
+        "_AdmissionTransaction.revoke",
+        "_Ci60AdmissionHandoff",
+        "_Ci60AdmissionHandoff.__init__",
+        "_Ci60AdmissionHandoff._repository",
+        "_Ci60AdmissionHandoff.check",
+        "_Ci60AdmissionHandoff.discard",
+        "_Ci60AdmissionHandoff.revoke",
+        "_Digests",
+        "_Digests.__init__",
+        "_Digests.admission",
+        "_Digests.digest",
+        "_Digests.member_plan",
+        "_admission_binding",
+        "_literal_member_plan",
+        "_member_plan",
+        "_path_plan_size",
+        "_posix_path_dependencies",
+        "_same_file",
+        "_same_read",
+        "_source_digest",
+        "_source_members",
+        "_transaction_payload_size",
+        "admission_proof",
+        "ci60_admission_bindings",
+        "ci60_bootstrap_admission",
+        "ci60_phase_admission",
+        "ci60_transaction",
+        "discovered_sources",
+        "grouped_admission",
+        "invocation",
+        "owner_proof",
+        "recipe_proof",
+        "source_hashes",
+        "source_members"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

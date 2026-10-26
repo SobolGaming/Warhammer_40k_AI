@@ -1,5 +1,8 @@
 # CI64 provenance computation scope
 
+The CI64-CI66 descriptions below record historical strict per-call guarantees.
+Their receipts retain those original meanings. The current CI67 contract is separate.
+
 CI64 changes three pure computations in performance qualification: a literal-path
 index narrows operation-map matching while retaining original operation order and
 lazy validation; an identity set removes quadratic class-body filtering without
@@ -83,3 +86,51 @@ operand references, allowing authenticated historical snapshot bytes to compare
 by identity on later calls; complete equality, payload charge and proof lifecycle
 remain unchanged. All prior failed attempts and authentic source cohorts remain
 historical evidence. No further cache or timing-budget change is included.
+
+## CI67 explicit transaction boundary
+
+The owner approved grouping nested CI60 admissions inside each
+cumulative_preservation.verify_live transaction. Only an active authenticated
+history phase and invocation may lend the complete private start result.
+Original complete admission runs freshly at both boundaries and must return equal
+complete byte mappings. A temporary change fully reverted between those boundaries
+may no longer be detected. This changes mutation detection; older strict-contract
+results are not proof of this contract.
+
+Whole-source discovery/hash scans, supplied-byte checks, all original ordered
+admission observations and mode semantics, repository/owner binding and independent
+preflight/postflight remain mandatory. Admission's Git checks authenticate original
+ancestry; existing phase-final identity still detects persistent descendant HEAD
+movement. Mapping equality adds no blanket mode or exact-HEAD authority.
+
+Results never cross transactions, phases, invocations, owners or roots. Callers
+receive defensive dictionaries of immutable bytes. Physical metadata, protected
+worktree-pointer bytes, repository-selector environment, finite callable/code/
+default/selector bindings and actual phase/invocation capabilities govern borrowing.
+Boundary acquisition cannot borrow or recursively open another transaction.
+Failures/cancellation revoke; context-reset errors cannot retain active byte leases.
+
+The shared512MiB retained-payload limit remains. Complete results and owned identity
+data are charged; only pure digest entries may be evicted. If a complete result
+cannot fit, no transaction is published and the original fully fresh body executes,
+without grouped equality claims. Unsupported metadata also retains that old path.
+The limit describes retained payload, not RSS. Ordinary source reads preserve
+the original unbounded default. Only the tiny .git pointer uses64KiB-plus-one
+bounded reads and rejects excess or concurrent growth.
+
+All1974 old case identities, definitions and assertions remain. A necessary generated-ledger repair moves25policy and40preflight case entries to their already-owning module lanes; module argv placements/order stay fixed, and all.txt is canonically sorted.59 controls give an
+exact disjoint2033-case collection; mechanism passes and collection are not full
+quality or hosted CI. Finite authority expands to34members,16controls,10changed
+collector inputs and18new members. Exactly one collector file is new; its original
+historical absence is authenticated. No old collector input is removed.
+
+All original authorities, operations, pins, gameplay assertions, samples,85% gate,
+180-second complete command and600-second workload limits remain. Six authentic
+actual-base/head source-family arms are required on the stable frozen producer.
+Eleven other families retain labels only through exact unchanged timed/startup
+input and reachability proofs. Native/current receipt/full quality remain pending.
+No publication or merge is authorized.
+
+Original direct admission retains its153 observations plus the new regression and two corrected shard ledgers:156owned members over the same five scans and three live HEAD ancestry checks. All20extra members are explicitly acquired and authenticated. Old153-count receipts remain prior-input evidence.
+
+Two original provenance fixture contexts are reconciled without changing any original assertion: the pure fixture supplies all20extra operands, and the native guard first verifies actual156/20/new-three observations before preserving old17/153 assertions over only their explicitly historical subset. Native post-activation execution remains required; these old assertions are not current153-count certification.

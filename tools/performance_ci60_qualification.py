@@ -8,6 +8,7 @@ import json
 import subprocess
 from collections import Counter
 from collections.abc import Callable
+from contextlib import AbstractContextManager
 from pathlib import Path
 from typing import Any, Protocol, cast
 
@@ -167,19 +168,24 @@ DERIVATION_INPUTS = frozenset(
 
 PRELUDE_BASE = "620cbe91ae3ddd356eaf7effa7455b931882a39e"
 PRELUDE_NAMESPACE = "data/source_audits/ci64_provenance_v1"
-PRELUDE_FREEZE: str | None = "3a0cfcd80ca3c226e894c402b2d9c8e55d7dd25c"
+PRELUDE_FREEZE: str | None = None
 PRELUDE_REPORT = "docs/performance/current/ci64-external_contract_source_reuse.json"
+TRANSACTION_TEST = "tests/code_quality/test_performance_admission_transaction.py"
+TRANSACTION_SHARDS = frozenset({"ci/quality_shards/shard-2.txt", "ci/quality_shards/shard-3.txt"})
 PRELUDE_CONTROLS = frozenset(
     {
         SELF,
         "tools/performance_policy.py",
         "tools/performance_preflight.py",
         "tools/performance_history_snapshot.py",
+        "tools/cumulative_preservation.py",
         "tests/code_quality/test_performance_policy.py",
         "tests/code_quality/test_performance_preflight.py",
         DERIVATION_TEST,
         "ci/quality_shards/all.txt",
         "ci/quality_shards/shard-1.txt",
+        *TRANSACTION_SHARDS,
+        "ci/quality_shards/shard-1-modules.txt",
         "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
         ASSESSMENT,
         MAP,
@@ -187,6 +193,7 @@ PRELUDE_CONTROLS = frozenset(
 )
 PRELUDE_NEW = frozenset(
     {
+        TRANSACTION_TEST,
         "docs/CI64_PROVENANCE_SCOPE.md",
         PRELUDE_REPORT,
         *(
@@ -215,6 +222,8 @@ PRELUDE_MEMBERS = PRELUDE_CONTROLS | PRELUDE_NEW
 PRELUDE_INPUTS = frozenset(
     {
         SELF,
+        TRANSACTION_TEST,
+        "tools/cumulative_preservation.py",
         "tools/performance_policy.py",
         "tools/performance_preflight.py",
         "tools/performance_history_snapshot.py",
@@ -224,6 +233,9 @@ PRELUDE_INPUTS = frozenset(
         MAP,
     }
 )
+
+
+PRELUDE_OBSERVED = PRELUDE_NEW | TRANSACTION_SHARDS
 
 
 def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
@@ -247,7 +259,8 @@ def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
         or len(names) != len(PRELUDE_MEMBERS)
         or set(frozen) != PRELUDE_MEMBERS
         or set(previous) != PRELUDE_CONTROLS
-        or set(extra) != PRELUDE_NEW
+        or PRELUDE_OBSERVED != PRELUDE_NEW | TRANSACTION_SHARDS
+        or set(extra) != PRELUDE_OBSERVED
         or json.loads(frozen[PRELUDE_NAMESPACE + "/changed-members.json"]) != sorted(names)
     ):
         raise ValueError("CI64 finite source membership changed.")
@@ -458,6 +471,17 @@ def _derivation_transition(operands: AdmissionOperands, identity: tuple[str, ...
             raise ValueError("CI61 new operation must be finite, literal and mandatory.")
 
 
+def _transaction_absence(raw: bytes) -> None:
+    if raw:
+        raise ValueError("CI67 transaction regression existed in its exact historical base.")
+
+
+def _transaction_inputs_match(previous: dict[str, str], produced: dict[str, str]) -> bool:
+    return TRANSACTION_TEST not in previous and produced.keys() == previous.keys() | {
+        TRANSACTION_TEST
+    }
+
+
 def _derivation_source(
     root: Path,
     observed: AdmissionOperands,
@@ -492,9 +516,14 @@ def _derivation_source(
     )
     if set(next_names) != PRELUDE_MEMBERS or len(next_names) != len(PRELUDE_MEMBERS):
         raise ValueError("CI64 finite source membership changed.")
+    _transaction_absence(
+        history(
+            root, "--literal-pathspecs", "ls-tree", "-r", "-z", PRELUDE_BASE, "--", TRANSACTION_TEST
+        )
+    )
     next_frozen = read_frozen_blobs(root, next_freeze, next_names)
     next_previous = read_frozen_blobs(root, PRELUDE_BASE, sorted(PRELUDE_CONTROLS))
-    extra_names = [name for name in next_frozen if name in PRELUDE_NEW]
+    extra_names = [name for name in next_frozen if name in PRELUDE_OBSERVED]
     extra = source_members(root, extra_names)
     operands = (
         ("next-freeze", 0, next_freeze.encode()),
@@ -513,6 +542,9 @@ def _derivation_source(
                     sorted(PRELUDE_MEMBERS),
                     sorted(PRELUDE_NEW),
                     sorted(PRELUDE_INPUTS),
+                    sorted(TRANSACTION_SHARDS),
+                    sorted(PRELUDE_OBSERVED),
+                    TRANSACTION_TEST,
                 ],
                 separators=(",", ":"),
             ).encode(),
@@ -661,8 +693,8 @@ def admission_validators() -> tuple[AdmissionValidator, AdmissionValidator]:
     return _current_derivation_transition, _admitted_derivation
 
 
-def admitted(root: Path) -> dict[str, bytes]:
-    """Fresh complete observations precede invocation-local pure proof reuse."""
+def fresh_admission(root: Path) -> dict[str, bytes]:
+    """Original complete ordered live observations and pure admission validation."""
     from tools.performance_history_snapshot import proof_identity
     from tools.performance_policy import owner_hashes
     from tools.performance_preflight import admission_proof, source_members
@@ -705,6 +737,20 @@ def admitted(root: Path) -> dict[str, bytes]:
         repository=root,
     )
     return {name: raw for name, _, raw in current} | derived
+
+
+def admitted(root: Path) -> dict[str, bytes]:
+    """Fresh by default; lend complete bytes only inside an explicit transaction."""
+    from tools.performance_preflight import grouped_admission
+
+    return grouped_admission(root, fresh_admission)
+
+
+def admission_transaction(root: Path) -> AbstractContextManager[None]:
+    """Bound nested CI60 admissions only for an existing authenticated phase."""
+    from tools.performance_preflight import ci60_admission_bindings, ci60_transaction
+
+    return ci60_transaction(root, fresh_admission, ci60_admission_bindings)
 
 
 def control_projection(root: Path) -> dict[str, bytes]:
@@ -887,7 +933,7 @@ def _producing_inputs(actual: dict[str, bytes], current: dict[str, str]) -> dict
 def _prelude_applicability(
     actual: dict[str, bytes], current: dict[str, str], family: str
 ) -> dict[str, Any]:
-    """The seven current collector changes compose with authenticated CI61 applicability."""
+    """The finite current collector changes compose with authenticated CI61 applicability."""
     produced = _producing_inputs(actual, current)
     previous: dict[str, str] = json.loads(actual[DERIVATION_NAMESPACE + "/producing-inputs.json"])
     historical = _ci61_view(actual)
@@ -920,7 +966,7 @@ def _prelude_applicability(
         or proof["previous_applicability_sha256"] != canonical(old_proof)
         or proof["changes"] != changed
         or changed.keys() != PRELUDE_INPUTS
-        or previous.keys() != produced.keys()
+        or not _transaction_inputs_match(previous, produced)
         or proof["unchanged_inputs"] != unchanged
         or set(proof["families"]) != selected
         or family not in selected
@@ -1049,6 +1095,13 @@ def extend_catalog(builder: Any) -> None:
     )
     if set(changed) != PRELUDE_MEMBERS or len(changed) != len(PRELUDE_MEMBERS):
         raise ValueError("CI64 native catalog membership changed.")
+    _transaction_absence(
+        builder.fact(
+            "plain60",
+            ("--literal-pathspecs", "ls-tree", "-r", "-z", PRELUDE_BASE, "--", TRANSACTION_TEST),
+            "ci67.transaction-regression-absence",
+        )
+    )
     builder.add("plain60", prelude, dict.fromkeys(changed), "ci64.freeze")
     builder.add("plain60", PRELUDE_BASE, dict.fromkeys(PRELUDE_CONTROLS), "ci64.preimages")
     earlier = set(builder.all_paths("plain60", BASE)) & set(changed)
