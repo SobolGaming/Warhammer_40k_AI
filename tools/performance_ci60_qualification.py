@@ -169,7 +169,7 @@ DERIVATION_INPUTS = frozenset(
 
 PRELUDE_BASE = "620cbe91ae3ddd356eaf7effa7455b931882a39e"
 PRELUDE_NAMESPACE = "data/source_audits/ci64_provenance_v1"
-PRELUDE_FREEZE: str | None = None
+PRELUDE_FREEZE: str | None = "b97a3d355b434a70ceaf321e3275a11ce5fb081b"
 PRELUDE_REPORT = "docs/performance/current/ci64-external_contract_source_reuse.json"
 TRANSACTION_TEST = "tests/code_quality/test_performance_admission_transaction.py"
 TRANSACTION_SHARDS = frozenset({"ci/quality_shards/shard-2.txt", "ci/quality_shards/shard-3.txt"})
