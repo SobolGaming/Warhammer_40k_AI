@@ -924,8 +924,10 @@ def ci64_pure_transition_operands() -> AdmissionOperands:
 
 def test_ci64_pure_transition_preserves_exact_native_preimages(
     ci64_pure_transition_operands: AdmissionOperands,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from tools import performance_ci60_qualification as ci60
+    from tools import performance_ci69_members as members
 
     result = _Ci64Mechanisms.transition(cast(_Ci64Mechanisms, ci60), ci64_pure_transition_operands)
     assert result == {
@@ -933,6 +935,25 @@ def test_ci64_pure_transition_preserves_exact_native_preimages(
         for name, _, raw in ci64_pure_transition_operands
         if name.startswith("next-previous/")
     }
+
+    bindings = preflight.ci60_admission_bindings()
+    empty_additions: frozenset[str] = frozenset()
+    with monkeypatch.context() as unused_declaration:
+        unused_declaration.setattr(members, "OBSERVED_ADDITIONS", empty_additions)
+        assert preflight.ci60_admission_bindings() == bindings
+        assert (
+            _Ci64Mechanisms.transition(cast(_Ci64Mechanisms, ci60), ci64_pure_transition_operands)
+            == result
+        )
+        with monkeypatch.context() as actual_selector:
+            actual_selector.setattr(
+                ci60, "PRELUDE_OBSERVED", ci60.PRELUDE_OBSERVED | {"unreviewed-owned-input"}
+            )
+            assert preflight.ci60_admission_bindings() != bindings
+            with pytest.raises(ValueError, match="CI64 finite source membership changed"):
+                _Ci64Mechanisms.transition(
+                    cast(_Ci64Mechanisms, ci60), ci64_pure_transition_operands
+                )
 
 
 @pytest.mark.parametrize(

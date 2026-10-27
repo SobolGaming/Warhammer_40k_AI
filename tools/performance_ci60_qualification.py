@@ -262,9 +262,15 @@ def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
         or set(previous) != PRELUDE_CONTROLS
         or PRELUDE_NEW
         | TRANSACTION_SHARDS
-        | ci69.OBSERVED_ADDITIONS
         | {
+            "ci/quality_shards/shard-2-modules.txt",
+            "ci/quality_shards/shard-3-modules.txt",
+            "ci/quality_shards/shard-4-modules.txt",
+            "ci/quality_shards/shard-4.txt",
+            "tests/code_quality/test_d07_geometry_containment.py",
             "tests/code_quality/test_performance_category_migration.py",
+            "tests/code_quality/test_quality_runtime.py",
+            "tests/d07_geometry_containment.py",
             "tools/performance_preflight_successor.py",
         }
         != PRELUDE_OBSERVED

@@ -1,7 +1,7 @@
 {
   "schema": "ci64-finite-current-applicability-v1",
   "original_input_digest": "e8e85f08af6a203f5c943fe55458d9541198c0fa4bcbcb70bb3ef5f998b85139",
-  "current_producing_input_digest": "31c865e98c3c6a4890f7130eb0a64151f95524888197913b9757b1a0ce91d635",
+  "current_producing_input_digest": "5e67c3a89981d24f707fdf72c4da466d8e2d146ae9adc74d3ec0fe972575affa",
   "previous_applicability_sha256": "9f0d51de50c458a5caeaa1fe3eabefeab3e90d701ce1afb8bfd4dc0cc8744148",
   "changes": {
     "docs/performance/policy-v3/operation-map.json": {
@@ -30,7 +30,7 @@
     },
     "tests/code_quality/test_performance_provenance.py": {
       "before": "d41520a9beeb772db7fc4b65bcfd13fc7bd6cdf3b1ec2bf5fbcd89920ce94d71",
-      "after": "e3ce8bb4144f590245083698451474281293415f9c0121ca5e6151a3de64d4bd"
+      "after": "983ae2d386429d40c8996909205bb908a655613a493b6236a88a6403529de0be"
     },
     "tests/code_quality/test_qualification40_successor.py": {
       "before": "3ff6e268cdec93872d7a9993442989cffcb203581e681c916eeb618386330206",
@@ -54,7 +54,7 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before": "d94b11e3bcb165bdaec0cd8bb3e4dce7a627d0df07d17028285fb71e9703493e",
-      "after": "01483b91f51dc1e84b27072d1279a6298c098e1d3cce2e722a6a31475e4affde"
+      "after": "cc8793085dd60078cfc1f116406099f62123c518cb1294c376a53bbdb218618b"
     },
     "tools/performance_ci69_members.py": {
       "before": null,
