@@ -5,8 +5,8 @@
       "side": "head",
       "index": 0,
       "testcase": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
-      "testcase_seconds": 139.975,
-      "whole_sample_seconds": 144.90566031699996,
+      "testcase_seconds": 133.842,
+      "whole_sample_seconds": 138.680677304,
       "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
       "command": [
         "/tmp/task55-bytecode-launch/exact-locked-test-pristine/bin/python",
@@ -16,11 +16,11 @@
         "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
         "-q",
         "--no-cov",
-        "--basetemp=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/114-ci68-source-head-0/temp",
-        "--junitxml=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/114-ci68-source-head-0/result.xml",
+        "--basetemp=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/153-ci68-computation-source-head-0/temp",
+        "--junitxml=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/153-ci68-computation-source-head-0/result.xml",
         "--tb=short"
       ],
-      "cwd": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/arms/head",
+      "cwd": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/arms/head",
       "completed": true,
       "complete_generated_tree": {
         "README.md": "1bfb1a20af400559369623d49d24d424b3e414d0b9e0a598de45378605122880",
@@ -260,23 +260,23 @@
         "schemas/support-profile.schema.json": "61b21e8456cf27179bc4647e760d3a24fdce2b036694f86b249badd5642736e6",
         "session-semantics.md": "b3989ac0bf10f32ba95f533d65d46414ca8350d4530696bf3382a89d381258bc"
       },
-      "pytest_log_sha256": "bf1f24a0df6946f23c70c3800bc0f79446a9e6fd89e7c85bd0ea530918b55101",
+      "pytest_log_sha256": "567948d59d2266cbe295b78992b36e4a2d646ac5593a8a31caf8b85d70dad361",
       "host": {
         "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-        "memory_bytes": 67359395840,
+        "memory_bytes": 67359379456,
         "logical_cpus": 64,
         "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
         "python": "3.14.5",
         "role": "provisional"
       },
-      "wrapper_sha256": "0505644b05ad178b58bebf3dd61960daf6d7c70837f05988addff544d6777fa8"
+      "wrapper_sha256": "ede2733639ed46f7e013b4e448192f06e24f67f3a57d3ef0582c7fc76e7d4301"
     },
     {
       "side": "head",
       "index": 1,
       "testcase": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
-      "testcase_seconds": 138.946,
-      "whole_sample_seconds": 140.834602485,
+      "testcase_seconds": 136.804,
+      "whole_sample_seconds": 138.63548330100002,
       "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
       "command": [
         "/tmp/task55-bytecode-launch/exact-locked-test-pristine/bin/python",
@@ -286,11 +286,11 @@
         "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
         "-q",
         "--no-cov",
-        "--basetemp=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/116-ci68-source-head-1/temp",
-        "--junitxml=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/116-ci68-source-head-1/result.xml",
+        "--basetemp=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/155-ci68-computation-source-head-1/temp",
+        "--junitxml=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/155-ci68-computation-source-head-1/result.xml",
         "--tb=short"
       ],
-      "cwd": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/arms/head",
+      "cwd": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/arms/head",
       "completed": true,
       "complete_generated_tree": {
         "README.md": "1bfb1a20af400559369623d49d24d424b3e414d0b9e0a598de45378605122880",
@@ -530,23 +530,23 @@
         "schemas/support-profile.schema.json": "61b21e8456cf27179bc4647e760d3a24fdce2b036694f86b249badd5642736e6",
         "session-semantics.md": "b3989ac0bf10f32ba95f533d65d46414ca8350d4530696bf3382a89d381258bc"
       },
-      "pytest_log_sha256": "ad9b994753d9b7089b64829e4dd0319ad05ddc172f0a4fdc151d0d932a43458c",
+      "pytest_log_sha256": "0be5ffd256bf5b27dbf303f38ce08195cb5dc003a22577fad944d28c490065b0",
       "host": {
         "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-        "memory_bytes": 67359395840,
+        "memory_bytes": 67359379456,
         "logical_cpus": 64,
         "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
         "python": "3.14.5",
         "role": "provisional"
       },
-      "wrapper_sha256": "0505644b05ad178b58bebf3dd61960daf6d7c70837f05988addff544d6777fa8"
+      "wrapper_sha256": "ede2733639ed46f7e013b4e448192f06e24f67f3a57d3ef0582c7fc76e7d4301"
     },
     {
       "side": "head",
       "index": 2,
       "testcase": "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
-      "testcase_seconds": 138.805,
-      "whole_sample_seconds": 140.61355597800002,
+      "testcase_seconds": 134.789,
+      "whole_sample_seconds": 136.54409409300013,
       "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
       "command": [
         "/tmp/task55-bytecode-launch/exact-locked-test-pristine/bin/python",
@@ -556,11 +556,11 @@
         "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
         "-q",
         "--no-cov",
-        "--basetemp=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/118-ci68-source-head-2/temp",
-        "--junitxml=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/118-ci68-source-head-2/result.xml",
+        "--basetemp=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/157-ci68-computation-source-head-2/temp",
+        "--junitxml=/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/157-ci68-computation-source-head-2/result.xml",
         "--tb=short"
       ],
-      "cwd": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/arms/head",
+      "cwd": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/arms/head",
       "completed": true,
       "complete_generated_tree": {
         "README.md": "1bfb1a20af400559369623d49d24d424b3e414d0b9e0a598de45378605122880",
@@ -800,16 +800,16 @@
         "schemas/support-profile.schema.json": "61b21e8456cf27179bc4647e760d3a24fdce2b036694f86b249badd5642736e6",
         "session-semantics.md": "b3989ac0bf10f32ba95f533d65d46414ca8350d4530696bf3382a89d381258bc"
       },
-      "pytest_log_sha256": "ef406d484e74962945d463057f12bad436a743ffb53895442db0204df6029aab",
+      "pytest_log_sha256": "c67e0fe1a5948e0b5201f41d2a9eb25642cfbec929f0bfb3910d3106fc412c39",
       "host": {
         "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-        "memory_bytes": 67359395840,
+        "memory_bytes": 67359379456,
         "logical_cpus": 64,
         "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
         "python": "3.14.5",
         "role": "provisional"
       },
-      "wrapper_sha256": "0505644b05ad178b58bebf3dd61960daf6d7c70837f05988addff544d6777fa8"
+      "wrapper_sha256": "ede2733639ed46f7e013b4e448192f06e24f67f3a57d3ef0582c7fc76e7d4301"
     }
   ],
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6"
