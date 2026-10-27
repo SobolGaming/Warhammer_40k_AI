@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
-  "operation_map_sha256": "bb2f0f2a9f3339c72e75faf4c62f63c155fe128ed69c6ea505403e8edaea75b8",
+  "operation_map_sha256": "bfdee826437dfd4f586adf6defb163815909fd1ca21b7de3e5822dbd91d337f8",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "dcb7c3f93fb3f439c357fb2d47277919b42ded8cd6c7d3322c1e31f68444c793",
+      "after_sha256": "7e0fdb30bf6e2631963e5afe19c271f013a7c975f9fb7d9d605d9f14090d0b74",
       "owners": {
         "@document": {
           "before": null,
-          "after": "dcb7c3f93fb3f439c357fb2d47277919b42ded8cd6c7d3322c1e31f68444c793"
+          "after": "7e0fdb30bf6e2631963e5afe19c271f013a7c975f9fb7d9d605d9f14090d0b74"
         }
       }
     },
@@ -46,11 +46,11 @@
     },
     "ci/quality_shards/shard-1.txt": {
       "before_sha256": null,
-      "after_sha256": "aa5daf6ab8790947258042be7f13797d85686a4d1ba1d95bb8d07497287e664c",
+      "after_sha256": "bb3190758cec44674f6d63801e5be22054fb6ee1c469811293b1f4f35bdc67c0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "aa5daf6ab8790947258042be7f13797d85686a4d1ba1d95bb8d07497287e664c"
+          "after": "bb3190758cec44674f6d63801e5be22054fb6ee1c469811293b1f4f35bdc67c0"
         }
       }
     },
@@ -1216,11 +1216,11 @@
     },
     "data/source_audits/ci64_provenance_v1/applicability.json": {
       "before_sha256": null,
-      "after_sha256": "43931d54ff3bbc39a0a434dfed0696ff6b18f710f7e2a4fdf2629be9046b3914",
+      "after_sha256": "ea768737b15775820defe7896897747be8d858f4b7e92a6a10f8ffc6c5c77c2d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "43931d54ff3bbc39a0a434dfed0696ff6b18f710f7e2a4fdf2629be9046b3914"
+          "after": "ea768737b15775820defe7896897747be8d858f4b7e92a6a10f8ffc6c5c77c2d"
         }
       }
     },
@@ -1236,11 +1236,11 @@
     },
     "data/source_audits/ci64_provenance_v1/control-transitions.json": {
       "before_sha256": null,
-      "after_sha256": "d12ccc52254ab2832e8e9c73941ca20810b387936d0579c43ed59e42e15b569b",
+      "after_sha256": "c6b0646618c92b08fbb977eb33c30e6ca5515cac1f9bc43ccfc8b153c9032ea5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d12ccc52254ab2832e8e9c73941ca20810b387936d0579c43ed59e42e15b569b"
+          "after": "c6b0646618c92b08fbb977eb33c30e6ca5515cac1f9bc43ccfc8b153c9032ea5"
         }
       }
     },
@@ -1276,11 +1276,11 @@
     },
     "data/source_audits/ci64_provenance_v1/producing-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "38f985dc028e2b44516dfe0b5486d3f555a06b5431ab6e6d12757df6ebde1b1e",
+      "after_sha256": "d81d3a836ca1648a6e7f9b4a3cfa450deb50a30b386e73c040441cf6e3085ad0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "38f985dc028e2b44516dfe0b5486d3f555a06b5431ab6e6d12757df6ebde1b1e"
+          "after": "d81d3a836ca1648a6e7f9b4a3cfa450deb50a30b386e73c040441cf6e3085ad0"
         }
       }
     },
@@ -3266,21 +3266,21 @@
     },
     "docs/CI64_PROVENANCE_SCOPE.md": {
       "before_sha256": null,
-      "after_sha256": "11560da77dbe3fc0001f985cf29815d023c553f35e947d4ee5722f2f3b53b0b9",
+      "after_sha256": "d349c2245d3ef63e3f2b19cc856d19dfab29c1b41fb3b5e332c2e21335633b88",
       "owners": {
         "@document": {
           "before": null,
-          "after": "11560da77dbe3fc0001f985cf29815d023c553f35e947d4ee5722f2f3b53b0b9"
+          "after": "d349c2245d3ef63e3f2b19cc856d19dfab29c1b41fb3b5e332c2e21335633b88"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-      "after_sha256": "8d409dd653f0a913bb4e43e9410389d82d9b6ef0ffc81448555027dec843507b",
+      "after_sha256": "4b73d7dbee58003a2146768eecc50373deb22a73822ae35fd66936639bc5dd79",
       "owners": {
         "@document": {
           "before": "da333874f1c3c223dba9d6a042da3c44f6439c4214f253c8d23216f08eca02e9",
-          "after": "8d409dd653f0a913bb4e43e9410389d82d9b6ef0ffc81448555027dec843507b"
+          "after": "4b73d7dbee58003a2146768eecc50373deb22a73822ae35fd66936639bc5dd79"
         }
       }
     },
@@ -3876,11 +3876,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "d98c36d5c7c92039e47802f1fb8df7d482b716b6700753ea92645f08ea8df810",
+      "after_sha256": "2ef125419c398e603030395742cc75337eb9c7598610423efba65e9dfcdf1c61",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "d98c36d5c7c92039e47802f1fb8df7d482b716b6700753ea92645f08ea8df810"
+          "after": "2ef125419c398e603030395742cc75337eb9c7598610423efba65e9dfcdf1c61"
         }
       }
     },
@@ -6755,11 +6755,11 @@
     },
     "tests/code_quality/test_performance_admission_transaction.py": {
       "before_sha256": null,
-      "after_sha256": "3334949e5f8f89a3b07df5b3fe239d15a57fba2028e5fa4aa944941b110f09dd",
+      "after_sha256": "d3ed199308a3a6f1b9345350138158aedf2f0cd74ff355bd52c59127d0bea64e",
       "owners": {
         "@module": {
           "before": null,
-          "after": "9a184383c94b7bb861537ef0ffecf451623e8f9287e3e023c84a0143c4e5e7d5"
+          "after": "cd37c1776e744fd618f681a89dba032d77854fcdf2199cf8da3da24084a9d964"
         },
         "_Internals": {
           "before": null,
@@ -6813,6 +6813,30 @@
           "before": null,
           "after": "6de92ee974b0ac48789a12148bb61a75f16fffa2516da9fa53d26df4e54f01cb"
         },
+        "_compute_first": {
+          "before": null,
+          "after": "5991bacfd3c459eb6a06e9c15ef2bff7f8849bd633721d9faff119f76c2fe7c4"
+        },
+        "_compute_observation": {
+          "before": null,
+          "after": "5de36882dc1fab0371db2d54856215b696a954fa759abcaca642cfd0973d148c"
+        },
+        "_compute_second": {
+          "before": null,
+          "after": "5335363babbe375edf7892ea8910496a27cdf657429791b079b22580f4f94111"
+        },
+        "_compute_unselected": {
+          "before": null,
+          "after": "7f216d08caa9155c00266493a3f5f327a9d5643fa9b0e9400b6c27a4b966619e"
+        },
+        "_compute_validate": {
+          "before": null,
+          "after": "217a6982c9e992314f53f61088d633851d7998c236be2725c7efd3ea50a41e9c"
+        },
+        "computation_root": {
+          "before": null,
+          "after": "dd6e2d75a20fe933fae716fcad802b68fd2938cc07d33b7981a2b9dc5df06b55"
+        },
         "inactive_identity": {
           "before": null,
           "after": "91da00ad9be7e6330ad9e6632d87d33e6ec5c16e8c3713ebc5b2c37913320f60"
@@ -6849,9 +6873,49 @@
           "before": null,
           "after": "7516e6271c7b9e51b1ede9ca5256f8863769095a62e405f13f4d71d0d4a2f8bf"
         },
+        "test_category_forwarder_real_pytest_reporter_lifetime": {
+          "before": null,
+          "after": "fc9623fba3484017d351de481bf2d4c93861105576c4275a4012462f7e45d7ea"
+        },
         "test_complete_result_reservation_evicts_only_digest_entries": {
           "before": null,
           "after": "43872dc512377d13547f681de3a97cfa5174a750f6e59a88cad1b643b5c29ed4"
+        },
+        "test_computation_only_scope_cannot_promote_or_group_after_unexpected_phase": {
+          "before": null,
+          "after": "6c82c859e2fc1933fad700e51db4c2ab0d219473c9965ce66a3a0465f0a558c4"
+        },
+        "test_computation_only_scope_capacity_fallback_stays_fresh": {
+          "before": null,
+          "after": "8696524ec6717620d552ddebb4b85cb4a18d04e39886a610cacb92ebb6f6be1c"
+        },
+        "test_computation_only_scope_keeps_fresh_reads_and_isolates_calls": {
+          "before": null,
+          "after": "b51e1ddb21af1d3c3578192ffdd7c498294bc7cb21a7049d9638c8f359f493fc"
+        },
+        "test_computation_only_scope_rejects_callable_dependency_instances": {
+          "before": null,
+          "after": "0511a2aad9406a2d842b30e6fbf0c2e62bf3a638dbe1acc459f8cbd9f02f2eea"
+        },
+        "test_computation_only_scope_rejects_dependency_changes": {
+          "before": null,
+          "after": "b40eab62e78238ea45bc1d46d12bbe365e890649bfa4ba6977978bde17326600"
+        },
+        "test_computation_only_scope_rejects_preinstalled_mutable_dependency_closures": {
+          "before": null,
+          "after": "47f2a0501c25553bce7faa44f89acf17ce42c68e3797eef840605f66ea395521"
+        },
+        "test_computation_only_scope_rejects_unselected_callbacks": {
+          "before": null,
+          "after": "2d611db877f3d740dfc2bf993b12800825a1d230e2dd35549c4bc723754c786a"
+        },
+        "test_computation_only_scope_revalidates_complete_operands": {
+          "before": null,
+          "after": "a8001640810f9b40698303182a8f091553a4b766c4c37b6f075595035545272d"
+        },
+        "test_computation_only_scope_revokes_on_failure": {
+          "before": null,
+          "after": "ee2b1351f11d6c531f122df5d692a5862d94d51ded7d8df3a069645763e59123"
         },
         "test_copied_context_is_revoked_before_fresh_end_acquisition": {
           "before": null,
@@ -6965,11 +7029,11 @@
     },
     "tests/code_quality/test_performance_category_migration.py": {
       "before_sha256": "3a215830994717abdd58a5466391a57d82d57d1cb2aa5b341ffde7b4174f1d0f",
-      "after_sha256": "8d4342d3febbab9aae589a6c902f66eaa1b3abf3576f9c7fe78203bba82258b7",
+      "after_sha256": "6d3b39397a80dd39f82796d016b9b9e095e70a9ce800889665c8a75876f147ce",
       "owners": {
         "@module": {
           "before": "c003981b21506e200fd31ac2f916f396bbbe61775d0ee378484ac064bda8cd6e",
-          "after": "312cef94f8709775e7b0bb6a59bc5387b861d5936d4ed8bb66beecd30773b41c"
+          "after": "7c51bfde7679f2c63e13fc041693d30ff9ae8fa14ff3c1f3353c2bac0ec94163"
         },
         "_current": {
           "before": "0395f0257aeecbbff7cc7d1c17d384faa5f88cc263255096604f76e8c697825c",
@@ -6982,6 +7046,10 @@
         "copied_migration": {
           "before": "c22757d3b41b1827e687fafd513f7650428c18debf2c28e76a47c357e099540e",
           "after": "9a62718bd878c515ddf6f517cea760c8b054b04c44f6a2ac342fc5a4b9d52f16"
+        },
+        "private_computation_scope": {
+          "before": null,
+          "after": "d874ee501698dd6e90215d8f6d91cc40f59fb6bc09fe5f1638fbfecbb1843129"
         },
         "private_expected_input_reference": {
           "before": null,
@@ -21113,11 +21181,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "1c561ccb6f46a3a72ab4ba22ec268b1b19da5a47d7c8c7bc78bd014c8377e92e",
+      "after_sha256": "a3f8a892bec800d6a62cfa6b38bf0fb19df872643fa3d0461312e237f3c68fd9",
       "owners": {
         "@module": {
           "before": null,
-          "after": "63174f187b730f4b7a84786adca7f65b73c62eec495cab3ef09a7069ef10fe2c"
+          "after": "88168bbe9d5b18b4b0fbebc1faf219ce9df36731a69bd0453fb8edcdd9d2772d"
         },
         "_HistoricalPrevious": {
           "before": null,
@@ -21499,11 +21567,11 @@
     },
     "tools/performance_preflight.py": {
       "before_sha256": null,
-      "after_sha256": "16817c05526b44de281b383d0d469ac0df3a6ee51cc57a772bf28fe671943bf1",
+      "after_sha256": "1db639fe435d0e7d88436284653929c70c6991dc59ff7d0a7793e0935d2a8bb4",
       "owners": {
         "@module": {
           "before": null,
-          "after": "dd96ae982476959dee5681b374ada7ca252089b5608d3c8f2da677d5220b903c"
+          "after": "b56317ec02e01fa9800e2c081e5c3765897f2d7c2367070f2b97317115515684"
         },
         "_AdmissionTransaction": {
           "before": null,
@@ -21535,7 +21603,7 @@
         },
         "_Ci60AdmissionHandoff.__init__": {
           "before": null,
-          "after": "5a51ed7d4ae80c3820162666a16dec200378874cbf0188dcfec929ef3ef28ff4"
+          "after": "b94c2206bab254d718e8cd4b96b1188beb762ec99c7042ab334b5fc7f43be13e"
         },
         "_Ci60AdmissionHandoff._repository": {
           "before": null,
@@ -21543,7 +21611,7 @@
         },
         "_Ci60AdmissionHandoff.check": {
           "before": null,
-          "after": "cba7ff5ba6ead56bd1b0645c9cedff6334834d53b17e8be738ba6656d44da108"
+          "after": "ba16219ba0d278d544f4bf6b94a682a51eaeac5eb8c39c5417a32dd866e0535d"
         },
         "_Ci60AdmissionHandoff.discard": {
           "before": null,
@@ -21576,6 +21644,10 @@
         "_admission_binding": {
           "before": null,
           "after": "30f12192243e24521447054e3e6d03954238f06ea9987cd5a2d638c537cb18cf"
+        },
+        "_ci60_computation_bindings": {
+          "before": null,
+          "after": "1fd664ac93a80390a8ac31a6e4db049d5ed7499359e5ccb54646bdf517a97d26"
         },
         "_literal_member_plan": {
           "before": null,
@@ -21615,7 +21687,7 @@
         },
         "admission_proof": {
           "before": null,
-          "after": "0872afcae6ac030c31637abebd4034cf716c8dd28580ee2ccfb77a561abbca53"
+          "after": "b0127a06171de652dcd8c64cd327682b0ef0a423ae2de19f0a85cd9164ad2513"
         },
         "ci60_admission_bindings": {
           "before": null,
@@ -21623,15 +21695,19 @@
         },
         "ci60_bootstrap_admission": {
           "before": null,
-          "after": "43ac2d7efd9b11730779876c4419cb6f4dd88d85590ef78236658af31dd72216"
+          "after": "495af7b300071af35c463a00d162fbe4dd61e876cc9f0e0586c39587dbe3e33f"
+        },
+        "ci60_computation": {
+          "before": null,
+          "after": "799c706e097bb84f5a3f7824fc8a4b865950727ad24354fa9012f7c5a7225b41"
         },
         "ci60_phase_admission": {
           "before": null,
-          "after": "97ff9abe41f4e8892266a68fec52c2b7de46ae3980a9733dbc968a6bffed840e"
+          "after": "60d33dd7de07121b304451f9ca7ea0153a26fbbd1f23ae802dd920a61d2eb477"
         },
         "ci60_transaction": {
           "before": null,
-          "after": "d5ece05a1e9196a069e372996eea759fddfd08cde2280b941e6ae3842a40503c"
+          "after": "632757f5102c4cd90474b053693f09fcf58e34efd1f30ad4e588735196e7f388"
         },
         "discovered_sources": {
           "before": null,
@@ -28140,24 +28216,28 @@
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
     },
     "tests/code_quality/test_performance_admission_transaction.py": {
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
       "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
       "category": "measured_workload",
       "operations": [
-        "ci67-transaction-51d8e1a1c6f47c28af7f0870d6dcd16b4bfa2eee92437c2439a207bf2f594b92"
+        "ci67-transaction-51d8e1a1c6f47c28af7f0870d6dcd16b4bfa2eee92437c2439a207bf2f594b92",
+        "ci68-computation-51d8e1a1c6f47c28af7f0870d6dcd16b4bfa2eee92437c2439a207bf2f594b92"
       ],
-      "selected_families": []
+      "selected_families": [
+        "external_contract_source_reuse"
+      ]
     },
     "tests/code_quality/test_performance_category_migration.py": {
       "category": "measured_workload",
       "operations": [
+        "ci68-computation-b9967ff3a58e5b467283dcf99e88f929db96605c02d44dbe23905f77ed577d4f",
         "ci68-quality-b9967ff3a58e5b467283dcf99e88f929db96605c02d44dbe23905f77ed577d4f"
       ],
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
@@ -28177,7 +28257,7 @@
         "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
@@ -28188,12 +28268,12 @@
         "ci67-transaction-68a42866e64b03909939024b6c5ec3cc50a32a88ce2ba4097ebbeab0f1dc6772"
       ],
       "selected_families": [],
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tests/code_quality/test_performance_provenance.py": {
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
       "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
       "category": "measured_workload",
@@ -28236,7 +28316,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
     },
@@ -34043,7 +34123,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "The separate CI49D record admits exactly the immutable 599161cc cumulative preimage and two literal edits. Full current freeze, physical live bytes, membership and ancestry authenticate this transition before its exact historical comparison feeds unchanged prior records. STATIC48, CI49, CI49B and CI49C records, all prior assertions/delegates, operation map and roadmap remain byte-exact. Five new guards cover real original/new function member and override equivalence, actual fresh Git-object tamper, exact transition, repinned override removal, and malformed duplicate selection; existing hardened parser guards remain unchanged. All 83 blobs are read and hashed even where live control hashes override them. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog. Preserve original pins, the existing pre/post live verification, downstream whole-module assertions, five borrowed roles and all catalog authorities; one genuine batch regression checks both native predecessors and rejects unrelated supplied bytes.",
       "unchanged_work": "No engine, runtime build identity, gameplay function, fixture seed, measured workload, CI selection, operation/family/case/sample counts, 512 MiB digest retention cap, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The selected 3796-file historical inventory retains the prior 3795 raw-exact files and the single previously admitted Command-end export delta. The 83 immutable members total 15,619,849 bytes (maximum 1,879,442); batching adds bounded transient payload/slice retention without a success cache. The prior 188.799-second CI49C result remains a failed whole-budget receipt; paired transport measurements are diagnostic only. Fresh exact-source performance, full quality, static checks, integrity controls and independent review remain required; no prior timing, behavioral aggregate, coverage or hosted acceptance is transferred. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
@@ -34091,7 +34171,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
       "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
@@ -34105,7 +34185,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
@@ -34124,7 +34204,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
@@ -34133,12 +34213,13 @@
       "operations": [
         "ci61-provenance-3cacc2199960a29e392d67004401cdff9c1b806dd2e5493132e7b711e29e5faa",
         "ci64-provenance-3cacc2199960a29e392d67004401cdff9c1b806dd2e5493132e7b711e29e5faa",
-        "ci67-transaction-3cacc2199960a29e392d67004401cdff9c1b806dd2e5493132e7b711e29e5faa"
+        "ci67-transaction-3cacc2199960a29e392d67004401cdff9c1b806dd2e5493132e7b711e29e5faa",
+        "ci68-computation-3cacc2199960a29e392d67004401cdff9c1b806dd2e5493132e7b711e29e5faa"
       ],
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Retain all seven metadata fields within each matching API channel, every other field across APIs, fresh complete-byte hashes, ownership and alias checks; reject real midread and final-path-query changes, including identical-byte writes with restored mtime.",
       "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     },
@@ -34150,7 +34231,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI68 preserves all original assertions and validator calls; only fixed expected test data is retained privately per worker/session, and the finite historical comparator and namespace-gated native projection preserve current admission. The already approved verify_live transaction and its fresh start/end boundary remain unchanged; whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI68 preserves all original assertions and validator calls. Its category-test forwarding seam uses one standalone computation-only scope per individual original call, reusing only two pure proofs over complete equal fresh operands and audited dependencies. Owner/recipe reuse is disabled; no phase promotion or grouped-live eligibility is added. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },

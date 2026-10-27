@@ -250,6 +250,16 @@ The new21-path producing scope and37-member finite catalog require genuine
 source-bound qualification. Full behavior,85percent coverage and hosted runtime
 remain open. See [CI64 provenance scope](CI64_PROVENANCE_SCOPE.md).
 
+CI68's standalone category-test correction may reuse only its two audited pure
+proofs within each original validator call; all live observations remain fresh,
+with no phase promotion or grouped-admission eligibility. All2033 old cases remain;
+actual2053-case collection adds20 controls to the same module/lane, retaining old
+membership/order. The1643 existing operations remain exact plus three finite new
+owner obligations. Focused correctness and full static evidence do not qualify
+current source timing, complete quality, behavior or85percent coverage. Historical
+timeouts and receipts retain their original source identities. No publication or
+merge is authorized. See [CI64 provenance scope](CI64_PROVENANCE_SCOPE.md).
+
 ## Compliance claim
 
 The project may claim Core Rules categories 01–25 compliant only after every implementation PR, `S-MIRRORS`, and `PFINAL` are merged, including any further PR the audit inserts, and a fresh 25-category audit on `main` finds no new gap. The claim names the selected snapshot, provider, and observation date, and it excludes factions and every scope `AGENTS.md` prohibits.

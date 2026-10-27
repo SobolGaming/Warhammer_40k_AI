@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import contextvars
+import hashlib
+import json
 import os
 from collections.abc import Callable, Generator, Iterator
 from contextlib import contextmanager, nullcontext
@@ -801,3 +803,408 @@ def test_exact_historical_absence_rejects_any_nonempty_native_result(observed: b
             require_absence(observed)
     else:
         assert require_absence(observed) is None
+
+
+_COMPUTATION_CALLS: list[str] = []
+
+
+def _compute_first(operands: preflight.AdmissionOperands, identity: tuple[str, ...]) -> None:
+    _COMPUTATION_CALLS.append("first")
+    if operands != (("member", 33188, b"original"), ("other", 33188, b"stable")):
+        raise ValueError("invalid complete computation operands")
+
+
+def _compute_second(operands: preflight.AdmissionOperands, identity: tuple[str, ...]) -> None:
+    _COMPUTATION_CALLS.append("second")
+    if operands != (("member", 33188, b"original"), ("other", 33188, b"stable")):
+        raise ValueError("invalid complete computation operands")
+
+
+@pytest.fixture
+def computation_root(root: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    from tools import performance_ci60_qualification as q
+
+    (root / q.NAMESPACE).mkdir(parents=True)
+    (root / "other").write_bytes(b"stable")
+    monkeypatch.setattr(history, "proof_identity", inactive_identity)
+    monkeypatch.setattr(q, "_current_derivation_transition", _compute_first)
+    monkeypatch.setattr(q, "_admitted_derivation", _compute_second)
+    _COMPUTATION_CALLS.clear()
+    return root
+
+
+def _compute_observation(root: Path) -> preflight.AdmissionOperands:
+    return preflight.source_members(root, ["member", "other"])
+
+
+def _compute_validate(root: Path, operands: preflight.AdmissionOperands) -> None:
+    for validator in (_compute_first, _compute_second):
+        preflight.admission_proof(validator, operands, None, (validator,), repository=root)
+
+
+def test_computation_only_scope_keeps_fresh_reads_and_isolates_calls(
+    computation_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    observed: list[preflight.AdmissionOperands] = []
+    calls: list[str] = []
+
+    @preflight.owner_proof
+    def owners(path: str, content: bytes | None) -> dict[str, str]:
+        calls.append("owner")
+        return {path: str(content)}
+
+    @preflight.recipe_proof
+    def recipe(before: bytes, current: bytes, value: dict[str, Any]) -> None:
+        calls.append("recipe")
+
+    def acquire() -> dict[str, str]:
+        for _ in range(3):
+            operands = _compute_observation(computation_root)
+            observed.append(operands)
+            _compute_validate(computation_root, operands)
+            assert history.proof_identity(computation_root) is None
+            assert _Internals.current_transaction(internals) is None
+            owners("member", b"original")
+            recipe(b"before", b"after", {})
+        return {"complete": "result"}
+
+    assert preflight.ci60_computation(computation_root, acquire) == {"complete": "result"}
+    assert _COMPUTATION_CALLS == ["first", "second"]
+    assert calls == ["owner", "recipe"] * 3
+    assert len(observed) == 3
+    assert observed[0] == observed[1] == observed[2]
+    assert observed[0][0][2] is not observed[1][0][2]
+    assert _Internals.current_storage(internals) is None
+    preflight.ci60_computation(computation_root, acquire)
+    assert _COMPUTATION_CALLS == ["first", "second"] * 2
+
+
+@pytest.mark.parametrize("change", ["bytes", "mode", "order", "root"])
+def test_computation_only_scope_revalidates_complete_operands(
+    computation_root: Path, change: str
+) -> None:
+    def acquire() -> None:
+        operands = _compute_observation(computation_root)
+        _compute_validate(computation_root, operands)
+        if change == "bytes":
+            (computation_root / "member").write_bytes(b"tampered")
+            changed = _compute_observation(computation_root)
+        elif change == "mode":
+            changed = (("member", 33216, b"original"), operands[1])
+        elif change == "order":
+            changed = tuple(reversed(operands))
+        else:
+            with pytest.raises(ValueError, match="another repository"):
+                _compute_validate(computation_root.parent, operands)
+            return
+        with pytest.raises(ValueError, match="invalid complete computation operands"):
+            _compute_validate(computation_root, changed)
+
+    preflight.ci60_computation(computation_root, acquire)
+    assert _Internals.current_storage(internals) is None
+
+
+@pytest.mark.parametrize("change", ["function", "code", "closure", "selector", "json"])
+def test_computation_only_scope_rejects_dependency_changes(
+    computation_root: Path, monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
+    from tools import performance_ci60_qualification as q
+    from tools import performance_policy as policy
+
+    def acquire() -> None:
+        operands = _compute_observation(computation_root)
+        _compute_validate(computation_root, operands)
+        owner = policy.owner_hashes
+        closure = owner.__closure__
+        assert closure is not None
+        cell = closure[0]
+        captured = cell.cell_contents
+        try:
+            with monkeypatch.context() as patch:
+                if change == "function":
+                    patch.setattr(q, "_admitted_derivation", _compute_first)
+                elif change == "code":
+                    patch.setattr(_compute_second, "__code__", _compute_first.__code__)
+                elif change == "closure":
+                    cell.cell_contents = _compute_first
+                elif change == "selector":
+                    patch.setattr(q, "BASE", "f" * 40)
+                else:
+
+                    def changed_json(value: object) -> dict[str, object]:
+                        return {}
+
+                    patch.setattr(json, "loads", changed_json)
+                with pytest.raises(ValueError, match=r"computation.*changed"):
+                    _compute_validate(computation_root, operands)
+        finally:
+            cell.cell_contents = captured
+
+    preflight.ci60_computation(computation_root, acquire)
+    assert _Internals.current_storage(internals) is None
+
+
+@pytest.mark.parametrize("error", [ValueError("body failure"), KeyboardInterrupt("cancel")])
+def test_computation_only_scope_revokes_on_failure(
+    computation_root: Path, error: BaseException
+) -> None:
+    retained: list[_Storage] = []
+
+    def acquire() -> None:
+        cache = _Internals.current_storage(internals)
+        assert cache is not None
+        retained.append(cache)
+        _compute_validate(computation_root, _compute_observation(computation_root))
+        raise error
+
+    with pytest.raises(type(error)) as observed:
+        preflight.ci60_computation(computation_root, acquire)
+    assert observed.value is error
+    assert _Internals.current_storage(internals) is None
+    assert retained[0].retained == 0
+    assert not retained[0].active
+
+
+def test_computation_only_scope_capacity_fallback_stays_fresh(computation_root: Path) -> None:
+    def acquire() -> None:
+        cache = _Internals.current_storage(internals)
+        assert cache is not None
+        cache.limit = 0
+        for _ in range(2):
+            _compute_validate(computation_root, _compute_observation(computation_root))
+        assert cache.retained == 0
+
+    preflight.ci60_computation(computation_root, acquire)
+    assert _COMPUTATION_CALLS == ["first", "second"] * 2
+
+
+def _compute_unselected(operands: preflight.AdmissionOperands, identity: tuple[str, ...]) -> None:
+    pytest.fail("an unselected computation callback ran")
+
+
+@pytest.mark.parametrize("direct", [False, True], ids=["changed-factory", "direct-wrong-pair"])
+def test_computation_only_scope_rejects_unselected_callbacks(
+    computation_root: Path, monkeypatch: pytest.MonkeyPatch, direct: bool
+) -> None:
+    from tools import performance_ci60_qualification as q
+
+    if not direct:
+        monkeypatch.setattr(
+            q, "admission_validators", lambda: (_compute_first, _compute_unselected)
+        )
+        with pytest.raises(ValueError, match="exact two pure validators"):
+            preflight.ci60_computation(computation_root, lambda: None)
+    else:
+
+        @preflight.invocation
+        def acquire() -> None:
+            with preflight.ci60_bootstrap_admission(
+                computation_root,
+                (_compute_first, _compute_unselected),
+                lambda: None,
+                computation_only=True,
+            ):
+                pytest.fail("unselected callbacks were published")
+
+        with pytest.raises(ValueError, match=r"two validators|exact two pure validators"):
+            acquire()
+    assert not _COMPUTATION_CALLS
+    assert _Internals.current_storage(internals) is None
+
+
+def test_computation_only_scope_cannot_promote_or_group_after_unexpected_phase(
+    computation_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    selected: list[tuple[str, ...] | None] = [None]
+    fresh_calls: list[Path] = []
+
+    def identity(root: Path) -> tuple[str, ...] | None:
+        return selected[0]
+
+    def fresh(root: Path) -> dict[str, bytes]:
+        fresh_calls.append(root)
+        raw = (root / "live").read_bytes()
+        if raw != b"original":
+            raise ValueError("changed live input")
+        return {"live": raw}
+
+    monkeypatch.setattr(history, "proof_identity", identity)
+    (computation_root / "live").write_bytes(b"original")
+
+    def acquire() -> None:
+        operands = _compute_observation(computation_root)
+        _compute_validate(computation_root, operands)
+        selected[0] = PHASE
+        with preflight.ci60_phase_admission(computation_root, PHASE):
+            _compute_validate(computation_root, operands)
+            with preflight.ci60_transaction(computation_root, fresh, lambda: (fresh,)):
+                assert _Internals.current_transaction(internals) is None
+                assert preflight.grouped_admission(computation_root, fresh) == {"live": b"original"}
+                (computation_root / "live").write_bytes(b"changed")
+                with pytest.raises(ValueError, match="changed live input"):
+                    preflight.grouped_admission(computation_root, fresh)
+        selected[0] = None
+        _compute_validate(computation_root, operands)
+
+    preflight.ci60_computation(computation_root, acquire)
+    assert _COMPUTATION_CALLS == ["first", "second"] * 3
+    assert fresh_calls == [computation_root] * 2
+    assert _Internals.current_transaction(internals) is None
+    assert _Internals.current_storage(internals) is None
+
+
+@pytest.mark.parametrize("dependency", ["json", "hash"])
+def test_computation_only_scope_rejects_preinstalled_mutable_dependency_closures(
+    computation_root: Path, monkeypatch: pytest.MonkeyPatch, dependency: str
+) -> None:
+
+    captured: list[object] = ["mutable"]
+
+    def changed(*args: Any, **kwargs: Any) -> object:
+        return captured[0]
+
+    with monkeypatch.context() as patch:
+        if dependency == "json":
+            patch.setattr(json, "loads", changed)
+        else:
+            patch.setattr(hashlib, "sha256", changed)
+        with pytest.raises(ValueError, match="dependency closure changed"):
+            preflight.ci60_computation(computation_root, lambda: None)
+    assert not _COMPUTATION_CALLS
+    assert _Internals.current_storage(internals) is None
+
+
+def test_computation_only_scope_rejects_callable_dependency_instances(
+    computation_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+
+    class MutableCallable:
+        def __call__(self, *args: Any, **kwargs: Any) -> object:
+            return {}
+
+    with monkeypatch.context() as patch:
+        patch.setattr(json, "loads", MutableCallable())
+        with pytest.raises(ValueError, match="dependency closure changed"):
+            preflight.ci60_computation(computation_root, lambda: None)
+    assert not _COMPUTATION_CALLS
+    assert _Internals.current_storage(internals) is None
+
+
+def test_category_forwarder_real_pytest_reporter_lifetime(tmp_path: Path) -> None:
+    """Run the actual fixture AST with pinned pytest, four workers and reporter."""
+    import ast
+    import json
+    import sys
+
+    from scripts.quality_runner import Deadlines, Supervisor
+
+    assert os.name == "posix", "This supervised Linux-local control requires POSIX process groups"
+    root = Path(__file__).resolve().parents[2]
+    category = root / "tests/code_quality/test_performance_category_migration.py"
+    source = category.read_text(encoding="utf-8")
+    fixture = next(
+        node
+        for node in ast.parse(source).body
+        if isinstance(node, ast.FunctionDef) and node.name == "private_computation_scope"
+    )
+    probe = tmp_path / "test_probe.py"
+    probe.write_text(
+        "from pathlib import Path\nfrom collections.abc import Iterator\n"
+        "from functools import wraps\nfrom types import SimpleNamespace\n"
+        "from typing import Any, cast\n"
+        "import pytest\nfrom tools import performance_preflight as preflight\n"
+        "def original_verify(root, *, value, default='original-default'):\n"
+        "    assert isinstance(root, Path) and default == 'original-default'\n"
+        "    if value == 'error':\n"
+        "        raise ValueError('forwarded error') from KeyError('original cause')\n"
+        "    return value\n"
+        "migration = SimpleNamespace(verify_current_inventory=original_verify)\n"
+        + ast.unparse(fixture)
+        + "\n@pytest.mark.parametrize('value', ['one', 'two', 'error'])\n"
+        "def test_probe(value, tmp_path):\n"
+        "    assert migration.verify_current_inventory is not original_verify\n"
+        "    assert migration.verify_current_inventory(tmp_path, value=value) == value\n"
+        "ORIGINAL_TEST = test_probe\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "conftest.py").write_text(
+        "import pytest\nfrom scripts import quality_reporter as reporter\n"
+        "@pytest.hookimpl(wrapper=True, trylast=True)\n"
+        "def pytest_runtest_makereport(item, call):\n"
+        "    report = yield\n"
+        "    if call.when == 'call':\n"
+        "        assert item.module.migration.verify_current_inventory "
+        "is item.module.original_verify\n"
+        "        assert item.obj is item.module.ORIGINAL_TEST\n"
+        "        reporter.reporter().journal.emit('wrapper_restored', node=item.nodeid)\n"
+        "    return report\n",
+        encoding="utf-8",
+    )
+    ini = tmp_path / "pytest.ini"
+    ini.write_text("[pytest]\naddopts =\n", encoding="utf-8")
+    evidence = tmp_path / "evidence"
+    evidence.mkdir()
+    binding = "diagnostic-wrapper-lifetime"
+    nodes = [f"test_probe.py::test_probe[{value}]" for value in ("one", "two", "error")]
+    admitted = {
+        "binding": binding,
+        "inventory": {"shards": {"diagnostic": {"nodes": nodes}}},
+    }
+    (evidence / "admitted.json").write_text(json.dumps(admitted), encoding="utf-8")
+    (evidence / "start.json").write_text('{"shard":"diagnostic"}', encoding="utf-8")
+    environment = dict(os.environ)
+    for name in ("PYTEST_XDIST_WORKER", "PYTEST_XDIST_WORKER_COUNT", "PYTEST_XDIST_TESTRUNUID"):
+        environment.pop(name, None)
+    environment.update(
+        PYTHONPATH=str(root) + os.pathsep + str(root / "src"),
+        PYTHONDONTWRITEBYTECODE="1",
+        PYTEST_DISABLE_PLUGIN_AUTOLOAD="1",
+        QUALITY_EVIDENCE_DIR=str(evidence),
+        QUALITY_EVIDENCE_MODE="execute",
+        QUALITY_EVIDENCE_BINDING=binding,
+    )
+    command = [
+        sys.executable,
+        "-B",
+        "-m",
+        "pytest",
+        "-c",
+        str(ini),
+        "-p",
+        "xdist.plugin",
+        "-p",
+        "scripts.quality_reporter",
+        "-n",
+        "4",
+        "--dist=worksteal",
+        "--max-worker-restart=0",
+        "-q",
+        str(probe),
+    ]
+    supervisor = Supervisor(evidence, binding, Deadlines(45, 50, 55, 60))
+    try:
+        status = supervisor.run(command, tmp_path, environment, "probe")
+    finally:
+        watchdog_status = supervisor.close()
+    log = (evidence / "probe.log").read_text(encoding="utf-8")
+    assert status == 1, log
+    assert watchdog_status == 0, log
+    native = json.loads((evidence / "probe-process.json").read_text(encoding="utf-8"))
+    assert native["exit_status"] == 1
+    events = [
+        json.loads(line)
+        for journal in evidence.glob("execute-gw*.jsonl")
+        for line in journal.read_text(encoding="utf-8").splitlines()
+    ]
+    assert sorted(
+        event["node"] for event in events if event["kind"] == "wrapper_restored"
+    ) == sorted(nodes)
+    calls = [event for event in events if event["kind"] == "phase_end" and event["phase"] == "call"]
+    assert len(calls) == 3
+    assert sorted(event["outcome"] for event in calls) == ["failed", "passed", "passed"]
+    assert len([event for event in events if event["kind"] == "phase_end"]) == 9
+    failures = "\n".join(
+        path.read_text(encoding="utf-8") for path in evidence.glob("*failure*.json")
+    )
+    assert "forwarded error" in failures
+    assert "original cause" in failures

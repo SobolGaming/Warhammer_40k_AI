@@ -177,3 +177,43 @@ coverage gate and twelve behavior shards remain unchanged. The prior transaction
 freshness guarantee, including its explicitly approved restored-transient gap,
 also remains unchanged. Full quality, full behavior/coverage and hosted total
 runtime are separate gates; no publication or merge is authorized.
+
+
+## CI68 standalone computation-only test scope
+
+The next bounded correction changes only the category quality fixture's temporary
+forwarding seam and the existing pure admission helper. Each individual original
+validator call starts an empty, owner-bound computation-only scope. All original
+validator calls and assertions remain, with fresh complete filesystem/Git reads,
+ordered bytes and modes, physical identity, caller and Windows checks. Only the
+two already audited pure admission proofs may reuse complete equal operands inside
+that one call. Complete finite callable/code/default/selector bindings and the
+permitted immutable closure shape are checked before every proof lookup. Owner
+and recipe caches are disabled in this mode; unsupported dependencies fail closed.
+
+This scope creates no historical phase or live admission lease. It cannot promote
+into a phase, and an unexpected phase revokes its proof eligibility while original
+fresh validation continues. Results never cross calls, phases, invocations, roots
+or owners. Original512MiB retained-payload and128MiB operand limits remain. The
+temporary validator and pytest callable restore before outer reporter callbacks,
+including on exceptions. The existing transaction freshness contract does not
+expand, and independent preflight/postflight still start fresh.
+
+All2033 prior quality case identities and original definitions/assertions remain.
+Actual collection contains2053 unique cases, with20 new pure-mechanism controls
+in the already-owning first lane:568/396/658/431. All old shard membership and
+relative order and the four module manifests are preserved. All1643 existing
+operations remain exact, with only three literal obligations for19 new owners,
+now1646 operations. Synthetic mechanism/reporter controls and original transaction
+compatibility checks are distinct from authentic current-source observation and
+complete quality qualification; collection executes no tests. The source-bound
+158-observation/read/Git proof and actual pure-call reduction remain required.
+
+The previous affected selection's600-second timeout, its94 completed cases and
+one incomplete case, and the separate192.170-second remaining-case completion
+stay separate evidence. Neither their union nor the structural12-to-2 pure-proof
+target establishes a600-second aggregate or a speedup. The full configured static
+checks passed on the working code snapshot, but final finite metadata, genuine
+source evidence, current180-second command and complete quality lanes remain
+required. No gameplay, sample, threshold, dependency or concurrency change is made;
+no publication or merge is authorized.

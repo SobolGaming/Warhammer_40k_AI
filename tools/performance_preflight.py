@@ -22,7 +22,7 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from functools import wraps
 from pathlib import Path, PosixPath, PurePath
-from types import FunctionType
+from types import BuiltinFunctionType, FunctionType
 from typing import Any, cast
 
 # Bound retained raw payload independently of the complete source/input corpus.
@@ -244,6 +244,8 @@ class _Ci60AdmissionHandoff:
         self.used = False
         self.revoked = False
         self.phase_identity: tuple[str, ...] | None = None
+        self.computation_only = False
+        self.dependencies: tuple[object, ...] = ()
 
     @staticmethod
     def _repository(root: Path) -> tuple[str, ...]:
@@ -257,6 +259,10 @@ class _Ci60AdmissionHandoff:
             raise ValueError("CI60 admission handoff belongs to another owner.")
         if root != self.root or self._repository(root) != self.repository:
             raise ValueError("CI60 admission handoff belongs to another repository.")
+        if self.computation_only and self.dependencies != _ci60_computation_bindings(
+            self.validators
+        ):
+            raise ValueError("CI60 computation dependency changed.")
 
     def discard(self, digests: _Digests, identity: tuple[str, ...]) -> None:
         for key, operands in tuple(digests.admissions.items()):
@@ -277,6 +283,8 @@ def ci60_bootstrap_admission[T](
     root: Path,
     validators: tuple[AdmissionValidator, AdmissionValidator],
     acquire: Callable[[], T],
+    *,
+    computation_only: bool = False,
 ) -> Iterator[T]:
     """Keep bootstrap proofs private through acquisition and revoke on every exit."""
     digests = _DIGESTS.get()
@@ -288,6 +296,9 @@ def ci60_bootstrap_admission[T](
     if digests.ci60_handoff is not None or len(set(validators)) != 2:
         raise ValueError("CI60 admission requires one bootstrap and two validators.")
     state = _Ci60AdmissionHandoff(root, validators)
+    state.computation_only = computation_only
+    if computation_only:
+        state.dependencies = _ci60_computation_bindings(validators)
     digests.ci60_handoff = state
     try:
         state.capturing = True
@@ -307,6 +318,10 @@ def ci60_phase_admission(root: Path, identity: tuple[str, ...] | None) -> Iterat
     digests = _DIGESTS.get()
     state = None if digests is None else digests.ci60_handoff
     if digests is None or not digests.active or state is None:
+        yield
+        return
+    if state.computation_only:
+        state.revoke(digests)
         yield
         return
     state.check(root)
@@ -343,6 +358,25 @@ def admission_proof(
     """Reuse a complete pure proof only in its phase or explicit CI60 bootstrap."""
     digests = _DIGESTS.get()
     state = None if digests is None else digests.ci60_handoff
+    if digests is not None and state is not None and state.computation_only:
+        if repository is None:
+            state.revoke(digests)
+        else:
+            state.check(repository)
+            from tools.performance_history_snapshot import proof_identity
+
+            if identity is not None or proof_identity(repository) is not None:
+                state.revoke(digests)
+        if (
+            digests.active
+            and state.capturing
+            and not state.revoked
+            and validator in state.validators
+        ):
+            digests.admission(validator, operands, state.bootstrap_identity, dependencies)
+        else:
+            validator(operands, () if identity is None else identity)
+        return
     if (
         digests is not None
         and digests.active
@@ -546,6 +580,12 @@ def ci60_transaction(
     if storage.owner != (os.getpid(), threading.get_ident()):
         raise ValueError("Admission transaction invocation identity changed.")
     phase = proof_identity(root)
+    handoff = storage.ci60_handoff
+    if handoff is not None and handoff.computation_only:
+        if phase is not None:
+            handoff.revoke(storage)
+        yield
+        return
     if phase is None:
         yield
         return
@@ -757,6 +797,96 @@ def ci60_admission_bindings() -> tuple[object, ...]:
         _posix_path_dependencies(),
     )
     return tuple(_admission_binding(value) for value in objects)
+
+
+def _ci60_computation_bindings(
+    validators: tuple[AdmissionValidator, AdmissionValidator],
+) -> tuple[object, ...]:
+    """Only the audited pure closure graph may enter computation-only reuse."""
+    import ast
+
+    from tools import performance_ci60_qualification as q
+    from tools import performance_policy as policy
+
+    selected = tuple(
+        getattr(q, name) for name in ("_current_derivation_transition", "_admitted_derivation")
+    )
+    if validators != selected:
+        raise ValueError("CI60 computation validators changed; exact two pure validators required.")
+    owner = policy.owner_hashes
+    raw_owner = vars(owner).get("__wrapped__") if isinstance(owner, FunctionType) else None
+    pure = (
+        *(
+            getattr(q, name)
+            for name in (
+                "_current_derivation_transition",
+                "_prelude_transition",
+                "_derivation_transition",
+                "_admitted_derivation",
+                "digest",
+            )
+        ),
+        policy.digest,
+        raw_owner,
+    )
+    if any(not isinstance(function, FunctionType) or function.__closure__ for function in pure):
+        raise ValueError("CI60 computation pure closure changed.")
+    dependencies = (json.loads, json.dumps, hashlib.sha256, ast.parse, ast.dump, ast.iter_fields)
+    if any(
+        not isinstance(value, (FunctionType, BuiltinFunctionType))
+        or (isinstance(value, FunctionType) and value.__closure__)
+        for value in dependencies
+    ):
+        raise ValueError("CI60 computation dependency closure changed.")
+    closure = owner.__closure__ if isinstance(owner, FunctionType) else None
+    if (
+        not isinstance(owner, FunctionType)
+        or owner.__code__.co_freevars != ("function",)
+        or closure is None
+        or len(closure) != 1
+    ):
+        raise ValueError("CI60 computation owner closure changed.")
+    try:
+        captured = closure[0].cell_contents
+    except ValueError as error:
+        raise ValueError("CI60 computation owner closure became empty.") from error
+    if captured is not raw_owner:
+        raise ValueError("CI60 computation owner closure changed.")
+    return (
+        *ci60_admission_bindings(),
+        _admission_binding(_ci60_computation_bindings),
+        _admission_binding(ci60_computation),
+        _admission_binding(q.admission_validators),
+        captured,
+    )
+
+
+def ci60_computation[T](root: Path, acquire: Callable[[], T]) -> T:
+    """One test-local CPU scope; every live admission remains fully fresh."""
+    from tools import performance_ci60_qualification as q
+    from tools.performance_history_snapshot import proof_identity
+
+    if (
+        _DIGESTS.get() is not None
+        or proof_identity(root) is not None
+        or not (root / q.NAMESPACE).is_dir()
+    ):
+        return acquire()
+
+    @invocation
+    def compute() -> T:
+        owners = _OWNERS.set(None)
+        proofs = _PROOFS.set(None)
+        try:
+            with ci60_bootstrap_admission(
+                root, q.admission_validators(), acquire, computation_only=True
+            ) as result:
+                return result
+        finally:
+            _PROOFS.reset(proofs)
+            _OWNERS.reset(owners)
+
+    return compute()
 
 
 def recipe_proof[F: Callable[..., None]](function: F) -> F:

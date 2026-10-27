@@ -1,20 +1,20 @@
 {
   "schema": "ci64-finite-current-applicability-v1",
   "original_input_digest": "e8e85f08af6a203f5c943fe55458d9541198c0fa4bcbcb70bb3ef5f998b85139",
-  "current_producing_input_digest": "119c6f74f65a9b1eb677b2cce3f97f88419c8075beb5f3da0fa300ad10bb34fb",
+  "current_producing_input_digest": "e182342755c0610735f578ddfdbd9d031b96fd4e005b36a0653fff67588fb84e",
   "previous_applicability_sha256": "9f0d51de50c458a5caeaa1fe3eabefeab3e90d701ce1afb8bfd4dc0cc8744148",
   "changes": {
     "docs/performance/policy-v3/operation-map.json": {
       "before": "813b3219639758c6d11976533147455b32492b58122bb2d0933e9660deff00cf",
-      "after": "d98c36d5c7c92039e47802f1fb8df7d482b716b6700753ea92645f08ea8df810"
+      "after": "2ef125419c398e603030395742cc75337eb9c7598610423efba65e9dfcdf1c61"
     },
     "tests/code_quality/test_performance_admission_transaction.py": {
       "before": null,
-      "after": "3334949e5f8f89a3b07df5b3fe239d15a57fba2028e5fa4aa944941b110f09dd"
+      "after": "d3ed199308a3a6f1b9345350138158aedf2f0cd74ff355bd52c59127d0bea64e"
     },
     "tests/code_quality/test_performance_category_migration.py": {
       "before": "df412bbc22e69eb6834b47b6aea8606fce20004d30876438eff13ced04344dfa",
-      "after": "8d4342d3febbab9aae589a6c902f66eaa1b3abf3576f9c7fe78203bba82258b7"
+      "after": "6d3b39397a80dd39f82796d016b9b9e095e70a9ce800889665c8a75876f147ce"
     },
     "tests/code_quality/test_performance_policy.py": {
       "before": "f45929b1d7138997e9bef8a390ca7fa1b1db467816cc6534871dd850222ddb98",
@@ -50,7 +50,7 @@
     },
     "tools/performance_preflight.py": {
       "before": "dc857922ba519ffc7b627f048458f448c82319723032c6889793bb496a359e36",
-      "after": "16817c05526b44de281b383d0d469ac0df3a6ee51cc57a772bf28fe671943bf1"
+      "after": "1db639fe435d0e7d88436284653929c70c6991dc59ff7d0a7793e0935d2a8bb4"
     },
     "tools/performance_preflight_successor.py": {
       "before": "60e1e493fe3aaaf98e88c28c85b781c52c5355ece3be556ea33681819817df59",

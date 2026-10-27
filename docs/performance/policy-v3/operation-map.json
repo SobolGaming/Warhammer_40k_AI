@@ -27772,6 +27772,61 @@
       ],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci68-computation-51d8e1a1c6f47c28af7f0870d6dcd16b4bfa2eee92437c2439a207bf2f594b92": {
+      "paths": [
+        "tests/code_quality/test_performance_admission_transaction.py"
+      ],
+      "owners": [
+        "_compute_first",
+        "_compute_observation",
+        "_compute_second",
+        "_compute_unselected",
+        "_compute_validate",
+        "computation_root",
+        "test_category_forwarder_real_pytest_reporter_lifetime",
+        "test_computation_only_scope_cannot_promote_or_group_after_unexpected_phase",
+        "test_computation_only_scope_capacity_fallback_stays_fresh",
+        "test_computation_only_scope_keeps_fresh_reads_and_isolates_calls",
+        "test_computation_only_scope_rejects_callable_dependency_instances",
+        "test_computation_only_scope_rejects_dependency_changes",
+        "test_computation_only_scope_rejects_preinstalled_mutable_dependency_closures",
+        "test_computation_only_scope_rejects_unselected_callbacks",
+        "test_computation_only_scope_revalidates_complete_operands",
+        "test_computation_only_scope_revokes_on_failure"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci68-computation-b9967ff3a58e5b467283dcf99e88f929db96605c02d44dbe23905f77ed577d4f": {
+      "paths": [
+        "tests/code_quality/test_performance_category_migration.py"
+      ],
+      "owners": [
+        "private_computation_scope"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci68-computation-3cacc2199960a29e392d67004401cdff9c1b806dd2e5493132e7b711e29e5faa": {
+      "paths": [
+        "tools/performance_preflight.py"
+      ],
+      "owners": [
+        "_ci60_computation_bindings",
+        "ci60_computation"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

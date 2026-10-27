@@ -9,13 +9,15 @@ import subprocess
 import sys
 from collections.abc import Iterator, Mapping
 from copy import deepcopy
+from functools import wraps
 from pathlib import Path
 from types import MappingProxyType
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from tools import cumulative_preservation as migration
 from tools import performance_policy as policy
+from tools import performance_preflight as preflight
 from tools import performance_qualification_successor as successor
 from tools import performance_reconstruction_campaign as reconstruction
 from tools import performance_tool_inputs as original
@@ -64,6 +66,36 @@ def private_expected_input_reference() -> Iterator[None]:
             yield
         finally:
             reference = None
+
+
+@pytest.fixture(autouse=True)
+def private_computation_scope(request: pytest.FixtureRequest) -> Iterator[None]:
+    """Restore the temporary validator and callable before outer reporter hooks."""
+    node = cast(pytest.Item, cast(Any, request).node)
+    if not isinstance(node, pytest.Function):
+        yield
+        return
+    original_test = node.obj
+    original_verify = migration.verify_current_inventory
+
+    @wraps(original_test)
+    def run_original(*args: Any, **kwargs: Any) -> Any:
+        @wraps(original_verify)
+        def verify(root: Path, **values: Any) -> None:
+            return preflight.ci60_computation(root, lambda: original_verify(root, **values))
+
+        try:
+            with pytest.MonkeyPatch.context() as private:
+                private.setattr(migration, "verify_current_inventory", verify)
+                return original_test(*args, **kwargs)
+        finally:
+            node.obj = original_test
+
+    node.obj = run_original
+    try:
+        yield
+    finally:
+        node.obj = original_test
 
 
 @pytest.fixture(scope="module")
