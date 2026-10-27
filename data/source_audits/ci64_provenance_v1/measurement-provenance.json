@@ -1,25 +1,25 @@
 {
   "external_contract_source_reuse": {
     "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
-    "head_input_digest": "77908a6c16f57f693396efe43585ca7b50e14cd085e20efbd7c1d03aa45faa3e",
-    "producing_head": "5aaa6de0383e3ae0567545ed8ff8634656dcb0bd",
+    "head_input_digest": "3bb4f2a53600be7e7f121b342b1fba673a92595f542c9a625a233a032b78e312",
+    "producing_head": "824778b0ae34ab4082937c3f7cea2f2834ebde11",
     "base": {
       "path": "data/source_audits/ci64_provenance_v1/measurements/source-base.json",
-      "sha256": "74e44d0443a4333b4b350759e410c23262637b7caac4c099972f2ce272d82156",
-      "canonical_sha256": "37c9d2000549072cdeb9300052c2f88aae826530e53949b3c7c73a49fc4596ce",
+      "sha256": "64cc15e73c06a1f758053b368b6822d76fc9a0d4d39416b9a8be7636d5604115",
+      "canonical_sha256": "650cbd914223fd3f4b473ced63e30429454bdcaa7867ccdd6f1bbe5cf6be97f5",
       "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
       "samples": {
         "orphan-write-independent-check": [
-          150.524,
-          150.453,
-          149.066
+          154.109,
+          155.84,
+          153.21
         ]
       },
       "completed": true,
       "native_attempt_names": [
-        "260-ci70-affinity-source-base-0",
-        "262-ci70-affinity-source-base-1",
-        "264-ci70-affinity-source-base-2"
+        "305-ci71-source-base-0",
+        "307-ci71-source-base-1",
+        "309-ci71-source-base-2"
       ],
       "receipt_paths": [
         "data/source_audits/ci64_provenance_v1/receipts/source-base-0.json",
@@ -28,7 +28,7 @@
       ],
       "host": {
         "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-        "memory_bytes": 67359399936,
+        "memory_bytes": 67359404032,
         "logical_cpus": 64,
         "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
         "python": "3.14.5",
@@ -37,21 +37,21 @@
     },
     "head": {
       "path": "data/source_audits/ci64_provenance_v1/measurements/source-head.json",
-      "sha256": "59ea38fe4f5b02beec85abe234e8791b6312ec1e1a4fc5ea6fa403feef8ebfe5",
-      "canonical_sha256": "dd53ae8f15a4e83418360750efd0ad90826c02d69aa691f838e62b4805c652a3",
+      "sha256": "80413932dbcb721df05a400e243cbc16946634da80d0d8e5655cbe92189631d8",
+      "canonical_sha256": "8329c8d0d270b8f0457c9dad0b6e5eeeea6b15b54f0f99f128979b960829b499",
       "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
       "samples": {
         "orphan-write-independent-check": [
-          139.662,
-          138.317,
-          137.02
+          141.77,
+          139.879,
+          139.512
         ]
       },
       "completed": true,
       "native_attempt_names": [
-        "261-ci70-affinity-source-head-0",
-        "263-ci70-affinity-source-head-1",
-        "265-ci70-affinity-source-head-2"
+        "306-ci71-source-head-0",
+        "308-ci71-source-head-1",
+        "310-ci71-source-head-2"
       ],
       "receipt_paths": [
         "data/source_audits/ci64_provenance_v1/receipts/source-head-0.json",
@@ -60,7 +60,7 @@
       ],
       "host": {
         "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-        "memory_bytes": 67359399936,
+        "memory_bytes": 67359404032,
         "logical_cpus": 64,
         "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
         "python": "3.14.5",

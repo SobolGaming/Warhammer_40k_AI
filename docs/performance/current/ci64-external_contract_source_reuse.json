@@ -4,20 +4,21 @@
   "workload_id": "external-contract-orphan-write-independent-check-v1",
   "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
-  "head_input_digest": "77908a6c16f57f693396efe43585ca7b50e14cd085e20efbd7c1d03aa45faa3e",
+  "head_input_digest": "3bb4f2a53600be7e7f121b342b1fba673a92595f542c9a625a233a032b78e312",
   "budget_profile": "current-change-relative-v1",
   "historical_failures": [
     "Original CI60 complete CLI122 remains a failed180second invocation with incomplete postflight; no physical check converts it into a pass.",
     "CI61 complete CLI045 remains a failed180second invocation and CI63 standalone preflight remains incomplete. CI64 E2 complete CLI058 also remains a failed180second invocation. CI65 E3 complete CLI051 remains a failed180second invocation; standalone diagnostic052 is component evidence only. Historical CI66 source-token samples retain their native M4 71e5f3bf45de47730bde9516aeb5680634120e54 binding. CI66 E4 complete CLI052 remains failed at180.210501606seconds and diagnostic057 remains a censored180.268147208second attempt; the historical six authentic CI67 source-token samples retain native M 987f9a5464763879c97bc5e14fdbeffb1f04bf22. The earlier six authentic CI68 source-token samples retain native M 0b439e38dfba78b627e2910e605ec295c1af1f5f; the earlier six CI68 computation-only successor samples152-157 bind native M acd5ecb8c132865974fe5ca46f17f592e5ab6634; prior CI67 E complete150.771216177second success remains predecessor evidence, and its quality098 remains failed/incomplete; all prior source reports and eleven other families retain their actual producer identities. Final current admission and complete gates remain pending.",
     "CI69 producer M 88de23e1737ec3cdb65400598c8b45f411744086 retains five authentic completed samples190-194 as partial predecessor evidence. Sample195 was not run after the selector-closure gap was confirmed; no complete comparison or current qualification is attributed to that producer. Completed CI69 source samples217-222 retain native M 67578da27af11eee69f5bfd42318eca6fa63d625; current CI70 source samples260-265 bind native M 5aaa6de0383e3ae0567545ed8ff8634656dcb0bd; independent current admission, complete performance and full quality remain separate required gates.",
     "Earlier M2 source attempts203/204 both completed natively but their recorded memory differed by20480bytes, so exact host admission rejected the pair;205-208 were unrun. Cohort210-213 completed four native samples but its declared45second transition guard prevented214 after72.826167seconds;214/215 were unrun. Neither incomplete cohort is selected. The historical predeclared217-222 cohort retains all original matching and limits; ordinary API sequencing removed model-response gaps, with no persistent host controller or normalization.",
-    "CI69 complete performance158.123475658seconds remains bound to9301fdf3feaf99a0859d629c6248ea8c37d8f710; lane1 remains interrupted with658passes,2failures and1incomplete, with no native terminal. CI70 sample254 was rejected before child launch for missing required four-core affinity and produced no measurement. New260-265 use command-local affinity0-3 and preserve every original guard. Current activated admission, complete performance and2061quality remain separate pending gates."
+    "CI69 complete performance158.123475658seconds remains bound to9301fdf3feaf99a0859d629c6248ea8c37d8f710; lane1 remains interrupted with658passes,2failures and1incomplete, with no native terminal. CI70 sample254 was rejected before child launch for missing required four-core affinity and produced no measurement. New260-265 use command-local affinity0-3 and preserve every original guard. Current activated admission, complete performance and2061quality remain separate pending gates.",
+    "CI70 complete160.879467271second performance remains bound to b97abaa120f143a020688cc316f152818c5e1ae2. Its four quality lanes retain2060passes and one category fixture setup error from copying a transient reporter file; no strict passing fan-in is claimed. CI71 preserves the failure and all old assertions, excludes only unowned root reports in three fixture copies, adds two real-copy regressions, and binds these six fresh samples305-310 to native producer 824778b0ae34ab4082937c3f7cea2f2834ebde11; activated source qualification, complete180second command, all2063qualitycases and hosted behavior/85coverage remain separately required."
   ],
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359399936,
+      "memory_bytes": 67359404032,
       "logical_cpus": 64,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -25,12 +26,12 @@
     },
     "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be",
-    "fixture_sha256": "36fde1417e10937c906e54e88ebad383325c361adc704028b5afcf3512f42caa",
+    "fixture_sha256": "23b1d35001d71144afd2b240506df8ef878164d52caae1d92044a26eb10ec2d9",
     "samples": {
       "orphan-write-independent-check": [
-        150.524,
-        150.453,
-        149.066
+        154.109,
+        155.84,
+        153.21
       ]
     },
     "completed": true,
@@ -41,7 +42,7 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359399936,
+      "memory_bytes": 67359404032,
       "logical_cpus": 64,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -49,12 +50,12 @@
     },
     "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be",
-    "fixture_sha256": "36fde1417e10937c906e54e88ebad383325c361adc704028b5afcf3512f42caa",
+    "fixture_sha256": "23b1d35001d71144afd2b240506df8ef878164d52caae1d92044a26eb10ec2d9",
     "samples": {
       "orphan-write-independent-check": [
-        139.662,
-        138.317,
-        137.02
+        141.77,
+        139.879,
+        139.512
       ]
     },
     "completed": true,
@@ -65,10 +66,10 @@
     "schema": "tool-input-roles-v3",
     "family": "external_contract_source_reuse",
     "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
-    "head_input_digest": "77908a6c16f57f693396efe43585ca7b50e14cd085e20efbd7c1d03aa45faa3e",
-    "role_spec_sha256": "1d7670a3159fabfdf032bcf0911edc010bc93d8df702aef3a9c9853e94427a3c",
-    "complete_inventories_sha256": "1256afa407bcca49edfeb64729ea48a16209a30732e0a50686e2285e591861b8",
-    "common_sha256": "36fde1417e10937c906e54e88ebad383325c361adc704028b5afcf3512f42caa",
+    "head_input_digest": "3bb4f2a53600be7e7f121b342b1fba673a92595f542c9a625a233a032b78e312",
+    "role_spec_sha256": "fcb8b4c75868b0ca790d9945080a204ba960d436749ffb6d7f8d7b1e6f4e2738",
+    "complete_inventories_sha256": "06ce3a6d0deae81addbfd6bd9d1d990de5b7f55a7f195619d21337af6d86a345",
+    "common_sha256": "23b1d35001d71144afd2b240506df8ef878164d52caae1d92044a26eb10ec2d9",
     "contract_trees": {
       "base": {
         "README.md": "f8bc470b0b2cc63503964bda1121092eb781371d48dc6ae92e5ef53676aafcce",
@@ -551,7 +552,7 @@
       "head": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6"
     },
     "shared_dependencies_sha256": "a2a00c5e977c7a8dcbb2188efed485d69e924d20649bc637108e43914d201f39",
-    "shared_workload_sha256": "3ed1aefca23ee02b0e2a46d5d446baa80affd86930009e2353a5feabd14521a9"
+    "shared_workload_sha256": "1e24ef767dd242aecefe409871203af16e4f5ec7f21e97bbb37a7030541a232b"
   },
   "generated_output_binding": {
     "base": [

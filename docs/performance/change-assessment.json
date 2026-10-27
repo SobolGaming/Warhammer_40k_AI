@@ -1246,31 +1246,31 @@
     },
     "data/source_audits/ci64_provenance_v1/measurement-provenance.json": {
       "before_sha256": null,
-      "after_sha256": "ccf9a8d827d78d953ae77fb11f24d53bf278487f48cfb5506e2463a65d0447d0",
+      "after_sha256": "6a37917937d8536b4952316ec17ae87e80d4c52adf1ca82c2f6f650fb680ee39",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ccf9a8d827d78d953ae77fb11f24d53bf278487f48cfb5506e2463a65d0447d0"
+          "after": "6a37917937d8536b4952316ec17ae87e80d4c52adf1ca82c2f6f650fb680ee39"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/measurements/source-base.json": {
       "before_sha256": null,
-      "after_sha256": "74e44d0443a4333b4b350759e410c23262637b7caac4c099972f2ce272d82156",
+      "after_sha256": "64cc15e73c06a1f758053b368b6822d76fc9a0d4d39416b9a8be7636d5604115",
       "owners": {
         "@document": {
           "before": null,
-          "after": "74e44d0443a4333b4b350759e410c23262637b7caac4c099972f2ce272d82156"
+          "after": "64cc15e73c06a1f758053b368b6822d76fc9a0d4d39416b9a8be7636d5604115"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/measurements/source-head.json": {
       "before_sha256": null,
-      "after_sha256": "59ea38fe4f5b02beec85abe234e8791b6312ec1e1a4fc5ea6fa403feef8ebfe5",
+      "after_sha256": "80413932dbcb721df05a400e243cbc16946634da80d0d8e5655cbe92189631d8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "59ea38fe4f5b02beec85abe234e8791b6312ec1e1a4fc5ea6fa403feef8ebfe5"
+          "after": "80413932dbcb721df05a400e243cbc16946634da80d0d8e5655cbe92189631d8"
         }
       }
     },
@@ -1286,81 +1286,81 @@
     },
     "data/source_audits/ci64_provenance_v1/receipts/source-base-0.json": {
       "before_sha256": null,
-      "after_sha256": "c2932d4b170c79508703afb57d84d86ac2fcce69ac24954d705f91c4057c41aa",
+      "after_sha256": "12f5ebec2804ba3e980fb55464cc9e1171fa57a1ac6ce62bb8aa90f039e34507",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c2932d4b170c79508703afb57d84d86ac2fcce69ac24954d705f91c4057c41aa"
+          "after": "12f5ebec2804ba3e980fb55464cc9e1171fa57a1ac6ce62bb8aa90f039e34507"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/receipts/source-base-1.json": {
       "before_sha256": null,
-      "after_sha256": "965d6f0bd0287aa8ba153e7422dd6283b2506f3f6a5277d687e684b947e3b0f6",
+      "after_sha256": "3b24fd7479079363c2932d9c46731151c9ef290a127df943a380a088861ad65b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "965d6f0bd0287aa8ba153e7422dd6283b2506f3f6a5277d687e684b947e3b0f6"
+          "after": "3b24fd7479079363c2932d9c46731151c9ef290a127df943a380a088861ad65b"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/receipts/source-base-2.json": {
       "before_sha256": null,
-      "after_sha256": "b25b61f2dc9de4aeae88ad6a24454e6a18c201a324cc943370b291270e9a5b58",
+      "after_sha256": "a68f5df0c74f9e22d516e9cbd555205ed12515726d328eb5437c7f6c3782d471",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b25b61f2dc9de4aeae88ad6a24454e6a18c201a324cc943370b291270e9a5b58"
+          "after": "a68f5df0c74f9e22d516e9cbd555205ed12515726d328eb5437c7f6c3782d471"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/receipts/source-head-0.json": {
       "before_sha256": null,
-      "after_sha256": "aef8713184427fb8d7ab822ec2c1bad64183f68a6ecc405f7083ce35aeb915e9",
+      "after_sha256": "5f5906f895e106bc02729dfb0e4a27a8d9020d83c0ba3d862e426868512cf6c1",
       "owners": {
         "@document": {
           "before": null,
-          "after": "aef8713184427fb8d7ab822ec2c1bad64183f68a6ecc405f7083ce35aeb915e9"
+          "after": "5f5906f895e106bc02729dfb0e4a27a8d9020d83c0ba3d862e426868512cf6c1"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/receipts/source-head-1.json": {
       "before_sha256": null,
-      "after_sha256": "9f0ff2d3b3107dc6a5b95d6d11f0677f3832bb0647b1335d766f0c7e05979338",
+      "after_sha256": "1d14cbc3c7530eec6f7e88b88ca976212b85588c69c24f74d09356ebf76de74e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9f0ff2d3b3107dc6a5b95d6d11f0677f3832bb0647b1335d766f0c7e05979338"
+          "after": "1d14cbc3c7530eec6f7e88b88ca976212b85588c69c24f74d09356ebf76de74e"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/receipts/source-head-2.json": {
       "before_sha256": null,
-      "after_sha256": "1c5856d4ee7ab3e47e655d32811287fd7dec84314ce35c0d5cfff014dd82c4e9",
+      "after_sha256": "526c20d090479f34cba03313cfa2a90ed8aac74d82df15da7f7e02a9b7840ada",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1c5856d4ee7ab3e47e655d32811287fd7dec84314ce35c0d5cfff014dd82c4e9"
+          "after": "526c20d090479f34cba03313cfa2a90ed8aac74d82df15da7f7e02a9b7840ada"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/source-token-inventories.json": {
       "before_sha256": null,
-      "after_sha256": "146c6a9ed98f870301d3d5915c5242f677222a393c94050b93d270986b0f9476",
+      "after_sha256": "44367977c621d10f0120ae58fa2cfe1987c854e9f7d90e74d18e294a56aea24d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "146c6a9ed98f870301d3d5915c5242f677222a393c94050b93d270986b0f9476"
+          "after": "44367977c621d10f0120ae58fa2cfe1987c854e9f7d90e74d18e294a56aea24d"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/source-token-roles.json": {
       "before_sha256": null,
-      "after_sha256": "322b3f5e764597deb8839b8a36517dfb0e53e16c3952cf216c2a50251bf7a65f",
+      "after_sha256": "fd689c2bf65308c7bfe87f085fb1a58a15f057a1ef2c2b18d465bc10f1e90333",
       "owners": {
         "@document": {
           "before": null,
-          "after": "322b3f5e764597deb8839b8a36517dfb0e53e16c3952cf216c2a50251bf7a65f"
+          "after": "fd689c2bf65308c7bfe87f085fb1a58a15f057a1ef2c2b18d465bc10f1e90333"
         }
       }
     },
@@ -3696,11 +3696,11 @@
     },
     "docs/performance/current/ci64-external_contract_source_reuse.json": {
       "before_sha256": null,
-      "after_sha256": "12b52e9f8d7b8bffec428a3d18b3becfee8907112e37ff5310fd8a95ecb5ba82",
+      "after_sha256": "95809d41d4f2b6e1704e3bedf4e2c36a390d3de2cd624a56a28735149093cf9f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "12b52e9f8d7b8bffec428a3d18b3becfee8907112e37ff5310fd8a95ecb5ba82"
+          "after": "95809d41d4f2b6e1704e3bedf4e2c36a390d3de2cd624a56a28735149093cf9f"
         }
       }
     },
