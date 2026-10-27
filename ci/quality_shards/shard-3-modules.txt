@@ -1,14 +1,11 @@
-tests/code_quality/test_ws12_generated_data_artifacts.py
 tests/code_quality/test_faction_content_runtime_structure.py
 tests/code_quality/test_performance_category_migration.py
 tests/code_quality/test_faction_integration_contract.py
 tests/code_quality/test_v963_shock_source.py
 tests/code_quality/test_order135_current_core_audit.py
 tests/code_quality/test_ws4_runtime_descriptor_boundary.py
-tests/code_quality/test_qualification40_successor.py
 tests/code_quality/test_core_modifier_boundaries.py
 tests/code_quality/test_command_point_invariants.py
-tests/code_quality/test_quality_runtime_process.py
 tests/code_quality/test_unit_split_ownership.py
 tests/code_quality/test_order43_critical_hits.py
 tests/code_quality/test_engine_build_identity.py
@@ -16,7 +13,6 @@ tests/code_quality/test_order96_reroll_authority.py
 tests/code_quality/test_ws5_ws10_hardening.py
 tests/code_quality/test_order59_empty_dedicated_transport.py
 tests/code_quality/test_order80_normal_move.py
-tests/code_quality/test_performance_static_successor.py
 tests/code_quality/test_order116_additional_mortals.py
 tests/code_quality/test_qualification40_measurements.py
 tests/code_quality/test_performance_preflight.py

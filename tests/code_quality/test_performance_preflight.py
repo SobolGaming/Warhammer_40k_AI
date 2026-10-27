@@ -1573,6 +1573,7 @@ def test_ci65_handoff_uses_real_native_phase_lease(tmp_path: Path, outcome: str)
 
     @preflight.invocation
     def run() -> None:
+        handled_errors = (RuntimeError, KeyboardInterrupt)
         try:
             with preflight.ci60_bootstrap_admission(root, validators, acquire):
                 with (
@@ -1596,7 +1597,7 @@ def test_ci65_handoff_uses_real_native_phase_lease(tmp_path: Path, outcome: str)
                         assert calls == ["first", "second"]
                         copied.append(contextvars.copy_context())
                         finish_body()
-        except RuntimeError, KeyboardInterrupt:
+        except handled_errors:
             if outcome == "complete":
                 raise
         assert history.proof_identity(root) is None

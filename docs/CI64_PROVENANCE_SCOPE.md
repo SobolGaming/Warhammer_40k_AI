@@ -217,3 +217,60 @@ checks passed on the working code snapshot, but final finite metadata, genuine
 source evidence, current180-second command and complete quality lanes remain
 required. No gameplay, sample, threshold, dependency or concurrency change is made;
 no publication or merge is authorized.
+
+
+## CI69 consolidated quality repair and redistribution
+
+The preceding activated head 2dea50232bdeb868e36f0513d837946c11e59a8f
+passed its complete performance command in153.923473562seconds. That receipt
+remains prior-head evidence. Its four quality attempts recorded2030passes,
+18failures and five incomplete cases across2053 unique cases; this is not a
+passing full quality result. A separate five-case diagnostic completed all five
+with the native reporter, but its extra supervisor postcheck failed on journal
+ordering. Independent read-only reconciliation accepted those five native
+outcomes separately; the original supervisor failure and lane timeout remain.
+
+The bounded correction authenticates an exact V3 D07 catalog for the seven
+reviewed C5 runtime replacements, preserving every original V1/V2/FNP authority,
+archive member and bounded AST comparison. The historical FNP test receives exact
+authenticated native operands after fresh current admission. Exception handling
+uses the same two exception classes through an explicit tuple alias. The history
+observer forwards original acquisition calls only before snapshot activation and
+still rejects fallback after activation or deactivation. Generated report prose
+separates a full hexadecimal commit from its preceding label; the retired-edition
+scanner and its real negative detection remain unchanged.
+
+A data-only module holds literal finite selectors to keep the existing qualifier
+below the repository module-size limit. It adds no code, cache, observations or
+phase lifecycle. The catalog contains46members:26controls,18changed collector
+inputs and20new members. Exactly three collector files are absent from the native
+CI61 producer: the existing transaction test, V3 data and new selector module.
+The current fifth scan observes31members; all five scans make167observations.
+The guard checks those complete current observations before peeling nine explicit
+additions into local historical views, retaining all original158/156/153assertions.
+Raw observations and three fresh live HEAD checks remain unchanged.
+
+Six whole test modules move across the existing four lanes to reduce the measured
+long tail. All2053 prior case identities and within-module order remain. Six new
+D07 guards produce2059cases, partitioned661/393/545/460. No case is duplicated or
+omitted, and unmoved module order remains. Four workers, producer dependencies,
+required aggregates, cancellation, source/dependency admission,180-second complete
+performance and600-second workload limits,85percent coverage and twelve behavior
+shards remain unchanged. Scheduling arithmetic is a lower bound, not a wall-time
+prediction or proof of the ten-minute objective.
+
+All1646 prior operations, profiles and budgets remain exact. Four new literal
+mandatory mappings cover62 newly assessed owners across four changed paths.
+Eleven comparison families may retain244samples per arm only after complete
+unchanged consumer, startup and dependency proof. The source-token family needs
+three genuine actual-base and three current-producer samples because its complete
+current workload inputs changed. All twelve families,41cases and247samples per
+arm remain mandatory. No prior receipt or sample is relabeled onto this candidate.
+
+The approved transaction-boundary freshness contract is unchanged: complete fresh
+start/end admissions with independent preflight/postflight; a transient interior
+mutation restored before the boundary can be missed. No reuse crosses transactions
+or phases. Final source-bound controls, static checks, current complete protocol,
+all four quality lanes, full behavioral coverage and hosted total remain separate
+gates. Publication and merge require those applicable gates and branch protections;
+no result in this document declares them passed.

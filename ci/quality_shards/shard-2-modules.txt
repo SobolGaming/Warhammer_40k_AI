@@ -13,9 +13,7 @@ tests/code_quality/test_phase17c_rule_ir_boundary.py
 tests/code_quality/test_action_movement_interruption.py
 tests/code_quality/test_order42_target_replacement.py
 tests/code_quality/test_ws8_game_state_mutation_discipline.py
-tests/code_quality/test_performance_integration_batch.py
 tests/code_quality/test_movement_geometry_contract.py
-tests/code_quality/test_ci_lookup_history.py
 tests/code_quality/test_official_source_redistribution_policy.py
 tests/code_quality/test_phase18i_interaction_contract.py
 tests/code_quality/test_order123_datasheet_identity.py

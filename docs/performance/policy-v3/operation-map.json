@@ -27827,6 +27827,116 @@
       ],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci69-qualification-e709350c1a267aaebeb5ffe034def0b7f25722eff69f7007f3bdbf993d1320f1": {
+      "paths": [
+        "tests/code_quality/test_d07_geometry_containment.py"
+      ],
+      "owners": [
+        "@module",
+        "_FnpRecipeConstants",
+        "_SuccessorFreeze",
+        "_SuccessorFreeze._freeze",
+        "_SuccessorFreeze.freeze",
+        "_changed_geometry",
+        "preserved_root",
+        "reviewed_fnp_stage",
+        "test_d07_arbitrary_live_repin_cannot_replace_reviewed_successor",
+        "test_d07_bounded_ast_rejects_unlisted_changes_even_without_byte_pins",
+        "test_d07_current_catalog_matches_exact_accepted_runtime_successors",
+        "test_d07_geometry_exact_containment_positive",
+        "test_d07_historical_recipe_remains_authenticated",
+        "test_d07_membership_recipe_and_archive_are_bound",
+        "test_d07_recomputed_current_pin_cannot_admit_fourth_statement",
+        "test_d07_reviewed_fnp_authority_still_rejects_mutation_before_archive",
+        "test_d07_reviewed_fnp_successor_is_exactly_five_digest_substitutions",
+        "test_d07_reviewed_successor_runtime_drift_refuses_before_archive",
+        "test_d07_warm_live_drift_rejects_before_archive_access",
+        "test_order135_reviewed_fnp_metadata_transition_preserves_all_obligations"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci69-qualification-791593bfe3358a4b2494de163105067ce4a8b0311cd0f91b15629ec6395d030a": {
+      "paths": [
+        "tests/code_quality/test_quality_runtime.py"
+      ],
+      "owners": [
+        "@module",
+        "_HistoryActivity",
+        "_HistoryActivity.active",
+        "_PreflightBatchProbe",
+        "_PreflightBatchProbe._blobs",
+        "_PreflightBatchProbe._freeze",
+        "_PreflightBatchProbe._git",
+        "_PreflightBatchProbe.blobs_function",
+        "_PreflightBatchProbe.freeze",
+        "_PreflightBatchProbe.git_function",
+        "execution",
+        "lane",
+        "performance_receipt",
+        "test_aggregate_rejects_every_unsuccessful_upstream_result",
+        "test_bootstrap_imports_no_engine_or_performance_admission_helpers",
+        "test_complete_dependency_hash_detects_cached_bytecode_and_unlisted_inputs",
+        "test_complete_execution_requires_teardown_and_exact_controller_mirrors",
+        "test_complete_inventory_preserves_every_ci53_case_and_whole_module",
+        "test_complete_lane_admission_requires_authoritative_context_and_invocation",
+        "test_complete_preflight_freeze_forwards_only_five_authenticated_members",
+        "test_d07_dispatch_preserves_both_exact_ci54_predecessors",
+        "test_evidence_write_failure_never_creates_a_referencing_event",
+        "test_failure_payload_is_synced_before_the_reference",
+        "test_fixture_compatibility_view_requires_fresh_authentic_module_owned_checkout",
+        "test_history_complete_current_protocol_resolves_every_actual_consumer",
+        "test_history_snapshot_preimages_extend_only_existing_native_bridge",
+        "test_ignored_source_and_bytecode_cannot_escape_exact_checkout_admission",
+        "test_incomplete_failed_or_mixed_execution_never_passes",
+        "test_lane_admission_rejects_wrong_identity_configuration_and_missing_evidence",
+        "test_live_workflow_preserves_required_names_and_all_four_producer_controls",
+        "test_measurement_batch_matches_literal_projection_and_reads_each_invocation",
+        "test_missing_files_cannot_disappear_from_the_uploaded_seal",
+        "test_missing_or_stale_upload_cannot_be_accepted",
+        "test_payload_names_are_exclusive_and_never_overwrite_earlier_failure",
+        "test_performance_receipt_rejects_stale_failed_missing_and_relabelled_attempts",
+        "test_predecessor_borrowing_matches_five_real_fallbacks_and_rejects_wrong_roles",
+        "test_predecessor_borrowing_revalidates_distinct_roots_and_warm_same_size_mutation",
+        "test_preserved_performance_receipt_is_validated_without_running_engine_admission",
+        "test_raw_crlf_checkout_accepts_only_exact_head_bytes_index_modes_and_members",
+        "test_real_lane_creates_absent_scratch_before_four_worker_pytest"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci69-qualification-6a3db5c87814c87c9ba68ac93fcc8a5b4b24f31bd401bee5eaa00f8c616d6ab5": {
+      "paths": [
+        "tests/data/d07_geometry_containment_v3.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci69-qualification-f1ea02aa9819b407d74c91e787679c321c889b96fd25857c0118b6a173302dd1": {
+      "paths": [
+        "tools/performance_ci69_members.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

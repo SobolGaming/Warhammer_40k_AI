@@ -12,6 +12,7 @@ from contextlib import AbstractContextManager
 from pathlib import Path
 from typing import Any, Protocol, cast
 
+from tools import performance_ci69_members as ci69
 from tools.performance_preflight import AdmissionOperands, AdmissionValidator
 
 BASE = "d7b7650fa1c76ee5830a9ffc78522eba3a6a3209"
@@ -168,35 +169,16 @@ DERIVATION_INPUTS = frozenset(
 
 PRELUDE_BASE = "620cbe91ae3ddd356eaf7effa7455b931882a39e"
 PRELUDE_NAMESPACE = "data/source_audits/ci64_provenance_v1"
-PRELUDE_FREEZE: str | None = "549ce74228789a0c98ab07efcb7050bb3d7a4c86"
+PRELUDE_FREEZE: str | None = None
 PRELUDE_REPORT = "docs/performance/current/ci64-external_contract_source_reuse.json"
 TRANSACTION_TEST = "tests/code_quality/test_performance_admission_transaction.py"
 TRANSACTION_SHARDS = frozenset({"ci/quality_shards/shard-2.txt", "ci/quality_shards/shard-3.txt"})
-PRELUDE_CONTROLS = frozenset(
-    {
-        "tests/code_quality/test_qualification40_successor.py",
-        "tests/code_quality/test_performance_category_migration.py",
-        "tools/performance_preflight_successor.py",
-        SELF,
-        "tools/performance_policy.py",
-        "tools/performance_preflight.py",
-        "tools/performance_history_snapshot.py",
-        "tools/cumulative_preservation.py",
-        "tests/code_quality/test_performance_policy.py",
-        "tests/code_quality/test_performance_preflight.py",
-        DERIVATION_TEST,
-        "ci/quality_shards/all.txt",
-        "ci/quality_shards/shard-1.txt",
-        *TRANSACTION_SHARDS,
-        "ci/quality_shards/shard-1-modules.txt",
-        "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
-        ASSESSMENT,
-        MAP,
-    }
-)
+PRELUDE_CONTROLS = ci69.CONTROL_MEMBERS
 PRELUDE_NEW = frozenset(
     {
         TRANSACTION_TEST,
+        "tests/data/d07_geometry_containment_v3.json",
+        "tools/performance_ci69_members.py",
         "docs/CI64_PROVENANCE_SCOPE.md",
         PRELUDE_REPORT,
         *(
@@ -222,28 +204,32 @@ PRELUDE_NEW = frozenset(
     }
 )
 PRELUDE_MEMBERS = PRELUDE_CONTROLS | PRELUDE_NEW
-PRELUDE_INPUTS = frozenset(
-    {
-        "tests/code_quality/test_qualification40_successor.py",
-        "tests/code_quality/test_performance_category_migration.py",
-        "tools/performance_preflight_successor.py",
-        SELF,
-        TRANSACTION_TEST,
-        "tools/cumulative_preservation.py",
-        "tools/performance_policy.py",
-        "tools/performance_preflight.py",
-        "tools/performance_history_snapshot.py",
-        "tests/code_quality/test_performance_policy.py",
-        "tests/code_quality/test_performance_preflight.py",
-        DERIVATION_TEST,
-        MAP,
-    }
+PRELUDE_INPUTS = (
+    frozenset(
+        {
+            "tests/code_quality/test_qualification40_successor.py",
+            "tests/code_quality/test_performance_category_migration.py",
+            "tools/performance_preflight_successor.py",
+            SELF,
+            TRANSACTION_TEST,
+            "tools/cumulative_preservation.py",
+            "tools/performance_policy.py",
+            "tools/performance_preflight.py",
+            "tools/performance_history_snapshot.py",
+            "tests/code_quality/test_performance_policy.py",
+            "tests/code_quality/test_performance_preflight.py",
+            DERIVATION_TEST,
+            MAP,
+        }
+    )
+    | ci69.INPUT_ADDITIONS
 )
 
 
 PRELUDE_OBSERVED = (
     PRELUDE_NEW
     | TRANSACTION_SHARDS
+    | ci69.OBSERVED_ADDITIONS
     | frozenset(
         {
             "tests/code_quality/test_performance_category_migration.py",
@@ -276,6 +262,7 @@ def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
         or set(previous) != PRELUDE_CONTROLS
         or PRELUDE_NEW
         | TRANSACTION_SHARDS
+        | ci69.OBSERVED_ADDITIONS
         | {
             "tests/code_quality/test_performance_category_migration.py",
             "tools/performance_preflight_successor.py",
@@ -498,9 +485,12 @@ def _transaction_absence(raw: bytes) -> None:
 
 
 def _transaction_inputs_match(previous: dict[str, str], produced: dict[str, str]) -> bool:
-    return TRANSACTION_TEST not in previous and produced.keys() == previous.keys() | {
-        TRANSACTION_TEST
+    additions = {
+        TRANSACTION_TEST,
+        "tests/data/d07_geometry_containment_v3.json",
+        "tools/performance_ci69_members.py",
     }
+    return additions.isdisjoint(previous) and produced.keys() == previous.keys() | additions
 
 
 def _derivation_source(

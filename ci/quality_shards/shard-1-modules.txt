@@ -1,5 +1,8 @@
 tests/code_quality/test_order97_inventory.py
+tests/code_quality/test_ws12_generated_data_artifacts.py
+tests/code_quality/test_performance_static_successor.py
 tests/code_quality/test_category_migration_preservation.py
+tests/code_quality/test_quality_runtime_process.py
 tests/code_quality/test_section08_native_mission_source.py
 tests/code_quality/test_d07_upper_floor_preservation.py
 tests/code_quality/test_ws13_test_suite_health.py

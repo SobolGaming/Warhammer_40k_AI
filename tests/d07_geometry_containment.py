@@ -16,8 +16,42 @@ from typing import TypedDict, cast
 
 HISTORICAL_RECIPE = "tests/data/d07_geometry_containment_v1.json"
 HISTORICAL_RECIPE_SHA256 = "9a48238773d43f9b0bca31a87921eea9854b71a242f0004ba98121f2b39dc676"
-RECIPE = "tests/data/d07_geometry_containment_v2.json"
-RECIPE_SHA256 = "f41c809e76eeec51ef4d2f723020c9035ef84bfbb42b0f109a09445ed3d87abe"
+FNP_RECIPE = "tests/data/d07_geometry_containment_v2.json"
+FNP_RECIPE_SHA256 = "f41c809e76eeec51ef4d2f723020c9035ef84bfbb42b0f109a09445ed3d87abe"
+RECIPE = "tests/data/d07_geometry_containment_v3.json"
+RECIPE_SHA256 = "3f1ff9c73b8df6d6581896f68d83dc9f43e70a627df7023a4219c5da39a5af2f"
+CURRENT_RUNTIME_BASE = "d7b7650fa1c76ee5830a9ffc78522eba3a6a3209"
+CURRENT_RUNTIME_COMMIT = "9fb03ba622df1b7524acb72e5990fc500bc50696"
+CURRENT_SOURCE_SUBSTITUTIONS: dict[str, tuple[str, str]] = {
+    "src/warhammer40k_core/_engine_build_manifest.json": (
+        "b6b896a59ff7e2369a7b0f98d646959e52fe1f512aed81da5953e1dff3bccdc0",
+        "de81bf5648c419d0aff27fa9b87e30b742ac3775d51ad3038f357abe247f241d",
+    ),
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/generated_manifest.py": (
+        "82bd099f7bef7a5ac80250308f53a049679b3356e5f0440a2e7ce3c487b9ff05",
+        "ac7cde842c7d205c45ec52a3ac245fdff5f47449c30d728f235f73c11fa45065",
+    ),
+    "src/warhammer40k_core/engine/model_destruction_cause_authority.py": (
+        "b4ec2cf988ee099490d10bd80d15faa23956e6a66b596dc117c1a7ed2224d83d",
+        "89fd630f98562ca5c10cbeca1c0efe6cf224d8574ffcb8f1359a0986b7d4a93c",
+    ),
+    "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py": (
+        "39e899cc655836022c77d81558470755f3a754f5a7847283f641b2f74fc48452",
+        "223241ff32ca0c0ab5fecb0a8816a875b5c3e6e121c8ad033fe7d79e91cff5e2",
+    ),
+    "src/warhammer40k_core/engine/model_destruction_cause_producers.py": (
+        "b4b2a2161bf241c4d0c64e44c542f649acf18b8989fe8c02a671d255b76ca139",
+        "9542b0a0454ca2dc2265abf021406792aa6150b5f8a924aa50abe4675c9d2876",
+    ),
+    "src/warhammer40k_core/engine/retained_demise_removal.py": (
+        "59e685da563e6cd0ed95bfe4d69e9c06e625a679f0f443ff3fc5c3bff5fad880",
+        "48f911ed0726091b04dbd497dbab33f1952502578eed9d24dacf14b85d261c45",
+    ),
+    "src/warhammer40k_core/engine/retained_destruction_history.py": (
+        "5a23f6af83cee991c0207073c43e58e13e1e2e80ac285acea07b1385102a5ead",
+        "c1cd862e38ed2ad2aaefe829e5ffa29b11bc00fcfe3f0195923e65a0d31ce1ee",
+    ),
+}
 LIVE = "src/warhammer40k_core/engine/phases/movement_resolution_flow.py"
 ARCHIVE = "data/source_audits/d07/baseline/" + LIVE + ".txt"
 
@@ -126,12 +160,15 @@ def verify_d07_geometry_containment(root: Path) -> None:
     historical = read_owned_geometry_member(root, HISTORICAL_RECIPE)
     if _sha256(historical) != HISTORICAL_RECIPE_SHA256:
         raise ValueError("D07 historical recipe changed.")
+    fnp_raw = read_owned_geometry_member(root, FNP_RECIPE)
+    if _sha256(fnp_raw) != FNP_RECIPE_SHA256:
+        raise ValueError("D07 reviewed FNP recipe changed.")
     raw = read_owned_geometry_member(root, RECIPE)
     if _sha256(raw) != RECIPE_SHA256:
         raise ValueError("D07 containment recipe changed.")
     recipe = cast(GeometryRecipe, json.loads(raw))
     if (
-        recipe["version"] != "d07-geometry-containment-v2-reviewed-fnp"
+        recipe["version"] != "d07-geometry-containment-v3-reviewed-ci57-c5"
         or recipe["live"] != LIVE
         or recipe["archive"] != ARCHIVE
     ):
@@ -161,3 +198,13 @@ def verify_d07_geometry_containment(root: Path) -> None:
     if _sha256(old) != recipe["archive_sha256"]:
         raise ValueError("D07 geometry archive changed.")
     assert_bounded_geometry(old, live)
+    # Keep the original AST rejection boundary ahead of the finite catalog proof.
+    # This current catalog is not semantic qualification of the seven successors.
+    expected_recipe = cast(GeometryRecipe, json.loads(fnp_raw))
+    for name, (before, after) in CURRENT_SOURCE_SUBSTITUTIONS.items():
+        if expected_recipe["source_files"][name] != before:
+            raise ValueError("D07 reviewed runtime predecessor changed: " + name)
+        expected_recipe["source_files"][name] = after
+    expected_recipe["version"] = "d07-geometry-containment-v3-reviewed-ci57-c5"
+    if recipe != expected_recipe:
+        raise ValueError("D07 current catalog differs outside the seven reviewed successors.")

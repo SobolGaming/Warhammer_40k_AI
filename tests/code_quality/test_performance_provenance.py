@@ -486,6 +486,31 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
                 .decode()
                 .splitlines()
             )
+            # Validate the complete new observation before the exact historical views.
+            ci69_observed = {
+                "tests/d07_geometry_containment.py",
+                "tests/code_quality/test_d07_geometry_containment.py",
+                "tests/code_quality/test_quality_runtime.py",
+                "ci/quality_shards/shard-4.txt",
+                "ci/quality_shards/shard-2-modules.txt",
+                "ci/quality_shards/shard-3-modules.txt",
+                "ci/quality_shards/shard-4-modules.txt",
+                "tests/data/d07_geometry_containment_v3.json",
+                "tools/performance_ci69_members.py",
+            }
+            assert len(ci69_observed) == 9
+            assert len(first_observations) == 5
+            assert len(first_observations[4]) == 31
+            assert sum(map(len, first_observations)) == 167
+            assert first_observations[4] == tuple(
+                name for name in latest_names if name in ci60.PRELUDE_OBSERVED
+            )
+            assert all(first_observations[4].count(name) == 1 for name in ci69_observed)
+            first_observations = [
+                *first_observations[:4],
+                tuple(name for name in first_observations[4] if name not in ci69_observed),
+            ]
+            latest_names = [name for name in latest_names if name not in ci69_observed]
             extra_observed = {
                 "tests/code_quality/test_performance_category_migration.py",
                 "tools/performance_preflight_successor.py",

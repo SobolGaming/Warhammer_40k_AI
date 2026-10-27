@@ -7,7 +7,7 @@ import hashlib
 import json
 import shutil
 from pathlib import Path
-from typing import Protocol, cast
+from typing import NamedTuple, Protocol, cast
 
 import pytest
 
@@ -33,6 +33,7 @@ def preserved_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
     for name in (
         geometry.RECIPE,
         geometry.HISTORICAL_RECIPE,
+        geometry.FNP_RECIPE,
         geometry.ARCHIVE,
         *recipe["source_evidence"],
     ):
@@ -40,6 +41,55 @@ def preserved_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes((ROOT / name).read_bytes())
     return root
+
+
+class _FnpRecipeConstants(NamedTuple):
+    HISTORICAL_RECIPE: str
+    HISTORICAL_RECIPE_SHA256: str
+    RECIPE: str
+    RECIPE_SHA256: str
+
+
+@pytest.fixture
+def reviewed_fnp_stage(tmp_path: Path) -> tuple[Path, _FnpRecipeConstants]:
+    """Original FNP assertion inputs, explicitly historical after live admission."""
+    from tools import performance_ci60_qualification as ci60
+    from tools.performance_preflight_successor import read_frozen_blobs
+
+    ci60.admitted(ROOT)
+    transition_name = "tests/data/reviewed_fnp_record_transition.json"
+    transition_raw = geometry.read_owned_geometry_member(ROOT, transition_name)
+    if hashlib.sha256(transition_raw).hexdigest() != (
+        "a0a30709ad38cc2bf051877c1439b774325db745ae5871c4744c19db714071e9"
+    ):
+        raise ValueError("D07 historical FNP transition changed.")
+    transition = json.loads(transition_raw)
+    substitutions = transition["runtime_digest_substitutions"]
+    names = [row["path"] for row in substitutions]
+    historical = read_frozen_blobs(ROOT, "234deb628f3d6d7c49f3d344dfe6f066151017da", names)
+    constants = _FnpRecipeConstants(
+        geometry.HISTORICAL_RECIPE,
+        geometry.HISTORICAL_RECIPE_SHA256,
+        geometry.FNP_RECIPE,
+        geometry.FNP_RECIPE_SHA256,
+    )
+    for row in substitutions:
+        if hashlib.sha256(historical[row["path"]]).hexdigest() != row["candidate_sha"]:
+            raise ValueError("D07 historical FNP native input changed.")
+    for name, pin in (
+        (constants.HISTORICAL_RECIPE, constants.HISTORICAL_RECIPE_SHA256),
+        (constants.RECIPE, constants.RECIPE_SHA256),
+    ):
+        raw = geometry.read_owned_geometry_member(ROOT, name)
+        if hashlib.sha256(raw).hexdigest() != pin:
+            raise ValueError("D07 historical FNP authority changed.")
+        historical[name] = raw
+    historical[transition_name] = transition_raw
+    for name, raw in historical.items():
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(raw)
+    return tmp_path, constants
 
 
 def _changed_geometry(kind: str) -> bytes:
@@ -204,7 +254,10 @@ def test_d07_membership_recipe_and_archive_are_bound(preserved_root: Path, chang
             target.write_bytes(raw)
 
 
-def test_d07_reviewed_fnp_successor_is_exactly_five_digest_substitutions() -> None:
+def test_d07_reviewed_fnp_successor_is_exactly_five_digest_substitutions(
+    reviewed_fnp_stage: tuple[Path, _FnpRecipeConstants],
+) -> None:
+    ROOT, geometry = reviewed_fnp_stage
     transition_raw = (ROOT / "tests/data/reviewed_fnp_record_transition.json").read_bytes()
     assert (
         hashlib.sha256(transition_raw).hexdigest()
@@ -245,6 +298,10 @@ def test_d07_reviewed_fnp_successor_is_exactly_five_digest_substitutions() -> No
         "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py",
         "src/warhammer40k_core/engine/retained_demise_removal.py",
         "src/warhammer40k_core/engine/psychic_ability_usage.py",
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/generated_manifest.py",
+        "src/warhammer40k_core/engine/model_destruction_cause_authority.py",
+        "src/warhammer40k_core/engine/model_destruction_cause_producers.py",
+        "src/warhammer40k_core/engine/retained_destruction_history.py",
     ],
 )
 def test_d07_reviewed_successor_runtime_drift_refuses_before_archive(
@@ -349,3 +406,47 @@ def test_order135_reviewed_fnp_metadata_transition_preserves_all_obligations() -
     actual = successor.preceding_control(ROOT, transition["order135_output"], actual)
     assert hashlib.sha256(actual).hexdigest() == transition["order135_output_sha256"]
     assert json.loads(actual) == expected
+
+
+def test_d07_current_catalog_matches_exact_accepted_runtime_successors() -> None:
+    from tools.performance_preflight_successor import read_frozen_blobs
+
+    geometry.verify_d07_geometry_containment(ROOT)
+    names = list(geometry.CURRENT_SOURCE_SUBSTITUTIONS)
+    assert len(names) == 7
+    before = read_frozen_blobs(ROOT, geometry.CURRENT_RUNTIME_BASE, names)
+    after = read_frozen_blobs(ROOT, geometry.CURRENT_RUNTIME_COMMIT, names)
+    expected = json.loads((ROOT / geometry.FNP_RECIPE).read_bytes())
+    for name, (old_pin, new_pin) in geometry.CURRENT_SOURCE_SUBSTITUTIONS.items():
+        assert hashlib.sha256(before[name]).hexdigest() == old_pin
+        assert hashlib.sha256(after[name]).hexdigest() == new_pin
+        assert (ROOT / name).read_bytes() == after[name]
+        assert expected["source_files"][name] == old_pin
+        expected["source_files"][name] = new_pin
+    expected["version"] = "d07-geometry-containment-v3-reviewed-ci57-c5"
+    current = json.loads((ROOT / geometry.RECIPE).read_bytes())
+    assert current == expected
+    assert len(current["source_files"]) == 3104
+
+
+def test_d07_reviewed_fnp_authority_still_rejects_mutation_before_archive(
+    preserved_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    geometry.verify_d07_geometry_containment(preserved_root)
+    path = preserved_root / geometry.FNP_RECIPE
+    original = path.read_bytes()
+    reads: list[str] = []
+    read = geometry.read_owned_geometry_member
+
+    def tracked(root: Path, name: str) -> bytes:
+        reads.append(name)
+        return read(root, name)
+
+    monkeypatch.setattr(geometry, "read_owned_geometry_member", tracked)
+    path.write_bytes(original + b" ")
+    try:
+        with pytest.raises(ValueError, match="D07 reviewed FNP recipe changed"):
+            geometry.verify_d07_geometry_containment(preserved_root)
+        assert geometry.ARCHIVE not in reads
+    finally:
+        path.write_bytes(original)

@@ -1,7 +1,10 @@
+tests/code_quality/test_qualification40_successor.py
 tests/code_quality/test_phase18m_conformance_boundary.py
 tests/code_quality/test_generated_faction_docs.py
 tests/code_quality/test_order64_reconstruction_guard.py
 tests/code_quality/test_generated_ability_support_artifacts.py
+tests/code_quality/test_performance_integration_batch.py
+tests/code_quality/test_ci_lookup_history.py
 tests/code_quality/test_order34_action_restrictions.py
 tests/code_quality/test_order33_indirect_shooting.py
 tests/code_quality/test_unit_model_semantics.py

@@ -1299,10 +1299,21 @@ def test_history_complete_current_protocol_resolves_every_actual_consumer(
     original_blobs = history.eligible_blobs
     queries: set[tuple[str, tuple[str, ...]]] = set()
     blob_queries: set[tuple[str, str]] = set()
+    bootstrap_queries: set[tuple[str, tuple[str, ...]]] = set()
+    bootstrap_blobs: set[tuple[str, str]] = set()
+    seen_active = False
 
     def historical(
         root: Path, domain: Domain, args: tuple[str, ...], fresh: Callable[[], bytes]
     ) -> bytes:
+        nonlocal seen_active
+        if _HistoryActivity.active(cast(_HistoryActivity, history)) is None:
+            if seen_active:
+                raise AssertionError("A historical consumer ran after phase deactivation.")
+            bootstrap_queries.add((domain, args))
+            return original(root, domain, args, fresh)
+        seen_active = True
+
         def unexpected() -> bytes:
             raise AssertionError("An active immutable consumer escaped the complete catalog.")
 
@@ -1310,6 +1321,13 @@ def test_history_complete_current_protocol_resolves_every_actual_consumer(
         return original(root, domain, args, unexpected)
 
     def blobs(root: Path, revision: str, names: list[str]) -> dict[str, bytes] | None:
+        nonlocal seen_active
+        if _HistoryActivity.active(cast(_HistoryActivity, history)) is None:
+            if seen_active:
+                raise AssertionError("A historical blob consumer ran after phase deactivation.")
+            bootstrap_blobs.update((revision, name) for name in names)
+            return original_blobs(root, revision, names)
+        seen_active = True
         blob_queries.update((revision, name) for name in names)
         result = original_blobs(root, revision, names)
         assert result is not None
@@ -1322,6 +1340,9 @@ def test_history_complete_current_protocol_resolves_every_actual_consumer(
         binding = gate.validate_current(
             ROOT, "5f509724da25a2f6ded0c2739a8e7c84bdf59c91", pr_head=None
         )
+    assert bootstrap_queries
+    assert bootstrap_blobs
+    assert seen_active
     assert queries
     assert blob_queries
     assert len(witnesses) == 1
