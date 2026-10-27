@@ -1,16 +1,16 @@
 {
   "schema": "ci64-original-supervised-receipt-v1",
-  "attempt": "218-ci69-cadence-source-head-0",
-  "nonce": "b4490915fbce44e2a17ae3bdf6972a89",
+  "attempt": "261-ci70-affinity-source-head-0",
+  "nonce": "f0fc974177e74409976d004e1cbb71ac",
   "command": [
     "/tmp/task55-bytecode-launch/exact-locked-test-pristine/bin/python",
     "-B",
-    "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/source-sample65.py",
+    "/tmp/task57-correctness/repo/reports/performance-attempts/ci70-fixture-closure/closure-source-5aaa6de0/source-sample65.py",
     "head",
     "0"
   ],
   "cwd": "/tmp/task57-correctness/repo",
-  "expected_head": "67578da27af11eee69f5bfd42318eca6fa63d625",
+  "expected_head": "5aaa6de0383e3ae0567545ed8ff8634656dcb0bd",
   "exit_code": 0,
   "timeout": false,
   "source_drift": false,
@@ -18,11 +18,11 @@
   "warning_seconds": 500,
   "warning_emitted": false,
   "process_group_closed": true,
-  "whole_before_terminal_journal_seconds": 153.910876967,
+  "whole_before_terminal_journal_seconds": 166.11882998300007,
   "elapsed_scope": "Original supervisor duration before terminal journal write; authentic complete status verifies whole invocation below600seconds.",
-  "started_utc": "2026-10-27T16:28:46.866507+00:00",
-  "finished_utc": "2026-10-27T16:31:20.523723+00:00",
-  "raw_entries_sha256": "a59e606faa7072e7048ec6cf819280fb0dbe3a339d70d59634f526b8b6278f93",
+  "started_utc": "2026-10-27T19:27:25.088498+00:00",
+  "finished_utc": "2026-10-27T19:30:10.786442+00:00",
+  "raw_entries_sha256": "21f797b8e6d0a58f0b6eb15d769b071f440328e2de59481a56b0b50c38619bec",
   "dependency_physical_sha256": "a2a00c5e977c7a8dcbb2188efed485d69e924d20649bc637108e43914d201f39",
   "native_child_environment": {
     "passed_child_environment": {
@@ -33,10 +33,10 @@
       "UV_OFFLINE": "1",
       "UV_FROZEN": "1",
       "UV_PYTHON_DOWNLOADS": "never",
-      "UV_CACHE_DIR": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/uv-cache",
-      "PRE_COMMIT_HOME": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/precommit-home",
+      "UV_CACHE_DIR": "/tmp/task57-correctness/repo/reports/performance-attempts/ci70-fixture-closure/closure-source-5aaa6de0/uv-cache",
+      "PRE_COMMIT_HOME": "/tmp/task57-correctness/repo/reports/performance-attempts/ci70-fixture-closure/closure-source-5aaa6de0/precommit-home",
       "PATH": "/home/nostrademous/.local/opt/node-v24.18.0-linux-x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/usr/lib/linux-tools/6.18.54.1-microsoft-standard-WSL2/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell:/mnt/c/Users/nostr/.codex/tmp/arg0-windows/codex-arg01nHnnE:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/libheif/libheif/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/jxrlib/jxrlib/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/poppler/Library/bin:/mnt/c/Program Files/Common Files/Oracle/Java/javapath:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/Intel/WiFi/bin/:/mnt/c/Program Files/Common Files/Intel/WirelessCommon/:/mnt/c/Program Files/dotnet/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/010 Editor:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA app/NvDLISR:/mnt/c/Program Files/Go/bin:/mnt/c/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/:/mnt/c/Program Files/GitHub CLI/:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/WSL/:/mnt/c/Users/nostr/.local/bin:/mnt/c/Users/nostr/AppData/Local/pnpm:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python312/Scripts/:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python312/:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python38-32/Scripts/:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python38-32/:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell:/mnt/c/Users/nostr/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/nostr/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/nostr/.dotnet/tools:/mnt/c/Users/nostr/go/bin:/mnt/c/Users/nostr/AppData/Local/Microsoft/WinGet/Packages/Schniz.fnm_Microsoft.Winget.Source_8wekyb3d8bbwe:/mnt/c/Users/nostr/AppData/Local/Programs/cursor/resources/app/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/cmd",
-      "CAPTURE_OUT": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/218-ci69-cadence-source-head-0/stdout.log",
+      "CAPTURE_OUT": "/tmp/task57-correctness/repo/reports/performance-attempts/ci70-fixture-closure/closure-source-5aaa6de0/261-ci70-affinity-source-head-0/stdout.log",
       "PYTEST_PLUGINS": null,
       "PYTEST_ADDOPTS": null,
       "CI60_SOURCE_OUT": null
@@ -61,28 +61,28 @@
   },
   "original_artifacts": {
     "request.json": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/218-ci69-cadence-source-head-0/request.json",
-      "sha256": "89e9d068320222479bfee5553b173cf286a2904635241047c914c11474331cf3"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci70-fixture-closure/closure-source-5aaa6de0/261-ci70-affinity-source-head-0/request.json",
+      "sha256": "bb7ff6f23ca78b4627982d72a94cccaf35a9542038bcd8f1302a5a04e5fddf7a"
     },
     "supervisor-result.json": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/218-ci69-cadence-source-head-0/supervisor-result.json",
-      "sha256": "e0b915821d281a0b58aeef420c71c46fa3b7e5f6061af69969ff8a03917ec1db"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci70-fixture-closure/closure-source-5aaa6de0/261-ci70-affinity-source-head-0/supervisor-result.json",
+      "sha256": "44a6879a0782f6f69fc612fb0d67c66756aeb99b72582a2e92fac8967eabebf9"
     },
     "worker-journal.json": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/218-ci69-cadence-source-head-0/worker-journal.json",
-      "sha256": "eef19815c05dc16c2805a85c5407058714c5a937112733b2d2d12b0e3ac82c25"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci70-fixture-closure/closure-source-5aaa6de0/261-ci70-affinity-source-head-0/worker-journal.json",
+      "sha256": "ab896f85ae73b3060e7af9c4f827a396aad316686660b33f39053c379ac3b857"
     },
     "sample.json": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/218-ci69-cadence-source-head-0/sample.json",
-      "sha256": "cd5488e771d283c8aae835c495cd7a564c3d3eca04d068ec145e494067c30fd2"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci70-fixture-closure/closure-source-5aaa6de0/261-ci70-affinity-source-head-0/sample.json",
+      "sha256": "f487ec3b328367f335ee4886aefd3d5a4f852c7afcf58ccb26a2b73b7ecd9d8e"
     },
     "result.xml": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/218-ci69-cadence-source-head-0/result.xml",
-      "sha256": "3ca337aa025c61482f2faee2c10d35c82c9a59bd73bb327ba353cd7d3a552b93"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci70-fixture-closure/closure-source-5aaa6de0/261-ci70-affinity-source-head-0/result.xml",
+      "sha256": "cbc35cc108ea5cabf43f1cc3465ba4b5c7d7773722ea037c486fac4997628915"
     },
     "pytest.log": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/218-ci69-cadence-source-head-0/pytest.log",
-      "sha256": "eb5472507cb28bf0b9c85bd94825e6ba4e38a63395bd6c08824cfc9aa8cb239d"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci70-fixture-closure/closure-source-5aaa6de0/261-ci70-affinity-source-head-0/pytest.log",
+      "sha256": "d15ab27a13a2c5271547f9e1dc58845cea7630692a5b677a806533a9117b9360"
     }
   }
 }
