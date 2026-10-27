@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
-  "operation_map_sha256": "a49bf47c2b49d1334dc18e3b4cc0d2a245a95224e7247c87352c567f0957ad26",
+  "operation_map_sha256": "793bb95ecb0ba283326ad4b68fbb74e35f333a06ad38307f989e2067e5535f2e",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "29e77a37eb41e3b79315b8231039e2d5d0ee7683eff9ef9d19ca729d8ce2a866",
+      "after_sha256": "364ff40a83f8c3a0e4d089781f8899d494fc112adca3c286c526afa917f47cf5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "29e77a37eb41e3b79315b8231039e2d5d0ee7683eff9ef9d19ca729d8ce2a866"
+          "after": "364ff40a83f8c3a0e4d089781f8899d494fc112adca3c286c526afa917f47cf5"
         }
       }
     },
@@ -46,11 +46,11 @@
     },
     "ci/quality_shards/shard-1.txt": {
       "before_sha256": null,
-      "after_sha256": "cef425da87f800bb0e33700623b178eac5c3abfd74ef409e4e1819b7a76bbedb",
+      "after_sha256": "f5388cf6e031c9681ba34cdcbc368ee7de3b0fd06b67cbc6aab6f579d2af08e0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "cef425da87f800bb0e33700623b178eac5c3abfd74ef409e4e1819b7a76bbedb"
+          "after": "f5388cf6e031c9681ba34cdcbc368ee7de3b0fd06b67cbc6aab6f579d2af08e0"
         }
       }
     },
@@ -1216,31 +1216,31 @@
     },
     "data/source_audits/ci64_provenance_v1/applicability.json": {
       "before_sha256": null,
-      "after_sha256": "abf81f05caa78b2b2fdfb39e21d45c488ee586cafb7bac5cabf1764b3c44004e",
+      "after_sha256": "f47220658adeb2a2c4d7408300393d1db94dc3409185d57751612c2389d740c0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "abf81f05caa78b2b2fdfb39e21d45c488ee586cafb7bac5cabf1764b3c44004e"
+          "after": "f47220658adeb2a2c4d7408300393d1db94dc3409185d57751612c2389d740c0"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/changed-members.json": {
       "before_sha256": null,
-      "after_sha256": "b545199be300ab08e45d2d4fac59e0d94ede451dcd246efe10cf5e8092de01c9",
+      "after_sha256": "d3751230745b0d32fa0a53a892cd773e2e291d82fe22647db922d522374c2b1b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b545199be300ab08e45d2d4fac59e0d94ede451dcd246efe10cf5e8092de01c9"
+          "after": "d3751230745b0d32fa0a53a892cd773e2e291d82fe22647db922d522374c2b1b"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/control-transitions.json": {
       "before_sha256": null,
-      "after_sha256": "9401cb8782bfa3bf6d094609bfc884732b9525a62287a6718462d1b06d84ca82",
+      "after_sha256": "873b046a41db5d076ce7e3843ebb8fc53adeb933bb372eb67e46d90b60e0aefb",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9401cb8782bfa3bf6d094609bfc884732b9525a62287a6718462d1b06d84ca82"
+          "after": "873b046a41db5d076ce7e3843ebb8fc53adeb933bb372eb67e46d90b60e0aefb"
         }
       }
     },
@@ -1276,11 +1276,11 @@
     },
     "data/source_audits/ci64_provenance_v1/producing-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "0e84bec0b604e1e7477fce8816943182ccab842e38f0782ffa17310db89e0fde",
+      "after_sha256": "228c60a3b697598db0b7bcd548250bc80212911ef4615ae2a9746106645df0a3",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0e84bec0b604e1e7477fce8816943182ccab842e38f0782ffa17310db89e0fde"
+          "after": "228c60a3b697598db0b7bcd548250bc80212911ef4615ae2a9746106645df0a3"
         }
       }
     },
@@ -3876,11 +3876,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "39321ecda4da3736b1c288c7dbce05f7b881842659f5a26d6565d9c55361d931",
+      "after_sha256": "050d4fdcd5a3b0d35accaac8874fc351eb5459d897f4f6b97febf142699b64cc",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "39321ecda4da3736b1c288c7dbce05f7b881842659f5a26d6565d9c55361d931"
+          "after": "050d4fdcd5a3b0d35accaac8874fc351eb5459d897f4f6b97febf142699b64cc"
         }
       }
     },
@@ -6771,7 +6771,7 @@
     },
     "tests/code_quality/test_performance_admission_transaction.py": {
       "before_sha256": null,
-      "after_sha256": "d3ed199308a3a6f1b9345350138158aedf2f0cd74ff355bd52c59127d0bea64e",
+      "after_sha256": "0e15f4343f7b35b7b013765adf0b03c39137804b1b382921d694f4a1a38b8e59",
       "owners": {
         "@module": {
           "before": null,
@@ -6983,7 +6983,7 @@
         },
         "test_only_the_exact_declared_transaction_input_addition_is_admitted": {
           "before": null,
-          "after": "b0e4e04fae962d6072ce4d5801478385daf5e2d5dcc4afc93d1ff3ebc766fd0f"
+          "after": "fc2047a0cb7db0fc404de8f3c69f84efc424f6ca880dcff456b082021616c43e"
         },
         "test_original_default_reader_matches_explicit_none_with_real_owned_bytes": {
           "before": null,
@@ -7601,7 +7601,7 @@
     },
     "tests/code_quality/test_performance_provenance.py": {
       "before_sha256": null,
-      "after_sha256": "983ae2d386429d40c8996909205bb908a655613a493b6236a88a6403529de0be",
+      "after_sha256": "765a90adba4e3ff3fa77cafdc22eb30d9e953a02d44687d2ba9849ef321e81b7",
       "owners": {
         "@module": {
           "before": null,
@@ -7737,7 +7737,7 @@
         },
         "test_activated_native_history_revokes_copied_phase_after_completion": {
           "before": null,
-          "after": "97a2fab20d308f7e98a836f40466bbcd051bc731b944f945122e350a8f92f4a9"
+          "after": "9ee9aa9d007962db1d9be90e0184ffb37741cc18e39b29821bd1b468857ac752"
         },
         "test_admission_and_digest_share_the_existing_payload_limit": {
           "before": null,
@@ -7871,7 +7871,7 @@
     },
     "tests/code_quality/test_performance_static_successor.py": {
       "before_sha256": null,
-      "after_sha256": "281a212d9371bc2d2cc3e5a769e8483d7d3523befdf78aeb92e38e25942eed8e",
+      "after_sha256": "d692fa9c0e99d4e17fb36257b82ff115caadc0be97ac4e3f7e201597ee3ae559",
       "owners": {
         "@module": {
           "before": null,
@@ -7927,7 +7927,7 @@
         },
         "test_static_edits_match_independent_immutable_whole_module_recipes": {
           "before": null,
-          "after": "e255c45b3664720d2411c5d2f9081f2c3851fff32cbbb6cceb4c688502cb1716"
+          "after": "27e78be280be3263808cd652282b35a6b01841483de0a1ceb05614dbfa65dc07"
         },
         "test_static_historical_projection_rejects_unrelated_caller_bytes": {
           "before": null,
@@ -21207,11 +21207,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "afdd17af169a4138c3801c1f739e688c088540dcfd1ca4a621e0f453b8533466",
+      "after_sha256": "52a53e09fa8ca259af0f1b0a8f47fbdbdd3ae55eb65819ab11c8714b22b43deb",
       "owners": {
         "@module": {
           "before": null,
-          "after": "105b0e82c9bdbb8987a603faad132a8ddbb1b854a44dbb9d6a28fd8e3ab129a1"
+          "after": "fbccb2b15e7d596bccea2b3e28378abddd8e1cb294765d0e580b7de78f3a5f40"
         },
         "_HistoricalPrevious": {
           "before": null,
@@ -21303,7 +21303,7 @@
         },
         "_prelude_transition": {
           "before": null,
-          "after": "16ed80eb25b5e2b60a7dda5814e6a31b220c8dfb63d597ec2dbdf9982d773b0f"
+          "after": "0229da1f56766946d3d89f13aaeebf3874b32d4fda0cddd878ddd8384b27740f"
         },
         "_producing_inputs": {
           "before": null,
@@ -21429,11 +21429,11 @@
     },
     "tools/performance_ci69_members.py": {
       "before_sha256": null,
-      "after_sha256": "bc8b2a335252b2d77734fe3717cccd1bc1069677f1e7e25882085577390e9ab7",
+      "after_sha256": "f242f44bcaee801bf3a1facb77aba2ff830adeb6e1ccc9a52926169925445225",
       "owners": {
         "@module": {
           "before": null,
-          "after": "890298c241157333fa68df7b0579aba5c5692ff958d4368655a1da31712f10e3"
+          "after": "107072058688a9cbb7574002199f18c51ce802384704ad9c08d60082c29ded50"
         }
       }
     },
@@ -28147,7 +28147,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
     },
@@ -28256,7 +28256,7 @@
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
     },
     "tests/code_quality/test_performance_admission_transaction.py": {
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
       "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
       "category": "measured_workload",
@@ -28277,7 +28277,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
@@ -28297,7 +28297,7 @@
         "order108-client-regressions"
       ],
       "selected_families": [],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
@@ -28308,12 +28308,12 @@
         "ci67-transaction-68a42866e64b03909939024b6c5ec3cc50a32a88ce2ba4097ebbeab0f1dc6772"
       ],
       "selected_families": [],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
     "tests/code_quality/test_performance_provenance.py": {
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
       "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
       "category": "measured_workload",
@@ -28325,10 +28325,14 @@
       "selected_families": []
     },
     "tests/code_quality/test_performance_static_successor.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Approved one-complete-snapshot-per-validation-phase historical acquisition, retaining original pin/recipe authorities and every live current-source and caller check. Preflight and postflight acquire independently; immutable full-commit operands alone are reused.",
+      "category": "measured_workload",
+      "operations": [
+        "ci70-qualification-16fd2339dbb90545837ee3470f23dc227615ff4399efa76e5930c6192dc4f63e"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Authenticate the narrowed current finite edits against immutable CI50 9746a372344322abd77a496d2b9621629b79e7be bytes before exposing predecessor inputs to unchanged historical recipes. Preserve independent record provenance, all row assertions, tuple ordering/multiplicity and persistent drift visible to the loader; the final reload is not a universal raw-byte guard. Historical compatibility positives still authenticate live roadmap/static-test bytes before selecting hash-checked CI50 after inputs. The workflow is exact frozen CI51F, retaining the existing ten-minute quality-step cap, original fetch/source checks, jobs, concurrency and every validation command. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
       "unchanged_work": "All 1683 historical quality cases, their original assertions, the audited 244 assertions and 16 delegates, original source obligations, historical pins/recipes, all production code and 85/180/600 limits remain retained. Five explicitly new initializer-optimization cases and four current-member parameters are retired with that removed optimization; two unrelated-caller parameters now exercise retained faction/history owners, preserving both rejection controls. No cache, skipped validation or new comparison infrastructure is introduced. Expected collection is 1692 cases, pending actual collection. Exact restoration makes the changed migration input equal CI50 again; historical receipts remain historical and neither aggregate applicability nor a current runtime pass is inherited. A genuine current receipt, complete applicable local/hosted gates and both exact-head reviews remain required. No performance target, rules certification or publication is claimed. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
@@ -28356,7 +28360,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
     },
@@ -28368,7 +28372,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Prevent package-initializer bytecode before strict sequential quality source admission; preserve original transition preimages, historical checks and all 1,809 quality cases.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
@@ -28436,7 +28440,7 @@
         "qualification40-exact-fa728a4043c9f1df"
       ],
       "selected_families": [],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
@@ -28461,7 +28465,7 @@
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },
     "tests/data/d07_geometry_containment_v3.json": {
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
       "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
       "category": "measured_workload",
@@ -34179,7 +34183,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "The separate CI49D record admits exactly the immutable 599161cc cumulative preimage and two literal edits. Full current freeze, physical live bytes, membership and ancestry authenticate this transition before its exact historical comparison feeds unchanged prior records. STATIC48, CI49, CI49B and CI49C records, all prior assertions/delegates, operation map and roadmap remain byte-exact. Five new guards cover real original/new function member and override equivalence, actual fresh Git-object tamper, exact transition, repinned override removal, and malformed duplicate selection; existing hardened parser guards remain unchanged. All 83 blobs are read and hashed even where live control hashes override them. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog. Preserve original pins, the existing pre/post live verification, downstream whole-module assertions, five borrowed roles and all catalog authorities; one genuine batch regression checks both native predecessors and rejects unrelated supplied bytes.",
       "unchanged_work": "No engine, runtime build identity, gameplay function, fixture seed, measured workload, CI selection, operation/family/case/sample counts, 512 MiB digest retention cap, 180-second protocol allowance, 600-second watchdog or 85% coverage requirement changes. The selected 3796-file historical inventory retains the prior 3795 raw-exact files and the single previously admitted Command-end export delta. The 83 immutable members total 15,619,849 bytes (maximum 1,879,442); batching adds bounded transient payload/slice retention without a success cache. The prior 188.799-second CI49C result remains a failed whole-budget receipt; paired transport measurements are diagnostic only. Fresh exact-source performance, full quality, static checks, integrity controls and independent review remain required; no prior timing, behavioral aggregate, coverage or hosted acceptance is transferred. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
@@ -34227,12 +34231,12 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve engine-generated valid-state causal restoration, legal retry and the existing shared fixture, source and performance obligations.",
       "unchanged_work": "Preserve every existing operation, required case, sample, semantic assertion and work/cache gate; current evidence follows the finite family plan."
     },
     "tools/performance_ci69_members.py": {
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every original assertion, case, sample, runtime/dependency input and supported legal-play or generated-state boundary.",
       "unchanged_work": "Existing family operations, budgets and timed drivers remain unchanged; eleven-family applicability is explicit and source-token arms are fresh.",
       "category": "measured_workload",
@@ -34253,7 +34257,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },
@@ -34272,7 +34276,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
     },
@@ -34287,7 +34291,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Retain all seven metadata fields within each matching API channel, every other field across APIs, fresh complete-byte hashes, ownership and alias checks; reject real midread and final-path-query changes, including identical-byte writes with restored mtime.",
       "unchanged_work": "No runtime, workload driver, imported fixture, operation, family, case, sample, budget or mandatory obligation is dropped or modified."
     },
@@ -34299,7 +34303,7 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI69 preserves all original assertions and validator calls. It authenticates the exact reviewed C5 D07 catalog while retaining V1/V2/FNP history, restores three failing quality consumers without weakening their original checks, and moves six whole modules between the existing four quality lanes. New finite selectors and data-only declarations remain fresh authenticated inputs. The prior computation-only and live-transaction contracts are unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
       "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries. This phase-snapshot successor preserves the original CI54 BASE/BEFORE pins, five borrowed roles and every earlier finite edit preimage, appending only exact reviewed edits; native commit/tree/blob identities and authenticated registry/qualification declarations bound the complete catalog.",
       "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged. Historical-store observations are intentionally stable after each acquisition and freshly reacquired at postflight; transient restored changes are not guaranteed detectable. Current admission, all original assertions/cases and the complete 180/600-second limits remain required."
     },

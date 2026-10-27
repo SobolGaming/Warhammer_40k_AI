@@ -486,6 +486,19 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
                 .decode()
                 .splitlines()
             )
+            static_test = "tests/code_quality/test_performance_static_successor.py"
+            assert len(first_observations) == 5
+            assert len(first_observations[4]) == 32
+            assert sum(map(len, first_observations)) == 168
+            assert first_observations[4] == tuple(
+                name for name in latest_names if name in ci60.PRELUDE_OBSERVED
+            )
+            assert first_observations[4].count(static_test) == 1
+            first_observations = [
+                *first_observations[:4],
+                tuple(name for name in first_observations[4] if name != static_test),
+            ]
+            latest_names = [name for name in latest_names if name != static_test]
             # Validate the complete new observation before the exact historical views.
             ci69_observed = {
                 "tests/d07_geometry_containment.py",

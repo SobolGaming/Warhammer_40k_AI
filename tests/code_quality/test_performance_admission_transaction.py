@@ -772,13 +772,27 @@ def test_pointer_growth_after_stat_is_rejected_by_bounded_actual_read(
 
 
 @pytest.mark.parametrize(
-    "changed", ["valid", "second-new", "removed-old", "new-test-already-old", "missing-new"]
+    "changed",
+    [
+        "valid",
+        "second-new",
+        "removed-old",
+        "new-test-already-old",
+        "missing-new",
+        "missing-d07-json",
+        "missing-ci69-module",
+    ],
 )
 def test_only_the_exact_declared_transaction_input_addition_is_admitted(changed: str) -> None:
     from tools import performance_ci60_qualification as q
 
     previous = {"unchanged-prior-owner": "a", "changed-prior-owner": "b"}
-    produced = previous | {q.TRANSACTION_TEST: "current", "changed-prior-owner": "c"}
+    produced = previous | {
+        q.TRANSACTION_TEST: "current",
+        "tests/data/d07_geometry_containment_v3.json": "current-d07",
+        "tools/performance_ci69_members.py": "current-ci69",
+        "changed-prior-owner": "c",
+    }
     if changed == "second-new":
         produced["undeclared-extra-owner"] = "different"
     elif changed == "removed-old":
@@ -787,6 +801,10 @@ def test_only_the_exact_declared_transaction_input_addition_is_admitted(changed:
         previous[q.TRANSACTION_TEST] = "historical"
     elif changed == "missing-new":
         del produced[q.TRANSACTION_TEST]
+    elif changed == "missing-d07-json":
+        del produced["tests/data/d07_geometry_containment_v3.json"]
+    elif changed == "missing-ci69-module":
+        del produced["tools/performance_ci69_members.py"]
     predicate = cast(
         Callable[[dict[str, str], dict[str, str]], bool], vars(q)["_transaction_inputs_match"]
     )

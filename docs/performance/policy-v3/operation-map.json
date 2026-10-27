@@ -27937,6 +27937,37 @@
       ],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci70-qualification-16fd2339dbb90545837ee3470f23dc227615ff4399efa76e5930c6192dc4f63e": {
+      "paths": [
+        "tests/code_quality/test_performance_static_successor.py"
+      ],
+      "owners": [
+        "@module",
+        "ci_transitions",
+        "previous",
+        "test_aeldari_generator_uses_the_canonical_source_loader_in_both_routes",
+        "test_ci_formatting_cannot_absorb_changed_benchmark_samples",
+        "test_ci_formatting_preserves_import_bindings_and_nonimport_ast",
+        "test_ci_relocation_and_map_seam_match_exact_immutable_preimages",
+        "test_ci_relocation_rejects_unreviewed_bootstrap_or_validation_even_if_repinned",
+        "test_ci_transition_preserves_exact_import_bootstrap_and_mapping_edits",
+        "test_ci_transition_rejects_false_absence_and_malformed_edits",
+        "test_ci_transition_rejects_unreviewed_behavior_even_with_updated_after_hash",
+        "test_default_package_launch_prevents_own_bytecode_but_discovers_explicit_pyc",
+        "test_quality_bootstrap_historical_view_rejects_unrelated_caller_bytes",
+        "test_static_edits_match_independent_immutable_whole_module_recipes",
+        "test_static_historical_projection_rejects_unrelated_caller_bytes",
+        "test_static_recipes_reject_changed_seams_assertions_and_fixture_behavior_even_if_repinned",
+        "test_static_transition_rejects_malformed_records",
+        "test_static_transition_rejects_unlisted_source",
+        "transitions"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

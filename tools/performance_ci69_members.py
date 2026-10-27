@@ -23,6 +23,7 @@ CONTROL_MEMBERS: frozenset[str] = frozenset(
         "tests/code_quality/test_performance_policy.py",
         "tests/code_quality/test_performance_preflight.py",
         "tests/code_quality/test_performance_provenance.py",
+        "tests/code_quality/test_performance_static_successor.py",
         "tests/code_quality/test_qualification40_successor.py",
         "tests/code_quality/test_quality_runtime.py",
         "tests/d07_geometry_containment.py",
@@ -38,6 +39,7 @@ CONTROL_MEMBERS: frozenset[str] = frozenset(
 INPUT_ADDITIONS: frozenset[str] = frozenset(
     {
         "tests/code_quality/test_d07_geometry_containment.py",
+        "tests/code_quality/test_performance_static_successor.py",
         "tests/code_quality/test_quality_runtime.py",
         "tests/d07_geometry_containment.py",
         "tests/data/d07_geometry_containment_v3.json",
@@ -52,6 +54,7 @@ OBSERVED_ADDITIONS: frozenset[str] = frozenset(
         "ci/quality_shards/shard-4-modules.txt",
         "ci/quality_shards/shard-4.txt",
         "tests/code_quality/test_d07_geometry_containment.py",
+        "tests/code_quality/test_performance_static_successor.py",
         "tests/code_quality/test_quality_runtime.py",
         "tests/d07_geometry_containment.py",
     }

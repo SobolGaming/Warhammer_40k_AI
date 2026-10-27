@@ -49,6 +49,7 @@ def test_static_edits_match_independent_immutable_whole_module_recipes(
     current = (ROOT / name).read_bytes()
     if name in {
         "tests/code_quality/test_cumulative_preservation.py",
+        "tests/code_quality/test_d07_geometry_containment.py",
         "tools/core_rules_order97_inventory.py",
     }:
         from tools import performance_ci60_qualification as ci60
