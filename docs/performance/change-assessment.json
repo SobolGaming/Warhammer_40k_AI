@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
-  "operation_map_sha256": "793bb95ecb0ba283326ad4b68fbb74e35f333a06ad38307f989e2067e5535f2e",
+  "operation_map_sha256": "c412f461a96548b5ac8971b15b94599cbc2e420d7b1966b9e468fdc4ff36c51a",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": null,
-      "after_sha256": "364ff40a83f8c3a0e4d089781f8899d494fc112adca3c286c526afa917f47cf5",
+      "after_sha256": "743970a54d948c95085bb516799a6cc9eca580fb1b47514df56fb281921169de",
       "owners": {
         "@document": {
           "before": null,
-          "after": "364ff40a83f8c3a0e4d089781f8899d494fc112adca3c286c526afa917f47cf5"
+          "after": "743970a54d948c95085bb516799a6cc9eca580fb1b47514df56fb281921169de"
         }
       }
     },
@@ -86,11 +86,11 @@
     },
     "ci/quality_shards/shard-3.txt": {
       "before_sha256": null,
-      "after_sha256": "01ec9e6f36de44e0118b132b5f0aca4c8a3fbb6cc4d148e23640c41c2f2f0db4",
+      "after_sha256": "8e3de511664f778e778f38095f8d9a86ebee59e2c2ff8cdd39b8f9efe40182d9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "01ec9e6f36de44e0118b132b5f0aca4c8a3fbb6cc4d148e23640c41c2f2f0db4"
+          "after": "8e3de511664f778e778f38095f8d9a86ebee59e2c2ff8cdd39b8f9efe40182d9"
         }
       }
     },
@@ -1216,31 +1216,31 @@
     },
     "data/source_audits/ci64_provenance_v1/applicability.json": {
       "before_sha256": null,
-      "after_sha256": "f47220658adeb2a2c4d7408300393d1db94dc3409185d57751612c2389d740c0",
+      "after_sha256": "77e1d0810fa9d42e1c6af3a858c5f2fe22b4c35ff11e6f9c8ea761b5c0ba821e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f47220658adeb2a2c4d7408300393d1db94dc3409185d57751612c2389d740c0"
+          "after": "77e1d0810fa9d42e1c6af3a858c5f2fe22b4c35ff11e6f9c8ea761b5c0ba821e"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/changed-members.json": {
       "before_sha256": null,
-      "after_sha256": "d3751230745b0d32fa0a53a892cd773e2e291d82fe22647db922d522374c2b1b",
+      "after_sha256": "df22859e33bafa8e25edbe63074fb22b2c23536dc73f0ab0a06e50a8f43b6a74",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d3751230745b0d32fa0a53a892cd773e2e291d82fe22647db922d522374c2b1b"
+          "after": "df22859e33bafa8e25edbe63074fb22b2c23536dc73f0ab0a06e50a8f43b6a74"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/control-transitions.json": {
       "before_sha256": null,
-      "after_sha256": "873b046a41db5d076ce7e3843ebb8fc53adeb933bb372eb67e46d90b60e0aefb",
+      "after_sha256": "f4f98f57ce43c48421e1168eb0cce4d93c6d71640aaaccff76bd4ab853df069d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "873b046a41db5d076ce7e3843ebb8fc53adeb933bb372eb67e46d90b60e0aefb"
+          "after": "f4f98f57ce43c48421e1168eb0cce4d93c6d71640aaaccff76bd4ab853df069d"
         }
       }
     },
@@ -1276,11 +1276,11 @@
     },
     "data/source_audits/ci64_provenance_v1/producing-inputs.json": {
       "before_sha256": null,
-      "after_sha256": "228c60a3b697598db0b7bcd548250bc80212911ef4615ae2a9746106645df0a3",
+      "after_sha256": "c8fb622d94c63018eaf5d63db43101310c1a859063017084ebd834aa13b0bb6d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "228c60a3b697598db0b7bcd548250bc80212911ef4615ae2a9746106645df0a3"
+          "after": "c8fb622d94c63018eaf5d63db43101310c1a859063017084ebd834aa13b0bb6d"
         }
       }
     },
@@ -3876,11 +3876,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "050d4fdcd5a3b0d35accaac8874fc351eb5459d897f4f6b97febf142699b64cc",
+      "after_sha256": "25fca222377a7ae307d26b27279984d793edcfd9b8ee6b3a5290b6379f95ecac",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "050d4fdcd5a3b0d35accaac8874fc351eb5459d897f4f6b97febf142699b64cc"
+          "after": "25fca222377a7ae307d26b27279984d793edcfd9b8ee6b3a5290b6379f95ecac"
         }
       }
     },
@@ -6421,7 +6421,7 @@
     },
     "tests/code_quality/test_cumulative_preservation.py": {
       "before_sha256": null,
-      "after_sha256": "32f945adccf7f10fba68a255987ddb5ce802d44a7c358c2c2af00d94fe1ff4c4",
+      "after_sha256": "95bdcc4cf19ef0fb83d2943fc17d5e8d19c34edbc8cc64fa3338da643a2133d6",
       "owners": {
         "@module": {
           "before": null,
@@ -6447,9 +6447,13 @@
           "before": null,
           "after": "8034072b670109fab344cd3dcdfa258dee8c91307f549acd52b24ae4d3d3904e"
         },
+        "_copy_ignore": {
+          "before": null,
+          "after": "e89c156b11ff010e1134580a305083bca27f3a6fa6d707f72bf5a7e3899a63e8"
+        },
         "copy_source": {
           "before": null,
-          "after": "6004f937e9a21fbe8c8be13722d78b686d50166c1642284a14650373a45dcf2e"
+          "after": "a5c8915c954de1f3f317e672007fbcce43021c1c7a9626b0116dacbcffe93319"
         },
         "test_actual_dependency_selection_owner_assertion_or_authority_drift_refuses": {
           "before": null,
@@ -6470,6 +6474,10 @@
         "test_finite_owner_and_operation_union_preserves_all_prior_obligations": {
           "before": null,
           "after": "bef8ffdf5973bd7fd87fcee99f33c914392a9fe1c205b48d4c9bd8557afe6a45"
+        },
+        "test_fixture_copy_omits_only_generated_root_reports": {
+          "before": null,
+          "after": "424ab89ca8a01559a54e7cd25775f2b6397f80224c9e7798f5378a834f64c014"
         },
         "test_ignored_consumer_inputs_do_not_escape_membership": {
           "before": null,
@@ -7045,11 +7053,15 @@
     },
     "tests/code_quality/test_performance_category_migration.py": {
       "before_sha256": "3a215830994717abdd58a5466391a57d82d57d1cb2aa5b341ffde7b4174f1d0f",
-      "after_sha256": "6d3b39397a80dd39f82796d016b9b9e095e70a9ce800889665c8a75876f147ce",
+      "after_sha256": "11a149d00742be3c296d1cf51998eb745da67f26a6f5cdee82b30de78a1e2dc8",
       "owners": {
         "@module": {
           "before": "c003981b21506e200fd31ac2f916f396bbbe61775d0ee378484ac064bda8cd6e",
           "after": "7c51bfde7679f2c63e13fc041693d30ff9ae8fa14ff3c1f3353c2bac0ec94163"
+        },
+        "_copy_ignore": {
+          "before": null,
+          "after": "e89c156b11ff010e1134580a305083bca27f3a6fa6d707f72bf5a7e3899a63e8"
         },
         "_current": {
           "before": "0395f0257aeecbbff7cc7d1c17d384faa5f88cc263255096604f76e8c697825c",
@@ -7061,7 +7073,7 @@
         },
         "copied_migration": {
           "before": "c22757d3b41b1827e687fafd513f7650428c18debf2c28e76a47c357e099540e",
-          "after": "9a62718bd878c515ddf6f517cea760c8b054b04c44f6a2ac342fc5a4b9d52f16"
+          "after": "17f1a633965ed6ec7a5e97220c4df2295dc4c1f33b741179dd0e84a823a17459"
         },
         "private_computation_scope": {
           "before": null,
@@ -7073,7 +7085,11 @@
         },
         "test_direct_v2_api_still_rejects_migrated_current_source": {
           "before": "a38430a8cd47fcc3f457a669d163788e092b58f8acae96e8328bb9c64b5e0d44",
-          "after": "53daa3db7b52ff3d1ebd03cb1fb414ce51f22f8be2192bf2c09941815ac1548f"
+          "after": "e433953771be5aca401ccf465906affbdb9d1246360a0c21ceabc55f8e858b10"
+        },
+        "test_fixture_copy_omits_only_generated_root_reports": {
+          "before": null,
+          "after": "424ab89ca8a01559a54e7cd25775f2b6397f80224c9e7798f5378a834f64c014"
         }
       }
     },
@@ -21207,11 +21223,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "24653ab67762c59322c5829651a3871896e2c9691f0a0b1c579639f561fff6db",
+      "after_sha256": "52a53e09fa8ca259af0f1b0a8f47fbdbdd3ae55eb65819ab11c8714b22b43deb",
       "owners": {
         "@module": {
           "before": null,
-          "after": "f8828ddeee633f32131b921097e8be7904966aa01ce553d2398b759e96adfdea"
+          "after": "fbccb2b15e7d596bccea2b3e28378abddd8e1cb294765d0e580b7de78f3a5f40"
         },
         "_HistoricalPrevious": {
           "before": null,
@@ -21429,11 +21445,11 @@
     },
     "tools/performance_ci69_members.py": {
       "before_sha256": null,
-      "after_sha256": "f242f44bcaee801bf3a1facb77aba2ff830adeb6e1ccc9a52926169925445225",
+      "after_sha256": "c8d797d59b7ec5d67c84e42132db406b4122675971563feb1b64fda0fb569d65",
       "owners": {
         "@module": {
           "before": null,
-          "after": "107072058688a9cbb7574002199f18c51ce802384704ad9c08d60082c29ded50"
+          "after": "9543aee40a798bd0cda030736f971db2d8659448a5f1ca731cc9e76629ee93bf"
         }
       }
     },
@@ -28135,7 +28151,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Preserve the exact static and hosted-entry repairs, while relocating pytest bytecode suppression from the historically pinned root test initializer to the quality package before its module imports. Root tests/__init__.py is restored byte-for-byte and separately authenticated as an unchanged owned anchor. D07 geometry and category-migration readers remain unchanged. Cumulative integration-member transport now uses one fresh hardened immutable Git batch while retaining the same member/hash/control decisions. Only their existing finite predecessor boundary admits the exact quality initializer history after full current-source authentication. The original symbolic operation-map validator is extracted without changing its comparisons and remains called after every actual current-input check; focused tests exercise it independently and retain a real forged-collector rejection.",
+      "rationale": "CI71 preserves each original assertion, genuine Git fixture, live positive admission and intended negative mutation. Three fixture copies exclude only the unowned generated root reports directory, preventing atomic reporter temporary-file races; nested owned reports and all complete native source inputs remain included. Two real-copy regressions reject both the old racing traversal and overbroad exclusion. The cumulative fixture retains its existing governance assessment, while changed producing bytes and exact predecessor projection are authenticated in the finite current control/input cohort. Category retains measured_workload and two finite literal source-family owners. All original authorities, live boundaries, independent preflight/postflight, limits and case placements remain unchanged.",
       "source_obligation": "The immutable 856 continuation record separately authenticates root rollback, nested bootstrap, one exact existing operation path relocation, the pure map seam, preserved assertion fixtures and this roadmap cell. The nine b150 static recipes and prior d1d/d330 CI records remain byte-exact; their finite comparison views expose only independently authenticated prior bytes. All 244 original static assertions and 16 typed real-function delegates remain. Source discovery includes ignored bytecode; unlisted sources, unrelated caller bytes and modified initializer/validator bodies remain rejected. Live map membership stays 1515 operations/868 mandatory; the historical 52-operation cohort, families, cases, samples and limits remain unchanged.",
       "unchanged_work": "No engine algorithm, runtime build identity, gameplay function, fixture seed, comparison workload, CI selection or threshold changes. The script package bootstrap, canonical loader import and prior import-format fixes remain unchanged. The selected 3796-file historical inventory now has 3795 raw-exact files; only the prior Command-end explicit export differs. Quality initializer and map/test/tool bytes are genuine historical producer-input changes requiring finite applicability validation. Prior receipts and 856 performance remain tied to their original sources; no current full behavioral aggregate, 85% coverage, hosted acceptance or current performance receipt is inherited. Fresh exact-source smoke, applicable static/quality controls and independent review remain required."
     },
@@ -28272,12 +28288,13 @@
       "category": "measured_workload",
       "operations": [
         "ci68-computation-b9967ff3a58e5b467283dcf99e88f929db96605c02d44dbe23905f77ed577d4f",
-        "ci68-quality-b9967ff3a58e5b467283dcf99e88f929db96605c02d44dbe23905f77ed577d4f"
+        "ci68-quality-b9967ff3a58e5b467283dcf99e88f929db96605c02d44dbe23905f77ed577d4f",
+        "ci71-qualification-b9967ff3a58e5b467283dcf99e88f929db96605c02d44dbe23905f77ed577d4f"
       ],
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI70 retains every original assertion and validator call. It supplies the complete three-input transaction fixture, adds two missing-input rejection cases, and routes the existing D07 static comparator through its exact authenticated predecessor. The finite static-test owner is included in control and observation catalogs, while all prior pins, shard memberships, computation-only and live-transaction contracts remain unchanged. The existing verify_live transaction contract and all original live filesystem/Git observations, whole-source scans and independent preflight/postflight remain mandatory.",
+      "rationale": "CI71 preserves each original assertion, genuine Git fixture, live positive admission and intended negative mutation. Three fixture copies exclude only the unowned generated root reports directory, preventing atomic reporter temporary-file races; nested owned reports and all complete native source inputs remain included. Two real-copy regressions reject both the old racing traversal and overbroad exclusion. The cumulative fixture retains its existing governance assessment, while changed producing bytes and exact predecessor projection are authenticated in the finite current control/input cohort. Category retains measured_workload and two finite literal source-family owners. All original authorities, live boundaries, independent preflight/postflight, limits and case placements remain unchanged.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },

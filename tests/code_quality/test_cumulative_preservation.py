@@ -23,6 +23,17 @@ from tools import performance_tool_inputs as original
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def _copy_ignore(directory: str, names: list[str]) -> set[str]:
+    ignored = set(
+        shutil.ignore_patterns(
+            ".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"
+        )(directory, names)
+    )
+    if Path(directory) == ROOT:
+        ignored.add("reports")
+    return ignored
+
+
 class _CumulativeMechanisms(Protocol):
     def _registry(self, root: Path) -> dict[str, Any]: ...
 
@@ -126,9 +137,7 @@ def copy_source(tmp_path_factory: pytest.TempPathFactory) -> Path:
         ROOT,
         root,
         dirs_exist_ok=True,
-        ignore=shutil.ignore_patterns(
-            ".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"
-        ),
+        ignore=_copy_ignore,
     )
     git_dir = (
         subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=ROOT)
@@ -376,3 +385,30 @@ def test_later_d07_successors_preserve_exact_separate_prerequisite_stages(path: 
     recipe["after_sha256"] = hashlib.sha256(forged).hexdigest()
     with pytest.raises(ValueError, match="whole-module"):
         cumulative.assert_recipe(before, forged, recipe)
+
+
+def test_fixture_copy_omits_only_generated_root_reports(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    copied = tmp_path / "copied"
+    generated = source / "reports" / "quality-timing" / "active.json.tmp"
+    nested = source / "data" / "reports" / "owned.json"
+    ordinary = source / "src" / "owned.py"
+    for path, raw in (
+        (generated, b"ephemeral reporter output\n"),
+        (nested, b'{"owned": true}\n'),
+        (ordinary, b"VALUE = 1\n"),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+
+    def copy_owned(source_name: str, target_name: str) -> str:
+        if Path(source_name).is_relative_to(source / "reports"):
+            raise FileNotFoundError("Reporter temporary file disappeared before copy")
+        return shutil.copy2(source_name, target_name)
+
+    with pytest.MonkeyPatch.context() as private:
+        private.setitem(globals(), "ROOT", source)
+        shutil.copytree(source, copied, ignore=_copy_ignore, copy_function=copy_owned)
+    assert not (copied / "reports").exists()
+    assert (copied / "data" / "reports" / "owned.json").read_bytes() == nested.read_bytes()
+    assert (copied / "src" / "owned.py").read_bytes() == ordinary.read_bytes()

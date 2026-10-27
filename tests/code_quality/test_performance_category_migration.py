@@ -26,6 +26,17 @@ from tools import performance_tool_inputs_v2 as fresh
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def _copy_ignore(directory: str, names: list[str]) -> set[str]:
+    ignored = set(
+        shutil.ignore_patterns(
+            ".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"
+        )(directory, names)
+    )
+    if Path(directory) == ROOT:
+        ignored.add("reports")
+    return ignored
+
+
 def read_archive() -> dict[str, object]:
     return migration.read_archive(ROOT)
 
@@ -107,9 +118,7 @@ def copied_migration(tmp_path_factory: pytest.TempPathFactory) -> Path:
         ROOT,
         root,
         dirs_exist_ok=True,
-        ignore=shutil.ignore_patterns(
-            ".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"
-        ),
+        ignore=_copy_ignore,
     )
     git_dir = (
         subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=ROOT)
@@ -197,9 +206,7 @@ def test_direct_v2_api_still_rejects_migrated_current_source(tmp_path: Path) -> 
     shutil.copytree(
         ROOT,
         root,
-        ignore=shutil.ignore_patterns(
-            ".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"
-        ),
+        ignore=_copy_ignore,
     )
     shutil.copytree(ROOT / ".git", root / ".git")
     subprocess.run(
@@ -634,3 +641,30 @@ def test_assessment_map_actual_input_hashes_cannot_be_omitted_or_forged(
         migration.assessment_map_inputs(
             assessment_map_root, archive=read_archive(), current=current, tools=tools
         )
+
+
+def test_fixture_copy_omits_only_generated_root_reports(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    copied = tmp_path / "copied"
+    generated = source / "reports" / "quality-timing" / "active.json.tmp"
+    nested = source / "data" / "reports" / "owned.json"
+    ordinary = source / "src" / "owned.py"
+    for path, raw in (
+        (generated, b"ephemeral reporter output\n"),
+        (nested, b'{"owned": true}\n'),
+        (ordinary, b"VALUE = 1\n"),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+
+    def copy_owned(source_name: str, target_name: str) -> str:
+        if Path(source_name).is_relative_to(source / "reports"):
+            raise FileNotFoundError("Reporter temporary file disappeared before copy")
+        return shutil.copy2(source_name, target_name)
+
+    with pytest.MonkeyPatch.context() as private:
+        private.setitem(globals(), "ROOT", source)
+        shutil.copytree(source, copied, ignore=_copy_ignore, copy_function=copy_owned)
+    assert not (copied / "reports").exists()
+    assert (copied / "data" / "reports" / "owned.json").read_bytes() == nested.read_bytes()
+    assert (copied / "src" / "owned.py").read_bytes() == ordinary.read_bytes()

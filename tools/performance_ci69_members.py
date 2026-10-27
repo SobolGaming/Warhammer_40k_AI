@@ -18,6 +18,7 @@ CONTROL_MEMBERS: frozenset[str] = frozenset(
         "docs/CORE_RULES_REMEDIATION_ROADMAP.md",
         "docs/performance/change-assessment.json",
         "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_cumulative_preservation.py",
         "tests/code_quality/test_d07_geometry_containment.py",
         "tests/code_quality/test_performance_category_migration.py",
         "tests/code_quality/test_performance_policy.py",
@@ -38,6 +39,7 @@ CONTROL_MEMBERS: frozenset[str] = frozenset(
 
 INPUT_ADDITIONS: frozenset[str] = frozenset(
     {
+        "tests/code_quality/test_cumulative_preservation.py",
         "tests/code_quality/test_d07_geometry_containment.py",
         "tests/code_quality/test_performance_static_successor.py",
         "tests/code_quality/test_quality_runtime.py",

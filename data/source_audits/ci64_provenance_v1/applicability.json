@@ -1,12 +1,16 @@
 {
   "schema": "ci64-finite-current-applicability-v1",
   "original_input_digest": "e8e85f08af6a203f5c943fe55458d9541198c0fa4bcbcb70bb3ef5f998b85139",
-  "current_producing_input_digest": "77908a6c16f57f693396efe43585ca7b50e14cd085e20efbd7c1d03aa45faa3e",
+  "current_producing_input_digest": "3bb4f2a53600be7e7f121b342b1fba673a92595f542c9a625a233a032b78e312",
   "previous_applicability_sha256": "9f0d51de50c458a5caeaa1fe3eabefeab3e90d701ce1afb8bfd4dc0cc8744148",
   "changes": {
     "docs/performance/policy-v3/operation-map.json": {
       "before": "813b3219639758c6d11976533147455b32492b58122bb2d0933e9660deff00cf",
-      "after": "050d4fdcd5a3b0d35accaac8874fc351eb5459d897f4f6b97febf142699b64cc"
+      "after": "25fca222377a7ae307d26b27279984d793edcfd9b8ee6b3a5290b6379f95ecac"
+    },
+    "tests/code_quality/test_cumulative_preservation.py": {
+      "before": "32f945adccf7f10fba68a255987ddb5ce802d44a7c358c2c2af00d94fe1ff4c4",
+      "after": "95bdcc4cf19ef0fb83d2943fc17d5e8d19c34edbc8cc64fa3338da643a2133d6"
     },
     "tests/code_quality/test_d07_geometry_containment.py": {
       "before": "7de3292b5ac379ece05285fc4e94eab943af5dfc55f6961b5a0e42644384fdd4",
@@ -18,7 +22,7 @@
     },
     "tests/code_quality/test_performance_category_migration.py": {
       "before": "df412bbc22e69eb6834b47b6aea8606fce20004d30876438eff13ced04344dfa",
-      "after": "6d3b39397a80dd39f82796d016b9b9e095e70a9ce800889665c8a75876f147ce"
+      "after": "11a149d00742be3c296d1cf51998eb745da67f26a6f5cdee82b30de78a1e2dc8"
     },
     "tests/code_quality/test_performance_policy.py": {
       "before": "f45929b1d7138997e9bef8a390ca7fa1b1db467816cc6534871dd850222ddb98",
@@ -62,7 +66,7 @@
     },
     "tools/performance_ci69_members.py": {
       "before": null,
-      "after": "f242f44bcaee801bf3a1facb77aba2ff830adeb6e1ccc9a52926169925445225"
+      "after": "c8d797d59b7ec5d67c84e42132db406b4122675971563feb1b64fda0fb569d65"
     },
     "tools/performance_history_snapshot.py": {
       "before": "033896c722dcb38cb12040098ec253089e7d06ceb10d6aa9f6a6e58f41456dcf",
@@ -3363,7 +3367,6 @@
     "tests/code_quality/test_command_point_invariants.py": "ee4fd86c081ecd74863a618a85745b026eb5e9635947f0cb9254642909c6dec4",
     "tests/code_quality/test_core_modifier_boundaries.py": "1fbce34c088f6cd77447cdb25fcc6b3c011ba5bfc92976e13e5b8c167f0c923a",
     "tests/code_quality/test_core_rules_roadmap.py": "5a50717c8e6408864112929e2deb8f1be6966a72882bef9273104e1bfac77d1a",
-    "tests/code_quality/test_cumulative_preservation.py": "32f945adccf7f10fba68a255987ddb5ce802d44a7c358c2c2af00d94fe1ff4c4",
     "tests/code_quality/test_d02_performance_assessment.py": "4a2cc86f393649134f0669be775ac4f44dce749583567f999ecd052b355a8eb2",
     "tests/code_quality/test_d06_embark_preservation.py": "716ead49dc603694945b6ea5f49a08b30c38ebd76c52be5f0940db441383727f",
     "tests/code_quality/test_d07_upper_floor_preservation.py": "5f2f116cbf69d7b38e8e34bd66df0e19e807a34b77c96be07dcb0881e2262c0e",

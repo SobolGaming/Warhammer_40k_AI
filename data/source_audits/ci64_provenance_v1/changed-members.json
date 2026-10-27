@@ -28,6 +28,7 @@
   "docs/performance/change-assessment.json",
   "docs/performance/current/ci64-external_contract_source_reuse.json",
   "docs/performance/policy-v3/operation-map.json",
+  "tests/code_quality/test_cumulative_preservation.py",
   "tests/code_quality/test_d07_geometry_containment.py",
   "tests/code_quality/test_performance_admission_transaction.py",
   "tests/code_quality/test_performance_category_migration.py",
