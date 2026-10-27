@@ -1,16 +1,16 @@
 {
   "schema": "ci64-original-supervised-receipt-v1",
-  "attempt": "156-ci68-computation-source-base-2",
-  "nonce": "ebe1c517632e4203819b2508d8b0f9df",
+  "attempt": "221-ci69-cadence-source-base-2",
+  "nonce": "15a32bfd5f90440ca06595015a19faa9",
   "command": [
     "/tmp/task55-bytecode-launch/exact-locked-test-pristine/bin/python",
     "-B",
-    "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/source-sample65.py",
+    "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/source-sample65.py",
     "base",
     "2"
   ],
   "cwd": "/tmp/task57-correctness/repo",
-  "expected_head": "acd5ecb8c132865974fe5ca46f17f592e5ab6634",
+  "expected_head": "67578da27af11eee69f5bfd42318eca6fa63d625",
   "exit_code": 0,
   "timeout": false,
   "source_drift": false,
@@ -18,11 +18,11 @@
   "warning_seconds": 500,
   "warning_emitted": false,
   "process_group_closed": true,
-  "whole_before_terminal_journal_seconds": 163.87177817200006,
+  "whole_before_terminal_journal_seconds": 164.3481812529999,
   "elapsed_scope": "Original supervisor duration before terminal journal write; authentic complete status verifies whole invocation below600seconds.",
-  "started_utc": "2026-10-27T04:30:06.442742+00:00",
-  "finished_utc": "2026-10-27T04:32:50.108286+00:00",
-  "raw_entries_sha256": "aa457a84ac7c2b654c04cd94a6a9d82c466aac2b424d0d8cda4207cceb714eba",
+  "started_utc": "2026-10-27T16:36:47.473266+00:00",
+  "finished_utc": "2026-10-27T16:39:31.545277+00:00",
+  "raw_entries_sha256": "a59e606faa7072e7048ec6cf819280fb0dbe3a339d70d59634f526b8b6278f93",
   "dependency_physical_sha256": "a2a00c5e977c7a8dcbb2188efed485d69e924d20649bc637108e43914d201f39",
   "native_child_environment": {
     "passed_child_environment": {
@@ -33,10 +33,10 @@
       "UV_OFFLINE": "1",
       "UV_FROZEN": "1",
       "UV_PYTHON_DOWNLOADS": "never",
-      "UV_CACHE_DIR": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/uv-cache",
-      "PRE_COMMIT_HOME": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/precommit-home",
+      "UV_CACHE_DIR": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/uv-cache",
+      "PRE_COMMIT_HOME": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/precommit-home",
       "PATH": "/home/nostrademous/.local/opt/node-v24.18.0-linux-x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/usr/lib/linux-tools/6.18.54.1-microsoft-standard-WSL2/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell:/mnt/c/Users/nostr/.codex/tmp/arg0-windows/codex-arg01nHnnE:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/libheif/libheif/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/jxrlib/jxrlib/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/poppler/Library/bin:/mnt/c/Program Files/Common Files/Oracle/Java/javapath:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/Intel/WiFi/bin/:/mnt/c/Program Files/Common Files/Intel/WirelessCommon/:/mnt/c/Program Files/dotnet/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/010 Editor:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA app/NvDLISR:/mnt/c/Program Files/Go/bin:/mnt/c/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/:/mnt/c/Program Files/GitHub CLI/:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/WSL/:/mnt/c/Users/nostr/.local/bin:/mnt/c/Users/nostr/AppData/Local/pnpm:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python312/Scripts/:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python312/:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python38-32/Scripts/:/mnt/c/Users/nostr/AppData/Local/Programs/Python/Python38-32/:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell:/mnt/c/Users/nostr/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/nostr/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/nostr/.dotnet/tools:/mnt/c/Users/nostr/go/bin:/mnt/c/Users/nostr/AppData/Local/Microsoft/WinGet/Packages/Schniz.fnm_Microsoft.Winget.Source_8wekyb3d8bbwe:/mnt/c/Users/nostr/AppData/Local/Programs/cursor/resources/app/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/mnt/c/Users/nostr/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/cmd",
-      "CAPTURE_OUT": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/156-ci68-computation-source-base-2/stdout.log",
+      "CAPTURE_OUT": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/221-ci69-cadence-source-base-2/stdout.log",
       "PYTEST_PLUGINS": null,
       "PYTEST_ADDOPTS": null,
       "CI60_SOURCE_OUT": null
@@ -61,28 +61,28 @@
   },
   "original_artifacts": {
     "request.json": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/156-ci68-computation-source-base-2/request.json",
-      "sha256": "586940848c9d205660ae975c7196d1df8edf9f3a69047be87349f151fca71ca5"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/221-ci69-cadence-source-base-2/request.json",
+      "sha256": "4e2065502c5b2e4bc9f30552587951b495a260eebc74148f64632f5171aa39f2"
     },
     "supervisor-result.json": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/156-ci68-computation-source-base-2/supervisor-result.json",
-      "sha256": "0d42ab7b7e199fdfed03261792d5276cd8b7ea3ba64bdde8403eead2ad463f29"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/221-ci69-cadence-source-base-2/supervisor-result.json",
+      "sha256": "b9d2740e5210519e16d9c545cf7e93296816fd2022be5afa13707a742304bcaf"
     },
     "worker-journal.json": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/156-ci68-computation-source-base-2/worker-journal.json",
-      "sha256": "e508fbcf3d580dee5e680b1b4366396bb183042c741ff60b335ff4cf249aea34"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/221-ci69-cadence-source-base-2/worker-journal.json",
+      "sha256": "e534b91cdc8aa0e435631f5baee5648aabd16e6b38425100671547994c64b250"
     },
     "sample.json": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/156-ci68-computation-source-base-2/sample.json",
-      "sha256": "3853b785ba2f512e2b05eaa73c296660cdc968663517d86df88044cab3a137a4"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/221-ci69-cadence-source-base-2/sample.json",
+      "sha256": "6d1019a5e76e7774e6548be68a9fe14fb633ad9b6e92b959dfc358dd9394cf7f"
     },
     "result.xml": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/156-ci68-computation-source-base-2/result.xml",
-      "sha256": "a731af0e23ba77ee68e509c92512d2db66ee71cd627dfdffe323020d76bf9a5c"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/221-ci69-cadence-source-base-2/result.xml",
+      "sha256": "e9c0c833f79f35e4f9b0b2534803b1a416b524fa0e7bcbd1dad322b85088f8af"
     },
     "pytest.log": {
-      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci68/source-computation-acd5/156-ci68-computation-source-base-2/pytest.log",
-      "sha256": "dadf5b7fdd8ed75ea50096864e1aac4780f90b2cd16d4ec243c4a0813dca8999"
+      "path": "/tmp/task57-correctness/repo/reports/performance-attempts/ci69-d07/closure-source-67578da2/221-ci69-cadence-source-base-2/pytest.log",
+      "sha256": "1a885244c13f4b4c5b43e55de55517630c1820f7d5e25a908023d7b5765c0834"
     }
   }
 }

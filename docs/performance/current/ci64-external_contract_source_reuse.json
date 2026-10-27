@@ -4,17 +4,19 @@
   "workload_id": "external-contract-orphan-write-independent-check-v1",
   "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
-  "head_input_digest": "e182342755c0610735f578ddfdbd9d031b96fd4e005b36a0653fff67588fb84e",
+  "head_input_digest": "5e67c3a89981d24f707fdf72c4da466d8e2d146ae9adc74d3ec0fe972575affa",
   "budget_profile": "current-change-relative-v1",
   "historical_failures": [
     "Original CI60 complete CLI122 remains a failed180second invocation with incomplete postflight; no physical check converts it into a pass.",
-    "CI61 complete CLI045 remains a failed180second invocation and CI63 standalone preflight remains incomplete. CI64 E2 complete CLI058 also remains a failed180second invocation. CI65 E3 complete CLI051 remains a failed180second invocation; standalone diagnostic052 is component evidence only. Historical CI66 source-token samples retain their native M4 71e5f3bf45de47730bde9516aeb5680634120e54 binding. CI66 E4 complete CLI052 remains failed at180.210501606seconds and diagnostic057 remains a censored180.268147208second attempt; the historical six authentic CI67 source-token samples retain native M987f9a5464763879c97bc5e14fdbeffb1f04bf22. The earlier six authentic CI68 source-token samples retain native M0b439e38dfba78b627e2910e605ec295c1af1f5f; the current six CI68 computation-only successor samples152-157 bind native Macd5ecb8c132865974fe5ca46f17f592e5ab6634; prior CI67 E complete150.771216177second success remains predecessor evidence, and its quality098 remains failed/incomplete; all prior source reports and eleven other families retain their actual producer identities. Final current admission and complete gates remain pending."
+    "CI61 complete CLI045 remains a failed180second invocation and CI63 standalone preflight remains incomplete. CI64 E2 complete CLI058 also remains a failed180second invocation. CI65 E3 complete CLI051 remains a failed180second invocation; standalone diagnostic052 is component evidence only. Historical CI66 source-token samples retain their native M4 71e5f3bf45de47730bde9516aeb5680634120e54 binding. CI66 E4 complete CLI052 remains failed at180.210501606seconds and diagnostic057 remains a censored180.268147208second attempt; the historical six authentic CI67 source-token samples retain native M 987f9a5464763879c97bc5e14fdbeffb1f04bf22. The earlier six authentic CI68 source-token samples retain native M 0b439e38dfba78b627e2910e605ec295c1af1f5f; the earlier six CI68 computation-only successor samples152-157 bind native M acd5ecb8c132865974fe5ca46f17f592e5ab6634; prior CI67 E complete150.771216177second success remains predecessor evidence, and its quality098 remains failed/incomplete; all prior source reports and eleven other families retain their actual producer identities. Final current admission and complete gates remain pending.",
+    "CI69 producer M 88de23e1737ec3cdb65400598c8b45f411744086 retains five authentic completed samples190-194 as partial predecessor evidence. Sample195 was not run after the selector-closure gap was confirmed; no complete comparison or current qualification is attributed to that producer. Current repaired CI69 source samples217-222 bind native M 67578da27af11eee69f5bfd42318eca6fa63d625; independent current admission, complete performance and full quality remain separate required gates.",
+    "Earlier M2 source attempts203/204 both completed natively but their recorded memory differed by20480bytes, so exact host admission rejected the pair;205-208 were unrun. Cohort210-213 completed four native samples but its declared45second transition guard prevented214 after72.826167seconds;214/215 were unrun. Neither incomplete cohort is selected. The current predeclared217-222 cohort retains all original matching and limits; ordinary API sequencing removed model-response gaps, with no persistent host controller or normalization."
   ],
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359379456,
+      "memory_bytes": 67359404032,
       "logical_cpus": 64,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -22,12 +24,12 @@
     },
     "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be",
-    "fixture_sha256": "4ba8369b9a0b670c442031be28086b0cea045f55a98467ed40290e57df230d33",
+    "fixture_sha256": "d07a314164295ed85fc9bceab058cd87f0b751a7bfffc2533ede7f1b4903b716",
     "samples": {
       "orphan-write-independent-check": [
-        147.244,
-        147.575,
-        148.623
+        147.633,
+        148.048,
+        149.085
       ]
     },
     "completed": true,
@@ -38,7 +40,7 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359379456,
+      "memory_bytes": 67359404032,
       "logical_cpus": 64,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -46,12 +48,12 @@
     },
     "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be",
-    "fixture_sha256": "4ba8369b9a0b670c442031be28086b0cea045f55a98467ed40290e57df230d33",
+    "fixture_sha256": "d07a314164295ed85fc9bceab058cd87f0b751a7bfffc2533ede7f1b4903b716",
     "samples": {
       "orphan-write-independent-check": [
-        133.842,
-        136.804,
-        134.789
+        135.596,
+        135.878,
+        139.189
       ]
     },
     "completed": true,
@@ -62,10 +64,10 @@
     "schema": "tool-input-roles-v3",
     "family": "external_contract_source_reuse",
     "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
-    "head_input_digest": "e182342755c0610735f578ddfdbd9d031b96fd4e005b36a0653fff67588fb84e",
-    "role_spec_sha256": "9806bc2369b1c5d4c681b627c71a02fee46dea5370f66ec96e359677530149b4",
-    "complete_inventories_sha256": "94e3f6a114b9adfef9bb4f5e34e3eeb456862493bbe782140c16452c420279c9",
-    "common_sha256": "4ba8369b9a0b670c442031be28086b0cea045f55a98467ed40290e57df230d33",
+    "head_input_digest": "5e67c3a89981d24f707fdf72c4da466d8e2d146ae9adc74d3ec0fe972575affa",
+    "role_spec_sha256": "e1ffbb4077d8dd6272d1862d39850bcfb6cce6d3e1ae45c5af6237c13bcb6a5a",
+    "complete_inventories_sha256": "c619d117fe4dd3aa01e770666894829e9fa44008c8bfd231b9faf07ddb4b164f",
+    "common_sha256": "d07a314164295ed85fc9bceab058cd87f0b751a7bfffc2533ede7f1b4903b716",
     "contract_trees": {
       "base": {
         "README.md": "f8bc470b0b2cc63503964bda1121092eb781371d48dc6ae92e5ef53676aafcce",
@@ -548,7 +550,7 @@
       "head": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6"
     },
     "shared_dependencies_sha256": "a2a00c5e977c7a8dcbb2188efed485d69e924d20649bc637108e43914d201f39",
-    "shared_workload_sha256": "fb2cb6239e828bbb13e1124c6a1c70d602bffae5742b5d8d4c2fbdf7e83969de"
+    "shared_workload_sha256": "176bceffc8fe9372c1782d117d655a15e3cfe27b328fc7ed680d6afccb3fe8f4"
   },
   "generated_output_binding": {
     "base": [

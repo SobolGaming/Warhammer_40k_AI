@@ -2,7 +2,7 @@
   "schema": "tool-input-roles-v3",
   "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "inventories_path": "data/source_audits/ci64_provenance_v1/source-token-inventories.json",
-  "inventories_sha256": "94e3f6a114b9adfef9bb4f5e34e3eeb456862493bbe782140c16452c420279c9",
+  "inventories_sha256": "c619d117fe4dd3aa01e770666894829e9fa44008c8bfd231b9faf07ddb4b164f",
   "roles": {
     ".github/workflows/ci.yml": "untimed-governance",
     "ci/quality_shards/all.txt": "untimed-governance",
@@ -529,6 +529,7 @@
     "tools/generate_aeldari_datasheet_semantic_coverage.py": "runtime-or-generator-treatment",
     "tools/generate_faction_content_scaffold.py": "runtime-or-generator-treatment",
     "tools/performance_ci60_qualification.py": "runtime-or-generator-treatment",
+    "tools/performance_ci69_members.py": "runtime-or-generator-treatment",
     "tools/performance_history_snapshot.py": "runtime-or-generator-treatment",
     "tools/performance_policy.py": "runtime-or-generator-treatment",
     "tools/performance_preflight.py": "runtime-or-generator-treatment",
@@ -540,7 +541,7 @@
     "tools/quality_runtime_successor.py": "runtime-or-generator-treatment",
     "tools/thousand_sons_perils_preservation.py": "runtime-or-generator-treatment"
   },
-  "common_sha256": "4ba8369b9a0b670c442031be28086b0cea045f55a98467ed40290e57df230d33",
+  "common_sha256": "d07a314164295ed85fc9bceab058cd87f0b751a7bfffc2533ede7f1b4903b716",
   "contract_trees": {
     "base": {
       "README.md": "f8bc470b0b2cc63503964bda1121092eb781371d48dc6ae92e5ef53676aafcce",
@@ -1023,5 +1024,5 @@
     "head": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6"
   },
   "shared_dependencies_sha256": "a2a00c5e977c7a8dcbb2188efed485d69e924d20649bc637108e43914d201f39",
-  "shared_workload_sha256": "fb2cb6239e828bbb13e1124c6a1c70d602bffae5742b5d8d4c2fbdf7e83969de"
+  "shared_workload_sha256": "176bceffc8fe9372c1782d117d655a15e3cfe27b328fc7ed680d6afccb3fe8f4"
 }
