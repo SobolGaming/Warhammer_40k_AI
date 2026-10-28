@@ -785,14 +785,22 @@ def test_pointer_growth_after_stat_is_rejected_by_bounded_actual_read(
 )
 def test_only_the_exact_declared_transaction_input_addition_is_admitted(changed: str) -> None:
     from tools import performance_ci60_qualification as q
+    from tools import performance_ci69_members as ci69
+
+    assert "tests/rules/section24/README.md" in q.PRELUDE_INPUTS
+    assert "tests/measurement_native_api.py" in ci69.CUTOVER_ADDED_INPUTS
 
     previous = {"unchanged-prior-owner": "a", "changed-prior-owner": "b"}
-    produced = previous | {
-        q.TRANSACTION_TEST: "current",
-        "tests/data/d07_geometry_containment_v3.json": "current-d07",
-        "tools/performance_ci69_members.py": "current-ci69",
-        "changed-prior-owner": "c",
-    }
+    produced = (
+        previous
+        | {
+            q.TRANSACTION_TEST: "current",
+            "tests/data/d07_geometry_containment_v3.json": "current-d07",
+            "tools/performance_ci69_members.py": "current-ci69",
+            "changed-prior-owner": "c",
+        }
+        | dict.fromkeys(ci69.CUTOVER_ADDED_INPUTS, "current-cutover")
+    )
     if changed == "second-new":
         produced["undeclared-extra-owner"] = "different"
     elif changed == "removed-old":
@@ -809,6 +817,10 @@ def test_only_the_exact_declared_transaction_input_addition_is_admitted(changed:
         Callable[[dict[str, str], dict[str, str]], bool], vars(q)["_transaction_inputs_match"]
     )
     assert predicate(previous, produced) is (changed == "valid")
+    if changed == "valid":
+        without_adapter = produced.copy()
+        del without_adapter["tests/measurement_native_api.py"]
+        assert predicate(previous, without_adapter) is False
 
 
 @pytest.mark.parametrize("observed", [b"", b"100644 blob authentic-existing-member"])

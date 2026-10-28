@@ -1044,7 +1044,8 @@ CUTOVER_NEW |= frozenset(
         "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/phase13b_shooting_declaration_helpers.py.txt",
     }
 )
-INPUT_ADDITIONS |= frozenset({"tests/measurement_native_api.py"})
+INPUT_ADDITIONS |= frozenset({"tests/measurement_native_api.py", "tests/rules/section24/README.md"})
+CUTOVER_ADDED_INPUTS |= frozenset({"tests/measurement_native_api.py"})
 OBSERVED_ADDITIONS |= frozenset(
     {
         "tests/measurement_native_api.py",
