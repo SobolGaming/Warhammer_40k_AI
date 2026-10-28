@@ -615,7 +615,7 @@ def _apply_setup_reactive_charge(
             "reachable_target_distances_inches": dict(
                 sorted(roll_result.reachable_target_distances_inches.items())
             ),
-            CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: [target_unit_id],
+            CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: [],
             "target_unit_instance_id": target_unit_id,
             "charge_roll": validate_json_value(roll_result.to_payload()),
             "charge_bonus_suppressed": True,
@@ -645,7 +645,7 @@ def _apply_setup_reactive_charge(
                 "reachable_target_unit_instance_ids": list(
                     roll_result.reachable_target_distances_inches
                 ),
-                CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: [target_unit_id],
+                CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: [],
                 "charge_bonus_suppressed": True,
             }
         ),
@@ -666,7 +666,7 @@ def _apply_setup_reactive_charge(
             "reachable_target_unit_instance_ids": list(
                 roll_result.reachable_target_distances_inches
             ),
-            CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: [target_unit_id],
+            CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: [],
         },
     )
 
