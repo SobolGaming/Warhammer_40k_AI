@@ -1751,7 +1751,8 @@ def test_rng_projection_preserves_typed_legacy_los_tokens_and_rejection() -> Non
     )
     witness = cast(JsonValue, context.resolve_line_of_sight().to_payload())
     assert decision_module._rng_payload_history_token(witness) == baseline["rng_history_token"]
-    for payload in (witness, {"nested": [witness]}):
+    payloads: tuple[JsonValue, ...] = (witness, {"nested": [witness]})
+    for payload in payloads:
         assert decision_module._rng_payload_history_token(payload) == (
             decision_module._unfused_rng_payload_history_token(payload)
         )

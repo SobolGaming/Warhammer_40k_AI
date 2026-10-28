@@ -186,9 +186,19 @@ def test_retained_destruction_resolves_deferred_deadly_demise_at_cleanup() -> No
     from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
     from tests.retained_attack_helpers import pending_retained_attack
 
+    from warhammer40k_core.engine.destroyed_referent_measurement import (
+        former_footprint_for_destroyed_model,
+    )
     from warhammer40k_core.engine.phase import LifecycleStatusKind
 
     session, model_id = pending_retained_attack(deadly_demise=True)
+    state = session.lifecycle.state
+    assert state is not None
+    footprint_before_cleanup = former_footprint_for_destroyed_model(
+        state=state,
+        event_records=session.lifecycle.decision_controller.event_log.records,
+        model_instance_id=model_id,
+    )
     request = pending_request(session)
     status = session.submit_option(
         request_id=request.request_id,
@@ -223,4 +233,21 @@ def test_retained_destruction_resolves_deferred_deadly_demise_at_cleanup() -> No
     ]
     assert len(demise_indices) == 1
     assert len(removal_indices) == 1
-    assert demise_indices[0] < removal_indices[0]
+    # Adopted FAQ20 applies to this accepted Fight-on-Death casualty only.
+    assert removal_indices[0] < demise_indices[0]
+    assert state is not None
+    assert state.battlefield_state is not None
+    assert model_id in state.battlefield_state.removed_model_ids
+    assert state.battlefield_state.model_placement_or_none(model_id) is None
+    removal_payload = events[removal_indices[0]].payload
+    assert isinstance(removal_payload, dict)
+    assert (
+        removal_payload["destroyed_model_placement"]
+        == footprint_before_cleanup.logical_death.destroyed_model_placement.to_payload()
+    )
+    assert (
+        former_footprint_for_destroyed_model(
+            state=state, event_records=events, model_instance_id=model_id
+        )
+        == footprint_before_cleanup
+    )
