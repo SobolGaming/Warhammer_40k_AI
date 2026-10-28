@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import math
 import os
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+from itertools import product
 from pathlib import Path, PurePosixPath
 from statistics import median
 from typing import TypedDict, cast
@@ -14,7 +16,7 @@ from typing import TypedDict, cast
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 TESTS_ROOT = REPOSITORY_ROOT / "tests"
 EXCLUDED_TEST_DIRECTORIES = {"benchmarks", "code_quality"}
-SHARD_STRATEGY = "largest-processing-time-by-median-file-duration"
+SHARD_STRATEGY = "largest-processing-time-by-derived-selector-weight"
 
 
 class ProfileEvidence(TypedDict):
@@ -65,7 +67,7 @@ def main() -> int:
     if args.profile_source is None or len(args.profile_source) != len(args.junit):
         parser.error("one --profile-source is required per --junit")
     durations, profiles = _profile_medians(tuple(args.junit), tuple(args.profile_source))
-    durations = _rounded_durations(durations)
+    durations = _rounded_durations(_partitioned_durations(durations))
     shards = _balanced_shards(durations=durations, shard_count=args.shard_count)
     _write_manifests(output_dir=output_dir, shards=shards, durations=durations, profiles=profiles)
     return 0
@@ -324,6 +326,127 @@ def _behavioral_test_files() -> tuple[str, ...]:
     return behavioral_selection(REPOSITORY_ROOT).active_files
 
 
+CASE_PARTITION_PATH = "ci/test_shards/case-partitions.json"
+CASE_PARTITION_FILE = "tests/rules/rules04/unit/test_s25_permission_relevance.py"
+CASE_PARTITION_SHA256 = "be09d3680ac4ac47c248a1962b24846a3791824821c14a5a4080f5cab8b73c07"
+
+
+def _literal_partition_nodes(root: Path) -> tuple[str, ...]:
+    path = root / CASE_PARTITION_FILE
+    _selection_no_links(root, path)
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != CASE_PARTITION_SHA256:
+        raise SystemExit("Finite case partition source changed; regeneration/review required.")
+    module = ast.parse(raw.decode(), filename=CASE_PARTITION_FILE)
+    functions = [
+        node
+        for node in module.body
+        if isinstance(node, ast.FunctionDef) and node.name.startswith("test_")
+    ]
+    if (
+        len(functions) != 1
+        or functions[0].name != "test_normal_native_relevant_operations_and_owned_selected_sources"
+    ):
+        raise SystemExit("Finite case partition test function changed.")
+    function = functions[0]
+    if len(function.decorator_list) != 2:
+        raise SystemExit("Finite case partition decorators changed.")
+    axes: list[tuple[str, ...]] = []
+    for decorator, name, count in zip(
+        reversed(function.decorator_list), ("mode", "player"), (10, 2), strict=True
+    ):
+        if (
+            not isinstance(decorator, ast.Call)
+            or ast.unparse(decorator.func) != "pytest.mark.parametrize"
+            or len(decorator.args) != 2
+            or decorator.keywords
+            or not isinstance(decorator.args[0], ast.Constant)
+            or decorator.args[0].value != name
+            or not isinstance(decorator.args[1], ast.List)
+        ):
+            raise SystemExit("Only the reviewed literal parameter axes are admitted.")
+        values: list[str] = []
+        for value in decorator.args[1].elts:
+            if not isinstance(value, ast.Constant) or not isinstance(value.value, str):
+                raise SystemExit("Partition parameters must be literal strings.")
+            values.append(value.value)
+        if len(values) != count or len(set(values)) != count:
+            raise SystemExit("Partition parameter count or uniqueness changed.")
+        axes.append(tuple(values))
+    nodes = tuple(
+        CASE_PARTITION_FILE + "::" + function.name + "[" + "-".join(row) + "]"
+        for row in product(*axes)
+    )
+    if len(nodes) != 20 or len(set(nodes)) != 20:
+        raise SystemExit("Finite partition must contain exactly twenty unique nodes.")
+    return nodes
+
+
+def _case_partition(root: Path, files: frozenset[str]) -> dict[str, float]:
+    if CASE_PARTITION_FILE not in files:
+        return {}
+    path = root / CASE_PARTITION_PATH
+    _selection_no_links(root, path)
+    value = json.loads(path.read_bytes(), object_pairs_hook=_selection_object)
+    fields = {"schema", "source_file", "source_sha256", "nodes", "weights", "evidence"}
+    if (
+        not isinstance(value, dict)
+        or value.keys() != fields
+        or value["schema"] != "finite-behavior-node-partition-v1"
+        or value["source_file"] != CASE_PARTITION_FILE
+        or value["source_sha256"] != CASE_PARTITION_SHA256
+    ):
+        raise SystemExit("Finite node partition schema or source identity changed.")
+    nodes = _literal_partition_nodes(root)
+    if (
+        value["nodes"] != list(nodes)
+        or not isinstance(value["weights"], dict)
+        or value["weights"].keys() != set(nodes)
+    ):
+        raise SystemExit("Finite node partition is not the complete exact literal inventory.")
+    result: dict[str, float] = {}
+    for node in nodes:
+        weight = value["weights"][node]
+        if (
+            isinstance(weight, bool)
+            or not isinstance(weight, int | float)
+            or not math.isfinite(weight)
+            or weight <= 0
+        ):
+            raise SystemExit("Finite partition weights must be positive finite scheduling values.")
+        result[node] = float(weight)
+    evidence = value["evidence"]
+    if (
+        not isinstance(evidence, dict)
+        or evidence.get("purpose")
+        != "Derived scheduling weights only; not current performance or full-suite qualification"
+    ):
+        raise SystemExit("Finite partition must retain its scheduling-only evidence label.")
+    return result
+
+
+def _behavioral_shard_selectors() -> tuple[str, ...]:
+    files = frozenset(_behavioral_test_files())
+    partition = _case_partition(REPOSITORY_ROOT, files)
+    return (
+        tuple(sorted((files - {CASE_PARTITION_FILE}) | partition.keys()))
+        if partition
+        else tuple(sorted(files))
+    )
+
+
+def _partitioned_durations(durations: dict[str, float]) -> dict[str, float]:
+    """Preserve file totals; node ratios are derived scheduling weights, not case profiles."""
+    partition = _case_partition(REPOSITORY_ROOT, frozenset(durations))
+    if not partition:
+        return dict(durations)
+    result = dict(durations)
+    total = result.pop(CASE_PARTITION_FILE)
+    denominator = sum(partition.values())
+    result.update({node: total * weight / denominator for node, weight in partition.items()})
+    return result
+
+
 def _profile_medians(
     paths: tuple[Path, ...],
     sources: tuple[str, ...],
@@ -476,7 +599,7 @@ def _write_manifests(
 
 
 def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
-    expected = set(_behavioral_test_files())
+    expected = set(_behavioral_shard_selectors())
     manifest_names = {path.name for path in output_dir.glob("shard-*.txt")}
     if manifest_names != {f"shard-{index}.txt" for index in range(1, shard_count + 1)}:
         raise SystemExit("Shard manifest count does not match --shard-count.")

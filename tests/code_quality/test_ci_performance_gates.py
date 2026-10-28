@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import tomllib
@@ -456,6 +457,7 @@ def test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard(
     cutover_root: Path, explicit: str
 ) -> None:
     for name in (
+        "scripts/__init__.py",
         "scripts/build_test_shards.py",
         "tests/conftest.py",
         "tests/timing_plugin.py",
@@ -477,6 +479,7 @@ def test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard(
     result = subprocess.run(
         [sys.executable, "-B", "-m", "pytest", "--collect-only", "-q", explicit],
         cwd=cutover_root,
+        env=_collection_environment(cutover_root),
         capture_output=True,
         text=True,
         timeout=30,
@@ -492,6 +495,7 @@ def test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard(
 @pytest.mark.stubbed
 def test_cutover_real_cli_rejects_naming_override(cutover_root: Path) -> None:
     for name in (
+        "scripts/__init__.py",
         "scripts/build_test_shards.py",
         "tests/conftest.py",
         "tests/timing_plugin.py",
@@ -523,9 +527,110 @@ def test_cutover_real_cli_rejects_naming_override(cutover_root: Path) -> None:
             "python_files=*_test.py",
         ],
         cwd=cutover_root,
+        env=_collection_environment(cutover_root),
         capture_output=True,
         text=True,
         timeout=30,
     )
     assert result.returncode == 4
     assert "Effective pytest python_files" in result.stderr
+
+
+def _collection_environment(root: Path) -> dict[str, str]:
+    environment = dict(os.environ)
+    environment["PYTHONPATH"] = os.pathsep.join((str(root), str(root / "src")))
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    plugins = environment.get("PYTEST_PLUGINS", "").split(",")
+    plugins = [name for name in plugins if name.strip() and name.strip() != "source_observer"]
+    if plugins:
+        environment["PYTEST_PLUGINS"] = ",".join(plugins)
+    else:
+        environment.pop("PYTEST_PLUGINS", None)
+    environment.pop("TEST_TIMING_DIR", None)
+    return environment
+
+
+def test_finite_partition_has_real_complete_pytest_collection() -> None:
+    expected = sharding._literal_partition_nodes(ROOT)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-B",
+            "-m",
+            "pytest",
+            sharding.CASE_PARTITION_FILE,
+            "--collect-only",
+            "-q",
+            "-n0",
+            "--no-cov",
+            "--color=no",
+        ],
+        cwd=ROOT,
+        env=_collection_environment(ROOT),
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    observed = tuple(
+        line.strip()
+        for line in result.stdout.splitlines()
+        if line.startswith(sharding.CASE_PARTITION_FILE + "::")
+    )
+    assert len(observed) == len(set(observed)) == 20
+    assert observed == expected
+    assert (
+        tuple(sharding._case_partition(ROOT, frozenset(sharding._behavioral_test_files())))
+        == expected
+    )
+
+
+@pytest.fixture
+def partition_root(tmp_path: Path) -> Path:
+    for name in (sharding.CASE_PARTITION_FILE, sharding.CASE_PARTITION_PATH):
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / name).read_bytes())
+    return tmp_path
+
+
+@pytest.mark.parametrize(
+    "mutation", ["drop", "extra", "duplicate", "reorder", "source", "body", "weight", "field"]
+)
+def test_finite_partition_rejects_missing_extra_and_malformed_cases(
+    partition_root: Path, mutation: str
+) -> None:
+    target = partition_root / sharding.CASE_PARTITION_PATH
+    value = json.loads(target.read_text())
+    if mutation == "drop":
+        value["nodes"].pop()
+    elif mutation == "extra":
+        value["nodes"].append(sharding.CASE_PARTITION_FILE + "::invented")
+    elif mutation == "duplicate":
+        value["nodes"][1] = value["nodes"][0]
+    elif mutation == "reorder":
+        value["nodes"].reverse()
+    elif mutation == "source":
+        value["source_sha256"] = "0" * 64
+    elif mutation == "body":
+        with (partition_root / sharding.CASE_PARTITION_FILE).open("a") as stream:
+            stream.write("\n# undeclared source change\n")
+    elif mutation == "weight":
+        value["weights"][value["nodes"][0]] = float("nan")
+    elif mutation == "field":
+        value["unreviewed"] = True
+    else:
+        raise AssertionError("Unknown partition mutation")
+    target.write_text(json.dumps(value))
+    with pytest.raises(SystemExit):
+        sharding._case_partition(partition_root, frozenset({sharding.CASE_PARTITION_FILE}))
+
+
+def test_finite_partition_preserves_total_weight_and_other_file_weights() -> None:
+    durations = {sharding.CASE_PARTITION_FILE: 200.0, "tests/example.py": 37.0}
+    expanded = sharding._partitioned_durations(durations)
+    assert durations == {sharding.CASE_PARTITION_FILE: 200.0, "tests/example.py": 37.0}
+    assert expanded["tests/example.py"] == 37.0
+    assert sharding.CASE_PARTITION_FILE not in expanded
+    assert len(expanded) == 21
+    assert sum(expanded.values()) == pytest.approx(237.0)
