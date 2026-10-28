@@ -35,6 +35,7 @@ from warhammer40k_core.core.dice import (
     RollOffRound,
 )
 from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
+from warhammer40k_core.engine import decision as decision_module
 from warhammer40k_core.engine.decision import (
     DecisionError,
     DecisionOption,
@@ -1625,3 +1626,250 @@ def test_starting_unit_resources_reject_non_positive_and_duplicate_entries() -> 
             "starting_resources",
             (allocation, allocation),
         )
+
+
+class _RngProjectionString(str):
+    def __contains__(self, _item: object) -> bool:
+        return False
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        [None, True, False, 0, -3, 0.0, -0.0, 1.25, "caf\u00e9"],
+        ({"model_destruction_cause_id": "kept-inside-tuple", "values": (1, 2)},),
+        {_RngProjectionString("key"): _RngProjectionString("value")},
+        {
+            "component_values": [3],
+            "result_override": None,
+            "component_index": 0,
+            "previous_values": [2],
+            "objective_control_modifier_scope_id": None,
+            "modifier_trace": None,
+            "desperate_escape_roll_modifiers": [],
+            "nested": {"component_id": "left", "result_override": 6},
+        },
+        [
+            {
+                "save_kind": kind,
+                "characteristic_target_number": 4,
+                "target_number": 5,
+                "armor_penetration": -1,
+                "cover_applied": False,
+                "inherent_roll_modifiers": ["audit"],
+                "characteristic_trace": None,
+                "armor_penetration_trace": None,
+                "roll_modifiers": [],
+                "ignored_roll_modifier_ids": [],
+            }
+            for kind in ("armour", "invulnerable", "other")
+        ],
+        [
+            {"value_kind": "random", "evaluation": {"raw": 3}, "evaluation_raw": 3},
+            {"value_kind": "random", "evaluation": {"raw": 3}, "evaluation_raw": 4},
+            {"component_index": 0, "previous_values": [1, 2], "result_override": None},
+        ],
+        {
+            "critical_is_threshold": True,
+            "success_requires_exact": True,
+            "destroyed_model_placements": [],
+            "destruction_evidence": {},
+            "logical_death_cause_binding": {},
+            "logical_death_events": [],
+            "model_destruction_cause_id": "audit",
+            "target_lineage": {},
+            "weapon_instance_id": "weapon",
+            "physical_choice": "left",
+        },
+        {"modifier_trace": {"actual": "kept"}, "result_override": 0},
+        {
+            "event_type": "out_of_phase_shooting_declaration_accepted",
+            "payload": {"attack_sequence_id": float("nan"), "target": "kept"},
+        },
+        {"target_lineage": object(), "actual": 1},
+    ],
+)
+def test_rng_projection_matches_unmodified_two_pass_token(payload: object) -> None:
+    value = cast(JsonValue, payload)
+    assert decision_module._rng_payload_history_token(value) == (
+        decision_module._unfused_rng_payload_history_token(value)
+    )
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"value": float("nan")},
+        {"value": float("inf")},
+        {"value": float("-inf")},
+        {1: "invalid-key"},
+        {"value": "<Thing object at 0x123abc>"},
+        {"<Thing object at 0x123abc>": "value"},
+        {"value": _RngProjectionString("<Thing object at 0x123abc>")},
+        {_RngProjectionString("<Thing object at 0x123abc>"): "value"},
+        {"value": object()},
+        ({1: "invalid-tuple-key"},),
+        {"rng_compatibility_projection": {}},
+        {"early": float("nan"), "later": {"rng_compatibility_projection": {}}},
+        {"early": {"rng_compatibility_projection": {}}, "later": float("nan")},
+        {
+            "event_type": "out_of_phase_shooting_declaration_accepted",
+            "payload": {"attack_sequence_id": {"rng_compatibility_projection": {}}},
+        },
+    ],
+)
+def test_rng_projection_preserves_invalid_input_error_type_and_order(payload: object) -> None:
+    value = cast(JsonValue, payload)
+    with pytest.raises((ValueError, KeyError, TypeError)) as previous:
+        decision_module._unfused_rng_payload_history_token(value)
+    with pytest.raises(type(previous.value)) as current:
+        decision_module._rng_payload_history_token(value)
+    assert type(current.value) is type(previous.value)
+    assert str(current.value) == str(previous.value)
+
+
+def test_rng_projection_preserves_typed_legacy_los_tokens_and_rejection() -> None:
+    from pathlib import Path
+
+    from warhammer40k_core.core.visibility import (
+        TerrainVisibilityContext,
+        TerrainVisibilityContextPayload,
+    )
+
+    baseline = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "data/source_audits/order135/los-rng-base-control.json"
+        ).read_text()
+    )
+    context = TerrainVisibilityContext.from_payload(
+        cast(
+            TerrainVisibilityContextPayload,
+            baseline["context"]
+            | {"battlefield_bounds": {"min_x": "0", "min_y": "0", "max_x": "12", "max_y": "12"}},
+        )
+    )
+    witness = cast(JsonValue, context.resolve_line_of_sight().to_payload())
+    assert decision_module._rng_payload_history_token(witness) == baseline["rng_history_token"]
+    for payload in (witness, {"nested": [witness]}):
+        assert decision_module._rng_payload_history_token(payload) == (
+            decision_module._unfused_rng_payload_history_token(payload)
+        )
+    changed = json.loads(json.dumps(witness))
+    changed["rng_compatibility_projection"]["version"] = "unapproved:2"
+    with pytest.raises(ValueError, match=r"^Unsupported LOS RNG projection version\.$") as previous:
+        decision_module._unfused_rng_payload_history_token(changed)
+    with pytest.raises(type(previous.value)) as current:
+        decision_module._rng_payload_history_token(changed)
+    assert type(current.value) is type(previous.value)
+    assert str(current.value) == str(previous.value)
+
+
+def _rng_projection_reconstructed_trace() -> dict[str, Any]:
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=2, sides=6),
+        reason="RNG projection reconstruction control",
+        roll_type="test_roll",
+    )
+    manager = DiceRollManager("rng-projection-control")
+    first = manager.roll(spec)
+    manager.request_reroll(first, allowed_selections=((0, 1),))
+    request = _select_unit_request()
+    manager.record_decision(
+        request=request,
+        result=DecisionResult.for_request(
+            result_id="rng-projection-result",
+            request=request,
+            selected_option_id="unit-a",
+        ),
+    )
+    manager.event_log.append("model_logical_death_recorded", {"audit": "neutral"})
+    before_append = DiceRollManager("rng-projection-control", event_log=manager.event_log)
+    manager.event_log.append("external-choice", {"nested": {"selected": "unit-b"}})
+    restored = DiceRollManager("rng-projection-control", event_log=manager.event_log)
+    assert restored.rng.history != before_append.rng.history
+    assert restored.rng.draw_count == 2
+    following = restored.roll(spec)
+    next_request = restored.request_reroll(following, allowed_selections=((0, 1),))
+    assert following.original_result.roll_id == "roll-000002"
+    assert next_request.request_id == "decision-request-000002"
+    assert restored.rng.draw_count == 4
+    return {
+        "rng": restored.rng.to_payload(),
+        "roll": following.to_payload(),
+        "request": next_request.to_payload(),
+        "decisions": [record.to_payload() for record in restored.decision_records],
+        "events": restored.event_log.to_payload(),
+    }
+
+
+def test_rng_projection_preserves_rebuilt_history_roll_ids_draws_and_external_append(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    with monkeypatch.context() as reference:
+        reference.setattr(
+            decision_module,
+            "_rng_payload_history_token",
+            decision_module._unfused_rng_payload_history_token,
+        )
+        expected = _rng_projection_reconstructed_trace()
+    assert _rng_projection_reconstructed_trace() == expected
+
+
+def test_rng_projection_rebuild_reads_changed_nested_payload(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    log = EventLog()
+    event = log.append("external-choice", {"nested": {"value": 1}})
+    first = DiceRollManager("mutable-rng-control", event_log=log)
+    cast(dict[str, Any], event.payload)["nested"]["value"] = 2
+    changed = DiceRollManager("mutable-rng-control", event_log=log)
+    assert changed.rng.history != first.rng.history
+    with monkeypatch.context() as reference:
+        reference.setattr(
+            decision_module,
+            "_rng_payload_history_token",
+            decision_module._unfused_rng_payload_history_token,
+        )
+        expected = DiceRollManager("mutable-rng-control", event_log=log)
+    assert changed.rng.to_payload() == expected.rng.to_payload()
+    cast(dict[str, Any], event.payload)["nested"]["value"] = float("nan")
+    with pytest.raises(EventLogError):
+        DiceRollManager("mutable-rng-control", event_log=log)
+
+
+@pytest.mark.parametrize("event_type", ["decision_requested", "decision_recorded"])
+def test_rng_projection_keeps_eager_typed_validation_after_nested_mutation(
+    event_type: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    request = _select_unit_request()
+    log = EventLog()
+    if event_type == "decision_requested":
+        event = log.append(event_type, request.to_payload())
+    else:
+        manager = DiceRollManager("typed-rng-control", event_log=log)
+        manager.record_decision(
+            request=request,
+            result=DecisionResult.for_request(
+                result_id="typed-rng-result", request=request, selected_option_id="unit-a"
+            ),
+        )
+        event = log.records[-1]
+    DiceRollManager("typed-rng-control", event_log=log)
+    payload = cast(dict[str, Any], event.payload)
+    if event_type == "decision_requested":
+        payload["options"][1]["option_id"] = payload["options"][0]["option_id"]
+    else:
+        payload["result"]["payload"]["selected_unit_id"] = "mismatched-unit"
+    with monkeypatch.context() as reference:
+        reference.setattr(
+            decision_module,
+            "_rng_payload_history_token",
+            decision_module._unfused_rng_payload_history_token,
+        )
+        with pytest.raises(DecisionError) as previous:
+            DiceRollManager("typed-rng-control", event_log=log)
+    with pytest.raises(type(previous.value)) as current:
+        DiceRollManager("typed-rng-control", event_log=log)
+    assert type(current.value) is type(previous.value)
+    assert str(current.value) == str(previous.value)

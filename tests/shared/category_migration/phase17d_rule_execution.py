@@ -313,6 +313,25 @@ def _psychic_level_session(
         armies=armies,
     ).battlefield_state
     place_attached_components_coherently_for_fixture(state)
+    if attached and state.battlefield_state is not None:
+        # Keep the two 40 mm Characters coherent after the fixture removes Bodyguards.
+        # The Support also starts within 2 inches of the nearest 32 mm Bodyguard.
+        leader_pose = (
+            state.battlefield_state.unit_placement_by_id("army-alpha:leader-unit")
+            .model_placements[0]
+            .pose
+        )
+        state.replace_battlefield_state(
+            _with_unit_pose(
+                state.battlefield_state,
+                unit_instance_id="army-alpha:support-unit",
+                pose=Pose.at(
+                    leader_pose.position.x + 2.0,
+                    leader_pose.position.y,
+                    leader_pose.position.z,
+                ),
+            )
+        )
     state.battle_phase_index = state.battle_phase_sequence.index(start_phase)
     for player_id in state.player_ids:
         state.record_secondary_mission_choice(

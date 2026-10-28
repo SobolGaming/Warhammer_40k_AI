@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from collections import deque
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
@@ -41,6 +42,7 @@ from warhammer40k_core.engine.decision_request import (
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import (
     EventLog,
+    EventLogError,
     EventRecord,
     JsonValue,
     canonical_json,
@@ -139,6 +141,22 @@ def _rng_history_token(event: EventRecord, *, neutral_event_count: int) -> str:
 
 
 def _rng_payload_history_token(payload: JsonValue) -> str:
+    if (
+        isinstance(payload, dict)
+        and payload.get("event_type") == "out_of_phase_shooting_declaration_accepted"
+    ):
+        # This event projects its entire body before dropping attack_sequence_id.
+        return _unfused_rng_payload_history_token(payload)
+    try:
+        normalized = _validated_rng_history_projection(payload)
+    except EventLogError:
+        # Projection historically finished before JSON validation. Re-run that
+        # unchanged path so a later typed LOS failure keeps its original priority.
+        return _unfused_rng_payload_history_token(payload)
+    return json.dumps(normalized, ensure_ascii=True, separators=(",", ":"), sort_keys=True)
+
+
+def _unfused_rng_payload_history_token(payload: JsonValue) -> str:
     normalized = _without_rng_history_neutral_metadata(payload)
     if (
         isinstance(normalized, dict)
@@ -149,6 +167,69 @@ def _rng_payload_history_token(payload: JsonValue) -> str:
             key: item for key, item in body.items() if key != "attack_sequence_id"
         }
     return canonical_json(normalized)
+
+
+def _validated_rng_history_projection(value: JsonValue) -> JsonValue:
+    """Project and validate fresh RNG input without retaining payload identity."""
+    if isinstance(value, dict):
+        if "rng_compatibility_projection" in value:
+            # Keep typed LOS interpretation and its projection on the old path.
+            return validate_json_value(_without_rng_history_neutral_metadata(value))
+        omit_absent_override = value.get("result_override") is None and any(
+            field in value for field in ("component_values", "components", "component_id")
+        )
+        omit_single_die_index = (
+            value.get("component_index") == 0
+            and isinstance(previous := value.get("previous_values"), list)
+            and len(previous) == 1
+        )
+        save_option = value.get("save_kind") in ("armour", "invulnerable") and all(
+            field in value
+            for field in (
+                "characteristic_target_number",
+                "target_number",
+                "armor_penetration",
+                "cover_applied",
+            )
+        )
+        redundant_random_raw = (
+            value.get("value_kind") == "random"
+            and isinstance(evaluation := value.get("evaluation"), dict)
+            and value.get("evaluation_raw") == evaluation.get("raw")
+        )
+        projected: dict[str, JsonValue] = {}
+        for key, item in value.items():
+            if (
+                key in _RNG_HISTORY_NEUTRAL_PAYLOAD_KEYS
+                or (key == "result_override" and omit_absent_override)
+                or (key == "component_index" and omit_single_die_index)
+                or (key == "objective_control_modifier_scope_id" and item is None)
+                or (key == "modifier_trace" and item is None)
+                or (key == "evaluation_raw" and redundant_random_raw)
+                or (key == "desperate_escape_roll_modifiers" and item == [])
+                or (
+                    save_option
+                    and (
+                        key == "inherent_roll_modifiers"
+                        or (
+                            key in ("characteristic_trace", "armor_penetration_trace")
+                            and item is None
+                        )
+                        or (key in ("roll_modifiers", "ignored_roll_modifier_ids") and item == [])
+                    )
+                )
+            ):
+                continue
+            if not isinstance(key, str):
+                raise EventLogError("JSON payload dictionary keys must be strings.")
+            validate_json_value(key)
+            projected[key] = _validated_rng_history_projection(item)
+        return projected
+    if isinstance(value, list):
+        return [_validated_rng_history_projection(item) for item in value]
+    # Tuples were not projected by the old normalizer. Keep ordinary JSON
+    # validation/conversion for them, including any dictionaries inside them.
+    return validate_json_value(value)
 
 
 def _without_rng_history_neutral_metadata(value: JsonValue) -> JsonValue:
