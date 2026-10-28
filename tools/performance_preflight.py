@@ -669,10 +669,23 @@ def ci60_admission_bindings() -> tuple[object, ...]:
     import ast
 
     from tools import performance_ci60_qualification as q
+    from tools import performance_ci69_members as ci69
     from tools import performance_history_snapshot as history
     from tools import performance_policy as policy
     from tools import performance_preflight_successor as successor
 
+    if (
+        q.ci69 is not ci69
+        or q.ast is not ast
+        or q.json is not json
+        or q.hashlib is not hashlib
+        or ci69.ast is not ast
+        or ci69.json is not json
+        or ci69.hashlib is not hashlib
+        or policy.ast is not ast
+        or policy.hashlib is not hashlib
+    ):
+        raise ValueError("Admission transaction pure module alias changed.")
     owner = policy.owner_hashes
     if not isinstance(owner, FunctionType) or "__wrapped__" not in vars(owner):
         raise ValueError("Admission transaction owner dependency changed.")
@@ -694,6 +707,8 @@ def ci60_admission_bindings() -> tuple[object, ...]:
                 "history",
             )
         ),
+        ci69.validate_cutover,
+        ci69.expected_observed,
         owner,
         vars(owner)["__wrapped__"],
         policy.digest,
@@ -743,6 +758,13 @@ def ci60_admission_bindings() -> tuple[object, ...]:
         q.TRANSACTION_TEST,
         q.TRANSACTION_SHARDS,
         q.PRELUDE_OBSERVED,
+        ci69.CONTROL_MEMBERS,
+        ci69.INPUT_ADDITIONS,
+        ci69.OBSERVED_ADDITIONS,
+        ci69.CUTOVER_PATH,
+        ci69.CUTOVER_NEW,
+        ci69.CUTOVER_ADDED_INPUTS,
+        ci69.RUNTIME_SUCCESSORS,
     )
     if any(
         type(value) not in (str, type(None), frozenset)
@@ -767,6 +789,12 @@ def ci60_admission_bindings() -> tuple[object, ...]:
         hashlib.sha1,
         ast.parse,
         ast.dump,
+        ast.iter_fields,
+        ast.walk,
+        ast.iter_child_nodes,
+        ast.AST,
+        ast.Call,
+        ast.Attribute,
         ast.iter_fields,
         ast.FunctionDef,
         ast.AsyncFunctionDef,
@@ -806,6 +834,7 @@ def _ci60_computation_bindings(
     import ast
 
     from tools import performance_ci60_qualification as q
+    from tools import performance_ci69_members as ci69
     from tools import performance_policy as policy
 
     selected = tuple(
@@ -826,12 +855,24 @@ def _ci60_computation_bindings(
                 "digest",
             )
         ),
+        ci69.validate_cutover,
+        ci69.expected_observed,
         policy.digest,
         raw_owner,
     )
     if any(not isinstance(function, FunctionType) or function.__closure__ for function in pure):
         raise ValueError("CI60 computation pure closure changed.")
-    dependencies = (json.loads, json.dumps, hashlib.sha256, ast.parse, ast.dump, ast.iter_fields)
+    dependencies = (
+        json.loads,
+        json.dumps,
+        hashlib.sha256,
+        hashlib.sha1,
+        ast.parse,
+        ast.dump,
+        ast.iter_fields,
+        ast.walk,
+        ast.iter_child_nodes,
+    )
     if any(
         not isinstance(value, (FunctionType, BuiltinFunctionType))
         or (isinstance(value, FunctionType) and value.__closure__)

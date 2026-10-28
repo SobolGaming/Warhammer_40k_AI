@@ -203,7 +203,8 @@ PRELUDE_NEW = frozenset(
         ),
     }
 )
-PRELUDE_MEMBERS = PRELUDE_CONTROLS | PRELUDE_NEW
+PRELUDE_NEW |= ci69.CUTOVER_NEW
+PRELUDE_MEMBERS = PRELUDE_CONTROLS | PRELUDE_NEW | ci69.RUNTIME_SUCCESSORS
 PRELUDE_INPUTS = (
     frozenset(
         {
@@ -259,23 +260,8 @@ def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
         set(names) != PRELUDE_MEMBERS
         or len(names) != len(PRELUDE_MEMBERS)
         or set(frozen) != PRELUDE_MEMBERS
-        or set(previous) != PRELUDE_CONTROLS
-        or PRELUDE_NEW
-        | TRANSACTION_SHARDS
-        | {
-            "tests/code_quality/test_thousand_sons_perils_preservation.py",
-            "ci/quality_shards/shard-2-modules.txt",
-            "ci/quality_shards/shard-3-modules.txt",
-            "ci/quality_shards/shard-4-modules.txt",
-            "ci/quality_shards/shard-4.txt",
-            "tests/code_quality/test_d07_geometry_containment.py",
-            "tests/code_quality/test_performance_category_migration.py",
-            "tests/code_quality/test_performance_static_successor.py",
-            "tests/code_quality/test_quality_runtime.py",
-            "tests/d07_geometry_containment.py",
-            "tools/performance_preflight_successor.py",
-        }
-        != PRELUDE_OBSERVED
+        or set(previous) != PRELUDE_CONTROLS | ci69.RUNTIME_SUCCESSORS
+        or PRELUDE_NEW | TRANSACTION_SHARDS | ci69.expected_observed() != PRELUDE_OBSERVED
         or set(extra) != PRELUDE_OBSERVED
         or json.loads(frozen[PRELUDE_NAMESPACE + "/changed-members.json"]) != sorted(names)
     ):
@@ -285,7 +271,7 @@ def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
         record.keys() != {"schema", "base", "changes"}
         or record["schema"] != "ci64-exact-provenance-v1"
         or record["base"] != PRELUDE_BASE
-        or record["changes"].keys() != PRELUDE_CONTROLS - {ASSESSMENT}
+        or record["changes"].keys() != (PRELUDE_CONTROLS | ci69.RUNTIME_SUCCESSORS) - {ASSESSMENT}
     ):
         raise ValueError("CI64 exact transition membership changed.")
     for name, row in record["changes"].items():
@@ -328,6 +314,7 @@ def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
     for name, raw in observations:
         if name in expected and raw != expected[name]:
             raise ValueError("CI64 Preflight source changed between observations: " + name)
+    ci69.validate_cutover(operands)
     old_map, new_map = json.loads(previous[MAP]), json.loads(frozen[MAP])
     if {key: value for key, value in old_map.items() if key != "operations"} != {
         key: value for key, value in new_map.items() if key != "operations"
@@ -498,6 +485,7 @@ def _transaction_inputs_match(previous: dict[str, str], produced: dict[str, str]
         "tests/data/d07_geometry_containment_v3.json",
         "tools/performance_ci69_members.py",
     }
+    additions |= ci69.CUTOVER_ADDED_INPUTS
     return additions.isdisjoint(previous) and produced.keys() == previous.keys() | additions
 
 
@@ -541,7 +529,9 @@ def _derivation_source(
         )
     )
     next_frozen = read_frozen_blobs(root, next_freeze, next_names)
-    next_previous = read_frozen_blobs(root, PRELUDE_BASE, sorted(PRELUDE_CONTROLS))
+    next_previous = read_frozen_blobs(
+        root, PRELUDE_BASE, sorted(PRELUDE_CONTROLS | ci69.RUNTIME_SUCCESSORS)
+    )
     extra_names = [name for name in next_frozen if name in PRELUDE_OBSERVED]
     extra = source_members(root, extra_names)
     operands = (
@@ -608,6 +598,8 @@ def _derivation_source(
             owner_hashes,
             _prelude_transition,
             _derivation_transition,
+            *(ci69.validate_cutover, ci69.expected_observed),
+            *(hashlib.sha1, ast.parse, ast.dump, ast.walk),
         ),
         repository=root,
     )
@@ -772,10 +764,12 @@ def admission_transaction(root: Path) -> AbstractContextManager[None]:
     return ci60_transaction(root, fresh_admission, ci60_admission_bindings)
 
 
-def control_projection(root: Path) -> dict[str, bytes]:
+def control_projection(root: Path, workflow: bytes | None = None) -> dict[str, bytes]:
     from tools.performance_preflight_successor import read_frozen_blobs
 
-    admitted(root)
+    actual = admitted(root)
+    if workflow is not None and actual[".github/workflows/ci.yml"] != workflow:
+        raise ValueError("CI64 Preflight source changed: .github/workflows/ci.yml")
     return (
         read_frozen_blobs(root, PRELUDE_BASE, sorted(PRELUDE_CONTROLS - {SELF}))
         | read_frozen_blobs(root, BASE, sorted(CONTROLS))
@@ -791,7 +785,9 @@ def preceding_control(root: Path, name: str, supplied: bytes) -> bytes:
             actual = owned(root, name)
             if supplied != actual:
                 raise ValueError("CI61 predecessor caller supplied unrelated bytes.")
-            return control_projection(root)[name]
+            return control_projection(
+                root, supplied if name == ".github/workflows/ci.yml" else None
+            )[name]
         return supplied
     actual = owned(root, name)
     if supplied != actual:
@@ -1122,7 +1118,12 @@ def extend_catalog(builder: Any) -> None:
         )
     )
     builder.add("plain60", prelude, dict.fromkeys(changed), "ci64.freeze")
-    builder.add("plain60", PRELUDE_BASE, dict.fromkeys(PRELUDE_CONTROLS), "ci64.preimages")
+    builder.add(
+        "plain60",
+        PRELUDE_BASE,
+        dict.fromkeys(PRELUDE_CONTROLS | ci69.RUNTIME_SUCCESSORS),
+        "ci64.preimages",
+    )
     earlier = set(builder.all_paths("plain60", BASE)) & set(changed)
     builder.add("plain60", BASE, dict.fromkeys(earlier), "ci64.source-preimages")
 

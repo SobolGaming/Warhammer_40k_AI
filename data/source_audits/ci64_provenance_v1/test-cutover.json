@@ -1039,10 +1039,10 @@
       "sha256": "2c199077d997c58e9344b86cf7baab8de7c8e7cf9ee82ed8f1abf6a2f54756d4"
     },
     "tests/rules/section04/test_completion_boundaries.py": {
-      "blob_sha1": "edb77da4bf07a63461976a7344391e8693d52acb",
-      "bytes": 44700,
+      "blob_sha1": "a710cd53c17154e3e3c04973bf916ce9ddec9530",
+      "bytes": 45889,
       "mode": "100644",
-      "sha256": "978f08bde5c6e306e9cd61ed576c9873f76a705946c3b064b38975a6ae32f1fc"
+      "sha256": "d4a653d9d7ead869a30e599dbf984234655ed9c634e3854cab267e8c9cd9de0f"
     },
     "tests/rules/section04/test_coverage_map.py": {
       "blob_sha1": "2f75964963650ff473fcc9111651d6d9745437f4",

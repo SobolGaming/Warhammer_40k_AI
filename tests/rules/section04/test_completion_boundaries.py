@@ -799,18 +799,14 @@ def test_shared_group_pending_damage_valid_save_fork_continue_and_replay() -> No
 
 @pytest.mark.parametrize("model_choice", [False, True])
 def test_native_shooting_owner_waits_for_attack_mortal_choices(
-    section04_definitions: Section02Definitions,
-    section04_mission: MissionSetup,
     model_choice: bool,
 ) -> None:
     """Native declaration and fixed-dice executor kernel, not a full-game replay."""
     import copy
     import json
 
-    from tests.support.section02_fixtures import INFRACTORS
-    from tests.support.section03_fixtures import grid, native_state
+    from tests.phase13b_shooting_declaration_helpers import _canonical_catalog, shooting_lifecycle
     from tests.support.section04_fixtures import shooting_payload
-    from tests.support.section24_fixtures import profile_grant, with_profile
     from warhammer40k_core.core.weapon_profiles import (
         AbilityDescriptor,
         AttackProfile,
@@ -830,56 +826,89 @@ def test_native_shooting_owner_waits_for_attack_mortal_choices(
     from warhammer40k_core.engine.mortal_wound_model_allocation import (
         mortal_wound_resolution_progress,
     )
-    from warhammer40k_core.rules.mission_pack_import import (
-        warhammer_event_companion_2026_07_mission_pack,
-    )
 
-    mission = MissionSetup.from_mission_pack(
-        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
-        mission_pool_entry_id="mission-disruption-vs-reconnaissance-layout-2",
-        terrain_layout_id="disruption-vs-reconnaissance-layout-2",
-        attacker_player_id="owner",
-        defender_player_id="opponent",
-        attacker_force_disposition_id="disruption",
-        defender_force_disposition_id="reconnaissance",
-    )
-    assert mission.mission_pool_entry_id == section04_mission.mission_pool_entry_id
-
-    # Explicit Core ability/characteristic inputs on one physically equipped weapon.
-    profile = replace(
-        profile_grant(
-            section04_definitions.weapon(f"{LORD_EXULTANT}:bolt-pistol"),
-            WeaponKeyword.DEVASTATING_WOUNDS,
-            AbilityDescriptor.devastating_wounds(),
+    # The retained setup owner starts one config and musters both armies from
+    # that same catalog. Explicit Core weapon inputs are installed before start.
+    canonical = _canonical_catalog()
+    catalog = replace(
+        canonical,
+        wargear=tuple(
+            replace(
+                wargear,
+                weapon_profiles=tuple(
+                    replace(
+                        profile,
+                        attack_profile=AttackProfile.fixed(1),
+                        damage_profile=DamageProfile.fixed(1),
+                        keywords=(WeaponKeyword.DEVASTATING_WOUNDS,),
+                        abilities=(AbilityDescriptor.devastating_wounds(),),
+                    )
+                    for profile in wargear.weapon_profiles
+                ),
+            )
+            if wargear.wargear_id == "core-bolt-rifle"
+            else wargear
+            for wargear in canonical.wargear
         ),
-        attack_profile=AttackProfile.fixed(1),
-        damage_profile=DamageProfile.fixed(1),
+        datasheets=tuple(
+            replace(
+                sheet,
+                wargear_options=tuple(
+                    replace(
+                        option,
+                        default_wargear_ids=(*option.default_wargear_ids, "core-bolt-rifle"),
+                        allowed_wargear_ids=(*option.allowed_wargear_ids, "core-bolt-rifle"),
+                        min_selections=option.min_selections + 1,
+                        max_selections=option.max_selections + 1,
+                    )
+                    for option in sheet.wargear_options
+                ),
+            )
+            if sheet.datasheet_id == "core-character-leader"
+            else sheet
+            for sheet in canonical.datasheets
+        ),
     )
-    definitions = with_profile(section04_definitions, profile)
-    attacker = definitions.unit(LORD_EXULTANT)
-    target = definitions.unit(
-        INFRACTORS if model_choice else LORD_EXULTANT, army_id="enemy", identity="target"
+    profile = next(
+        weapon.weapon_profiles[0]
+        for weapon in catalog.wargear
+        if weapon.wargear_id == "core-bolt-rifle"
     )
-    state = native_state(
-        definitions, attacker, grid(attacker, 10, 2), enemy=target, enemy_poses=grid(target, 18, 2)
+    leader = ("core-character-leader", "core-character-leader", 1)
+    lifecycle, units = shooting_lifecycle(
+        alpha_unit_ids=("attacker", "spare"),
+        alpha_datasheets={"attacker": leader},
+        enemy_datasheet=("core-intercessor-like-infantry", "core-intercessor-like", 5)
+        if model_choice
+        else leader,
+        catalog=catalog,
+        game_id="s04-native-mortal-owner-" + str(model_choice),
     )
-    assert state.battlefield_state is not None
-    state.replace_battlefield_state(
-        replace(
-            state.battlefield_state,
-            battlefield_width_inches=mission.battlefield_width_inches,
-            battlefield_depth_inches=mission.battlefield_depth_inches,
-            terrain_features=mission.terrain_features,
-        )
-    )
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    attacker, target = units["attacker"], units["enemy"]
+    state = lifecycle.state
+    assert state is not None
+    assert lifecycle.config.army_catalog == catalog
+    assert state.ruleset_descriptor_hash == lifecycle.config.ruleset_descriptor.descriptor_hash
+    assert state.mission_setup == lifecycle.config.mission_setup
     for model in target.own_models:
         state.record_model_feel_no_pain_sources(
             model_instance_id=model.model_instance_id,
             sources=(FeelNoPainSource(source_id="constructed:s04:optional-fnp", threshold=5),),
             decline_allowed=True,
         )
-    session = combat_session(definitions, state, mission)
+    # Admit the complete setup through the ordinary restore owner before any
+    # declaration or attack. Its audited checkpoint must be stable in full.
+    lifecycle = GameLifecycle.from_payload(lifecycle.to_payload())
+    constructed = lifecycle.to_payload()
+    constructed_copy = copy.deepcopy(constructed)
+    assert GameLifecycle.from_payload(constructed).to_payload() == constructed_copy
+    assert constructed == constructed_copy
+    session = LocalGameSession(lifecycle)
+    session.advance_until_decision_or_terminal()
+    if pending(session).decision_type == "start_mission_action":
+        choose(session, pending(session), "continue_to_shooting")
+    state = lifecycle.state
+    assert state is not None
     declaration = shooting_request(session, attacker.unit_instance_id)
     rows = [
         row for row in weapon_rows(declaration) if row["weapon_profile_id"] == profile.profile_id
@@ -988,7 +1017,7 @@ def test_native_shooting_owner_waits_for_attack_mortal_choices(
         event_records=decisions.event_log.records,
         model_instance_id=pool.attacker_model_instance_id,
         battle_round=state.battle_round,
-        active_player_id="owner",
+        active_player_id=sequence.attacker_player_id,
         phase="shooting",
     )
     paused = lifecycle.to_payload()

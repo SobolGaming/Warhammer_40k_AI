@@ -412,7 +412,46 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
     from concurrent.futures import ThreadPoolExecutor
 
     from tools import performance_ci60_qualification as ci60
+    from tools import performance_ci69_members as ci69
     from tools import performance_history_snapshot as history
+    from tools import performance_policy as policy
+
+    original_bindings = preflight.ci60_admission_bindings()
+    for module, attribute in (
+        (ci60, "ci69"),
+        (ci60, "ast"),
+        (ci60, "json"),
+        (ci60, "hashlib"),
+        (ci69, "ast"),
+        (ci69, "json"),
+        (ci69, "hashlib"),
+        (policy, "ast"),
+        (policy, "hashlib"),
+    ):
+        with monkeypatch.context() as aliases:
+            aliases.setattr(module, attribute, object())
+            with pytest.raises(ValueError, match="module alias"):
+                preflight.ci60_admission_bindings()
+        assert preflight.ci60_admission_bindings() == original_bindings
+    for attribute in (
+        "CONTROL_MEMBERS",
+        "INPUT_ADDITIONS",
+        "OBSERVED_ADDITIONS",
+        "CUTOVER_PATH",
+        "RUNTIME_SUCCESSORS",
+        "CUTOVER_NEW",
+        "CUTOVER_ADDED_INPUTS",
+    ):
+        original_selector = vars(ci69)[attribute]
+        changed_selector = (
+            original_selector | {"unexpected"}
+            if isinstance(original_selector, frozenset)
+            else original_selector + "-unexpected"
+        )
+        with monkeypatch.context() as aliases:
+            aliases.setattr(ci69, attribute, changed_selector)
+            assert preflight.ci60_admission_bindings() != original_bindings
+        assert preflight.ci60_admission_bindings() == original_bindings
 
     root = Path(__file__).resolve().parents[2]
     copied: list[contextvars.Context] = []
@@ -479,6 +518,48 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
             assert live_head_checks[head_start:] == first_head_checks
             assert observations[start:] == first_observations
             assert computations == ["transition", "original"]
+            cutover_rows = {
+                "tests/rules/section04/test_completion_boundaries.py",
+                "tests/rules/rules24/unit/test_shadow_form_lookup.py",
+                "tests/rules/section05/test_rule_effect_retention.py",
+                "tests/rules/section11/test_required_target_protocol.py",
+                "tests/unit/test_phase13b_shooting_declarations.py",
+                "tests/unit/test_phase15c_fight_order.py",
+            }
+            cutover_operands = (
+                *(("next-frozen/" + name, 0, raw) for name, raw in second.items()),
+                *(
+                    ("next-current/" + name, (root / name).stat().st_mode, second[name])
+                    for name in sorted(cutover_rows)
+                ),
+            )
+            cutover_calls: list[str] = []
+
+            def validate_cutover(operands: AdmissionOperands, _identity: tuple[str, ...]) -> None:
+                cutover_calls.append("native")
+                ci69.validate_cutover(operands)
+
+            preflight.admission_proof(validate_cutover, cutover_operands, identity, ())
+            preflight.admission_proof(validate_cutover, cutover_operands, identity, ())
+            assert cutover_calls == ["native"]
+            changed_record = ci69.json.loads(second[ci69.CUTOVER_PATH])
+            changed_record["coverage"]["current_floor"] = 49
+            changed_operands = tuple(
+                (
+                    name,
+                    mode,
+                    ci69.json.dumps(changed_record).encode()
+                    if name == "next-frozen/" + ci69.CUTOVER_PATH
+                    else raw,
+                )
+                for name, mode, raw in cutover_operands
+            )
+            assert changed_operands != cutover_operands
+            with pytest.raises(ValueError, match="coverage policy"):
+                preflight.admission_proof(validate_cutover, changed_operands, identity, ())
+            assert cutover_calls == ["native", "native"]
+            preflight.admission_proof(validate_cutover, cutover_operands, identity, ())
+            assert cutover_calls == ["native", "native"]
             latest_names = (
                 ci60.history(
                     root, "diff", "--name-only", ci60.PRELUDE_BASE, str(ci60.PRELUDE_FREEZE)
@@ -486,6 +567,49 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
                 .decode()
                 .splitlines()
             )
+            cutover_observed = {
+                ".github/pull_request_template.md",
+                ".github/workflows/ci.yml",
+                "AGENTS.md",
+                "README.md",
+                "data/source_audits/ci64_provenance_v1/test-cutover.json",
+                "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md",
+                "pyproject.toml",
+                "scripts/build_test_shards.py",
+                "src/warhammer40k_core/_engine_build_manifest.json",
+                "src/warhammer40k_core/engine/model_attack_completion.py",
+                "src/warhammer40k_core/engine/phases/shooting_decisions.py",
+                "src/warhammer40k_core/engine/phases/shooting_handler.py",
+                "src/warhammer40k_core/engine/phases/shooting_model.py",
+                "src/warhammer40k_core/engine/retained_destruction_dispatch.py",
+                "src/warhammer40k_core/engine/retained_shooting.py",
+                "src/warhammer40k_core/engine/shooting_target_replacement.py",
+                "src/warhammer40k_core/engine/target_replacement_dispatch.py",
+                "tests/code_quality/test_ci_performance_gates.py",
+                "tests/conftest.py",
+                "tests/emergency_geometry_helpers.py",
+                "tests/order101_failed_setup_helpers.py",
+                "tests/phase13b_shooting_declaration_helpers.py",
+                "tests/rules/rules24/unit/test_shadow_form_lookup.py",
+                "tests/rules/section04/test_completion_boundaries.py",
+                "tests/rules/section05/test_rule_effect_retention.py",
+                "tests/rules/section11/test_required_target_protocol.py",
+                "tests/support/section05_rule_effect_retention.py",
+                "tests/unit/test_phase13b_shooting_declarations.py",
+                "tests/unit/test_phase15c_fight_order.py",
+            }
+            assert len(cutover_observed) == 29
+            assert len(first_observations[4]) == 62
+            assert sum(map(len, first_observations)) == 198
+            assert all(first_observations[4].count(name) == 1 for name in cutover_observed)
+            assert first_observations[4] == tuple(
+                name for name in latest_names if name in ci60.PRELUDE_OBSERVED
+            )
+            first_observations = [
+                *first_observations[:4],
+                tuple(name for name in first_observations[4] if name not in cutover_observed),
+            ]
+            latest_names = [name for name in latest_names if name not in cutover_observed]
             perils_guard = "tests/code_quality/test_thousand_sons_perils_preservation.py"
             assert len(first_observations[4]) == 33
             assert sum(map(len, first_observations)) == 169
