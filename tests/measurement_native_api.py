@@ -16,7 +16,7 @@ from inspect import Parameter, signature
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
-from warhammer40k_core.engine.phases.shooting_model import ShootingPhaseState
+from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.attack_sequence import AttackSequence
