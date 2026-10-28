@@ -297,6 +297,35 @@ def test_source_backed_conditional_charge_selects_pair_and_round_trips_required_
         selected_enemy_id
     ]
 
+    before_invalid = restored.to_payload()
+    restored_state = _state(restored)
+    assert restored_state.battlefield_state is not None
+    placement = restored_state.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
+    invalid_witness = _submit_charge_move_proposal(
+        restored,
+        request=proposal_request,
+        result_id="phase15a-source-backed-conditional-charge-no-move-witness",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal.request_id,
+            proposal_kind=proposal.proposal_kind,
+            unit_instance_id=proposal.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(),
+            witness=PathWitness.for_paths(
+                tuple(
+                    (model.model_instance_id, (model.pose, model.pose))
+                    for model in placement.model_placements
+                )
+            ),
+        ),
+    )
+    assert invalid_witness.status_kind is LifecycleStatusKind.INVALID
+    assert _first_proposal_validation_violation(invalid_witness)["violation_code"] == (
+        "no_move_witness_forbidden"
+    )
+    assert restored.to_payload() == before_invalid
+
     invalid = _submit_charge_move_proposal(
         restored,
         request=proposal_request,

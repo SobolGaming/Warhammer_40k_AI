@@ -15,6 +15,9 @@ from tests.phase13b_shooting_declaration_helpers import (
 from tests.phase15c_fight_order_helpers import fight_lifecycle
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.weapon_profiles import AttackProfile, WeaponKeyword, WeaponProfile
+from warhammer40k_core.engine.charge_required_targets import (
+    CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
+)
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -191,8 +194,30 @@ def submit_fixture_request(session: LocalGameSession, request: DecisionRequest) 
         )
     elif request.decision_type == "submit_melee_declaration":
         melee = MeleeDeclarationProposalRequest.from_decision_request(request)
-        weapon = cast(dict[str, JsonValue], melee.available_weapons[0])
-        targets = cast(list[str], weapon["engaged_target_unit_instance_ids"])
+        declarations: list[JsonValue] = []
+        primary_model_ids: set[str] = set()
+        selected_weapon_ids: set[str] = set()
+        for row in melee.available_weapons:
+            weapon = cast(dict[str, JsonValue], row)
+            model_id = cast(str, weapon["model_instance_id"])
+            weapon_id = cast(str, weapon["weapon_instance_id"])
+            targets = cast(list[str], weapon["engaged_target_unit_instance_ids"])
+            if not targets or weapon_id in selected_weapon_ids:
+                continue
+            if weapon["is_extra_attacks"] is not True:
+                if model_id in primary_model_ids:
+                    continue
+                primary_model_ids.add(model_id)
+            selected_weapon_ids.add(weapon_id)
+            declarations.append(
+                {
+                    "attacker_model_instance_id": model_id,
+                    "weapon_instance_id": weapon_id,
+                    "wargear_id": weapon["wargear_id"],
+                    "weapon_profile_id": weapon["weapon_profile_id"],
+                    "target_allocations": [{"target_unit_instance_id": targets[0]}],
+                }
+            )
         status = session.submit_parameterized_payload(
             request_id=request.request_id,
             result_id=result_id,
@@ -204,15 +229,7 @@ def submit_fixture_request(session: LocalGameSession, request: DecisionRequest) 
                 "unit_instance_id": melee.unit_instance_id,
                 "source_decision_request_id": melee.source_decision_request_id,
                 "source_decision_result_id": melee.source_decision_result_id,
-                "declarations": [
-                    {
-                        "attacker_model_instance_id": weapon["model_instance_id"],
-                        "weapon_instance_id": weapon["weapon_instance_id"],
-                        "wargear_id": weapon["wargear_id"],
-                        "weapon_profile_id": weapon["weapon_profile_id"],
-                        "target_allocations": [{"target_unit_instance_id": targets[0]}],
-                    }
-                ],
+                "declarations": declarations,
             },
         )
     elif request.decision_type == "submit_movement_proposal":
@@ -227,7 +244,12 @@ def submit_fixture_request(session: LocalGameSession, request: DecisionRequest) 
         }
         # This drainer declines optional Fight movement with empty target selections.
         # "No move" is derived from those selections, not from movement_mode.
-        if move.proposal_kind not in {ProposalKind.PILE_IN, ProposalKind.CONSOLIDATE}:
+        if move.proposal_kind is ProposalKind.CHARGE_MOVE:
+            assert not context.get(CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY), request
+            movement_payload["charge_target_unit_instance_ids"] = []
+        elif move.proposal_kind not in {ProposalKind.PILE_IN, ProposalKind.CONSOLIDATE}:
+            if move.proposal_kind is ProposalKind.FALL_BACK:
+                movement_payload["fall_back_mode"] = context["fall_back_mode"]
             state = session.lifecycle.state
             assert state is not None
             assert state.battlefield_state is not None
