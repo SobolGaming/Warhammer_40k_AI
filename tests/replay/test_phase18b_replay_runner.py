@@ -883,6 +883,7 @@ def test_replay_v6_rejects_attributed_destruction_relabelled_as_coherency_cleanu
     cleanup_states.append(
         {
             "cleanup_id": cleanup_id,
+            "completes_boundary": True,
             "game_id": state_payload["game_id"],
             "battle_round": 1,
             "active_player_id": "player-a",

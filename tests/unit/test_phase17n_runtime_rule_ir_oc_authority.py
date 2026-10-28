@@ -1062,8 +1062,14 @@ def test_order79_turn_snapshot_respects_phase_and_turn_effect_expiration(
     marker = center_marker_definition(state)
     unit = state.army_definitions[0].units[0]
     placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    assert len(placement.model_placements) == 5
+    # Only the first model contributes; the other four remain outside the marker's range.
     state.battlefield_state = state.battlefield_state.with_unit_placement(
-        with_model_offsets(placement, marker, offsets=((0.0, 0.0),))
+        with_model_offsets(
+            placement,
+            marker,
+            offsets=((3.0, 0.0), (4.6, 0.0), (6.2, 0.0), (4.6, 1.6), (6.2, 1.6)),
+        )
     )
     clause = rule_ir.clauses[0]
     assert clause.duration is not None

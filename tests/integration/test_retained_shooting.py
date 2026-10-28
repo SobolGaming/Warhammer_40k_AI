@@ -142,9 +142,9 @@ def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_
         catalog=for_the_chapter_catalog(hazardous=True),
         # Additional native keyword facts participate in recorded RNG history.
         # Keep real own-Hazardous destruction, including the optional FNP branch.
-        game_id="order117-own-hazard-continuation-4:d07:123"
+        game_id="order117-own-hazard-continuation-4:d07:123:ci77-premise:01"
         if with_feel_no_pain
-        else "order123-own-hazard-keyword-identity-0:d07:501",
+        else "order123-own-hazard-keyword-identity-0:d07:501:ci77-premise:07",
         enemy_model_count=5,
     )
     state = lifecycle.state

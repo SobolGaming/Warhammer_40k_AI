@@ -3291,7 +3291,7 @@ def test_primary_destruction_capture_does_not_complete_attached_unit_for_bodygua
     )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
-    state = _battle_state_from_config(config)
+    state = _battle_state_from_config(config, coherent_attached_units=True)
     lifecycle.state = state
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     seed_completed_fight_phase(state)
@@ -8010,6 +8010,7 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
     lifecycle.state = _battle_state_from_config(
         config,
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+        coherent_attached_units=True,
         decisions=lifecycle.decision_controller,
     )
     state = lifecycle.state
@@ -8021,7 +8022,6 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
     independent_id = "army-alpha:intercessor-unit-2"
     enemy_id = "army-beta:intercessor-unit-3"
     for unit_id, x_inches, y_inches in (
-        (leader_id, 20.0, 20.0),
         (independent_id, 20.0, 30.0),
         (enemy_id, 27.0, 25.0),
     ):
@@ -8030,6 +8030,24 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
             unit_instance_id=unit_id,
             x_inches=x_inches,
             y_inches=y_inches,
+        )
+    _place_unit_near_objective(state, unit_instance_id=bodyguard_id, target_suffix="center")
+    assert state.mission_setup is not None
+    marker = next(
+        marker
+        for marker in state.mission_setup.objective_markers
+        if _objective_marker_matches_suffix(marker.objective_marker_id, "center")
+    )
+    component_offsets = [(leader_id, (4.4, 1.6))]
+    if with_support:
+        component_offsets.append(("army-alpha:support-unit", (6.0, 1.6)))
+    # Keep both characters outside the objective and coherent after bodyguard loss.
+    for component_id, offset in component_offsets:
+        placement = state.battlefield_state.unit_placement_by_id(component_id)
+        state.replace_battlefield_state(
+            state.battlefield_state.with_unit_placement(
+                _with_model_offsets(placement, marker, offsets=(offset,))
+            )
         )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     action = _start_mission_action_via_lifecycle(

@@ -41,7 +41,11 @@ def _reach(*, generated: bool = False) -> tuple[LocalGameSession, DecisionReques
             return session, request
         status = session.submit_option(
             request_id=request.request_id,
-            result_id=f"override:preceding:{index}",
+            result_id=(
+                "override:preceding:0:ci77-premise:01"
+                if generated and index == 0
+                else f"override:preceding:{index}"
+            ),
             option_id="use" if generated and index == 0 else "decline",
         )
         assert status.status_kind is not LifecycleStatusKind.INVALID, status

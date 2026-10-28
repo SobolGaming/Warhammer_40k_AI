@@ -414,6 +414,12 @@ def test_reconnaissance_sweep_scores_exclusive_quarters_through_lifecycle() -> N
             defender_force_disposition_id="take-and-hold",
         ),
     )
+    assert state.battlefield_state is not None
+    leader = state.battlefield_state.unit_placement_by_id("army-alpha:leader")
+    assert len(leader.model_placements) == 1
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        leader.with_model_placements((leader.model_placements[0].with_pose(Pose.at(10.3, 50.9)),))
+    )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
 
     state.advance_to_next_battle_phase()

@@ -426,12 +426,18 @@ def test_firing_deck_preserves_attached_ability_ownership() -> None:
     from warhammer40k_core.engine.phases.shooting_firing_deck import _available_firing_deck_weapons
     from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierContext
 
-    config, state, _ = ability_presence_fixture(
+    config, state, decisions = ability_presence_fixture(
         ability_text=(
             "While this model is leading a unit, ranged weapons equipped by models in that unit "
             "have the [LETHAL HITS] ability."
         )
     )
+    assert state.current_battle_phase is BattlePhase.COMMAND
+    assert state.active_player_id == "player-a"
+    state.advance_to_next_battle_phase(decisions=decisions, event_log=decisions.event_log)
+    state.advance_to_next_battle_phase(decisions=decisions, event_log=decisions.event_log)
+    assert state.current_battle_phase is BattlePhase.SHOOTING
+    assert state.active_player_id == "player-a"
     transport = next(
         unit
         for unit in state.army_definitions[0].units
