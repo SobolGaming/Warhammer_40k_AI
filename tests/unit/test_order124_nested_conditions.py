@@ -116,7 +116,13 @@ def _assert_roundtrips(session: LocalGameSession) -> tuple[LocalGameSession, Loc
 def test_real_nested_upgrade_survives_pending_and_completed_continuations(
     attached: bool, use_reroll: bool
 ) -> None:
-    session = nested_session(attached=attached)
+    # Preserve the original natural roll-four premise under the current descriptor.
+    game_id = (
+        "order124-nested:current-rules-20261028:1:02"
+        if attached
+        else "order124-nested:current-rules-20261028:0:00"
+    )
+    session = nested_session(attached=attached, game_id=game_id)
     state = session.lifecycle.state
     assert state is not None
     records = state.objective_control_records
