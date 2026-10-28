@@ -486,6 +486,19 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
                 .decode()
                 .splitlines()
             )
+            perils_guard = "tests/code_quality/test_thousand_sons_perils_preservation.py"
+            assert len(first_observations[4]) == 33
+            assert sum(map(len, first_observations)) == 169
+            assert first_observations[4].count(perils_guard) == 1
+            assert first[perils_guard] == (root / perils_guard).read_bytes()
+            assert first_observations[4] == tuple(
+                name for name in latest_names if name in ci60.PRELUDE_OBSERVED
+            )
+            first_observations = [
+                *first_observations[:4],
+                tuple(name for name in first_observations[4] if name != perils_guard),
+            ]
+            latest_names = [name for name in latest_names if name != perils_guard]
             static_test = "tests/code_quality/test_performance_static_successor.py"
             assert len(first_observations) == 5
             assert len(first_observations[4]) == 32

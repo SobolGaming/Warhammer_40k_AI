@@ -422,6 +422,8 @@ def test_order97_fall_back_uses_model_movement_characteristic(distance: float) -
 def test_order97_extra_fight_distance_preserves_target_range(target_gap: float) -> None:
     from tests.phase15c_fight_order_helpers import fight_lifecycle
 
+    from warhammer40k_core.core.army_catalog import ArmyCatalog
+    from warhammer40k_core.core.datasheet import BaseSizeDefinition
     from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
     from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
     from warhammer40k_core.engine.fight_activation_abilities import (
@@ -433,7 +435,25 @@ def test_order97_extra_fight_distance_preserves_target_range(target_gap: float) 
     )
     from warhammer40k_core.engine.movement_proposals import ProposalKind
 
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    # Half-inch radii make the five-inch boundary exact in the stored coordinates.
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            replace(
+                sheet,
+                model_profiles=tuple(
+                    replace(profile, base_size=BaseSizeDefinition.circular(25.4))
+                    for profile in sheet.model_profiles
+                ),
+            )
+            if sheet.datasheet_id == "core-character-leader"
+            else sheet
+            for sheet in catalog.datasheets
+        ),
+    )
     life, units = fight_lifecycle(
+        catalog=catalog,
         alpha_unit_ids=("source",),
         enemy_unit_ids=("enemy",),
         origins={"source": Pose.at(10, 10), "enemy": Pose.at(20, 10)},
@@ -451,6 +471,7 @@ def test_order97_extra_fight_distance_preserves_target_range(target_gap: float) 
         source.own_models[0].geometry.base_shape().max_radius()
         + enemy.own_models[0].geometry.base_shape().max_radius()
     )
+    assert radius == 1.0
     placement = state.battlefield_state.unit_placement_by_id(enemy.unit_instance_id)
     state.replace_battlefield_state(
         state.battlefield_state.with_unit_placement(

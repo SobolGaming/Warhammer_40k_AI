@@ -7204,9 +7204,21 @@ def test_local_session_exposes_held_mission_action_and_decline_continues_shootin
     for index in range(30):
         if action_state.active_player_id != "player-a":
             break
-        assert rules_unit_started_mission_action_this_turn(
-            state=action_state, player_id="player-a", unit_instance_id=started.unit_instance_id
+        cleanup_complete = any(
+            cleanup.completes_boundary
+            and cleanup.battle_round == started.battle_round_started
+            and cleanup.active_player_id == "player-a"
+            for cleanup in action_state.end_turn_cleanup_states
         )
+        # Mission sequencing can pause after turn cleanup, before the player changes.
+        if not cleanup_complete:
+            assert rules_unit_started_mission_action_this_turn(
+                state=action_state, player_id="player-a", unit_instance_id=started.unit_instance_id
+            )
+        else:
+            assert not rules_unit_started_mission_action_this_turn(
+                state=action_state, player_id="player-a", unit_instance_id=started.unit_instance_id
+            )
         pending = action_session.advance_until_decision_or_terminal().decision_request
         assert pending is not None
         if action_state.active_player_id != "player-a":
@@ -7664,17 +7676,21 @@ def test_attached_rules_unit_has_one_canonical_action_option_and_state_identity(
     assert payload["unit_instance_id"] == attached_id
     assert payload["eligible_unit_instance_ids"] == [attached_id]
 
-    session.submit_option(
+    status = session.submit_option(
         request_id=request.request_id,
         option_id=action_options[0].option_id,
         result_id="phase11e-attached-start-cleanse",
     )
+    from tests.movement_submission_helpers import resolve_ordering_for_fixture
+
+    # Resolve the real mandatory mission ordering after non-mission turn cleanup.
+    resolve_ordering_for_fixture(lifecycle, status)
 
     action_state = state.mission_action_state_by_id(
         "mission-action:phase11e-attached-start-cleanse"
     )
     assert action_state.unit_instance_id == attached_id
-    # With no other eligible activation, the facade reaches the opponent's turn.
+    # With mission ordering complete, the facade reaches the opponent's turn.
     assert state.active_player_id == "player-b"
     assert (
         mission_action_unit_ineligibility_reason(

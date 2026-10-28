@@ -6,6 +6,7 @@ assertions, live observation boundaries, or historical authorities.
 
 CONTROL_MEMBERS: frozenset[str] = frozenset(
     {
+        "tests/code_quality/test_thousand_sons_perils_preservation.py",
         "ci/quality_shards/all.txt",
         "ci/quality_shards/shard-1-modules.txt",
         "ci/quality_shards/shard-1.txt",
@@ -39,6 +40,7 @@ CONTROL_MEMBERS: frozenset[str] = frozenset(
 
 INPUT_ADDITIONS: frozenset[str] = frozenset(
     {
+        "tests/code_quality/test_thousand_sons_perils_preservation.py",
         "tests/code_quality/test_cumulative_preservation.py",
         "tests/code_quality/test_d07_geometry_containment.py",
         "tests/code_quality/test_performance_static_successor.py",
@@ -51,6 +53,7 @@ INPUT_ADDITIONS: frozenset[str] = frozenset(
 
 OBSERVED_ADDITIONS: frozenset[str] = frozenset(
     {
+        "tests/code_quality/test_thousand_sons_perils_preservation.py",
         "ci/quality_shards/shard-2-modules.txt",
         "ci/quality_shards/shard-3-modules.txt",
         "ci/quality_shards/shard-4-modules.txt",

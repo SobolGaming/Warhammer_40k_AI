@@ -27982,6 +27982,63 @@
       ],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci77-root-environment-503f1e4e0b15d48dbe108962d5a1af6a283723f32ee6424f62751179346673e2": {
+      "paths": [
+        "tests/code_quality/test_cumulative_preservation.py"
+      ],
+      "owners": [
+        "@module",
+        "_copy_ignore",
+        "test_root_environment_copy_filter_preserves_owned_and_nested_sources"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci77-root-environment-45794e1add81e9363e7b9a6ce63f2b0ac18c3fcb2121ce9875f054b918a51434": {
+      "paths": [
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "owners": [
+        "_copy_ignore",
+        "test_root_environment_copy_filter_preserves_owned_and_nested_sources"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci77-root-environment-1b88d36a2782dc3ec2df266b09435ce5cda5411c53f31a60da2f29511ae3af4f": {
+      "paths": [
+        "tests/code_quality/test_thousand_sons_perils_preservation.py"
+      ],
+      "owners": [
+        "@module",
+        "_copy_ignore",
+        "test_root_environment_copy_filter_preserves_owned_and_nested_sources"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci77-root-environment-b9967ff3a58e5b467283dcf99e88f929db96605c02d44dbe23905f77ed577d4f": {
+      "paths": [
+        "tests/code_quality/test_performance_category_migration.py"
+      ],
+      "owners": [
+        "test_root_environment_copy_filter_preserves_owned_and_nested_sources"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

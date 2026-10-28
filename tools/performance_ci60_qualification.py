@@ -263,6 +263,7 @@ def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
         or PRELUDE_NEW
         | TRANSACTION_SHARDS
         | {
+            "tests/code_quality/test_thousand_sons_perils_preservation.py",
             "ci/quality_shards/shard-2-modules.txt",
             "ci/quality_shards/shard-3-modules.txt",
             "ci/quality_shards/shard-4-modules.txt",
