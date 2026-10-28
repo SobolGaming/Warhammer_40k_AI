@@ -21223,11 +21223,11 @@
     },
     "tools/performance_ci60_qualification.py": {
       "before_sha256": null,
-      "after_sha256": "52a53e09fa8ca259af0f1b0a8f47fbdbdd3ae55eb65819ab11c8714b22b43deb",
+      "after_sha256": "2f3e81fa0089f2a80f406663458a2a05822f23afb75abdedf97d5b958c6e3143",
       "owners": {
         "@module": {
           "before": null,
-          "after": "fbccb2b15e7d596bccea2b3e28378abddd8e1cb294765d0e580b7de78f3a5f40"
+          "after": "32107f68561a8628644f295a88125e19e4c7c353116b95c17213d233fdae0a2e"
         },
         "_HistoricalPrevious": {
           "before": null,
