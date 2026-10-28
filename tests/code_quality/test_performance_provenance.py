@@ -620,6 +620,12 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
                 "tests/unit/test_phase15c_fight_order.py",
             }
             cutover_observed |= {
+                "tests/measurement_native_api.py",
+                "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/order101_failed_setup_helpers.py.txt",
+                "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/emergency_geometry_helpers.py.txt",
+                "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/phase13b_shooting_declaration_helpers.py.txt",
+            }
+            cutover_observed |= {
                 "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order127_infiltrators_redeploy.py.txt",
                 "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order128_setup_overhang.py.txt",
                 "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order135_gathered_override.py.txt",
@@ -750,9 +756,96 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
                 "ci/test_shards/durations.json",
                 "ci/test_shards/shard-6.txt",
             }
-            assert len(cutover_observed) == 152
-            assert len(first_observations[4]) == 185
-            assert sum(map(len, first_observations)) == 321
+            cutover_observed |= {
+                "data/source_audits/ci64_provenance_v1/measurements/dice-base.json",
+                "data/source_audits/ci64_provenance_v1/measurements/dice-head.json",
+                "data/source_audits/ci64_provenance_v1/measurements/dice_sustained-base.json",
+                "data/source_audits/ci64_provenance_v1/measurements/dice_sustained-head.json",
+                "data/source_audits/ci64_provenance_v1/measurements/fight-base.json",
+                "data/source_audits/ci64_provenance_v1/measurements/fight-head.json",
+                "data/source_audits/ci64_provenance_v1/measurements/movement-base.json",
+                "data/source_audits/ci64_provenance_v1/measurements/movement-head.json",
+                "data/source_audits/ci64_provenance_v1/measurements/objective_control-base.json",
+                "data/source_audits/ci64_provenance_v1/measurements/objective_control-head.json",
+                "data/source_audits/ci64_provenance_v1/measurements/reconstruction-base.json",
+                "data/source_audits/ci64_provenance_v1/measurements/reconstruction-head.json",
+                "data/source_audits/ci64_provenance_v1/measurements/roster-base.json",
+                "data/source_audits/ci64_provenance_v1/measurements/roster-head.json",
+                "data/source_audits/ci64_provenance_v1/measurements/setup-base.json",
+                "data/source_audits/ci64_provenance_v1/measurements/setup-head.json",
+                "data/source_audits/ci64_provenance_v1/measurements/shock_reconstruction-base.json",
+                "data/source_audits/ci64_provenance_v1/measurements/shock_reconstruction-head.json",
+                "data/source_audits/ci64_provenance_v1/measurements/strength-base.json",
+                "data/source_audits/ci64_provenance_v1/measurements/strength-head.json",
+                "data/source_audits/ci64_provenance_v1/measurements/visibility-base.json",
+                "data/source_audits/ci64_provenance_v1/measurements/visibility-head.json",
+                "data/source_audits/ci64_provenance_v1/receipts/dice-base.json",
+                "data/source_audits/ci64_provenance_v1/receipts/dice-head.json",
+                "data/source_audits/ci64_provenance_v1/receipts/dice_sustained-base.json",
+                "data/source_audits/ci64_provenance_v1/receipts/dice_sustained-head.json",
+                "data/source_audits/ci64_provenance_v1/receipts/fight-base.json",
+                "data/source_audits/ci64_provenance_v1/receipts/fight-head.json",
+                "data/source_audits/ci64_provenance_v1/receipts/movement-base.json",
+                "data/source_audits/ci64_provenance_v1/receipts/movement-head.json",
+                "data/source_audits/ci64_provenance_v1/receipts/objective_control-base.json",
+                "data/source_audits/ci64_provenance_v1/receipts/objective_control-head.json",
+                "data/source_audits/ci64_provenance_v1/receipts/reconstruction-base.json",
+                "data/source_audits/ci64_provenance_v1/receipts/reconstruction-head.json",
+                "data/source_audits/ci64_provenance_v1/receipts/roster-base.json",
+                "data/source_audits/ci64_provenance_v1/receipts/roster-head.json",
+                "data/source_audits/ci64_provenance_v1/receipts/setup-base.json",
+                "data/source_audits/ci64_provenance_v1/receipts/setup-head.json",
+                "data/source_audits/ci64_provenance_v1/receipts/shock_reconstruction-base.json",
+                "data/source_audits/ci64_provenance_v1/receipts/shock_reconstruction-head.json",
+                "data/source_audits/ci64_provenance_v1/receipts/strength-base.json",
+                "data/source_audits/ci64_provenance_v1/receipts/strength-head.json",
+                "data/source_audits/ci64_provenance_v1/receipts/visibility-base.json",
+                "data/source_audits/ci64_provenance_v1/receipts/visibility-head.json",
+                "docs/ORDER_124_SCOPE_PLAN.md",
+                "docs/SECTION24_CORE_ABILITIES_SCOPE.md",
+                "docs/performance/current/ci78-current-dice.json",
+                "docs/performance/current/ci78-current-dice_sustained.json",
+                "docs/performance/current/ci78-current-external_contract_source_reuse.json",
+                "docs/performance/current/ci78-current-fight.json",
+                "docs/performance/current/ci78-current-movement.json",
+                "docs/performance/current/ci78-current-objective_control.json",
+                "docs/performance/current/ci78-current-reconstruction.json",
+                "docs/performance/current/ci78-current-roster.json",
+                "docs/performance/current/ci78-current-setup.json",
+                "docs/performance/current/ci78-current-shock_reconstruction.json",
+                "docs/performance/current/ci78-current-strength.json",
+                "docs/performance/current/ci78-current-visibility.json",
+                "src/warhammer40k_core/engine/catalog_setup_reactive_shoot_charge.py",
+                "src/warhammer40k_core/engine/catalog_shadow_form_runtime.py",
+                "src/warhammer40k_core/engine/decision.py",
+                "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py",
+                "src/warhammer40k_core/engine/phases/charge.py",
+                "tests/integration/test_catalog_rule_ir_runtime.py",
+                "tests/integration/test_embarked_ability_authority.py",
+                "tests/integration/test_fight_on_death_presence.py",
+                "tests/integration/test_retained_shooting.py",
+                "tests/phase15a_charge_declaration_helpers.py",
+                "tests/psychic_modifier_helpers.py",
+                "tests/replay/test_phase18b_replay_runner.py",
+                "tests/rules/section07/coverage.json",
+                "tests/rules/section18/coverage.json",
+                "tests/rules/section20/coverage.json",
+                "tests/rules/section22/coverage.json",
+                "tests/rules/section24/README.md",
+                "tests/rules/section24/coverage.json",
+                "tests/rules/section24/test_inventory.py",
+                "tests/shared/category_migration/phase17d_rule_execution.py",
+                "tests/unit/test_dice.py",
+                "tests/unit/test_phase11e_mission_scoring_cleanup.py",
+                "tests/unit/test_phase15a_charge_declarations.py",
+                "tests/unit/test_phase17_emperors_children_datasheet_overlay.py",
+                "tests/unit/test_phase17g_chaos_daemons_blood_legion.py",
+                "tests/unit/test_phase17n_primary_scoring_spatial_evidence.py",
+                "tests/unit/test_phase17n_runtime_rule_ir_oc_authority.py",
+            }
+            assert len(cutover_observed) == 241
+            assert len(first_observations[4]) == 274
+            assert sum(map(len, first_observations)) == 410
             assert all(first_observations[4].count(name) == 1 for name in cutover_observed)
             assert first_observations[4] == tuple(
                 name for name in latest_names if name in ci60.PRELUDE_OBSERVED
@@ -1846,3 +1939,85 @@ def test_ci66_refreshed_admission_still_checks_every_operand_and_key(changed: st
         identity = (*IDENTITY[:-1], "second-phase")
     storage.admission(check, altered, identity, dependencies)
     assert len(calls) == 2
+
+
+def test_benchmark_shooting_api_preserves_native_current_arguments(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tests import measurement_native_api as api
+    from warhammer40k_core.engine.phases.shooting_model import ShootingPhaseState
+
+    phase = ShootingPhaseState(battle_round=1, active_player_id="player-a")
+    expected = phase.with_attack_sequence_update(
+        attack_sequence=None, allocated_model_ids_this_phase=(), pending_decision_requests=()
+    )
+    api._benchmark_method.cache_clear()
+    try:
+        with monkeypatch.context() as scoped:
+            scoped.delenv(api._MODE, raising=False)
+            ordinary = api.benchmark_shooting_update(
+                phase,
+                attack_sequence=None,
+                allocated_model_ids_this_phase=(),
+                pending_decision_requests=(),
+            )
+            scoped.setenv(api._MODE, "head-current")
+            scoped.setenv(api._SOURCE, str(Path(__file__).resolve().parents[2] / "src"))
+            head = api.benchmark_shooting_update(
+                phase,
+                attack_sequence=None,
+                allocated_model_ids_this_phase=(),
+                pending_decision_requests=(),
+            )
+        assert ordinary == expected
+        assert head == expected
+    finally:
+        api._benchmark_method.cache_clear()
+
+
+def test_benchmark_shooting_api_rejects_unknown_mode_or_native_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tests import measurement_native_api as api
+    from warhammer40k_core.engine.phases.shooting_model import ShootingPhaseState
+
+    phase = ShootingPhaseState(battle_round=1, active_player_id="player-a")
+    api._benchmark_method.cache_clear()
+    try:
+        with monkeypatch.context() as scoped:
+            scoped.setenv(api._SOURCE, str(Path(__file__).resolve().parents[2] / "src"))
+            for role in ("unknown", "base-5f509724"):
+                scoped.setenv(api._MODE, role)
+                with pytest.raises(ValueError, match="Unknown benchmark"):
+                    api.benchmark_shooting_update(
+                        phase,
+                        attack_sequence=None,
+                        allocated_model_ids_this_phase=(),
+                        pending_decision_requests=(),
+                    )
+    finally:
+        api._benchmark_method.cache_clear()
+
+
+@pytest.mark.stubbed
+def test_benchmark_shooting_api_rejects_unknown_signature(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from inspect import Signature
+
+    from tests import measurement_native_api as api
+
+    api._benchmark_method.cache_clear()
+    try:
+        with monkeypatch.context() as scoped:
+
+            def changed_signature(_method: object) -> Signature:
+                return Signature()
+
+            scoped.setattr(api, "signature", changed_signature)
+            with pytest.raises(ValueError, match="Unknown benchmark native Shooting"):
+                api._benchmark_method(
+                    "head-current", str(Path(__file__).resolve().parents[2] / "src")
+                )
+    finally:
+        api._benchmark_method.cache_clear()

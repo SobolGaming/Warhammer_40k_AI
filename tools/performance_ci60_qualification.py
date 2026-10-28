@@ -169,8 +169,8 @@ DERIVATION_INPUTS = frozenset(
 
 PRELUDE_BASE = "620cbe91ae3ddd356eaf7effa7455b931882a39e"
 PRELUDE_NAMESPACE = "data/source_audits/ci64_provenance_v1"
-PRELUDE_FREEZE: str | None = "972404946b4be85cac44012ab53a930ef96e4dcb"
-PRELUDE_REPORT = "docs/performance/current/ci64-external_contract_source_reuse.json"
+PRELUDE_FREEZE: str | None = None
+PRELUDE_REPORT = "docs/performance/current/ci78-current-external_contract_source_reuse.json"
 TRANSACTION_TEST = "tests/code_quality/test_performance_admission_transaction.py"
 TRANSACTION_SHARDS = frozenset({"ci/quality_shards/shard-2.txt", "ci/quality_shards/shard-3.txt"})
 PRELUDE_CONTROLS = ci69.CONTROL_MEMBERS
@@ -880,6 +880,9 @@ def _cohort(actual: dict[str, bytes]) -> dict[str, Any]:
     ):
         raise ValueError("CI60 Qualification family inventory changed.")
     families["external_contract_source_reuse"]["comparison"] = PRELUDE_REPORT
+    if PRELUDE_REPORT == ci69.CURRENT_SOURCE_REPORT:
+        for name, row in families.items():
+            row["comparison"] = PRELUDE_REPORT.replace("external_contract_source_reuse", name)
     return families
 
 
@@ -1234,13 +1237,13 @@ def measurement(
     families = _cohort(actual)
     plan = families[family]
     applicability = None
-    if family != "external_contract_source_reuse":
+    fresh = PRELUDE_REPORT == ci69.CURRENT_SOURCE_REPORT
+    if family != "external_contract_source_reuse" and not fresh:
         applicability = _prelude_applicability(actual, current, family)
         inputs = _original_producing_inputs(actual)
-    qualified_inputs = inputs
-    binding = None
+    qualified_inputs, binding = inputs, None
     proof: dict[str, Any] | None = None
-    if family in RETAINED:
+    if family in RETAINED and not fresh:
         historical_stage = cast(_HistoricalStage, old)
         freeze = _HistoricalStage.freeze(historical_stage, root)
         inputs = json.loads(
@@ -1267,10 +1270,11 @@ def measurement(
         def member(name: str) -> bytes:
             return _HistoricalStage.member(historical_stage, root, name, freeze)
     else:
-        provenance = json.loads(actual[NAMESPACE + "/measurement-provenance.json"])
-        if set(provenance) != set(families) - RETAINED:
+        namespace = PRELUDE_NAMESPACE if fresh else NAMESPACE
+        provenance = json.loads(actual[namespace + "/measurement-provenance.json"])
+        if set(provenance) != (set(families) if fresh else set(families) - RETAINED):
             raise ValueError("CI60 fresh family provenance membership changed.")
-        if family == "external_contract_source_reuse":
+        if family == "external_contract_source_reuse" and not fresh:
             provenance = json.loads(actual[PRELUDE_NAMESPACE + "/measurement-provenance.json"])
             if set(provenance) != {"external_contract_source_reuse"}:
                 raise ValueError("CI61 fresh source-token provenance membership changed.")
@@ -1286,6 +1290,7 @@ def measurement(
         or report["family"] != family
         or report["base_revision"] != PR_BASE
         or report["head_runtime_build_id"] != runtime
+        or (fresh and row["head"]["runtime_build_id"] != runtime)
     ):
         raise ValueError("CI60 comparison has another producing cohort.")
     for side in ("base", "head"):
@@ -1334,12 +1339,7 @@ def measurement(
 
 def retained_historical_report(*, base: str, path: str, change: dict[str, object]) -> bool:
     """Exact immutable former-current records remain historical obligations."""
-    return (
-        base == PR_BASE
-        and path in SUPERSEDED_REPORTS
-        and change["before_sha256"] is None
-        and change["after_sha256"] == SUPERSEDED_REPORTS[path]
-    )
+    return ci69.historical_current_report(base, path, change, PR_BASE, SUPERSEDED_REPORTS)
 
 
 class _HistoricalStage(Protocol):

@@ -6,6 +6,7 @@ from typing import Any, cast
 
 import warhammer40k_core.engine.attack_sequence as attack_sequence_module
 import warhammer40k_core.engine.phases.shooting as shooting_phase_module
+from tests.measurement_native_api import benchmark_shooting_update
 from tests.order60_emergency_disembark_helpers import (
     emergency_disembark_contact_poses,
     emergency_disembark_poses_around,
@@ -2261,7 +2262,8 @@ def _damage_model_choice_lifecycle(
             allocated_model_ids_this_phase=allocated_ids,
         )
     else:
-        state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+        state.shooting_phase_state = benchmark_shooting_update(
+            shooting_state,
             attack_sequence=remaining_sequence,
             allocated_model_ids_this_phase=allocated_ids,
             pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
@@ -2589,7 +2591,8 @@ def _store_shooting_attack_sequence(
             allocated_model_ids_this_phase=allocated_ids,
         )
         return
-    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+    state.shooting_phase_state = benchmark_shooting_update(
+        shooting_state,
         attack_sequence=attack_sequence,
         allocated_model_ids_this_phase=allocated_ids,
         pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
@@ -2812,7 +2815,8 @@ def _paused_optional_fnp_lifecycle() -> tuple[GameLifecycle, DecisionRequest]:
     assert remaining_sequence.pending_grouped_damage is not None
     shooting_state = state.shooting_phase_state
     assert shooting_state is not None
-    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+    state.shooting_phase_state = benchmark_shooting_update(
+        shooting_state,
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
         pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,

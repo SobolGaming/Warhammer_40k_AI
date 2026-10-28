@@ -273,6 +273,35 @@ def expected_observed() -> frozenset[str]:
     """Independent literal boundary; never alias the mutable declaration name."""
     return frozenset(
         {
+            "docs/ORDER_124_SCOPE_PLAN.md",
+            "docs/SECTION24_CORE_ABILITIES_SCOPE.md",
+            "src/warhammer40k_core/engine/catalog_setup_reactive_shoot_charge.py",
+            "src/warhammer40k_core/engine/catalog_shadow_form_runtime.py",
+            "src/warhammer40k_core/engine/decision.py",
+            "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py",
+            "src/warhammer40k_core/engine/phases/charge.py",
+            "tests/integration/test_catalog_rule_ir_runtime.py",
+            "tests/integration/test_embarked_ability_authority.py",
+            "tests/integration/test_fight_on_death_presence.py",
+            "tests/integration/test_retained_shooting.py",
+            "tests/phase15a_charge_declaration_helpers.py",
+            "tests/psychic_modifier_helpers.py",
+            "tests/replay/test_phase18b_replay_runner.py",
+            "tests/rules/section07/coverage.json",
+            "tests/rules/section18/coverage.json",
+            "tests/rules/section20/coverage.json",
+            "tests/rules/section22/coverage.json",
+            "tests/rules/section24/README.md",
+            "tests/rules/section24/coverage.json",
+            "tests/rules/section24/test_inventory.py",
+            "tests/shared/category_migration/phase17d_rule_execution.py",
+            "tests/unit/test_dice.py",
+            "tests/unit/test_phase11e_mission_scoring_cleanup.py",
+            "tests/unit/test_phase15a_charge_declarations.py",
+            "tests/unit/test_phase17_emperors_children_datasheet_overlay.py",
+            "tests/unit/test_phase17g_chaos_daemons_blood_legion.py",
+            "tests/unit/test_phase17n_primary_scoring_spatial_evidence.py",
+            "tests/unit/test_phase17n_runtime_rule_ir_oc_authority.py",
             "ci/test_shards/durations.json",
             "ci/test_shards/shard-1.txt",
             "ci/test_shards/shard-10.txt",
@@ -763,4 +792,245 @@ OBSERVED_ADDITIONS |= frozenset(
         "ci/test_shards/shard-8.txt",
         "ci/test_shards/shard-9.txt",
     ]
+)
+
+# Exact current source and native evidence epoch; no historical input is repinned.
+
+CONTROL_MEMBERS |= frozenset(
+    {
+        "docs/ORDER_124_SCOPE_PLAN.md",
+        "docs/SECTION24_CORE_ABILITIES_SCOPE.md",
+        "tests/rules/section24/README.md",
+    }
+)
+
+RUNTIME_SUCCESSORS |= frozenset(
+    {
+        "src/warhammer40k_core/engine/catalog_setup_reactive_shoot_charge.py",
+        "src/warhammer40k_core/engine/catalog_shadow_form_runtime.py",
+        "src/warhammer40k_core/engine/decision.py",
+        "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py",
+        "src/warhammer40k_core/engine/phases/charge.py",
+        "tests/integration/test_catalog_rule_ir_runtime.py",
+        "tests/integration/test_embarked_ability_authority.py",
+        "tests/integration/test_fight_on_death_presence.py",
+        "tests/integration/test_retained_shooting.py",
+        "tests/phase15a_charge_declaration_helpers.py",
+        "tests/psychic_modifier_helpers.py",
+        "tests/replay/test_phase18b_replay_runner.py",
+        "tests/rules/section07/coverage.json",
+        "tests/rules/section18/coverage.json",
+        "tests/rules/section20/coverage.json",
+        "tests/rules/section22/coverage.json",
+        "tests/rules/section24/coverage.json",
+        "tests/rules/section24/test_inventory.py",
+        "tests/shared/category_migration/phase17d_rule_execution.py",
+        "tests/unit/test_dice.py",
+        "tests/unit/test_phase11e_mission_scoring_cleanup.py",
+        "tests/unit/test_phase15a_charge_declarations.py",
+        "tests/unit/test_phase17_emperors_children_datasheet_overlay.py",
+        "tests/unit/test_phase17g_chaos_daemons_blood_legion.py",
+        "tests/unit/test_phase17n_primary_scoring_spatial_evidence.py",
+        "tests/unit/test_phase17n_runtime_rule_ir_oc_authority.py",
+    }
+)
+
+INPUT_ADDITIONS |= frozenset(
+    {
+        "src/warhammer40k_core/engine/catalog_setup_reactive_shoot_charge.py",
+        "src/warhammer40k_core/engine/catalog_shadow_form_runtime.py",
+        "src/warhammer40k_core/engine/decision.py",
+        "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py",
+        "src/warhammer40k_core/engine/phases/charge.py",
+        "tests/integration/test_catalog_rule_ir_runtime.py",
+        "tests/integration/test_embarked_ability_authority.py",
+        "tests/integration/test_fight_on_death_presence.py",
+        "tests/integration/test_retained_shooting.py",
+        "tests/phase15a_charge_declaration_helpers.py",
+        "tests/psychic_modifier_helpers.py",
+        "tests/replay/test_phase18b_replay_runner.py",
+        "tests/rules/section07/coverage.json",
+        "tests/rules/section18/coverage.json",
+        "tests/rules/section20/coverage.json",
+        "tests/rules/section22/coverage.json",
+        "tests/rules/section24/coverage.json",
+        "tests/rules/section24/test_inventory.py",
+        "tests/shared/category_migration/phase17d_rule_execution.py",
+        "tests/unit/test_dice.py",
+        "tests/unit/test_phase11e_mission_scoring_cleanup.py",
+        "tests/unit/test_phase15a_charge_declarations.py",
+        "tests/unit/test_phase17_emperors_children_datasheet_overlay.py",
+        "tests/unit/test_phase17g_chaos_daemons_blood_legion.py",
+        "tests/unit/test_phase17n_primary_scoring_spatial_evidence.py",
+        "tests/unit/test_phase17n_runtime_rule_ir_oc_authority.py",
+    }
+)
+
+OBSERVED_ADDITIONS |= frozenset(
+    {
+        "docs/ORDER_124_SCOPE_PLAN.md",
+        "docs/SECTION24_CORE_ABILITIES_SCOPE.md",
+        "src/warhammer40k_core/engine/catalog_setup_reactive_shoot_charge.py",
+        "src/warhammer40k_core/engine/catalog_shadow_form_runtime.py",
+        "src/warhammer40k_core/engine/decision.py",
+        "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py",
+        "src/warhammer40k_core/engine/phases/charge.py",
+        "tests/integration/test_catalog_rule_ir_runtime.py",
+        "tests/integration/test_embarked_ability_authority.py",
+        "tests/integration/test_fight_on_death_presence.py",
+        "tests/integration/test_retained_shooting.py",
+        "tests/phase15a_charge_declaration_helpers.py",
+        "tests/psychic_modifier_helpers.py",
+        "tests/replay/test_phase18b_replay_runner.py",
+        "tests/rules/section07/coverage.json",
+        "tests/rules/section18/coverage.json",
+        "tests/rules/section20/coverage.json",
+        "tests/rules/section22/coverage.json",
+        "tests/rules/section24/README.md",
+        "tests/rules/section24/coverage.json",
+        "tests/rules/section24/test_inventory.py",
+        "tests/shared/category_migration/phase17d_rule_execution.py",
+        "tests/unit/test_dice.py",
+        "tests/unit/test_phase11e_mission_scoring_cleanup.py",
+        "tests/unit/test_phase15a_charge_declarations.py",
+        "tests/unit/test_phase17_emperors_children_datasheet_overlay.py",
+        "tests/unit/test_phase17g_chaos_daemons_blood_legion.py",
+        "tests/unit/test_phase17n_primary_scoring_spatial_evidence.py",
+        "tests/unit/test_phase17n_runtime_rule_ir_oc_authority.py",
+    }
+)
+
+CUTOVER_NEW |= frozenset(
+    {
+        "data/source_audits/ci64_provenance_v1/measurements/dice-base.json",
+        "data/source_audits/ci64_provenance_v1/measurements/dice-head.json",
+        "data/source_audits/ci64_provenance_v1/measurements/dice_sustained-base.json",
+        "data/source_audits/ci64_provenance_v1/measurements/dice_sustained-head.json",
+        "data/source_audits/ci64_provenance_v1/measurements/fight-base.json",
+        "data/source_audits/ci64_provenance_v1/measurements/fight-head.json",
+        "data/source_audits/ci64_provenance_v1/measurements/movement-base.json",
+        "data/source_audits/ci64_provenance_v1/measurements/movement-head.json",
+        "data/source_audits/ci64_provenance_v1/measurements/objective_control-base.json",
+        "data/source_audits/ci64_provenance_v1/measurements/objective_control-head.json",
+        "data/source_audits/ci64_provenance_v1/measurements/reconstruction-base.json",
+        "data/source_audits/ci64_provenance_v1/measurements/reconstruction-head.json",
+        "data/source_audits/ci64_provenance_v1/measurements/roster-base.json",
+        "data/source_audits/ci64_provenance_v1/measurements/roster-head.json",
+        "data/source_audits/ci64_provenance_v1/measurements/setup-base.json",
+        "data/source_audits/ci64_provenance_v1/measurements/setup-head.json",
+        "data/source_audits/ci64_provenance_v1/measurements/shock_reconstruction-base.json",
+        "data/source_audits/ci64_provenance_v1/measurements/shock_reconstruction-head.json",
+        "data/source_audits/ci64_provenance_v1/measurements/strength-base.json",
+        "data/source_audits/ci64_provenance_v1/measurements/strength-head.json",
+        "data/source_audits/ci64_provenance_v1/measurements/visibility-base.json",
+        "data/source_audits/ci64_provenance_v1/measurements/visibility-head.json",
+        "data/source_audits/ci64_provenance_v1/receipts/dice-base.json",
+        "data/source_audits/ci64_provenance_v1/receipts/dice-head.json",
+        "data/source_audits/ci64_provenance_v1/receipts/dice_sustained-base.json",
+        "data/source_audits/ci64_provenance_v1/receipts/dice_sustained-head.json",
+        "data/source_audits/ci64_provenance_v1/receipts/fight-base.json",
+        "data/source_audits/ci64_provenance_v1/receipts/fight-head.json",
+        "data/source_audits/ci64_provenance_v1/receipts/movement-base.json",
+        "data/source_audits/ci64_provenance_v1/receipts/movement-head.json",
+        "data/source_audits/ci64_provenance_v1/receipts/objective_control-base.json",
+        "data/source_audits/ci64_provenance_v1/receipts/objective_control-head.json",
+        "data/source_audits/ci64_provenance_v1/receipts/reconstruction-base.json",
+        "data/source_audits/ci64_provenance_v1/receipts/reconstruction-head.json",
+        "data/source_audits/ci64_provenance_v1/receipts/roster-base.json",
+        "data/source_audits/ci64_provenance_v1/receipts/roster-head.json",
+        "data/source_audits/ci64_provenance_v1/receipts/setup-base.json",
+        "data/source_audits/ci64_provenance_v1/receipts/setup-head.json",
+        "data/source_audits/ci64_provenance_v1/receipts/shock_reconstruction-base.json",
+        "data/source_audits/ci64_provenance_v1/receipts/shock_reconstruction-head.json",
+        "data/source_audits/ci64_provenance_v1/receipts/strength-base.json",
+        "data/source_audits/ci64_provenance_v1/receipts/strength-head.json",
+        "data/source_audits/ci64_provenance_v1/receipts/visibility-base.json",
+        "data/source_audits/ci64_provenance_v1/receipts/visibility-head.json",
+        "docs/performance/current/ci64-external_contract_source_reuse.json",
+        "docs/performance/current/ci78-current-dice.json",
+        "docs/performance/current/ci78-current-dice_sustained.json",
+        "docs/performance/current/ci78-current-fight.json",
+        "docs/performance/current/ci78-current-movement.json",
+        "docs/performance/current/ci78-current-objective_control.json",
+        "docs/performance/current/ci78-current-reconstruction.json",
+        "docs/performance/current/ci78-current-roster.json",
+        "docs/performance/current/ci78-current-setup.json",
+        "docs/performance/current/ci78-current-shock_reconstruction.json",
+        "docs/performance/current/ci78-current-strength.json",
+        "docs/performance/current/ci78-current-visibility.json",
+    }
+)
+
+HISTORICAL_CURRENT_REPORTS: dict[str, str] = {
+    "docs/performance/current/ci60-dice.json": (
+        "6d8fd010383901ec4a853daac45aab84a79e4ee244b7057ffffc57696ec15e8e"
+    ),
+    "docs/performance/current/ci60-dice_sustained.json": (
+        "a8bbdac5f0c49da74c6189d4440d896c326f4b30ae0fc82c8c3d7394a198ec95"
+    ),
+    "docs/performance/current/ci64-external_contract_source_reuse.json": (
+        "95809d41d4f2b6e1704e3bedf4e2c36a390d3de2cd624a56a28735149093cf9f"
+    ),
+    "docs/performance/current/ci60-fight.json": (
+        "70a746c1edffe86747ba18a69d750e6998d2367628d0abdfe56e96c44bfbcb37"
+    ),
+    "docs/performance/current/ci60-movement.json": (
+        "3289f042642874383d108910e126989b17f54aac6e77466e9bf83ec175df5ef1"
+    ),
+    "docs/performance/current/qualification40-objective_control.json": (
+        "9a3dbd260593b859c21e984b684945612a9ac7651dd25fe9b75c7611ef2db9ab"
+    ),
+    "docs/performance/current/ci60-reconstruction.json": (
+        "4aaa1f15793a1240b40a627b0e7f56f4b58498be8c4b6a08f369602327ce4344"
+    ),
+    "docs/performance/current/qualification40-roster.json": (
+        "400c84b7ac8833ca5251b45a79e440d61e5a15626cb6a4bb84dd6307741e46a9"
+    ),
+    "docs/performance/current/ci60-setup.json": (
+        "20e5fe0386d04a57b9929dfb9e1d6ae08972bf7016ec28e715194638100aad65"
+    ),
+    "docs/performance/current/ci60-shock_reconstruction.json": (
+        "e511bf0c7c52de4e37d3d1ce35fa15bb93dc9e425e76200ea5c5a5c0af5e3ba8"
+    ),
+    "docs/performance/current/ci60-strength.json": (
+        "2ff96033f8859142838b8d131b89a01362cf5347f764085d54bb94b89d9e8b2f"
+    ),
+    "docs/performance/current/ci60-visibility.json": (
+        "5253a0edab3afde964ae9257a3decfbee7a4199e05c2d6140acd09046e32309c"
+    ),
+}
+
+CURRENT_SOURCE_REPORT = "docs/performance/current/ci78-current-external_contract_source_reuse.json"
+
+
+def historical_current_report(
+    base: str, path: str, change: dict[str, object], expected_base: str, previous: dict[str, str]
+) -> bool:
+    """Only exact old report bytes receive historical status, never current credit."""
+    pins = previous | HISTORICAL_CURRENT_REPORTS
+    return (
+        base == expected_base
+        and path in pins
+        and change["before_sha256"] is None
+        and change["after_sha256"] == pins[path]
+    )
+
+
+# Exact approved benchmark fixture input and three native historical preimages.
+CUTOVER_NEW |= frozenset(
+    {
+        "tests/measurement_native_api.py",
+        "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/order101_failed_setup_helpers.py.txt",
+        "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/emergency_geometry_helpers.py.txt",
+        "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/phase13b_shooting_declaration_helpers.py.txt",
+    }
+)
+INPUT_ADDITIONS |= frozenset({"tests/measurement_native_api.py"})
+OBSERVED_ADDITIONS |= frozenset(
+    {
+        "tests/measurement_native_api.py",
+        "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/order101_failed_setup_helpers.py.txt",
+        "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/emergency_geometry_helpers.py.txt",
+        "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/phase13b_shooting_declaration_helpers.py.txt",
+    }
 )

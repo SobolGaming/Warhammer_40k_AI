@@ -28410,6 +28410,122 @@
       ],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci78-current-owners-9451ac01095a73066ab8092e9656d50b05040696b8bf390baac83e4049a85f02": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_shadow_form_runtime.py"
+      ],
+      "owners": [
+        "@module",
+        "_selectable_shadow_form_record_by_source_id"
+      ],
+      "families": [
+        "external_contract_source_reuse",
+        "reconstruction"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-current-owners-ffea4920fec33a5f4db66f9036e85ce9e36eb42d8cec14a35f284c5e0369efef": {
+      "paths": [
+        "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py"
+      ],
+      "owners": [
+        "_consumed_retained_rule_mortal_request",
+        "validate_rule_effect_completion_or_pending_window"
+      ],
+      "families": [
+        "dice",
+        "fight",
+        "reconstruction"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-current-owners-f1ea02aa9819b407d74c91e787679c321c889b96fd25857c0118b6a173302dd1": {
+      "paths": [
+        "tools/performance_ci69_members.py"
+      ],
+      "owners": [
+        "historical_current_report"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-benchmark-api-42f038cfe9a142f963374e94414df55a1e2136d53e381f5c40615cf1721843a4": {
+      "paths": [
+        "tests/measurement_native_api.py"
+      ],
+      "owners": [
+        "@module",
+        "_benchmark_method",
+        "benchmark_shooting_update"
+      ],
+      "families": [
+        "external_contract_source_reuse",
+        "fight",
+        "setup"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-benchmark-api-78dec3ec3595dbc3aa7237d2cbbbb342d43b2b74db620b2189c38277e8b56f17": {
+      "paths": [
+        "tests/emergency_geometry_helpers.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-benchmark-api-afa194825cf216294aed4d901647e9d4eb246603da9f219451027f06aca98413": {
+      "paths": [
+        "tests/order101_failed_setup_helpers.py"
+      ],
+      "owners": [
+        "emergency_component_omission_session"
+      ],
+      "families": [
+        "external_contract_source_reuse",
+        "setup"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-benchmark-api-b8a07a50d2ab636b02a11559f104152dcc612c9b40acd7764ba17db66a02fef8": {
+      "paths": [
+        "tools/cumulative_preservation.py"
+      ],
+      "owners": [
+        "benchmark_fixture_preimage"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-benchmark-api-b08ea3b287452f059f912a78f817b77173a3bebdef74f36947d8ac10ba9bb67f": {
+      "paths": [
+        "tests/code_quality/test_performance_provenance.py"
+      ],
+      "owners": [
+        "test_benchmark_shooting_api_preserves_native_current_arguments",
+        "test_benchmark_shooting_api_rejects_unknown_mode_or_native_source",
+        "test_benchmark_shooting_api_rejects_unknown_signature"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

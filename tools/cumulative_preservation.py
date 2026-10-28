@@ -367,6 +367,100 @@ def verify_control_transformations(root: Path) -> None:
         assert_recipe(accepted, current, row["accepted_to_integration"])
 
 
+def benchmark_fixture_preimage(root: Path, path: str, supplied: bytes) -> bytes:
+    """Expose only the native D07 view; never project measurement inputs."""
+    recipes = {
+        "tests/emergency_geometry_helpers.py": (
+            "12160125d23dbe61048d74d7fd564571a5c11d7f05215c6fce54aaa29e16d3d2",
+            "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/emergency_geometry_helpers.py.txt",
+            "3995f09d6dd5eac2ee0493fd3b6e0336941e2a0dcec11cdb2518f212b1e5bcb0",
+            1,
+        ),
+        "tests/order101_failed_setup_helpers.py": (
+            "d3dd8d91b493456b9eeb7b5f81e734a3b549d3552c9c69fb4552b0995f54aea9",
+            "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/order101_failed_setup_helpers.py.txt",
+            "d9124feb0f56deba25ecf4fdaad90e3b197d972b613fc081b8bdb8f3c1536313",
+            1,
+        ),
+        "tests/phase13b_shooting_declaration_helpers.py": (
+            "d8579e5ae8705b7962878c3bbd760fd16e531c63bd8deb2cb8cbfe3dc83847ac",
+            "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/phase13b_shooting_declaration_helpers.py.txt",
+            "fb8226cefd149badf5c9c9a77ee54f16125d48d583471f29611fee9a598d23c1",
+            3,
+        ),
+    }
+    if path not in recipes:
+        return supplied
+    current_pin, archive, native_pin, count = recipes[path]
+    if _sha(supplied) != current_pin:
+        raise ValueError("Benchmark fixture caller differs from its declared current source.")
+    tree = ast.parse(supplied)
+    imports = [
+        node
+        for node in tree.body
+        if isinstance(node, ast.ImportFrom) and node.module == "tests.measurement_native_api"
+    ]
+    if len(imports) != 1 or ast.dump(imports[0], include_attributes=False) != ast.dump(
+        ast.parse("from tests.measurement_native_api import benchmark_shooting_update").body[0],
+        include_attributes=False,
+    ):
+        raise ValueError("Benchmark fixture dispatch import changed.")
+    tree.body.remove(imports[0])
+    restored = 0
+    pending = ast.dump(
+        ast.parse("lifecycle.decision_controller.queue.pending_requests", mode="eval").body,
+        include_attributes=False,
+    )
+    for call in ast.walk(tree):
+        if not (
+            isinstance(call, ast.Call)
+            and isinstance(call.func, ast.Name)
+            and call.func.id == "benchmark_shooting_update"
+        ):
+            continue
+        if len(call.args) != 1 or not isinstance(call.args[0], ast.Name):
+            raise ValueError("Benchmark fixture native receiver changed.")
+        queue = [key for key in call.keywords if key.arg == "pending_decision_requests"]
+        if len(queue) != 1 or ast.dump(queue[0].value, include_attributes=False) != pending:
+            raise ValueError("Benchmark fixture real pending queue changed.")
+        call.keywords.remove(queue[0])
+        call.func = ast.Attribute(
+            value=call.args.pop(0), attr="with_attack_sequence_update", ctx=ast.Load()
+        )
+        restored += 1
+    if path == "tests/phase13b_shooting_declaration_helpers.py":
+        owner = next(
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == "_build_shooting_lifecycle"
+        )
+        layouts = [
+            node
+            for node in owner.body
+            if isinstance(node, ast.For)
+            and isinstance(node.target, ast.Name)
+            and node.target.id == "army"
+            and isinstance(node.iter, ast.Name)
+            and node.iter.id == "armies"
+        ]
+        if (
+            len(layouts) != 1
+            or _sha(ast.dump(layouts[0], include_attributes=False).encode())
+            != "438582a38fc1b556fe4bb61e41806c900dbd2fdee5d62ea0d4d226ec1ac54941"
+        ):
+            raise ValueError("Historical fixture coherency recipe changed.")
+        owner.body.remove(layouts[0])
+    raw = _read(root, archive)
+    if (
+        restored != count
+        or _sha(raw) != native_pin
+        or ast.dump(tree, include_attributes=False)
+        != ast.dump(ast.parse(raw), include_attributes=False)
+    ):
+        raise ValueError("Benchmark fixture historical native body changed.")
+    return raw.replace(b"\r\n", b"\n")
+
+
 def d07_predecessors(root: Path) -> dict[str, bytes]:
     """One atomic historical request; live proofs precede predecessor exposure."""
     from tests.category_migration_preservation import read_historical_test_bytes
@@ -399,6 +493,7 @@ def d07_predecessors(root: Path) -> dict[str, bytes]:
         }:
             live = previous(root, path, live)
         live = live.replace(b"\r\n", b"\n")
+        live = benchmark_fixture_preimage(root, path, live)
         live = static_predecessor(root, path, live)
         live = preceding_test(root, path, live)
         if path in d09:
