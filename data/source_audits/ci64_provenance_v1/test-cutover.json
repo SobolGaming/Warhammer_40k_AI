@@ -2257,10 +2257,10 @@
       "sha256": "d46ea0005063643502c30d44147fbfe0560efaa67bbfeaa2dc9b848afac716dc"
     },
     "tests/rules/section24/test_inventory.py": {
-      "blob_sha1": "9c81e75d17c74e7a9e0dd09d4f06671b6fc2c994",
-      "bytes": 3425,
+      "blob_sha1": "b2e1dd7c0eef6bed21d2505493f9457ed6eaefd2",
+      "bytes": 3846,
       "mode": "100644",
-      "sha256": "45591ea912e43bb29cb6f2364452ed1238fd0d1a259d0b66fc2954d9a63fdadf"
+      "sha256": "2981a9c802591c3c662587e334e048d8d61f6a71a6f5fd70dba9ff9164c11ce3"
     },
     "tests/rules/section24/test_movement.py": {
       "blob_sha1": "200821f7e8a14920607e6caf6703feee2573c306",

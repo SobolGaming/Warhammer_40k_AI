@@ -430,7 +430,10 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
     }
     if type(active) is not dict or active.keys() != native.keys() | ports:
         raise ValueError("Finite active test membership omitted or invented a test.")
-    changed_active = ports | {"tests/rules/section04/test_completion_boundaries.py"}
+    changed_active = ports | {
+        "tests/rules/section04/test_completion_boundaries.py",
+        "tests/rules/section24/test_inventory.py",
+    }
     for name, row in active.items():
         if name in changed_active:
             current_row(name, row)
