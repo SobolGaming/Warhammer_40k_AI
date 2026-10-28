@@ -795,3 +795,212 @@ def test_shared_group_pending_damage_valid_save_fork_continue_and_replay() -> No
     assert _unit_has_already_shot(state=state, unit_instance_id=unit.unit_instance_id)
     replay = ReplayRunner.from_payload(session.replay_artifact(artifact_id="sf04-shared")).run()
     assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
+@pytest.mark.parametrize("model_choice", [False, True])
+def test_native_shooting_owner_waits_for_attack_mortal_choices(
+    section04_definitions: Section02Definitions,
+    section04_mission: MissionSetup,
+    model_choice: bool,
+) -> None:
+    """Native declaration and fixed-dice executor kernel, not a full-game replay."""
+    import copy
+    import json
+
+    from tests.support.section02_fixtures import INFRACTORS
+    from tests.support.section03_fixtures import grid, native_state
+    from tests.support.section04_fixtures import shooting_payload
+    from tests.support.section24_fixtures import profile_grant, with_profile
+    from warhammer40k_core.core.weapon_profiles import (
+        AbilityDescriptor,
+        AttackProfile,
+        DamageProfile,
+        WeaponKeyword,
+    )
+    from warhammer40k_core.engine.attack_sequence import (
+        attack_sequence_hit_roll_spec,
+        attack_sequence_wound_roll_spec,
+        resolve_attack_sequence_until_blocked,
+    )
+    from warhammer40k_core.engine.damage_allocation import FeelNoPainSource, model_by_id
+    from warhammer40k_core.engine.decision_request import PARAMETERIZED_DECISION_OPTION_ID
+    from warhammer40k_core.engine.decision_result import DecisionResult
+    from warhammer40k_core.engine.dice import DiceRollManager
+    from warhammer40k_core.engine.model_attack_completion import all_attacks_resolved
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        mortal_wound_resolution_progress,
+    )
+
+    # Explicit Core ability/characteristic inputs on one physically equipped weapon.
+    profile = replace(
+        profile_grant(
+            section04_definitions.weapon(f"{LORD_EXULTANT}:bolt-pistol"),
+            WeaponKeyword.DEVASTATING_WOUNDS,
+            AbilityDescriptor.devastating_wounds(),
+        ),
+        attack_profile=AttackProfile.fixed(1),
+        damage_profile=DamageProfile.fixed(1),
+    )
+    definitions = with_profile(section04_definitions, profile)
+    attacker = definitions.unit(LORD_EXULTANT)
+    target = definitions.unit(
+        INFRACTORS if model_choice else LORD_EXULTANT, army_id="enemy", identity="target"
+    )
+    state = native_state(definitions, attacker, enemy=target, enemy_poses=grid(target, 18, 10))
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    for model in target.own_models:
+        state.record_model_feel_no_pain_sources(
+            model_instance_id=model.model_instance_id,
+            sources=(FeelNoPainSource(source_id="constructed:s04:optional-fnp", threshold=5),),
+            decline_allowed=True,
+        )
+    session = combat_session(definitions, state, section04_mission)
+    declaration = shooting_request(session, attacker.unit_instance_id)
+    rows = [
+        row for row in weapon_rows(declaration) if row["weapon_profile_id"] == profile.profile_id
+    ]
+    assert len(rows) == 1
+    result = DecisionResult(
+        result_id=declaration.request_id + ":s04-mortals",
+        request_id=declaration.request_id,
+        decision_type=declaration.decision_type,
+        actor_id=declaration.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=shooting_payload(declaration, rows, [target.unit_instance_id]),
+    )
+    lifecycle = session.lifecycle
+    handler = lifecycle._shooting_phase_handler  # pyright: ignore[reportPrivateUsage]
+    decisions = lifecycle.decision_controller
+    assert (
+        handler.invalid_declaration_submission_status(
+            state=state, request=declaration, result=result, decisions=decisions
+        )
+        is None
+    )
+    decisions.submit_result(result)
+    assert handler.apply_decision(state=state, result=result, decisions=decisions) is None
+
+    # Bind this native declaration kernel before execution. The admitted audited
+    # payload, including every gameplay field, must then roundtrip exactly.
+    lifecycle = GameLifecycle.from_payload(lifecycle.to_payload())
+    initial = lifecycle.to_payload()
+    initial_copy = copy.deepcopy(initial)
+    assert GameLifecycle.from_payload(initial).to_payload() == initial_copy
+    assert initial == initial_copy
+    state = lifecycle.state
+    assert state is not None
+    assert state.shooting_phase_state is not None
+    owner = state.shooting_phase_state
+    sequence = owner.attack_sequence
+    assert sequence is not None
+    assert len(sequence.attack_pools) == 1
+    assert not sequence.is_complete
+    assert not owner.shot_unit_ids
+    decisions = lifecycle.decision_controller
+    assert not decisions.queue.pending_requests
+    (pool,) = sequence.attack_pools
+    context_id = f"{sequence.sequence_id}:pool-001:attack-001"
+    physical_dice = DiceRollManager("s04:physical-critical")
+    fixed = tuple(
+        physical_dice.roll_fixed(
+            factory(
+                weapon_profile_id=pool.weapon_profile_id,
+                attack_context_id=context_id,
+                attacker_player_id=sequence.attacker_player_id,
+            ),
+            (6,),
+        ).original_result
+        for factory in (attack_sequence_hit_roll_spec, attack_sequence_wound_roll_spec)
+    )
+    handler = lifecycle._shooting_phase_handler  # pyright: ignore[reportPrivateUsage]
+    remaining, allocated, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=owner.allocated_model_ids_this_phase,
+        runtime_modifier_registry=handler.runtime_modifier_registry,
+        dice_manager=DiceRollManager(
+            state.game_id, event_log=decisions.event_log, injected_results=fixed
+        ),
+    )
+    assert remaining is not None
+    assert status is not None
+    (request,) = decisions.queue.pending_requests
+    assert request.decision_type == (
+        "select_mortal_wound_model" if model_choice else "select_feel_no_pain"
+    )
+    assert remaining.is_complete
+    assert not remaining.deferred_mortal_wounds
+    progress = mortal_wound_resolution_progress(request)
+    assert isinstance(progress.source_context, dict)
+    assert progress.source_context["sequence_id"] == sequence.sequence_id
+    assert progress.source_context["source_kind"] == "devastating_wounds"
+    assert progress.remaining_mortal_wounds == 1
+    assert not all_attacks_resolved(
+        remaining, pending_decision_requests=decisions.queue.pending_requests
+    )
+    # A different action's request cannot postpone this action's completion.
+    assert all_attacks_resolved(
+        replace(remaining, sequence_id="s04:unrelated-action"),
+        pending_decision_requests=decisions.queue.pending_requests,
+    )
+    with pytest.raises(GameLifecycleError, match="cannot release pending attack mortal"):
+        owner.with_attack_sequence_update(
+            attack_sequence=None,
+            allocated_model_ids_this_phase=allocated,
+            pending_decision_requests=decisions.queue.pending_requests,
+        )
+    state.replace_shooting_phase_state(
+        owner.with_attack_sequence_update(
+            attack_sequence=remaining,
+            allocated_model_ids_this_phase=allocated,
+            pending_decision_requests=decisions.queue.pending_requests,
+        )
+    )
+    assert not _unit_has_already_shot(state=state, unit_instance_id=attacker.unit_instance_id)
+    assert not model_has_attacked_this_phase(
+        event_records=decisions.event_log.records,
+        model_instance_id=pool.attacker_model_instance_id,
+        battle_round=state.battle_round,
+        active_player_id="owner",
+        phase="shooting",
+    )
+    paused = lifecycle.to_payload()
+    paused_copy = copy.deepcopy(paused)
+    restored = GameLifecycle.from_payload(paused)
+    assert restored.to_payload() == paused_copy
+    assert paused == paused_copy
+    forged = json.loads(json.dumps(paused))
+    forged["state"]["shooting_phase_state"]["shot_unit_ids"] = [attacker.unit_instance_id]
+    with pytest.raises(GameLifecycleError, match="has-shot inventory"):
+        GameLifecycle.from_payload(forged)
+
+    session = LocalGameSession(restored)
+    selected_model_id = target.own_models[-1].model_instance_id
+    if model_choice:
+        choose(session, pending(session), selected_model_id)
+    request = pending(session)
+    assert request.decision_type == "select_feel_no_pain"
+    fnp_state = session.lifecycle.state
+    assert fnp_state is not None
+    assert not _unit_has_already_shot(state=fnp_state, unit_instance_id=attacker.unit_instance_id)
+    fnp = session.lifecycle.to_payload()
+    fnp_copy = copy.deepcopy(fnp)
+    continued = GameLifecycle.from_payload(fnp)
+    assert continued.to_payload() == fnp_copy
+    assert fnp == fnp_copy
+    session = LocalGameSession(continued)
+    choose(session, pending(session), "decline")
+    completed_state = session.lifecycle.state
+    assert completed_state is not None
+    assert _unit_has_already_shot(state=completed_state, unit_instance_id=attacker.unit_instance_id)
+    assert model_by_id(
+        state=completed_state, model_instance_id=selected_model_id
+    ).current_wounds == (target.own_models[-1].initial_wounds - 1)
+    assert completed_attack_sequence(
+        event_records=session.lifecycle.decision_controller.event_log.records,
+        sequence_id=sequence.sequence_id,
+    ).is_complete
+    final = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(final).to_payload() == final

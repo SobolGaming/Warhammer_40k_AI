@@ -548,18 +548,36 @@ class ShootingPhaseState:
         *,
         attack_sequence: AttackSequence | None,
         allocated_model_ids_this_phase: tuple[str, ...],
+        pending_decision_requests: tuple[DecisionRequest, ...],
     ) -> Self:
         from warhammer40k_core.engine.attack_completion_authority import (
             attack_completion_continuation,
         )
 
         shot_unit_ids = self.shot_unit_ids
-        from warhammer40k_core.engine.model_attack_completion import all_attacks_resolved
+        from warhammer40k_core.engine.model_attack_completion import (
+            all_attacks_resolved,
+            has_pending_attack_mortals,
+        )
+
+        if (
+            attack_sequence is None
+            and self.attack_sequence is not None
+            and has_pending_attack_mortals(
+                self.attack_sequence, pending_decision_requests=pending_decision_requests
+            )
+        ):
+            raise GameLifecycleError("Shooting cannot release pending attack mortal wounds.")
 
         if (
             self.attack_sequence is not None
             and self.attack_sequence.attack_pools
-            and (attack_sequence is None or all_attacks_resolved(attack_sequence))
+            and (
+                attack_sequence is None
+                or all_attacks_resolved(
+                    attack_sequence, pending_decision_requests=pending_decision_requests
+                )
+            )
         ):
             shot_unit_ids = tuple(
                 sorted(

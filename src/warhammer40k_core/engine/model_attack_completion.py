@@ -18,6 +18,7 @@ from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.decision_request import DecisionRequest
     from warhammer40k_core.engine.event_log import EventRecord
     from warhammer40k_core.engine.game_state import GameState
 
@@ -172,10 +173,55 @@ def resolved_model_ids(
     return (complete - group_models) | frozenset(declared - unresolved)
 
 
-def all_attacks_resolved(sequence: AttackSequence) -> bool:
+def has_pending_attack_mortals(
+    sequence: AttackSequence, *, pending_decision_requests: tuple[DecisionRequest, ...]
+) -> bool:
+    """Follow deferred attack damage after ownership transfers to a shared request."""
+    from warhammer40k_core.engine.additional_attack_mortal_permissions import (
+        ADDITIONAL_ATTACK_MORTAL_SOURCE_KIND,
+    )
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_progress,
+    )
+
+    for request in pending_decision_requests:
+        if not is_mortal_wound_resolution_request(request):
+            continue
+        progress = mortal_wound_resolution_progress(request)
+        context = progress.source_context
+        if (
+            not isinstance(context, dict)
+            or context.get("sequence_id") != sequence.sequence_id
+            or context.get("source_kind")
+            not in {"devastating_wounds", ADDITIONAL_ATTACK_MORTAL_SOURCE_KIND}
+        ):
+            continue
+        evidence = progress.destruction_evidence
+        if (
+            context.get("attacking_unit_instance_id") != sequence.attacking_unit_instance_id
+            or evidence is None
+            or evidence.action_phase is not sequence.source_phase
+            or evidence.source_step != context["source_kind"]
+            or evidence.destruction_attribution.attacking_model_instance_id
+            not in {pool.attacker_model_instance_id for pool in sequence.attack_pools}
+        ):
+            raise GameLifecycleError("Pending attack mortal wound ownership drift.")
+        return True
+    return False
+
+
+def all_attacks_resolved(
+    sequence: AttackSequence, *, pending_decision_requests: tuple[DecisionRequest, ...]
+) -> bool:
     """Target post-attack reactions do not delay the attacking unit having shot."""
     return (
-        bool(sequence.attack_pools) and sequence.is_complete and not sequence.deferred_mortal_wounds
+        bool(sequence.attack_pools)
+        and sequence.is_complete
+        and not sequence.deferred_mortal_wounds
+        and not has_pending_attack_mortals(
+            sequence, pending_decision_requests=pending_decision_requests
+        )
     )
 
 

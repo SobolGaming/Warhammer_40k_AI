@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import subprocess
+import sys
+import tomllib
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -104,6 +108,7 @@ def test_junit_file_attribute_rejects_paths_outside_behavioral_inventory() -> No
         sharding._test_file_from_testcase(testcase, expected=expected)
 
 
+@pytest.mark.stubbed
 def test_manifest_check_rejects_assignment_drift(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -121,6 +126,7 @@ def test_manifest_check_rejects_assignment_drift(
         sharding._check_manifests(output_dir=output_dir, shard_count=2)
 
 
+@pytest.mark.stubbed
 def test_manifest_check_rejects_stale_duration_totals(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -135,6 +141,7 @@ def test_manifest_check_rejects_stale_duration_totals(
         sharding._check_manifests(output_dir=output_dir, shard_count=2)
 
 
+@pytest.mark.stubbed
 def test_manifest_check_rejects_stale_duration_file_inventory(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -164,6 +171,14 @@ def _write_sample_shards(
     second_test.write_text("def test_second(): pass\n", encoding="utf-8")
     monkeypatch.setattr(sharding, "REPOSITORY_ROOT", repository_root)
     monkeypatch.setattr(sharding, "TESTS_ROOT", tests_root)
+    # Pure two-file shard/profile fixture; real cutover admission is tested below.
+    monkeypatch.setattr(
+        sharding,
+        "behavioral_selection",
+        lambda _root: sharding.BehavioralSelection(
+            ("tests/unit/test_first.py", "tests/unit/test_second.py"), (), (), (), "0" * 64
+        ),
+    )
 
     durations = {
         "tests/unit/test_first.py": 10.0,
@@ -175,6 +190,7 @@ def _write_sample_shards(
     return output_dir
 
 
+@pytest.mark.stubbed
 def test_junit_profiles_use_file_medians_and_preserve_evidence(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -198,6 +214,7 @@ def test_junit_profiles_use_file_medians_and_preserve_evidence(
     assert evidence[0]["source"] == "run-0"
 
 
+@pytest.mark.stubbed
 @pytest.mark.parametrize(
     "invalid", ["duplicate", "missing", "failed", "skipped", "truncated", "nan"]
 )
@@ -255,7 +272,15 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
         assert workflow.count(f"manifest: ci/test_shards/shard-{shard}.txt") == 1
     coverage = workflow.partition("\n  coverage-gate:\n")[2]
     assert "scripts/check_shard_coverage.py coverage-data --shard-count 12" in coverage
-    assert "uv run --no-sync coverage report --fail-under=85" in coverage
+    assert "uv run --no-sync coverage report --fail-under=50" in coverage
+    configuration = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    coverage_config = configuration["tool"]["coverage"]
+    assert coverage_config["run"] == {"branch": True, "source": ["warhammer40k_core"]}
+    assert coverage_config["report"] == {
+        "show_missing": True,
+        "skip_covered": True,
+        "fail_under": 50,
+    }
     assert "scripts/build_test_shards.py --check --shard-count 12" in workflow
 
 
@@ -284,3 +309,223 @@ def test_cached_function_spans_match_python_ast_with_unicode(newline: str, tmp_p
         if isinstance(node, ast.FunctionDef)
     }
     assert function_sources_for((path,)) == expected
+
+
+@pytest.fixture
+def cutover_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Small declared source fixture for the pure selection and collection policy."""
+    payload = json.loads((ROOT / sharding.CUTOVER_PATH).read_text())
+    active_name = "tests/rules/test_active.py"
+    inactive_name = "tests/unit/test_inactive.py"
+    benchmark_name = "tests/benchmarks/test_measurement.py"
+    names = [active_name, *sharding.RETAINED_ACTIVE_FILES, inactive_name, benchmark_name]
+    rows: dict[str, dict[str, object]] = {}
+    for name in names:
+        raw = b"def test_example():\n    assert True\n"
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+        rows[name] = {
+            "mode": "100644",
+            "bytes": len(raw),
+            "sha256": hashlib.sha256(raw).hexdigest(),
+            "blob_sha1": hashlib.sha1(
+                b"blob " + str(len(raw)).encode() + b"\0" + raw, usedforsecurity=False
+            ).hexdigest(),
+        }
+    for name in sharding.ACTIVE_TEST_ROOTS:
+        (tmp_path / name).mkdir(parents=True, exist_ok=True)
+    (tmp_path / "tests/code_quality").mkdir()
+    payload["active_files"] = {
+        name: rows[name] for name in [active_name, *sharding.RETAINED_ACTIVE_FILES]
+    }
+    payload["native_active_files"] = dict(payload["active_files"])
+    payload["retained_active_files"] = {name: rows[name] for name in sharding.RETAINED_ACTIVE_FILES}
+    payload["inactive_legacy_files"] = {inactive_name: rows[inactive_name]}
+    payload["inactive_updates"] = {}
+    payload["benchmark_files"] = {benchmark_name: rows[benchmark_name]}
+    # The pure policy fixture has its own pinned six-file source authority;
+    # repository-native 5734 authentication remains independently verified.
+    (tmp_path / "original-cutover-pin.txt").write_text(sharding.CUTOVER_LEDGER_SHA256)
+    fields = (
+        "source_base",
+        "active_roots",
+        "native_active_files",
+        "retained_active_files",
+        "inactive_legacy_files",
+        "benchmark_files",
+    )
+    fixture_ledger = {name: payload[name] for name in fields}
+    fixture_pin = hashlib.sha256(
+        json.dumps(fixture_ledger, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    monkeypatch.setattr(sharding, "CUTOVER_LEDGER_SHA256", fixture_pin)
+    target = tmp_path / sharding.CUTOVER_PATH
+    target.parent.mkdir(parents=True)
+    target.write_text(json.dumps(payload))
+    return tmp_path
+
+
+@pytest.mark.stubbed
+def test_cutover_exact_inventory_and_explicit_inactive_rejection(cutover_root: Path) -> None:
+    selection = sharding.behavioral_selection(cutover_root)
+    assert selection.active_files == tuple(
+        sorted(("tests/rules/test_active.py", *sharding.RETAINED_ACTIVE_FILES))
+    )
+    assert selection.inactive_files == ("tests/unit/test_inactive.py",)
+    assert selection.benchmark_files == ("tests/benchmarks/test_measurement.py",)
+    selection.check_explicit(cutover_root, ("tests/rules/test_active.py::test_example",))
+    with pytest.raises(SystemExit, match="Explicit inactive legacy test"):
+        selection.check_explicit(cutover_root, ("tests/unit/test_inactive.py::test_example",))
+    with pytest.raises(SystemExit, match="parent aliases"):
+        selection.check_explicit(cutover_root, ("tests/rules/../unit/test_dice.py",))
+
+
+@pytest.mark.stubbed
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "missing_active",
+        "changed_active",
+        "unknown_active",
+        "unknown_legacy",
+        "active_suffix",
+        "legacy_suffix",
+        "status_overlap",
+        "wrong_source",
+        "wrong_roots",
+        "wrong_coverage",
+        "extra_field",
+        "undeclared_retirement",
+        "path_alias",
+    ],
+)
+def test_cutover_rejects_incomplete_malformed_and_changed_members(
+    cutover_root: Path, mutation: str
+) -> None:
+    target = cutover_root / sharding.CUTOVER_PATH
+    payload = json.loads(target.read_text())
+    active = cutover_root / "tests/rules/test_active.py"
+    if mutation == "missing_active":
+        active.unlink()
+    elif mutation == "changed_active":
+        active.write_text("def test_changed():\n    assert False\n")
+    elif mutation in {"unknown_active", "unknown_legacy"}:
+        parent = "tests/rules" if mutation == "unknown_active" else "tests/unit"
+        (cutover_root / parent / "test_undeclared.py").write_text("def test_new(): pass\n")
+    elif mutation in {"active_suffix", "legacy_suffix"}:
+        parent = "tests/rules" if mutation == "active_suffix" else "tests/unit"
+        (cutover_root / parent / "extra_test.py").write_text("def test_new(): pass\n")
+    elif mutation == "status_overlap":
+        payload["inactive_legacy_files"]["tests/unit/test_dice.py"] = payload["active_files"][
+            "tests/unit/test_dice.py"
+        ]
+    elif mutation == "wrong_source":
+        payload["source_base"]["commit"] = "0" * 40
+    elif mutation == "wrong_roots":
+        payload["active_roots"] = ["tests/unit"]
+    elif mutation == "wrong_coverage":
+        payload["coverage"]["current_floor"] = 49
+    elif mutation == "extra_field":
+        payload["unreviewed"] = True
+    elif mutation == "undeclared_retirement":
+        payload["retirements"] = ["tests/unit/test_inactive.py"]
+    elif mutation == "path_alias":
+        payload["active_files"]["tests/rules/../rules/test_active.py"] = payload[
+            "active_files"
+        ].pop("tests/rules/test_active.py")
+    else:
+        raise AssertionError("Unknown cutover mutation")
+    target.write_text(json.dumps(payload))
+    with pytest.raises(SystemExit):
+        sharding.behavioral_selection(cutover_root)
+
+
+@pytest.mark.stubbed
+def test_cutover_rejects_duplicate_json_keys(cutover_root: Path) -> None:
+    target = cutover_root / sharding.CUTOVER_PATH
+    raw = target.read_text()
+    target.write_text('{"schema":"wrong",' + raw[1:])
+    with pytest.raises(SystemExit, match="Duplicate cutover field"):
+        sharding.behavioral_selection(cutover_root)
+
+
+@pytest.mark.stubbed
+@pytest.mark.parametrize("explicit", ["tests/unit/test_inactive.py", "tests/rules/test_active.py"])
+def test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard(
+    cutover_root: Path, explicit: str
+) -> None:
+    for name in (
+        "scripts/build_test_shards.py",
+        "tests/conftest.py",
+        "tests/timing_plugin.py",
+        "tests/__init__.py",
+    ):
+        target = cutover_root / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        raw = (ROOT / name).read_text()
+        if name == "scripts/build_test_shards.py":
+            native_pin = (cutover_root / "original-cutover-pin.txt").read_text()
+            before = 'CUTOVER_LEDGER_SHA256 = "' + native_pin + '"'
+            after = 'CUTOVER_LEDGER_SHA256 = "' + sharding.CUTOVER_LEDGER_SHA256 + '"'
+            assert raw.count(before) == 1
+            raw = raw.replace(before, after, 1)
+        target.write_text(raw)
+    (cutover_root / "pyproject.toml").write_text(
+        '[tool.pytest.ini_options]\npython_files = ["test_*.py"]\n'
+    )
+    result = subprocess.run(
+        [sys.executable, "-B", "-m", "pytest", "--collect-only", "-q", explicit],
+        cwd=cutover_root,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    if explicit.startswith("tests/unit/"):
+        assert result.returncode == 4
+        assert "Explicit inactive legacy test is quarantined" in result.stderr
+    else:
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "test_example" in result.stdout
+
+
+@pytest.mark.stubbed
+def test_cutover_real_cli_rejects_naming_override(cutover_root: Path) -> None:
+    for name in (
+        "scripts/build_test_shards.py",
+        "tests/conftest.py",
+        "tests/timing_plugin.py",
+        "tests/__init__.py",
+    ):
+        target = cutover_root / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        raw = (ROOT / name).read_text()
+        if name == "scripts/build_test_shards.py":
+            native_pin = (cutover_root / "original-cutover-pin.txt").read_text()
+            before = 'CUTOVER_LEDGER_SHA256 = "' + native_pin + '"'
+            after = 'CUTOVER_LEDGER_SHA256 = "' + sharding.CUTOVER_LEDGER_SHA256 + '"'
+            assert raw.count(before) == 1
+            raw = raw.replace(before, after, 1)
+        target.write_text(raw)
+    (cutover_root / "pyproject.toml").write_text(
+        '[tool.pytest.ini_options]\npython_files = ["test_*.py"]\n'
+    )
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-B",
+            "-m",
+            "pytest",
+            "--collect-only",
+            "-q",
+            "tests/rules/test_active.py",
+            "-o",
+            "python_files=*_test.py",
+        ],
+        cwd=cutover_root,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == 4
+    assert "Effective pytest python_files" in result.stderr

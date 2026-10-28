@@ -71,7 +71,10 @@ def resume_declined_attack_collateral(
             )
     else:
         replace_host_attack_sequence(
-            state=state, original_sequence_id=original_sequence.sequence_id, sequence=sequence
+            state=state,
+            decisions=decisions,
+            original_sequence_id=original_sequence.sequence_id,
+            sequence=sequence,
         )
     if status is None:
         complete_removed_retained_destructions(state=state, decisions=decisions)
@@ -79,7 +82,11 @@ def resume_declined_attack_collateral(
 
 
 def replace_host_attack_sequence(
-    *, state: GameState, original_sequence_id: str, sequence: AttackSequence | None
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    original_sequence_id: str,
+    sequence: AttackSequence | None,
 ) -> None:
     out_of_phase = state.out_of_phase_shooting_state
     if (
@@ -117,6 +124,7 @@ def replace_host_attack_sequence(
             shooting.with_attack_sequence_update(
                 attack_sequence=sequence,
                 allocated_model_ids_this_phase=shooting.allocated_model_ids_this_phase,
+                pending_decision_requests=decisions.queue.pending_requests,
             )
         )
         return

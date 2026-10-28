@@ -3869,6 +3869,7 @@ def test_phase14k_grouped_damage_requests_defender_model_choice_inside_current_g
         state.shooting_phase_state = shooting_state.with_attack_sequence_update(
             attack_sequence=remaining_sequence,
             allocated_model_ids_this_phase=allocated_ids,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
     selection_result = DecisionResult.for_request(
         result_id="phase14k-current-group-model-choice-select",
@@ -4065,6 +4066,7 @@ def test_phase14k_damage_model_choice_stale_pending_damage_rejects_before_queue_
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence.without_pending_grouped_damage(),
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     result = DecisionResult.for_request(
         result_id="phase14k-model-choice-stale-result",
@@ -7933,6 +7935,7 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
     state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
         attack_sequence=None,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     status = resolve_core_attack_completion_for_executor_fixture(
         state=state,
@@ -7959,6 +7962,7 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
     state.shooting_phase_state = current_shooting_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     checkpoint = cast(
         GameLifecyclePayload,
@@ -8137,6 +8141,7 @@ def test_p24d_hazardous_preserves_order_through_completion_and_restore(
         state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
             attack_sequence=None,
             allocated_model_ids_this_phase=(),
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
     record_models_attacked(state=state, decisions=lifecycle.decision_controller, sequence=sequence)
     record_attack_sequence_completed(
@@ -10692,6 +10697,7 @@ def test_phase14l_attack_sequence_selection_invalid_before_queue_pop() -> None:
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=shooting_state.attack_sequence.without_selected_target_unit(),
         allocated_model_ids_this_phase=shooting_state.allocated_model_ids_this_phase,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
 
     drift_status = _submit_result(
@@ -12423,6 +12429,7 @@ def test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle(
     state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
 
     from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -12553,6 +12560,7 @@ def test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection(
     state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
 
     assert request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
@@ -13124,6 +13132,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=suffix_sequence,
         allocated_model_ids_this_phase=suffix_allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     suffix_restored = GameLifecycle.from_payload(
         cast(
@@ -13372,6 +13381,7 @@ def _retain_attack_casualty_for_fight_on_death(
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     reaction_record = lifecycle.decision_controller.submit_result(
         DecisionResult.for_request(
@@ -13395,6 +13405,7 @@ def _retain_attack_casualty_for_fight_on_death(
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=continued_sequence,
         allocated_model_ids_this_phase=continued_allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     assert continued_status is None
     assert model_is_present_on_battlefield(
@@ -13955,6 +13966,7 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
         shooting_phase_state.with_attack_sequence_update(
             attack_sequence=remaining_sequence,
             allocated_model_ids_this_phase=allocated_ids,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
     )
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
@@ -16609,6 +16621,7 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
         state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
             attack_sequence=remaining_sequence,
             allocated_model_ids_this_phase=allocated_ids,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
         restored = GameLifecycle.from_payload(lifecycle.to_payload())
         session = LocalGameSession(lifecycle=restored)
@@ -16910,6 +16923,7 @@ def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> N
     state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     assert request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
     status = lifecycle.submit_decision(
@@ -17127,6 +17141,7 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     assert request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
     status = lifecycle.submit_decision(
@@ -17619,6 +17634,7 @@ def test_phase13e_destruction_reaction_invalid_submission_does_not_mutate_queue(
     state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     before_records = len(lifecycle.decision_controller.records)
 

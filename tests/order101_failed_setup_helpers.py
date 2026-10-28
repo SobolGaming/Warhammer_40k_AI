@@ -964,7 +964,9 @@ def emergency_component_omission_session() -> tuple[LocalGameSession, PlacementP
     assert phase is not None
     state.replace_shooting_phase_state(
         phase.with_attack_sequence_update(
-            attack_sequence=remaining_sequence, allocated_model_ids_this_phase=allocated
+            attack_sequence=remaining_sequence,
+            allocated_model_ids_this_phase=allocated,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
     )
     request = MovementProposalRequest.from_decision_request_payload(

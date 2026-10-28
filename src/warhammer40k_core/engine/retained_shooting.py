@@ -281,7 +281,7 @@ def advance_retained_shooting(
     if phase is None:
         raise GameLifecycleError("Retained shooting requires a battle phase.")
     if record.owner_kind is DestructionOwnerKind.ATTACK:
-        _release_parent_attack_destruction(state=state, record=record)
+        _release_parent_attack_destruction(state=state, decisions=decisions, record=record)
     execution = RetainedShootingExecution(
         cause_id=record.cause_id,
         parent_cause_id=executions[-1].cause_id if executions else None,
@@ -428,7 +428,7 @@ def automatically_pass_retained_shooting_hazardous(
 
 
 def _release_parent_attack_destruction(
-    *, state: GameState, record: RetainedModelDestruction
+    *, state: GameState, decisions: DecisionController, record: RetainedModelDestruction
 ) -> None:
     from warhammer40k_core.engine.retained_destruction_cleanup import (
         attack_sequence_for_retained_destruction,
@@ -458,6 +458,7 @@ def _release_parent_attack_destruction(
     ):
         replace_host_attack_sequence(
             state=state,
+            decisions=decisions,
             original_sequence_id=sequence.sequence_id,
             sequence=sequence.without_current_pending_attack_destruction(),
         )

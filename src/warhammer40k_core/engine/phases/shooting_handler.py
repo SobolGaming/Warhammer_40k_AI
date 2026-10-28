@@ -199,6 +199,7 @@ class ShootingPhaseHandler:
             shooting_state = shooting_state.with_attack_sequence_update(
                 attack_sequence=attack_sequence,
                 allocated_model_ids_this_phase=allocated_model_ids,
+                pending_decision_requests=decisions.queue.pending_requests,
             )
             state.replace_shooting_phase_state(shooting_state)
             if status is not None:

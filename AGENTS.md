@@ -377,13 +377,17 @@ Legacy code containing broad exceptions, fallback behavior, ambiguous model acce
 
 ## Required commands before PR
 
+The temporary owner-approved coverage floor is 50%; post-merge coverage work must restore
+85%. Keep full-package branch coverage and all other required gates. See
+docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md.
+
 Run:
 
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=50
 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports

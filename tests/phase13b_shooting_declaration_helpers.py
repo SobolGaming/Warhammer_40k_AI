@@ -2264,6 +2264,7 @@ def _damage_model_choice_lifecycle(
         state.shooting_phase_state = shooting_state.with_attack_sequence_update(
             attack_sequence=remaining_sequence,
             allocated_model_ids_this_phase=allocated_ids,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
     return (
         lifecycle,
@@ -2591,6 +2592,7 @@ def _store_shooting_attack_sequence(
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=attack_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
 
 
@@ -2813,6 +2815,7 @@ def _paused_optional_fnp_lifecycle() -> tuple[GameLifecycle, DecisionRequest]:
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     return lifecycle, request
 

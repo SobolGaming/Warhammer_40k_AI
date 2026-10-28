@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
@@ -70,13 +71,257 @@ def main() -> int:
     return 0
 
 
-def _behavioral_test_files() -> tuple[str, ...]:
-    paths = (
-        path
-        for path in TESTS_ROOT.rglob("test_*.py")
-        if not EXCLUDED_TEST_DIRECTORIES.intersection(path.relative_to(TESTS_ROOT).parts)
+CUTOVER_PATH = "data/source_audits/ci64_provenance_v1/test-cutover.json"
+CUTOVER_BASE = "5734eace50abe8fe99bbe46282652e4ab3c021b4"
+CUTOVER_TREE = "29eb413bb3c6c698c7f12a74e96b373e1084fd46"
+CUTOVER_LEDGER_SHA256 = "207e59b1e4f56c209ca35f1839823a3dfa94e0ad71e231334549b3ce74945217"
+ACTIVE_TEST_ROOTS = ("tests/rules", "tests/factions", "tests/infrastructure", "tests/performance")
+RETAINED_ACTIVE_FILES = (
+    "tests/unit/test_dice.py",
+    "tests/unit/test_phase10i_terrain_movement.py",
+)
+
+
+@dataclass(frozen=True, slots=True)
+class BehavioralSelection:
+    active_files: tuple[str, ...]
+    inactive_files: tuple[str, ...]
+    quality_files: tuple[str, ...]
+    benchmark_files: tuple[str, ...]
+    manifest_sha256: str
+
+    def check_explicit(self, root: Path, arguments: tuple[str, ...]) -> None:
+        """Reject explicit quarantined files; pytest otherwise bypasses ignore lists."""
+        for argument in arguments:
+            name = argument.split("::", 1)[0]
+            path = Path(name)
+            if ".." in path.parts:
+                raise SystemExit("Test selector must not contain parent aliases: " + name)
+            candidate = path if path.is_absolute() else root / path
+            _selection_no_links(root, candidate)
+            if candidate.is_dir():
+                if candidate != root and not candidate.is_relative_to(root / "tests"):
+                    raise SystemExit("Test selector escaped tests: " + name)
+                continue
+            relative = candidate.relative_to(root).as_posix()
+            if relative in self.inactive_files:
+                raise SystemExit("Explicit inactive legacy test is quarantined: " + relative)
+            if relative not in (*self.active_files, *self.quality_files, *self.benchmark_files):
+                raise SystemExit("Explicit test is outside the declared cutover: " + relative)
+
+
+def _selection_no_links(root: Path, path: Path) -> None:
+    if not path.is_relative_to(root):
+        raise SystemExit("Test selection escaped repository: " + str(path))
+    for member in (path, *path.parents):
+        if member == root:
+            break
+        if member.is_symlink():
+            raise SystemExit("Test selection contains a symlink alias: " + str(member))
+
+
+def _selection_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    value: dict[str, object] = {}
+    for key, item in pairs:
+        if key in value:
+            raise SystemExit("Duplicate cutover field: " + key)
+        value[key] = item
+    return value
+
+
+def _selection_members(
+    value: object, root: Path, *, current: dict[str, dict[str, object]] | None = None
+) -> dict[str, dict[str, object]]:
+    if not isinstance(value, dict) or not value:
+        raise SystemExit("Cutover members must be a nonempty object.")
+    result: dict[str, dict[str, object]] = {}
+    for name, item in value.items():
+        if (
+            not isinstance(name, str)
+            or name != PurePosixPath(name).as_posix()
+            or PurePosixPath(name).is_absolute()
+            or ".." in PurePosixPath(name).parts
+            or "\\" in name
+            or ":" in name
+            or not name.startswith("tests/")
+            or not PurePosixPath(name).name.startswith("test_")
+            or not name.endswith(".py")
+            or not isinstance(item, dict)
+            or item.keys() != {"mode", "blob_sha1", "sha256", "bytes"}
+            or item["mode"] not in {"100644", "100755"}
+            or type(item["bytes"]) is not int
+            or item["bytes"] < 0
+        ):
+            raise SystemExit("Malformed cutover member: " + str(name))
+        for key, size in (("sha256", 64), ("blob_sha1", 40)):
+            token = item[key]
+            if (
+                not isinstance(token, str)
+                or len(token) != size
+                or set(token) - set("0123456789abcdef")
+            ):
+                raise SystemExit("Malformed cutover digest: " + name)
+        path = root / name
+        _selection_no_links(root, path)
+        if not path.is_file():
+            raise SystemExit("Missing declared cutover member: " + name)
+        observed = item if current is None else current.get(name, item)
+        raw = path.read_bytes()
+        blob = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw, usedforsecurity=False)
+        if (
+            len(raw) != observed["bytes"]
+            or hashlib.sha256(raw).hexdigest() != observed["sha256"]
+            or blob.hexdigest() != observed["blob_sha1"]
+        ):
+            raise SystemExit("Cutover member bytes changed: " + name)
+        if os.name != "nt" and bool(path.stat().st_mode & 0o100) != (observed["mode"] == "100755"):
+            raise SystemExit("Cutover member mode changed: " + name)
+        result[name] = item
+    if len({name.casefold() for name in result}) != len(result):
+        raise SystemExit("Case aliases in cutover membership.")
+    return result
+
+
+def behavioral_selection(root: Path) -> BehavioralSelection:
+    """Fresh finite cutover admission shared by pytest and shard discovery."""
+    root = root.resolve(strict=True)
+    path = root / CUTOVER_PATH
+    _selection_no_links(root, path)
+    raw = path.read_bytes()
+    value = json.loads(raw, object_pairs_hook=_selection_object)
+    fields = {
+        "schema",
+        "source_base",
+        "active_roots",
+        "active_files",
+        "retained_active_files",
+        "inactive_legacy_files",
+        "inactive_updates",
+        "native_active_files",
+        "benchmark_files",
+        "retirements",
+        "coverage",
+    }
+    if (
+        not isinstance(value, dict)
+        or value.keys() != fields
+        or value["schema"] != "finite-test-cutover-v1"
+    ):
+        raise SystemExit("Invalid finite test cutover schema.")
+    if value["source_base"] != {"commit": CUTOVER_BASE, "tree": CUTOVER_TREE}:
+        raise SystemExit("Test cutover source authority changed.")
+    if value["active_roots"] != list(ACTIVE_TEST_ROOTS) or value["retirements"] != []:
+        raise SystemExit("Test cutover roots or approved retirement set changed.")
+    expected_coverage = {
+        "metric": "coverage.py total with branch=true",
+        "source": ["warhammer40k_core"],
+        "current_floor": 50,
+        "restoration_floor": 85,
+        "restoration_condition": (
+            "post-merge rebuild until complete selected behavioral coverage meets85; then restore85"
+        ),
+    }
+    if (
+        value["coverage"] != expected_coverage
+        or type(value["coverage"]["current_floor"]) is not int
+        or type(value["coverage"]["restoration_floor"]) is not int
+    ):
+        raise SystemExit("Test cutover coverage authority changed.")
+    ledger_fields = (
+        "source_base",
+        "active_roots",
+        "native_active_files",
+        "retained_active_files",
+        "inactive_legacy_files",
+        "benchmark_files",
     )
-    return tuple(sorted(path.relative_to(REPOSITORY_ROOT).as_posix() for path in paths))
+    ledger = {name: value[name] for name in ledger_fields}
+    if (
+        hashlib.sha256(
+            json.dumps(ledger, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        != CUTOVER_LEDGER_SHA256
+    ):
+        raise SystemExit("Native behavioral classification ledger changed.")
+    if not isinstance(value["native_active_files"], dict):
+        raise SystemExit("Native active file ledger must be an object.")
+    active = _selection_members(value["active_files"], root)
+    if not value["native_active_files"].keys() <= active.keys():
+        raise SystemExit("A native active Core/regression file was omitted.")
+    retained = _selection_members(value["retained_active_files"], root)
+    updates = value["inactive_updates"]
+    allowed_updates = {
+        "tests/unit/test_phase15c_fight_order.py",
+        "tests/unit/test_phase13b_shooting_declarations.py",
+    }
+    if not isinstance(updates, dict) or set(updates) - allowed_updates:
+        raise SystemExit("Inactive update membership changed.")
+    current: dict[str, dict[str, object]] = {}
+    for name, update in updates.items():
+        if (
+            not isinstance(update, dict)
+            or update.keys() != {"before", "after", "recipe"}
+            or update["recipe"] != "add-pending-decision-requests-v1"
+            or not isinstance(value["inactive_legacy_files"], dict)
+            or update["before"] != value["inactive_legacy_files"].get(name)
+        ):
+            raise SystemExit("Inactive update native preimage/recipe changed.")
+        current.update(_selection_members({name: update["after"]}, root))
+    inactive = _selection_members(value["inactive_legacy_files"], root, current=current)
+    benchmarks = _selection_members(value["benchmark_files"], root)
+    if tuple(sorted(retained)) != RETAINED_ACTIVE_FILES or any(
+        active.get(n) != row for n, row in retained.items()
+    ):
+        raise SystemExit("Retained active regression files changed.")
+    if set(active) & set(inactive) or (set(active) | set(inactive)) & set(benchmarks):
+        raise SystemExit("Cutover status memberships overlap.")
+    if any(
+        not any(name.startswith(prefix + "/") for prefix in ACTIVE_TEST_ROOTS)
+        and name not in retained
+        for name in active
+    ):
+        raise SystemExit("Active file is outside approved roots and retained files.")
+    if any(
+        not name.startswith(("tests/unit/", "tests/integration/", "tests/replay/"))
+        for name in inactive
+    ):
+        raise SystemExit("Inactive file is outside the finite legacy roots.")
+    if any(not name.startswith("tests/benchmarks/") for name in benchmarks):
+        raise SystemExit("Measurement file is outside benchmark root.")
+    found: set[str] = set()
+    tests_root = root / "tests"
+    _selection_no_links(root, tests_root)
+    for directory, directories, filenames in os.walk(tests_root, followlinks=False):
+        base = Path(directory)
+        for entry in directories:
+            _selection_no_links(root, base / entry)
+        for filename in filenames:
+            if filename.endswith("_test.py") and not filename.startswith("test_"):
+                raise SystemExit("Undeclared alternate pytest naming: " + str(base / filename))
+            if filename.startswith("test_") and filename.endswith(".py"):
+                member = base / filename
+                _selection_no_links(root, member)
+                found.add(member.relative_to(root).as_posix())
+    quality = {name for name in found if name.startswith("tests/code_quality/")}
+    declared = set(active) | set(inactive) | set(benchmarks) | quality
+    if found != declared:
+        raise SystemExit("Cutover test membership changed: " + repr(sorted(found ^ declared)))
+    if len({name.casefold() for name in found}) != len(found):
+        raise SystemExit("Case aliases in physical test membership.")
+    for name in ACTIVE_TEST_ROOTS:
+        if not (root / name).is_dir():
+            raise SystemExit("Missing active test root: " + name)
+    return BehavioralSelection(
+        tuple(sorted(active)),
+        tuple(sorted(inactive)),
+        tuple(sorted(quality)),
+        tuple(sorted(benchmarks)),
+        hashlib.sha256(raw).hexdigest(),
+    )
+
+
+def _behavioral_test_files() -> tuple[str, ...]:
+    return behavioral_selection(REPOSITORY_ROOT).active_files
 
 
 def _profile_medians(

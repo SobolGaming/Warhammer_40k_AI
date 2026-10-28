@@ -99,8 +99,21 @@ review alongside validation and the fresh parent audit alongside hosted CI.
 Keep automatic evidence capture off the critical path; archive transfers are not
 publication prerequisites. Do not add repeated intermediate planning, benchmark,
 or evidence reviews. Preserve both clean exact-head reviews, complete correctness
-inventories, local covered behavior at 85%, quality/type/lint/contracts, required
-hosted CI and branch protections.
+inventories, local covered behavior at the active threshold below, quality/type/lint/contracts,
+required hosted CI and branch protections.
+
+On 28 October 2026, the owner authorized a temporary coverage floor of 50%,
+superseding the active 85% requirement. Coverage still measures the complete
+warhammer40k_core package with branches; the denominator and default omissions
+and exclusions are unchanged. CI must combine all required successful behavioral
+shards before enforcing the threshold. Retained test failures and every other
+required gate continue to block merge. This authorization is not a coverage,
+CI, publication or merge success claim.
+
+Post-merge coverage work must rebuild coverage and restore the 85% requirement
+in configuration, CI and active documented commands. Historical 85% receipts,
+source pins and prior qualification records retain their original meaning and
+bytes; the temporary floor does not reclassify a historical failure as a pass.
 
 For these bounded repairs, the default performance evidence is the existing
 serial current-runtime smoke and exact-base assessment. Detailed benchmarks are

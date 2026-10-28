@@ -52,7 +52,9 @@ def active_shooting_sequence(state: GameState) -> AttackSequence:
     return shooting.attack_sequence
 
 
-def replace_active_shooting_sequence(state: GameState, sequence: AttackSequence) -> None:
+def replace_active_shooting_sequence(
+    state: GameState, sequence: AttackSequence, *, decisions: DecisionController
+) -> None:
     current = active_shooting_sequence(state)
     if sequence.sequence_id != current.sequence_id:
         raise GameLifecycleError("Target replacement action identity drift.")
@@ -72,6 +74,7 @@ def replace_active_shooting_sequence(state: GameState, sequence: AttackSequence)
         shooting.with_attack_sequence_update(
             attack_sequence=sequence,
             allocated_model_ids_this_phase=shooting.allocated_model_ids_this_phase,
+            pending_decision_requests=decisions.queue.pending_requests,
         )
     )
 
