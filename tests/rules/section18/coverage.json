@@ -3867,7 +3867,6 @@
     "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
     "data/source_audits/v963_shock/captures/core-page.js": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
     "docs/SECTION05_DEADLY_DEMISE_DECISION.md": "3b4aac0079939d4c2d8c9068901c737c7d51cbe10c5495adf270c47077b63c2c",
-    "tests/integration/test_embarked_ability_authority.py": "a3eff20d6782f3ec0b792880c7ccac73d4018e5e8ee1ee4e8dce034f293309cf",
     "tests/rules/section18/test_attached.py": "d23660806374db51e9911b02a755d3b3730d39a5e42a3a9c582df32598b23b5c",
     "tests/rules/section18/test_combat.py": "cd52e0d1b51def7655f99cf189396af2a5f7eedb8d2b4a53e3319bc7a6a311af",
     "tests/rules/section18/test_disembark.py": "4ca60395ad8dd62064b49e77c0c48660a89abf901ab4da711c0f8ef8f80c5cf8",
@@ -3878,10 +3877,7 @@
     "tests/rules/section18/test_faqs.py": "8897688f2eaaeb5a19c1e90f0f52994b276ded51ee36b67aa1031c0c70673178",
     "tests/rules/section18/test_formations.py": "1e64f5f3a7bd354f572af4d5796ecac0b85c5e48390acc7be94bbd368ee374ad",
     "tests/support/section18_fixtures.py": "322ca252066382ad5f0dd2548427ef8ba9ec6f055bfd7f99a4be9173d8531e46",
-    "tests/unit/test_order132_disembark_distance.py": "f33934ec38e87ec77cdca6c268590076141c3dc9fe2f330a73247e8644d48055",
-    "tests/unit/test_order61_embark.py": "b73391a3dff3173ff871192c5435cb14748afd08a372a18c36c647c1afd0781d",
     "tests/unit/test_phase10q_transports.py": "69392d9013a45e174a674d624925550150a40f5b993eda25c3da152e518c56a5",
-    "tests/unit/test_phase13b_shooting_declarations.py": "6d009e0edd18ae45e003daa0a8a1a7a2c1ae242349eaf764d6f8fff01d87f991",
     "tests/unit/test_v963_shock_disembark.py": "90dc173f104a0cfcf3cb5d3697023e7507e30b450dd07cf95d3ec7f303d528d1"
   },
   "metadata_is_not_semantic_coverage": true,
@@ -3908,5 +3904,12 @@
       "tests/rules/section18/test_facade.py::test_a32_oct14_cli_never_overwrites_original_or_existing_output"
     ]
   },
-  "cutover_qualification": "Literal/source inventory remains complete. Current behavioral evidence is partial after the approved legacy-test cutover. Only selected active tests are live semantic bindings; historical_nonselected_evidence preserves former records without current gameplay or coverage credit. Explicit gaps remain for unselected checks; archives are historical evidence, never current test sources."
+  "cutover_qualification": "Literal/source inventory remains complete. Current behavioral evidence is partial after the approved legacy-test cutover. Only selected active tests are live semantic bindings; historical_nonselected_evidence preserves former records without current gameplay or coverage credit. Explicit gaps remain for unselected checks; archives are historical evidence, never current test sources.",
+  "historical_authenticated_inputs": {
+    "tests/integration/test_embarked_ability_authority.py": "a3eff20d6782f3ec0b792880c7ccac73d4018e5e8ee1ee4e8dce034f293309cf",
+    "tests/unit/test_order132_disembark_distance.py": "f33934ec38e87ec77cdca6c268590076141c3dc9fe2f330a73247e8644d48055",
+    "tests/unit/test_order61_embark.py": "b73391a3dff3173ff871192c5435cb14748afd08a372a18c36c647c1afd0781d",
+    "tests/unit/test_phase13b_shooting_declarations.py": "6d009e0edd18ae45e003daa0a8a1a7a2c1ae242349eaf764d6f8fff01d87f991"
+  },
+  "authenticated_inputs_maintenance": "Four nonselected legacy gameplay dependencies retain their exact former hashes in historical_authenticated_inputs. Retired archives and inactive test files are historical evidence, not current gameplay bindings or current file dependencies. No historical hash is repinned to current or archive bytes."
 }

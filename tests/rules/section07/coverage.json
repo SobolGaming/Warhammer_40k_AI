@@ -317,7 +317,7 @@
           "ordinal": 1,
           "kind": "text",
           "sha256": "8d6f2dbed419a90642969e90ba642727afd61ba4be5273131f81f0333aac78b4",
-          "value": "Both players now take one turn each. The same player always takes the first turn in each battle round \u2013 the mission you are playing will tell you which player this is. Once that player\u2019s turn has ended, their opponent takes their turn."
+          "value": "Both players now take one turn each. The same player always takes the first turn in each battle round – the mission you are playing will tell you which player this is. Once that player’s turn has ended, their opponent takes their turn."
         },
         {
           "ordinal": 2,
@@ -335,7 +335,7 @@
           "ordinal": 4,
           "kind": "text",
           "sha256": "a0feb126b5a69e40c1c4a09204ac901408e14d287c6dac8b35e0a5e7649f6269",
-          "value": "\u00052. Command Phase:\u0006 You marshal strategic resources and check your units\u2019 morale."
+          "value": "\u00052. Command Phase:\u0006 You marshal strategic resources and check your units’ morale."
         },
         {
           "ordinal": 5,
@@ -1042,13 +1042,13 @@
           "ordinal": 2,
           "kind": "text",
           "sha256": "cf64b71ca5c65e5b6e1270c7ef5c5c14389afc3bd67880f16d5a396f0cbcb394",
-          "value": "When using these out-of-phase rules, you cannot use any other \u2018phase-locked\u2019 rules; that is, any other rule that explicitly states the phase in which that rule applies."
+          "value": "When using these out-of-phase rules, you cannot use any other ‘phase-locked’ rules; that is, any other rule that explicitly states the phase in which that rule applies."
         },
         {
           "ordinal": 3,
           "kind": "text",
           "sha256": "88b739404a54944aebc1c81f40c0e3d4cbfbf405a1603d33f4c1017217b25f34",
-          "value": "\u0005Example\u0006: \u0007In your opponent\u2019s Movement phase, you target a friendly unit with the Fire Overwatch \u0005stratagem\u0006. That unit has an ability which is used \u2018In your Shooting phase, after this unit has shot\u2019. Because Fire Overwatch is phase-locked to your opponent's Shooting phase, that ability is not triggered.\b"
+          "value": "\u0005Example\u0006: \u0007In your opponent’s Movement phase, you target a friendly unit with the Fire Overwatch \u0005stratagem\u0006. That unit has an ability which is used ‘In your Shooting phase, after this unit has shot’. Because Fire Overwatch is phase-locked to your opponent's Shooting phase, that ability is not triggered.\b"
         }
       ],
       "requirements": [
@@ -1121,19 +1121,19 @@
           "ordinal": 1,
           "kind": "text",
           "sha256": "13f0acc7b0cc71c8441f704ee41ea5503fa67642f1e8f6ba596f031281f8291e",
-          "value": "\u2022 \u0005Start of Battle Round/Turn/Phase:\u0006 If a rule is triggered at the start of the battle round/turn/phase, it is triggered at the start of every battle round/turn/phase."
+          "value": "• \u0005Start of Battle Round/Turn/Phase:\u0006 If a rule is triggered at the start of the battle round/turn/phase, it is triggered at the start of every battle round/turn/phase."
         },
         {
           "ordinal": 2,
           "kind": "text",
           "sha256": "2a516107898d98ad69c98f5e85611b3a22a3a66b897ba9aceb4fb65a5fb5fe55",
-          "value": "\u2022 \u0005The Turn/the Phase:\u0006 If a rule is triggered during \u0001the\u0002 turn/phase instead of during \u0001your\u0002 turn/phase or \u0001your opponent\u2019s\u0002 turn/phase, it is triggered in both players\u2019 turn/phase."
+          "value": "• \u0005The Turn/the Phase:\u0006 If a rule is triggered during \u0001the\u0002 turn/phase instead of during \u0001your\u0002 turn/phase or \u0001your opponent’s\u0002 turn/phase, it is triggered in both players’ turn/phase."
         },
         {
           "ordinal": 3,
           "kind": "text",
           "sha256": "aabb7bae78e7ed224abae6038448e6aab79d015038e4853f78b100cc03aab9df",
-          "value": "\u0005Example\u0006: \u0007If a rule states \u2018At the end of the Movement phase, this model \u0005heals\u0006 1 wound\u2019, that rule triggers at the end of your Movement phase and at the end of your opponent\u2019s Movement phase.\b"
+          "value": "\u0005Example\u0006: \u0007If a rule states ‘At the end of the Movement phase, this model \u0005heals\u0006 1 wound’, that rule triggers at the end of your Movement phase and at the end of your opponent’s Movement phase.\b"
         }
       ],
       "requirements": [
@@ -1525,9 +1525,9 @@
   ],
   "unadopted_gaps": [],
   "authenticated_inputs": {
-    "AGENTS.md": "76801ae91602ab66a164e7d4500294977bd92725ca78026472ddfcd23f20e309",
-    "README.md": "ad52bc7e7e40aa9a7e2296f20c8726fcf63a5b92bd087100e09238572901a583",
-    "pyproject.toml": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192",
+    "AGENTS.md": "86e68555bc32a40ce24658b7d93391ff5638c21b2cfe5fdf2d7d672e3b53827f",
+    "README.md": "dc56745fbffccc97c257292ed367c5d2f3110b33d4926065df271fa583ad7897",
+    "pyproject.toml": "f11ef7317eb37d7ebb7eaba3766cafbeb9a422a123c9e77fdc208f960d675627",
     "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
     "data/source_audits/order97/categories/07.json": "52a349cc268a3c3e9cb0348ac9bb101a2c9a4d83ccde60f99a3d2ad071adc80d",
     "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
@@ -1566,5 +1566,11 @@
     "The phase-permission Heavy test begins at a typed out-of-phase outcome; it does not certify granting ability activation.",
     "Mission participant priority is exercised at the shared production sequencing owner. It does not certify all mission formulas or invent an end-of-round mission provider.",
     "Two-round adapter progression covers normal empty phase completion and viewer event deltas, not full-game startup, mustering, replay or universal fixture order independence."
-  ]
+  ],
+  "historical_authenticated_inputs": {
+    "AGENTS.md": "76801ae91602ab66a164e7d4500294977bd92725ca78026472ddfcd23f20e309",
+    "README.md": "ad52bc7e7e40aa9a7e2296f20c8726fcf63a5b92bd087100e09238572901a583",
+    "pyproject.toml": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192"
+  },
+  "authenticated_inputs_maintenance": "Three current governance/configuration inputs are refreshed to the exact reviewed coverage-50/behavioral-cutover source. Their former native5734 hashes remain historical_authenticated_inputs. Literal capture/source authorities and all gameplay bindings are unchanged; this update claims no qualification pass."
 }
