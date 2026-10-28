@@ -34,9 +34,9 @@
         "title": "Repositioned Units",
         "text": [
           "Some rules allow units to be removed from the battlefield and placed in \u0005strategic reserves\u0006 during the battle. Units that use such rules are known as \u0005repositioned\u0006 units. In addition to any other rules that apply to such units (such as where they can or cannot arrive), \u0001all\u0002 of the following rules apply to them:",
-          "\u2022 If used in the Movement phase, such rules can be used on units that have already moved that phase.",
-          "\u2022 A \u0005repositioned\u0006 unit that is set up in the same turn in which it made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 has still made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 that turn.",
-          "\u2022 When they are removed from the battlefield, any rules that are affecting such units for a specified duration or under specified circumstances continue to affect them while that duration and/or those circumstances apply.",
+          "• If used in the Movement phase, such rules can be used on units that have already moved that phase.",
+          "• A \u0005repositioned\u0006 unit that is set up in the same turn in which it made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 has still made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 that turn.",
+          "• When they are removed from the battlefield, any rules that are affecting such units for a specified duration or under specified circumstances continue to affect them while that duration and/or those circumstances apply.",
           "\u0005Example:\u0006 \u0007A unit that was within range of an \u0005aura ability\u0006 when removed from the battlefield would no longer be affected by that \u0005aura ability\u0006 if it is no longer within range of it when it makes an \u0005ingress move\u0006, but a unit that was \u0005battle-shocked\u0006 when removed from the battlefield would still be \u0005battle-shocked\u0006 if it makes an \u0005ingress move\u0006 in the same turn.\b"
         ]
       },
@@ -46,8 +46,8 @@
         "text": [
           "To arrive on the battlefield, each \u0005strategic reserves\u0006 unit must make an \u0005ingress move\u0006 (20.04). Unless otherwise stated, they can only do so from the second battle round onwards.",
           "At the end of the third battle round, unless otherwise stated, all \u0005strategic reserves\u0006 units that have not made one or more \u0005ingress moves\u0006 are \u0005destroyed\u0006, with the following exceptions:",
-          "\u2022 Units embarked within \u0003TRANSPORTS\u0004 that have made an \u0005ingress move\u0006 during the battle.",
-          "\u2022 Repositioned units (20.02)."
+          "• Units embarked within \u0003TRANSPORTS\u0004 that have made an \u0005ingress move\u0006 during the battle.",
+          "• Repositioned units (20.02)."
         ],
         "accordions": [
           {
@@ -69,7 +69,7 @@
           "6\"",
           "\u000eWhile Moving",
           "Set up your unit wholly within the \u0005set-up distance\u0006 of one or more battlefield edges and more than 8\" horizontally from all enemy units.",
-          "\u2022 \u0005Before the Third Battle Round:\u0006 While doing so, no models can be set up within your opponent\u2019s deployment zone.",
+          "• \u0005Before the Third Battle Round:\u0006 While doing so, no models can be set up within your opponent’s deployment zone.",
           "\u000eEffect",
           "Your unit is set up as described in Set Up (03.02)",
           "\u000eAfter Moving",
@@ -345,19 +345,19 @@
           "ordinal": 2,
           "kind": "text",
           "sha256": "97cd299e32eca0cf9b334f1c87f37da8d0a1aacf9bb033d1c93a432216fc2995",
-          "value": "\u2022 If used in the Movement phase, such rules can be used on units that have already moved that phase."
+          "value": "• If used in the Movement phase, such rules can be used on units that have already moved that phase."
         },
         {
           "ordinal": 3,
           "kind": "text",
           "sha256": "dfef29c308f6592e845e45b998efff2862b53f31fc86ec27b27d2e93f2420870",
-          "value": "\u2022 A \u0005repositioned\u0006 unit that is set up in the same turn in which it made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 has still made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 that turn."
+          "value": "• A \u0005repositioned\u0006 unit that is set up in the same turn in which it made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 has still made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 that turn."
         },
         {
           "ordinal": 4,
           "kind": "text",
           "sha256": "2cb3542982f3eade5d383c7ee0ba580b1219f69f7de2cd3a0b677e9b41c1d8ce",
-          "value": "\u2022 When they are removed from the battlefield, any rules that are affecting such units for a specified duration or under specified circumstances continue to affect them while that duration and/or those circumstances apply."
+          "value": "• When they are removed from the battlefield, any rules that are affecting such units for a specified duration or under specified circumstances continue to affect them while that duration and/or those circumstances apply."
         },
         {
           "ordinal": 5,
@@ -601,13 +601,13 @@
           "ordinal": 3,
           "kind": "text",
           "sha256": "cde2409b135181eab9d2a02ba69953b43e3c4d3cea49eb54929377bbd5495946",
-          "value": "\u2022 Units embarked within \u0003TRANSPORTS\u0004 that have made an \u0005ingress move\u0006 during the battle."
+          "value": "• Units embarked within \u0003TRANSPORTS\u0004 that have made an \u0005ingress move\u0006 during the battle."
         },
         {
           "ordinal": 4,
           "kind": "text",
           "sha256": "439da5b91f1d04fa1141439ef0257965f24e5e1247ae3db7f8fbbc2ed6b9cd4b",
-          "value": "\u2022 Repositioned units (20.02)."
+          "value": "• Repositioned units (20.02)."
         }
       ],
       "obligations": [
@@ -880,7 +880,7 @@
           "ordinal": 7,
           "kind": "text",
           "sha256": "b44e3dba6f8d5dba1add2427544faeeeb7a7b79c7434e652269fef4d409795ca",
-          "value": "\u2022 \u0005Before the Third Battle Round:\u0006 While doing so, no models can be set up within your opponent\u2019s deployment zone."
+          "value": "• \u0005Before the Third Battle Round:\u0006 While doing so, no models can be set up within your opponent’s deployment zone."
         },
         {
           "ordinal": 8,
@@ -1141,7 +1141,9 @@
                 "assert json.loads(json.dumps(view)) == view"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order64_reserve_lifetimes.py::test_next_charge_boundary_uses_actual_turn_and_phase",
               "function_ast_sha256": "4471f23c31bc1387096e662d0ff17ff5ec745f9ac11bc9b40af6024bb8b44e82",
@@ -1162,6 +1164,17 @@
                 "assert [option.option_id for option in request.options] == [DECLINE_TRIGGERED_MOVEMENT_OPTION_ID]"
               ],
               "expected_exceptions": []
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order64_reserve_lifetimes.py::test_next_charge_boundary_uses_actual_turn_and_phase",
+                "tests/unit/test_order64_reserve_lifetimes.py::test_reactive_movement_selection_excludes_ingressed_units_until_charge"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -1908,5 +1921,6 @@
     }
   ],
   "metadata_is_not_semantic_coverage": true,
-  "unresolved_source_interpretations": []
+  "unresolved_source_interpretations": [],
+  "cutover_qualification": "Literal/source inventory remains complete. Current behavioral evidence is partial after the approved legacy-test cutover. Only selected active tests are live semantic bindings; historical_nonselected_evidence preserves former records without current gameplay or coverage credit. Explicit gaps remain for unselected checks; archives are historical evidence, never current test sources."
 }

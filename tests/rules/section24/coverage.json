@@ -32,17 +32,17 @@
         "title": "Duplicated Abilities",
         "text": [
           "Multiple instances of the same \u0005core ability\u0006 or \u0005weapon ability\u0006 are not cumulative, regardless of any numbers or keywords included in them. In such cases, the controlling player must select which instance will apply at any one time. In the case of duplicated \u0005weapon abilities\u0006, this selection must be made each time that unit makes attacks, in the Select Weapons step.",
-          "\u2022 Multiple instances of \u0005core abilities\u0006 that include a number are duplicated even if that number varies. However, in the case of \u0005Scouts\u0006, you must select the lowest number not shared by every model in that unit (e.g. if every model in a unit has both \u0005Scouts 6\"\u0006 and \u0005Scouts 8\"\u0006, you could select \u0005Scouts 8\"\u0006 as it is shared by every model, but if a unit contains one model with \u0005Scouts 6\"\u0006 and five with \u0005Scouts 8\"\u0006, you must select \u0005Scouts 6\"\u0006).",
-          "\u2022 Multiple instances of \u0005weapon abilities\u0006 that include a number (e.g. \u0003[SUSTAINED HITS 1]\u0004) are duplicated even if that number varies (e.g. the controlling player would have to select between \u0003[SUSTAINED HITS 1]\u0004 and \u0003[SUSTAINED HITS 2]\u0004).",
-          "\u2022 Multiple instances of \u0005weapon abilities\u0006 that include a keyword are duplicated even if that keyword varies (e.g. the controlling player would have to select between \u0003[ANTI\u2011VEHICLE 4+]\u0004 and \u0003[ANTI\u2011INFANTRY 2+]\u0004)."
+          "• Multiple instances of \u0005core abilities\u0006 that include a number are duplicated even if that number varies. However, in the case of \u0005Scouts\u0006, you must select the lowest number not shared by every model in that unit (e.g. if every model in a unit has both \u0005Scouts 6\"\u0006 and \u0005Scouts 8\"\u0006, you could select \u0005Scouts 8\"\u0006 as it is shared by every model, but if a unit contains one model with \u0005Scouts 6\"\u0006 and five with \u0005Scouts 8\"\u0006, you must select \u0005Scouts 6\"\u0006).",
+          "• Multiple instances of \u0005weapon abilities\u0006 that include a number (e.g. \u0003[SUSTAINED HITS 1]\u0004) are duplicated even if that number varies (e.g. the controlling player would have to select between \u0003[SUSTAINED HITS 1]\u0004 and \u0003[SUSTAINED HITS 2]\u0004).",
+          "• Multiple instances of \u0005weapon abilities\u0006 that include a keyword are duplicated even if that keyword varies (e.g. the controlling player would have to select between \u0003[ANTI‑VEHICLE 4+]\u0004 and \u0003[ANTI‑INFANTRY 2+]\u0004)."
         ]
       },
       {
         "ref": "24.03",
         "title": "[ANTI]",
         "text": [
-          "This ability always takes the form \u0003[ANTI\u2011X Y+]\u0004. Each time an attack is made with an \u0005[ANTI]\u0006 weapon, if the target unit has the keyword denoted by \u0005X\u0006, an unmodified \u0005wound roll\u0006 of \u0005Y+\u0006 is a \u0005critical wound.\u0006",
-          "\u0005Example:\u0006 \u0007An attack made with an \u0003[ANTI\u2011VEHICLE 4+]\u0004 weapon against a \u0003VEHICLE\u0004 unit will result in a \u0005critical wound\u0006  on an unmodified wound roll of 4+, while an attack made with an \u0003[ANTI\u2011PSYKER 2+]\u0004 weapon against a \u0003PSYKER\u0004 unit will result in a \u0005critical wound\u0006  on an unmodified wound roll of 2+.\b"
+          "This ability always takes the form \u0003[ANTI‑X Y+]\u0004. Each time an attack is made with an \u0005[ANTI]\u0006 weapon, if the target unit has the keyword denoted by \u0005X\u0006, an unmodified \u0005wound roll\u0006 of \u0005Y+\u0006 is a \u0005critical wound.\u0006",
+          "\u0005Example:\u0006 \u0007An attack made with an \u0003[ANTI‑VEHICLE 4+]\u0004 weapon against a \u0003VEHICLE\u0004 unit will result in a \u0005critical wound\u0006  on an unmodified wound roll of 4+, while an attack made with an \u0003[ANTI‑PSYKER 2+]\u0004 weapon against a \u0003PSYKER\u0004 unit will result in a \u0005critical wound\u0006  on an unmodified wound roll of 2+.\b"
         ]
       },
       {
@@ -65,7 +65,7 @@
         "ref": "24.06",
         "title": "[CLEAVE]",
         "text": [
-          "This ability always takes the form \u0003[CLEAVE X]\u0004. Each time you gather \u0005attack dice\u0006 for a \u0003[CLEAVE]\u0004 weapon, if you only selected one target for all of that weapon\u2019s attacks, add \u0005X\u0006 additional \u0005attack dice\u0006 for every five models that were in the target unit in the Select Targets step (rounding down).",
+          "This ability always takes the form \u0003[CLEAVE X]\u0004. Each time you gather \u0005attack dice\u0006 for a \u0003[CLEAVE]\u0004 weapon, if you only selected one target for all of that weapon’s attacks, add \u0005X\u0006 additional \u0005attack dice\u0006 for every five models that were in the target unit in the Select Targets step (rounding down).",
           "\u0005Example:\u0006 \u0007If a \u0003[CLEAVE 1]\u0004 weapon with an \u0005A\u0006 characteristic of 3 targets one unit containing 16 models, you would gather three additional \u0005attack dice\u0006 for that weapon (for a total of six for that weapon).\b"
         ]
       },
@@ -73,10 +73,10 @@
         "ref": "24.07",
         "title": "[CLOSE-QUARTERS]",
         "text": [
-          "Units containing one or more models with a \u0003[CLOSE\u2011QUARTERS]\u0004 weapon can shoot using \u0005close\u2011quarters shooting\u0006 (10.06).",
+          "Units containing one or more models with a \u0003[CLOSE‑QUARTERS]\u0004 weapon can shoot using \u0005close‑quarters shooting\u0006 (10.06).",
           "When using another \u0005shooting type\u0006, for each model in that unit (excluding \u0005MONSTER/VEHICLE\u0006 models), you can only select \u0001one\u0002 of the following to make attacks with:",
-          "\u2022 One or more of its \u0003[CLOSE\u2011QUARTERS]\u0004 weapons.",
-          "\u2022 One or more of its other ranged weapons."
+          "• One or more of its \u0003[CLOSE‑QUARTERS]\u0004 weapons.",
+          "• One or more of its other ranged weapons."
         ]
       },
       {
@@ -90,7 +90,7 @@
         "ref": "24.09",
         "title": "Deep Strike",
         "text": [
-          "Each time this unit makes an \u0005ingress move\u0006 (20.04), if every model in this unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from all enemy units, even if that is within your opponent\u2019s deployment zone."
+          "Each time this unit makes an \u0005ingress move\u0006 (20.04), if every model in this unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from all enemy units, even if that is within your opponent’s deployment zone."
         ]
       },
       {
@@ -107,8 +107,8 @@
         "title": "[EXTRA ATTACKS]",
         "text": [
           "Each time a unit containing one or more models with an \u0003[EXTRA ATTACKS]\u0004 weapon fights, those models will make attacks with those weapons in addition to any others. In the Select Weapons step (04.01), for each of those models, you must select:",
-          "\u2022 All of that model\u2019s \u0003[EXTRA ATTACKS]\u0004 weapons.",
-          "\u2022 One of that model\u2019s other melee weapons, if possible."
+          "• All of that model’s \u0003[EXTRA ATTACKS]\u0004 weapons.",
+          "• One of that model’s other melee weapons, if possible."
         ],
         "accordions": [
           {
@@ -158,9 +158,9 @@
         "title": "[HEAVY]",
         "text": [
           "In your Shooting phase, each time an attack is made with a \u0003[HEAVY]\u0004 weapon, add 1 to the \u0005hit roll\u0006 if \u0001all\u0002 of the following apply to the attacking unit:",
-          "\u2022 That unit is \u0005unengaged\u0006.",
-          "\u2022 That unit was not set up on the battlefield this turn.",
-          "\u2022 No model in that unit has moved moret han 3\" this turn."
+          "• That unit is \u0005unengaged\u0006.",
+          "• That unit was not set up on the battlefield this turn.",
+          "• No model in that unit has moved moret han 3\" this turn."
         ]
       },
       {
@@ -188,14 +188,14 @@
         "ref": "24.20",
         "title": "Infiltrators",
         "text": [
-          "During deployment, if every model in a unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from your opponent\u2019s deployment zone and all enemy units."
+          "During deployment, if every model in a unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from your opponent’s deployment zone and all enemy units."
         ]
       },
       {
         "ref": "24.21",
         "title": "[LANCE]",
         "text": [
-          "Each time an attack is made with a \u0003[LANCE]\u0004 weapon, if the attacking model\u2019s unit made a \u0005charge\u0006 move this turn, add 1 to the \u0005wound roll\u0006."
+          "Each time an attack is made with a \u0003[LANCE]\u0004 weapon, if the attacking model’s unit made a \u0005charge\u0006 move this turn, add 1 to the \u0005wound roll\u0006."
         ]
       },
       {
@@ -212,7 +212,7 @@
         "title": "[LETHAL HITS]",
         "text": [
           "Each time an attack made with a \u0003[LETHAL HITS]\u0004 weapon results in a \u0005critical hit\u0006, you can choose for that attack to automatically wound the target.",
-          "\u0005Designer\u2019s Note:\u0006 \u0007Choosing to automatically wound the target means that no \u0005wound roll\u0006 is made for that attack. You may decide against this, as it means that attack cannot result in a \u0005critical wound\u0006 and so cannot trigger other abilities such as \u0003[DEVASTATING WOUNDS]\u0004.\b"
+          "\u0005Designer’s Note:\u0006 \u0007Choosing to automatically wound the target means that no \u0005wound roll\u0006 is made for that attack. You may decide against this, as it means that attack cannot result in a \u0005critical wound\u0006 and so cannot trigger other abilities such as \u0003[DEVASTATING WOUNDS]\u0004.\b"
         ]
       },
       {
@@ -240,7 +240,7 @@
         "ref": "24.25",
         "title": "[MELTA]",
         "text": [
-          "This ability always takes the form \u0003[MELTA X]\u0004. Each time a model makes an attack with a \u0003[MELTA]\u0004 weapon, if the target unit was within half range of that weapon in the Select Targets step, until the attacking unit\u2019s attacks have been resolved, add \u0005X\u0006 to that weapon\u2019s \u0005D\u0006 characteristic.",
+          "This ability always takes the form \u0003[MELTA X]\u0004. Each time a model makes an attack with a \u0003[MELTA]\u0004 weapon, if the target unit was within half range of that weapon in the Select Targets step, until the attacking unit’s attacks have been resolved, add \u0005X\u0006 to that weapon’s \u0005D\u0006 characteristic.",
           "\u0005Example:\u0006 \u0007A model targets a unit that is within half range of a \u0003[MELTA 2]\u0004 weapon with a \u0005D\u0006 characteristic of D6. While resolving those attacks, that weapon has a \u0005D\u0006 characteristic of D6+2\b"
         ]
       },
@@ -266,8 +266,8 @@
         "ref": "24.27",
         "title": "[PISTOL]",
         "text": [
-          "\u0003[PISTOL]\u0004 and \u0003[CLOSE\u2011QUARTERS]\u0004 are identical for all rules purposes. See \u0003[CLOSE\u2011QUARTERS]\u0004.",
-          "\u0005Designer\u2019s Note:\u0006 \u0003[PISTOL]\u0004 \u0007is a pre-existing ability that will be superseded by \u0003[CLOSE-QUARTERS]\u0004 as this edition of Warhammer 40,000 progresses. Both are functionally the same, but the latter is a more suitable term for weapons that function in this way.\b"
+          "\u0003[PISTOL]\u0004 and \u0003[CLOSE‑QUARTERS]\u0004 are identical for all rules purposes. See \u0003[CLOSE‑QUARTERS]\u0004.",
+          "\u0005Designer’s Note:\u0006 \u0003[PISTOL]\u0004 \u0007is a pre-existing ability that will be superseded by \u0003[CLOSE-QUARTERS]\u0004 as this edition of Warhammer 40,000 progresses. Both are functionally the same, but the latter is a more suitable term for weapons that function in this way.\b"
         ]
       },
       {
@@ -290,7 +290,7 @@
         "ref": "24.29",
         "title": "[PSYCHIC]",
         "text": [
-          "Each time an attack is made with a \u0003[PSYCHIC]\u0004 weapon, you can ignore any or all modifiers to that attack\u2019s \u0005BS\u0006 or \u0005WS\u0006 characteristic and any or all modifiers to the \u0005hit roll\u0006. Attacks made with \u0003[PSYCHIC]\u0004 weapons are known as \u0005psychic attacks\u0006 (this can be important for the triggering of other rules)."
+          "Each time an attack is made with a \u0003[PSYCHIC]\u0004 weapon, you can ignore any or all modifiers to that attack’s \u0005BS\u0006 or \u0005WS\u0006 characteristic and any or all modifiers to the \u0005hit roll\u0006. Attacks made with \u0003[PSYCHIC]\u0004 weapons are known as \u0005psychic attacks\u0006 (this can be important for the triggering of other rules)."
         ]
       },
       {
@@ -305,10 +305,10 @@
         "ref": "24.31",
         "title": "Scouts",
         "text": [
-          "This ability always takes the form \u0005Scouts X\"\u0006. In the Resolve Pre\u2011battle Abilities step, if every model in a unit has this ability, you can do \u0001one\u0002 of the following:",
-          "\u2022 If that unit is in \u0005strategic reserves\u0006, you can set up that unit anywhere that is wholly within your deployment zone.",
-          "\u2022 If that unit is wholly within your deployment zone, it can make a \u0005scout move\u0006 (24.32).",
-          "\u2022 If that unit is embarked within a \u0003DEDICATED TRANSPORT\u0004 that is wholly within your deployment zone, and if every model embarked within that \u0003DEDICATED TRANSPORT\u0004 has the \u0005Scouts\u0006 ability, that \u0003DEDICATED TRANSPORT\u0004 can make a \u0005scout move\u0006."
+          "This ability always takes the form \u0005Scouts X\"\u0006. In the Resolve Pre‑battle Abilities step, if every model in a unit has this ability, you can do \u0001one\u0002 of the following:",
+          "• If that unit is in \u0005strategic reserves\u0006, you can set up that unit anywhere that is wholly within your deployment zone.",
+          "• If that unit is wholly within your deployment zone, it can make a \u0005scout move\u0006 (24.32).",
+          "• If that unit is embarked within a \u0003DEDICATED TRANSPORT\u0004 that is wholly within your deployment zone, and if every model embarked within that \u0003DEDICATED TRANSPORT\u0004 has the \u0005Scouts\u0006 ability, that \u0003DEDICATED TRANSPORT\u0004 can make a \u0005scout move\u0006."
         ]
       },
       {
@@ -346,9 +346,9 @@
         "title": "Super-Heavy Walker",
         "text": [
           "Each time a unit with this ability makes a \u0005normal\u0006, \u0005advance\u0006 or \u0005fall-back move\u0006:",
-          "\u2022 Models in that unit can move through models (including \u0003MONSTER/VEHICLE\u0004 models, but excluding \u0003TITANIC\u0004 models) and can move horizontally through sections of \u0005terrain features\u0006 that are 4\" or less in height.",
-          "\u2022 Before moving that unit, you can select for all models in that unit to have the \u0003MOBILE\u0004 keyword until that move ends. If you do, when that move ends, roll one D6: on a 1, that unit is \u0005battle-shocked\u0006.",
-          "\u0005Designer\u2019s Note:\u0006 \u0007Gaining the \u0003MOBILE\u0004 keyword for the duration of a move will enable models in that unit to move horizontally through \u0005dense terrain features\u0006\b (13.06)."
+          "• Models in that unit can move through models (including \u0003MONSTER/VEHICLE\u0004 models, but excluding \u0003TITANIC\u0004 models) and can move horizontally through sections of \u0005terrain features\u0006 that are 4\" or less in height.",
+          "• Before moving that unit, you can select for all models in that unit to have the \u0003MOBILE\u0004 keyword until that move ends. If you do, when that move ends, roll one D6: on a 1, that unit is \u0005battle-shocked\u0006.",
+          "\u0005Designer’s Note:\u0006 \u0007Gaining the \u0003MOBILE\u0004 keyword for the duration of a move will enable models in that unit to move horizontally through \u0005dense terrain features\u0006\b (13.06)."
         ]
       },
       {
@@ -379,15 +379,15 @@
         "ref": "24.38",
         "title": "[TWIN-LINKED]",
         "text": [
-          "Each time an attack is made with a \u0003[TWIN\u2011LINKED]\u0004 weapon, you can re\u2011roll the \u0005wound roll\u0006."
+          "Each time an attack is made with a \u0003[TWIN‑LINKED]\u0004 weapon, you can re‑roll the \u0005wound roll\u0006."
         ]
       },
       {
         "ref": "24.39",
         "title": "Damaged",
         "text": [
-          "This ability always takes the form \u0005Damaged X\u0006. While a model\u2019s remaining wounds are equal to or less than \u0005X\u0006, that model is \u0005damaged\u0006:",
-          "\u2022 While a model is \u0005damaged\u0006, that model's attacks have -1 to \u0005hit rolls\u0006."
+          "This ability always takes the form \u0005Damaged X\u0006. While a model’s remaining wounds are equal to or less than \u0005X\u0006, that model is \u0005damaged\u0006:",
+          "• While a model is \u0005damaged\u0006, that model's attacks have -1 to \u0005hit rolls\u0006."
         ]
       }
     ]
@@ -747,7 +747,9 @@
               ],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_deadly_demise_instance_choice_is_mandatory",
               "function_ast_sha256": "8288347b507081103793409872e7a29200b19bbd4cf5a6a26493035db18aa095",
@@ -760,6 +762,16 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_deadly_demise_instance_choice_is_mandatory"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -767,7 +779,7 @@
           "source_blocks": [
             2
           ],
-          "literal_clause": "\u2022 Multiple instances of \u0005core abilities\u0006 that include a number are duplicated even if that number varies. However, in the case of \u0005Scouts\u0006, you must select the lowest number not shared by every model in that unit (e.g. if every model in a unit has both \u0005Scouts 6\"\u0006 and \u0005Scouts 8\"\u0006, you could select \u0005Scouts 8\"\u0006 as it is shared by every model, but if a unit contains one model with \u0005Scouts 6\"\u0006 and five with \u0005Scouts 8\"\u0006, you must select \u0005Scouts 6\"\u0006).",
+          "literal_clause": "• Multiple instances of \u0005core abilities\u0006 that include a number are duplicated even if that number varies. However, in the case of \u0005Scouts\u0006, you must select the lowest number not shared by every model in that unit (e.g. if every model in a unit has both \u0005Scouts 6\"\u0006 and \u0005Scouts 8\"\u0006, you could select \u0005Scouts 8\"\u0006 as it is shared by every model, but if a unit contains one model with \u0005Scouts 6\"\u0006 and five with \u0005Scouts 8\"\u0006, you must select \u0005Scouts 6\"\u0006).",
           "acceptance": "Complete literal 24.02 Duplicated Abilities block2; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -816,7 +828,9 @@
               ],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_deadly_demise_instance_choice_is_mandatory",
               "function_ast_sha256": "8288347b507081103793409872e7a29200b19bbd4cf5a6a26493035db18aa095",
@@ -829,6 +843,16 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_deadly_demise_instance_choice_is_mandatory"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -836,7 +860,7 @@
           "source_blocks": [
             3
           ],
-          "literal_clause": "\u2022 Multiple instances of \u0005weapon abilities\u0006 that include a number (e.g. \u0003[SUSTAINED HITS 1]\u0004) are duplicated even if that number varies (e.g. the controlling player would have to select between \u0003[SUSTAINED HITS 1]\u0004 and \u0003[SUSTAINED HITS 2]\u0004).",
+          "literal_clause": "• Multiple instances of \u0005weapon abilities\u0006 that include a number (e.g. \u0003[SUSTAINED HITS 1]\u0004) are duplicated even if that number varies (e.g. the controlling player would have to select between \u0003[SUSTAINED HITS 1]\u0004 and \u0003[SUSTAINED HITS 2]\u0004).",
           "acceptance": "Complete literal 24.02 Duplicated Abilities block3; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -885,7 +909,9 @@
               ],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_deadly_demise_instance_choice_is_mandatory",
               "function_ast_sha256": "8288347b507081103793409872e7a29200b19bbd4cf5a6a26493035db18aa095",
@@ -898,6 +924,16 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_deadly_demise_instance_choice_is_mandatory"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -905,7 +941,7 @@
           "source_blocks": [
             4
           ],
-          "literal_clause": "\u2022 Multiple instances of \u0005weapon abilities\u0006 that include a keyword are duplicated even if that keyword varies (e.g. the controlling player would have to select between \u0003[ANTI\u2011VEHICLE 4+]\u0004 and \u0003[ANTI\u2011INFANTRY 2+]\u0004).",
+          "literal_clause": "• Multiple instances of \u0005weapon abilities\u0006 that include a keyword are duplicated even if that keyword varies (e.g. the controlling player would have to select between \u0003[ANTI‑VEHICLE 4+]\u0004 and \u0003[ANTI‑INFANTRY 2+]\u0004).",
           "acceptance": "Complete literal 24.02 Duplicated Abilities block4; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -954,7 +990,9 @@
               ],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_deadly_demise_instance_choice_is_mandatory",
               "function_ast_sha256": "8288347b507081103793409872e7a29200b19bbd4cf5a6a26493035db18aa095",
@@ -966,6 +1004,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13d_weapon_ability_helpers.py::test_order56_deadly_demise_instance_choice_is_mandatory"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -997,7 +1045,7 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "This ability always takes the form \u0003[ANTI\u2011X Y+]\u0004. Each time an attack is made with an \u0005[ANTI]\u0006 weapon, if the target unit has the keyword denoted by \u0005X\u0006, an unmodified \u0005wound roll\u0006 of \u0005Y+\u0006 is a \u0005critical wound.\u0006",
+          "literal_clause": "This ability always takes the form \u0003[ANTI‑X Y+]\u0004. Each time an attack is made with an \u0005[ANTI]\u0006 weapon, if the target unit has the keyword denoted by \u0005X\u0006, an unmodified \u0005wound roll\u0006 of \u0005Y+\u0006 is a \u0005critical wound.\u0006",
           "acceptance": "Complete literal 24.03 [ANTI] block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -1030,7 +1078,7 @@
           "source_blocks": [
             2
           ],
-          "literal_clause": "\u0005Example:\u0006 \u0007An attack made with an \u0003[ANTI\u2011VEHICLE 4+]\u0004 weapon against a \u0003VEHICLE\u0004 unit will result in a \u0005critical wound\u0006  on an unmodified wound roll of 4+, while an attack made with an \u0003[ANTI\u2011PSYKER 2+]\u0004 weapon against a \u0003PSYKER\u0004 unit will result in a \u0005critical wound\u0006  on an unmodified wound roll of 2+.\b",
+          "literal_clause": "\u0005Example:\u0006 \u0007An attack made with an \u0003[ANTI‑VEHICLE 4+]\u0004 weapon against a \u0003VEHICLE\u0004 unit will result in a \u0005critical wound\u0006  on an unmodified wound roll of 4+, while an attack made with an \u0003[ANTI‑PSYKER 2+]\u0004 weapon against a \u0003PSYKER\u0004 unit will result in a \u0005critical wound\u0006  on an unmodified wound roll of 2+.\b",
           "acceptance": "Complete literal 24.03 [ANTI] block2; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -1329,7 +1377,7 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "This ability always takes the form \u0003[CLEAVE X]\u0004. Each time you gather \u0005attack dice\u0006 for a \u0003[CLEAVE]\u0004 weapon, if you only selected one target for all of that weapon\u2019s attacks, add \u0005X\u0006 additional \u0005attack dice\u0006 for every five models that were in the target unit in the Select Targets step (rounding down).",
+          "literal_clause": "This ability always takes the form \u0003[CLEAVE X]\u0004. Each time you gather \u0005attack dice\u0006 for a \u0003[CLEAVE]\u0004 weapon, if you only selected one target for all of that weapon’s attacks, add \u0005X\u0006 additional \u0005attack dice\u0006 for every five models that were in the target unit in the Select Targets step (rounding down).",
           "acceptance": "Complete literal 24.06 [CLEAVE] block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -1341,7 +1389,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order92_random_melee.py::test_order113_cleave_fixed_random_attached_restore_fork_replay",
               "function_ast_sha256": "ac3ace341e00af4e6fbcad6795aa97dea2dfcf5d3534d67935505dd86df62307",
@@ -1381,6 +1431,17 @@
               "native_provider_or_legal_roster_admission": false,
               "consumer_evidence": "Actual canonical physical melee weapon commitments, fixed/random attack budgets, actual attached target count, accepted single-target pools and rule provenance; persistence/fork/replay. Split control rejects bonus in a split allocation without mutation, accepts split base or unsplit bonus, then asserts physical pools and one random roll."
             }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order92_random_melee.py::test_order113_cleave_fixed_random_attached_restore_fork_replay",
+                "tests/unit/test_order92_random_melee.py::test_random_cleave_is_a_single_target_bonus_never_a_splittable_budget"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -1400,7 +1461,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order92_random_melee.py::test_order113_cleave_fixed_random_attached_restore_fork_replay",
               "function_ast_sha256": "ac3ace341e00af4e6fbcad6795aa97dea2dfcf5d3534d67935505dd86df62307",
@@ -1439,6 +1502,17 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false,
               "consumer_evidence": "Actual canonical physical melee weapon commitments, fixed/random attack budgets, actual attached target count, accepted single-target pools and rule provenance; persistence/fork/replay. Split control rejects bonus in a split allocation without mutation, accepts split base or unsplit bonus, then asserts physical pools and one random roll."
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order92_random_melee.py::test_order113_cleave_fixed_random_attached_restore_fork_replay",
+                "tests/unit/test_order92_random_melee.py::test_random_cleave_is_a_single_target_bonus_never_a_splittable_budget"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -1480,7 +1554,7 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "Units containing one or more models with a \u0003[CLOSE\u2011QUARTERS]\u0004 weapon can shoot using \u0005close\u2011quarters shooting\u0006 (10.06).",
+          "literal_clause": "Units containing one or more models with a \u0003[CLOSE‑QUARTERS]\u0004 weapon can shoot using \u0005close‑quarters shooting\u0006 (10.06).",
           "acceptance": "Complete literal 24.07 [CLOSE-QUARTERS] block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -1508,7 +1582,9 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_large_models_can_mix_close_quarters_and_ordinary_weapon_declarations",
               "function_ast_sha256": "c256c20a4786202b32971d8a3e3c772bd023b67d1a0a3fc60795671bcde7e9b1",
@@ -1518,6 +1594,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_large_models_can_mix_close_quarters_and_ordinary_weapon_declarations"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -1554,7 +1640,9 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_large_models_can_mix_close_quarters_and_ordinary_weapon_declarations",
               "function_ast_sha256": "c256c20a4786202b32971d8a3e3c772bd023b67d1a0a3fc60795671bcde7e9b1",
@@ -1565,6 +1653,16 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_large_models_can_mix_close_quarters_and_ordinary_weapon_declarations"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -1572,7 +1670,7 @@
           "source_blocks": [
             3
           ],
-          "literal_clause": "\u2022 One or more of its \u0003[CLOSE\u2011QUARTERS]\u0004 weapons.",
+          "literal_clause": "• One or more of its \u0003[CLOSE‑QUARTERS]\u0004 weapons.",
           "acceptance": "Complete literal 24.07 [CLOSE-QUARTERS] block3; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -1600,7 +1698,9 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_large_models_can_mix_close_quarters_and_ordinary_weapon_declarations",
               "function_ast_sha256": "c256c20a4786202b32971d8a3e3c772bd023b67d1a0a3fc60795671bcde7e9b1",
@@ -1611,6 +1711,16 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_large_models_can_mix_close_quarters_and_ordinary_weapon_declarations"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -1618,7 +1728,7 @@
           "source_blocks": [
             4
           ],
-          "literal_clause": "\u2022 One or more of its other ranged weapons.",
+          "literal_clause": "• One or more of its other ranged weapons.",
           "acceptance": "Complete literal 24.07 [CLOSE-QUARTERS] block4; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -1646,7 +1756,9 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_large_models_can_mix_close_quarters_and_ordinary_weapon_declarations",
               "function_ast_sha256": "c256c20a4786202b32971d8a3e3c772bd023b67d1a0a3fc60795671bcde7e9b1",
@@ -1656,6 +1768,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_large_models_can_mix_close_quarters_and_ordinary_weapon_declarations"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -1713,6 +1835,31 @@
               "native_provider_or_legal_roster_admission": false
             },
             {
+              "node": "tests/rules/section18/test_emergency.py::test_emergency_requires_closest_legal_setup_within_six_before_carrier_removal",
+              "function_ast_sha256": "9747e885d9af096120ecf8097f5a1ffa5d803ed40b2449ea86269b61b5312d9e",
+              "assertions": [
+                "assert result.placement.is_valid is valid, result.placement.violations",
+                "assert s.scenario.battlefield_state.unit_placement_or_none(s.transport.unit_instance_id) is not None",
+                "assert len(result.model_rolls) == 1",
+                "assert not result.destroyed_model_instance_ids",
+                "assert after.unit_placement_or_none(s.passenger.unit_instance_id) is not None",
+                "assert after.unit_placement_or_none(s.transport.unit_instance_id) is not None",
+                "assert outcome is not None",
+                "assert outcome.turn_player_id == 'opponent'",
+                "assert outcome.battle_shocked_until == 'until_cleared'",
+                "assert not outcome.can_declare_charge",
+                "assert DestroyedTransportDisembark.from_payload(result.to_payload()) == result",
+                "assert code in {v.violation_code.value for v in result.placement.violations}",
+                "assert result.placement.updated_cargo_state is None",
+                "assert result.placement.transition_batch is None"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
               "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_deadly_demise_rolls_random_damage_separately_for_each_target",
               "function_ast_sha256": "43316ead33ab34b36762f200742ca065d0881ed68fa66235f70068258b4dc3cd",
               "assertions": [
@@ -1735,29 +1882,17 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section18/test_emergency.py::test_emergency_requires_closest_legal_setup_within_six_before_carrier_removal",
-              "function_ast_sha256": "9747e885d9af096120ecf8097f5a1ffa5d803ed40b2449ea86269b61b5312d9e",
-              "assertions": [
-                "assert result.placement.is_valid is valid, result.placement.violations",
-                "assert s.scenario.battlefield_state.unit_placement_or_none(s.transport.unit_instance_id) is not None",
-                "assert len(result.model_rolls) == 1",
-                "assert not result.destroyed_model_instance_ids",
-                "assert after.unit_placement_or_none(s.passenger.unit_instance_id) is not None",
-                "assert after.unit_placement_or_none(s.transport.unit_instance_id) is not None",
-                "assert outcome is not None",
-                "assert outcome.turn_player_id == 'opponent'",
-                "assert outcome.battle_shocked_until == 'until_cleared'",
-                "assert not outcome.can_declare_charge",
-                "assert DestroyedTransportDisembark.from_payload(result.to_payload()) == result",
-                "assert code in {v.violation_code.value for v in result.placement.violations}",
-                "assert result.placement.updated_cargo_state is None",
-                "assert result.placement.transition_batch is None"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_deadly_demise_rolls_random_damage_separately_for_each_target",
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_deadly_demise_target_query_uses_the_six_inch_base_boundary"
               ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -1865,7 +2000,7 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "Each time this unit makes an \u0005ingress move\u0006 (20.04), if every model in this unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from all enemy units, even if that is within your opponent\u2019s deployment zone.",
+          "literal_clause": "Each time this unit makes an \u0005ingress move\u0006 (20.04), if every model in this unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from all enemy units, even if that is within your opponent’s deployment zone.",
           "acceptance": "Complete literal 24.09 Deep Strike block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -1880,7 +2015,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_deep_strike_enemy_zone_still_requires_more_than_eight_inches",
               "function_ast_sha256": "367082644178af60454aaa0e9e752f897b8115cd779cb214a724c2c521d9bb57",
@@ -1903,6 +2040,17 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_deep_strike_enemy_zone_still_requires_more_than_eight_inches",
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_deep_strike_and_infiltrators_require_every_component"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -1956,7 +2104,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay",
               "function_ast_sha256": "25d4c46b6a63883f828b96cc04bf8855466388c9eebde1bcbb05bb83533dd59f",
@@ -1983,6 +2133,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -2008,7 +2168,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay",
               "function_ast_sha256": "25d4c46b6a63883f828b96cc04bf8855466388c9eebde1bcbb05bb83533dd59f",
@@ -2036,6 +2198,16 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -2060,7 +2232,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay",
               "function_ast_sha256": "25d4c46b6a63883f828b96cc04bf8855466388c9eebde1bcbb05bb83533dd59f",
@@ -2087,6 +2261,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -2125,7 +2309,8 @@
           ],
           "literal_clause": "Each time a unit containing one or more models with an \u0003[EXTRA ATTACKS]\u0004 weapon fights, those models will make attacks with those weapons in addition to any others. In the Select Weapons step (04.01), for each of those models, you must select:",
           "acceptance": "Complete literal 24.11 [EXTRA ATTACKS] block1; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_extra_attacks_weapon_can_be_added_to_primary_melee_weapon",
               "function_ast_sha256": "ed6d92074acb4dee1312052402526c7d22a84e83f30c876cdf807587facb0cfd",
@@ -2148,6 +2333,17 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_extra_attacks_weapon_can_be_added_to_primary_melee_weapon",
+                "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_rule_validation_rejects_weapon_selection_invariants"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -2156,9 +2352,10 @@
           "source_blocks": [
             2
           ],
-          "literal_clause": "\u2022 All of that model\u2019s \u0003[EXTRA ATTACKS]\u0004 weapons.",
+          "literal_clause": "• All of that model’s \u0003[EXTRA ATTACKS]\u0004 weapons.",
           "acceptance": "Complete literal 24.11 [EXTRA ATTACKS] block2; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_extra_attacks_weapon_can_be_added_to_primary_melee_weapon",
               "function_ast_sha256": "ed6d92074acb4dee1312052402526c7d22a84e83f30c876cdf807587facb0cfd",
@@ -2182,6 +2379,17 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_extra_attacks_weapon_can_be_added_to_primary_melee_weapon",
+                "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_rule_validation_rejects_weapon_selection_invariants"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -2189,9 +2397,10 @@
           "source_blocks": [
             3
           ],
-          "literal_clause": "\u2022 One of that model\u2019s other melee weapons, if possible.",
+          "literal_clause": "• One of that model’s other melee weapons, if possible.",
           "acceptance": "Complete literal 24.11 [EXTRA ATTACKS] block3; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_extra_attacks_weapon_can_be_added_to_primary_melee_weapon",
               "function_ast_sha256": "ed6d92074acb4dee1312052402526c7d22a84e83f30c876cdf807587facb0cfd",
@@ -2214,6 +2423,17 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_extra_attacks_weapon_can_be_added_to_primary_melee_weapon",
+                "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_melee_rule_validation_rejects_weapon_selection_invariants"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -2242,7 +2462,8 @@
           ],
           "literal_clause": "If a unit has \u0003[Extra Attacks]\u0004 weapons, it does not need to select weapons without the \u0003[Extra Attacks]\u0004 ability in order to make attacks with those \u0003[Extra Attacks]\u0004 weapons.",
           "acceptance": "Complete literal 24.11.01 Only [EXTRA ATTACKS] weapons block1; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_extra_attacks_only_model_can_select_its_weapon",
               "function_ast_sha256": "4a04507d178066ffaf2badac1d85bf7cc65742a4a25b8a7bccad4cba7dc65e2e",
@@ -2253,6 +2474,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_extra_attacks_only_model_can_select_its_weapon"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -2478,85 +2709,6 @@
           "acceptance": "Complete literal 24.14 Firing Deck block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
-              "node": "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
-              "function_ast_sha256": "fa4cd4f9986e80cb036a2e3ba2250a823dc8dbc1c58e73ee871f54c563ef8f8b",
-              "assertions": [
-                "assert result.is_valid",
-                "assert result.temporary_weapon_profiles == (profile,)",
-                "assert result.ineligible_unit_instance_ids == (passenger.unit_instance_id,)",
-                "assert TransportOperationViolationCode.FIRING_DECK_DUPLICATE_MODEL_SELECTION in {violation.violation_code for violation in duplicate_model_result.violations}",
-                "assert TransportOperationViolationCode.FIRING_DECK_ONE_SHOT_WEAPON in {violation.violation_code for violation in one_shot_result.violations}",
-                "assert TransportOperationViolationCode.FIRING_DECK_WEAPON_INSTANCE_DRIFT in {violation.violation_code for violation in forged_instance_result.violations}"
-              ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
-            },
-            {
-              "node": "tests/unit/test_phase10q_transports.py::test_firing_deck_reports_capacity_membership_shot_model_and_melee_failures",
-              "function_ast_sha256": "ab9c88b6e0e479e65188287501035d27ad9e10d99e959a3212701bb812586227",
-              "assertions": [
-                "assert not result.is_valid",
-                "assert {TransportOperationViolationCode.FIRING_DECK_CAPACITY_EXCEEDED, TransportOperationViolationCode.FIRING_DECK_UNIT_NOT_EMBARKED, TransportOperationViolationCode.FIRING_DECK_UNIT_ALREADY_SHOT, TransportOperationViolationCode.FIRING_DECK_MODEL_DRIFT, TransportOperationViolationCode.FIRING_DECK_MELEE_WEAPON} <= {violation.violation_code for violation in result.violations}"
-              ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
-            },
-            {
-              "node": "tests/unit/test_public_firing_deck_history.py::test_public_firing_deck_after_shot_history",
-              "function_ast_sha256": "9e7a692cb3984622ecf48f85bf9b19d7e6f23ddcdb94daf56afc88bff5edc057",
-              "assertions": [
-                "assert state is not None",
-                "assert state.shooting_phase_state is not None",
-                "assert list(state.shooting_phase_state.shot_unit_ids) == expected",
-                "assert _object(proposal['firing_deck_selection'])['already_shot_unit_instance_ids'] == expected",
-                "assert _public_proposal(restored, cargo=True) == proposal",
-                "assert _public_proposal(session.fork(), cargo=True) == proposal",
-                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
-                "assert restored_status == status",
-                "assert restored.to_persistence_payload() == session.to_persistence_payload()",
-                "assert session.lifecycle.to_payload() != before",
-                "assert state is not None",
-                "assert effect.target_unit_instance_ids == ('army-alpha:noncontributor', 'army-alpha:passenger')",
-                "assert LocalGameSession.from_persistence_payload(persisted).to_persistence_payload() == persisted",
-                "assert replay.status is ReplayRunStatus.REPRODUCED, replay.diagnostics",
-                "assert pending is not None",
-                "assert _object(_object(pending['payload'])['proposal_request'])[HISTORY] == expected",
-                "assert HISTORY in json.dumps(events)"
-              ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
-            },
-            {
-              "node": "tests/unit/test_order65_firing_deck.py::test_all_cargo_is_restricted_even_with_zero_contributors",
-              "function_ast_sha256": "a6d13d6216bb284599f025f25d1bd8e36ed482e900c331488e3fd5e1a7b75cff",
-              "assertions": [
-                "assert status.status_kind is not LifecycleStatusKind.INVALID",
-                "assert state is not None",
-                "assert effect.target_unit_instance_ids == PASSENGERS",
-                "assert state.shooting_phase_state is not None",
-                "assert not set(PASSENGERS).intersection(state.shooting_phase_state.shot_unit_ids)",
-                "assert TRANSPORT in state.shooting_phase_state.selected_unit_ids",
-                "assert TRANSPORT not in state.shooting_phase_state.shot_unit_ids",
-                "assert restored.to_payload() == session.lifecycle.to_payload()",
-                "assert clone.to_persistence_payload() == persisted",
-                "assert 'object at 0x' not in encoded",
-                "assert pending is not None",
-                "assert isinstance(payload, dict)",
-                "assert isinstance(advertised, dict)",
-                "assert advertised['firing_deck_embarked_unit_instance_ids'] == list(PASSENGERS)",
-                "assert clone.view(viewer_player_id=player) == session.view(viewer_player_id=player)",
-                "assert clone.events_since(EventStreamCursor(), viewer_player_id=player) == events",
-                "assert isinstance(accepted_payload, dict)",
-                "assert accepted_payload['ineligible_unit_instance_ids'] == list(PASSENGERS)"
-              ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
-            },
-            {
               "node": "tests/rules/section24/test_facade.py::test_overwatch_filters_borrowed_weapons_rejects_atomic_retry_and_fires_carrier",
               "function_ast_sha256": "1d0a02ecdc2e8c1dc90f99545d4e0c1d3272aff2af898f4ff3c5b2fd14e25ae1",
               "assertions": [
@@ -2636,16 +2788,8 @@
               ],
               "expected_exceptions": []
             }
-          ]
-        },
-        {
-          "clause_id": "S24-036",
-          "source_blocks": [
-            2
           ],
-          "literal_clause": "1. Select up to \u0005X\u0006 models embarked within this \u0003TRANSPORT\u0004 (excluding models whose units have already been \u0005selected to shoot\u0006 this phase).",
-          "acceptance": "Complete literal 24.14 Firing Deck block2; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
               "function_ast_sha256": "fa4cd4f9986e80cb036a2e3ba2250a823dc8dbc1c58e73ee871f54c563ef8f8b",
@@ -2724,6 +2868,122 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
+                "tests/unit/test_phase10q_transports.py::test_firing_deck_reports_capacity_membership_shot_model_and_melee_failures",
+                "tests/unit/test_public_firing_deck_history.py::test_public_firing_deck_after_shot_history",
+                "tests/unit/test_order65_firing_deck.py::test_all_cargo_is_restricted_even_with_zero_contributors"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
+          ]
+        },
+        {
+          "clause_id": "S24-036",
+          "source_blocks": [
+            2
+          ],
+          "literal_clause": "1. Select up to \u0005X\u0006 models embarked within this \u0003TRANSPORT\u0004 (excluding models whose units have already been \u0005selected to shoot\u0006 this phase).",
+          "acceptance": "Complete literal 24.14 Firing Deck block2; jointly satisfy the retained clause and its required positive/negative controls.",
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
+            {
+              "node": "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
+              "function_ast_sha256": "fa4cd4f9986e80cb036a2e3ba2250a823dc8dbc1c58e73ee871f54c563ef8f8b",
+              "assertions": [
+                "assert result.is_valid",
+                "assert result.temporary_weapon_profiles == (profile,)",
+                "assert result.ineligible_unit_instance_ids == (passenger.unit_instance_id,)",
+                "assert TransportOperationViolationCode.FIRING_DECK_DUPLICATE_MODEL_SELECTION in {violation.violation_code for violation in duplicate_model_result.violations}",
+                "assert TransportOperationViolationCode.FIRING_DECK_ONE_SHOT_WEAPON in {violation.violation_code for violation in one_shot_result.violations}",
+                "assert TransportOperationViolationCode.FIRING_DECK_WEAPON_INSTANCE_DRIFT in {violation.violation_code for violation in forged_instance_result.violations}"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase10q_transports.py::test_firing_deck_reports_capacity_membership_shot_model_and_melee_failures",
+              "function_ast_sha256": "ab9c88b6e0e479e65188287501035d27ad9e10d99e959a3212701bb812586227",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert {TransportOperationViolationCode.FIRING_DECK_CAPACITY_EXCEEDED, TransportOperationViolationCode.FIRING_DECK_UNIT_NOT_EMBARKED, TransportOperationViolationCode.FIRING_DECK_UNIT_ALREADY_SHOT, TransportOperationViolationCode.FIRING_DECK_MODEL_DRIFT, TransportOperationViolationCode.FIRING_DECK_MELEE_WEAPON} <= {violation.violation_code for violation in result.violations}"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_public_firing_deck_history.py::test_public_firing_deck_after_shot_history",
+              "function_ast_sha256": "9e7a692cb3984622ecf48f85bf9b19d7e6f23ddcdb94daf56afc88bff5edc057",
+              "assertions": [
+                "assert state is not None",
+                "assert state.shooting_phase_state is not None",
+                "assert list(state.shooting_phase_state.shot_unit_ids) == expected",
+                "assert _object(proposal['firing_deck_selection'])['already_shot_unit_instance_ids'] == expected",
+                "assert _public_proposal(restored, cargo=True) == proposal",
+                "assert _public_proposal(session.fork(), cargo=True) == proposal",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert restored_status == status",
+                "assert restored.to_persistence_payload() == session.to_persistence_payload()",
+                "assert session.lifecycle.to_payload() != before",
+                "assert state is not None",
+                "assert effect.target_unit_instance_ids == ('army-alpha:noncontributor', 'army-alpha:passenger')",
+                "assert LocalGameSession.from_persistence_payload(persisted).to_persistence_payload() == persisted",
+                "assert replay.status is ReplayRunStatus.REPRODUCED, replay.diagnostics",
+                "assert pending is not None",
+                "assert _object(_object(pending['payload'])['proposal_request'])[HISTORY] == expected",
+                "assert HISTORY in json.dumps(events)"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_order65_firing_deck.py::test_all_cargo_is_restricted_even_with_zero_contributors",
+              "function_ast_sha256": "a6d13d6216bb284599f025f25d1bd8e36ed482e900c331488e3fd5e1a7b75cff",
+              "assertions": [
+                "assert status.status_kind is not LifecycleStatusKind.INVALID",
+                "assert state is not None",
+                "assert effect.target_unit_instance_ids == PASSENGERS",
+                "assert state.shooting_phase_state is not None",
+                "assert not set(PASSENGERS).intersection(state.shooting_phase_state.shot_unit_ids)",
+                "assert TRANSPORT in state.shooting_phase_state.selected_unit_ids",
+                "assert TRANSPORT not in state.shooting_phase_state.shot_unit_ids",
+                "assert restored.to_payload() == session.lifecycle.to_payload()",
+                "assert clone.to_persistence_payload() == persisted",
+                "assert 'object at 0x' not in encoded",
+                "assert pending is not None",
+                "assert isinstance(payload, dict)",
+                "assert isinstance(advertised, dict)",
+                "assert advertised['firing_deck_embarked_unit_instance_ids'] == list(PASSENGERS)",
+                "assert clone.view(viewer_player_id=player) == session.view(viewer_player_id=player)",
+                "assert clone.events_since(EventStreamCursor(), viewer_player_id=player) == events",
+                "assert isinstance(accepted_payload, dict)",
+                "assert accepted_payload['ineligible_unit_instance_ids'] == list(PASSENGERS)"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
+                "tests/unit/test_phase10q_transports.py::test_firing_deck_reports_capacity_membership_shot_model_and_melee_failures",
+                "tests/unit/test_public_firing_deck_history.py::test_public_firing_deck_after_shot_history",
+                "tests/unit/test_order65_firing_deck.py::test_all_cargo_is_restricted_even_with_zero_contributors"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -2734,7 +2994,8 @@
           ],
           "literal_clause": "2. For each selected model, select one of its ranged weapons (excluding \u0003[ONE SHOT]\u0004 weapons).",
           "acceptance": "Complete literal 24.14 Firing Deck block3; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
               "function_ast_sha256": "fa4cd4f9986e80cb036a2e3ba2250a823dc8dbc1c58e73ee871f54c563ef8f8b",
@@ -2813,6 +3074,19 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
+                "tests/unit/test_phase10q_transports.py::test_firing_deck_reports_capacity_membership_shot_model_and_melee_failures",
+                "tests/unit/test_public_firing_deck_history.py::test_public_firing_deck_after_shot_history",
+                "tests/unit/test_order65_firing_deck.py::test_all_cargo_is_restricted_even_with_zero_contributors"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -2823,7 +3097,8 @@
           ],
           "literal_clause": "3. Until this \u0003TRANSPORT\u0004 has resolved all of its attacks, it has all of those selected weapons in addition to its other weapons.",
           "acceptance": "Complete literal 24.14 Firing Deck block4; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
               "function_ast_sha256": "fa4cd4f9986e80cb036a2e3ba2250a823dc8dbc1c58e73ee871f54c563ef8f8b",
@@ -2902,6 +3177,19 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
+                "tests/unit/test_phase10q_transports.py::test_firing_deck_reports_capacity_membership_shot_model_and_melee_failures",
+                "tests/unit/test_public_firing_deck_history.py::test_public_firing_deck_after_shot_history",
+                "tests/unit/test_order65_firing_deck.py::test_all_cargo_is_restricted_even_with_zero_contributors"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -2912,7 +3200,8 @@
           ],
           "literal_clause": "4. Until the end of the turn, units embarked within this \u0003TRANSPORT\u0004 are \u0001not\u0002 \u0005eligible to shoot\u0006.",
           "acceptance": "Complete literal 24.14 Firing Deck block5; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
               "function_ast_sha256": "fa4cd4f9986e80cb036a2e3ba2250a823dc8dbc1c58e73ee871f54c563ef8f8b",
@@ -2992,6 +3281,19 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
+                "tests/unit/test_phase10q_transports.py::test_firing_deck_reports_capacity_membership_shot_model_and_melee_failures",
+                "tests/unit/test_public_firing_deck_history.py::test_public_firing_deck_after_shot_history",
+                "tests/unit/test_order65_firing_deck.py::test_all_cargo_is_restricted_even_with_zero_contributors"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         }
       ],
@@ -3000,7 +3302,8 @@
           "faq_number": 52,
           "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
           "clarification": "Cargo abilities do not transfer their bearer ownership to transport-equipped Firing Deck weapons.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_public_firing_deck_history.py::test_public_firing_deck_after_shot_history",
               "function_ast_sha256": "9e7a692cb3984622ecf48f85bf9b19d7e6f23ddcdb94daf56afc88bff5edc057",
@@ -3055,6 +3358,18 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false,
               "consumer_evidence": "Real canonical embarked attachment plus compiled unit-scoped Lethal Hits grant. Borrowed physical weapon is equipped by transport model: actual catalog grant runtime leaves it unchanged. Same equipped source weapon with original cargo model/unit receives Lethal Hits positive control. This is the ability-owner consumer boundary, not full native/provider lifecycle admission."
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_public_firing_deck_history.py::test_public_firing_deck_after_shot_history",
+                "tests/unit/test_phase10q_transports.py::test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligible",
+                "tests/integration/test_embarked_ability_authority.py::test_firing_deck_preserves_attached_ability_ownership"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -3262,6 +3577,25 @@
               "native_provider_or_legal_roster_admission": false
             },
             {
+              "node": "tests/rules/section21/test_clarifications.py::test_flying_vertical_legs_are_excluded_from_actual_heavy_hit_permission",
+              "function_ast_sha256": "6e3f32932d23b124c3861cfb476eaf6d712ec6863c16758d818e45ec2f451311",
+              "assertions": [
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert len(state.model_movement_history) == 1",
+                "assert isclose(state.model_movement_history[0].distance_inches, horizontal)",
+                "assert _heavy_hit_roll_modifier_applies(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner', out_of_phase_state=None) is heavy"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
               "function_ast_sha256": "852caed71a818e038a4fc233a9426848f6a4e6c26ef29c6e7a010ffcfe923051",
               "assertions": [
@@ -3294,23 +3628,18 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section21/test_clarifications.py::test_flying_vertical_legs_are_excluded_from_actual_heavy_hit_permission",
-              "function_ast_sha256": "6e3f32932d23b124c3861cfb476eaf6d712ec6863c16758d818e45ec2f451311",
-              "assertions": [
-                "assert status.decision_request is not None",
-                "assert request is not None",
-                "assert status.decision_request is not None",
-                "assert request is not None",
-                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
-                "assert len(state.model_movement_history) == 1",
-                "assert isclose(state.model_movement_history[0].distance_inches, horizontal)",
-                "assert _heavy_hit_roll_modifier_applies(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner', out_of_phase_state=None) is heavy"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_unit_set_up_this_turn",
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_engaged_unit"
               ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -3319,7 +3648,7 @@
           "source_blocks": [
             2
           ],
-          "literal_clause": "\u2022 That unit is \u0005unengaged\u0006.",
+          "literal_clause": "• That unit is \u0005unengaged\u0006.",
           "acceptance": "Complete literal 24.16 [HEAVY] block2; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -3367,6 +3696,25 @@
               "native_provider_or_legal_roster_admission": false
             },
             {
+              "node": "tests/rules/section21/test_clarifications.py::test_flying_vertical_legs_are_excluded_from_actual_heavy_hit_permission",
+              "function_ast_sha256": "6e3f32932d23b124c3861cfb476eaf6d712ec6863c16758d818e45ec2f451311",
+              "assertions": [
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert len(state.model_movement_history) == 1",
+                "assert isclose(state.model_movement_history[0].distance_inches, horizontal)",
+                "assert _heavy_hit_roll_modifier_applies(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner', out_of_phase_state=None) is heavy"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
               "function_ast_sha256": "852caed71a818e038a4fc233a9426848f6a4e6c26ef29c6e7a010ffcfe923051",
               "assertions": [
@@ -3399,23 +3747,18 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section21/test_clarifications.py::test_flying_vertical_legs_are_excluded_from_actual_heavy_hit_permission",
-              "function_ast_sha256": "6e3f32932d23b124c3861cfb476eaf6d712ec6863c16758d818e45ec2f451311",
-              "assertions": [
-                "assert status.decision_request is not None",
-                "assert request is not None",
-                "assert status.decision_request is not None",
-                "assert request is not None",
-                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
-                "assert len(state.model_movement_history) == 1",
-                "assert isclose(state.model_movement_history[0].distance_inches, horizontal)",
-                "assert _heavy_hit_roll_modifier_applies(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner', out_of_phase_state=None) is heavy"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_unit_set_up_this_turn",
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_engaged_unit"
               ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -3424,7 +3767,7 @@
           "source_blocks": [
             3
           ],
-          "literal_clause": "\u2022 That unit was not set up on the battlefield this turn.",
+          "literal_clause": "• That unit was not set up on the battlefield this turn.",
           "acceptance": "Complete literal 24.16 [HEAVY] block3; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -3472,6 +3815,25 @@
               "native_provider_or_legal_roster_admission": false
             },
             {
+              "node": "tests/rules/section21/test_clarifications.py::test_flying_vertical_legs_are_excluded_from_actual_heavy_hit_permission",
+              "function_ast_sha256": "6e3f32932d23b124c3861cfb476eaf6d712ec6863c16758d818e45ec2f451311",
+              "assertions": [
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert len(state.model_movement_history) == 1",
+                "assert isclose(state.model_movement_history[0].distance_inches, horizontal)",
+                "assert _heavy_hit_roll_modifier_applies(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner', out_of_phase_state=None) is heavy"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
               "function_ast_sha256": "852caed71a818e038a4fc233a9426848f6a4e6c26ef29c6e7a010ffcfe923051",
               "assertions": [
@@ -3504,23 +3866,18 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section21/test_clarifications.py::test_flying_vertical_legs_are_excluded_from_actual_heavy_hit_permission",
-              "function_ast_sha256": "6e3f32932d23b124c3861cfb476eaf6d712ec6863c16758d818e45ec2f451311",
-              "assertions": [
-                "assert status.decision_request is not None",
-                "assert request is not None",
-                "assert status.decision_request is not None",
-                "assert request is not None",
-                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
-                "assert len(state.model_movement_history) == 1",
-                "assert isclose(state.model_movement_history[0].distance_inches, horizontal)",
-                "assert _heavy_hit_roll_modifier_applies(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner', out_of_phase_state=None) is heavy"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_unit_set_up_this_turn",
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_engaged_unit"
               ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -3529,7 +3886,7 @@
           "source_blocks": [
             4
           ],
-          "literal_clause": "\u2022 No model in that unit has moved moret han 3\" this turn.",
+          "literal_clause": "• No model in that unit has moved moret han 3\" this turn.",
           "acceptance": "Complete literal 24.16 [HEAVY] block4; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -3577,6 +3934,25 @@
               "native_provider_or_legal_roster_admission": false
             },
             {
+              "node": "tests/rules/section21/test_clarifications.py::test_flying_vertical_legs_are_excluded_from_actual_heavy_hit_permission",
+              "function_ast_sha256": "6e3f32932d23b124c3861cfb476eaf6d712ec6863c16758d818e45ec2f451311",
+              "assertions": [
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.decision_request is not None",
+                "assert request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert len(state.model_movement_history) == 1",
+                "assert isclose(state.model_movement_history[0].distance_inches, horizontal)",
+                "assert _heavy_hit_roll_modifier_applies(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner', out_of_phase_state=None) is heavy"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
               "function_ast_sha256": "852caed71a818e038a4fc233a9426848f6a4e6c26ef29c6e7a010ffcfe923051",
               "assertions": [
@@ -3609,23 +3985,18 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section21/test_clarifications.py::test_flying_vertical_legs_are_excluded_from_actual_heavy_hit_permission",
-              "function_ast_sha256": "6e3f32932d23b124c3861cfb476eaf6d712ec6863c16758d818e45ec2f451311",
-              "assertions": [
-                "assert status.decision_request is not None",
-                "assert request is not None",
-                "assert status.decision_request is not None",
-                "assert request is not None",
-                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
-                "assert len(state.model_movement_history) == 1",
-                "assert isclose(state.model_movement_history[0].distance_inches, horizontal)",
-                "assert _heavy_hit_roll_modifier_applies(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), player_id='owner', out_of_phase_state=None) is heavy"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_unit_set_up_this_turn",
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_engaged_unit"
               ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -3721,7 +4092,8 @@
           ],
           "literal_clause": "Each time an attack is made with an \u0003[IGNORES COVER]\u0004 weapon, the target cannot have the \u0005benefit of cover\u0006 against that attack (13.08), including from rules that give a model or unit the \u0005benefit of cover\u0006 (e.g. \u0005Stealth\u0006).",
           "acceptance": "Complete literal 24.18 [IGNORES COVER] block1; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order39_stealth_uses_one_cover_skill_modifier",
               "function_ast_sha256": "8a25f9bca550e7f1b537dab64fc81c95ece9dc56deb36197811b10f15d348f86",
@@ -3733,6 +4105,16 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order39_stealth_uses_one_cover_skill_modifier"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         }
       ],
@@ -3742,17 +4124,6 @@
           "id": "e01c8a02-7a36-4d3b-b168-976b11bd47e8",
           "clarification": "Cover is evaluated per attacking model; Ignores Cover also defeats Stealth cover.",
           "semantic_assertions": [
-            {
-              "node": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order39_stealth_uses_one_cover_skill_modifier",
-              "function_ast_sha256": "8a25f9bca550e7f1b537dab64fc81c95ece9dc56deb36197811b10f15d348f86",
-              "assertions": [
-                "assert len(snapshots) == (0 if ignored else 1)",
-                "assert snapshots[0].kind == 'skill'"
-              ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
-            },
             {
               "node": "tests/rules/section13/test_consumers.py::test_faq44_attacker_specific_cover_reaches_native_grouping_with_physical_provenance",
               "function_ast_sha256": "27fa8857f6f2eed91aa89df36b205138d1b7764e7b566dc5786685d6a92e86fe",
@@ -3770,6 +4141,29 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false,
               "consumer_evidence": "Two native physical bearers view one target through different geometry, retain distinct source pools, resolve both pools and assert actual Hit target numbers {0:{4},1:{3}}. Constructed post-casualty incoherent placement checkpoint; no prior Movement history certification."
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
+              "node": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order39_stealth_uses_one_cover_skill_modifier",
+              "function_ast_sha256": "8a25f9bca550e7f1b537dab64fc81c95ece9dc56deb36197811b10f15d348f86",
+              "assertions": [
+                "assert len(snapshots) == (0 if ignored else 1)",
+                "assert snapshots[0].kind == 'skill'"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order39_stealth_uses_one_cover_skill_modifier"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -3838,7 +4232,7 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "During deployment, if every model in a unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from your opponent\u2019s deployment zone and all enemy units.",
+          "literal_clause": "During deployment, if every model in a unit has this ability, it can be set up anywhere on the battlefield that is more than 8\" horizontally from your opponent’s deployment zone and all enemy units.",
           "acceptance": "Complete literal 24.20 Infiltrators block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -3852,17 +4246,6 @@
               ],
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
-              "native_provider_or_legal_roster_admission": false
-            },
-            {
-              "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_deep_strike_and_infiltrators_require_every_component",
-              "function_ast_sha256": "12fdfb5dcb1923041c21f4350ad5c3101e84e8d1b423f1802141937d1a6b5f30",
-              "assertions": [
-                "assert rules_unit_has_infiltrators(state=state, view=view) is all_components",
-                "assert (option is not None) is all_components"
-              ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             },
             {
@@ -3883,6 +4266,19 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
+              "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_deep_strike_and_infiltrators_require_every_component",
+              "function_ast_sha256": "12fdfb5dcb1923041c21f4350ad5c3101e84e8d1b423f1802141937d1a6b5f30",
+              "assertions": [
+                "assert rules_unit_has_infiltrators(state=state, view=view) is all_components",
+                "assert (option is not None) is all_components"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
             },
             {
               "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_infiltrators_enemy_model_distance_is_independent_of_zone",
@@ -3897,6 +4293,17 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_attached_deep_strike_and_infiltrators_require_every_component",
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_infiltrators_enemy_model_distance_is_independent_of_zone"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -3923,9 +4330,10 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "Each time an attack is made with a \u0003[LANCE]\u0004 weapon, if the attacking model\u2019s unit made a \u0005charge\u0006 move this turn, add 1 to the \u0005wound roll\u0006.",
+          "literal_clause": "Each time an attack is made with a \u0003[LANCE]\u0004 weapon, if the attacking model’s unit made a \u0005charge\u0006 move this turn, add 1 to the \u0005wound roll\u0006.",
           "acceptance": "Complete literal 24.21 [LANCE] block1; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_lance_without_charge_has_no_wound_bonus",
               "function_ast_sha256": "7430a33b56ada9390ebec03220ba47a13d821da711a073860193f9488b83748a",
@@ -3949,6 +4357,17 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_lance_without_charge_has_no_wound_bonus",
+                "tests/unit/test_phase15d_fight_resolution.py::test_phase14e_melee_lance_uses_charge_move_wound_modifier"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -4197,7 +4616,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay",
               "function_ast_sha256": "25d4c46b6a63883f828b96cc04bf8855466388c9eebde1bcbb05bb83533dd59f",
@@ -4225,6 +4646,16 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -4232,7 +4663,7 @@
           "source_blocks": [
             2
           ],
-          "literal_clause": "\u0005Designer\u2019s Note:\u0006 \u0007Choosing to automatically wound the target means that no \u0005wound roll\u0006 is made for that attack. You may decide against this, as it means that attack cannot result in a \u0005critical wound\u0006 and so cannot trigger other abilities such as \u0003[DEVASTATING WOUNDS]\u0004.\b",
+          "literal_clause": "\u0005Designer’s Note:\u0006 \u0007Choosing to automatically wound the target means that no \u0005wound roll\u0006 is made for that attack. You may decide against this, as it means that attack cannot result in a \u0005critical wound\u0006 and so cannot trigger other abilities such as \u0003[DEVASTATING WOUNDS]\u0004.\b",
           "acceptance": "Complete literal 24.23 [LETHAL HITS] block2; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -4251,7 +4682,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay",
               "function_ast_sha256": "25d4c46b6a63883f828b96cc04bf8855466388c9eebde1bcbb05bb83533dd59f",
@@ -4278,6 +4711,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -4662,7 +5105,7 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "This ability always takes the form \u0003[MELTA X]\u0004. Each time a model makes an attack with a \u0003[MELTA]\u0004 weapon, if the target unit was within half range of that weapon in the Select Targets step, until the attacking unit\u2019s attacks have been resolved, add \u0005X\u0006 to that weapon\u2019s \u0005D\u0006 characteristic.",
+          "literal_clause": "This ability always takes the form \u0003[MELTA X]\u0004. Each time a model makes an attack with a \u0003[MELTA]\u0004 weapon, if the target unit was within half range of that weapon in the Select Targets step, until the attacking unit’s attacks have been resolved, add \u0005X\u0006 to that weapon’s \u0005D\u0006 characteristic.",
           "acceptance": "Complete literal 24.25 [MELTA] block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -4697,7 +5140,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_melta_keeps_declared_half_range_when_target_geometry_later_changes",
               "function_ast_sha256": "bd372363973749440641fcb23a100b06dc1206792b32c96a931f738cab972d8d",
@@ -4709,6 +5154,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_melta_keeps_declared_half_range_when_target_geometry_later_changes"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -4752,7 +5207,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order97_semantic_evidence_18_25.py::test_melta_keeps_declared_half_range_when_target_geometry_later_changes",
               "function_ast_sha256": "bd372363973749440641fcb23a100b06dc1206792b32c96a931f738cab972d8d",
@@ -4764,6 +5221,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_melta_keeps_declared_half_range_when_target_geometry_later_changes"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -4802,7 +5269,8 @@
           ],
           "literal_clause": "Each weapon with this ability can only be selected to make attacks with once per battle.",
           "acceptance": "Complete literal 24.26 [ONE SHOT] block1; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration",
               "function_ast_sha256": "448a58c05b6e8e148fdac98b66ab8c738d598779ea593ee5b0c4a58886072dc8",
@@ -4847,6 +5315,18 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_phase_declarations.py::test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration",
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_revived_model_keeps_spent_physical_one_shot_weapon",
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_new_unit_identity_has_fresh_one_shot_weapons"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -4857,7 +5337,8 @@
           ],
           "literal_clause": "If a \u0005destroyed\u0006 model is returned to a unit, all of its \u0003[ONE SHOT]\u0004 weapons that have already been selected to make attacks with during the battle cannot be selected to make attacks with again.",
           "acceptance": "Complete literal 24.26 [ONE SHOT] block2; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration",
               "function_ast_sha256": "448a58c05b6e8e148fdac98b66ab8c738d598779ea593ee5b0c4a58886072dc8",
@@ -4903,6 +5384,18 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_phase_declarations.py::test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration",
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_revived_model_keeps_spent_physical_one_shot_weapon",
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_new_unit_identity_has_fresh_one_shot_weapons"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -4912,7 +5405,8 @@
           ],
           "literal_clause": "If a new unit is added to an army, all \u0003[ONE SHOT]\u0004 weapons in that unit can be selected to make attacks with once per battle.",
           "acceptance": "Complete literal 24.26 [ONE SHOT] block3; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration",
               "function_ast_sha256": "448a58c05b6e8e148fdac98b66ab8c738d598779ea593ee5b0c4a58886072dc8",
@@ -4957,6 +5451,18 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_phase_declarations.py::test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration",
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_revived_model_keeps_spent_physical_one_shot_weapon",
+                "tests/unit/test_order97_semantic_evidence_18_25.py::test_new_unit_identity_has_fresh_one_shot_weapons"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -5034,7 +5540,7 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "\u0003[PISTOL]\u0004 and \u0003[CLOSE\u2011QUARTERS]\u0004 are identical for all rules purposes. See \u0003[CLOSE\u2011QUARTERS]\u0004.",
+          "literal_clause": "\u0003[PISTOL]\u0004 and \u0003[CLOSE‑QUARTERS]\u0004 are identical for all rules purposes. See \u0003[CLOSE‑QUARTERS]\u0004.",
           "acceptance": "Complete literal 24.27 [PISTOL] block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -5070,7 +5576,7 @@
           "source_blocks": [
             2
           ],
-          "literal_clause": "\u0005Designer\u2019s Note:\u0006 \u0003[PISTOL]\u0004 \u0007is a pre-existing ability that will be superseded by \u0003[CLOSE-QUARTERS]\u0004 as this edition of Warhammer 40,000 progresses. Both are functionally the same, but the latter is a more suitable term for weapons that function in this way.\b",
+          "literal_clause": "\u0005Designer’s Note:\u0006 \u0003[PISTOL]\u0004 \u0007is a pre-existing ability that will be superseded by \u0003[CLOSE-QUARTERS]\u0004 as this edition of Warhammer 40,000 progresses. Both are functionally the same, but the latter is a more suitable term for weapons that function in this way.\b",
           "acceptance": "Complete literal 24.27 [PISTOL] block2; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -5128,6 +5634,20 @@
           "acceptance": "Complete literal 24.28 [PRECISION] block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
+              "node": "tests/rules/section04/test_grouping.py::test_faq21_precision_is_applicable_only_against_character",
+              "function_ast_sha256": "87290cc2fa656f96ec783fb31552e2b049b55acca0d4fcc20d8f9ec4865351c0",
+              "assertions": [
+                "assert len(groups) == (2 if character else 1)",
+                "assert sum((g.total_attacks for g in groups)) == 8",
+                "assert sequence.attack_pools == pools"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_allocation_can_select_visible_attached_character",
               "function_ast_sha256": "f60f495f4616901278618837c48ee097cca6a02e998c9aa2adb1b10a6ea7a0d6",
               "assertions": [
@@ -5162,18 +5682,17 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section04/test_grouping.py::test_faq21_precision_is_applicable_only_against_character",
-              "function_ast_sha256": "87290cc2fa656f96ec783fb31552e2b049b55acca0d4fcc20d8f9ec4865351c0",
-              "assertions": [
-                "assert len(groups) == (2 if character else 1)",
-                "assert sum((g.total_attacks for g in groups)) == 8",
-                "assert sequence.attack_pools == pools"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_allocation_can_select_visible_attached_character",
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_decline_or_no_visible_character_uses_bodyguard_allocation"
               ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -5222,7 +5741,8 @@
           ],
           "literal_clause": "\u0005Mortal Wounds\u0006 inflicted by a \u0003[PRECISION]\u0004 attack with the \u0003[DEVASTATING WOUNDS]\u0004 ability are first applied to the \u0003CHARACTER\u0004 group that was selected for those \u0003[PRECISION]\u0004 attacks (if that group is not already \u0005destroyed\u0006).",
           "acceptance": "Complete literal 24.28.01 Precision and Devastating Wounds block1; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_devastating_mortal_wounds_prioritize_selected_character",
               "function_ast_sha256": "6516f7a271e6b0eb90c2c4824d1ea74fc4dca59012e93bf8758dad043788b330",
@@ -5235,6 +5755,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_precision_devastating_mortal_wounds_prioritize_selected_character"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -5261,9 +5791,10 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "Each time an attack is made with a \u0003[PSYCHIC]\u0004 weapon, you can ignore any or all modifiers to that attack\u2019s \u0005BS\u0006 or \u0005WS\u0006 characteristic and any or all modifiers to the \u0005hit roll\u0006. Attacks made with \u0003[PSYCHIC]\u0004 weapons are known as \u0005psychic attacks\u0006 (this can be important for the triggering of other rules).",
+          "literal_clause": "Each time an attack is made with a \u0003[PSYCHIC]\u0004 weapon, you can ignore any or all modifiers to that attack’s \u0005BS\u0006 or \u0005WS\u0006 characteristic and any or all modifiers to the \u0005hit roll\u0006. Attacks made with \u0003[PSYCHIC]\u0004 weapons are known as \u0005psychic attacks\u0006 (this can be important for the triggering of other rules).",
           "acceptance": "Complete literal 24.29 [PSYCHIC] block1; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_psychic_attack_can_ignore_detrimental_skill_and_hit_roll_modifiers",
               "function_ast_sha256": "57deaeca8915ab486e81fc7519de51e8ebc18da4c173bdeede82c2943e62497e",
@@ -5308,6 +5839,17 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_psychic_attack_can_ignore_detrimental_skill_and_hit_roll_modifiers",
+                "tests/unit/test_phase13b_shooting_declarations.py::test_psychic_attack_can_ignore_detrimental_modifiers_and_keep_hit_bonus"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -5458,9 +6000,23 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "This ability always takes the form \u0005Scouts X\"\u0006. In the Resolve Pre\u2011battle Abilities step, if every model in a unit has this ability, you can do \u0001one\u0002 of the following:",
+          "literal_clause": "This ability always takes the form \u0005Scouts X\"\u0006. In the Resolve Pre‑battle Abilities step, if every model in a unit has this ability, you can do \u0001one\u0002 of the following:",
           "acceptance": "Complete literal 24.31 Scouts block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
+            {
+              "node": "tests/rules/section24/test_scout_boundary.py::test_native_scouts_supply_distance_and_require_full_witnessed_coherent_path",
+              "function_ast_sha256": "2daf1deb089830daebe5d6719a31bf3a74958f0e0d1b2b7c809ba05b341eaada",
+              "assertions": [
+                "assert request.scout_distance_inches == 6",
+                "assert result.is_valid is (distance <= 6), result.to_payload()",
+                "assert state.to_payload() == before"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_and_explicit_core_input",
+              "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event",
               "function_ast_sha256": "014de5cfce6cd0a93ca94e2708963f7646674bc4ca3091e9fe134adf802f391e",
@@ -5505,18 +6061,18 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section24/test_scout_boundary.py::test_native_scouts_supply_distance_and_require_full_witnessed_coherent_path",
-              "function_ast_sha256": "2daf1deb089830daebe5d6719a31bf3a74958f0e0d1b2b7c809ba05b341eaada",
-              "assertions": [
-                "assert request.scout_distance_inches == 6",
-                "assert result.is_valid is (distance <= 6), result.to_payload()",
-                "assert state.to_payload() == before"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event",
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_action",
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_with_non_scout_cargo_is_ineligible"
               ],
-              "expected_exceptions": [],
-              "role": "owned_native_and_explicit_core_input",
-              "native_provider_or_legal_roster_admission": false
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -5525,9 +6081,23 @@
           "source_blocks": [
             2
           ],
-          "literal_clause": "\u2022 If that unit is in \u0005strategic reserves\u0006, you can set up that unit anywhere that is wholly within your deployment zone.",
+          "literal_clause": "• If that unit is in \u0005strategic reserves\u0006, you can set up that unit anywhere that is wholly within your deployment zone.",
           "acceptance": "Complete literal 24.31 Scouts block2; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
+            {
+              "node": "tests/rules/section24/test_scout_boundary.py::test_native_scouts_supply_distance_and_require_full_witnessed_coherent_path",
+              "function_ast_sha256": "2daf1deb089830daebe5d6719a31bf3a74958f0e0d1b2b7c809ba05b341eaada",
+              "assertions": [
+                "assert request.scout_distance_inches == 6",
+                "assert result.is_valid is (distance <= 6), result.to_payload()",
+                "assert state.to_payload() == before"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_and_explicit_core_input",
+              "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event",
               "function_ast_sha256": "014de5cfce6cd0a93ca94e2708963f7646674bc4ca3091e9fe134adf802f391e",
@@ -5572,18 +6142,18 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section24/test_scout_boundary.py::test_native_scouts_supply_distance_and_require_full_witnessed_coherent_path",
-              "function_ast_sha256": "2daf1deb089830daebe5d6719a31bf3a74958f0e0d1b2b7c809ba05b341eaada",
-              "assertions": [
-                "assert request.scout_distance_inches == 6",
-                "assert result.is_valid is (distance <= 6), result.to_payload()",
-                "assert state.to_payload() == before"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event",
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_action",
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_with_non_scout_cargo_is_ineligible"
               ],
-              "expected_exceptions": [],
-              "role": "owned_native_and_explicit_core_input",
-              "native_provider_or_legal_roster_admission": false
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -5592,54 +6162,9 @@
           "source_blocks": [
             3
           ],
-          "literal_clause": "\u2022 If that unit is wholly within your deployment zone, it can make a \u0005scout move\u0006 (24.32).",
+          "literal_clause": "• If that unit is wholly within your deployment zone, it can make a \u0005scout move\u0006 (24.32).",
           "acceptance": "Complete literal 24.31 Scouts block3; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
-            {
-              "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event",
-              "function_ast_sha256": "014de5cfce6cd0a93ca94e2708963f7646674bc4ca3091e9fe134adf802f391e",
-              "assertions": [
-                "assert resolution.is_valid",
-                "assert state.battlefield_state is not None",
-                "assert state.battlefield_state.unit_placement_by_id('army-beta:intercessor-unit-2')",
-                "assert reserve_state is not None",
-                "assert reserve_state.status is ReserveStatus.ARRIVED",
-                "assert reserve_state.arrived_phase == SetupStep.RESOLVE_PREBATTLE_ACTIONS.value",
-                "assert len(records) == 1",
-                "assert records[0].to_payload() == PreBattleActionRecord.from_payload(records[0].to_payload()).to_payload()",
-                "assert 'prebattle_scout_reserve_setup_completed' in (event.event_type for event in decisions.event_log.records)",
-                "assert timing.next_player_id is None"
-              ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
-            },
-            {
-              "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_action",
-              "function_ast_sha256": "90dcdb88e2007dcd17b2a16b3f685894ce62bb8ae34437e410289f2a2008d1da",
-              "assertions": [
-                "assert len(options) == 2",
-                "assert proposal_request.action_kind is PreBattleActionKind.DEDICATED_TRANSPORT_SCOUT_MOVE",
-                "assert proposal_request.scout_distance_inches == selected_distance",
-                "assert resolution.is_valid",
-                "assert len(records) == 1",
-                "assert records[0].unit_instance_id == 'army-beta:transport-unit-1'",
-                "assert 'prebattle_scout_move_completed' in (event.event_type for event in decisions.event_log.records)"
-              ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
-            },
-            {
-              "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_with_non_scout_cargo_is_ineligible",
-              "function_ast_sha256": "af1042a8e0b9fc1348fbd9b4481e1cb653b6b16b360077dffd414f7e1544d505",
-              "assertions": [
-                "assert dedicated_transport_scout_move_candidates_for_player(state=state, army_catalog=catalog, player_id='player-b') == ()"
-              ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency",
-              "native_provider_or_legal_roster_admission": false
-            },
             {
               "node": "tests/rules/section24/test_scout_boundary.py::test_native_scouts_supply_distance_and_require_full_witnessed_coherent_path",
               "function_ast_sha256": "2daf1deb089830daebe5d6719a31bf3a74958f0e0d1b2b7c809ba05b341eaada",
@@ -5652,16 +6177,8 @@
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
             }
-          ]
-        },
-        {
-          "clause_id": "S24-078",
-          "source_blocks": [
-            4
           ],
-          "literal_clause": "\u2022 If that unit is embarked within a \u0003DEDICATED TRANSPORT\u0004 that is wholly within your deployment zone, and if every model embarked within that \u0003DEDICATED TRANSPORT\u0004 has the \u0005Scouts\u0006 ability, that \u0003DEDICATED TRANSPORT\u0004 can make a \u0005scout move\u0006.",
-          "acceptance": "Complete literal 24.31 Scouts block4; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event",
               "function_ast_sha256": "014de5cfce6cd0a93ca94e2708963f7646674bc4ca3091e9fe134adf802f391e",
@@ -5706,7 +6223,29 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event",
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_action",
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_with_non_scout_cargo_is_ineligible"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
+          ]
+        },
+        {
+          "clause_id": "S24-078",
+          "source_blocks": [
+            4
+          ],
+          "literal_clause": "• If that unit is embarked within a \u0003DEDICATED TRANSPORT\u0004 that is wholly within your deployment zone, and if every model embarked within that \u0003DEDICATED TRANSPORT\u0004 has the \u0005Scouts\u0006 ability, that \u0003DEDICATED TRANSPORT\u0004 can make a \u0005scout move\u0006.",
+          "acceptance": "Complete literal 24.31 Scouts block4; jointly satisfy the retained clause and its required positive/negative controls.",
+          "semantic_assertions": [
             {
               "node": "tests/rules/section24/test_scout_boundary.py::test_native_scouts_supply_distance_and_require_full_witnessed_coherent_path",
               "function_ast_sha256": "2daf1deb089830daebe5d6719a31bf3a74958f0e0d1b2b7c809ba05b341eaada",
@@ -5718,6 +6257,65 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
+              "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event",
+              "function_ast_sha256": "014de5cfce6cd0a93ca94e2708963f7646674bc4ca3091e9fe134adf802f391e",
+              "assertions": [
+                "assert resolution.is_valid",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_by_id('army-beta:intercessor-unit-2')",
+                "assert reserve_state is not None",
+                "assert reserve_state.status is ReserveStatus.ARRIVED",
+                "assert reserve_state.arrived_phase == SetupStep.RESOLVE_PREBATTLE_ACTIONS.value",
+                "assert len(records) == 1",
+                "assert records[0].to_payload() == PreBattleActionRecord.from_payload(records[0].to_payload()).to_payload()",
+                "assert 'prebattle_scout_reserve_setup_completed' in (event.event_type for event in decisions.event_log.records)",
+                "assert timing.next_player_id is None"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_action",
+              "function_ast_sha256": "90dcdb88e2007dcd17b2a16b3f685894ce62bb8ae34437e410289f2a2008d1da",
+              "assertions": [
+                "assert len(options) == 2",
+                "assert proposal_request.action_kind is PreBattleActionKind.DEDICATED_TRANSPORT_SCOUT_MOVE",
+                "assert proposal_request.scout_distance_inches == selected_distance",
+                "assert resolution.is_valid",
+                "assert len(records) == 1",
+                "assert records[0].unit_instance_id == 'army-beta:transport-unit-1'",
+                "assert 'prebattle_scout_move_completed' in (event.event_type for event in decisions.event_log.records)"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_with_non_scout_cargo_is_ineligible",
+              "function_ast_sha256": "af1042a8e0b9fc1348fbd9b4481e1cb653b6b16b360077dffd414f7e1544d505",
+              "assertions": [
+                "assert dedicated_transport_scout_move_candidates_for_player(state=state, army_catalog=catalog, player_id='player-b') == ()"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event",
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_action",
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_dedicated_transport_with_non_scout_cargo_is_ineligible"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -5727,7 +6325,8 @@
           "faq_number": 54,
           "id": "80182be3-1a44-464b-9ef6-cd9212429603",
           "clarification": "Both players alternate pre-battle abilities starting with first turn player.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_simultaneous_scouts_start_with_first_turn_player_and_alternate_by_unit",
               "function_ast_sha256": "82aede4a1991bd9d1c36835f96bf17886273bf9b3add10d11273218611c8eb2f",
@@ -5758,6 +6357,16 @@
               ],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_simultaneous_scouts_start_with_first_turn_player_and_alternate_by_unit"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -5832,7 +6441,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy",
               "function_ast_sha256": "247c3d377c0cb14bc7a7b148f74e8e57f8c868120d125bd30dc98234adf585a9",
@@ -5847,6 +6458,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -5869,7 +6490,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy",
               "function_ast_sha256": "247c3d377c0cb14bc7a7b148f74e8e57f8c868120d125bd30dc98234adf585a9",
@@ -5884,6 +6507,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -5906,7 +6539,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy",
               "function_ast_sha256": "247c3d377c0cb14bc7a7b148f74e8e57f8c868120d125bd30dc98234adf585a9",
@@ -5921,6 +6556,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -5943,7 +6588,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy",
               "function_ast_sha256": "247c3d377c0cb14bc7a7b148f74e8e57f8c868120d125bd30dc98234adf585a9",
@@ -5958,6 +6605,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -5980,7 +6637,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy",
               "function_ast_sha256": "247c3d377c0cb14bc7a7b148f74e8e57f8c868120d125bd30dc98234adf585a9",
@@ -5995,6 +6654,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -6017,7 +6686,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy",
               "function_ast_sha256": "247c3d377c0cb14bc7a7b148f74e8e57f8c868120d125bd30dc98234adf585a9",
@@ -6032,6 +6703,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -6054,7 +6735,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy",
               "function_ast_sha256": "247c3d377c0cb14bc7a7b148f74e8e57f8c868120d125bd30dc98234adf585a9",
@@ -6069,6 +6752,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -6091,7 +6784,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy",
               "function_ast_sha256": "247c3d377c0cb14bc7a7b148f74e8e57f8c868120d125bd30dc98234adf585a9",
@@ -6106,6 +6801,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase16b_prebattle.py::test_phase16b_scout_move_requires_more_than_eight_from_enemy"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -6147,7 +6852,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order39_stealth_uses_one_cover_skill_modifier",
               "function_ast_sha256": "8a25f9bca550e7f1b537dab64fc81c95ece9dc56deb36197811b10f15d348f86",
@@ -6158,6 +6865,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order39_stealth_uses_one_cover_skill_modifier"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -6358,7 +7075,8 @@
           ],
           "literal_clause": "Each time a unit with this ability makes a \u0005normal\u0006, \u0005advance\u0006 or \u0005fall-back move\u0006:",
           "acceptance": "Complete literal 24.35 Super-Heavy Walker block1; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order53_movement_abilities.py::test_source_linked_movement_ability_grants_only_its_transit_permissions",
               "function_ast_sha256": "d8d25a4f8407ad27428c585b00f8da0e296e9f988f89a2a2eb0685e9148fd9b1",
@@ -6407,6 +7125,18 @@
               ],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order53_movement_abilities.py::test_source_linked_movement_ability_grants_only_its_transit_permissions",
+                "tests/unit/test_order53_movement_abilities.py::test_horizontal_terrain_sections_mobile_and_endpoints",
+                "tests/unit/test_order53_movement_abilities.py::test_move_keyword_completion_is_once_per_move_and_replays"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -6415,9 +7145,10 @@
           "source_blocks": [
             2
           ],
-          "literal_clause": "\u2022 Models in that unit can move through models (including \u0003MONSTER/VEHICLE\u0004 models, but excluding \u0003TITANIC\u0004 models) and can move horizontally through sections of \u0005terrain features\u0006 that are 4\" or less in height.",
+          "literal_clause": "• Models in that unit can move through models (including \u0003MONSTER/VEHICLE\u0004 models, but excluding \u0003TITANIC\u0004 models) and can move horizontally through sections of \u0005terrain features\u0006 that are 4\" or less in height.",
           "acceptance": "Complete literal 24.35 Super-Heavy Walker block2; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order53_movement_abilities.py::test_source_linked_movement_ability_grants_only_its_transit_permissions",
               "function_ast_sha256": "d8d25a4f8407ad27428c585b00f8da0e296e9f988f89a2a2eb0685e9148fd9b1",
@@ -6466,6 +7197,18 @@
               ],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order53_movement_abilities.py::test_source_linked_movement_ability_grants_only_its_transit_permissions",
+                "tests/unit/test_order53_movement_abilities.py::test_horizontal_terrain_sections_mobile_and_endpoints",
+                "tests/unit/test_order53_movement_abilities.py::test_move_keyword_completion_is_once_per_move_and_replays"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -6474,9 +7217,10 @@
           "source_blocks": [
             3
           ],
-          "literal_clause": "\u2022 Before moving that unit, you can select for all models in that unit to have the \u0003MOBILE\u0004 keyword until that move ends. If you do, when that move ends, roll one D6: on a 1, that unit is \u0005battle-shocked\u0006.",
+          "literal_clause": "• Before moving that unit, you can select for all models in that unit to have the \u0003MOBILE\u0004 keyword until that move ends. If you do, when that move ends, roll one D6: on a 1, that unit is \u0005battle-shocked\u0006.",
           "acceptance": "Complete literal 24.35 Super-Heavy Walker block3; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order53_movement_abilities.py::test_source_linked_movement_ability_grants_only_its_transit_permissions",
               "function_ast_sha256": "d8d25a4f8407ad27428c585b00f8da0e296e9f988f89a2a2eb0685e9148fd9b1",
@@ -6526,6 +7270,18 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order53_movement_abilities.py::test_source_linked_movement_ability_grants_only_its_transit_permissions",
+                "tests/unit/test_order53_movement_abilities.py::test_horizontal_terrain_sections_mobile_and_endpoints",
+                "tests/unit/test_order53_movement_abilities.py::test_move_keyword_completion_is_once_per_move_and_replays"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -6533,9 +7289,10 @@
           "source_blocks": [
             4
           ],
-          "literal_clause": "\u0005Designer\u2019s Note:\u0006 \u0007Gaining the \u0003MOBILE\u0004 keyword for the duration of a move will enable models in that unit to move horizontally through \u0005dense terrain features\u0006\b (13.06).",
+          "literal_clause": "\u0005Designer’s Note:\u0006 \u0007Gaining the \u0003MOBILE\u0004 keyword for the duration of a move will enable models in that unit to move horizontally through \u0005dense terrain features\u0006\b (13.06).",
           "acceptance": "Complete literal 24.35 Super-Heavy Walker block4; jointly satisfy the retained clause and its required positive/negative controls.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order53_movement_abilities.py::test_source_linked_movement_ability_grants_only_its_transit_permissions",
               "function_ast_sha256": "d8d25a4f8407ad27428c585b00f8da0e296e9f988f89a2a2eb0685e9148fd9b1",
@@ -6584,6 +7341,18 @@
               ],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order53_movement_abilities.py::test_source_linked_movement_ability_grants_only_its_transit_permissions",
+                "tests/unit/test_order53_movement_abilities.py::test_horizontal_terrain_sections_mobile_and_endpoints",
+                "tests/unit/test_order53_movement_abilities.py::test_move_keyword_completion_is_once_per_move_and_replays"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -6629,7 +7398,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_lethal_and_sustained_hits_resolve_generated_hits",
               "function_ast_sha256": "87e1cfc3d1ce304a25443b076e40bab7ae1d491f584eb323a8dfaa92d8f9d46f",
@@ -6675,6 +7446,17 @@
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
             }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_lethal_and_sustained_hits_resolve_generated_hits",
+                "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -6696,7 +7478,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_lethal_and_sustained_hits_resolve_generated_hits",
               "function_ast_sha256": "87e1cfc3d1ce304a25443b076e40bab7ae1d491f584eb323a8dfaa92d8f9d46f",
@@ -6741,6 +7525,17 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_lethal_and_sustained_hits_resolve_generated_hits",
+                "tests/unit/test_lethal_hits.py::test_choices_devastating_sustained_restore_and_replay"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -6891,7 +7686,7 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "Each time an attack is made with a \u0003[TWIN\u2011LINKED]\u0004 weapon, you can re\u2011roll the \u0005wound roll\u0006.",
+          "literal_clause": "Each time an attack is made with a \u0003[TWIN‑LINKED]\u0004 weapon, you can re‑roll the \u0005wound roll\u0006.",
           "acceptance": "Complete literal 24.38 [TWIN-LINKED] block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -6910,7 +7705,9 @@
               "expected_exceptions": [],
               "role": "owned_native_and_explicit_core_input",
               "native_provider_or_legal_roster_admission": false
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order96_twin_linked.py::test_optional_twin_linked_all_wounds_restore_viewers_and_exact_replay",
               "function_ast_sha256": "6e6638d7ef3c54f32afd76f5eb76f0dfe2c62f58846fae2641f49703df773d5d",
@@ -6937,6 +7734,16 @@
               "expected_exceptions": [],
               "role": "bounded_existing_dependency",
               "native_provider_or_legal_roster_admission": false
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order96_twin_linked.py::test_optional_twin_linked_all_wounds_restore_viewers_and_exact_replay"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -6968,7 +7775,7 @@
           "source_blocks": [
             1
           ],
-          "literal_clause": "This ability always takes the form \u0005Damaged X\u0006. While a model\u2019s remaining wounds are equal to or less than \u0005X\u0006, that model is \u0005damaged\u0006:",
+          "literal_clause": "This ability always takes the form \u0005Damaged X\u0006. While a model’s remaining wounds are equal to or less than \u0005X\u0006, that model is \u0005damaged\u0006:",
           "acceptance": "Complete literal 24.39 Damaged block1; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -6992,7 +7799,7 @@
           "source_blocks": [
             2
           ],
-          "literal_clause": "\u2022 While a model is \u0005damaged\u0006, that model's attacks have -1 to \u0005hit rolls\u0006.",
+          "literal_clause": "• While a model is \u0005damaged\u0006, that model's attacks have -1 to \u0005hit rolls\u0006.",
           "acceptance": "Complete literal 24.39 Damaged block2; jointly satisfy the retained clause and its required positive/negative controls.",
           "semantic_assertions": [
             {
@@ -7666,5 +8473,6 @@
     }
   ],
   "metadata_gameplay_credit": false,
-  "qualification": "Real native datasheet bodies/equipment with explicit constructed Core descriptors/grants where named providers absent. Existing canonical dependencies are separately identified. No full-game/roster/provider or all-FAQ subsystem certification."
+  "qualification": "Real native datasheet bodies/equipment with explicit constructed Core descriptors/grants where named providers absent. Existing canonical dependencies are separately identified. No full-game/roster/provider or all-FAQ subsystem certification.",
+  "cutover_qualification": "Literal/source inventory remains complete. Current behavioral evidence is partial after the approved legacy-test cutover. Only selected active tests are live semantic bindings; historical_nonselected_evidence preserves former records without current gameplay or coverage credit. Explicit gaps remain for unselected checks; archives are historical evidence, never current test sources."
 }

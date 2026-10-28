@@ -19,11 +19,11 @@
         "title": "Embarking",
         "text": [
           "Once the first battle round has started, a friendly unit can embark within a friendly \u0003TRANSPORT\u0004 model after making a \u0005normal\u0006, \u0005advance\u0006 or \u0005fall-back move\u0006, if \u0001all\u0002 of the following conditions apply:",
-          "\u2022 Each model in that unit is within 3\" of that \u0003TRANSPORT\u0004.",
-          "\u2022 That unit was not set up on the battlefield this turn.",
-          "\u2022 That unit is \u0005eligible to embark\u0006 within that \u0003TRANSPORT\u0004, as described on that \u0003TRANSPORT\u0004\u2019s datasheet.",
-          "\u2022 That \u0003TRANSPORT\u0004 has sufficient remaining \u0005transport capacity\u0006 for each model in that unit.",
-          "When a unit embarks, the active player removes that unit from the battlefield and places it to one side \u2013 it is now embarked within that \u0003TRANSPORT\u0004 and is not on the battlefield."
+          "• Each model in that unit is within 3\" of that \u0003TRANSPORT\u0004.",
+          "• That unit was not set up on the battlefield this turn.",
+          "• That unit is \u0005eligible to embark\u0006 within that \u0003TRANSPORT\u0004, as described on that \u0003TRANSPORT\u0004’s datasheet.",
+          "• That \u0003TRANSPORT\u0004 has sufficient remaining \u0005transport capacity\u0006 for each model in that unit.",
+          "When a unit embarks, the active player removes that unit from the battlefield and places it to one side – it is now embarked within that \u0003TRANSPORT\u0004 and is not on the battlefield."
         ],
         "accordions": [
           {
@@ -39,7 +39,7 @@
         "ref": "18.03",
         "title": "Disembarking",
         "text": [
-          "In the active player\u2019s Movement phase, each friendly unit embarked within a \u0003TRANSPORT\u0004 model can disembark from it by making a \u0005disembark move\u0006 (18.04).",
+          "In the active player’s Movement phase, each friendly unit embarked within a \u0003TRANSPORT\u0004 model can disembark from it by making a \u0005disembark move\u0006 (18.04).",
           "If a \u0003TRANSPORT\u0004 model is destroyed, before removing it from the battlefield, the active player must make an \u0005emergency disembark move\u0006 (18.05) with each unit embarked within it."
         ]
       },
@@ -49,34 +49,34 @@
         "text": [
           "\u000eEligible If",
           "\u0001All\u0002 of the following apply to your unit:",
-          "\u2022 Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield.",
-          "\u2022 Did not embark within that \u0003TRANSPORT\u0004 this phase.",
-          "\u2022 That \u0003TRANSPORT\u0004 has not made an \u0005advance\u0006 or \u0005fall-back\u0006 move this phase.",
+          "• Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield.",
+          "• Did not embark within that \u0003TRANSPORT\u0004 this phase.",
+          "• That \u0003TRANSPORT\u0004 has not made an \u0005advance\u0006 or \u0005fall-back\u0006 move this phase.",
           "\u000eSet-up Distance",
           "- Rapid/Tactical Disembark: 3\"",
           "- Combat Disembark: 6\"",
           "\u000eBefore Moving",
           "Select \u0005disembark mode\u0006:",
-          "\u2022 \u0005Rapid Disembark:\u0006 If that \u0003TRANSPORT\u0004 made a \u0005normal\u0006 or \u0005ingress move\u0006 this phase, you must select this mode.",
-          "\u2022 \u0005Tactical Disembark:\u0006 Otherwise, If that \u0003TRANSPORT\u0004 \u0005remained stationary\u0006 or has not yet been \u0005selected to move\u0006 this phase, and if you can set up your unit as described below, you must select this mode.",
-          "\u2022 \u0005Combat Disembark:\u0006Otherwise, you must select this mode. Make a \u0005hazard roll\u0006 for each model in your unit.",
+          "• \u0005Rapid Disembark:\u0006 If that \u0003TRANSPORT\u0004 made a \u0005normal\u0006 or \u0005ingress move\u0006 this phase, you must select this mode.",
+          "• \u0005Tactical Disembark:\u0006 Otherwise, If that \u0003TRANSPORT\u0004 \u0005remained stationary\u0006 or has not yet been \u0005selected to move\u0006 this phase, and if you can set up your unit as described below, you must select this mode.",
+          "• \u0005Combat Disembark:\u0006Otherwise, you must select this mode. Make a \u0005hazard roll\u0006 for each model in your unit.",
           "\u000eWhile Moving",
           "Set up each model in your unit wholly within the \u0005set-up distance\u0006 of that \u0003TRANSPORT\u0004.",
-          "\u2022 \u0005Rapid Disembark:\u0006 If that \u0003TRANSPORT\u0004 made an \u0005ingress move\u0006 this turn, each model must follow the same rules that \u0003TRANSPORT\u0004 had to follow while resolving that move.",
-          "\u2022 \u0005Combat Disembark:\u0006 Each model can be set up \u0005engaged\u0006 with one or more enemy units that \u0003TRANSPORT\u0004 is \u0005engaged\u0006 with.",
+          "• \u0005Rapid Disembark:\u0006 If that \u0003TRANSPORT\u0004 made an \u0005ingress move\u0006 this turn, each model must follow the same rules that \u0003TRANSPORT\u0004 had to follow while resolving that move.",
+          "• \u0005Combat Disembark:\u0006 Each model can be set up \u0005engaged\u0006 with one or more enemy units that \u0003TRANSPORT\u0004 is \u0005engaged\u0006 with.",
           "\u000eEffect",
           "Your unit is set up as described in Set Up (03.02)",
           "\u000eAfter Moving",
-          "\u2022 \u0005Rapid Disembark:\u0006 Until the end of the turn, your unit is \u0001not\u0002 \u0005eligible to declare a charge\u0006.",
-          "\u2022 \u0005Tactical Disembark:\u0006 Select your unit to make a \u0005normal\u0006 or \u0005advance move\u0006.",
-          "\u2022 \u0005Combat Disembark:\u0006 Your unit is \u0005battle-shocked\u0006 and, until the end of the turn, it is \u0001not\u0002 \u0005eligible to declare a charge\u0006."
+          "• \u0005Rapid Disembark:\u0006 Until the end of the turn, your unit is \u0001not\u0002 \u0005eligible to declare a charge\u0006.",
+          "• \u0005Tactical Disembark:\u0006 Select your unit to make a \u0005normal\u0006 or \u0005advance move\u0006.",
+          "• \u0005Combat Disembark:\u0006 Your unit is \u0005battle-shocked\u0006 and, until the end of the turn, it is \u0001not\u0002 \u0005eligible to declare a charge\u0006."
         ],
         "accordions": [
           {
             "ref": "18.04.01",
             "title": "Rapid Disembark And Limitations",
             "text": [
-              "When a unit uses the \u0005rapid disembark\u0006 mode after its \u0003TRANSPORT\u0004 makes an \u0005ingress move\u0006, the models must follow the same rules and restrictions as that \u0003TRANSPORT\u0004 did. For example, if that \u0003TRANSPORT\u0004 had to be set up more than 8\" from all enemy units and not within your opponent\u2019s deployment zone, the same applies to the disembarking unit."
+              "When a unit uses the \u0005rapid disembark\u0006 mode after its \u0003TRANSPORT\u0004 makes an \u0005ingress move\u0006, the models must follow the same rules and restrictions as that \u0003TRANSPORT\u0004 did. For example, if that \u0003TRANSPORT\u0004 had to be set up more than 8\" from all enemy units and not within your opponent’s deployment zone, the same applies to the disembarking unit."
             ]
           }
         ]
@@ -91,8 +91,8 @@
           "Make a \u0005hazard roll\u0006 for each model in your unit (06.03)",
           "\u000eWhile Moving",
           "Set up each model in your unit:",
-          "\u2022 Wholly within the \u0005set-up distance\u0006 of that \u0003TRANSPORT\u0004, and as close as possible to that \u0003TRANSPORT\u0004.",
-          "\u2022 \u0001Or:\u0002 If the above is not possible while remaining \u0005unengaged\u0006, set up that model wholly within the \u0005set-up distance\u0006 of that \u0003TRANSPORT\u0004, as close as possible to that \u0003TRANSPORT\u0004, and \u0005engaged\u0006.",
+          "• Wholly within the \u0005set-up distance\u0006 of that \u0003TRANSPORT\u0004, and as close as possible to that \u0003TRANSPORT\u0004.",
+          "• \u0001Or:\u0002 If the above is not possible while remaining \u0005unengaged\u0006, set up that model wholly within the \u0005set-up distance\u0006 of that \u0003TRANSPORT\u0004, as close as possible to that \u0003TRANSPORT\u0004, and \u0005engaged\u0006.",
           "Each model that still cannot be set up is \u0005destroyed\u0006.",
           "\u000eEffect",
           "Your unit is set up as described in Set Up (03.02)",
@@ -108,13 +108,13 @@
         "text": [
           "\u000eEligible If",
           "As stated in the rule allowing this \u0005move type\u0006, if all of the following apply to your unit:",
-          "\u2022 Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield.",
-          "\u2022 Did not embark within that \u0003TRANSPORT\u0004 this phase.",
-          "\u2022 That \u0003TRANSPORT\u0004 has not made an \u0005advance/fall\u2011back\u0006 move this phase.",
+          "• Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield.",
+          "• Did not embark within that \u0003TRANSPORT\u0004 this phase.",
+          "• That \u0003TRANSPORT\u0004 has not made an \u0005advance/fall‑back\u0006 move this phase.",
           "\u000eSet-up Distance",
           "3\"",
           "\u000eWhile Moving",
-          "Set up each model in your unit wholly within the \u0005set\u2011up distance\u0006 of that \u0003TRANSPORT\u0004.",
+          "Set up each model in your unit wholly within the \u0005set‑up distance\u0006 of that \u0003TRANSPORT\u0004.",
           "\u000eEffect",
           "Your unit is set up as described in Set Up (Core Rules, 03.02)."
         ]
@@ -125,12 +125,12 @@
         "text": [
           "\u000eEligible If",
           "As stated in the rule allowing this \u0005move type\u0006, if all of the following apply to your unit:",
-          "\u2022 Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield.",
-          "\u2022 Did not embark within that \u0003TRANSPORT\u0004 this phase.",
+          "• Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield.",
+          "• Did not embark within that \u0003TRANSPORT\u0004 this phase.",
           "\u000eSet-up Distance",
           "3\"",
           "\u000eWhile Moving",
-          "Set up each model in your unit wholly within the \u0005set\u2011up distance\u0006 of that \u0003TRANSPORT\u0004.",
+          "Set up each model in your unit wholly within the \u0005set‑up distance\u0006 of that \u0003TRANSPORT\u0004.",
           "\u000eEffect",
           "Your unit is set up as described in Set Up (Core Rules, 03.02).",
           "\u000eAfter Moving",
@@ -330,31 +330,31 @@
           "ordinal": 2,
           "kind": "text",
           "sha256": "fac618c38cc3a5e0dafe55bc1a659748f141dca7f0cf566f6a3ca18940f95c45",
-          "value": "\u2022 Each model in that unit is within 3\" of that \u0003TRANSPORT\u0004."
+          "value": "• Each model in that unit is within 3\" of that \u0003TRANSPORT\u0004."
         },
         {
           "ordinal": 3,
           "kind": "text",
           "sha256": "4925d92519279b18daace03eeb976bdc22a2914b767420f1d88fd241c94c5351",
-          "value": "\u2022 That unit was not set up on the battlefield this turn."
+          "value": "• That unit was not set up on the battlefield this turn."
         },
         {
           "ordinal": 4,
           "kind": "text",
           "sha256": "179924150f0d37e2bf05f0fc91c19d8fd79f152668c1a3a9c42ca87f894ea0ef",
-          "value": "\u2022 That unit is \u0005eligible to embark\u0006 within that \u0003TRANSPORT\u0004, as described on that \u0003TRANSPORT\u0004\u2019s datasheet."
+          "value": "• That unit is \u0005eligible to embark\u0006 within that \u0003TRANSPORT\u0004, as described on that \u0003TRANSPORT\u0004’s datasheet."
         },
         {
           "ordinal": 5,
           "kind": "text",
           "sha256": "d576ffb8a52d1d01a03f071452e69d2a5f71f07e6d003326e80f5cabf03eefb0",
-          "value": "\u2022 That \u0003TRANSPORT\u0004 has sufficient remaining \u0005transport capacity\u0006 for each model in that unit."
+          "value": "• That \u0003TRANSPORT\u0004 has sufficient remaining \u0005transport capacity\u0006 for each model in that unit."
         },
         {
           "ordinal": 6,
           "kind": "text",
           "sha256": "fd5e9f11f242ac691bf6e9abb6e667472cdf7d55b0804c376ab2e7ddbbe3f854",
-          "value": "When a unit embarks, the active player removes that unit from the battlefield and places it to one side \u2013 it is now embarked within that \u0003TRANSPORT\u0004 and is not on the battlefield."
+          "value": "When a unit embarks, the active player removes that unit from the battlefield and places it to one side – it is now embarked within that \u0003TRANSPORT\u0004 and is not on the battlefield."
         }
       ],
       "obligations": [
@@ -669,7 +669,7 @@
           "ordinal": 1,
           "kind": "text",
           "sha256": "9a3869a9c503ed3f815826ad1fa81ea49c66a65e7a39a1311dcfa2282e057dc1",
-          "value": "In the active player\u2019s Movement phase, each friendly unit embarked within a \u0003TRANSPORT\u0004 model can disembark from it by making a \u0005disembark move\u0006 (18.04)."
+          "value": "In the active player’s Movement phase, each friendly unit embarked within a \u0003TRANSPORT\u0004 model can disembark from it by making a \u0005disembark move\u0006 (18.04)."
         },
         {
           "ordinal": 2,
@@ -732,6 +732,29 @@
           ],
           "acceptance": "Destruction interrupts before removing the carrier, hazards resolve first, and every cargo unit receives its Emergency placement before carrier removal.",
           "semantic_assertions": [
+            {
+              "node": "tests/rules/section18/test_emergency.py::test_emergency_requires_closest_legal_setup_within_six_before_carrier_removal",
+              "function_ast_sha256": "9747e885d9af096120ecf8097f5a1ffa5d803ed40b2449ea86269b61b5312d9e",
+              "assertions": [
+                "assert result.placement.is_valid is valid, result.placement.violations",
+                "assert s.scenario.battlefield_state.unit_placement_or_none(s.transport.unit_instance_id) is not None",
+                "assert len(result.model_rolls) == 1",
+                "assert not result.destroyed_model_instance_ids",
+                "assert after.unit_placement_or_none(s.passenger.unit_instance_id) is not None",
+                "assert after.unit_placement_or_none(s.transport.unit_instance_id) is not None",
+                "assert outcome is not None",
+                "assert outcome.turn_player_id == 'opponent'",
+                "assert outcome.battle_shocked_until == 'until_cleared'",
+                "assert not outcome.can_declare_charge",
+                "assert DestroyedTransportDisembark.from_payload(result.to_payload()) == result",
+                "assert code in {v.violation_code.value for v in result.placement.violations}",
+                "assert result.placement.updated_cargo_state is None",
+                "assert result.placement.transition_batch is None"
+              ],
+              "expected_exceptions": []
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise",
               "function_ast_sha256": "c17ba87b104bd877caf4d3a54bc79dc958ec21a591129985972e504d5b2a8d0f",
@@ -800,27 +823,17 @@
                 "assert not any((payload['model_instance_id'] == transport_model.model_instance_id for payload in _event_payloads(lifecycle, 'model_destroyed')))"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section18/test_emergency.py::test_emergency_requires_closest_legal_setup_within_six_before_carrier_removal",
-              "function_ast_sha256": "9747e885d9af096120ecf8097f5a1ffa5d803ed40b2449ea86269b61b5312d9e",
-              "assertions": [
-                "assert result.placement.is_valid is valid, result.placement.violations",
-                "assert s.scenario.battlefield_state.unit_placement_or_none(s.transport.unit_instance_id) is not None",
-                "assert len(result.model_rolls) == 1",
-                "assert not result.destroyed_model_instance_ids",
-                "assert after.unit_placement_or_none(s.passenger.unit_instance_id) is not None",
-                "assert after.unit_placement_or_none(s.transport.unit_instance_id) is not None",
-                "assert outcome is not None",
-                "assert outcome.turn_player_id == 'opponent'",
-                "assert outcome.battle_shocked_until == 'until_cleared'",
-                "assert not outcome.can_declare_charge",
-                "assert DestroyedTransportDisembark.from_payload(result.to_payload()) == result",
-                "assert code in {v.violation_code.value for v in result.placement.violations}",
-                "assert result.placement.updated_cargo_state is None",
-                "assert result.placement.transition_batch is None"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise",
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_requests_each_embarked_unit_before_removal"
               ],
-              "expected_exceptions": []
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -848,19 +861,19 @@
           "ordinal": 3,
           "kind": "text",
           "sha256": "2641f7519e95c82f4cc156f0d0c0454f1573663b2ddd70b6ac81862792bd6bd4",
-          "value": "\u2022 Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield."
+          "value": "• Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield."
         },
         {
           "ordinal": 4,
           "kind": "text",
           "sha256": "858e26c8aa849217d8b9db0ccb156d8a3997054d43070e099e384d0f37c9c975",
-          "value": "\u2022 Did not embark within that \u0003TRANSPORT\u0004 this phase."
+          "value": "• Did not embark within that \u0003TRANSPORT\u0004 this phase."
         },
         {
           "ordinal": 5,
           "kind": "text",
           "sha256": "e02813fa41a009338404be4fbd628522b80d4b9b342c9354de570ab15bc82cf9",
-          "value": "\u2022 That \u0003TRANSPORT\u0004 has not made an \u0005advance\u0006 or \u0005fall-back\u0006 move this phase."
+          "value": "• That \u0003TRANSPORT\u0004 has not made an \u0005advance\u0006 or \u0005fall-back\u0006 move this phase."
         },
         {
           "ordinal": 6,
@@ -896,19 +909,19 @@
           "ordinal": 11,
           "kind": "text",
           "sha256": "5a016716ff8a6bb0b720bac7f4ece910fcb6d6321662091b557ce3060b1d450b",
-          "value": "\u2022 \u0005Rapid Disembark:\u0006 If that \u0003TRANSPORT\u0004 made a \u0005normal\u0006 or \u0005ingress move\u0006 this phase, you must select this mode."
+          "value": "• \u0005Rapid Disembark:\u0006 If that \u0003TRANSPORT\u0004 made a \u0005normal\u0006 or \u0005ingress move\u0006 this phase, you must select this mode."
         },
         {
           "ordinal": 12,
           "kind": "text",
           "sha256": "07913b8e6ea8ead7c957aa803e86ccffa12bd72c6f0ce9f63eabffec61677a12",
-          "value": "\u2022 \u0005Tactical Disembark:\u0006 Otherwise, If that \u0003TRANSPORT\u0004 \u0005remained stationary\u0006 or has not yet been \u0005selected to move\u0006 this phase, and if you can set up your unit as described below, you must select this mode."
+          "value": "• \u0005Tactical Disembark:\u0006 Otherwise, If that \u0003TRANSPORT\u0004 \u0005remained stationary\u0006 or has not yet been \u0005selected to move\u0006 this phase, and if you can set up your unit as described below, you must select this mode."
         },
         {
           "ordinal": 13,
           "kind": "text",
           "sha256": "7fd3407ba95dfc7093076c11bf155eaf0204cf50327c98a04d21509a5d9a7538",
-          "value": "\u2022 \u0005Combat Disembark:\u0006Otherwise, you must select this mode. Make a \u0005hazard roll\u0006 for each model in your unit."
+          "value": "• \u0005Combat Disembark:\u0006Otherwise, you must select this mode. Make a \u0005hazard roll\u0006 for each model in your unit."
         },
         {
           "ordinal": 14,
@@ -926,13 +939,13 @@
           "ordinal": 16,
           "kind": "text",
           "sha256": "d63c42cdf5d4a964a0af124eb19d0efe162e94ad8553cc04081c37f0632c1635",
-          "value": "\u2022 \u0005Rapid Disembark:\u0006 If that \u0003TRANSPORT\u0004 made an \u0005ingress move\u0006 this turn, each model must follow the same rules that \u0003TRANSPORT\u0004 had to follow while resolving that move."
+          "value": "• \u0005Rapid Disembark:\u0006 If that \u0003TRANSPORT\u0004 made an \u0005ingress move\u0006 this turn, each model must follow the same rules that \u0003TRANSPORT\u0004 had to follow while resolving that move."
         },
         {
           "ordinal": 17,
           "kind": "text",
           "sha256": "c02cabf3df732994735523c49ca7a0c125c4fac0c43dee5ffaca7c3ecffca34a",
-          "value": "\u2022 \u0005Combat Disembark:\u0006 Each model can be set up \u0005engaged\u0006 with one or more enemy units that \u0003TRANSPORT\u0004 is \u0005engaged\u0006 with."
+          "value": "• \u0005Combat Disembark:\u0006 Each model can be set up \u0005engaged\u0006 with one or more enemy units that \u0003TRANSPORT\u0004 is \u0005engaged\u0006 with."
         },
         {
           "ordinal": 18,
@@ -956,19 +969,19 @@
           "ordinal": 21,
           "kind": "text",
           "sha256": "88cff389966c883cbbcec929dd6e4295203cd0981d74bc604988911713714ea7",
-          "value": "\u2022 \u0005Rapid Disembark:\u0006 Until the end of the turn, your unit is \u0001not\u0002 \u0005eligible to declare a charge\u0006."
+          "value": "• \u0005Rapid Disembark:\u0006 Until the end of the turn, your unit is \u0001not\u0002 \u0005eligible to declare a charge\u0006."
         },
         {
           "ordinal": 22,
           "kind": "text",
           "sha256": "049903545c9db34af68c65ce8b1ef0a5d4585bfdfd984470db0a9818f34b0c62",
-          "value": "\u2022 \u0005Tactical Disembark:\u0006 Select your unit to make a \u0005normal\u0006 or \u0005advance move\u0006."
+          "value": "• \u0005Tactical Disembark:\u0006 Select your unit to make a \u0005normal\u0006 or \u0005advance move\u0006."
         },
         {
           "ordinal": 23,
           "kind": "text",
           "sha256": "2decde634c5ca07be667731781538ff1452b840f73144a99f739be8986c07f81",
-          "value": "\u2022 \u0005Combat Disembark:\u0006 Your unit is \u0005battle-shocked\u0006 and, until the end of the turn, it is \u0001not\u0002 \u0005eligible to declare a charge\u0006."
+          "value": "• \u0005Combat Disembark:\u0006 Your unit is \u0005battle-shocked\u0006 and, until the end of the turn, it is \u0001not\u0002 \u0005eligible to declare a charge\u0006."
         }
       ],
       "obligations": [
@@ -1301,7 +1314,9 @@
                 "assert not dice.event_log.records"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase10q_transports.py::test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes",
               "function_ast_sha256": "eea6f5ac1d0541ffb19185b82a653547dd55e439d76d49e3563c9bfc0a6ce903",
@@ -1327,6 +1342,16 @@
                 "assert hazard_event['mortal_wounds'] == 2"
               ],
               "expected_exceptions": []
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase10q_transports.py::test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -1515,7 +1540,9 @@
                 "assert json.loads(json.dumps(view)) == view"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase10q_transports.py::test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and_replay",
               "function_ast_sha256": "ad0598ef8a6c8e666adc0eb142dd74ec8e829bc8266d6b9ea4afbb940d0d5ccc",
@@ -1543,6 +1570,16 @@
                 "with pytest.raises(GameLifecycleError, match='restriction override drift'):\n    GameLifecycle.from_payload(forged_event_payload)",
                 "with pytest.raises(GameLifecycleError, match='decision history drift'):\n    GameLifecycle.from_payload(forged_request_payload)"
               ]
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase10q_transports.py::test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and_replay"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -1590,7 +1627,9 @@
                 "assert json.loads(json.dumps(view)) == view"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order132_disembark_distance.py::test_facade_invalid_atomicity_retry_restore_fork_views_events_replay",
               "function_ast_sha256": "7f8cf40714094c1a4dde6854c9400242d51ffc903b102cc1b501b05389007c5f",
@@ -1623,6 +1662,16 @@
               ],
               "expected_exceptions": []
             }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order132_disembark_distance.py::test_facade_invalid_atomicity_retry_restore_fork_views_events_replay"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -1651,7 +1700,9 @@
                 "assert not dice.event_log.records"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase10q_transports.py::test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes",
               "function_ast_sha256": "eea6f5ac1d0541ffb19185b82a653547dd55e439d76d49e3563c9bfc0a6ce903",
@@ -1678,6 +1729,16 @@
               ],
               "expected_exceptions": []
             }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase10q_transports.py::test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         }
       ]
@@ -1692,7 +1753,7 @@
           "ordinal": 1,
           "kind": "text",
           "sha256": "df9207e17879913c4fbd4669cb381faa242459c9c4881cdc2c05571cbe187010",
-          "value": "When a unit uses the \u0005rapid disembark\u0006 mode after its \u0003TRANSPORT\u0004 makes an \u0005ingress move\u0006, the models must follow the same rules and restrictions as that \u0003TRANSPORT\u0004 did. For example, if that \u0003TRANSPORT\u0004 had to be set up more than 8\" from all enemy units and not within your opponent\u2019s deployment zone, the same applies to the disembarking unit."
+          "value": "When a unit uses the \u0005rapid disembark\u0006 mode after its \u0003TRANSPORT\u0004 makes an \u0005ingress move\u0006, the models must follow the same rules and restrictions as that \u0003TRANSPORT\u0004 did. For example, if that \u0003TRANSPORT\u0004 had to be set up more than 8\" from all enemy units and not within your opponent’s deployment zone, the same applies to the disembarking unit."
         }
       ],
       "obligations": [
@@ -1713,7 +1774,9 @@
                 "assert result.transition_batch is None"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase10q_transports.py::test_order63_attached_passengers_all_inherit_edge_distance",
               "function_ast_sha256": "8be840483c861514a0ae868253a52fe83f3b62748eb30a587b9da80a5a9b57c3",
@@ -1724,6 +1787,16 @@
                 "assert {row.model_instance_id for row in result.violations if row.violation_code is TransportOperationViolationCode.RAPID_DISEMBARK_INGRESS_RESTRICTION} == {leader.own_models[0].model_instance_id}"
               ],
               "expected_exceptions": []
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase10q_transports.py::test_order63_attached_passengers_all_inherit_edge_distance"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -1775,13 +1848,13 @@
           "ordinal": 7,
           "kind": "text",
           "sha256": "a263c9bca025bf79b7e1321b1192ddec8d5885905a659847d871c1cb285ed4e9",
-          "value": "\u2022 Wholly within the \u0005set-up distance\u0006 of that \u0003TRANSPORT\u0004, and as close as possible to that \u0003TRANSPORT\u0004."
+          "value": "• Wholly within the \u0005set-up distance\u0006 of that \u0003TRANSPORT\u0004, and as close as possible to that \u0003TRANSPORT\u0004."
         },
         {
           "ordinal": 8,
           "kind": "text",
           "sha256": "da33d7378cef003cde6b37901f913af14823416396edce35ed7cccb53617d4c8",
-          "value": "\u2022 \u0001Or:\u0002 If the above is not possible while remaining \u0005unengaged\u0006, set up that model wholly within the \u0005set-up distance\u0006 of that \u0003TRANSPORT\u0004, as close as possible to that \u0003TRANSPORT\u0004, and \u0005engaged\u0006."
+          "value": "• \u0001Or:\u0002 If the above is not possible while remaining \u0005unengaged\u0006, set up that model wholly within the \u0005set-up distance\u0006 of that \u0003TRANSPORT\u0004, as close as possible to that \u0003TRANSPORT\u0004, and \u0005engaged\u0006."
         },
         {
           "ordinal": 9,
@@ -1834,7 +1907,8 @@
             2
           ],
           "acceptance": "Emergency is the mandatory just-destroyed carrier interruption for embarked cargo.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise",
               "function_ast_sha256": "c17ba87b104bd877caf4d3a54bc79dc958ec21a591129985972e504d5b2a8d0f",
@@ -1884,6 +1958,16 @@
                 "with pytest.raises(GameLifecycleError, match='exact hazard survivor inventory'):\n    GameLifecycle.from_payload(forged_survivor_checkpoint)"
               ]
             }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
           ]
         },
         {
@@ -1908,7 +1992,9 @@
                 "assert len(dice.event_log.records) == 5"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise",
               "function_ast_sha256": "c17ba87b104bd877caf4d3a54bc79dc958ec21a591129985972e504d5b2a8d0f",
@@ -1957,6 +2043,16 @@
               "expected_exceptions": [
                 "with pytest.raises(GameLifecycleError, match='exact hazard survivor inventory'):\n    GameLifecycle.from_payload(forged_survivor_checkpoint)"
               ]
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -2121,7 +2217,9 @@
                 "assert result.placement.transition_batch is None"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_invalid_placement_retries_before_removal",
               "function_ast_sha256": "572f68bbcef2156ca5b173a2d3a3f525fd47aa5211cd8d2f01dd38b15bd80b81",
@@ -2139,6 +2237,16 @@
                 "assert not any((payload['model_instance_id'] == transport_model.model_instance_id for payload in _event_payloads(lifecycle, 'model_destroyed')))"
               ],
               "expected_exceptions": []
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_destroyed_transport_invalid_placement_retries_before_removal"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -2194,7 +2302,9 @@
                 "assert not any((e.event_type == 'attack_sequence_completed' for e in session.lifecycle.decision_controller.event_log.records)), [e.to_payload() for e in session.lifecycle.decision_controller.event_log.records if e.event_type == 'dice_rolled']"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase10q_transports.py::test_opponent_turn_destroyed_transport_disembark_state_expires_with_that_turn",
               "function_ast_sha256": "4907c5430f74d3e26351f9452a9796b3ae99b5f570990b81dc5faed7e6daf628",
@@ -2202,6 +2312,16 @@
                 "assert state.disembarked_unit_states == []"
               ],
               "expected_exceptions": []
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase10q_transports.py::test_opponent_turn_destroyed_transport_disembark_state_expires_with_that_turn"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -2260,19 +2380,19 @@
           "ordinal": 3,
           "kind": "text",
           "sha256": "2641f7519e95c82f4cc156f0d0c0454f1573663b2ddd70b6ac81862792bd6bd4",
-          "value": "\u2022 Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield."
+          "value": "• Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield."
         },
         {
           "ordinal": 4,
           "kind": "text",
           "sha256": "858e26c8aa849217d8b9db0ccb156d8a3997054d43070e099e384d0f37c9c975",
-          "value": "\u2022 Did not embark within that \u0003TRANSPORT\u0004 this phase."
+          "value": "• Did not embark within that \u0003TRANSPORT\u0004 this phase."
         },
         {
           "ordinal": 5,
           "kind": "text",
           "sha256": "3e6c82a42fcc41844ec2baca43ea67bb3674907048a03729c2ea17f268b07675",
-          "value": "\u2022 That \u0003TRANSPORT\u0004 has not made an \u0005advance/fall\u2011back\u0006 move this phase."
+          "value": "• That \u0003TRANSPORT\u0004 has not made an \u0005advance/fall‑back\u0006 move this phase."
         },
         {
           "ordinal": 6,
@@ -2296,7 +2416,7 @@
           "ordinal": 9,
           "kind": "text",
           "sha256": "8b0586e250eae8733522cdc99db37465bbe764f6018a548a7f9ac51f94e98501",
-          "value": "Set up each model in your unit wholly within the \u0005set\u2011up distance\u0006 of that \u0003TRANSPORT\u0004."
+          "value": "Set up each model in your unit wholly within the \u0005set‑up distance\u0006 of that \u0003TRANSPORT\u0004."
         },
         {
           "ordinal": 10,
@@ -2549,13 +2669,13 @@
           "ordinal": 3,
           "kind": "text",
           "sha256": "2641f7519e95c82f4cc156f0d0c0454f1573663b2ddd70b6ac81862792bd6bd4",
-          "value": "\u2022 Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield."
+          "value": "• Embarked within a \u0003TRANSPORT\u0004 model that is on the battlefield."
         },
         {
           "ordinal": 4,
           "kind": "text",
           "sha256": "858e26c8aa849217d8b9db0ccb156d8a3997054d43070e099e384d0f37c9c975",
-          "value": "\u2022 Did not embark within that \u0003TRANSPORT\u0004 this phase."
+          "value": "• Did not embark within that \u0003TRANSPORT\u0004 this phase."
         },
         {
           "ordinal": 5,
@@ -2579,7 +2699,7 @@
           "ordinal": 8,
           "kind": "text",
           "sha256": "8b0586e250eae8733522cdc99db37465bbe764f6018a548a7f9ac51f94e98501",
-          "value": "Set up each model in your unit wholly within the \u0005set\u2011up distance\u0006 of that \u0003TRANSPORT\u0004."
+          "value": "Set up each model in your unit wholly within the \u0005set‑up distance\u0006 of that \u0003TRANSPORT\u0004."
         },
         {
           "ordinal": 9,
@@ -2726,7 +2846,9 @@
                 "assert result.transition_batch is None"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_v963_shock_disembark.py::test_v963_shock_unengaged_setup_has_no_queue_and_restores_exactly",
               "function_ast_sha256": "8d9d3244d30fa902251c13f829bbb1ec99910c3dafc7bd5ff987b357caaa7a7d",
@@ -2745,6 +2867,16 @@
                 "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)"
               ],
               "expected_exceptions": []
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_v963_shock_disembark.py::test_v963_shock_unengaged_setup_has_no_queue_and_restores_exactly"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -2792,7 +2924,9 @@
                 "assert json.loads(json.dumps(view)) == view"
               ],
               "expected_exceptions": []
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_v963_shock_disembark.py::test_v963_shock_charge_lock_includes_all_turn_end_rules_then_expires",
               "function_ast_sha256": "06cd6b0ee9e380242067ae1d92edd8a181297215ddf0a318038b32113445c4e8",
@@ -2821,6 +2955,16 @@
                 "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)"
               ],
               "expected_exceptions": []
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_v963_shock_disembark.py::test_v963_shock_charge_lock_includes_all_turn_end_rules_then_expires"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -3423,7 +3567,9 @@
             "assert selection.movement_phase_action is TransportMovementStatus.NOT_MOVED"
           ],
           "expected_exceptions": []
-        },
+        }
+      ],
+      "historical_nonselected_evidence": [
         {
           "node": "tests/unit/test_order61_embark.py::test_source_embark_after_real_disembark_facade_restore_fork_replay",
           "function_ast_sha256": "2d7d086ad01d7c0e9a5d16f1e485f5bfad94eeb71c4165278ad59cfa80aebb09",
@@ -3443,6 +3589,16 @@
             "assert status.status_kind is not LifecycleStatusKind.INVALID, status"
           ],
           "expected_exceptions": []
+        }
+      ],
+      "coverage_status": "partial",
+      "coverage_gaps": [
+        {
+          "kind": "nonselected_assertion_evidence",
+          "nodes": [
+            "tests/unit/test_order61_embark.py::test_source_embark_after_real_disembark_facade_restore_fork_replay"
+          ],
+          "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
         }
       ]
     },
@@ -3506,7 +3662,9 @@
             "assert json.loads(json.dumps(view)) == view"
           ],
           "expected_exceptions": []
-        },
+        }
+      ],
+      "historical_nonselected_evidence": [
         {
           "node": "tests/unit/test_phase10q_transports.py::test_opponent_turn_destroyed_transport_disembark_state_expires_with_that_turn",
           "function_ast_sha256": "4907c5430f74d3e26351f9452a9796b3ae99b5f570990b81dc5faed7e6daf628",
@@ -3514,6 +3672,16 @@
             "assert state.disembarked_unit_states == []"
           ],
           "expected_exceptions": []
+        }
+      ],
+      "coverage_status": "partial",
+      "coverage_gaps": [
+        {
+          "kind": "nonselected_assertion_evidence",
+          "nodes": [
+            "tests/unit/test_phase10q_transports.py::test_opponent_turn_destroyed_transport_disembark_state_expires_with_that_turn"
+          ],
+          "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
         }
       ]
     },
@@ -3580,7 +3748,9 @@
             "assert passenger_weapons.isdisjoint(carrier_weapons)"
           ],
           "expected_exceptions": []
-        },
+        }
+      ],
+      "historical_nonselected_evidence": [
         {
           "node": "tests/integration/test_embarked_ability_authority.py::test_firing_deck_preserves_attached_ability_ownership",
           "function_ast_sha256": "77fdaaef02cc591d2f1e7abca5d7b6da12e373f7eaf5966f2ed5a7dfe7dfe3aa",
@@ -3592,6 +3762,16 @@
           ],
           "expected_exceptions": []
         }
+      ],
+      "coverage_status": "partial",
+      "coverage_gaps": [
+        {
+          "kind": "nonselected_assertion_evidence",
+          "nodes": [
+            "tests/integration/test_embarked_ability_authority.py::test_firing_deck_preserves_attached_ability_ownership"
+          ],
+          "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+        }
       ]
     },
     {
@@ -3600,7 +3780,8 @@
       "question": "If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle?",
       "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn.",
       "source_sha256": "f1569a6a16420f52ff3a4cc89c61762db7467cba6bdc320c8a4e3fa8ceec239f",
-      "semantic_assertions": [
+      "semantic_assertions": [],
+      "historical_nonselected_evidence": [
         {
           "node": "tests/unit/test_v963_shock_disembark.py::test_v963_shock_charge_lock_includes_all_turn_end_rules_then_expires",
           "function_ast_sha256": "06cd6b0ee9e380242067ae1d92edd8a181297215ddf0a318038b32113445c4e8",
@@ -3629,6 +3810,16 @@
             "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)"
           ],
           "expected_exceptions": []
+        }
+      ],
+      "coverage_status": "gap",
+      "coverage_gaps": [
+        {
+          "kind": "nonselected_assertion_evidence",
+          "nodes": [
+            "tests/unit/test_v963_shock_disembark.py::test_v963_shock_charge_lock_includes_all_turn_end_rules_then_expires"
+          ],
+          "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
         }
       ]
     },
@@ -3716,5 +3907,6 @@
       "tests/rules/section18/test_facade.py::test_a32_oct14_recovery_rejects_different_or_underdetermined_source",
       "tests/rules/section18/test_facade.py::test_a32_oct14_cli_never_overwrites_original_or_existing_output"
     ]
-  }
+  },
+  "cutover_qualification": "Literal/source inventory remains complete. Current behavioral evidence is partial after the approved legacy-test cutover. Only selected active tests are live semantic bindings; historical_nonselected_evidence preserves former records without current gameplay or coverage credit. Explicit gaps remain for unselected checks; archives are historical evidence, never current test sources."
 }

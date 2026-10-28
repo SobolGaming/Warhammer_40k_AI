@@ -1,4 +1,4 @@
-"""Literal completeness and isolation diagnostics; no gameplay case credit."""
+"""Complete literal inventory and partial live-binding diagnostics; no gameplay case credit."""
 
 import ast
 import hashlib
@@ -36,6 +36,14 @@ def test_entire_retained_hierarchy_blocks_and_all_faqs_have_live_assertion_bindi
             n for ob in row["obligations"] for n in ob["source_blocks"]
         }
         for ob in row["obligations"] + row["colocated_faq_clarifications"]:
+            if not ob["semantic_assertions"]:
+                assert ob["coverage_status"] == "gap"
+                gaps = ob["coverage_gaps"]
+                assert isinstance(gaps, list)
+                assert gaps
+                assert all(isinstance(gap, dict) and gap["reason"] and gap["nodes"] for gap in gaps)
+                assert ob["historical_nonselected_evidence"]
+                continue
             assert ob["semantic_assertions"]
             for binding in ob["semantic_assertions"]:
                 node = binding["node"]

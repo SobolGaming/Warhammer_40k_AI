@@ -9,7 +9,7 @@
         "ref": "22.01",
         "title": "Aura Abilities",
         "text": [
-          "Abilities that affect models or units within a stated range are \u0005aura abilities\u0006, and are tagged with the word \u2018Aura\u2019.",
+          "Abilities that affect models or units within a stated range are \u0005aura abilities\u0006, and are tagged with the word ‘Aura’.",
           "While a model with an \u0005aura ability\u0006 is on the battlefield, it is always within range of its own \u0005aura ability\u0006.",
           "A unit can be affected by more than one \u0005aura ability\u0006 at a time, but if a unit is within range of the same \u0005aura ability\u0006 more than once, that \u0005aura ability\u0006 only applies to that unit once."
         ]
@@ -18,15 +18,15 @@
         "ref": "22.02",
         "title": "Faction Abilities",
         "text": [
-          "Some abilities are common to each unit that belongs to a particular faction \u2013 these are \u0005faction abilities\u0006 (also known as \u0005army rules\u0006), and are listed in the Faction Abilities section of a datasheet.",
-          "Unless otherwise stated, a unit\u2019s \u0005faction abilities\u0006 only apply if the \u0005army faction\u0006 you selected while mustering your army matches a faction keyword listed on that unit\u2019s datasheet."
+          "Some abilities are common to each unit that belongs to a particular faction – these are \u0005faction abilities\u0006 (also known as \u0005army rules\u0006), and are listed in the Faction Abilities section of a datasheet.",
+          "Unless otherwise stated, a unit’s \u0005faction abilities\u0006 only apply if the \u0005army faction\u0006 you selected while mustering your army matches a faction keyword listed on that unit’s datasheet."
         ]
       },
       {
         "ref": "22.03",
         "title": "Psychic Abilities",
         "text": [
-          "Abilities tagged with the word \u2018Psychic\u2019 are \u0005psychic abilities\u0006. If a \u0005psychic ability\u0006 causes a model to lose one or more wounds, each of those wounds is said to be inflicted by a \u0005psychic attack\u0006 (this can be important for the triggering of other rules)."
+          "Abilities tagged with the word ‘Psychic’ are \u0005psychic abilities\u0006. If a \u0005psychic ability\u0006 causes a model to lose one or more wounds, each of those wounds is said to be inflicted by a \u0005psychic attack\u0006 (this can be important for the triggering of other rules)."
         ],
         "accordions": [
           {
@@ -43,7 +43,7 @@
         "title": "Wargear Abilities",
         "text": [
           "Abilities that are gained when a unit (or one of its models) has a particular item of wargear are \u0005wargear abilities\u0006, and are listed in the Wargear Abilities section of a datasheet.",
-          "If a unit has an item of wargear that has a \u0005wargear ability\u0006, that ability applies to that unit. If a model within a unit has an item of wargear that has a \u0005wargear ability\u0006, that model is the \u2018bearer\u2019 of that item of wargear and that ability applies until that model is \u0005destroyed\u0006."
+          "If a unit has an item of wargear that has a \u0005wargear ability\u0006, that ability applies to that unit. If a model within a unit has an item of wargear that has a \u0005wargear ability\u0006, that model is the ‘bearer’ of that item of wargear and that ability applies until that model is \u0005destroyed\u0006."
         ]
       },
       {
@@ -51,8 +51,8 @@
         "title": "Plunging Fire",
         "text": [
           "Each time a model makes a ranged attack that targets a \u0005visible unit\u0006 containing one or more models on ground level, if one or more of the following conditions apply, improve the \u0005BS\u0006 characteristic of that attack by 1:",
-          "\u2022 The attacking model is on a section of a \u0005terrain feature\u0006 that is 3\" or more in height.",
-          "\u2022 The attacking model has the \u0003TOWERING\u0004 keyword and the target unit is within 12\".",
+          "• The attacking model is on a section of a \u0005terrain feature\u0006 that is 3\" or more in height.",
+          "• The attacking model has the \u0003TOWERING\u0004 keyword and the target unit is within 12\".",
           "\u000ePlunging Fire",
           "All the attacking models in unit \u0005\u0007A\b\u0006 are on a section of \u0005\u0007terrain feature\b\u0006 that is 3\" or more in height, and the target unit contains models on ground level, so \u0005\u0007Plunging Fire\b\u0006 improves the \u0005\u0007BS\b\u0006 characteristic of those attacks by 1.",
           "Attacking model \u0005\u0007B\b\u0006 is on ground level, but has the \u0003Towering\u0004 keyword. The target unit is within 12\" and contains models on ground level, so \u0005\u0007Plunging Fire\b\u0006 improves the \u0005\u0007BS\b\u0006 characteristic of those attacks by 1."
@@ -73,7 +73,7 @@
           "ordinal": 1,
           "kind": "text",
           "sha256": "837cc3e7279c031a3173a31fc0b10384b82b381f445e4ede20294383d06d80ab",
-          "value": "Abilities that affect models or units within a stated range are \u0005aura abilities\u0006, and are tagged with the word \u2018Aura\u2019."
+          "value": "Abilities that affect models or units within a stated range are \u0005aura abilities\u0006, and are tagged with the word ‘Aura’."
         },
         {
           "ordinal": 2,
@@ -212,13 +212,13 @@
           "ordinal": 1,
           "kind": "text",
           "sha256": "80b5f2be147d1000f13a1b2453a9d880675e81a9224574ab1d3ec86b7def87e5",
-          "value": "Some abilities are common to each unit that belongs to a particular faction \u2013 these are \u0005faction abilities\u0006 (also known as \u0005army rules\u0006), and are listed in the Faction Abilities section of a datasheet."
+          "value": "Some abilities are common to each unit that belongs to a particular faction – these are \u0005faction abilities\u0006 (also known as \u0005army rules\u0006), and are listed in the Faction Abilities section of a datasheet."
         },
         {
           "ordinal": 2,
           "kind": "text",
           "sha256": "377ea22864d6c6d0d0719bb50f60e69c87cf15b1f51019139a214ddaf90ae557",
-          "value": "Unless otherwise stated, a unit\u2019s \u0005faction abilities\u0006 only apply if the \u0005army faction\u0006 you selected while mustering your army matches a faction keyword listed on that unit\u2019s datasheet."
+          "value": "Unless otherwise stated, a unit’s \u0005faction abilities\u0006 only apply if the \u0005army faction\u0006 you selected while mustering your army matches a faction keyword listed on that unit’s datasheet."
         }
       ],
       "obligations": [
@@ -276,7 +276,7 @@
           "ordinal": 1,
           "kind": "text",
           "sha256": "492bd2ced01ec6d882271a9a195a33c225f162f47af843004e731a986013eee8",
-          "value": "Abilities tagged with the word \u2018Psychic\u2019 are \u0005psychic abilities\u0006. If a \u0005psychic ability\u0006 causes a model to lose one or more wounds, each of those wounds is said to be inflicted by a \u0005psychic attack\u0006 (this can be important for the triggering of other rules)."
+          "value": "Abilities tagged with the word ‘Psychic’ are \u0005psychic abilities\u0006. If a \u0005psychic ability\u0006 causes a model to lose one or more wounds, each of those wounds is said to be inflicted by a \u0005psychic attack\u0006 (this can be important for the triggering of other rules)."
         }
       ],
       "obligations": [
@@ -286,7 +286,8 @@
             1
           ],
           "acceptance": "Only an explicit Psychic title tag produces structured Psychic ability classification.",
-          "semantic_assertions": [
+          "semantic_assertions": [],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order117_mortal_allocation.py::test_order120_classifies_explicit_source_title_once",
               "function_ast_sha256": "ce6b41cf68c7205925526d378fa2563013ffea1f9ddcd0d4e072193033fb13c5",
@@ -295,6 +296,16 @@
               ],
               "expected_exceptions": [],
               "role": "bounded_existing_dependency"
+            }
+          ],
+          "coverage_status": "gap",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order117_mortal_allocation.py::test_order120_classifies_explicit_source_title_once"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -317,7 +328,9 @@
                 "with pytest.raises(GameLifecycleError, match='choices require lifecycle routing'):\n    apply()"
               ],
               "role": "recreated_native_core"
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_order117_mortal_allocation.py::test_order120_ability_classification_survives_real_pending_fork_viewers_and_replay",
               "function_ast_sha256": "5575c940df08efe3e99302f266143825196eba9bcc43236ce46f981907d4633c",
@@ -338,6 +351,16 @@
                 "with pytest.raises(DecisionError, match='finite action space'):\n    restored.submit_option(request_id=request.request_id, result_id='order120:invalid', option_id='wrong-source')"
               ],
               "role": "bounded_existing_dependency"
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order117_mortal_allocation.py::test_order120_ability_classification_survives_real_pending_fork_viewers_and_replay"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -478,6 +501,22 @@
               "role": "recreated_native_core"
             },
             {
+              "node": "tests/rules/section22/test_psychic.py::test_psychic_use_is_by_ability_rules_unit_and_actual_phase",
+              "function_ast_sha256": "af1d865e91c66f0e14a60f1f01c34406e1055f31574dd9394691ad802608d9fb",
+              "assertions": [
+                "assert first.status is RuleExecutionStatus.APPLIED",
+                "assert len(psychic_uses(log)) == 1",
+                "assert (again.status is RuleExecutionStatus.INVALID) is denied",
+                "assert len(psychic_uses(log)) == (1 if denied else 2)",
+                "assert again.reason == 'psychic_ability_used_this_phase'",
+                "assert (state.to_payload(), log.to_payload()) == before"
+              ],
+              "expected_exceptions": [],
+              "role": "recreated_native_core"
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
               "node": "tests/unit/test_phase17d_rule_execution.py::test_psychic_catalog_activation_uses_one_model_per_unit_and_restores",
               "function_ast_sha256": "c7a35714d5233159cebcf1009d3f9077a399221ad33e37a17d5938ae2a69d16e",
               "assertions": [
@@ -497,20 +536,16 @@
                 "with pytest.raises(GameLifecycleError, match='Psychic'):\n    GameLifecycle.from_payload(altered)"
               ],
               "role": "bounded_existing_dependency"
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section22/test_psychic.py::test_psychic_use_is_by_ability_rules_unit_and_actual_phase",
-              "function_ast_sha256": "af1d865e91c66f0e14a60f1f01c34406e1055f31574dd9394691ad802608d9fb",
-              "assertions": [
-                "assert first.status is RuleExecutionStatus.APPLIED",
-                "assert len(psychic_uses(log)) == 1",
-                "assert (again.status is RuleExecutionStatus.INVALID) is denied",
-                "assert len(psychic_uses(log)) == (1 if denied else 2)",
-                "assert again.reason == 'psychic_ability_used_this_phase'",
-                "assert (state.to_payload(), log.to_payload()) == before"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase17d_rule_execution.py::test_psychic_catalog_activation_uses_one_model_per_unit_and_restores"
               ],
-              "expected_exceptions": [],
-              "role": "recreated_native_core"
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -534,7 +569,7 @@
           "ordinal": 2,
           "kind": "text",
           "sha256": "b90c7d3b111a44974cd4952bb297c49259149f2994e02f6c3387a5ac32141b00",
-          "value": "If a unit has an item of wargear that has a \u0005wargear ability\u0006, that ability applies to that unit. If a model within a unit has an item of wargear that has a \u0005wargear ability\u0006, that model is the \u2018bearer\u2019 of that item of wargear and that ability applies until that model is \u0005destroyed\u0006."
+          "value": "If a unit has an item of wargear that has a \u0005wargear ability\u0006, that ability applies to that unit. If a model within a unit has an item of wargear that has a \u0005wargear ability\u0006, that model is the ‘bearer’ of that item of wargear and that ability applies until that model is \u0005destroyed\u0006."
         }
       ],
       "obligations": [
@@ -579,6 +614,23 @@
           "acceptance": "A unit-owned item applies to its unit; attached unit-wide and model-only subjects retain separate scope.",
           "semantic_assertions": [
             {
+              "node": "tests/rules/section19/test_scope_controls.py::test_conditional_unit_and_model_recipients_keep_positive_scope_and_source_lifetime",
+              "function_ast_sha256": "4494212ae3e6b0d8427d023e523c7c584d8403d26f2bb43edb34cb6fc42d4056",
+              "assertions": [
+                "assert native.rule_ir_payload is not None",
+                "assert s.support is not None",
+                "assert s.state.battlefield_state is not None",
+                "assert len(grants) == 1",
+                "assert grants[0].model_ids(ModelAbilityGrantContext(s.state, s.view)) == (expected if source_available else ())",
+                "assert bool(restrictions) is (whole_unit and source_available)",
+                "assert clause.target is not None"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency"
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
               "node": "tests/unit/rules/test_wahapedia_bridge_catalog.py::test_phase17k_selected_optional_wargear_adds_catalog_ir_ability_record",
               "function_ast_sha256": "5da1497eb3bf140e17ce79e225c2e2963f6b96ba2fad37652e639029b9d5c2be",
               "assertions": [
@@ -593,21 +645,16 @@
               ],
               "expected_exceptions": [],
               "role": "bounded_existing_dependency"
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section19/test_scope_controls.py::test_conditional_unit_and_model_recipients_keep_positive_scope_and_source_lifetime",
-              "function_ast_sha256": "4494212ae3e6b0d8427d023e523c7c584d8403d26f2bb43edb34cb6fc42d4056",
-              "assertions": [
-                "assert native.rule_ir_payload is not None",
-                "assert s.support is not None",
-                "assert s.state.battlefield_state is not None",
-                "assert len(grants) == 1",
-                "assert grants[0].model_ids(ModelAbilityGrantContext(s.state, s.view)) == (expected if source_available else ())",
-                "assert bool(restrictions) is (whole_unit and source_available)",
-                "assert clause.target is not None"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/rules/test_wahapedia_bridge_catalog.py::test_phase17k_selected_optional_wargear_adds_catalog_ir_ability_record"
               ],
-              "expected_exceptions": [],
-              "role": "bounded_existing_dependency"
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -663,13 +710,13 @@
           "ordinal": 2,
           "kind": "text",
           "sha256": "ea98570896c3dac194bee10983349e1f8d27faeaa41ebac716ca5f15a2a10bd2",
-          "value": "\u2022 The attacking model is on a section of a \u0005terrain feature\u0006 that is 3\" or more in height."
+          "value": "• The attacking model is on a section of a \u0005terrain feature\u0006 that is 3\" or more in height."
         },
         {
           "ordinal": 3,
           "kind": "text",
           "sha256": "4d5e867f441a84cbdaaad53925dcb62abc8e76193f184eb42f109adbb9dd20cb",
-          "value": "\u2022 The attacking model has the \u0003TOWERING\u0004 keyword and the target unit is within 12\"."
+          "value": "• The attacking model has the \u0003TOWERING\u0004 keyword and the target unit is within 12\"."
         },
         {
           "ordinal": 4,
@@ -699,27 +746,6 @@
           "acceptance": "Ranged Plunging Fire requires a visible target unit containing a ground-level model.",
           "semantic_assertions": [
             {
-              "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mandatory_saves_and_plunging_fire_are_typed",
-              "function_ast_sha256": "50902e1875c02fbe1ffb8ba50da50cca4b8919ba458741b21db23ccd3508af99",
-              "assertions": [
-                "assert selected is not None",
-                "assert save_kind_from_token('armour') is SaveKind.ARMOUR",
-                "assert saving_throw.successful is True",
-                "assert saving_throw.to_payload()['option']['save_kind'] == 'invulnerable'",
-                "assert SaveOption.from_payload(armour_option.to_payload()) == armour_option",
-                "assert mandatory_save_option(options=(armour_option, stronger_invulnerable_option)) == stronger_invulnerable_option",
-                "assert unsupported.status == 'unsupported'",
-                "assert too_low.reason == 'height_advantage_not_met'",
-                "assert not_visible.reason == 'target_not_fully_visible'",
-                "assert applied.to_payload()['final_ballistic_skill'] == 3"
-              ],
-              "expected_exceptions": [
-                "with pytest.raises(GameLifecycleError, match='SaveKind token'):\n    save_kind_from_token(3)",
-                "with pytest.raises(GameLifecycleError, match='status'):\n    PlungingFireModifierResult(source_rule_id='plunging-fire', status='wrong', reason=None, input_ballistic_skill=4, final_ballistic_skill=4, required_height_advantage_inches=3.0, actual_height_advantage_inches=7.0, target_fully_visible=True)"
-              ],
-              "role": "bounded_existing_dependency"
-            },
-            {
               "node": "tests/rules/section22/test_plunging.py::test_supported_floor_surface_controls_three_inch_eligibility",
               "function_ast_sha256": "ca7f632670b6b0ae2d5570372c31bf0df77403b3fa6286c822a9cc09c44bc88a",
               "assertions": [
@@ -740,6 +766,39 @@
               ],
               "expected_exceptions": [],
               "role": "recreated_native_core"
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
+              "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mandatory_saves_and_plunging_fire_are_typed",
+              "function_ast_sha256": "50902e1875c02fbe1ffb8ba50da50cca4b8919ba458741b21db23ccd3508af99",
+              "assertions": [
+                "assert selected is not None",
+                "assert save_kind_from_token('armour') is SaveKind.ARMOUR",
+                "assert saving_throw.successful is True",
+                "assert saving_throw.to_payload()['option']['save_kind'] == 'invulnerable'",
+                "assert SaveOption.from_payload(armour_option.to_payload()) == armour_option",
+                "assert mandatory_save_option(options=(armour_option, stronger_invulnerable_option)) == stronger_invulnerable_option",
+                "assert unsupported.status == 'unsupported'",
+                "assert too_low.reason == 'height_advantage_not_met'",
+                "assert not_visible.reason == 'target_not_fully_visible'",
+                "assert applied.to_payload()['final_ballistic_skill'] == 3"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='SaveKind token'):\n    save_kind_from_token(3)",
+                "with pytest.raises(GameLifecycleError, match='status'):\n    PlungingFireModifierResult(source_rule_id='plunging-fire', status='wrong', reason=None, input_ballistic_skill=4, final_ballistic_skill=4, required_height_advantage_inches=3.0, actual_height_advantage_inches=7.0, target_fully_visible=True)"
+              ],
+              "role": "bounded_existing_dependency"
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_mandatory_saves_and_plunging_fire_are_typed"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -822,6 +881,26 @@
           "acceptance": "Qualifying attacks improve actual BS by one through the shared attack owner; overlapping branches do not add two.",
           "semantic_assertions": [
             {
+              "node": "tests/rules/section22/test_plunging.py::test_towering_keyword_stays_with_physical_attacker_through_actual_hit",
+              "function_ast_sha256": "1949845235f4a93c5e7f17e9c191951bccac67b03e0732a8db21ac0d27cdbe1a",
+              "assertions": [
+                "assert profile.skill.final == 3",
+                "assert candidate.is_legal",
+                "assert candidate.observer_model_id == attacker.model_instance_id",
+                "assert (PLUNGING_FIRE_RULE_ID in candidate.targeting_rule_ids) is (attacking_index == towering_index)",
+                "assert len(hits) == 1",
+                "assert isinstance(step, dict)",
+                "assert isinstance(hit, dict)",
+                "assert hit['unmodified_roll'] == 2",
+                "assert hit['target_number'] == expected_bs",
+                "assert hit['successful'] is (expected_bs <= 2)"
+              ],
+              "expected_exceptions": [],
+              "role": "recreated_native_core"
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll",
               "function_ast_sha256": "b850033f2634a29514999871bccfc6f2fbc878e78b716454fcb5ee27f858ac31",
               "assertions": [
@@ -840,24 +919,16 @@
               ],
               "expected_exceptions": [],
               "role": "bounded_existing_dependency"
-            },
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
             {
-              "node": "tests/rules/section22/test_plunging.py::test_towering_keyword_stays_with_physical_attacker_through_actual_hit",
-              "function_ast_sha256": "1949845235f4a93c5e7f17e9c191951bccac67b03e0732a8db21ac0d27cdbe1a",
-              "assertions": [
-                "assert profile.skill.final == 3",
-                "assert candidate.is_legal",
-                "assert candidate.observer_model_id == attacker.model_instance_id",
-                "assert (PLUNGING_FIRE_RULE_ID in candidate.targeting_rule_ids) is (attacking_index == towering_index)",
-                "assert len(hits) == 1",
-                "assert isinstance(step, dict)",
-                "assert isinstance(hit, dict)",
-                "assert hit['unmodified_roll'] == 2",
-                "assert hit['target_number'] == expected_bs",
-                "assert hit['successful'] is (expected_bs <= 2)"
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll"
               ],
-              "expected_exceptions": [],
-              "role": "recreated_native_core"
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -878,7 +949,9 @@
               ],
               "expected_exceptions": [],
               "role": "recreated_native_core"
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll",
               "function_ast_sha256": "b850033f2634a29514999871bccfc6f2fbc878e78b716454fcb5ee27f858ac31",
@@ -898,6 +971,16 @@
               ],
               "expected_exceptions": [],
               "role": "bounded_existing_dependency"
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         },
@@ -919,7 +1002,9 @@
               ],
               "expected_exceptions": [],
               "role": "recreated_native_core"
-            },
+            }
+          ],
+          "historical_nonselected_evidence": [
             {
               "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll",
               "function_ast_sha256": "b850033f2634a29514999871bccfc6f2fbc878e78b716454fcb5ee27f858ac31",
@@ -939,6 +1024,16 @@
               ],
               "expected_exceptions": [],
               "role": "bounded_existing_dependency"
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
             }
           ]
         }
@@ -961,7 +1056,7 @@
       "answer": "Yes, as the unit embarking is not making a normal, advance or fall-back move as part of this embarkation.",
       "source_sha256": "5dde776b1cf69f6b47b71219938b51665eb2d8a42e8392befa07e5afdea855e2",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Aerialists ability allows you to get into a transport even though they disembarked a transport this turn? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section18; no new Strategic Reserves exception. Transport embark occasion belongs to Section18; attachment does not grant a new embark occasion.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Aerialists ability allows you to get into a transport even though they disembarked a transport this turn? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section18; no new Strategic Reserves exception. Transport embark occasion belongs to Section18; attachment does not grant a new embark occasion.",
       "semantic_assertions": []
     },
     {
@@ -971,7 +1066,7 @@
       "answer": "Yes, it just makes no attacks and then the fight type or shoot type is resolved.",
       "source_sha256": "8d4f6b7b01b92637f2848b261fe07f970ef819f1ee867b889e885d1bdcbb1ada",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can I select a unit to shoot or fight if it doesn't have melee or ranged weapons? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section10/12; no new Strategic Reserves exception. Weaponless activation is owned by Sections10/12; public attached activation is tested without inventing attacks.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can I select a unit to shoot or fight if it doesn't have melee or ranged weapons? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section10/12; no new Strategic Reserves exception. Weaponless activation is owned by Sections10/12; public attached activation is tested without inventing attacks.",
       "semantic_assertions": []
     },
     {
@@ -981,7 +1076,7 @@
       "answer": "Yes",
       "source_sha256": "4cfeea846d7a2e135d7eb728147265987cc1adf54ca93657427474d44fe9ce56",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can a model be within range of a weapon if it is not visible \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section04; no new Strategic Reserves exception. Visibility/range independence is Section04; no attached-only exception.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can a model be within range of a weapon if it is not visible â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section04; no new Strategic Reserves exception. Visibility/range independence is Section04; no attached-only exception.",
       "semantic_assertions": []
     },
     {
@@ -991,7 +1086,7 @@
       "answer": "Yes.",
       "source_sha256": "4d6f85a577496676241ac385c0cb4fa2e672c8c679d56ff363d7344279670845",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Do models destroyed when a unit is out of coherency count for mission objectives? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section01/03; no new Strategic Reserves exception. Mission credit for coherency casualties is Section01/mission scope; frozen attached destruction boundary is local.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Do models destroyed when a unit is out of coherency count for mission objectives? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section01/03; no new Strategic Reserves exception. Mission credit for coherency casualties is Section01/mission scope; frozen attached destruction boundary is local.",
       "semantic_assertions": []
     },
     {
@@ -1011,7 +1106,7 @@
       "answer": "The roll would be all at once and it would be 1 MW per fail",
       "source_sha256": "3baf6215041a9e32c26f4544ae11dc0907a480bc3e2b1f3b30f0dfd8a8f53efe",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: How many mortals do you take from Hazardous tests for a combined vehicle/monster and Infantry unit \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section06; no new Strategic Reserves exception. Mixed-unit Hazard amount is Section06; components do not change the owning hazard rule.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: How many mortals do you take from Hazardous tests for a combined vehicle/monster and Infantry unit â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section06; no new Strategic Reserves exception. Mixed-unit Hazard amount is Section06; components do not change the owning hazard rule.",
       "semantic_assertions": []
     },
     {
@@ -1021,7 +1116,7 @@
       "answer": "No, you allocate the mortal wounds to the unit as per Mortal Wounds(06.02). (This represents Bob the guardsmen picking up his fallen squad mates plasma gun or that the twisting power of James the Chaos Sorcerer pulling his followers into the warp.)",
       "source_sha256": "ce792ca90e1fcdfb597549aaba5c9c7fa227850068b1581a6b00492e993aafb7",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: I failed hazard rolls from [Hazardous] weapons, do those mortal wounds have to be allocated to the models with the [Hazardous] weapons? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section06; no new Strategic Reserves exception. Mortal allocation/weapon ownership is Section06; attachment introduces no Hazardous bearer lock.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: I failed hazard rolls from [Hazardous] weapons, do those mortal wounds have to be allocated to the models with the [Hazardous] weapons? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section06; no new Strategic Reserves exception. Mortal allocation/weapon ownership is Section06; attachment introduces no Hazardous bearer lock.",
       "semantic_assertions": []
     },
     {
@@ -1031,7 +1126,7 @@
       "answer": "When you select a model in the Select Model step of Mortal Wounds (06.02).",
       "source_sha256": "6cb474a554ba766f84b3bf678656f25876bec6fb41905666e7e3a0697b89e3fb",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: I have a rule that triggers when a mortal wound is allocated to a model, when does this happen? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section06; no new Strategic Reserves exception. Mortal Select Model timing is Section06; no new Section19 timing rule.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: I have a rule that triggers when a mortal wound is allocated to a model, when does this happen? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section06; no new Strategic Reserves exception. Mortal Select Model timing is Section06; no new Section19 timing rule.",
       "semantic_assertions": []
     },
     {
@@ -1041,7 +1136,7 @@
       "answer": "Yes, because other models in your unit may have Sv's that are better those models you've mentioned, this means that enough save rolls could be allocated to the those models that the rest of the results are not greater then the Sv's of the other models in your unit.",
       "source_sha256": "0c6ab46362def6aac110116ddd1f38ac0efee475fdefeeeac74b6291198e1f87",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: I have a unit being attacked with weapons that will modify some of their save rolls to be worse then 6 should I make those save rolls? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Heterogeneous Save allocation is shared Section05; highest-T distinction is locally asserted.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: I have a unit being attacked with weapons that will modify some of their save rolls to be worse then 6 should I make those save rolls? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Heterogeneous Save allocation is shared Section05; highest-T distinction is locally asserted.",
       "semantic_assertions": []
     },
     {
@@ -1051,7 +1146,7 @@
       "answer": "Yes",
       "source_sha256": "e8193326f2f9d7e3fb0a5d65ea64a96b7d6d2d5a3051487cc84a7c94bbef51d1",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If I have a rule that says my unit can move up to 6\" when it makes a pile-in move or consolidation move, does this also mean it changes the maximum distance of those moves to 6\"? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section12; no new Strategic Reserves exception. Pile-in/consolidation maximum is Section12, not changed by attachment.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If I have a rule that says my unit can move up to 6\" when it makes a pile-in move or consolidation move, does this also mean it changes the maximum distance of those moves to 6\"? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section12; no new Strategic Reserves exception. Pile-in/consolidation maximum is Section12, not changed by attachment.",
       "semantic_assertions": []
     },
     {
@@ -1061,7 +1156,7 @@
       "answer": "For pile-in moves, during the Pile-in step(12.02), and for consolidation moves, during the Consolidate step(12.07) of the Fight phase.",
       "source_sha256": "cade2b4fcf8c180e7fccd7db3cda6b1d9af1dcf01e2d728abbb3011d7bc286f2",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule allows my unit to pile-in or consolidate an extra distance in the Fight phase, when can I use that rule? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section12; no new Strategic Reserves exception. Fight step-specific movement grant remains Section12.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule allows my unit to pile-in or consolidate an extra distance in the Fight phase, when can I use that rule? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section12; no new Strategic Reserves exception. Fight step-specific movement grant remains Section12.",
       "semantic_assertions": []
     },
     {
@@ -1071,7 +1166,7 @@
       "answer": "No",
       "source_sha256": "5b0a2ff2b97ec653c19ef9a0b2b903cefe44903aae6ce26174360afd342a5b16",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule modifies how far a unit or model can move during a pile-in move or consolidation move does it also change the distance of the target units? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section12; no new Strategic Reserves exception. Target distances for movement grants remain Section12.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule modifies how far a unit or model can move during a pile-in move or consolidation move does it also change the distance of the target units? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section12; no new Strategic Reserves exception. Target distances for movement grants remain Section12.",
       "semantic_assertions": []
     },
     {
@@ -1081,7 +1176,7 @@
       "answer": "Yes",
       "source_sha256": "418d349eaf7304a61d3dd28047950280deee139fe1a1f4a68b3c71f5414183a3",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule says a unit auto passes Desperate Escape tests does that mean it would auto pass the hazard rolls from a desperate escape move? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section03; no new Strategic Reserves exception. Desperate Escape Hazard equivalence remains Section03.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule says a unit auto passes Desperate Escape tests does that mean it would auto pass the hazard rolls from a desperate escape move? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section03; no new Strategic Reserves exception. Desperate Escape Hazard equivalence remains Section03.",
       "semantic_assertions": []
     },
     {
@@ -1091,7 +1186,7 @@
       "answer": "Yes",
       "source_sha256": "203efbd7887644a4d4a986b7b38ecf618e7a775677f1b61a1726ae0954da4f17",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule says a unit can embark into a Transport in a turn that unit disembarked, does this ignore the core rules restriction on embarking in a turn that unit made a set up move (see 18.02)? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section18; no new Strategic Reserves exception. Embark exception remains Section18.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule says a unit can embark into a Transport in a turn that unit disembarked, does this ignore the core rules restriction on embarking in a turn that unit made a set up move (see 18.02)? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section18; no new Strategic Reserves exception. Embark exception remains Section18.",
       "semantic_assertions": []
     },
     {
@@ -1101,7 +1196,7 @@
       "answer": "No, the unit would make 1 single hazard roll.",
       "source_sha256": "63e2958a2a4ffb22895f940904bf6956f11e89ba2717bab129d341a8b6f60e6c",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule says my unit must make a hazard roll does every model in the unit make a hazard roll? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section18; no new Strategic Reserves exception. One unit hazard versus explicit each-model roll remains Section06/18.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule says my unit must make a hazard roll does every model in the unit make a hazard roll? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section18; no new Strategic Reserves exception. One unit hazard versus explicit each-model roll remains Section06/18.",
       "semantic_assertions": []
     },
     {
@@ -1111,7 +1206,7 @@
       "answer": "Yes",
       "source_sha256": "1912cbae65dddd8e8799e7e7a82a5ec5984533152aae9239745831f9dfed89ae",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a unit becomes battle-shocked after starting an action does it stop performing that action? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section16; no new Strategic Reserves exception. Battle-shock Action interruption remains Section16.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a unit becomes battle-shocked after starting an action does it stop performing that action? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section16; no new Strategic Reserves exception. Battle-shock Action interruption remains Section16.",
       "semantic_assertions": []
     },
     {
@@ -1121,7 +1216,7 @@
       "answer": "Yes",
       "source_sha256": "fef99387330cc3df5d34f0f94c59f49ddd403bffc2bb46936e4b80d8214f46bb",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section16; no new Strategic Reserves exception. Battle-shocked Action permission remains Section16.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section16; no new Strategic Reserves exception. Battle-shocked Action permission remains Section16.",
       "semantic_assertions": []
     },
     {
@@ -1131,7 +1226,7 @@
       "answer": "Yes.",
       "source_sha256": "1eb39b2856a8e102482e905b7bc7fb8392e71ad6d043627414f7a7c4a69fcc21",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a unit makes any disembark move in a turn (i.e. Disembark move, Emergency Disembark move etc.) has it disembarked that turn? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: every actual disembark mode marks disembarked this turn; local Tactical producer/return preserves receipt; other modes retained Section18.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a unit makes any disembark move in a turn (i.e. Disembark move, Emergency Disembark move etc.) has it disembarked that turn? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: every actual disembark mode marks disembarked this turn; local Tactical producer/return preserves receipt; other modes retained Section18.",
       "semantic_assertions": []
     },
     {
@@ -1141,7 +1236,7 @@
       "answer": "Yes",
       "source_sha256": "5ec36166d98fd4e9d6031f8f85a631801253c6a65f26008c6e58d8cec6e72b1c",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If my unit has taken control of an objective at the end of my movement phase and that unit has as an ability that secures an objective they control, can they secure that objective? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section17; no new Strategic Reserves exception. Objective securing timing remains Section17.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If my unit has taken control of an objective at the end of my movement phase and that unit has as an ability that secures an objective they control, can they secure that objective? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section17; no new Strategic Reserves exception. Objective securing timing remains Section17.",
       "semantic_assertions": []
     },
     {
@@ -1151,7 +1246,7 @@
       "answer": "Fight on Death rules are resolved before Deadly Demise abilities, meaning that your unit's Deadly Demise will resolve after your unit has fought/at the end of the phase and the relevant models have been removed from the battlefield.",
       "source_sha256": "6c0d66fac9785c64b585ccf535fece6c50738787459f61ccff18d7b4d54f22fc",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If my unit has the Deadly Demise ability and has an ability that allows it to Fight on Death, how do I resolve this? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05/DD-FoD decision; no new Strategic Reserves exception. Current adopted DD/FoD decision preserved unchanged; attachment creates no new removal ordering.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If my unit has the Deadly Demise ability and has an ability that allows it to Fight on Death, how do I resolve this? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05/DD-FoD decision; no new Strategic Reserves exception. Current adopted DD/FoD decision preserved unchanged; attachment creates no new removal ordering.",
       "semantic_assertions": []
     },
     {
@@ -1161,7 +1256,7 @@
       "answer": "Yes, the [PRECISION] ability is not an applicable ability for those attacks as there is no CHARACTER in the target unit for the ability to trigger its rule.",
       "source_sha256": "a46aec7c497acd207755a6a220760722b4b41ab05aa0b4936cd98911abbdb641",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If my unit has weapons that are identical in characteristics, but some of those weapons have [PRECISION] and those weapons targeted a unit without the character keyword, do I roll all of those weapons together? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Precision applicability remains Section05; actual attached model Precision dependency executes.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If my unit has weapons that are identical in characteristics, but some of those weapons have [PRECISION] and those weapons targeted a unit without the character keyword, do I roll all of those weapons together? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Precision applicability remains Section05; actual attached model Precision dependency executes.",
       "semantic_assertions": []
     },
     {
@@ -1171,7 +1266,7 @@
       "answer": "Yes, ANTI-non-(any keyword) will trigger on any unit that does not have the specified keyword.",
       "source_sha256": "2c17122ffb565c8449dcae5b2f4ca29654cb327c39f61e112cadfb49b73f0993",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If the [ANTI] ability on my unit is ANTI-non-Monster/Vehicle does it mean the [ANTI] rule triggers when targeting units that do not have the Monster or Vehicle keyword? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section24; no new Strategic Reserves exception. Anti negative keyword semantics belong to weapon ability authority; local exact Anti-Psyker example binds live union.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If the [ANTI] ability on my unit is ANTI-non-Monster/Vehicle does it mean the [ANTI] rule triggers when targeting units that do not have the Monster or Vehicle keyword? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section24; no new Strategic Reserves exception. Anti negative keyword semantics belong to weapon ability authority; local exact Anti-Psyker example binds live union.",
       "semantic_assertions": []
     },
     {
@@ -1181,7 +1276,7 @@
       "answer": "No, it increases the A characteristics of the unit's ranged weapons by 1.",
       "source_sha256": "9377700d849a18e73f6f58830a215dfe1b122e65b7e115d5ceecd9ca34a46feb",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: My rule says that \"this units ranged attacks have +1 A\", do each of my attacks get an extra attack dice? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section02; no new Strategic Reserves exception. Weapon A modifier remains Section02.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: My rule says that \"this units ranged attacks have +1 A\", do each of my attacks get an extra attack dice? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section02; no new Strategic Reserves exception. Weapon A modifier remains Section02.",
       "semantic_assertions": []
     },
     {
@@ -1191,7 +1286,7 @@
       "answer": "Use the Munitorium Field Manual.",
       "source_sha256": "e1ebb8a68e7f4c31e1672e4801af152cb6355b84d975b7329c57de930f5a61c1",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: The Munitorium Field Manual shows my unit can attach to different units then are on it's datasheet, which do I use? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct attachment source-precedence rule: execute actual MFM replacement owner for both Leader and Support.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: The Munitorium Field Manual shows my unit can attach to different units then are on it's datasheet, which do I use? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct attachment source-precedence rule: execute actual MFM replacement owner for both Leader and Support.",
       "semantic_assertions": []
     },
     {
@@ -1201,7 +1296,7 @@
       "answer": "The X is a placeholder for a number of inches that the ability might appear in a rule with, like Lone Operative 15\" where the X has been replaced with 15\"",
       "source_sha256": "5b6592050979bbcee593897a953177ea6ff01143998be6aaa82d94cec6e0e28f",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: What does the X\" in Lone Operative X\" mean? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section24; no new Strategic Reserves exception. Lone Operative numeric placeholder is Section24; bounded consumer uses native12 and explicit native15 controls.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: What does the X\" in Lone Operative X\" mean? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section24; no new Strategic Reserves exception. Lone Operative numeric placeholder is Section24; bounded consumer uses native12 and explicit native15 controls.",
       "semantic_assertions": []
     },
     {
@@ -1221,7 +1316,7 @@
       "answer": "Yes",
       "source_sha256": "08639241469c28315db54217af96362204e61b52d0bd272d16a40bab54e25fe8",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: When a rule instructs you to perform a charge outside of the charge phase, do I resolve step 2 and 3 of the Charge step(11.02)? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section11; no new Strategic Reserves exception. Out-of-phase charge sequencing remains Section11.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: When a rule instructs you to perform a charge outside of the charge phase, do I resolve step 2 and 3 of the Charge step(11.02)? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section11; no new Strategic Reserves exception. Out-of-phase charge sequencing remains Section11.",
       "semantic_assertions": []
     },
     {
@@ -1241,7 +1336,7 @@
       "answer": "Those groups can be selected in an order of your choosing but must be in an order that makes them come before any non-CHARACTER groups that do not contain a model with a missing wound.",
       "source_sha256": "e8c435f8a7716a35d41f4a7522b6d87d156c108f9ba88195bdab4b27d00897c1",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: When declaring the allocation order of groups in my unit I have more than one non-CHARACTER groups that contain a model with a missing wound, how must I select the order? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Wounded allocation-group priority remains Section05; no Section19 exception.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: When declaring the allocation order of groups in my unit I have more than one non-CHARACTER groups that contain a model with a missing wound, how must I select the order? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Wounded allocation-group priority remains Section05; no Section19 exception.",
       "semantic_assertions": []
     },
     {
@@ -1276,7 +1371,7 @@
       "answer": "Yes.",
       "source_sha256": "0726dff38f240002912d8730e11af4be7e4f1c14c17d67b797855e597dd88a42",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can an attached unit be given an Upgrade? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: actual attached unit accepts one Upgrade in executed roster validator.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can an attached unit be given an Upgrade? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: actual attached unit accepts one Upgrade in executed roster validator.",
       "semantic_assertions": []
     },
     {
@@ -1286,7 +1381,7 @@
       "answer": "No, units are prevented from having two enhancements, and Upgrades are enhancements.",
       "source_sha256": "7ee44f5393615f9102f2df97ea71badbd468f7b02b9f968aa1ec0c30da3ce524",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can a unit have both an Upgrade and an enhancement? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: shared attached squad enhancement cap forbids Upgrade plus leader Enhancement.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can a unit have both an Upgrade and an enhancement? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: shared attached squad enhancement cap forbids Upgrade plus leader Enhancement.",
       "semantic_assertions": []
     },
     {
@@ -1296,7 +1391,7 @@
       "answer": "Yes, Upgrades are a type of enhancement (but not all enhancements are Upgrades).",
       "source_sha256": "00e5a5e21fcdab4cfe98c30af6341386425851e952d8b85aa2febc27b4d2104e",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Are Upgrades enhancements? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: Upgrade is Enhancement; shared validation executes the same cap.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Are Upgrades enhancements? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: Upgrade is Enhancement; shared validation executes the same cap.",
       "semantic_assertions": []
     },
     {
@@ -1306,7 +1401,7 @@
       "answer": "Yes",
       "source_sha256": "f12df889b0db17cfacf6358aea3dcd1a3d2725660c8a159eabad35f6f6c9fef3",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Terrain area vertical membership remains Section14.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Terrain area vertical membership remains Section14.",
       "semantic_assertions": []
     },
     {
@@ -1337,7 +1432,7 @@
       "answer": "Yes.",
       "source_sha256": "83a20d1e25f2befd445e81a037eddc1fbae6799e634efe2a95b7b1724d5de541",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Increased CP cost payment remains Section15.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Increased CP cost payment remains Section15.",
       "semantic_assertions": []
     },
     {
@@ -1347,7 +1442,7 @@
       "answer": "In the Resolve Damage step of the Inflict Damage step (05.04).",
       "source_sha256": "f76c805bcfca3c48fd1702c593c0b7ae45b19cb075e805878fa90d19c9fbf2c3",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: In what step during the attack sequence do I roll for Feel No Pain? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Feel No Pain damage timing remains Section05; no attachment-specific timing.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: In what step during the attack sequence do I roll for Feel No Pain? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Feel No Pain damage timing remains Section05; no attachment-specific timing.",
       "semantic_assertions": []
     },
     {
@@ -1357,7 +1452,7 @@
       "answer": "Yes.",
       "source_sha256": "d4d4f6a90669f72253ba254163280068e061623dfd51e1989df9d53a3797f45d",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can an Epic Hero unit form an attached unit with a unit that has an enhancement? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: Epic Hero may attach to bodyguard with Upgrade; executed canonical roster control.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can an Epic Hero unit form an attached unit with a unit that has an enhancement? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section19; no new Strategic Reserves exception. Direct: Epic Hero may attach to bodyguard with Upgrade; executed canonical roster control.",
       "semantic_assertions": []
     },
     {
@@ -1377,7 +1472,7 @@
       "answer": "Yes. That restriction is applicable before the battle, in the Declare Battle Formations step.",
       "source_sha256": "4a48d283634e5425caf54f2f8426b8c64351a15d8772e58a6c3ee0cff47b7031",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: existing accepted prebattle cap is not reapplied to actual during-battle source removal. Local source consumer and explicit Core price premises; named native provider admission remains unproven.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: existing accepted prebattle cap is not reapplied to actual during-battle source removal. Local source consumer and explicit Core price premises; named native provider admission remains unproven.",
       "semantic_assertions": []
     },
     {
@@ -1387,7 +1482,7 @@
       "answer": "Yes.",
       "source_sha256": "fcbf7560ed5887e51b590721ed9949d9d631d5f5c22e4bd49886aba684e0dbfa",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: half-points restriction is prebattle; actual during-battle source reposition bypasses prebattle declaration admission while preserving route.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: half-points restriction is prebattle; actual during-battle source reposition bypasses prebattle declaration admission while preserving route.",
       "semantic_assertions": []
     },
     {
@@ -1397,7 +1492,7 @@
       "answer": "No CP are spent and that stratagem's effects are not resolved (but that stratagem still counts as having been used this phase).",
       "source_sha256": "e5ea7a06664adae76ec6f30368df75c64a03655b158375bbea49637e51d3c53a",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Insufficient increased CP remains Section15.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Insufficient increased CP remains Section15.",
       "semantic_assertions": []
     },
     {
@@ -1407,7 +1502,7 @@
       "answer": "Yes.",
       "source_sha256": "b071da95e8e4f7b784d6b56260bc20d1f99d1dee892c93e49694be55146a9f6e",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Is being within range of a terrain objective the same as being within range of an objective marker? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Terrain Objective/marker equivalence remains primary adopted Companion convention.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Is being within range of a terrain objective the same as being within range of an objective marker? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Terrain Objective/marker equivalence remains primary adopted Companion convention.",
       "semantic_assertions": []
     },
     {
@@ -1427,7 +1522,9 @@
           ],
           "expected_exceptions": [],
           "role": "recreated_native_core"
-        },
+        }
+      ],
+      "historical_nonselected_evidence": [
         {
           "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_attacker_observer_provenance_prevents_unsafe_cover_gathering",
           "function_ast_sha256": "2e93fd60b2024676df30e5011cd15977ea65c6244a52fce3c3b4be0b0c929665",
@@ -1439,6 +1536,16 @@
           "expected_exceptions": [],
           "role": "bounded_existing_dependency"
         }
+      ],
+      "coverage_status": "partial",
+      "coverage_gaps": [
+        {
+          "kind": "nonselected_assertion_evidence",
+          "nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_attacker_observer_provenance_prevents_unsafe_cover_gathering"
+          ],
+          "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+        }
       ]
     },
     {
@@ -1448,7 +1555,7 @@
       "answer": "No, a stratagem that costs 1CP and is making use of an optional +1CP section has an original cost of 2CP.",
       "source_sha256": "82f9c28b646f5734f69e5e94c22a2a9a1df8761eaf463c1510f301294963c5f0",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Optional Stratagem base cost remains Section15.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Optional Stratagem base cost remains Section15.",
       "semantic_assertions": []
     },
     {
@@ -1468,7 +1575,7 @@
       "answer": "No.",
       "source_sha256": "6c644170715564c73a7148e873c64fb055afa4031065a1027f319016ba4b6bee",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can I group or allocate a wound to a destroyed model? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Direct living-model membership: dead models cannot supply attack toughness/allocation; casualty producer and presence consumers are local.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can I group or allocate a wound to a destroyed model? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Direct living-model membership: dead models cannot supply attack toughness/allocation; casualty producer and presence consumers are local.",
       "semantic_assertions": []
     },
     {
@@ -1478,7 +1585,7 @@
       "answer": "After.",
       "source_sha256": "13028847f833da09851ea0172c574d87efff63f06d924d31f67bf2fb42574b60",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Post-save Damage-to-zero remains Section05.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Post-save Damage-to-zero remains Section05.",
       "semantic_assertions": []
     },
     {
@@ -1547,7 +1654,7 @@
       "answer": "No, as a unit's controlling player cannot target that unit with stratagems (01.07).",
       "source_sha256": "c5ad1503a94c734aa9f1d0dadca11d1daa19dc63928131659eb8214c5f4c7724",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can I use the Insane Bravery stratagem on a battle-shocked unit? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Friendly battle-shocked Stratagem denial remains Section01/15.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can I use the Insane Bravery stratagem on a battle-shocked unit? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section15; no new Strategic Reserves exception. Friendly battle-shocked Stratagem denial remains Section01/15.",
       "semantic_assertions": []
     },
     {
@@ -1611,7 +1718,9 @@
           ],
           "expected_exceptions": [],
           "role": "bounded_existing_dependency"
-        },
+        }
+      ],
+      "historical_nonselected_evidence": [
         {
           "node": "tests/integration/test_embarked_ability_authority.py::test_firing_deck_preserves_attached_ability_ownership",
           "function_ast_sha256": "77fdaaef02cc591d2f1e7abca5d7b6da12e373f7eaf5966f2ed5a7dfe7dfe3aa",
@@ -1624,6 +1733,16 @@
           "expected_exceptions": [],
           "role": "bounded_existing_dependency"
         }
+      ],
+      "coverage_status": "partial",
+      "coverage_gaps": [
+        {
+          "kind": "nonselected_assertion_evidence",
+          "nodes": [
+            "tests/integration/test_embarked_ability_authority.py::test_firing_deck_preserves_attached_ability_ownership"
+          ],
+          "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+        }
       ]
     },
     {
@@ -1633,7 +1752,7 @@
       "answer": "Line of sight is drawn from any part of the observing model to any part of the model being observed.",
       "source_sha256": "cf0fd95bcbcfb3ff78f04318e141c735309cc69f5f3815ab946d5a4245563333",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Physical line of sight remains Section14.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Physical line of sight remains Section14.",
       "semantic_assertions": []
     },
     {
@@ -1643,7 +1762,7 @@
       "answer": "Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn.",
       "source_sha256": "5d5056a4966de981a21706e962e5c9ea70f05377ff20fd4962f7cc7a01d5290b",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If both players have units with the Scouts ability, do they alternate resolving scout moves? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section01/03; no new Strategic Reserves exception. Scouts alternation remains Section03/prebattle.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If both players have units with the Scouts ability, do they alternate resolving scout moves? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section01/03; no new Strategic Reserves exception. Scouts alternation remains Section03/prebattle.",
       "semantic_assertions": []
     },
     {
@@ -1653,7 +1772,7 @@
       "answer": "Unless otherwise stated, no: when snap shooting, each attack only hits on a roll of 6.",
       "source_sha256": "b26dfcd0cc3f76a41e680b3bedaf3ba6a299fa135400cea6cbd42e493ea2e057",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Snap shooting threshold remains Section05/10.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Snap shooting threshold remains Section05/10.",
       "semantic_assertions": []
     },
     {
@@ -1663,7 +1782,7 @@
       "answer": "Yes, except when snap shooting: when snap shooting, each attack only hits on a roll of 6.",
       "source_sha256": "9bfda5c1d2a514b705e9feeec17efef3325815360389fe267537521350a557ac",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Critical hit thresholds remain Section05.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section05; no new Strategic Reserves exception. Critical hit thresholds remain Section05.",
       "semantic_assertions": []
     },
     {
@@ -1683,7 +1802,7 @@
       "answer": "Yes (excluding rules in the Core Rules)'.",
       "source_sha256": "f084d1e31353f70020957e67d0ad8821f406be29c8251048d27bf81e6664f4b3",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule refers to an 'objective marker', does this mean an 'objective'? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Non-Core objective terminology and current Companion policy remain unchanged.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule refers to an 'objective marker', does this mean an 'objective'? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Non-Core objective terminology and current Companion policy remain unchanged.",
       "semantic_assertions": []
     },
     {
@@ -1703,7 +1822,7 @@
       "answer": "Yes.",
       "source_sha256": "8352b49b9fbfaceb630ac21dc45eac4d9fdf112bd15de3e50ec2f0fbd30ca36e",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can a unit be controlling more than one objective at once? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section17; no new Strategic Reserves exception. Multiple-objective control remains Section17.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: Can a unit be controlling more than one objective at once? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section17; no new Strategic Reserves exception. Multiple-objective control remains Section17.",
       "semantic_assertions": []
     },
     {
@@ -1713,7 +1832,7 @@
       "answer": "Yes.",
       "source_sha256": "cda9f83e49d0006eef29aeb0e17f388472db9fa391be2ea4a96e6ce4850e80a6",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: When determining control over an objective, can the same model's OC count towards more than one objective that model is within range of? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section17; no new Strategic Reserves exception. OC may count for multiple in-range objectives remains Section17.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: When determining control over an objective, can the same model's OC count towards more than one objective that model is within range of? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section17; no new Strategic Reserves exception. OC may count for multiple in-range objectives remains Section17.",
       "semantic_assertions": []
     },
     {
@@ -1723,7 +1842,7 @@
       "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn.",
       "source_sha256": "f1569a6a16420f52ff3a4cc89c61762db7467cba6bdc320c8a4e3fa8ceec239f",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: original lasting effect survives removal/return and exists through end-turn query until shared expiry boundary; no renewed lifetime.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Direct: original lasting effect survives removal/return and exists through end-turn query until shared expiry boundary; no renewed lifetime.",
       "semantic_assertions": []
     },
     {
@@ -1733,7 +1852,7 @@
       "answer": "That model's controlling player can draw line of sight from any part of that model that is not overhanging the edge of the battlefield. Their opponent can draw line of sight to any part of that model.",
       "source_sha256": "1c43f713b930f8f51c7d429991f40174c22eb30bbf4bd56773993b4a8e319cd8",
       "disposition": "other_section_no_new_section22_obligation",
-      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: When a model overhangs the edge of the battlefield, how does that affect its visibility? \u00e2\u20ac\u201d This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Overhanging visibility remains Section14.",
+      "reason": "Screened complete question and answer: no new Aura/faction/Psychic/wargear/Plunging obligation. Existing allocation, phase, movement, terrain, Stratagem or objective owner remains. Screened for Section21: When a model overhangs the edge of the battlefield, how does that affect its visibility? â€” This concerns its existing other-section owner; it introduces no separate flight/Surge obligation. Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Overhanging visibility remains Section14.",
       "semantic_assertions": []
     },
     {
@@ -1824,7 +1943,9 @@
           ],
           "expected_exceptions": [],
           "role": "recreated_native_core"
-        },
+        }
+      ],
+      "historical_nonselected_evidence": [
         {
           "node": "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_attacker_observer_provenance_prevents_unsafe_cover_gathering",
           "function_ast_sha256": "2e93fd60b2024676df30e5011cd15977ea65c6244a52fce3c3b4be0b0c929665",
@@ -1835,6 +1956,16 @@
           ],
           "expected_exceptions": [],
           "role": "bounded_existing_dependency"
+        }
+      ],
+      "coverage_status": "partial",
+      "coverage_gaps": [
+        {
+          "kind": "nonselected_assertion_evidence",
+          "nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_phase14l_attacker_observer_provenance_prevents_unsafe_cover_gathering"
+          ],
+          "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
         }
       ]
     },
@@ -1943,7 +2074,9 @@
           ],
           "expected_exceptions": [],
           "role": "bounded_existing_dependency"
-        },
+        }
+      ],
+      "historical_nonselected_evidence": [
         {
           "node": "tests/integration/test_embarked_ability_authority.py::test_firing_deck_preserves_attached_ability_ownership",
           "function_ast_sha256": "77fdaaef02cc591d2f1e7abca5d7b6da12e373f7eaf5966f2ed5a7dfe7dfe3aa",
@@ -1955,6 +2088,16 @@
           ],
           "expected_exceptions": [],
           "role": "bounded_existing_dependency"
+        }
+      ],
+      "coverage_status": "partial",
+      "coverage_gaps": [
+        {
+          "kind": "nonselected_assertion_evidence",
+          "nodes": [
+            "tests/integration/test_embarked_ability_authority.py::test_firing_deck_preserves_attached_ability_ownership"
+          ],
+          "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
         }
       ]
     },
@@ -1993,5 +2136,6 @@
     }
   ],
   "metadata_gameplay_credit": false,
-  "qualification": "Native datasheets plus explicit constructed Core grants/checkpoints; generic faction gate is not native faction/provider activation. Separate supported canonical Core persistence/replay evidence. Existing mission/provider/Section08 and historical qualifications retained."
+  "qualification": "Native datasheets plus explicit constructed Core grants/checkpoints; generic faction gate is not native faction/provider activation. Separate supported canonical Core persistence/replay evidence. Existing mission/provider/Section08 and historical qualifications retained.",
+  "cutover_qualification": "Literal/source inventory remains complete. Current behavioral evidence is partial after the approved legacy-test cutover. Only selected active tests are live semantic bindings; historical_nonselected_evidence preserves former records without current gameplay or coverage credit. Explicit gaps remain for unselected checks; archives are historical evidence, never current test sources."
 }
