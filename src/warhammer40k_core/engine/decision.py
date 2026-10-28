@@ -198,7 +198,7 @@ def _validated_rng_history_projection(value: JsonValue) -> JsonValue:
             and value.get("evaluation_raw") == evaluation.get("raw")
         )
         projected: dict[str, JsonValue] = {}
-        for key, item in value.items():
+        for key, item in cast(dict[object, JsonValue], value).items():
             if (
                 key in _RNG_HISTORY_NEUTRAL_PAYLOAD_KEYS
                 or (key == "result_override" and omit_absent_override)
