@@ -1,7 +1,7 @@
 tests/code_quality/test_performance_policy.py
 tests/code_quality/test_exception_policy.py
 tests/code_quality/test_cumulative_preservation.py
-tests/code_quality/test_performance_tool_inputs.py
+tests/code_quality/test_performance_preflight.py
 tests/code_quality/test_phase14h_attack_resolution_convergence.py
 tests/code_quality/test_d07_geometry_containment.py
 tests/code_quality/test_order102_fight_completion_ownership.py
