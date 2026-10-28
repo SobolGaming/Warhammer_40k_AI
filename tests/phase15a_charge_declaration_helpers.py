@@ -116,6 +116,30 @@ def charge_lifecycle(
         battlefield = battlefield.with_unit_placement(
             unit_placement_at(unit, army_id=army_id, player_id=player_id, poses=poses)
         )
+    if alpha_attached_unit_ids is not None and not any(
+        key in origins for key in alpha_attached_unit_ids
+    ):
+        bodyguard_key, leader_key = alpha_attached_unit_ids
+        bodyguard = battlefield.unit_placement_by_id(units[bodyguard_key].unit_instance_id)
+        leader = units[leader_key]
+        anchor = bodyguard.model_placements[0].pose
+        # Preserve the five compact Bodyguard poses; clear the 32/40 mm bases.
+        leader_origin = Pose.at(
+            anchor.position.x,
+            anchor.position.y + 1.4 * ((len(bodyguard.model_placements) - 1) // 5) + 1.6,
+            anchor.position.z,
+            facing_degrees=anchor.facing.degrees,
+        )
+        battlefield = battlefield.with_unit_placement(
+            unit_placement_at(
+                leader,
+                army_id="army-alpha",
+                player_id="player-a",
+                poses=compact_test_unit_poses(
+                    origin=leader_origin, model_count=len(leader.own_models)
+                ),
+            )
+        )
     state = GameState.from_config(config)
     for army in armies:
         state.record_army_definition(army)

@@ -24,6 +24,7 @@ from warhammer40k_core.engine.movement_proposals import MovementProposalRequest,
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.stratagems import stratagem_decline_payload
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 
@@ -245,6 +246,12 @@ def submit_fixture_request(session: LocalGameSession, request: DecisionRequest) 
             request_id=request.request_id,
             result_id=result_id,
             payload=movement_payload,
+        )
+    elif request.decision_type == "submit_stratagem_target_proposal":
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id=result_id,
+            payload=stratagem_decline_payload(),
         )
     else:
         assert request.options, request.decision_type

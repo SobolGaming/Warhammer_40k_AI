@@ -14,6 +14,7 @@ from tests.phase11c_command_phase_helpers import (
     secondary_choice,
 )
 from tests.psychic_modifier_helpers import pending_request
+from tests.setup_completion_helpers import place_attached_components_coherently_for_fixture
 from tests.support.ability_presence_fixtures import ability_presence_fixture, compiled_ability_rule
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -82,6 +83,7 @@ def _session(
             battlefield_id="order121-battlefield", armies=tuple(state.army_definitions)
         ).battlefield_state
     )
+    place_attached_components_coherently_for_fixture(state)
     for unit in state.army_definitions[0].units:
         if (damaged_bodyguard and unit.unit_instance_id == "army-alpha:passengers") or (
             source_lost and unit.unit_instance_id == "army-alpha:leader"

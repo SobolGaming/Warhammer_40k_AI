@@ -19,6 +19,7 @@ from tests.movement_submission_helpers import (
     submit_action_and_movement_proposal,
 )
 from tests.setup_completion_helpers import (
+    place_attached_components_coherently_for_fixture,
     record_current_battlefield_placements_for_fixture,
     record_existing_primary_turn_start_evidence_events_for_fixture,
     record_primary_turn_start_evidence_for_fixture,
@@ -4622,6 +4623,8 @@ def test_icon_of_excess_matches_retained_attached_attack_identity_after_componen
         if unit.unit_instance_id == "army-b:extra-target-battleline"
     )
     _move_unit(state, tormentors.unit_instance_id, x=10.0, y=10.0)
+    # Keep the living 50 mm Leader beside its 32 mm Bodyguard until its casualty.
+    _move_unit(state, leader.unit_instance_id, x=8.0, y=10.0)
     _move_unit(state, extra_target.unit_instance_id, x=20.0, y=10.0)
     _move_unit(state, target.unit_instance_id, x=18.0, y=10.0)
     status = _advance_battleline_shooting_to_damage_allocation_request(
@@ -4931,13 +4934,16 @@ def test_tormentors_objective_defiled_uses_attached_unit_objective_contribution(
     leader = next(
         component.unit for component in attached_view.components if component.role == "leader"
     )
+    # With the 40 mm marker and 32/50 mm bases, only the Leader is within 3 inches.
+    # The nearest Bodyguard is 3.783 inches from the marker edge, but remains
+    # 0.586 inches from the Leader's base; the next model is also within coherency.
     _move_unit(
         state,
         tormentors.unit_instance_id,
-        x=marker.x_inches + 20.0,
+        x=marker.x_inches + 5.2,
         y=marker.y_inches,
     )
-    _move_unit(state, leader.unit_instance_id, x=marker.x_inches, y=marker.y_inches)
+    _move_unit(state, leader.unit_instance_id, x=marker.x_inches + 3.0, y=marker.y_inches)
     _move_unit(
         state,
         target.unit_instance_id,
@@ -6736,6 +6742,7 @@ def _configured_kakophonist_fixture(
             armies=armies,
         ).battlefield_state
     )
+    place_attached_components_coherently_for_fixture(state)
     state.stage = GameLifecycleStage.BATTLE
     state.setup_step_index = None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
@@ -7581,6 +7588,7 @@ def _battleline_lifecycle_session(
             armies=armies,
         ).battlefield_state
     )
+    place_attached_components_coherently_for_fixture(state)
     state.stage = GameLifecycleStage.BATTLE
     state.setup_step_index = None
     state.battle_phase_index = state.battle_phase_sequence.index(phase)

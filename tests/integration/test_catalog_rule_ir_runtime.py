@@ -133,6 +133,7 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.list_validation_errors import ListValidationError
 from warhammer40k_core.engine.phase import (
     BattlePhase,
+    GameLifecycleError,
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.charge import ChargePhaseHandler
@@ -1752,6 +1753,96 @@ def test_order_30_rule_cleanup_resumes_after_feel_no_pain_and_restores() -> None
         GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
         == session.lifecycle.to_payload()
     )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "root_identity",
+        "source",
+        "missing_retention",
+        "missing_request_event",
+        "duplicate_request_event",
+        "premature_finalization",
+    ],
+)
+def test_order_30_rule_cleanup_restore_rejects_mortal_continuation_drift(
+    mutation: str,
+) -> None:
+    state, decisions, runtime, _source, model_id, request_id, option_id = (
+        _pending_daemonic_patrons_fight_on_death_fixture(cleanup_fnp=True)
+    )
+    session, config = _daemonic_patrons_session(state=state, decisions=decisions)
+    _install_daemonic_patrons_resume_runtime(session=session, config=config, runtime=runtime)
+    status = session.submit_option(
+        request_id=request_id, option_id=option_id, result_id="accept-rule-retention"
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == "select_feel_no_pain"
+    checkpoint = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+    altered = cast(dict[str, Any], json.loads(json.dumps(checkpoint)))
+    pending = next(
+        request
+        for request in altered["decisions"]["queue"]["pending_requests"]
+        if request["request_id"] == status.decision_request.request_id
+    )
+    events = altered["decisions"]["event_log"]
+    source_context = pending["payload"]["lost_wound_context"]["source_context"]
+    root_context = source_context["root_context"]
+    if mutation == "root_identity":
+        root_context["target_unit_instance_id"] = "wrong-physical-unit"
+    elif mutation == "source":
+        source_context["source"]["optional"] = True
+    elif mutation == "missing_retention":
+        altered["state"]["persisting_effects"] = [
+            effect
+            for effect in altered["state"]["persisting_effects"]
+            if not effect["effect_id"].startswith("retained-destruction:")
+        ]
+    elif mutation == "missing_request_event":
+        event = next(
+            event
+            for event in events
+            if event["event_type"] == "decision_requested"
+            and event["payload"]["request_id"] == pending["request_id"]
+        )
+        event["event_type"] = "removed-request-evidence"
+    elif mutation == "duplicate_request_event":
+        events.append(
+            {
+                "event_id": f"event-{len(events) + 1:06d}",
+                "event_type": "decision_requested",
+                "payload": pending,
+            }
+        )
+    else:
+        assert mutation == "premature_finalization"
+        destroyed = next(
+            event
+            for event in events
+            if event["event_type"] == "model_destroyed"
+            and event["payload"]["model_instance_id"] == model_id
+        )
+        events.append(
+            {
+                "event_id": f"event-{len(events) + 1:06d}",
+                "event_type": "rule_model_destruction_finalized",
+                "payload": {
+                    "game_id": root_context["game_id"],
+                    "battle_round": destroyed["payload"]["battle_round"],
+                    "phase": root_context["phase"],
+                    "model_destroyed_event_id": destroyed["event_id"],
+                    "model_instance_id": model_id,
+                    "physical_unit_instance_id": root_context["target_unit_instance_id"],
+                    "rules_unit_instance_id": root_context["rules_unit_instance_id"],
+                    "completion_kind": root_context["completion_kind"],
+                },
+            }
+        )
+    with pytest.raises(GameLifecycleError):
+        GameLifecycle.from_payload(cast(Any, altered))
 
 
 def _daemonic_patrons_session(

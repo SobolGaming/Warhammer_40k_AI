@@ -7,7 +7,11 @@ from dataclasses import dataclass, replace
 
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.abilities import AbilityCatalogIndex, AbilityCatalogRecord
+from warhammer40k_core.engine.abilities import (
+    AbilityCatalogIndex,
+    AbilityCatalogRecord,
+    ability_record_is_active_generic_rule_ir,
+)
 from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_round_hooks import (
@@ -466,7 +470,9 @@ def _selectable_shadow_form_record_by_source_id(
     requested_source_id = _validate_identifier("selected_shadow_form_source_id", source_id)
     matches: list[tuple[AbilityCatalogRecord, RuleIR]] = []
     for record in index.all_records():
-        if not catalog_rule_record_source_matches_unit(
+        if not ability_record_is_active_generic_rule_ir(
+            record
+        ) or not catalog_rule_record_source_matches_unit(
             record=record,
             unit=unit,
             current_model_instance_ids=current_model_instance_ids,

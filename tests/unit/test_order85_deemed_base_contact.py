@@ -220,7 +220,11 @@ def test_restore_rejects_correlated_contact_evidence_forgery(corruption: str) ->
                 elif corruption == "transit_permission":
                     value["path_context"]["may_transit_enemy_models"] = True
                 elif corruption == "terrain_permission":
-                    value["terrain_context"]["can_move_through_terrain"] = True
+                    terrain_context = value["terrain_context"]
+                    assert type(terrain_context["can_move_through_terrain"]) is bool
+                    terrain_context["can_move_through_terrain"] = not terrain_context[
+                        "can_move_through_terrain"
+                    ]
                 elif corruption == "constraints":
                     value["coherency_max_span_inches"] = 100.0
             for key in ("base_contacts", "deemed_base_contacts"):
@@ -249,7 +253,9 @@ def test_restore_rejects_correlated_contact_evidence_forgery(corruption: str) ->
             for child in cast(list[object], value):
                 corrupt(child)
 
+    original = json.dumps(raw, sort_keys=True)
     corrupt(raw)
+    assert json.dumps(raw, sort_keys=True) != original
     with pytest.raises((GameLifecycleError, GeometryError)):
         GameLifecycle.from_payload(cast(GameLifecyclePayload, raw))
 

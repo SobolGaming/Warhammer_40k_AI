@@ -690,6 +690,43 @@ def _build_shooting_lifecycle(
         )
         if army_id == "army-alpha":
             friendly_unit_index += 1
+    # Default physical-unit slots must not split an attached rules unit.
+    # Keep every Bodyguard pose; 1.6-inch spacing clears the 32/40 mm bases.
+    for army in armies:
+        for formation in army.attached_units:
+            component_ids = (
+                *formation.leader_unit_instance_ids,
+                *formation.support_unit_instance_ids,
+            )
+            if any(
+                battlefield.unit_placement_or_none(component_id) is None
+                for component_id in (formation.bodyguard_unit_instance_id, *component_ids)
+            ):
+                continue
+            bodyguard = battlefield.unit_placement_by_id(formation.bodyguard_unit_instance_id)
+            anchor = bodyguard.model_placements[0].pose
+            next_row_y = (
+                anchor.position.y + 1.4 * ((len(bodyguard.model_placements) - 1) // 5) + 1.6
+            )
+            model_index = 0
+            for component_id in component_ids:
+                placement = battlefield.unit_placement_by_id(component_id)
+                models: list[ModelPlacement] = []
+                for model in placement.model_placements:
+                    models.append(
+                        model.with_pose(
+                            Pose.at(
+                                anchor.position.x + 1.6 * (model_index % 5),
+                                next_row_y + 1.6 * (model_index // 5),
+                                anchor.position.z,
+                                facing_degrees=model.pose.facing.degrees,
+                            )
+                        )
+                    )
+                    model_index += 1
+                battlefield = battlefield.with_unit_placement(
+                    placement.with_model_placements(tuple(models))
+                )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
     lifecycle.decision_controller.event_log = EventLog()
