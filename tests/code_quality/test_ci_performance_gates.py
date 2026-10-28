@@ -9,7 +9,9 @@ import subprocess
 import sys
 import tomllib
 import xml.etree.ElementTree as ET
+from collections.abc import Callable
 from pathlib import Path
+from typing import cast
 
 import pytest
 import scripts.build_test_shards as sharding
@@ -172,14 +174,14 @@ def _write_sample_shards(
     second_test.write_text("def test_second(): pass\n", encoding="utf-8")
     monkeypatch.setattr(sharding, "REPOSITORY_ROOT", repository_root)
     monkeypatch.setattr(sharding, "TESTS_ROOT", tests_root)
+
     # Pure two-file shard/profile fixture; real cutover admission is tested below.
-    monkeypatch.setattr(
-        sharding,
-        "behavioral_selection",
-        lambda _root: sharding.BehavioralSelection(
+    def selection(_root: Path) -> sharding.BehavioralSelection:
+        return sharding.BehavioralSelection(
             ("tests/unit/test_first.py", "tests/unit/test_second.py"), (), (), (), "0" * 64
-        ),
-    )
+        )
+
+    monkeypatch.setattr(sharding, "behavioral_selection", selection)
 
     durations = {
         "tests/unit/test_first.py": 10.0,
@@ -663,7 +665,8 @@ def test_finite_partition_preserves_total_weight_and_other_file_weights() -> Non
     assert expanded["tests/example.py"] == 37.0
     assert sharding.CASE_PARTITION_FILE not in expanded
     assert len(expanded) == 21
-    assert sum(expanded.values()) == pytest.approx(237.0)
+    approx = cast(Callable[[float], object], vars(pytest)["approx"])
+    assert sum(expanded.values()) == approx(237.0)
 
 
 @pytest.fixture

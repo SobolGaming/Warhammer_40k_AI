@@ -357,17 +357,18 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     retained = _selection_members(value["retained_active_files"], root)
     updates = value["inactive_updates"]
     allowed_updates = {
-        "tests/unit/test_phase15c_fight_order.py",
-        "tests/unit/test_phase13b_shooting_declarations.py",
+        "tests/unit/test_phase15c_fight_order.py": "add-pending-decision-requests-v1",
+        "tests/unit/test_phase13b_shooting_declarations.py": "add-pending-decision-requests-v1",
+        "tests/integration/test_embarked_ability_authority.py": "type-only-battle-phase-cast-v1",
     }
-    if not isinstance(updates, dict) or set(updates) - allowed_updates:
+    if not isinstance(updates, dict) or set(updates) - allowed_updates.keys():
         raise SystemExit("Inactive update membership changed.")
     current: dict[str, dict[str, object]] = {}
     for name, update in updates.items():
         if (
             not isinstance(update, dict)
             or update.keys() != {"before", "after", "recipe"}
-            or update["recipe"] != "add-pending-decision-requests-v1"
+            or update["recipe"] != allowed_updates[name]
             or not isinstance(value["inactive_legacy_files"], dict)
             or update["before"] != value["inactive_legacy_files"].get(name)
         ):

@@ -4,6 +4,7 @@ import ast
 import hashlib
 import json
 from pathlib import Path
+from typing import Any, cast
 
 from tools.core_rules_order84_capture import capture_literals, fingerprint, source_inventory
 
@@ -40,6 +41,7 @@ def test_entire_retained_hierarchy_blocks_and_all_faqs_have_live_assertion_bindi
                 assert ob["coverage_status"] == "gap"
                 gaps = ob["coverage_gaps"]
                 assert isinstance(gaps, list)
+                gaps = cast(list[dict[str, Any]], gaps)
                 assert gaps
                 assert all(isinstance(gap, dict) and gap["reason"] and gap["nodes"] for gap in gaps)
                 assert ob["historical_nonselected_evidence"]

@@ -28526,6 +28526,163 @@
       ],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci78-current-owner-closure-f83517431236fc6310408e45339dac64861443343978ac8ee40fe7ae28b8593b": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_setup_reactive_shoot_charge.py"
+      ],
+      "owners": [
+        "_apply_setup_reactive_charge"
+      ],
+      "families": [
+        "external_contract_source_reuse",
+        "reconstruction",
+        "visibility"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "ci78-current-owner-closure-76d700899c4eb03622f832a547fbdb7b75e351d71a0c24ff32f9336b9b912856": {
+      "paths": [
+        "tests/integration/test_catalog_rule_ir_runtime.py"
+      ],
+      "owners": [
+        "@module",
+        "test_order_30_rule_cleanup_restore_rejects_mortal_continuation_drift"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-current-owner-closure-0f7f1e96391aa6668b10487172608613860af7f3a9b4c5d264255bdb435f1bd2": {
+      "paths": [
+        "tests/integration/test_embarked_ability_authority.py"
+      ],
+      "owners": [
+        "test_firing_deck_preserves_attached_ability_ownership"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-current-owner-closure-06e20876fe68dab08f57be20827d84ac984c28e9148c5f6659171ad42b687fd5": {
+      "paths": [
+        "tests/phase15a_charge_declaration_helpers.py"
+      ],
+      "owners": [
+        "charge_lifecycle"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-current-owner-closure-d7541556d480372d4548c81913a6a14ffc2d151f84e5c442a58f455d880cdfcd": {
+      "paths": [
+        "tests/replay/test_phase18b_replay_runner.py"
+      ],
+      "owners": [
+        "test_replay_v6_rejects_attributed_destruction_relabelled_as_coherency_cleanup"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-current-owner-closure-c469138e5d4879694540b5e283f40356a37075d357c644cd2e7d92f4531a3deb": {
+      "paths": [
+        "tests/unit/test_dice.py"
+      ],
+      "owners": [
+        "_RngProjectionString",
+        "_RngProjectionString.__contains__",
+        "_rng_projection_reconstructed_trace",
+        "test_rng_projection_keeps_eager_typed_validation_after_nested_mutation",
+        "test_rng_projection_matches_unmodified_two_pass_token",
+        "test_rng_projection_preserves_invalid_input_error_type_and_order",
+        "test_rng_projection_preserves_rebuilt_history_roll_ids_draws_and_external_append",
+        "test_rng_projection_preserves_typed_legacy_los_tokens_and_rejection",
+        "test_rng_projection_rebuild_reads_changed_nested_payload"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-current-owner-closure-fd689ac0e1ec1a077e58602e2954146210b3fd055216285eb985a8a914ca9643": {
+      "paths": [
+        "tests/unit/test_phase11e_mission_scoring_cleanup.py"
+      ],
+      "owners": [
+        "test_attached_rules_unit_has_one_canonical_action_option_and_state_identity",
+        "test_local_session_exposes_held_mission_action_and_decline_continues_shooting",
+        "test_primary_destruction_capture_does_not_complete_attached_unit_for_bodyguard_only"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-current-owner-closure-c95171ca9dea4c1e048aaf9488ad464df2ce3c34cb160a66a61a62685e2214b5": {
+      "paths": [
+        "tests/unit/test_phase15a_charge_declarations.py"
+      ],
+      "owners": [
+        "test_source_backed_conditional_charge_selects_pair_and_round_trips_required_target"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-current-owner-closure-6839d73bb277ac17ac0833954c660c94de822cfe73095845876992a2d0a4a843": {
+      "paths": [
+        "tests/unit/test_phase17g_chaos_daemons_blood_legion.py"
+      ],
+      "owners": [
+        "@module",
+        "_battle_ready_state"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-current-owner-closure-d7f7b5ae62e69a1bd59c40702ec183474cf1716ce0d09e49783bbf29995d50ae": {
+      "paths": [
+        "tests/unit/test_phase17n_primary_scoring_spatial_evidence.py"
+      ],
+      "owners": [
+        "test_reconnaissance_sweep_scores_exclusive_quarters_through_lifecycle"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-current-owner-closure-a3cc4a2a8eedd5644b41d9e9a60926e2a0abd608318ecd9fbe8f700522582a73": {
+      "paths": [
+        "tests/unit/test_phase17n_runtime_rule_ir_oc_authority.py"
+      ],
+      "owners": [
+        "test_order79_turn_snapshot_respects_phase_and_turn_effect_expiration"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

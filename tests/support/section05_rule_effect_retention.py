@@ -521,3 +521,10 @@ def _daemonic_patrons_records(*, source: UnitInstance) -> tuple[AbilityCatalogRe
             )
         )
     return tuple(records)
+
+
+__all__ = (
+    "_daemonic_patrons_session",
+    "_install_daemonic_patrons_resume_runtime",
+    "_pending_daemonic_patrons_fight_on_death_fixture",
+)

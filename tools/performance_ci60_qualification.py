@@ -174,7 +174,7 @@ PRELUDE_REPORT = "docs/performance/current/ci78-current-external_contract_source
 TRANSACTION_TEST = "tests/code_quality/test_performance_admission_transaction.py"
 TRANSACTION_SHARDS = frozenset({"ci/quality_shards/shard-2.txt", "ci/quality_shards/shard-3.txt"})
 PRELUDE_CONTROLS = ci69.CONTROL_MEMBERS
-PRELUDE_NEW = frozenset(
+PRELUDE_NEW: frozenset[str] = frozenset(
     {
         TRANSACTION_TEST,
         "tests/data/d07_geometry_containment_v3.json",
@@ -380,8 +380,7 @@ def _derivation_transition(operands: AdmissionOperands, identity: tuple[str, ...
     from tools.performance_policy import owner_hashes
 
     values = {name: raw for name, _, raw in operands}
-    freeze = values["freeze"].decode()
-    names = json.loads(values["selection"])
+    freeze, names = values["freeze"].decode(), json.loads(values["selection"])
     frozen = {name[7:]: raw for name, _, raw in operands if name.startswith("frozen/")}
     previous = {name[9:]: raw for name, _, raw in operands if name.startswith("previous/")}
     current = {name[8:]: raw for name, _, raw in operands if name.startswith("current/")}
@@ -1233,10 +1232,8 @@ def measurement(
 
     live = cumulative.verify_live(root)
     actual = admitted(root)
-    inputs = _producing_inputs(actual, current)
-    families = _cohort(actual)
-    plan = families[family]
-    applicability = None
+    inputs, families = _producing_inputs(actual, current), _cohort(actual)
+    plan, applicability = families[family], None
     fresh = PRELUDE_REPORT == ci69.CURRENT_SOURCE_REPORT
     if family != "external_contract_source_reuse" and not fresh:
         applicability = _prelude_applicability(actual, current, family)
@@ -1403,6 +1400,9 @@ def historical_ledger_owners(root: Path, path: str, current: dict[str, str]) -> 
 
 
 HISTORICAL_TEST_PINS: dict[str, str] = {
+    "tests/integration/test_embarked_ability_authority.py": (
+        "a3eff20d6782f3ec0b792880c7ccac73d4018e5e8ee1ee4e8dce034f293309cf"
+    ),
     "tests/shared/category_migration/phase11e_mission_scoring_cleanup_configuration.py": (
         "dcf42d1f5991ab5ced6061152472bc00e415117709c4c30846f8f709069a8553"
     ),

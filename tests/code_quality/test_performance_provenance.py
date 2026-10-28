@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import contextvars
+import json
 import os
 from collections.abc import Callable
 from pathlib import Path
@@ -444,7 +445,7 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
         "RETIRED_TESTS",
         "RETIREMENT_NAMESPACE",
     ):
-        original_selector = vars(ci69)[attribute]
+        original_selector = cast(frozenset[str] | str, vars(ci69)[attribute])
         changed_selector = (
             original_selector | {"unexpected"}
             if isinstance(original_selector, frozenset)
@@ -548,13 +549,13 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
             preflight.admission_proof(validate_cutover, cutover_operands, identity, ())
             preflight.admission_proof(validate_cutover, cutover_operands, identity, ())
             assert cutover_calls == ["native"]
-            changed_record = ci69.json.loads(second[ci69.CUTOVER_PATH])
+            changed_record = json.loads(second[ci69.CUTOVER_PATH])
             changed_record["coverage"]["current_floor"] = 49
             changed_operands = tuple(
                 (
                     name,
                     mode,
-                    ci69.json.dumps(changed_record).encode()
+                    json.dumps(changed_record).encode()
                     if name == "next-frozen/" + ci69.CUTOVER_PATH
                     else raw,
                 )
@@ -1951,18 +1952,20 @@ def test_benchmark_shooting_api_preserves_native_current_arguments(
     expected = phase.with_attack_sequence_update(
         attack_sequence=None, allocated_model_ids_this_phase=(), pending_decision_requests=()
     )
-    api._benchmark_method.cache_clear()
+    api.benchmark_shooting_method.cache_clear()
     try:
         with monkeypatch.context() as scoped:
-            scoped.delenv(api._MODE, raising=False)
+            scoped.delenv(api.BENCHMARK_SHOOTING_API_ENV, raising=False)
             ordinary = api.benchmark_shooting_update(
                 phase,
                 attack_sequence=None,
                 allocated_model_ids_this_phase=(),
                 pending_decision_requests=(),
             )
-            scoped.setenv(api._MODE, "head-current")
-            scoped.setenv(api._SOURCE, str(Path(__file__).resolve().parents[2] / "src"))
+            scoped.setenv(api.BENCHMARK_SHOOTING_API_ENV, "head-current")
+            scoped.setenv(
+                api.BENCHMARK_NATIVE_SRC_ENV, str(Path(__file__).resolve().parents[2] / "src")
+            )
             head = api.benchmark_shooting_update(
                 phase,
                 attack_sequence=None,
@@ -1972,7 +1975,7 @@ def test_benchmark_shooting_api_preserves_native_current_arguments(
         assert ordinary == expected
         assert head == expected
     finally:
-        api._benchmark_method.cache_clear()
+        api.benchmark_shooting_method.cache_clear()
 
 
 def test_benchmark_shooting_api_rejects_unknown_mode_or_native_source(
@@ -1982,12 +1985,14 @@ def test_benchmark_shooting_api_rejects_unknown_mode_or_native_source(
     from warhammer40k_core.engine.phases.shooting_model import ShootingPhaseState
 
     phase = ShootingPhaseState(battle_round=1, active_player_id="player-a")
-    api._benchmark_method.cache_clear()
+    api.benchmark_shooting_method.cache_clear()
     try:
         with monkeypatch.context() as scoped:
-            scoped.setenv(api._SOURCE, str(Path(__file__).resolve().parents[2] / "src"))
+            scoped.setenv(
+                api.BENCHMARK_NATIVE_SRC_ENV, str(Path(__file__).resolve().parents[2] / "src")
+            )
             for role in ("unknown", "base-5f509724"):
-                scoped.setenv(api._MODE, role)
+                scoped.setenv(api.BENCHMARK_SHOOTING_API_ENV, role)
                 with pytest.raises(ValueError, match="Unknown benchmark"):
                     api.benchmark_shooting_update(
                         phase,
@@ -1996,7 +2001,7 @@ def test_benchmark_shooting_api_rejects_unknown_mode_or_native_source(
                         pending_decision_requests=(),
                     )
     finally:
-        api._benchmark_method.cache_clear()
+        api.benchmark_shooting_method.cache_clear()
 
 
 @pytest.mark.stubbed
@@ -2007,7 +2012,7 @@ def test_benchmark_shooting_api_rejects_unknown_signature(
 
     from tests import measurement_native_api as api
 
-    api._benchmark_method.cache_clear()
+    api.benchmark_shooting_method.cache_clear()
     try:
         with monkeypatch.context() as scoped:
 
@@ -2016,8 +2021,8 @@ def test_benchmark_shooting_api_rejects_unknown_signature(
 
             scoped.setattr(api, "signature", changed_signature)
             with pytest.raises(ValueError, match="Unknown benchmark native Shooting"):
-                api._benchmark_method(
+                api.benchmark_shooting_method(
                     "head-current", str(Path(__file__).resolve().parents[2] / "src")
                 )
     finally:
-        api._benchmark_method.cache_clear()
+        api.benchmark_shooting_method.cache_clear()

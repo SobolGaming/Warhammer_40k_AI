@@ -39,7 +39,7 @@ def _benchmark_method(role: str, source: str) -> Callable[..., ShootingPhaseStat
     root = Path(source).resolve(strict=True)
     path = (root / _NATIVE_PATH).resolve(strict=True)
     method = ShootingPhaseState.with_attack_sequence_update
-    names = ("self", "attack_sequence", "allocated_model_ids_this_phase")
+    names: tuple[str, ...] = ("self", "attack_sequence", "allocated_model_ids_this_phase")
     if role == "head-current":
         names += ("pending_decision_requests",)
     parameters = tuple(signature(method).parameters.values())
@@ -85,3 +85,9 @@ def benchmark_shooting_update(
         allocated_model_ids_this_phase=allocated_model_ids_this_phase,
         pending_decision_requests=pending_decision_requests,
     )
+
+
+# Public benchmark controls expose these exact existing objects, not new adapters.
+benchmark_shooting_method = _benchmark_method
+BENCHMARK_SHOOTING_API_ENV = _MODE
+BENCHMARK_NATIVE_SRC_ENV = _SOURCE

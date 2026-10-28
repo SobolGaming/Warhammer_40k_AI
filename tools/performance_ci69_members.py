@@ -515,12 +515,31 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
     for row in retired.values():
         current_row(row["archive"], row["native"])
     updates = record["inactive_updates"]
-    if type(updates) is not dict or updates.keys() != recipes.keys():
+    typed_name = "tests/integration/test_embarked_ability_authority.py"
+    if type(updates) is not dict or updates.keys() != recipes.keys() | {typed_name}:
         raise ValueError("Finite inactive API update membership changed.")
     wanted = ast.dump(
         ast.parse("lifecycle.decision_controller.queue.pending_requests", mode="eval").body,
         include_attributes=False,
     )
+    typed = updates[typed_name]
+    if (
+        type(typed) is not dict
+        or typed.keys() != {"before", "after", "recipe"}
+        or typed["before"] != record["inactive_legacy_files"][typed_name]
+        or typed["recipe"] != "type-only-battle-phase-cast-v1"
+    ):
+        raise ValueError("Finite inactive typing update changed its native preimage or recipe.")
+    current_row(typed_name, typed["after"])
+    raw = frozen[typed_name]
+    after_assert = b"assert cast(BattlePhase, state.current_battle_phase) is BattlePhase.SHOOTING"
+    before_assert = b"assert state.current_battle_phase is BattlePhase.SHOOTING"
+    if (
+        raw.count(after_assert) != 1
+        or hashlib.sha256(raw.replace(after_assert, before_assert, 1)).hexdigest()
+        != typed["before"]["sha256"]
+    ):
+        raise ValueError("Finite inactive typing update changed bytes beyond the exact cast.")
     for name, recipe in recipes.items():
         update = updates[name]
         if (

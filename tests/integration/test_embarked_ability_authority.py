@@ -436,7 +436,7 @@ def test_firing_deck_preserves_attached_ability_ownership() -> None:
     assert state.active_player_id == "player-a"
     state.advance_to_next_battle_phase(decisions=decisions, event_log=decisions.event_log)
     state.advance_to_next_battle_phase(decisions=decisions, event_log=decisions.event_log)
-    assert state.current_battle_phase is BattlePhase.SHOOTING
+    assert cast(BattlePhase, state.current_battle_phase) is BattlePhase.SHOOTING
     assert state.active_player_id == "player-a"
     transport = next(
         unit
