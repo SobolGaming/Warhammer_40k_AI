@@ -830,6 +830,20 @@ def test_native_shooting_owner_waits_for_attack_mortal_choices(
     from warhammer40k_core.engine.mortal_wound_model_allocation import (
         mortal_wound_resolution_progress,
     )
+    from warhammer40k_core.rules.mission_pack_import import (
+        warhammer_event_companion_2026_07_mission_pack,
+    )
+
+    mission = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-disruption-vs-reconnaissance-layout-2",
+        terrain_layout_id="disruption-vs-reconnaissance-layout-2",
+        attacker_player_id="owner",
+        defender_player_id="opponent",
+        attacker_force_disposition_id="disruption",
+        defender_force_disposition_id="reconnaissance",
+    )
+    assert mission.mission_pool_entry_id == section04_mission.mission_pool_entry_id
 
     # Explicit Core ability/characteristic inputs on one physically equipped weapon.
     profile = replace(
@@ -846,7 +860,18 @@ def test_native_shooting_owner_waits_for_attack_mortal_choices(
     target = definitions.unit(
         INFRACTORS if model_choice else LORD_EXULTANT, army_id="enemy", identity="target"
     )
-    state = native_state(definitions, attacker, enemy=target, enemy_poses=grid(target, 18, 10))
+    state = native_state(
+        definitions, attacker, grid(attacker, 10, 2), enemy=target, enemy_poses=grid(target, 18, 2)
+    )
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        replace(
+            state.battlefield_state,
+            battlefield_width_inches=mission.battlefield_width_inches,
+            battlefield_depth_inches=mission.battlefield_depth_inches,
+            terrain_features=mission.terrain_features,
+        )
+    )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     for model in target.own_models:
         state.record_model_feel_no_pain_sources(
@@ -854,7 +879,7 @@ def test_native_shooting_owner_waits_for_attack_mortal_choices(
             sources=(FeelNoPainSource(source_id="constructed:s04:optional-fnp", threshold=5),),
             decline_allowed=True,
         )
-    session = combat_session(definitions, state, section04_mission)
+    session = combat_session(definitions, state, mission)
     declaration = shooting_request(session, attacker.unit_instance_id)
     rows = [
         row for row in weapon_rows(declaration) if row["weapon_profile_id"] == profile.profile_id
