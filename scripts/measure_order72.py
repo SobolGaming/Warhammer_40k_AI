@@ -18,7 +18,7 @@ from scripts.measure_order65 import _host_inventory, _select_runtime_src
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE = (
-    "tests/unit/test_phase15c_fight_order.py::"
+    "tests/performance/test_fight_phase_reconstruction.py::"
     "test_p12_full_fight_phase_reconstructs_ordinary_continuation_and_forced_overrun"
 )
 

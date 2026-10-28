@@ -1,4 +1,4 @@
-"""Current fixture evolution must not hide altered original test obligations."""
+"""Exact fixture history, including retired RANDOM, cannot hide original obligations."""
 
 from __future__ import annotations
 
@@ -28,17 +28,81 @@ TARGETS = {
 
 def _sources(path: str) -> tuple[bytes, bytes]:
     original = ROOT / cast(str, preservation.FILE_PINS[path]["baseline_archive"])
-    return original.read_bytes(), (ROOT / path).read_bytes()
+    from tools.performance_ci69_members import retired_test_source
+
+    retired = retired_test_source(ROOT, path)
+    current = retired[1] if retired is not None else (ROOT / path).read_bytes()
+    return original.read_bytes(), current
 
 
 @pytest.mark.parametrize("path", PATHS)
-def test_current_complete_bytes_and_literal_ast_join_unchanged_historical_chain(path: str) -> None:
+def test_current_complete_bytes_and_literal_ast_join_unchanged_historical_chain(
+    path: str, tmp_path: Path
+) -> None:
+    """Retired RANDOM is source-history evidence, without current engine/runtime credit."""
     original, current = _sources(path)
     preservation.assert_s25_fixture_only_ast(path, original, current)
     assert preservation.preserved_s25_predecessor_test_bytes(path, current) == original
     assert preserved_d10_predecessor_test_bytes(path, current) == original
     assert preserved_d09_predecessor_test_bytes(path, current) == original
     assert current != original
+    if path == RANDOM:
+        from tools import performance_ci69_members as ci69
+
+        # This is a native retired-source reader control, not current engine credit.
+        fixture = tmp_path / "retirement"
+        record = fixture / ci69.CUTOVER_PATH
+        archive_name = ci69.RETIREMENT_NAMESPACE + path + ".txt"
+        archive = fixture / archive_name
+        original_path = fixture / path
+        record.parent.mkdir(parents=True)
+        archive.parent.mkdir(parents=True)
+        original_path.parent.mkdir(parents=True)
+        native_record = (ROOT / ci69.CUTOVER_PATH).read_bytes()
+        record.write_bytes(native_record)
+        archive.write_bytes(current)
+        observed = ci69.retired_test_source(fixture, path)
+        assert observed is not None
+        assert observed == (archive, current)
+        assert ci69.retired_test_source(fixture, "tests/unit/unlisted.py") is None
+        for changed in (
+            "archive_bytes",
+            "native_row",
+            "reappeared",
+            "broken_original",
+            "archive_symlink",
+            "archive_hardlink",
+            "missing_archive",
+        ):
+            archive.unlink(missing_ok=True)
+            original_path.unlink(missing_ok=True)
+            other = fixture / "same-native.txt"
+            other.unlink(missing_ok=True)
+            record.write_bytes(native_record)
+            archive.write_bytes(current)
+            if changed == "archive_bytes":
+                archive.write_bytes(current + b"\n")
+            elif changed == "native_row":
+                invalid = json.loads(native_record)
+                invalid["retirements"][0]["native"]["sha256"] = "0" * 64
+                record.write_text(json.dumps(invalid))
+            elif changed == "reappeared":
+                original_path.write_bytes(b"")
+            elif changed == "broken_original":
+                original_path.symlink_to(fixture / "absent")
+            elif changed == "archive_symlink":
+                archive.unlink()
+                other.write_bytes(current)
+                archive.symlink_to(other)
+            elif changed == "archive_hardlink":
+                archive.unlink()
+                other.write_bytes(current)
+                archive.hardlink_to(other)
+            else:
+                archive.unlink()
+            with pytest.raises((ValueError, FileNotFoundError)):
+                ci69.retired_test_source(fixture, path)
+        assert original_path.is_symlink() is False
 
 
 @pytest.mark.parametrize(

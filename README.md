@@ -393,7 +393,7 @@ Start here:
 uv python install 3.14.5
 uv lock
 uv sync
-uv run pytest tests/unit/test_polygon_geometry.py -q --no-cov
+uv run pytest tests/unit/test_phase10i_terrain_movement.py -q --no-cov
 ```
 
 ## Test commands
@@ -404,8 +404,8 @@ workers or collect coverage unless requested.
 Fast local feedback names the affected test files explicitly, for example:
 
 ```bash
-uv run pytest tests/unit/test_polygon_geometry.py -q --no-cov
-uv run pytest tests/unit/test_phase13b_shooting_declarations.py -k hazardous -q --no-cov
+uv run pytest tests/unit/test_phase10i_terrain_movement.py -q --no-cov
+uv run pytest tests/rules/section04/test_completion_boundaries.py -k attack_mortal_choices -q --no-cov
 ```
 
 Architecture and source-shape audits run independently without behavioral coverage:
@@ -443,8 +443,10 @@ all required tests and other gates must still succeed. See the
 [active review policy](docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
 
 The twelve behavioral manifests in `ci/test_shards/` use deterministic
-largest-processing-time balancing of median per-file durations from complete
-successful Linux CI runs. Verify that every behavioral file appears exactly once:
+largest-processing-time balancing. One heavy, source-bound module is partitioned
+into its twenty exact collected cases; every other file remains intact. The
+required quality guard checks that partition against real pytest collection.
+Verify that every selected file or declared case appears exactly once:
 
 ```bash
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
@@ -463,12 +465,19 @@ uv run --no-sync python scripts/build_test_shards.py \
   --shard-count 12
 ```
 
+The initial replacement cutover uses explicitly derived scheduling seeds from
+the retained passing cases of hosted run 40639444907 and bounded local regression
+results. Those seeds are not a complete successful current-run profile; an empty
+`profiles` list records that limitation. Replace them with the first complete
+successful selected-suite profile. Seed totals are scheduling weights, not
+measured job wall times or proof that the ten-minute target passes.
+
 A single complete local JUnit XML is also accepted; label its host accurately and
 do not mix local and hosted-runner timings in one representative CI profile.
 Every supplied run must cover the current behavioral file inventory. Missing files,
 duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts
-are rejected. New test files require a fresh complete profile; timings are never
-filled with zero. `durations.json` preserves report SHA-256 hashes and run descriptions.
+are rejected. Outside the explicit initial migration seed above, new test files
+require a fresh complete profile; timings are never filled with zero. `durations.json` preserves report SHA-256 hashes and run descriptions.
 Historical profiles measure their recorded case inventory; changed cases within an
 existing file require refreshed successful CI reports to reflect their new cost.
 

@@ -121,6 +121,11 @@ class MigrationManifest(TypedDict):
 
 
 def _read(root: Path, relative: str) -> bytes:
+    from tools.performance_ci69_members import retired_test_source
+
+    retired = retired_test_source(root, relative)
+    if retired is not None:
+        return retired[1]
     name = Path(relative)
     if name.is_absolute() or ".." in name.parts:
         raise ValueError("Migration evidence path is outside its declared root.")
@@ -424,7 +429,7 @@ def _integration_migration_predecessor(root: Path, path: str, current: bytes) ->
 
 
 def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRecord]:
-    """Read current bytes every time; cache only immutable AST fingerprints by bytes."""
+    """Read live successors or explicitly retired native history; never claim retired execution."""
     if relative not in MIGRATED_PATHS:
         raise ValueError("Unknown migrated test path: " + relative)
     records, definition_membership = _manifest(_read(root, MANIFEST))
@@ -468,7 +473,7 @@ def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRec
 
 
 def read_historical_test_bytes(root: Path, relative: str) -> bytes:
-    """Historical readers alone may request predecessor bytes after live verification."""
+    """Historical readers may use authenticated retired bytes after source/absence checks."""
     if relative in FACTION_LAYOUT_ORIGINALS:
         return verify_layout_original(root, relative)[0]
     if relative == EDITION_TEST:

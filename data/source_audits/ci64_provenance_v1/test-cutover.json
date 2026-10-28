@@ -516,6 +516,12 @@
       "mode": "100644",
       "sha256": "4af8b5a67dfc03bc05f378baf812bdaf79e12ae82ebc13081facce43e059c0fe"
     },
+    "tests/performance/test_fight_phase_reconstruction.py": {
+      "blob_sha1": "ddb9a17e399761b37657cad29cbb5aa0f25efde7",
+      "bytes": 9789,
+      "mode": "100644",
+      "sha256": "e16f2fdbd0d82b6309a014fca8e25c1aab9661b1328ceb2cc42fa4e8adc599f9"
+    },
     "tests/performance/test_phase10u_movement_pathing_profile.py": {
       "blob_sha1": "716f92ea658d29a275acfb446ea318c26fba7d05",
       "bytes": 4821,
@@ -6794,7 +6800,928 @@
       "sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38"
     }
   },
-  "retirements": [],
+  "retirements": [
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order127_infiltrators_redeploy.py.txt",
+      "native": {
+        "blob_sha1": "31473a7e9ab3e72ef00e7d0a881ea9e7f0a12543",
+        "bytes": 8299,
+        "mode": "100644",
+        "sha256": "ffdfdcb004e3a9fc3cfcf629dfe3f759ee5dfd997fa9580be425f7499e00846f"
+      },
+      "path": "tests/integration/test_order127_infiltrators_redeploy.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order128_setup_overhang.py.txt",
+      "native": {
+        "blob_sha1": "c8e6f45fec0258010cf39310330aaa17ce2e58d0",
+        "bytes": 13098,
+        "mode": "100644",
+        "sha256": "c7db2cdfae537a71b61ef1546bbbb7bc1c6d6465552688f50384b6679ab16442"
+      },
+      "path": "tests/integration/test_order128_setup_overhang.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order135_gathered_override.py.txt",
+      "native": {
+        "blob_sha1": "3ea1cc6eadc252fb96b1b363fec0e8af6626cf49",
+        "bytes": 9508,
+        "mode": "100644",
+        "sha256": "ee9d784712d89fc80ed67eb253bc0e273472e14e4e3189d646ac702aabd92149"
+      },
+      "path": "tests/integration/test_order135_gathered_override.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order135_gathered_psychic_preparation.py.txt",
+      "native": {
+        "blob_sha1": "a5024a258f5ba24cecbf47eac363c1c655eb236d",
+        "bytes": 12804,
+        "mode": "100644",
+        "sha256": "333fde884d8399f639771862db980bce77ee359dc1743862a3c204a49012da47"
+      },
+      "path": "tests/integration/test_order135_gathered_psychic_preparation.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order100_frame_measurement.py.txt",
+      "native": {
+        "blob_sha1": "db4ac38ca1a6be4fb2e83050e9372bf9545ad67f",
+        "bytes": 17285,
+        "mode": "100644",
+        "sha256": "dfa892f6486c3d29d09e8f0b7c6a7c5ce1df7f688071f9f652be22e24d610e89"
+      },
+      "path": "tests/unit/test_order100_frame_measurement.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order101_setup_failure.py.txt",
+      "native": {
+        "blob_sha1": "0421ca657eee0de90222296f0008cea8373c46fa",
+        "bytes": 77845,
+        "mode": "100644",
+        "sha256": "3b94b261b157d85e9d1a48945798969a66f385bc448bccef2807c1c33138dbf1"
+      },
+      "path": "tests/unit/test_order101_setup_failure.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order104_range_visibility.py.txt",
+      "native": {
+        "blob_sha1": "839882d33db231f5e1c239868a3bae050798b854",
+        "bytes": 12307,
+        "mode": "100644",
+        "sha256": "65825ef84e39edb7eca7b40042a2e22a715787d7a10763971041e699e1f8ff05"
+      },
+      "path": "tests/unit/test_order104_range_visibility.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order105_hazard.py.txt",
+      "native": {
+        "blob_sha1": "88df03a1e86e764218c51b64ef406b2e1f17c41d",
+        "bytes": 17080,
+        "mode": "100644",
+        "sha256": "e6397dc57b1734f716087d1beb31cb5495a1b06f655c949a5d77d51cdd14a6b7"
+      },
+      "path": "tests/unit/test_order105_hazard.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order106_pile_in.py.txt",
+      "native": {
+        "blob_sha1": "1ffd2f86c8b01041d8b2a06a8d1434de02f1e40a",
+        "bytes": 11683,
+        "mode": "100644",
+        "sha256": "a2dc4ca28ce2807bdc29f573e70ace7dd4b35b2c4c11eafe7d2731e5839fc45d"
+      },
+      "path": "tests/unit/test_order106_pile_in.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order107_fight_distance_window.py.txt",
+      "native": {
+        "blob_sha1": "d8be1c3045fc9e736279d2ca72ebfcac771930d7",
+        "bytes": 9682,
+        "mode": "100644",
+        "sha256": "a277836d818551779cf23fec0cf231600ea6cbb702859171bc6ccbe8e67a7233"
+      },
+      "path": "tests/unit/test_order107_fight_distance_window.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order108_terrain_semantics.py.txt",
+      "native": {
+        "blob_sha1": "1b2170c5722da3623dcb6b5937f2ff129863cfae",
+        "bytes": 24313,
+        "mode": "100644",
+        "sha256": "c05268539da2b448b65c030d0081e26ac7057d480d5e1804e6a61f019c8ecae2"
+      },
+      "path": "tests/unit/test_order108_terrain_semantics.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order109_unit_control.py.txt",
+      "native": {
+        "blob_sha1": "fc66dfc28cef869c3ca9861ea75c0fe819905737",
+        "bytes": 24572,
+        "mode": "100644",
+        "sha256": "42f0e96b74bba1f44c400810b91276bd47d505cfc142b3006bcf61bf5beab789"
+      },
+      "path": "tests/unit/test_order109_unit_control.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order111_friendly_transit.py.txt",
+      "native": {
+        "blob_sha1": "ffd0a49d2e94b9daff2be6031744fdebb4eefa26",
+        "bytes": 12502,
+        "mode": "100644",
+        "sha256": "4ced23daaf5854be68c66d85e5f50c71ee65e3691d1a136f66e8ec1b44967954"
+      },
+      "path": "tests/unit/test_order111_friendly_transit.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order115_absent_movement.py.txt",
+      "native": {
+        "blob_sha1": "64a4c92c9bad2aaaa08acfd6ad09b385d000458a",
+        "bytes": 23371,
+        "mode": "100644",
+        "sha256": "698a9ab16eb87966ff1b9c8c2a2d04477146d9c231482efce15c5f53ba71bd41"
+      },
+      "path": "tests/unit/test_order115_absent_movement.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order116_additional_mortals.py.txt",
+      "native": {
+        "blob_sha1": "10e954b9f05cfdde7d516ad48d60501f0faf5b77",
+        "bytes": 21161,
+        "mode": "100644",
+        "sha256": "a7403545413122246b89e543dc5c3c26a0aa446531df6b793d04433649d112aa"
+      },
+      "path": "tests/unit/test_order116_additional_mortals.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order117_mortal_allocation.py.txt",
+      "native": {
+        "blob_sha1": "8a509c55a3135481082b0f446f293aceb4692257",
+        "bytes": 34103,
+        "mode": "100644",
+        "sha256": "5cf0e59b3c22d0167630a6971bb236dd8cccf5a3404f5c21f48caf97d7805f9b"
+      },
+      "path": "tests/unit/test_order117_mortal_allocation.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order121_command_abilities.py.txt",
+      "native": {
+        "blob_sha1": "70100d18ddc8a10ad1ef4099403e3d6b78953c9d",
+        "bytes": 18144,
+        "mode": "100644",
+        "sha256": "b9bb60738426dfdbca29f6a740e4ad6267ebc483259450e5100ba3bfdbd9d9f4"
+      },
+      "path": "tests/unit/test_order121_command_abilities.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order122_effect_defaults.py.txt",
+      "native": {
+        "blob_sha1": "17dc9aac6a775c233112d2b6ff12cbbd36c3fc28",
+        "bytes": 13933,
+        "mode": "100644",
+        "sha256": "a89a7563859f47c853255f260887408e7248bc9fdced11a1630b8613694b8f5e"
+      },
+      "path": "tests/unit/test_order122_effect_defaults.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order123_datasheet_identity.py.txt",
+      "native": {
+        "blob_sha1": "a6861ceeda6676aba6a1218f6ae3511118709434",
+        "bytes": 38411,
+        "mode": "100644",
+        "sha256": "9d44670f795a758e4501bbd661b1cf919cdd4c6c02c509c7c601fd1ddc024031"
+      },
+      "path": "tests/unit/test_order123_datasheet_identity.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order124_nested_conditions.py.txt",
+      "native": {
+        "blob_sha1": "e6c180ab064250379726e264d25f6977de0d16f2",
+        "bytes": 17236,
+        "mode": "100644",
+        "sha256": "3356da76a93c8093499ccf488871515eed165f31725cce8e04a3f27ca32fcf14"
+      },
+      "path": "tests/unit/test_order124_nested_conditions.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order125_implicit_subjects.py.txt",
+      "native": {
+        "blob_sha1": "40cc43725f7ba9bd5402ed35f1cdbc5797895dc8",
+        "bytes": 13818,
+        "mode": "100644",
+        "sha256": "66a1448e8780ba08714e522400738dfbc9416a8e069452b09876b76e5251a332"
+      },
+      "path": "tests/unit/test_order125_implicit_subjects.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order126_sequential_movement.py.txt",
+      "native": {
+        "blob_sha1": "a8599dbda26b251c61c8f2578033ce324d18764b",
+        "bytes": 18401,
+        "mode": "100644",
+        "sha256": "462b7df6dd793b5769423bee948f278f31dd826636af98d25250dffa8462a9c6"
+      },
+      "path": "tests/unit/test_order126_sequential_movement.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order128_setup_model_fit.py.txt",
+      "native": {
+        "blob_sha1": "264b171bcdde86f4bcf5908ad40ef330eb295a51",
+        "bytes": 5580,
+        "mode": "100644",
+        "sha256": "40e210b73becd766b11bb8c2c218f2be2c7e638706a32dfbd2ee074f6416bf8f"
+      },
+      "path": "tests/unit/test_order128_setup_model_fit.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order129_flight_history.py.txt",
+      "native": {
+        "blob_sha1": "4657493c3eb72f2dee4bd32e7a885c0095778967",
+        "bytes": 10547,
+        "mode": "100644",
+        "sha256": "0f9014353eb47b2a186bdfba192f4a10e2d2aaa2283e602f26a9c46121c5b8c1"
+      },
+      "path": "tests/unit/test_order129_flight_history.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order130_model_mission_destruction.py.txt",
+      "native": {
+        "blob_sha1": "3386810454a379226c325d7e522f3da40d489889",
+        "bytes": 7023,
+        "mode": "100644",
+        "sha256": "9d923c5f02ba03decbc44770d0c47d9910535ee2325322d9fb867392a108e601"
+      },
+      "path": "tests/unit/test_order130_model_mission_destruction.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order131_objective_endpoint_geometry.py.txt",
+      "native": {
+        "blob_sha1": "4f52d777249016052b74c0a3623cb7e4d5790a35",
+        "bytes": 4605,
+        "mode": "100644",
+        "sha256": "70f91e1a2f7409b6a6bd2fbabe8f8808f8a9f3565d0db638d83f1d61e5af5164"
+      },
+      "path": "tests/unit/test_order131_objective_endpoint_geometry.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order131_objective_movement.py.txt",
+      "native": {
+        "blob_sha1": "b18d3a4e4d607447ee0be7593305b528f690d6f2",
+        "bytes": 6448,
+        "mode": "100644",
+        "sha256": "8cece3259d9a14562c8328d9e37e8a3f8b3359b5a32fc8a9a3008f1fe9a0e512"
+      },
+      "path": "tests/unit/test_order131_objective_movement.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order132_disembark_distance.py.txt",
+      "native": {
+        "blob_sha1": "973515b0e7f2333cb0e0d5f47e6598db3d99ef08",
+        "bytes": 11662,
+        "mode": "100644",
+        "sha256": "f33934ec38e87ec77cdca6c268590076141c3dc9fe2f330a73247e8644d48055"
+      },
+      "path": "tests/unit/test_order132_disembark_distance.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order133_keyword_materialization.py.txt",
+      "native": {
+        "blob_sha1": "7aaeffa95f745e26b9ace5faff0901b5daf48a13",
+        "bytes": 9829,
+        "mode": "100644",
+        "sha256": "3f0df00ab38357f4728b4a3e89248bb0990a1d4280dc3f22d57e92a1d0726695"
+      },
+      "path": "tests/unit/test_order133_keyword_materialization.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order133_keyword_numbers.py.txt",
+      "native": {
+        "blob_sha1": "589531457c4b70ed6a0d127f9374b50097c56c23",
+        "bytes": 8077,
+        "mode": "100644",
+        "sha256": "8f4bf08d8af9bf9d13dbb86e5475f1e6f8b7abc45066fbf4b6d6b40e85a0b638"
+      },
+      "path": "tests/unit/test_order133_keyword_numbers.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order134_deployment_restrictions.py.txt",
+      "native": {
+        "blob_sha1": "af286a04461f2eb30c8fcbfb23a2cec7e8b8879e",
+        "bytes": 14110,
+        "mode": "100644",
+        "sha256": "a129cba7bf078ab997b6a01898a79dc2a0c8aac56c8147f383563618b0a938f0"
+      },
+      "path": "tests/unit/test_order134_deployment_restrictions.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_combat_tactical_feasibility.py.txt",
+      "native": {
+        "blob_sha1": "2c16534f51e5cb790f61a7c2ce8e4ef01f620edc",
+        "bytes": 18177,
+        "mode": "100644",
+        "sha256": "32e95357c41045d6d7adc89f49c34d330713c35315a1e8417f6c7c80a9a9e03b"
+      },
+      "path": "tests/unit/test_order135_combat_tactical_feasibility.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_counteroffensive_band.py.txt",
+      "native": {
+        "blob_sha1": "32edc3366f11d87c0aebddd65c33ea088f2df77e",
+        "bytes": 8394,
+        "mode": "100644",
+        "sha256": "91aac54652b476cca8144d580dedef4c2062cafe6d91b32c4107e97cd916e1b1"
+      },
+      "path": "tests/unit/test_order135_counteroffensive_band.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_counteroffensive_timing.py.txt",
+      "native": {
+        "blob_sha1": "36dcdcfd7a9d511e9f6fd5f523596682c260a603",
+        "bytes": 29482,
+        "mode": "100644",
+        "sha256": "8a2854349f1b63af1861a668eb69280e625c78443a0cc5ddf27b7bdb7631e053"
+      },
+      "path": "tests/unit/test_order135_counteroffensive_timing.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_fight_pass.py.txt",
+      "native": {
+        "blob_sha1": "6f549c46a7f210935becf048729ca259c7e5b692",
+        "bytes": 12349,
+        "mode": "100644",
+        "sha256": "6fb55b41b1912f5d96e63a24773d624155299416d2eb486a9a88ae612e07f14a"
+      },
+      "path": "tests/unit/test_order135_fight_pass.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_fight_transition.py.txt",
+      "native": {
+        "blob_sha1": "874e43323d4c729d225cc7f5e05c58b98f5620d0",
+        "bytes": 5142,
+        "mode": "100644",
+        "sha256": "e4a2c15557cc0d4d660b4f91f36acc93c8565e6c51f8b69d1ee462c13184bc11"
+      },
+      "path": "tests/unit/test_order135_fight_transition.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_gathered_attack_steps.py.txt",
+      "native": {
+        "blob_sha1": "8dd0d2d73f57283490f2e2a7e1c9c56130a7a311",
+        "bytes": 3933,
+        "mode": "100644",
+        "sha256": "b65da7f92131dfe467875d6eaeba6e10892274e5d549e55ddcafe505ed960e57"
+      },
+      "path": "tests/unit/test_order135_gathered_attack_steps.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_gathered_wound_callback.py.txt",
+      "native": {
+        "blob_sha1": "25e952b23fbbeab2567d78eeb31ed7c8e76d3deb",
+        "bytes": 4727,
+        "mode": "100644",
+        "sha256": "767ef06e27394d156af86e2a450b8f4c4a73fc888ddcbab5dc867014154305c1"
+      },
+      "path": "tests/unit/test_order135_gathered_wound_callback.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_objective_overlap.py.txt",
+      "native": {
+        "blob_sha1": "3f4573f6bb642203266762fff007621679aba72b",
+        "bytes": 2422,
+        "mode": "100644",
+        "sha256": "775ff5d75d4069d77fb6c504e6920f3ef01240ae24fb5b9c058a4b922e22023a"
+      },
+      "path": "tests/unit/test_order135_objective_overlap.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_physical_visibility.py.txt",
+      "native": {
+        "blob_sha1": "73dfadc41237332d21c03a0855257d434d6e7a92",
+        "bytes": 7741,
+        "mode": "100644",
+        "sha256": "b045754212c4d840de611a4b71c2db1167bb4da8011e3d76bae1d7f772cddd06"
+      },
+      "path": "tests/unit/test_order135_physical_visibility.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_shooting_boundary.py.txt",
+      "native": {
+        "blob_sha1": "e03f207369e1bf0f6b70f7d990b304375f47ba9f",
+        "bytes": 10538,
+        "mode": "100644",
+        "sha256": "0faac8c5de98389a76234b26ef4ab2ffb8270782f94224eb6b0bda1fecd1773d"
+      },
+      "path": "tests/unit/test_order135_shooting_boundary.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_tactical_setup_proof.py.txt",
+      "native": {
+        "blob_sha1": "25bff26a94eea0917600d4555b0d7fac646fb0ec",
+        "bytes": 1354,
+        "mode": "100644",
+        "sha256": "b959d7428a897d578b745e02c549af006f93ea3843b23019cf2d6fa8d55a5259"
+      },
+      "path": "tests/unit/test_order135_tactical_setup_proof.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_transport_boundaries.py.txt",
+      "native": {
+        "blob_sha1": "576d6d27a03b4f475759e8f509ed1b8e604ec536",
+        "bytes": 8057,
+        "mode": "100644",
+        "sha256": "9732c343086f747af5fbefc2868fd98de27160b1c5b6613018266f09685249eb"
+      },
+      "path": "tests/unit/test_order135_transport_boundaries.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_visibility_facade.py.txt",
+      "native": {
+        "blob_sha1": "705d922d8720cc3c4be2ed07d4de26bf9ad72e17",
+        "bytes": 5818,
+        "mode": "100644",
+        "sha256": "cc915572cd651e0429f2a31373d783aee9a32be6e4a19e831e95b79ca556a0d3"
+      },
+      "path": "tests/unit/test_order135_visibility_facade.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_visibility_rng_projection.py.txt",
+      "native": {
+        "blob_sha1": "90ab78945efeb65de3abdfcf45c8aa75f3f4220d",
+        "bytes": 7580,
+        "mode": "100644",
+        "sha256": "04469a4f36421efcae429c514d1573ff1fccb3d3ab60dec3a4eca9a42c1f5556"
+      },
+      "path": "tests/unit/test_order135_visibility_rng_projection.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order36_sequencing.py.txt",
+      "native": {
+        "blob_sha1": "b47b8ab47dcf212f03a6e67591a7d35d7da5702c",
+        "bytes": 59800,
+        "mode": "100644",
+        "sha256": "8b2554966c3956d45e6554841b298e4d23b9612396116f0c8528600f2fd1a1f3"
+      },
+      "path": "tests/unit/test_order36_sequencing.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order36_timing_authority.py.txt",
+      "native": {
+        "blob_sha1": "405eeb9c96dec81986aabe97f8cfb082ee4337fd",
+        "bytes": 44343,
+        "mode": "100644",
+        "sha256": "235be6f3af808040474d95e52530d5a6cec4391bf185562bf1fa2e58fe642073"
+      },
+      "path": "tests/unit/test_order36_timing_authority.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order51_flight.py.txt",
+      "native": {
+        "blob_sha1": "7ad825eba5347990e66477cc0b399856184c84d1",
+        "bytes": 32553,
+        "mode": "100644",
+        "sha256": "872b5607c76eace4544cf1afe23844cadeb124d9a36c3ab083ebdf2d41a61132"
+      },
+      "path": "tests/unit/test_order51_flight.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order52_surge.py.txt",
+      "native": {
+        "blob_sha1": "fb00d30786e3e232d1c0307d3e6a5cb1ea1a59e2",
+        "bytes": 45635,
+        "mode": "100644",
+        "sha256": "0c3ad5cb1da345f05faffe419b961a540819fa23ee75145d29d22491ae8a04ee"
+      },
+      "path": "tests/unit/test_order52_surge.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order53_movement_abilities.py.txt",
+      "native": {
+        "blob_sha1": "701978e0edabac20ee565ce680cc38ae9ffd096d",
+        "bytes": 39903,
+        "mode": "100644",
+        "sha256": "90688a7151aefd40e951fc286d11ca45b63d40992c1580c86c8667fea576c7eb"
+      },
+      "path": "tests/unit/test_order53_movement_abilities.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order54_setup.py.txt",
+      "native": {
+        "blob_sha1": "6c3d8a42e8d949f91e17ca22db4e6051db8fb63a",
+        "bytes": 14795,
+        "mode": "100644",
+        "sha256": "bb1faa47003c1b17fef24f2d1b9bd24f476c504744498b278794db8a515ca19e"
+      },
+      "path": "tests/unit/test_order54_setup.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order55_disembark.py.txt",
+      "native": {
+        "blob_sha1": "679a5db08722ce150e2429f067ef22c1f46cdaa1",
+        "bytes": 21419,
+        "mode": "100644",
+        "sha256": "b65f2ac8930433901ed2ffd1f326eb70cc900942e82cdf279a48edfee6ff9152"
+      },
+      "path": "tests/unit/test_order55_disembark.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order57_destroyed_referent_measurement.py.txt",
+      "native": {
+        "blob_sha1": "8782b03718c93813cd512a15fa0f1fb3ef0de403",
+        "bytes": 16793,
+        "mode": "100644",
+        "sha256": "fbd03a9ded01a24493cf63336c46293f087dfbe7c59eb53bf71fa6bf46f58908"
+      },
+      "path": "tests/unit/test_order57_destroyed_referent_measurement.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order58_failed_save_damage_timing.py.txt",
+      "native": {
+        "blob_sha1": "18bbaf834dc7c385b11851077965c1ae8020e25a",
+        "bytes": 9638,
+        "mode": "100644",
+        "sha256": "f51ae4a57f155a5dc075fd5387d6cd6bd619db9934c02f1b7fe09dc02d0f3301"
+      },
+      "path": "tests/unit/test_order58_failed_save_damage_timing.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order59_empty_dedicated_transport.py.txt",
+      "native": {
+        "blob_sha1": "a195d18e957c414c30ab3feee18b5503164285e1",
+        "bytes": 13381,
+        "mode": "100644",
+        "sha256": "5f9dff23fc045f0331f2ba062a796a5f5cc9e927ad666120e8799d605f803a1e"
+      },
+      "path": "tests/unit/test_order59_empty_dedicated_transport.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order60_emergency_disembark.py.txt",
+      "native": {
+        "blob_sha1": "37647dc7e9a11473fb63766b1f7d42d4cbb11f77",
+        "bytes": 34864,
+        "mode": "100644",
+        "sha256": "9fbf5fdc576a4fed4bbe5d36de1309b4ecae9fb30498cff1cd81a5b7cc968449"
+      },
+      "path": "tests/unit/test_order60_emergency_disembark.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order61_embark.py.txt",
+      "native": {
+        "blob_sha1": "66c7e9a7ee0590f2e74f64430c4d8fcdc3387f0b",
+        "bytes": 28215,
+        "mode": "100644",
+        "sha256": "b73391a3dff3173ff871192c5435cb14748afd08a372a18c36c647c1afd0781d"
+      },
+      "path": "tests/unit/test_order61_embark.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order63_reserve_transports.py.txt",
+      "native": {
+        "blob_sha1": "19988fba33660eb28652f1a66f6d8018108209ce",
+        "bytes": 15177,
+        "mode": "100644",
+        "sha256": "5f2a9ffabbcad0a7d8e17f88b1c0e2333d749819bb10efe6b851a6bd9282cdd3"
+      },
+      "path": "tests/unit/test_order63_reserve_transports.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order64_reserve_lifetimes.py.txt",
+      "native": {
+        "blob_sha1": "60aab5cc2519107b60ef3cc042c74be9780a771e",
+        "bytes": 26823,
+        "mode": "100644",
+        "sha256": "d6d490c27aca063642923310ba0daecae7da745341016bf72eebbfafbd32f510"
+      },
+      "path": "tests/unit/test_order64_reserve_lifetimes.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order65_firing_deck.py.txt",
+      "native": {
+        "blob_sha1": "3e43d81c906c82a51aac4d5995a9c6dabf4f887a",
+        "bytes": 13379,
+        "mode": "100644",
+        "sha256": "e10105dab65fc4c52a948be5fd536f5b7e5bddf2df27889526621710ccca8092"
+      },
+      "path": "tests/unit/test_order65_firing_deck.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order78_gone_to_ground.py.txt",
+      "native": {
+        "blob_sha1": "2d1cdc76b5f5762611e8807918208716959995d9",
+        "bytes": 26062,
+        "mode": "100644",
+        "sha256": "ab148e3897f1ac53af7e31058e3ac856567a34bb4d21f3ef1f98a16c6c5b8c8a"
+      },
+      "path": "tests/unit/test_order78_gone_to_ground.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order79_control_first.py.txt",
+      "native": {
+        "blob_sha1": "a5a65008d38e0cef791778a2b2e663a0f4d2ac5a",
+        "bytes": 18987,
+        "mode": "100644",
+        "sha256": "aced870b318edc7ce5932c3f154acf949c84ad542be4994e82d94a5b24c450a4"
+      },
+      "path": "tests/unit/test_order79_control_first.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order80_normal_move.py.txt",
+      "native": {
+        "blob_sha1": "e197d64ddf32ec35f01d4c323fa86842264f2138",
+        "bytes": 37429,
+        "mode": "100644",
+        "sha256": "8360a79eac5ef7684f2fb4f27e3b0e6f1a96d623bcaebc44c371be1dc9e520b2"
+      },
+      "path": "tests/unit/test_order80_normal_move.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order81_parameterized_projection.py.txt",
+      "native": {
+        "blob_sha1": "81df30c26015506cd88c4d20da0b13afab1492aa",
+        "bytes": 16630,
+        "mode": "100644",
+        "sha256": "fc13b60de292793596c4a6e7c2b3898e1727d202f361dcb33ee0bedb97e8c383"
+      },
+      "path": "tests/unit/test_order81_parameterized_projection.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order82_revival_engagement.py.txt",
+      "native": {
+        "blob_sha1": "d4d5df7a22a605db59b7dd47124c83d39475a196",
+        "bytes": 12324,
+        "mode": "100644",
+        "sha256": "3eba4a3511962e246f2c034a5623a519f16d4d765f03a6c32bf7ef34e3c3b720"
+      },
+      "path": "tests/unit/test_order82_revival_engagement.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order85_deemed_base_contact.py.txt",
+      "native": {
+        "blob_sha1": "41ee09a849acab2768608781a84747ba5f881789",
+        "bytes": 31375,
+        "mode": "100644",
+        "sha256": "28e7e45768641e50cd2bded6ed3923c513474aa39de3c29adf092bfdd6fddca8"
+      },
+      "path": "tests/unit/test_order85_deemed_base_contact.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order86_table_quarters.py.txt",
+      "native": {
+        "blob_sha1": "940ecc82365a6d3439a352bb3621bec6da1b17b1",
+        "bytes": 6173,
+        "mode": "100644",
+        "sha256": "a878e4ce38c03c31e5a96c59eea66f8f4c423f0cbd5a46c49558fa73741de4ea"
+      },
+      "path": "tests/unit/test_order86_table_quarters.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order87_gathered_profile_restore.py.txt",
+      "native": {
+        "blob_sha1": "1faee0594d4b12af74ff928aa213873632ea56ef",
+        "bytes": 6325,
+        "mode": "100644",
+        "sha256": "d4fdb9fa39675a0c12488f218ffd8e204abb4aa68a8aae8a2d7f390ad94ccab4"
+      },
+      "path": "tests/unit/test_order87_gathered_profile_restore.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order87_random_profiles.py.txt",
+      "native": {
+        "blob_sha1": "1ef53db426fb1ba2894fa82c6f1bac2393054d38",
+        "bytes": 47795,
+        "mode": "100644",
+        "sha256": "f07e11eb1d6a0c3b30c991f386c784877c7c360ba4d3fb69d5eee7f4bfe021de"
+      },
+      "path": "tests/unit/test_order87_random_profiles.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order88_absent_strength.py.txt",
+      "native": {
+        "blob_sha1": "11d177fb1c8634457841095d854ec14bae468615",
+        "bytes": 9346,
+        "mode": "100644",
+        "sha256": "2ebdf267ff145bc09bd99730cba82652f57f149131900768c112ad17d4f3167f"
+      },
+      "path": "tests/unit/test_order88_absent_strength.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order89_healing.py.txt",
+      "native": {
+        "blob_sha1": "6cc4a3343988eb2f0bf261886e87a214aec62223",
+        "bytes": 12539,
+        "mode": "100644",
+        "sha256": "b1c185b601a2405301231899421a790925692587c86e9858401207c439fec86d"
+      },
+      "path": "tests/unit/test_order89_healing.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order90_off_battlefield_revival.py.txt",
+      "native": {
+        "blob_sha1": "c1f3fc0543b4306aa31fa010393a459ff27e6076",
+        "bytes": 23728,
+        "mode": "100644",
+        "sha256": "00b15e024c4496dd463d0f27e16a909f9251c260e304bfc8940fe366e0bc2036"
+      },
+      "path": "tests/unit/test_order90_off_battlefield_revival.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order91_empty_shooting.py.txt",
+      "native": {
+        "blob_sha1": "12d5b7fbde380f683bc183eabf255f7549fe69a0",
+        "bytes": 18384,
+        "mode": "100644",
+        "sha256": "8e2531e66bac3a1d381fd6f288dad9e88f97a93ad2f11da1c2fa8f7a7690c958"
+      },
+      "path": "tests/unit/test_order91_empty_shooting.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order92_random_melee.py.txt",
+      "native": {
+        "blob_sha1": "88b38cc32c17728021ae18b163071577100de054",
+        "bytes": 49370,
+        "mode": "100644",
+        "sha256": "d66808312139f8931f3476fe076293ad78e94ec3a27965f8442d9c788df52164"
+      },
+      "path": "tests/unit/test_order92_random_melee.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_attack_modifiers.py.txt",
+      "native": {
+        "blob_sha1": "2e53ce0ed60a7609b02dad2f366b67ee23c65f1c",
+        "bytes": 25613,
+        "mode": "100644",
+        "sha256": "2b317d38848074232b14ad532a1c6e5869c39117727b2158ef2693f2528e81d6"
+      },
+      "path": "tests/unit/test_order93_attack_modifiers.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_catalog_leadership_modifiers.py.txt",
+      "native": {
+        "blob_sha1": "86b9b0a6285568bc8a56daf9c1f5494dbf038bd6",
+        "bytes": 5650,
+        "mode": "100644",
+        "sha256": "35d78f846902ec1c6bd3d5fb78c8bb67c2af356b5704d3c6552a48b4b39ea879"
+      },
+      "path": "tests/unit/test_order93_catalog_leadership_modifiers.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_healing_modifiers.py.txt",
+      "native": {
+        "blob_sha1": "26864df4fd03a55a7ff1968d268acc229c3eddba",
+        "bytes": 9603,
+        "mode": "100644",
+        "sha256": "e342adc55842657458da713e0425a02913e2b69df01db574f2fd51bd86f90f53"
+      },
+      "path": "tests/unit/test_order93_healing_modifiers.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_mission_action_modifiers.py.txt",
+      "native": {
+        "blob_sha1": "2e565ff17a76886ed8ea703c09612320f148aec9",
+        "bytes": 13039,
+        "mode": "100644",
+        "sha256": "0367f794d6a6d1cb919d077be4f774afee81cf5b89458dff84477a76d03a5054"
+      },
+      "path": "tests/unit/test_order93_mission_action_modifiers.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_modifier_ignore.py.txt",
+      "native": {
+        "blob_sha1": "d841e72dadd527d94b1ac21a188dbc02531a2bbc",
+        "bytes": 25835,
+        "mode": "100644",
+        "sha256": "902dd497f50349cf7aea5f377974de9449595b0249f3df260ddda14f8ff1ba8f"
+      },
+      "path": "tests/unit/test_order93_modifier_ignore.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_nonattack_modifiers.py.txt",
+      "native": {
+        "blob_sha1": "7c9babae60d10cc8bce3cf8fc40db3e04fac5168",
+        "bytes": 26370,
+        "mode": "100644",
+        "sha256": "afffff4ecdc435035ff9c469de66967150d544d733266bd05993a6abee1ad351"
+      },
+      "path": "tests/unit/test_order93_nonattack_modifiers.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_permission_context.py.txt",
+      "native": {
+        "blob_sha1": "ab747870db86c326ee462484c29bc75995368bf6",
+        "bytes": 13965,
+        "mode": "100644",
+        "sha256": "dd7821dcfd9bad063fc54d88f55d0bcfbe17d827415afe2ce2fd1605603c6237"
+      },
+      "path": "tests/unit/test_order93_permission_context.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_weapon_modifiers.py.txt",
+      "native": {
+        "blob_sha1": "1f345b39c98e03978900289c9935deaba2f2ebd7",
+        "bytes": 21891,
+        "mode": "100644",
+        "sha256": "800307a6bbdfb140231e3752e52a2553fb83726f7fa805dc770807c4dae08123"
+      },
+      "path": "tests/unit/test_order93_weapon_modifiers.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order95_optional_shooting.py.txt",
+      "native": {
+        "blob_sha1": "fa1b0a5b0dbc2afedcb748934cbd3f41b947ab93",
+        "bytes": 30474,
+        "mode": "100644",
+        "sha256": "3abeab4564d9d79906891a2d6a8f98b3b8082dbc753b53e9ee63eeaca5aed4c0"
+      },
+      "path": "tests/unit/test_order95_optional_shooting.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order96_twin_linked.py.txt",
+      "native": {
+        "blob_sha1": "e87bce116133133480899f989054fe654d10ee74",
+        "bytes": 24804,
+        "mode": "100644",
+        "sha256": "6457ff943506b21912a679386c7614a800a972545ab7ead751c32439f400dd41"
+      },
+      "path": "tests/unit/test_order96_twin_linked.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_attack_evidence.py.txt",
+      "native": {
+        "blob_sha1": "d6103913c28ce56db0db302e994744fa6be1372d",
+        "bytes": 21838,
+        "mode": "100644",
+        "sha256": "0df66af7f283a8c6959c4eab29ac12d2b657f8dd33389297b9b891855ff96dd3"
+      },
+      "path": "tests/unit/test_order97_attack_evidence.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_damage_evidence.py.txt",
+      "native": {
+        "blob_sha1": "7cb0bbf6a5b839a2d40eab513ba53287f70f6fe1",
+        "bytes": 9690,
+        "mode": "100644",
+        "sha256": "d5803587ca8d2fa8116f6fa6b1417d0d1eb5f3b9501e12f3d6461b8a559a63b1"
+      },
+      "path": "tests/unit/test_order97_damage_evidence.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_facade_evidence.py.txt",
+      "native": {
+        "blob_sha1": "6b5f9d9dbb35ec85589fcf5a461bd52d87a2b87b",
+        "bytes": 18820,
+        "mode": "100644",
+        "sha256": "8f30da22f4c01f6dc4a239d3d94c9080072986cd3dd2a76c03989efb72c859df"
+      },
+      "path": "tests/unit/test_order97_facade_evidence.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_foundation_evidence.py.txt",
+      "native": {
+        "blob_sha1": "2b0db1e705991577172b9db502e0df053be3f001",
+        "bytes": 31995,
+        "mode": "100644",
+        "sha256": "ce81f1695d4a94aa5c54f02ff153e6f177bf968042a0deb51a98b9c083c08cc9"
+      },
+      "path": "tests/unit/test_order97_foundation_evidence.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_movement_evidence.py.txt",
+      "native": {
+        "blob_sha1": "9356280a73554aea32a771953fddb984b85ee111",
+        "bytes": 17192,
+        "mode": "100644",
+        "sha256": "8982c39453c49888d00e921361a7ee0ba30d1de0cc3141fdb7c2738b57dbc388"
+      },
+      "path": "tests/unit/test_order97_movement_evidence.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_secondary_clause_evidence.py.txt",
+      "native": {
+        "blob_sha1": "1bce11a30d7af0cdd1ef2c77cc6a578251b1e98d",
+        "bytes": 48464,
+        "mode": "100644",
+        "sha256": "a62d30e9268e2e6dfc33aff4088b9610486849c9e412bbabe0a1c52e686f0e88"
+      },
+      "path": "tests/unit/test_order97_secondary_clause_evidence.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_semantic_evidence_18_25.py.txt",
+      "native": {
+        "blob_sha1": "3b5d60a39f85a4fea9df91cc86d01b5e53cc5423",
+        "bytes": 58181,
+        "mode": "100644",
+        "sha256": "1a05ad0be9bbd580a6ec77f45a9c633bfb0767761be8403ce664bb40cd64e251"
+      },
+      "path": "tests/unit/test_order97_semantic_evidence_18_25.py"
+    },
+    {
+      "archive": "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_timing_evidence.py.txt",
+      "native": {
+        "blob_sha1": "10ac8d5ca6160c99309a59384b3a1cadb557f6fa",
+        "bytes": 7039,
+        "mode": "100644",
+        "sha256": "153dda877be2304dd1ae455be5697e58cca606c5ab108874f09e5b8d1a4804f9"
+      },
+      "path": "tests/unit/test_order97_timing_evidence.py"
+    }
+  ],
   "schema": "finite-test-cutover-v1",
   "source_base": {
     "commit": "5734eace50abe8fe99bbe46282652e4ab3c021b4",

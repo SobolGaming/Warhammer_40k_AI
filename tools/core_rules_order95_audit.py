@@ -158,8 +158,17 @@ def validate_audit(audit: dict[str, Any], *, root: Path = ROOT, roadmap: str | N
     references.extend(ref for row in audit["findings"] for ref in row["owners"])
     if not set(RETIRED_REFERENCE_SUCCESSORS) <= set(references):
         raise AuditError("Order 95 retirement mapping has no historical reference.")
+    # Only this immutable negative survey may resolve declared retired source
+    # historically. validate_owner_reference remains a strict CURRENT API.
+    from tools.performance_ci69_members import retired_test_source
+
     for reference in references:
-        validate_owner_reference(reference, root)
+        filename, _, symbol = reference.replace("::", ":").partition(":")
+        retired = retired_test_source(root, filename)
+        if retired is None:
+            validate_owner_reference(reference, root)
+        elif symbol and f"def {symbol}(" not in retired[1].decode("utf-8"):
+            raise AuditError(f"Order 95 historical retired reference is absent: {reference}.")
     document = (
         (root / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text(encoding="utf-8")
         if roadmap is None

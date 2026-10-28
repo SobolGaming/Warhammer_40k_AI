@@ -180,7 +180,10 @@ def reviewed_inventory_fixture_history(reference: str, *, root: Path) -> Path | 
         raise ValueError("Reviewed inventory fixture history escaped the repository.")
     before = path.read_bytes()
     accepted = reviewed.read_bytes()
-    current = (root / reference).read_bytes()
+    from tools.performance_ci69_members import retired_test_source
+
+    retired = retired_test_source(root, reference)
+    current = retired[1] if retired is not None else (root / reference).read_bytes()
     if (
         hashlib.sha256(before).hexdigest() != old_hash
         or hashlib.sha256(accepted).hexdigest() != accepted_hash
@@ -199,7 +202,10 @@ def integration_inventory_history(reference: str, *, root: Path) -> Path | None:
     if not path.resolve().is_relative_to(root.resolve()):
         raise ValueError("Integration inventory history escaped the repository.")
     before = path.read_bytes()
-    current = (root / reference).read_bytes()
+    from tools.performance_ci69_members import retired_test_source
+
+    retired = retired_test_source(root, reference)
+    current = retired[1] if retired is not None else (root / reference).read_bytes()
     if (
         hashlib.sha256(before).hexdigest() != before_sha256
         or hashlib.sha256(current).hexdigest() != current_sha256

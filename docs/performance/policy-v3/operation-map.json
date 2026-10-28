@@ -28039,6 +28039,377 @@
       ],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f": {
+      "paths": [
+        "scripts/build_test_shards.py"
+      ],
+      "owners": [
+        "@module",
+        "BehavioralSelection",
+        "BehavioralSelection.check_explicit",
+        "_behavioral_shard_selectors",
+        "_behavioral_test_files",
+        "_case_partition",
+        "_check_manifests",
+        "_literal_partition_nodes",
+        "_partitioned_durations",
+        "_selection_members",
+        "_selection_no_links",
+        "_selection_object",
+        "_selection_retirements",
+        "behavioral_selection",
+        "main"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-45f23e9cccf0dd487703920d1b91e976d3c8f181a2e46464764c6cad024f4bf4": {
+      "paths": [
+        "src/warhammer40k_core/engine/model_attack_completion.py"
+      ],
+      "owners": [
+        "has_pending_attack_mortals"
+      ],
+      "families": [
+        "dice",
+        "fight",
+        "reconstruction",
+        "visibility"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-4ae20fd642e2091e24a42bd057119705c09b616291f7ed0270bebc184db282fc": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/shooting_handler.py"
+      ],
+      "owners": [
+        "ShootingPhaseHandler.begin_phase"
+      ],
+      "families": [
+        "precision_grouping",
+        "reconstruction",
+        "visibility"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-9aaf425a5688472654c4335235fa1237a94dd9d2034c6126fbcc33e2750a2f76": {
+      "paths": [
+        "src/warhammer40k_core/engine/retained_destruction_dispatch.py"
+      ],
+      "owners": [
+        "replace_host_attack_sequence",
+        "resume_declined_attack_collateral"
+      ],
+      "families": [
+        "reconstruction",
+        "visibility"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-0c778fee88779cb4d96c36b4b52b9323029a2484fed24058a840b246a59fad18": {
+      "paths": [
+        "src/warhammer40k_core/engine/retained_shooting.py"
+      ],
+      "owners": [
+        "_release_parent_attack_destruction",
+        "advance_retained_shooting"
+      ],
+      "families": [
+        "reconstruction",
+        "visibility"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-257aa017215bf1d70033447be824accc4c888a0282e2b5254742d4cca50957bb": {
+      "paths": [
+        "src/warhammer40k_core/engine/shooting_target_replacement.py"
+      ],
+      "owners": [
+        "replace_active_shooting_sequence"
+      ],
+      "families": [
+        "reconstruction",
+        "visibility"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-8b76c70440e39b188e10017d238a9bf185fc730ee44eb911c6550308289db47f": {
+      "paths": [
+        "src/warhammer40k_core/engine/target_replacement_dispatch.py"
+      ],
+      "owners": [
+        "decision_dispatch_handlers"
+      ],
+      "families": [
+        "reconstruction",
+        "visibility"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453": {
+      "paths": [
+        "tests/code_quality/test_ci_performance_gates.py"
+      ],
+      "owners": [
+        "@module",
+        "_collection_environment",
+        "_write_sample_shards",
+        "cutover_root",
+        "partition_root",
+        "retired_cutover_root",
+        "test_cutover_exact_inventory_and_explicit_inactive_rejection",
+        "test_cutover_real_cli_rejects_naming_override",
+        "test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard",
+        "test_cutover_rejects_duplicate_json_keys",
+        "test_cutover_rejects_incomplete_malformed_and_changed_members",
+        "test_finite_partition_has_real_complete_pytest_collection",
+        "test_finite_partition_preserves_total_weight_and_other_file_weights",
+        "test_finite_partition_rejects_missing_extra_and_malformed_cases",
+        "test_junit_profiles_reject_incomplete_or_invalid_runs",
+        "test_junit_profiles_use_file_medians_and_preserve_evidence",
+        "test_manifest_check_rejects_assignment_drift",
+        "test_manifest_check_rejects_stale_duration_file_inventory",
+        "test_manifest_check_rejects_stale_duration_totals",
+        "test_quality_gate_requires_every_independent_lane_even_when_skipped",
+        "test_retired_selection_keeps_current_cases_and_quarantine",
+        "test_retired_selection_rejects_reappearance_and_archive_drift"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-503f1e4e0b15d48dbe108962d5a1af6a283723f32ee6424f62751179346673e2": {
+      "paths": [
+        "tests/code_quality/test_cumulative_preservation.py"
+      ],
+      "owners": [
+        "copy_source",
+        "test_fixture_copy_omits_only_generated_root_reports"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-ca1ae95238a3c1b280927432318310493c2c62a0bed139f212f98cca5fe097c3": {
+      "paths": [
+        "tests/code_quality/test_order135_current_core_audit.py"
+      ],
+      "owners": [
+        "@module",
+        "test_complete_order135_inventory_matches_current_live_source_owners_and_assertions",
+        "test_integration_emergency_assertion_exception_rejects_obligation_drift"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-d3f5e09a1943ec18a50ed4e0f4e8696c01bcfb66f444110580bc950fcc8e36cd": {
+      "paths": [
+        "tests/code_quality/test_s25_fixture_preservation.py"
+      ],
+      "owners": [
+        "@module",
+        "_sources",
+        "test_current_complete_bytes_and_literal_ast_join_unchanged_historical_chain"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-1b88d36a2782dc3ec2df266b09435ce5cda5411c53f31a60da2f29511ae3af4f": {
+      "paths": [
+        "tests/code_quality/test_thousand_sons_perils_preservation.py"
+      ],
+      "owners": [
+        "source_copy"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-e52e4ddd58b7ef887ab03c04116e676f6280b824ab7469d5d3080e5cba4f2128": {
+      "paths": [
+        "tests/conftest.py"
+      ],
+      "owners": [
+        "_configured_selection",
+        "_explicit_benchmark",
+        "_read_selection",
+        "pytest_collect_file",
+        "pytest_configure",
+        "pytest_ignore_collect"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-78dec3ec3595dbc3aa7237d2cbbbb342d43b2b74db620b2189c38277e8b56f17": {
+      "paths": [
+        "tests/emergency_geometry_helpers.py"
+      ],
+      "owners": [
+        "emergency_geometry_session"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-3228cb400943d28e9874c08e1db40cbf9eadd490cf58b17bd30cf6e0b87ed88d": {
+      "paths": [
+        "tests/performance/test_fight_phase_reconstruction.py"
+      ],
+      "owners": [
+        "@module",
+        "test_p12_full_fight_phase_reconstructs_ordinary_continuation_and_forced_overrun"
+      ],
+      "families": [
+        "external_contract_source_reuse",
+        "fight"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-533546cfff86260102d35acb60170c948c4370f7cac27ee9fd0090fa50efd0ac": {
+      "paths": [
+        "tests/rules/rules24/unit/test_shadow_form_lookup.py"
+      ],
+      "owners": [
+        "@module",
+        "test_shadow_form_lookup_filters_inactive_and_non_generic_records"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-547642cb6d0387447d3e9bc750839db5ff3ccb75069ffb511c1d8567d774e17d": {
+      "paths": [
+        "tests/rules/section04/test_completion_boundaries.py"
+      ],
+      "owners": [
+        "test_native_shooting_owner_waits_for_attack_mortal_choices"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-4d98b4fa7579e36cab252fd0ee45110be0f562ccf068e0af6013d2492e83c371": {
+      "paths": [
+        "tests/rules/section05/test_rule_effect_retention.py"
+      ],
+      "owners": [
+        "@module",
+        "test_order_30_rule_cleanup_restore_rejects_mortal_continuation_drift",
+        "test_order_30_rule_cleanup_resumes_after_feel_no_pain_and_restores"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-448867ff354898dc43119d44264f35bd518fbc5cef56d6405a3504de0be155d4": {
+      "paths": [
+        "tests/rules/section11/test_required_target_protocol.py"
+      ],
+      "owners": [
+        "@module",
+        "test_source_backed_conditional_charge_selects_pair_and_round_trips_required_target"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-2da5cb2ac2e33579aae933134e54539766dd5c6c28c88a269ec8233e8efe78ce": {
+      "paths": [
+        "tests/support/fight_phase_reconstruction.py"
+      ],
+      "owners": [
+        "@module",
+        "_army_muster_request",
+        "_config",
+        "_drain_fight_movement_requests",
+        "_fight_lifecycle",
+        "_fight_movement_witness_for_unit",
+        "_p12_forge_continuation",
+        "_resolve_phase15d_activation",
+        "_state",
+        "_submit_fight_movement_no_move",
+        "_submit_option"
+      ],
+      "families": [
+        "external_contract_source_reuse",
+        "fight"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-bb02372823c9eb126dac53710dc5eece9856d0763c65d504200881b92543f57f": {
+      "paths": [
+        "tests/support/section05_rule_effect_retention.py"
+      ],
+      "owners": [
+        "@module",
+        "_daemonic_patrons_records",
+        "_daemonic_patrons_runtime_fixture",
+        "_daemonic_patrons_session",
+        "_install_daemonic_patrons_resume_runtime",
+        "_pending_daemonic_patrons_fight_on_death_fixture",
+        "_record_daemonic_patrons_effect"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-cutover-owners-f1ea02aa9819b407d74c91e787679c321c889b96fd25857c0118b6a173302dd1": {
+      "paths": [
+        "tools/performance_ci69_members.py"
+      ],
+      "owners": [
+        "current_source_projection",
+        "expected_observed",
+        "prelude_members",
+        "retired_test_source",
+        "retirement_absence",
+        "retirement_rows",
+        "validate_cutover"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

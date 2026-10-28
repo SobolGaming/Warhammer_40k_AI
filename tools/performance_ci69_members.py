@@ -7,6 +7,7 @@ assertions, live observation boundaries, or historical authorities.
 import ast
 import hashlib
 import json
+from pathlib import Path
 from typing import Any
 
 CONTROL_MEMBERS: frozenset[str] = frozenset(
@@ -169,10 +170,137 @@ CUTOVER_ADDED_INPUTS: frozenset[str] = frozenset(
 )
 
 
+RETIREMENT_NAMESPACE = "data/source_audits/ci64_provenance_v1/retired-tests/"
+RETIRED_TESTS: frozenset[str] = frozenset(
+    {
+        "tests/integration/test_order127_infiltrators_redeploy.py",
+        "tests/integration/test_order128_setup_overhang.py",
+        "tests/integration/test_order135_gathered_override.py",
+        "tests/integration/test_order135_gathered_psychic_preparation.py",
+        "tests/unit/test_order100_frame_measurement.py",
+        "tests/unit/test_order101_setup_failure.py",
+        "tests/unit/test_order104_range_visibility.py",
+        "tests/unit/test_order105_hazard.py",
+        "tests/unit/test_order106_pile_in.py",
+        "tests/unit/test_order107_fight_distance_window.py",
+        "tests/unit/test_order108_terrain_semantics.py",
+        "tests/unit/test_order109_unit_control.py",
+        "tests/unit/test_order111_friendly_transit.py",
+        "tests/unit/test_order115_absent_movement.py",
+        "tests/unit/test_order116_additional_mortals.py",
+        "tests/unit/test_order117_mortal_allocation.py",
+        "tests/unit/test_order121_command_abilities.py",
+        "tests/unit/test_order122_effect_defaults.py",
+        "tests/unit/test_order123_datasheet_identity.py",
+        "tests/unit/test_order124_nested_conditions.py",
+        "tests/unit/test_order125_implicit_subjects.py",
+        "tests/unit/test_order126_sequential_movement.py",
+        "tests/unit/test_order128_setup_model_fit.py",
+        "tests/unit/test_order129_flight_history.py",
+        "tests/unit/test_order130_model_mission_destruction.py",
+        "tests/unit/test_order131_objective_endpoint_geometry.py",
+        "tests/unit/test_order131_objective_movement.py",
+        "tests/unit/test_order132_disembark_distance.py",
+        "tests/unit/test_order133_keyword_materialization.py",
+        "tests/unit/test_order133_keyword_numbers.py",
+        "tests/unit/test_order134_deployment_restrictions.py",
+        "tests/unit/test_order135_combat_tactical_feasibility.py",
+        "tests/unit/test_order135_counteroffensive_band.py",
+        "tests/unit/test_order135_counteroffensive_timing.py",
+        "tests/unit/test_order135_fight_pass.py",
+        "tests/unit/test_order135_fight_transition.py",
+        "tests/unit/test_order135_gathered_attack_steps.py",
+        "tests/unit/test_order135_gathered_wound_callback.py",
+        "tests/unit/test_order135_objective_overlap.py",
+        "tests/unit/test_order135_physical_visibility.py",
+        "tests/unit/test_order135_shooting_boundary.py",
+        "tests/unit/test_order135_tactical_setup_proof.py",
+        "tests/unit/test_order135_transport_boundaries.py",
+        "tests/unit/test_order135_visibility_facade.py",
+        "tests/unit/test_order135_visibility_rng_projection.py",
+        "tests/unit/test_order36_sequencing.py",
+        "tests/unit/test_order36_timing_authority.py",
+        "tests/unit/test_order51_flight.py",
+        "tests/unit/test_order52_surge.py",
+        "tests/unit/test_order53_movement_abilities.py",
+        "tests/unit/test_order54_setup.py",
+        "tests/unit/test_order55_disembark.py",
+        "tests/unit/test_order57_destroyed_referent_measurement.py",
+        "tests/unit/test_order58_failed_save_damage_timing.py",
+        "tests/unit/test_order59_empty_dedicated_transport.py",
+        "tests/unit/test_order60_emergency_disembark.py",
+        "tests/unit/test_order61_embark.py",
+        "tests/unit/test_order63_reserve_transports.py",
+        "tests/unit/test_order64_reserve_lifetimes.py",
+        "tests/unit/test_order65_firing_deck.py",
+        "tests/unit/test_order78_gone_to_ground.py",
+        "tests/unit/test_order79_control_first.py",
+        "tests/unit/test_order80_normal_move.py",
+        "tests/unit/test_order81_parameterized_projection.py",
+        "tests/unit/test_order82_revival_engagement.py",
+        "tests/unit/test_order85_deemed_base_contact.py",
+        "tests/unit/test_order86_table_quarters.py",
+        "tests/unit/test_order87_gathered_profile_restore.py",
+        "tests/unit/test_order87_random_profiles.py",
+        "tests/unit/test_order88_absent_strength.py",
+        "tests/unit/test_order89_healing.py",
+        "tests/unit/test_order90_off_battlefield_revival.py",
+        "tests/unit/test_order91_empty_shooting.py",
+        "tests/unit/test_order92_random_melee.py",
+        "tests/unit/test_order93_attack_modifiers.py",
+        "tests/unit/test_order93_catalog_leadership_modifiers.py",
+        "tests/unit/test_order93_healing_modifiers.py",
+        "tests/unit/test_order93_mission_action_modifiers.py",
+        "tests/unit/test_order93_modifier_ignore.py",
+        "tests/unit/test_order93_nonattack_modifiers.py",
+        "tests/unit/test_order93_permission_context.py",
+        "tests/unit/test_order93_weapon_modifiers.py",
+        "tests/unit/test_order95_optional_shooting.py",
+        "tests/unit/test_order96_twin_linked.py",
+        "tests/unit/test_order97_attack_evidence.py",
+        "tests/unit/test_order97_damage_evidence.py",
+        "tests/unit/test_order97_facade_evidence.py",
+        "tests/unit/test_order97_foundation_evidence.py",
+        "tests/unit/test_order97_movement_evidence.py",
+        "tests/unit/test_order97_secondary_clause_evidence.py",
+        "tests/unit/test_order97_semantic_evidence_18_25.py",
+        "tests/unit/test_order97_timing_evidence.py",
+    }
+)
+
+
 def expected_observed() -> frozenset[str]:
     """Independent literal boundary; never alias the mutable declaration name."""
     return frozenset(
         {
+            "ci/test_shards/durations.json",
+            "ci/test_shards/shard-1.txt",
+            "ci/test_shards/shard-10.txt",
+            "ci/test_shards/shard-11.txt",
+            "ci/test_shards/shard-12.txt",
+            "ci/test_shards/shard-2.txt",
+            "ci/test_shards/shard-3.txt",
+            "ci/test_shards/shard-4.txt",
+            "ci/test_shards/shard-5.txt",
+            "ci/test_shards/shard-6.txt",
+            "ci/test_shards/shard-7.txt",
+            "ci/test_shards/shard-8.txt",
+            "ci/test_shards/shard-9.txt",
+            "scripts/measure_order72.py",
+            "contracts/examples/persistence/session-persistence.json",
+            "contracts/examples/sessions/session-command-outcome.json",
+            "contracts/examples/sessions/session-command-started.json",
+            "contracts/examples/sessions/session-metadata-created.json",
+            "contracts/examples/support-profile-player-a-redacted.json",
+            "contracts/examples/support-profile-player-b-redacted.json",
+            "contracts/examples/support-profile.json",
+            "contracts/manifest.json",
+            "tools/core_rules_order95_audit.py",
+            "tests/category_migration_preservation.py",
+            "tests/code_quality/test_order135_current_core_audit.py",
+            "tests/code_quality/test_s25_fixture_preservation.py",
+            "tools/core_rules_order97_history.py",
+            "tools/core_rules_order97_inventory.py",
             ".github/pull_request_template.md",
             ".github/workflows/ci.yml",
             "AGENTS.md",
@@ -252,8 +380,7 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
         != "207e59b1e4f56c209ca35f1839823a3dfa94e0ad71e231334549b3ce74945217"
     ):
         raise ValueError("Finite native5734 behavioral selection baseline changed.")
-    if record["retirements"] != []:
-        raise ValueError("Physical retirement is not admitted by this initial cutover.")
+    retired = retirement_rows(record)
     coverage = record["coverage"]
     if (
         type(coverage) is not dict
@@ -296,6 +423,7 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
     active = record["active_files"]
     native = record["native_active_files"]
     ports = {
+        "tests/performance/test_fight_phase_reconstruction.py",
         "tests/rules/rules24/unit/test_shadow_form_lookup.py",
         "tests/rules/section05/test_rule_effect_retention.py",
         "tests/rules/section11/test_required_target_protocol.py",
@@ -352,6 +480,8 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
             ],
         },
     }
+    for row in retired.values():
+        current_row(row["archive"], row["native"])
     updates = record["inactive_updates"]
     if type(updates) is not dict or updates.keys() != recipes.keys():
         raise ValueError("Finite inactive API update membership changed.")
@@ -390,3 +520,244 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
         restored = hashlib.sha256(ast.dump(tree, include_attributes=False).encode()).hexdigest()
         if restored != recipe["before_ast_sha256"]:
             raise ValueError("Inactive API update changed an original AST or assertion.")
+
+
+def retirement_rows(record: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Authenticate this exact policy retirement; never imply current execution."""
+    baseline = {
+        name: record[name]
+        for name in (
+            "source_base",
+            "active_roots",
+            "native_active_files",
+            "retained_active_files",
+            "inactive_legacy_files",
+            "benchmark_files",
+        )
+    }
+    encoded = json.dumps(baseline, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    if (
+        hashlib.sha256(encoded).hexdigest()
+        != "207e59b1e4f56c209ca35f1839823a3dfa94e0ad71e231334549b3ce74945217"
+    ):
+        raise ValueError("Retirement native5734 classification changed.")
+    supplied = record["retirements"]
+    if type(supplied) is not list or len(supplied) != 92:
+        raise ValueError("Exact92 retirement membership changed.")
+    rows: dict[str, dict[str, Any]] = {}
+    for row in supplied:
+        if type(row) is not dict or row.keys() != {"path", "archive", "native"}:
+            raise ValueError("Malformed retirement row.")
+        name = row["path"]
+        if type(name) is not str or name not in RETIRED_TESTS or name in rows:
+            raise ValueError("Unlisted or duplicate retired test.")
+        if (
+            row["archive"] != RETIREMENT_NAMESPACE + name + ".txt"
+            or row["native"] != record["inactive_legacy_files"][name]
+        ):
+            raise ValueError("Retirement archive or native identity changed.")
+        rows[name] = row
+    native = {name: row["native"] for name, row in rows.items()}
+    encoded = json.dumps(native, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    if (
+        rows.keys() != RETIRED_TESTS
+        or hashlib.sha256(encoded).hexdigest()
+        != "30ce81d57e4fe404dfac0de28662f1ae428d716a29ef095d711f520a4315ad46"
+    ):
+        raise ValueError("Exact92 native retirement authority changed.")
+    return rows
+
+
+def retirement_absence(root: Path, names: tuple[str, ...] | None = None) -> None:
+    """Fresh absence includes broken symlinks; this never supplies source bytes."""
+    if root.absolute() != root.resolve(strict=True):
+        raise ValueError("Retirement root is aliased.")
+    selected = tuple(sorted(RETIRED_TESTS)) if names is None else names
+    if any(name not in RETIRED_TESTS for name in selected):
+        raise ValueError("Unlisted retirement absence request.")
+    for name in selected:
+        target = root / name
+        if target.parent.resolve(strict=True) != target.parent:
+            raise ValueError("Retirement parent is aliased.")
+        try:
+            target.lstat()
+        except FileNotFoundError:
+            continue
+        raise ValueError("Retired test reappeared: " + name)
+
+
+def retired_test_source(root: Path, name: str) -> tuple[Path, bytes] | None:
+    """Historical only; unregistered roots retain their strict physical readers."""
+    if name not in RETIRED_TESTS or not (root / CUTOVER_PATH).is_file():
+        return None
+    from tools.performance_preflight import source_members
+
+    retirement_absence(root, (name,))
+    archive = RETIREMENT_NAMESPACE + name + ".txt"
+    observed = source_members(root, [CUTOVER_PATH, archive])
+    values = {path: raw for path, _, raw in observed}
+    rows = retirement_rows(json.loads(values[CUTOVER_PATH]))
+    row = rows[name]["native"]
+    mode = {path: mode for path, mode, _ in observed}[archive]
+    raw = values[archive]
+    oid = hashlib.sha1(
+        b"blob " + str(len(raw)).encode() + b"\0" + raw, usedforsecurity=False
+    ).hexdigest()
+    if (
+        ("100755" if mode & 0o100 else "100644") != row["mode"]
+        or len(raw) != row["bytes"]
+        or hashlib.sha256(raw).hexdigest() != row["sha256"]
+        or oid != row["blob_sha1"]
+    ):
+        raise ValueError("Retired native source archive changed.")
+    retirement_absence(root, (name,))
+    return root / archive, raw
+
+
+def current_source_projection(previous: dict[str, str], actual: dict[str, bytes]) -> dict[str, str]:
+    """Actual current membership omits retired tests; historical bytes stay separate."""
+    return {name: pin for name, pin in previous.items() if name not in RETIRED_TESTS} | {
+        name: hashlib.sha256(raw).hexdigest() for name, raw in actual.items()
+    }
+
+
+CONTROL_MEMBERS |= frozenset(
+    [
+        "tests/category_migration_preservation.py",
+        "tests/code_quality/test_order135_current_core_audit.py",
+        "tests/code_quality/test_s25_fixture_preservation.py",
+        "tools/core_rules_order97_history.py",
+        "tools/core_rules_order97_inventory.py",
+    ]
+)
+INPUT_ADDITIONS |= RETIRED_TESTS | frozenset(
+    [
+        "tests/category_migration_preservation.py",
+        "tests/code_quality/test_order135_current_core_audit.py",
+        "tests/code_quality/test_s25_fixture_preservation.py",
+        "tools/core_rules_order97_history.py",
+        "tools/core_rules_order97_inventory.py",
+    ]
+)
+OBSERVED_ADDITIONS |= frozenset(
+    [
+        "tests/category_migration_preservation.py",
+        "tests/code_quality/test_order135_current_core_audit.py",
+        "tests/code_quality/test_s25_fixture_preservation.py",
+        "tools/core_rules_order97_history.py",
+        "tools/core_rules_order97_inventory.py",
+    ]
+)
+CUTOVER_NEW |= frozenset(RETIREMENT_NAMESPACE + name + ".txt" for name in RETIRED_TESTS)
+
+CONTROL_MEMBERS |= frozenset({"tools/core_rules_order95_audit.py"})
+INPUT_ADDITIONS |= frozenset({"tools/core_rules_order95_audit.py"})
+OBSERVED_ADDITIONS |= frozenset({"tools/core_rules_order95_audit.py"})
+
+RUNTIME_SUCCESSORS |= frozenset(
+    [
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+    ]
+)
+OBSERVED_ADDITIONS |= frozenset(
+    [
+        "contracts/examples/persistence/session-persistence.json",
+        "contracts/examples/sessions/session-command-outcome.json",
+        "contracts/examples/sessions/session-command-started.json",
+        "contracts/examples/sessions/session-metadata-created.json",
+        "contracts/examples/support-profile-player-a-redacted.json",
+        "contracts/examples/support-profile-player-b-redacted.json",
+        "contracts/examples/support-profile.json",
+        "contracts/manifest.json",
+    ]
+)
+
+RUNTIME_SUCCESSORS |= frozenset({"scripts/measure_order72.py"})
+INPUT_ADDITIONS |= frozenset(
+    [
+        "tests/performance/test_fight_phase_reconstruction.py",
+        "tests/support/fight_phase_reconstruction.py",
+        "scripts/measure_order72.py",
+    ]
+)
+CUTOVER_NEW |= frozenset(
+    [
+        "tests/performance/test_fight_phase_reconstruction.py",
+        "tests/support/fight_phase_reconstruction.py",
+        "ci/test_shards/case-partitions.json",
+    ]
+)
+CUTOVER_ADDED_INPUTS |= frozenset(
+    [
+        "tests/performance/test_fight_phase_reconstruction.py",
+        "tests/support/fight_phase_reconstruction.py",
+    ]
+)
+OBSERVED_ADDITIONS |= frozenset({"scripts/measure_order72.py"})
+
+
+def prelude_members(raw: bytes, members: frozenset[str]) -> list[str]:
+    """One native no-renames status fact proves all92 are deleted in immutable F."""
+    expected = members | RETIRED_TESTS
+    if len(raw) != sum(len(name.encode()) + 3 for name in expected):
+        raise ValueError("CI64 native source-status byte count changed.")
+    fields = raw.split(b"\0")
+    if fields[-1:] != [b""] or len(fields) % 2 != 1:
+        raise ValueError("CI64 native source-status framing changed.")
+    rows: dict[str, bytes] = {}
+    for status, encoded in zip(fields[:-1:2], fields[1:-1:2], strict=True):
+        name = encoded.decode()
+        if name not in expected or name in rows:
+            raise ValueError("CI64 native source-status membership changed.")
+        if name in RETIRED_TESTS:
+            if status != b"D":
+                raise ValueError("CI64 source freeze retains a retired test.")
+        elif status not in {b"A", b"M"}:
+            raise ValueError("CI64 live source-status changed.")
+        rows[name] = status
+    if rows.keys() != expected:
+        raise ValueError("CI64 native source-status membership changed.")
+    return sorted(rows)
+
+
+CONTROL_MEMBERS |= frozenset(
+    [
+        "ci/test_shards/durations.json",
+        "ci/test_shards/shard-1.txt",
+        "ci/test_shards/shard-10.txt",
+        "ci/test_shards/shard-11.txt",
+        "ci/test_shards/shard-12.txt",
+        "ci/test_shards/shard-2.txt",
+        "ci/test_shards/shard-3.txt",
+        "ci/test_shards/shard-4.txt",
+        "ci/test_shards/shard-5.txt",
+        "ci/test_shards/shard-6.txt",
+        "ci/test_shards/shard-7.txt",
+        "ci/test_shards/shard-8.txt",
+        "ci/test_shards/shard-9.txt",
+    ]
+)
+OBSERVED_ADDITIONS |= frozenset(
+    [
+        "ci/test_shards/durations.json",
+        "ci/test_shards/shard-1.txt",
+        "ci/test_shards/shard-10.txt",
+        "ci/test_shards/shard-11.txt",
+        "ci/test_shards/shard-12.txt",
+        "ci/test_shards/shard-2.txt",
+        "ci/test_shards/shard-3.txt",
+        "ci/test_shards/shard-4.txt",
+        "ci/test_shards/shard-5.txt",
+        "ci/test_shards/shard-6.txt",
+        "ci/test_shards/shard-7.txt",
+        "ci/test_shards/shard-8.txt",
+        "ci/test_shards/shard-9.txt",
+    ]
+)

@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 import os
+import stat
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from itertools import product
@@ -77,6 +78,9 @@ CUTOVER_PATH = "data/source_audits/ci64_provenance_v1/test-cutover.json"
 CUTOVER_BASE = "5734eace50abe8fe99bbe46282652e4ab3c021b4"
 CUTOVER_TREE = "29eb413bb3c6c698c7f12a74e96b373e1084fd46"
 CUTOVER_LEDGER_SHA256 = "207e59b1e4f56c209ca35f1839823a3dfa94e0ad71e231334549b3ce74945217"
+RETIRED_TEST_COUNT = 92
+RETIRED_TEST_PATHS_SHA256 = "a60c2ab82c17e8703ae1faec743b8b1ff463094252e4249876cb7cca14800bf0"
+RETIRED_TEST_ROWS_SHA256 = "30ce81d57e4fe404dfac0de28662f1ae428d716a29ef095d711f520a4315ad46"
 ACTIVE_TEST_ROOTS = ("tests/rules", "tests/factions", "tests/infrastructure", "tests/performance")
 RETAINED_ACTIVE_FILES = (
     "tests/unit/test_dice.py",
@@ -184,6 +188,106 @@ def _selection_members(
     return result
 
 
+def _selection_retirements(root: Path, value: object, native: object) -> frozenset[str]:
+    """Fresh exact tombstones and owned native text archives; no virtual live bytes."""
+    if not isinstance(value, list) or not isinstance(native, dict):
+        raise SystemExit("Retirement data must be an exact list over the native ledger.")
+    paths: list[str] = []
+    rows: dict[str, object] = {}
+    for row in value:
+        if (
+            not isinstance(row, dict)
+            or row.keys() != {"path", "archive", "native"}
+            or not isinstance(row["path"], str)
+            or not isinstance(row["archive"], str)
+        ):
+            raise SystemExit("Malformed finite retirement row.")
+        name = row["path"]
+        if name in rows or name not in native or row["native"] != native[name]:
+            raise SystemExit("Retirement native membership or identity changed.")
+        archive = "data/source_audits/ci64_provenance_v1/retired-tests/" + name + ".txt"
+        if row["archive"] != archive:
+            raise SystemExit("Retirement archive path is not the exact owned location.")
+        paths.append(name)
+        rows[name] = row["native"]
+    if (
+        paths != sorted(paths)
+        or len(paths) != RETIRED_TEST_COUNT
+        or hashlib.sha256(json.dumps(paths, separators=(",", ":")).encode()).hexdigest()
+        != RETIRED_TEST_PATHS_SHA256
+        or hashlib.sha256(
+            json.dumps(rows, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        != RETIRED_TEST_ROWS_SHA256
+    ):
+        raise SystemExit("Approved finite retirement set changed.")
+    for row in value:
+        name = row["path"]
+        path = root / name
+        _selection_no_links(root, path)
+        if path.exists() or path.is_symlink():
+            raise SystemExit("Retired test path reappeared: " + name)
+        archive = root / row["archive"]
+        _selection_no_links(root, archive)
+        try:
+            resolved_before = archive.resolve(strict=True)
+            before = archive.lstat()
+        except FileNotFoundError as error:
+            raise SystemExit("Retirement archive is missing before acquisition.") from error
+        if resolved_before != archive:
+            raise SystemExit("Retirement archive has a physical path alias.")
+        if (
+            not stat.S_ISREG(before.st_mode)
+            or before.st_nlink != 1
+            or (os.name != "nt" and before.st_mode & 0o111)
+        ):
+            raise SystemExit("Retirement archive must be an owned regular non-executable file.")
+        fields = (
+            "st_dev",
+            "st_ino",
+            "st_mode",
+            "st_nlink",
+            "st_size",
+            "st_mtime_ns",
+            "st_ctime_ns",
+        )
+        before_identity = tuple(getattr(before, name) for name in fields)
+        try:
+            stream = archive.open("rb")
+        except FileNotFoundError as error:
+            raise SystemExit("Retirement archive disappeared before open.") from error
+        with stream:
+            opened = os.fstat(stream.fileno())
+            opened_identity = tuple(getattr(opened, name) for name in fields)
+            # Windows lstat/fstat ctime meanings can differ: compare it only within
+            # the same API. All remaining ownership/identity fields must agree.
+            if opened_identity[:-1] != before_identity[:-1]:
+                raise SystemExit("Retirement archive handle identity differs from its path.")
+            raw = stream.read()
+            finished = os.fstat(stream.fileno())
+            if tuple(getattr(finished, name) for name in fields) != opened_identity:
+                raise SystemExit("Retirement archive changed while its handle was open.")
+        _selection_no_links(root, archive)
+        try:
+            resolved_after = archive.resolve(strict=True)
+            after = archive.lstat()
+        except FileNotFoundError as error:
+            raise SystemExit("Retirement archive disappeared during acquisition.") from error
+        if resolved_after != archive:
+            raise SystemExit("Retirement archive physical path changed during acquisition.")
+        if tuple(getattr(after, name) for name in fields) != before_identity:
+            raise SystemExit("Retirement archive path identity changed during acquisition.")
+        expected = row["native"]
+        blob = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw, usedforsecurity=False)
+        if (
+            len(raw) != expected["bytes"]
+            or hashlib.sha256(raw).hexdigest() != expected["sha256"]
+            or blob.hexdigest() != expected["blob_sha1"]
+        ):
+            raise SystemExit("Retirement archive differs from authentic native bytes: " + name)
+    return frozenset(paths)
+
+
 def behavioral_selection(root: Path) -> BehavioralSelection:
     """Fresh finite cutover admission shared by pytest and shard discovery."""
     root = root.resolve(strict=True)
@@ -212,7 +316,7 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
         raise SystemExit("Invalid finite test cutover schema.")
     if value["source_base"] != {"commit": CUTOVER_BASE, "tree": CUTOVER_TREE}:
         raise SystemExit("Test cutover source authority changed.")
-    if value["active_roots"] != list(ACTIVE_TEST_ROOTS) or value["retirements"] != []:
+    if value["active_roots"] != list(ACTIVE_TEST_ROOTS):
         raise SystemExit("Test cutover roots or approved retirement set changed.")
     expected_coverage = {
         "metric": "coverage.py total with branch=true",
@@ -269,7 +373,14 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
         ):
             raise SystemExit("Inactive update native preimage/recipe changed.")
         current.update(_selection_members({name: update["after"]}, root))
-    inactive = _selection_members(value["inactive_legacy_files"], root, current=current)
+    retired = _selection_retirements(root, value["retirements"], value["inactive_legacy_files"])
+    if current.keys() & retired:
+        raise SystemExit("A retired test cannot also carry a live inactive update.")
+    present_inactive = {
+        name: row for name, row in value["inactive_legacy_files"].items() if name not in retired
+    }
+    inactive = _selection_members(present_inactive, root, current=current)
+    inactive.update({name: value["inactive_legacy_files"][name] for name in retired})
     benchmarks = _selection_members(value["benchmark_files"], root)
     if tuple(sorted(retained)) != RETAINED_ACTIVE_FILES or any(
         active.get(n) != row for n, row in retained.items()
@@ -305,7 +416,7 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
                 _selection_no_links(root, member)
                 found.add(member.relative_to(root).as_posix())
     quality = {name for name in found if name.startswith("tests/code_quality/")}
-    declared = set(active) | set(inactive) | set(benchmarks) | quality
+    declared = set(active) | (set(inactive) - retired) | set(benchmarks) | quality
     if found != declared:
         raise SystemExit("Cutover test membership changed: " + repr(sorted(found ^ declared)))
     if len({name.casefold() for name in found}) != len(found):
@@ -313,6 +424,11 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     for name in ACTIVE_TEST_ROOTS:
         if not (root / name).is_dir():
             raise SystemExit("Missing active test root: " + name)
+    for name in retired:
+        path = root / name
+        _selection_no_links(root, path)
+        if path.exists() or path.is_symlink():
+            raise SystemExit("Retired test path reappeared before admission closed: " + name)
     return BehavioralSelection(
         tuple(sorted(active)),
         tuple(sorted(inactive)),

@@ -344,6 +344,16 @@ def cutover_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     payload["retained_active_files"] = {name: rows[name] for name in sharding.RETAINED_ACTIVE_FILES}
     payload["inactive_legacy_files"] = {inactive_name: rows[inactive_name]}
     payload["inactive_updates"] = {}
+    payload["retirements"] = []
+    native_retirement_pins = {
+        "RETIRED_TEST_COUNT": sharding.RETIRED_TEST_COUNT,
+        "RETIRED_TEST_PATHS_SHA256": sharding.RETIRED_TEST_PATHS_SHA256,
+        "RETIRED_TEST_ROWS_SHA256": sharding.RETIRED_TEST_ROWS_SHA256,
+    }
+    (tmp_path / "original-retirement-pins.json").write_text(json.dumps(native_retirement_pins))
+    monkeypatch.setattr(sharding, "RETIRED_TEST_COUNT", 0)
+    monkeypatch.setattr(sharding, "RETIRED_TEST_PATHS_SHA256", hashlib.sha256(b"[]").hexdigest())
+    monkeypatch.setattr(sharding, "RETIRED_TEST_ROWS_SHA256", hashlib.sha256(b"{}").hexdigest())
     payload["benchmark_files"] = {benchmark_name: rows[benchmark_name]}
     # The pure policy fixture has its own pinned six-file source authority;
     # repository-native 5734 authentication remains independently verified.
@@ -472,6 +482,16 @@ def test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard(
             after = 'CUTOVER_LEDGER_SHA256 = "' + sharding.CUTOVER_LEDGER_SHA256 + '"'
             assert raw.count(before) == 1
             raw = raw.replace(before, after, 1)
+            native_pins = json.loads((cutover_root / "original-retirement-pins.json").read_text())
+            for key in (
+                "RETIRED_TEST_COUNT",
+                "RETIRED_TEST_PATHS_SHA256",
+                "RETIRED_TEST_ROWS_SHA256",
+            ):
+                old_pin = key + " = " + json.dumps(native_pins[key])
+                new_pin = key + " = " + json.dumps(getattr(sharding, key))
+                assert raw.count(old_pin) == 1
+                raw = raw.replace(old_pin, new_pin, 1)
         target.write_text(raw)
     (cutover_root / "pyproject.toml").write_text(
         '[tool.pytest.ini_options]\npython_files = ["test_*.py"]\n'
@@ -510,6 +530,16 @@ def test_cutover_real_cli_rejects_naming_override(cutover_root: Path) -> None:
             after = 'CUTOVER_LEDGER_SHA256 = "' + sharding.CUTOVER_LEDGER_SHA256 + '"'
             assert raw.count(before) == 1
             raw = raw.replace(before, after, 1)
+            native_pins = json.loads((cutover_root / "original-retirement-pins.json").read_text())
+            for key in (
+                "RETIRED_TEST_COUNT",
+                "RETIRED_TEST_PATHS_SHA256",
+                "RETIRED_TEST_ROWS_SHA256",
+            ):
+                old_pin = key + " = " + json.dumps(native_pins[key])
+                new_pin = key + " = " + json.dumps(getattr(sharding, key))
+                assert raw.count(old_pin) == 1
+                raw = raw.replace(old_pin, new_pin, 1)
         target.write_text(raw)
     (cutover_root / "pyproject.toml").write_text(
         '[tool.pytest.ini_options]\npython_files = ["test_*.py"]\n'
@@ -634,3 +664,112 @@ def test_finite_partition_preserves_total_weight_and_other_file_weights() -> Non
     assert sharding.CASE_PARTITION_FILE not in expanded
     assert len(expanded) == 21
     assert sum(expanded.values()) == pytest.approx(237.0)
+
+
+@pytest.fixture
+def retired_cutover_root(cutover_root: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    name = "tests/unit/test_inactive.py"
+    target = cutover_root / sharding.CUTOVER_PATH
+    value = json.loads(target.read_text())
+    native = value["inactive_legacy_files"][name]
+    # Match the real retirement contract: retired legacy plus remaining live inactive.
+    remaining = "tests/unit/test_remaining.py"
+    (cutover_root / remaining).write_bytes((cutover_root / name).read_bytes())
+    value["inactive_legacy_files"][remaining] = dict(native)
+    fields = (
+        "source_base",
+        "active_roots",
+        "native_active_files",
+        "retained_active_files",
+        "inactive_legacy_files",
+        "benchmark_files",
+    )
+    ledger = {key: value[key] for key in fields}
+    monkeypatch.setattr(
+        sharding,
+        "CUTOVER_LEDGER_SHA256",
+        hashlib.sha256(
+            json.dumps(ledger, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest(),
+    )
+    archive = "data/source_audits/ci64_provenance_v1/retired-tests/" + name + ".txt"
+    path = cutover_root / archive
+    path.parent.mkdir(parents=True)
+    path.write_bytes((cutover_root / name).read_bytes())
+    (cutover_root / name).unlink()
+    value["retirements"] = [{"path": name, "archive": archive, "native": native}]
+    target.write_text(json.dumps(value))
+    monkeypatch.setattr(sharding, "RETIRED_TEST_COUNT", 1)
+    monkeypatch.setattr(
+        sharding,
+        "RETIRED_TEST_PATHS_SHA256",
+        hashlib.sha256(json.dumps([name], separators=(",", ":")).encode()).hexdigest(),
+    )
+    monkeypatch.setattr(
+        sharding,
+        "RETIRED_TEST_ROWS_SHA256",
+        hashlib.sha256(
+            json.dumps({name: native}, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest(),
+    )
+    return cutover_root
+
+
+@pytest.mark.stubbed
+def test_retired_selection_keeps_current_cases_and_quarantine(retired_cutover_root: Path) -> None:
+    selected = sharding.behavioral_selection(retired_cutover_root)
+    assert selected.inactive_files == (
+        "tests/unit/test_inactive.py",
+        "tests/unit/test_remaining.py",
+    )
+    assert len(selected.active_files) == 3
+    assert not (retired_cutover_root / "tests/unit/test_inactive.py").exists()
+    with pytest.raises(SystemExit, match="Explicit inactive legacy test"):
+        selected.check_explicit(retired_cutover_root, ("tests/unit/test_inactive.py",))
+
+
+@pytest.mark.stubbed
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "reappear",
+        "broken_symlink",
+        "archive_hardlink",
+        "archive_changed",
+        "archive_missing",
+        "native_drift",
+        "archive_alias",
+        "extra_row",
+    ],
+)
+def test_retired_selection_rejects_reappearance_and_archive_drift(
+    retired_cutover_root: Path, mutation: str
+) -> None:
+    target = retired_cutover_root / sharding.CUTOVER_PATH
+    value = json.loads(target.read_text())
+    row = value["retirements"][0]
+    original = retired_cutover_root / row["path"]
+    archive = retired_cutover_root / row["archive"]
+    if mutation == "reappear":
+        original.write_bytes(archive.read_bytes())
+    elif mutation == "broken_symlink":
+        original.symlink_to(retired_cutover_root / "missing-target")
+    elif mutation == "archive_hardlink":
+        os.link(archive, archive.with_suffix(".hardlink"))
+    elif mutation == "archive_changed":
+        archive.write_bytes(b"changed archive")
+    elif mutation == "archive_missing":
+        archive.unlink()
+    elif mutation == "native_drift":
+        row["native"] = dict(row["native"], sha256="0" * 64)
+    elif mutation == "archive_alias":
+        row["archive"] = row["archive"].replace(
+            "/retired-tests/", "/retired-tests/../retired-tests/"
+        )
+    elif mutation == "extra_row":
+        value["retirements"].append(row)
+    else:
+        raise AssertionError("Unknown retirement mutation")
+    target.write_text(json.dumps(value))
+    with pytest.raises(SystemExit):
+        sharding.behavioral_selection(retired_cutover_root)

@@ -257,8 +257,7 @@ def _prelude_transition(operands: AdmissionOperands) -> dict[str, bytes]:
     ]
     actual = dict(observations) | extra
     if (
-        set(names) != PRELUDE_MEMBERS
-        or len(names) != len(PRELUDE_MEMBERS)
+        sorted(names) != sorted(PRELUDE_MEMBERS | ci69.RETIRED_TESTS)
         or set(frozen) != PRELUDE_MEMBERS
         or set(previous) != PRELUDE_CONTROLS | ci69.RUNTIME_SUCCESSORS
         or PRELUDE_NEW | TRANSACTION_SHARDS | ci69.expected_observed() != PRELUDE_OBSERVED
@@ -486,7 +485,8 @@ def _transaction_inputs_match(previous: dict[str, str], produced: dict[str, str]
         "tools/performance_ci69_members.py",
     }
     additions |= ci69.CUTOVER_ADDED_INPUTS
-    return additions.isdisjoint(previous) and produced.keys() == previous.keys() | additions
+    names = previous.keys() - ci69.RETIRED_TESTS
+    return additions.isdisjoint(previous) and produced.keys() == names | additions
 
 
 def _derivation_source(
@@ -500,6 +500,7 @@ def _derivation_source(
     from tools.performance_preflight import admission_proof, source_members
     from tools.performance_preflight_successor import read_frozen_blobs
 
+    ci69.retirement_absence(root)
     freeze = DERIVATION_FREEZE
     if freeze is None or len(freeze) != 40 or set(freeze) - set("0123456789abcdef"):
         raise ValueError("CI61 provenance source freeze is pending.")
@@ -518,17 +519,17 @@ def _derivation_source(
         raise ValueError("CI64 provenance source freeze is pending.")
     history(root, "merge-base", "--is-ancestor", PRELUDE_BASE, next_freeze)
     git(root, "merge-base", "--is-ancestor", next_freeze, "HEAD")
-    next_names = (
-        history(root, "diff", "--name-only", PRELUDE_BASE, next_freeze).decode().splitlines()
+    next_names = ci69.prelude_members(
+        history(root, "diff", "--name-status", "--no-renames", "-z", PRELUDE_BASE, next_freeze),
+        PRELUDE_MEMBERS,
     )
-    if set(next_names) != PRELUDE_MEMBERS or len(next_names) != len(PRELUDE_MEMBERS):
-        raise ValueError("CI64 finite source membership changed.")
     _transaction_absence(
         history(
             root, "--literal-pathspecs", "ls-tree", "-r", "-z", PRELUDE_BASE, "--", TRANSACTION_TEST
         )
     )
-    next_frozen = read_frozen_blobs(root, next_freeze, next_names)
+    live_names = sorted(set(next_names) - ci69.RETIRED_TESTS)
+    next_frozen = read_frozen_blobs(root, next_freeze, live_names)
     next_previous = read_frozen_blobs(
         root, PRELUDE_BASE, sorted(PRELUDE_CONTROLS | ci69.RUNTIME_SUCCESSORS)
     )
@@ -598,7 +599,7 @@ def _derivation_source(
             owner_hashes,
             _prelude_transition,
             _derivation_transition,
-            *(ci69.validate_cutover, ci69.expected_observed),
+            *(ci69.validate_cutover, ci69.expected_observed, ci69.retirement_rows),
             *(hashlib.sha1, ast.parse, ast.dump, ast.walk),
         ),
         repository=root,
@@ -844,7 +845,7 @@ def current_source(root: Path, previous: dict[str, str]) -> dict[str, str]:
     before = read_frozen_blobs(root, BASE, prior_names)
     if any(previous[name] != digest(before[name]) for name in prior_names):
         raise ValueError("CI60 Qualification predecessor source changed.")
-    return previous | {name: digest(raw) for name, raw in actual.items()}
+    return ci69.current_source_projection(previous, actual)
 
 
 def measurement_controls(root: Path, current: dict[str, str]) -> dict[str, str]:
@@ -1103,13 +1104,14 @@ def extend_catalog(builder: Any) -> None:
     if prelude is None:
         raise ValueError("CI64 provenance catalog freeze is pending.")
     builder.fact("plain60", ("merge-base", "--is-ancestor", PRELUDE_BASE, prelude), "ci64.ancestry")
-    changed = (
-        builder.fact("plain60", ("diff", "--name-only", PRELUDE_BASE, prelude), "ci64.membership")
-        .decode()
-        .splitlines()
+    changed = ci69.prelude_members(
+        builder.fact(
+            "plain60",
+            ("diff", "--name-status", "--no-renames", "-z", PRELUDE_BASE, prelude),
+            "ci64.membership",
+        ),
+        PRELUDE_MEMBERS,
     )
-    if set(changed) != PRELUDE_MEMBERS or len(changed) != len(PRELUDE_MEMBERS):
-        raise ValueError("CI64 native catalog membership changed.")
     _transaction_absence(
         builder.fact(
             "plain60",
@@ -1117,6 +1119,7 @@ def extend_catalog(builder: Any) -> None:
             "ci67.transaction-regression-absence",
         )
     )
+    changed = sorted(set(changed) - ci69.RETIRED_TESTS)
     builder.add("plain60", prelude, dict.fromkeys(changed), "ci64.freeze")
     builder.add(
         "plain60",

@@ -434,6 +434,7 @@ jobs:
         run: uv sync --locked --no-default-groups --group test
 
       - name: Run behavioral coverage shard
+        timeout-minutes: 10
         env:
           TEST_TIMING_DIR: reports/behavior-timing
           COVERAGE_FILE: .coverage.${{ matrix.shard_id }}
@@ -461,6 +462,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload shard coverage
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: behavior-coverage-${{ matrix.shard_id }}

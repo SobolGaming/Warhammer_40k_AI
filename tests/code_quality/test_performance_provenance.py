@@ -441,6 +441,8 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
         "RUNTIME_SUCCESSORS",
         "CUTOVER_NEW",
         "CUTOVER_ADDED_INPUTS",
+        "RETIRED_TESTS",
+        "RETIREMENT_NAMESPACE",
     ):
         original_selector = vars(ci69)[attribute]
         changed_selector = (
@@ -526,6 +528,10 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
                 "tests/unit/test_phase13b_shooting_declarations.py",
                 "tests/unit/test_phase15c_fight_order.py",
             }
+            cutover_rows.add("tests/performance/test_fight_phase_reconstruction.py")
+            cutover_rows |= {
+                ci69.RETIREMENT_NAMESPACE + name + ".txt" for name in ci69.RETIRED_TESTS
+            }
             cutover_operands = (
                 *(("next-frozen/" + name, 0, raw) for name, raw in second.items()),
                 *(
@@ -560,13 +566,28 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
             assert cutover_calls == ["native", "native"]
             preflight.admission_proof(validate_cutover, cutover_operands, identity, ())
             assert cutover_calls == ["native", "native"]
-            latest_names = (
-                ci60.history(
-                    root, "diff", "--name-only", ci60.PRELUDE_BASE, str(ci60.PRELUDE_FREEZE)
-                )
-                .decode()
-                .splitlines()
+            latest_status = ci60.history(
+                root,
+                "diff",
+                "--name-status",
+                "--no-renames",
+                "-z",
+                ci60.PRELUDE_BASE,
+                str(ci60.PRELUDE_FREEZE),
             )
+            latest_names = ci69.prelude_members(latest_status, ci60.PRELUDE_MEMBERS)
+            retired_name = min(ci69.RETIRED_TESTS)
+            deletion = b"D\0" + retired_name.encode() + b"\0"
+            assert latest_status.count(deletion) == 1
+            for wrong in (
+                latest_status.replace(deletion, b"M\0" + retired_name.encode() + b"\0", 1),
+                latest_status.replace(deletion, b"R100\0" + retired_name.encode() + b"\0", 1),
+                latest_status.replace(deletion, b"", 1),
+                latest_status + deletion,
+                latest_status + b"A\0tests/unit/unlisted.py\0",
+            ):
+                with pytest.raises(ValueError, match="CI64"):
+                    ci69.prelude_members(wrong, ci60.PRELUDE_MEMBERS)
             cutover_observed = {
                 ".github/pull_request_template.md",
                 ".github/workflows/ci.yml",
@@ -598,9 +619,140 @@ def test_activated_native_history_revokes_copied_phase_after_completion(
                 "tests/unit/test_phase13b_shooting_declarations.py",
                 "tests/unit/test_phase15c_fight_order.py",
             }
-            assert len(cutover_observed) == 29
-            assert len(first_observations[4]) == 62
-            assert sum(map(len, first_observations)) == 198
+            cutover_observed |= {
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order127_infiltrators_redeploy.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order128_setup_overhang.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order135_gathered_override.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order135_gathered_psychic_preparation.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order100_frame_measurement.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order101_setup_failure.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order104_range_visibility.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order105_hazard.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order106_pile_in.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order107_fight_distance_window.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order108_terrain_semantics.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order109_unit_control.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order111_friendly_transit.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order115_absent_movement.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order116_additional_mortals.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order117_mortal_allocation.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order121_command_abilities.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order122_effect_defaults.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order123_datasheet_identity.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order124_nested_conditions.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order125_implicit_subjects.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order126_sequential_movement.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order128_setup_model_fit.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order129_flight_history.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order130_model_mission_destruction.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order131_objective_endpoint_geometry.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order131_objective_movement.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order132_disembark_distance.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order133_keyword_materialization.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order133_keyword_numbers.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order134_deployment_restrictions.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_combat_tactical_feasibility.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_counteroffensive_band.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_counteroffensive_timing.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_fight_pass.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_fight_transition.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_gathered_attack_steps.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_gathered_wound_callback.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_objective_overlap.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_physical_visibility.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_shooting_boundary.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_tactical_setup_proof.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_transport_boundaries.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_visibility_facade.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_visibility_rng_projection.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order36_sequencing.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order36_timing_authority.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order51_flight.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order52_surge.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order53_movement_abilities.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order54_setup.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order55_disembark.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order57_destroyed_referent_measurement.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order58_failed_save_damage_timing.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order59_empty_dedicated_transport.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order60_emergency_disembark.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order61_embark.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order63_reserve_transports.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order64_reserve_lifetimes.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order65_firing_deck.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order78_gone_to_ground.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order79_control_first.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order80_normal_move.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order81_parameterized_projection.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order82_revival_engagement.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order85_deemed_base_contact.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order86_table_quarters.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order87_gathered_profile_restore.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order87_random_profiles.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order88_absent_strength.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order89_healing.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order90_off_battlefield_revival.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order91_empty_shooting.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order92_random_melee.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_attack_modifiers.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_catalog_leadership_modifiers.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_healing_modifiers.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_mission_action_modifiers.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_modifier_ignore.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_nonattack_modifiers.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_permission_context.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_weapon_modifiers.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order95_optional_shooting.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order96_twin_linked.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_attack_evidence.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_damage_evidence.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_facade_evidence.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_foundation_evidence.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_movement_evidence.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_secondary_clause_evidence.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_semantic_evidence_18_25.py.txt",
+                "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_timing_evidence.py.txt",
+                "tests/category_migration_preservation.py",
+                "tests/code_quality/test_order135_current_core_audit.py",
+                "tests/code_quality/test_s25_fixture_preservation.py",
+                "tools/core_rules_order97_history.py",
+                "tools/core_rules_order97_inventory.py",
+            }
+            cutover_observed.add("tools/core_rules_order95_audit.py")
+            cutover_observed |= {
+                "contracts/examples/support-profile-player-b-redacted.json",
+                "contracts/manifest.json",
+                "contracts/examples/persistence/session-persistence.json",
+                "contracts/examples/sessions/session-command-outcome.json",
+                "contracts/examples/support-profile.json",
+                "contracts/examples/support-profile-player-a-redacted.json",
+                "contracts/examples/sessions/session-metadata-created.json",
+                "contracts/examples/sessions/session-command-started.json",
+            }
+            cutover_observed |= {
+                "scripts/measure_order72.py",
+                "tests/performance/test_fight_phase_reconstruction.py",
+                "ci/test_shards/case-partitions.json",
+                "tests/support/fight_phase_reconstruction.py",
+            }
+            cutover_observed |= {
+                "ci/test_shards/shard-11.txt",
+                "ci/test_shards/shard-2.txt",
+                "ci/test_shards/shard-3.txt",
+                "ci/test_shards/shard-5.txt",
+                "ci/test_shards/shard-7.txt",
+                "ci/test_shards/shard-4.txt",
+                "ci/test_shards/shard-1.txt",
+                "ci/test_shards/shard-9.txt",
+                "ci/test_shards/shard-10.txt",
+                "ci/test_shards/shard-12.txt",
+                "ci/test_shards/shard-8.txt",
+                "ci/test_shards/durations.json",
+                "ci/test_shards/shard-6.txt",
+            }
+            assert len(cutover_observed) == 152
+            assert len(first_observations[4]) == 185
+            assert sum(map(len, first_observations)) == 321
             assert all(first_observations[4].count(name) == 1 for name in cutover_observed)
             assert first_observations[4] == tuple(
                 name for name in latest_names if name in ci60.PRELUDE_OBSERVED

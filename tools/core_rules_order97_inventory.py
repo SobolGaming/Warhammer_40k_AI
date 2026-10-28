@@ -36,6 +36,9 @@ class InventoryError(ValueError):
 
 
 def _path(reference: str, root: Path) -> Path:
+    from tools.performance_ci69_members import retired_test_source
+
+    retired = retired_test_source(root, reference)
     if reference in MIGRATED_PATHS:
         _, migration = verify_migrated_test(root, reference)
         path = root / migration["archive"]
@@ -43,7 +46,7 @@ def _path(reference: str, root: Path) -> Path:
         _, relocation = verify_layout_original(root, reference)
         path = root / relocation["archive"]
     else:
-        path = root / reference
+        path = retired[0] if retired is not None else root / reference
     if Path(reference).is_absolute() or not path.resolve().is_relative_to(root.resolve()):
         raise InventoryError(f"Evidence path escapes the repository: {reference}.")
     if not path.is_file():
@@ -163,6 +166,8 @@ def _symbol(
 
 def helper_source_paths(inventory: Inventory, *, root: Path = ROOT) -> set[str]:
     """Retain the shared fixture code that gives assertion ASTs their meaning."""
+    from tools.performance_ci69_members import retired_test_source
+
     pending = {a.nodeid.split("::", 1)[0] for a in inventory.assertions}
     pending.update(
         item.path
@@ -192,7 +197,7 @@ def helper_source_paths(inventory: Inventory, *, root: Path = ROOT) -> set[str]:
             if not node.module.startswith("tests."):
                 continue
             path = node.module.replace(".", "/") + ".py"
-            if not (root / path).is_file():
+            if not (root / path).is_file() and retired_test_source(root, path) is None:
                 path = node.module.replace(".", "/") + "/__init__.py"
             _path(path, root)
             helpers.add(path)

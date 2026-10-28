@@ -709,6 +709,11 @@ def ci60_admission_bindings() -> tuple[object, ...]:
         ),
         ci69.validate_cutover,
         ci69.expected_observed,
+        ci69.retirement_rows,
+        ci69.prelude_members,
+        ci69.retirement_absence,
+        ci69.retired_test_source,
+        ci69.current_source_projection,
         owner,
         vars(owner)["__wrapped__"],
         policy.digest,
@@ -765,6 +770,8 @@ def ci60_admission_bindings() -> tuple[object, ...]:
         ci69.CUTOVER_NEW,
         ci69.CUTOVER_ADDED_INPUTS,
         ci69.RUNTIME_SUCCESSORS,
+        ci69.RETIRED_TESTS,
+        ci69.RETIREMENT_NAMESPACE,
     )
     if any(
         type(value) not in (str, type(None), frozenset)
@@ -857,6 +864,8 @@ def _ci60_computation_bindings(
         ),
         ci69.validate_cutover,
         ci69.expected_observed,
+        ci69.retirement_rows,
+        ci69.prelude_members,
         policy.digest,
         raw_owner,
     )
