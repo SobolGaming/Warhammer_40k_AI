@@ -1,5 +1,4 @@
 tests/code_quality/test_faction_content_runtime_structure.py
-tests/code_quality/test_performance_category_migration.py
 tests/code_quality/test_faction_integration_contract.py
 tests/code_quality/test_v963_shock_source.py
 tests/code_quality/test_order135_current_core_audit.py
@@ -28,6 +27,7 @@ tests/code_quality/test_d09_heavy.py
 tests/code_quality/test_order47_charge_endpoints.py
 tests/code_quality/test_order78_gone_to_ground.py
 tests/code_quality/test_order89_healing_authority.py
+tests/code_quality/test_performance_category_migration.py
 tests/code_quality/test_sequencing_invariants.py
 tests/code_quality/test_proposal_source_index.py
 tests/code_quality/test_order72_consolidation.py
