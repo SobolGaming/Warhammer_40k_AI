@@ -409,6 +409,7 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
         "tests/unit/test_phase15c_fight_order.py": "add-pending-decision-requests-v1",
         "tests/unit/test_phase13b_shooting_declarations.py": "add-pending-decision-requests-v1",
         "tests/integration/test_embarked_ability_authority.py": "type-only-battle-phase-cast-v1",
+        "tests/unit/test_phase18e_server_api.py": "type-only-server-session-test-access-v1",
     }
     if not isinstance(updates, dict) or set(updates) - allowed_updates.keys():
         raise SystemExit("Inactive update membership changed.")

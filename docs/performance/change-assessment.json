@@ -164,6 +164,16 @@
         }
       }
     },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "before_sha256": "2c0f1176ca9581bb9fe53c91496e452a573ef1cdeaf2ab3d2d09e34da605bcab",
+      "after_sha256": "cb509024abdc79389044920ab2ffe1eaa704123f8dd953c65c1d8bc2dde83753",
+      "owners": {
+        "@document": {
+          "before": "2c0f1176ca9581bb9fe53c91496e452a573ef1cdeaf2ab3d2d09e34da605bcab",
+          "after": "cb509024abdc79389044920ab2ffe1eaa704123f8dd953c65c1d8bc2dde83753"
+        }
+      }
+    },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "512c8b0cc84faa881e1e32124b995c9bb875b56908458ffc27c7d338d3106183",
       "after_sha256": "5769f8f4b23c5c7792261f44ce916625fbf97d4586d9a250d1e9bb994cfc9daf",
@@ -171,6 +181,16 @@
         "@document": {
           "before": "512c8b0cc84faa881e1e32124b995c9bb875b56908458ffc27c7d338d3106183",
           "after": "5769f8f4b23c5c7792261f44ce916625fbf97d4586d9a250d1e9bb994cfc9daf"
+        }
+      }
+    },
+    "scripts/build_test_shards.py": {
+      "before_sha256": "8f55f7c587357c90cb242f526949ef1b83c1eaeeff583de8b8d5668291aa61aa",
+      "after_sha256": "a3afcf4ffef5effec1aae8c66e2cb1d5340bb0d0376b8b5eecc5c38aea347a06",
+      "owners": {
+        "behavioral_selection": {
+          "before": "b6d0c4bf5243721f7788ba920f1c596f4264891c49db5c1839ad99e8b623e8af",
+          "after": "7b413d71fbe13d6f35f4f540ebf307f966dbb7ce52c46466d48d43d8067454cf"
         }
       }
     },
@@ -213,6 +233,16 @@
         "test_phase18e_recorded_invalid_retry_commits_one_session_revision": {
           "before": "6e378122852d1447100b378a90d84fa710e939baa00eedbd1f26eae97d7125d7",
           "after": "6610c644f36463a716f30d73aac7d0c0cf6e5c9aae9c102301d0fb23ed89038b"
+        }
+      }
+    },
+    "tools/performance_ci69_members.py": {
+      "before_sha256": "d7c146dfa55bb42ade20ffa7cda0091d1f04f2dfc3a533e8750056050936f5a6",
+      "after_sha256": "ae5e922e01d9baeb4d62db776857c8a36baba32b8a000e361f55c3d26f280590",
+      "owners": {
+        "validate_cutover": {
+          "before": "a25ef976fe99f7705b4e1f9eba529eb02f0d536393323a68e95d70c68a1c4bf6",
+          "after": "c6dd1df50b9a50e63341dcadb5b6789eac83c4a74e06de85a60d3e0c6a899158"
         }
       }
     },
@@ -431,6 +461,36 @@
       "rationale": "Apply the owner-clarified720-second behavior setup-and-test cutoff; pin the unchanged macOS audit to supportedIntel after hostedARM allocation failed; reconcile the exact workflow guard and README binding; remove one unnecessary Pyright suppression without any Python AST change.",
       "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
       "unchanged_work": "The same macOS semantic-audit cases and command remain required; Intel execution does not attest ARM behavior. Engine source, runtime dependency closure, assertions and scheduler remain unchanged. The new operation admits only AST-unchanged text edits of this one server test file."
+    },
+    "scripts/build_test_shards.py": {
+      "category": "dependency_environment",
+      "operations": [
+        "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
+      ],
+      "selected_families": [],
+      "rationale": "Register the exact type-only server-test source update through the existing finite inactive-update mechanism. Keep its original native ledger pin, then authenticate current bytes and reverse exactly four typed-access substitutions to the original SHA256. This does not reactivate or execute legacy tests.",
+      "source_obligation": "Preserve the original5734 native classification, all92retirements, all4886 selected behavior cases,1848 active quality cases,260 explicitdeferrals and every original assertion. Preserve current source/index and fresh phase validation, coverage64%, performance180, quality600 and behavior720-second cutoffs.",
+      "unchanged_work": "Only one existing inactive test source receives an exact before/after update. No generic fallback, new tamper suite, mutable cache, engine change or historical authority replacement. The original three inactive recipes remain unchanged; the selected-suite union is unchanged."
+    },
+    "tools/performance_ci69_members.py": {
+      "category": "dependency_environment",
+      "operations": [
+        "ci78-cutover-owners-f1ea02aa9819b407d74c91e787679c321c889b96fd25857c0118b6a173302dd1"
+      ],
+      "selected_families": [],
+      "rationale": "Register the exact type-only server-test source update through the existing finite inactive-update mechanism. Keep its original native ledger pin, then authenticate current bytes and reverse exactly four typed-access substitutions to the original SHA256. This does not reactivate or execute legacy tests.",
+      "source_obligation": "Preserve the original5734 native classification, all92retirements, all4886 selected behavior cases,1848 active quality cases,260 explicitdeferrals and every original assertion. Preserve current source/index and fresh phase validation, coverage64%, performance180, quality600 and behavior720-second cutoffs.",
+      "unchanged_work": "Only one existing inactive test source receives an exact before/after update. No generic fallback, new tamper suite, mutable cache, engine change or historical authority replacement. The original three inactive recipes remain unchanged; the selected-suite union is unchanged."
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "category": "dependency_environment",
+      "operations": [
+        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+      ],
+      "selected_families": [],
+      "rationale": "Register the exact type-only server-test source update through the existing finite inactive-update mechanism. Keep its original native ledger pin, then authenticate current bytes and reverse exactly four typed-access substitutions to the original SHA256. This does not reactivate or execute legacy tests.",
+      "source_obligation": "Preserve the original5734 native classification, all92retirements, all4886 selected behavior cases,1848 active quality cases,260 explicitdeferrals and every original assertion. Preserve current source/index and fresh phase validation, coverage64%, performance180, quality600 and behavior720-second cutoffs.",
+      "unchanged_work": "Only one existing inactive test source receives an exact before/after update. No generic fallback, new tamper suite, mutable cache, engine change or historical authority replacement. The original three inactive recipes remain unchanged; the selected-suite union is unchanged."
     }
   },
   "milestone": "ordinary",
