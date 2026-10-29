@@ -17,14 +17,14 @@ unrun checks are not passes. This exception does not certify a speedup.
 Actual-base assessment, every changed-owner mapping, live current source/index
 and dependency identity, real serial smoke and independently fresh postflight,
 static checks, all 4,886 selected gameplay cases, full-package branch coverage
-at 50%, and absolute timing gates remain required. Restore coverage to 85% as
+at 64%, and absolute timing gates remain required. Restore coverage to 85% as
 documented in the cutover record. Other bases and ordinary assessments retain
 the existing comparison policy.
 
 The separately approved final complete covered run for this cutover is the
 required GitHub CI run, rather than a duplicate local full run. Focused local
 regressions and static checks remain required; the full selected gameplay suite
-and unchanged 50% full-package branch-coverage gate must pass in CI.
+and unchanged 64% full-package branch-coverage gate must pass in CI.
 
 ## Required evidence tiers
 

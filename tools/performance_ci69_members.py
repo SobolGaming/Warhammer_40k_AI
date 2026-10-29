@@ -433,7 +433,7 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
         or coverage["metric"] != "coverage.py total with branch=true"
         or coverage["source"] != ["warhammer40k_core"]
         or type(coverage["current_floor"]) is not int
-        or coverage["current_floor"] != 50
+        or coverage["current_floor"] != 64
         or type(coverage["restoration_floor"]) is not int
         or coverage["restoration_floor"] != 85
         or type(coverage["restoration_condition"]) is not str

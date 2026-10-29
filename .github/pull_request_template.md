@@ -23,7 +23,7 @@ What invariant, module, or behavior does this PR introduce/change?
 
 ## Testing
 
-The temporary coverage floor is 50%; restore 85% through post-merge coverage work.
+The temporary coverage floor is 64%; restore 85% through post-merge coverage work.
 Record actual results; the policy change is not a passing coverage result.
 
 Commands run:
@@ -33,7 +33,7 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=50
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=64
 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports

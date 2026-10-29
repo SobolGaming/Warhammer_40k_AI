@@ -611,7 +611,21 @@ def test_required_current_receipt_matches_this_checkout_and_assessment() -> None
     pr_head = report["pull_request_head"]
     assert isinstance(base, str)
     assert pr_head is None or isinstance(pr_head, str)
-    validate_smoke_report(report, binding=validate_current(ROOT, base, pr_head=pr_head))
+    binding = validate_current(ROOT, base, pr_head=pr_head)
+    validate_smoke_report(report, binding=binding)
+    assessment = read_object(ROOT / ASSESSMENT)
+    if (
+        assessment.get("milestone") == "ordinary"
+        and assessment.get("comparisons") == {}
+        and assessment.get("comparison_disposition") != "deferred"
+    ):
+        assert binding["base_revision"] == base
+        assert binding["selected_families"] == []
+        assert "comparison_disposition" not in binding
+        assert "historical_comparison_qualification" not in binding
+        assert "history_snapshot_digest" not in binding
+        assert "current_source_identity" in binding
+        assert "dependency_identity" in binding
 
 
 def test_current_smoke_is_in_the_required_serial_ci_lane() -> None:

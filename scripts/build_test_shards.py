@@ -328,7 +328,7 @@ def deferred_comparison_cases(value: object) -> tuple[str, ...]:
         coverage["metric"] != "coverage.py total with branch=true"
         or coverage["source"] != ["warhammer40k_core"]
         or type(coverage["current_floor"]) is not int
-        or coverage["current_floor"] != 50
+        or coverage["current_floor"] != 64
     ):
         raise SystemExit("Comparison deferral changed full-package branch coverage.")
     return tuple(nodes)
@@ -370,7 +370,7 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     expected_coverage = {
         "metric": "coverage.py total with branch=true",
         "source": ["warhammer40k_core"],
-        "current_floor": 50,
+        "current_floor": 64,
         "restoration_floor": 85,
         "restoration_condition": (
             "post-merge rebuild until complete selected behavioral coverage meets85; then restore85"

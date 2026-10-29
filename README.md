@@ -1,637 +1,3 @@
-D02 completes original Save rolls before reroll choices within the selected pool.
-See [source, ownership and validation scope](docs/D02_SAVE_STEP_SCOPE.md).
-
-D12 restores legal attached CHARACTER model selection for Epic Challenge through
-the shared rules-unit validator, retaining physical keywords and model-owned
-Precision. See [source, scope and controls](docs/D12_EPIC_CHALLENGE_SCOPE.md).
-
-The separately approved movement-witness prerequisite rejects wrong physical model
-inventories before decision commit, preserving native legal retry and the existing
-recorded rule-invalid geometry contract. See [scope and acceptance](docs/MOVEMENT_WITNESS_MEMBERSHIP_SCOPE.md).
-
-Order132 / P18K restores inclusive circular Rapid/Tactical disembark distance
-through shared geometry, preserving setup, continuation, persistence and replay.
-See [source and scope](docs/ORDER_132_SCOPE_PLAN.md).
-
-Order126 / P03G preserves physical model movement order across shared Movement,
-Scout, Charge, Fight and triggered consumers, including attached units. See
-[source and scope](docs/ORDER_126_SCOPE_PLAN.md).
-
-Order125 / P02N normalizes selected implicit keyword subjects to units at the
-data boundary and executes them through the existing catalog selected-target
-consumer. Model keyword ownership remains separate; see
-[source and scope](docs/ORDER_125_SCOPE_PLAN.md).
-
-# warhammer40k-core-v2
-
-Order124 / P02M compiles the retained Core nested reroll exemplar through generic
-RuleIR and the catalog reroll registry. The stronger objective branch retains
-closest eligible target selection with the actual weapon/type and recorded
-objective control. See [source and scope](docs/ORDER_124_SCOPE_PLAN.md).
-
-Order123 / P02L carries each datasheet name through shared catalog identity,
-effective catalog gates and model/unit keyword queries. Raw official inventories
-and faction admission remain unchanged; see [source and scope](docs/ORDER_123_SCOPE_PLAN.md).
-
-Strict bottom-up Warhammer 40k engine reconstruction.
-
-Order122 / P01K derives omitted effect lifetimes from typed trigger periods or
-the phase in which a lasting effect is given. Live modifiers, historical
-reconstruction and Objective Control use shared expiry; see
-[source and scope](docs/ORDER_122_SCOPE_PLAN.md).
-
-Order121 / P08C resolves source-backed unqualified Command abilities after
-Core CP/Battle-shock and before end-phase rules through the shared catalog,
-sequencing and continuation owners. Named faction activation remains deferred;
-see [source and scope](docs/ORDER_121_SCOPE_PLAN.md).
-
-Order 116 / P06E adds the generic source-permission attack seam for additional
-mortal wounds, preserving ordinary damage first, attack identity and shared
-allocation, persistence and replay. Named faction providers remain outside this
-Core repair. See [source and scope](docs/ORDER_116_SCOPE_PLAN.md).
-
-Order 115 / P02K preserves dash-M immobility throughout every witnessed path,
-including rotations and fixed-distance reactions. Numeric zero retains Advance
-and explicit distance; Surge certifies fixed-pose maximum approach, including
-oval bases. Setup, persistence and replay keep shared authority. See
-[source and scope](docs/ORDER_115_SCOPE_PLAN.md).
-
-Order 110 / P16C immediately interrupts Actions on newly applied Battle-shock.
-Explicit source permission allows shocked starts and continuation; original
-restrictions and movement interruption remain. See [scope and evidence](docs/ORDER_110_SCOPE_PLAN.md).
-
-Order 109 / P14B requires a controlling unit to be in objective range and contain
-a positive-OC model, which may be outside that range. Player scores still sum
-only in-range models. Shared Stratagem selection and frozen mission completion
-preserve attached units, restore and replay. See [source resolution and scope](docs/ORDER_109_SCOPE_PLAN.md).
-
-Order 107 / P12D limits extra Pile In and Consolidation distance to their matching
-Fight phase steps. Overrun retains three inches through the shared ordinary and
-attached movement authority. See [source, scope and validation](docs/ORDER_107_SCOPE_PLAN.md).
-
-Order 106 / P12C requires each moved Pile In model to approach its initially
-closest selected target and engage it when a legal witnessed move can do so.
-Ordinary and attached units share the existing movement reachability constraints,
-including coherency and continuing engagement. See
-[source, scope and validation](docs/ORDER_106_SCOPE_PLAN.md).
-
-Order 105 / P06D applies the all-model MONSTER/VEHICLE requirement to Hazard
-and Hazardous wound counts. Mixed and attached units share the same count across
-attacks and transport disembarkation; the Infantry/Vehicle FAQ retains one wound.
-See [source, scope and validation](docs/ORDER_105_SCOPE_PLAN.md).
-
-Order 104 / P04H permits a visible enemy model and a different in-range enemy
-model in the same target rules unit. Shared ordinary and reaction shooting keep
-complete visibility witnesses and bearer-specific range evidence. See
-[source, scope and validation](docs/ORDER_104_SCOPE_PLAN.md).
-
-Contract 44.1 makes Firing Deck declarations constructible from public requests
-after other units have shot. Exact engine validation and cargo restrictions remain
-unchanged; see [issue 533](docs/ISSUE_533_FIRING_DECK_AUTHORITY.md).
-
-Order 103 / P04G groups otherwise identical PRECISION and plain attacks when
-the selected target has no CHARACTER. Physical weapons and selected sources
-remain intact; recorded group context survives casualties, restore and replay.
-See [source, scope and evidence](docs/ORDER_103_SCOPE_PLAN.md).
-
-Order 102 / P04F separates completing a Fight selection from actually making melee
-attacks. Empty selections remain consumed, do not open after-fought windows, and
-retain Fight On Death models until phase-end cleanup. Armed retained cleanup,
-restore and Engaging continuation share the same completion authority. See
-[source, scope and evidence](docs/ORDER_102_SCOPE_PLAN.md).
-
-V963-SHOCK adopts the timestamped current 18.07 observation: ordinary coherent,
-unengaged setup, no Shock forced Fight response, and charge ineligibility through
-turn-end rules. See [source, scope and evidence](docs/V963_SHOCK_SCOPE_PLAN.md).
-The original Order 97 inventory remains historical; its superseded Shock
-assertions validate against five authenticated baseline copies.
-
-Order 101 / P03F restores ordinary Movement selection rights when complete
-disembark or reserve Ingress setup fails. Prior cargo/reserve location remains
-unchanged, and a fresh unit selection permits retry or legal Remain Stationary.
-Ordered history authenticates restore, continuation and exact replay. See
-[scope and evidence](docs/ORDER_101_SCOPE_PLAN.md).
-
-Order 100 / P17B measures every part of a based FRAME model for whole-distance,
-Engagement Range, objective control, movement, terrain-area membership, and
-disembark placement. Ordinary models still measure from the support base. See
-[scope and evidence](docs/ORDER_100_SCOPE_PLAN.md).
-
-Order 99 / P02J bounds modified Leadership to 5–8 and modified Weapon Skill and
-Ballistic Skill to 2–6 after the shared modifier algebra. Live leadership tests
-and weapon-profile hit rolls use that policy and keep source identity, order,
-and replay. See [scope and evidence](docs/ORDER_99_SCOPE_PLAN.md).
-
-Order 97 / PEVIDENCE adds the complete selected source-block and clause inventory,
-exact assertion receipts, and runtime source reconciliation. Its negative probes
-identify further source and gameplay prerequisites before PFINAL; see the
-[scope and limits](docs/ORDER_97_SCOPE_PLAN.md) and
-[clause evidence report](docs/ORDER_97_EVIDENCE_REPORT.md).
-Verify it with `uv run python -m tools.core_rules_order97_inventory --check`.
-
-Order 96 / P24K implements optional Twin-linked wound rerolls through the shared
-source-backed decision and resume authority. Successful rolls, declines, source
-overlap, retained attacks and replay use the same path. See
-[scope and evidence](docs/ORDER_96_SCOPE_PLAN.md).
-
-Order 95 / P04E implements optional ranged targets. A selected Shooting unit can
-select no weapons or decline targets for selected physical weapons; Hazardous,
-One Shot and selection restrictions still resolve through the shared engine.
-See [scope and evidence](docs/ORDER_95_SCOPE_PLAN.md).
-
-Current Core status: the retained [Order 95 audit](docs/ORDER_95_AUDIT_REPORT.md)
-found two gameplay gaps and an incomplete clause-evidence inventory after Orders
-1–94. Orders 95–96 address C04-06 and C24-11. Order 97 records the clause evidence
-and schedules newly discovered repairs before PFINAL. Core Rules and full-game performance remain uncertified; see the
-[roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md) and
-[evidence limits](docs/ORDER_95_AUDIT_NOTES.md). Historical audit observations remain unchanged.
-
-Order 84 / P01G implements source-assigned dice results and active-player
-selection among tied highest/lowest physical dice. See
-[scope and evidence](docs/ORDER_84_SCOPE_PLAN.md) and
-[Contract 38 migration](contracts/migrations/37-to-38.md). Core certification
-remains separate under PFINAL (after all current roadmap prerequisites). Orders 85–94 were open at that audit; the
-implementation entries below and roadmap record their later status.
-
-Order 93 / P02I preserves individual source operations until an authorized
-player selects which modifiers to ignore. A bounded finite decision serves
-characteristics and rolls across movement, attacks, saves, Leadership, Objective
-Control and source-backed healing, with model/weapon ownership and authenticated
-restore/replay. See the [scope and evidence](docs/ORDER_93_SCOPE_PLAN.md),
-[owner inventory](docs/ORDER_93_OWNER_INVENTORY.md), and
-[Contract 41 migration](contracts/migrations/40-to-41.md).
-
-Order 92 / P04D implements recorded random melee attack splits under the owner's
-provisional timing convention. Weapons/profiles commit before one physical A roll
-per weapon; invalid retries and target replacement preserve the counts. See the
-[convention and evidence](docs/ORDER_92_SCOPE_PLAN.md).
-
-Order 91 / P04C permits legal Shooting unit/type selection when no attacks can be
-made. Empty completion applies type and cargo restrictions without recording that
-the unit shot. Ordinary and retained hosts share the same engine owner; see the
-[scope and source record](docs/ORDER_91_SCOPE_PLAN.md).
-
-Order 90 / P01J preserves source-defined wounds and equipment for embarked and
-reserve revival. Shared finite decisions keep returns unplaced, enforce cargo
-capacity and authenticate restore before ordinary later ingress. See
-[scope and evidence](docs/ORDER_90_SCOPE_PLAN.md).
-
-Order 89 / P02H separates ordinary unit healing, model healing and explicit
-revival. All units can choose among wounded models; ordinary healing excludes
-destroyed Characters, model heals discard excess, and source ownership persists
-through the shared facade and replay. See [scope and evidence](docs/ORDER_89_SCOPE_PLAN.md).
-
-Order 88 / P02G treats absent weapon Strength as one for wound rolls and rule
-comparisons while preserving the immutable dash descriptor. Shooting, Fight and
-rerolls share the same query. See [scope and evidence](docs/ORDER_88_SCOPE_PLAN.md).
-
-Order 83 / P01F fixes phase-start revival coherency anchors. Shared producers
-and restore authenticate the phase-opening physical inventory, so models absent
-at phase start cannot become anchors through later returns. Contract 37
-records this source-bound authority. See [scope and evidence](docs/ORDER_83_PREFLIGHT_AUDIT.md).
-PFINAL is Order 84 and requires this prerequisite to merge and a fresh complete
-audit. Core Rules and complete-game performance remain uncertified.
-
-Order 82 / P01E implements revived-model engagement against already-engaged
-canonical enemy rules units, including attached components and retained destroyed
-models. The shared placement validator measures the pre-return battlefield;
-restore authenticates source-bound unit evidence against physical history.
-Contract 36 rejects obsolete model-scoped snapshots. See
-[scope, source and validation](docs/ORDER_82_SCOPE_PLAN.md).
-Order 81's shared parameterized projection prerequisite is merged in PR #501.
-Order 82 is merged in PR #502. PFINAL requires P01F and a fresh complete audit;
-no all-category or complete-game performance certification is claimed.
-
-Order 80's PFINAL preflight found C09-03: a reactive Normal Move in the
-opponent's Movement phase blocks the unit's Normal Move in its own phase of
-the same round. P09C now owns Order 80 and implements explicit turn ownership across Normal Move
-history, validation, direct consumers, persistence and replay.
-See [source, reproduction and approved implementation](docs/ORDER_80_PREFLIGHT_AUDIT.md).
-This prerequisite is merged in PR #500. No Core Rules or complete-game certificate is claimed.
-
-Order 79 / P14A freezes turn-end objective control before turn-end rules and
-cleanup. Control-based scoring retains models present before coherency removal.
-Optional reserve choices preserve that snapshot; source-dash Aircraft test event
-order without contributing OC. Phase-end effects expire at their separate boundary. See [scope and evidence](docs/ORDER_79_PREFLIGHT_AUDIT.md).
-This prerequisite is merged. PFINAL is Order 84 and requires P03E and P01E plus a fresh complete audit. Core Rules certification and complete-game performance remain uncertified.
-
-Order 78 / P13A applies Gone to Ground to Hidden models concealed by intervening
-Dense features, even outside those features. Shared shooting and LOS queries
-use per-model causal visibility and current/previous-turn ranged history.
-Ordinary Shooting and Fire Overwatch preserve validation, viewer scope, restore
-and exact replay. See [scope and evidence](docs/ORDER_78_PREFLIGHT_AUDIT.md).
-This prerequisite is merged. PFINAL is Order 84 and requires the new prerequisites and a fresh audit. Core Rules compliance and complete-game performance
-remain uncertified.
-
-Order 77 / P16B interrupts Actions from accepted completed moves, including
-return paths, rotation-only paths and zero-distance moves. Live play and restore
-share model-lineage evidence; physical transition deltas keep their existing
-meaning. See [scope and validation](docs/ORDER_77_PREFLIGHT_AUDIT.md). PFINAL is
-Order 84; this prerequisite is merged and a fresh complete audit is still required.
-
-Order 76 / P03D preserves exact replay and recovery after malformed or stale
-physical proposals. Shared diagnostics leave authoritative histories unchanged;
-recorded rule-invalid attempts retain their retry path. See
-[scope and validation](docs/ORDER_76_PREFLIGHT_AUDIT.md). PFINAL is Order 84;
-this prerequisite is merged and a fresh complete audit is still required.
-
-Order 75 / P21C accepts provably optimal Surge approaches to fixed oval and
-rectangular targets through the shared geometry, facade, restore and replay
-path. The bound preserves the target footprint and facing, while retaining
-conservative rotation allowances for noncircular movers. See
-[scope and evidence](docs/ORDER_75_PREFLIGHT_AUDIT.md). PFINAL is Order 84;
-this prerequisite is merged and a fresh complete audit is still required.
-
-Order 74 / P03C repairs terrain-blocked mandatory movement endpoints using a
-shared continuous exclusion proof. Charge records and restores that proof;
-Consolidation and Surge consume the same reachability authority. Unresolved
-path or maximum-approach searches remain fail-closed. See
-[scope and evidence](docs/ORDER_74_PREFLIGHT_AUDIT.md). PFINAL is now Order 84
-and still requires a complete audit; this prerequisite is merged.
-
-Order 72 resolves consolidation responses against owner-confirmed official App
-data v946: only Engaging Consolidation forces enemy Fight selections. Ongoing
-preserves prior engagements without a response queue. Shared source authority,
-restore and replay reject superseded Ongoing responses. See
-[scope and source resolution](docs/ORDER_72_SCOPE_PLAN.md). Reproduce both the
-current source package and its immutable historical copy with
-`uv run python tools/build_core_fight_source.py --check`.
-
-Order 70 requires Fights First on every rules-present model. Intrinsic component
-sources and conditional Leader model grants keep their model ownership; unit grants, Charge,
-casualties, retained cleanup and split lineage use the shared live coverage query.
-See [scope and validation](docs/ORDER_70_SCOPE_PLAN.md). Verify the reviewed source
-with `uv run python tools/build_core_fights_first_source.py --check`.
-
-Order 50 resolves Heroic Intervention through the ordinary Charge declaration,
-reroll, modifier, target-selection and witnessed-movement sequence. Into the Fray
-caps the modified roll before separate movement-distance effects; Leap to Defend
-uses completed Charge moves from the current phase. See
-[Order 50 scope and evidence](docs/ORDER_50_SCOPE_PLAN.md).
-
-Order 49 offers whole-roll Command Re-roll for ordinary Charges and preserves
-natural Charge rerolls during Heroic Intervention. Command Re-roll targets the
-rolling unit, so the shared one-Stratagem-per-unit-per-phase restriction applies.
-See [rules and validation](docs/ORDER_49_SCOPE_PLAN.md).
-
-Order 48 offers Crushing Impact after Charge completion through finite enemy/model
-choices, applies the selected model's modified Toughness and both six-wound caps,
-and resumes Charge after allocation, Feel No Pain and destruction. See
-[scope and validation](docs/ORDER_48_SCOPE_PLAN.md).
-
-Order 47 enforces every charging model's closer, within-one-inch and engagement
-obligations through the shared validated-path search. Attached units charge once
-under their canonical identity, with atomic component movement and authenticated
-per-model replay evidence. See [scope and validation](docs/ORDER_47_SCOPE_PLAN.md),
-[performance evidence](docs/performance/order47/README.md), and the
-[contract 19 migration](contracts/migrations/18-to-19.md).
-
-Order 46 implements Charge roll/movement-budget separation and finite target
-commitments with shared P04 replacement after later modifier changes. See
-[scope and validation](docs/ORDER_46_SCOPE_PLAN.md) and the
-[contract 18 migration](contracts/migrations/17-to-18.md).
-
-Order 45 implements one Fire Overwatch opportunity at the end of the opponent's
-Movement phase, with an independent choice of one eligible visible enemy within
-24 inches through canonical Snap Shooting. CP, source restrictions, attached units,
-Action locks, restore and replay share the engine path. See [scope and validation](docs/ORDER_45_SCOPE_PLAN.md),
-[performance evidence](docs/performance/order45/README.md), and the
-[Contract 17 migration](contracts/migrations/16-to-17.md).
-
-Order 44 adds the controlling player's per-critical-hit Lethal Hits choice in
-Shooting, Fight and reaction attacks. Automatic wounds and ordinary wound rolls
-share validation, restore and replay. See [scope and validation](docs/ORDER_44_SCOPE_PLAN.md)
-and [performance evidence](docs/performance/order44/README.md).
-
-Order 43 implements source-backed critical-hit success and the Snap Shooting
-unmodified-six requirement, with shared critical effects, restore and replay.
-See [scope and validation](docs/ORDER_43_SCOPE_PLAN.md) and the
-[Contract 16 migration](contracts/migrations/15-to-16.md).
-
-Order 42 adds shared target invalidation/replacement choices and the Shooting
-consumer, preserving committed weapons, dice, source restrictions, restore,
-replay and adapter visibility. See the [scope and validation](docs/ORDER_42_SCOPE_PLAN.md).
-Charge's later-modifier continuation is implemented by Order 46.
-
-Order 41 implements during-phase Explosives through finite rules-unit/model/enemy
-choices, model-specific range and visibility, shared shooting restrictions and
-mortal-wound continuations. See [scope and validation](docs/ORDER_41_SCOPE_PLAN.md).
-Verify its existing reviewed source with
-`uv run python tools/build_core_stratagem_app_source.py --check`.
-
-Order 40 moves Smokescreen to opponent Shooting-start sequencing and grants Cover
-through its selected rules unit and obscuring models, without a Hit-roll penalty.
-It uses generic RuleIR, shared causal visibility and the existing finite Stratagem
-contract. See [scope and validation](docs/ORDER_40_SCOPE_PLAN.md). Verify its reviewed
-source with `uv run python tools/build_core_smokescreen_source.py --check`.
-
-Order 39 makes Stealth grant Benefit of Cover only when every present model in
-the target rules unit has the ability. Native, attached, Aura, selected-target
-and Darkness grants share one source-aware engine query. See the
-[scope and validation record](docs/ORDER_39_SCOPE_PLAN.md). Regenerate its reviewed
-source with `uv run python tools/build_core_stealth_source.py`; the two catalog
-overlays, support reports, runtime identity and contract are described there.
-
-Order 38 separates source-permitted Assault and Shock Disembark eligibility from
-Transport movement history. Every legal mode has its own finite option; stale
-grants are rejected before placement. See the [scope and validation record](docs/ORDER_38_SCOPE_PLAN.md)
-and the [adapter contract](docs/ADAPTER_DECISION_CONTRACT.md#order-38--independent-core-disembark-eligibility).
-
-Order 36 implements source-backed Rules Sequencing: each player orders their
-mandatory and optional rules in the applicable tier, while new triggers wait for
-the original timing batch. Movement, attacks and mission scoring share that
-authority with replay and viewer redaction. See the
-[scope and validation record](docs/ORDER_36_SCOPE_PLAN.md) and the
-[Contract 15 migration](contracts/migrations/14-to-15.md). Regenerate its reviewed
-source package with `uv run python tools/build_core_sequencing_source.py`, then
-the engine identity and external contract as described below.
-
-Order 32 replaces sampled visibility with continuous predicates over analytic
-circles, ellipses and oriented rectangles, using the shared 1mm corridor authority.
-Its source evidence, acceptance matrix, correctness argument and consumer audit
-are in the [Order 32 review](docs/performance/ORDER_32_VISIBILITY_REVIEW.md).
-Regenerate the reviewed source data offline with
-`uv run python tools/build_core_other_concepts_source.py`; use `--check` to verify
-it, then regenerate engine identity and the external contract. The owner deferred
-further performance work until complete head-to-head headless games can be timed;
-the preserved diagnostics are not performance certification.
-
-Orders 26, 27 and 29 implement exact ordered modifiers, distinct raw/modified
-roll records with source-defined limits, and shared 9–30 inch Detection/Lone
-Operative range limits. Scope and evidence are recorded in the
-[combined scope audit](docs/ORDERS_26_27_29_SCOPE_PLAN.md) and
-[Core remediation roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md).
-Registered and generic characteristic operations share that arithmetic before
-terminal bounds, including Objective Control, Movement and historical Leadership.
-Regenerate their reviewed source artifacts offline with
-`uv run python tools/build_core_modifiers_source.py`; use `--check` to verify
-committed data, then regenerate engine identity and the external contract as
-shown in [contracts/README.md](contracts/README.md).
-
-Order 53 adds source-backed Super-Heavy Walker movement, the per-move all-model
-MOBILE choice and its sequenced direct Battle-shock roll. See
-[scope and validation](docs/ORDER_53_SCOPE_PLAN.md) and
-[Contract 24 migration](contracts/migrations/23-to-24.md). Reproduce its reviewed
-source artifact offline with
-`uv run python tools/build_core_super_heavy_walker_source.py --check`, then verify
-engine identity and the external contract using the generator commands below.
-
-Order 54 implements proven oversized deployment at the player's edge and shared
-setup-turn activity restrictions, preserving the Strategic Reserves AIRCRAFT
-exception. See [scope and validation](docs/ORDER_54_SCOPE_PLAN.md) and
-[Contract 25 migration](contracts/migrations/24-to-25.md). Verify source data with
-`uv run python tools/build_core_large_model_setup_source.py --check`.
-
-For faction coverage, start with the [faction support guides](docs/FACTION_SUPPORT.md).
-They list current army rules, detachments and unit costs, separate historical
-implementation evidence from fieldability/playability, and link the
-[faction remediation roadmap](docs/FACTION_RULES_REMEDIATION_ROADMAP.md).
-
-Start here:
-
-```bash
-uv python install 3.14.5
-uv lock
-uv sync
-uv run pytest tests/unit/test_phase10i_terrain_movement.py -q --no-cov
-```
-
-## Test commands
-
-Pytest defaults are intentionally lightweight: narrow local and IDE runs do not start xdist
-workers or collect coverage unless requested.
-
-Fast local feedback names the affected test files explicitly, for example:
-
-```bash
-uv run pytest tests/unit/test_phase10i_terrain_movement.py -q --no-cov
-uv run pytest tests/rules/section04/test_completion_boundaries.py -k attack_mortal_choices -q --no-cov
-```
-
-Architecture and source-shape audits run independently without behavioral coverage:
-
-```bash
-uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
-```
-
-For final validation, run the behavioral suite once with coverage and the code-quality
-suite above once without coverage. A second no-coverage behavioral run is unnecessary.
-Focused subsets and `--lf` are for iteration, never replacements for this final gate:
-
-```bash
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
-  uv run pytest tests --ignore=tests/code_quality \
-  -n auto --dist=worksteal \
-  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=50
-```
-
-The `PATH` prefix exposes the Node.js runtime bundled with Codex desktop to the executable
-viewer-renderer regressions. It is safe when that directory is absent: an independently installed
-`node` later on the existing `PATH` remains available. Keep this prefix on full-suite runs so those
-tests do not fail only because the desktop shell omitted the bundled runtime.
-
-CI shards this same behavioral suite, combines branch coverage, and applies the temporary 50%
-gate after every shard succeeds. Full type checking and architecture checks also remain required
-in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
-format for a shorter edit/commit loop.
-
-The owner temporarily lowered the coverage floor from 85% to 50% on 28 October 2026.
-Post-merge coverage work must restore the 85% requirement. The full
-warhammer40k_core package and branch metric remain unchanged, with no added coverage
-omissions or exclusions. This policy change does not claim either threshold has passed;
-all required tests and other gates must still succeed. See the
-[active review policy](docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
-
-The twelve behavioral manifests in `ci/test_shards/` use deterministic
-largest-processing-time balancing. One heavy, source-bound module is partitioned
-into its twenty exact collected cases; every other file remains intact. The
-required quality guard checks that partition against real pytest collection.
-Verify that every selected file or declared case appears exactly once:
-
-```bash
-uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
-```
-
-Download the `behavior-report-*` artifacts from each chosen successful run into a
-separate directory outside the checkout, then regenerate (repeat both options for
-additional runs). Downloaded profiles are supplied inputs, not generated source:
-
-```bash
-uv run --no-sync python scripts/build_test_shards.py \
-  --junit ../behavior-reports/run-one \
-  --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
-  --junit ../behavior-reports/run-two \
-  --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
-  --shard-count 12
-```
-
-The initial replacement cutover uses explicitly derived scheduling seeds from
-the retained passing cases of hosted run 40639444907 and bounded local regression
-results. Those seeds are not a complete successful current-run profile; an empty
-`profiles` list records that limitation. Replace them with the first complete
-successful selected-suite profile. Seed totals are scheduling weights, not
-measured job wall times or proof that the ten-minute target passes.
-
-A single complete local JUnit XML is also accepted; label its host accurately and
-do not mix local and hosted-runner timings in one representative CI profile.
-Every supplied run must cover the current behavioral file inventory. Missing files,
-duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts
-are rejected. Outside the explicit initial migration seed above, new test files
-require a fresh complete profile; timings are never filled with zero. `durations.json` preserves report SHA-256 hashes and run descriptions.
-Historical profiles measure their recorded case inventory; changed cases within an
-existing file require refreshed successful CI reports to reflect their new cost.
-
-Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing
-artifacts containing collection node IDs, collection time, setup/call/teardown times,
-outcomes, Python/platform/CPU/memory metadata, and commit/run IDs. Enable the same
-local evidence with `TEST_TIMING_DIR=reports/timing`. These artifacts distinguish
-collection overhead and long individual cases from aggregate file costs.
-
-`quality-fast` now aggregates concurrent lint, contract/conformance, code-quality,
-and the existing macOS semantic audit. Every child must succeed, including on draft
-PRs; failed, cancelled, and unexpectedly skipped children fail the aggregate.
-The contract lane executes TypeScript unit tests as well as generated-client checks,
-live conformance, base-ref compatibility, and installed-wheel smoke. Code-quality
-workers share read-only source/AST data within each process; mutable test fixtures
-and generated temporary output remain independently validated.
-
-Twelve standard runners increase behavioral parallel capacity without changing test
-selection or the combined branch-coverage measurement. Compare several successful CI
-runs before claiming a wall-time reduction: added capacity can increase total runner
-minutes, and cold caches or queued jobs can offset the idealized speedup. Keep main
-and merge-candidate verification; no previously tested tree is reused as authority.
-
-## Battlefield viewer
-
-Inspect the Event Companion battlefield projection with an orbitable 3D camera:
-
-```powershell
-uv run python scripts/mock_event_layout_ui.py --host 127.0.0.1 --port 8765
-```
-
-Open `http://127.0.0.1:8765/`. All 15 Event Companion force-disposition
-pairings and every A/B/C variant are available: 45 of 45 source-hashed
-executable battlefield packages with terrain, regions, source-linked objective
-footprints, walls, and floors. Across the package, the viewer exposes 720
-physical terrain-area footprint pieces forming 608 logical rules areas, plus
-1,349 physical components. The PDF layout-page Single/Separate glyphs are
-rendered at their source coordinates using the page-8 legend; 112 Single joins
-pair 224 footprint pieces and the other 496 pieces remain individual areas.
-Page 9 contains the source-backed 29-component exception, while every other
-layout contains 30. See
-[docs/BATTLEFIELD_VIEWER.md](docs/BATTLEFIELD_VIEWER.md) for controls, data
-authority, complete battlefield geometry, executable Primary scoring for all 25
-Event Companion missions, and Step 5G lifecycle, restore, viewer-redaction, and
-replay certification of both players' ordinary Primary scoring boundaries on all
-45 A/B/C layouts. The 90 layout/direction cases begin at an engine-owned fight
-activation decision boundary, round-trip `replay-artifact-v9-sequencing`,
-and require exact `ReplayRunner` reproduction. All 18 Secondary Mission cards
-are source-backed and executable through turn-end scoring with lifecycle restore
-evidence; their lifecycle certification remains Layout-A-only. The broader
-mission runtime exposes all 14 Mission Actions.
-
-CI uploads each shard's JUnit report for future median-duration profiles. Full behavioral shards
-run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the
-faster quality and parallel type-check feedback without repeatedly running the complete suite.
-The stable `coverage-gate` aggregate fails closed when any behavioral shard does not succeed, then
-combines all twelve coverage artifacts and enforces the branch-coverage threshold. Repositories that
-enable branch protection can require `quality-fast`, `mypy`, `pyright`, and `coverage-gate` without
-encoding matrix shard names in the protection rule.
-
-## External adapter contract
-
-Order 18 (P14) provides shared closest-part objective geometry for point markers
-and source-linked terrain footprints. Objective Control, generic objective
-rerolls, and historical mission witnesses consume the same engine query with
-explicit attached-model ownership. Source ingestion requires an objective scope
-and applies the v931 non-Core “objective marker” alias before parsing; Core Rules
-and historical text keep their original terminology. The reviewed source package
-and provider audit can be checked offline with
-`uv run --no-sync python tools/build_core_objectives_source.py --check`.
-See the P14 finding in
-[the remediation roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md) for evidence,
-scope, and validation.
-
-Order 19 (P12) consumes that geometry for Objective Consolidation and enforces
-per-model destinations for all consolidation modes. Mandatory endpoint queries
-validate complete paths and cache immutable geometry/policy snapshots in a bounded
-512-entry cache. Engaging consolidation suspends ordinary Fight state
-while each affected unselected enemy fights through the opponent's decision path,
-then resumes the interrupted consolidation order. Order 72's v946 source
-resolution excludes Ongoing Consolidation from this response. Internal continuation snapshots
-remain outside public event projections. Check the reviewed 12.07/12.08 and v931
-source artifact with `uv run --no-sync python tools/build_core_fight_source.py --check`.
-The P12 roadmap entry records the conservative reachability diagnostic and scope.
-
-Orders 20–21 apply Aura self-inclusion and non-stacking through shared rules-unit
-queries, and enforce Psychic-level ability use once per canonical PSYKER unit,
-stable source ability and phase occurrence. Physical source/component/model IDs
-remain replay evidence. The existing finite activation path rejects exhausted uses
-before recording or mutation. Check the reviewed 22.01/22.03.01 source package with
-`uv run --no-sync python tools/build_core_aura_psychic_source.py --check`; this
-offline builder reproduces both the versioned JSON and maintained-mirror audit.
-The source loader and authority registry pin their bytes and observation identities.
-
-Order 22 (P24C1) preserves duplicate Core and weapon ability source occurrences,
-including equal-valued grants from different sources. Native profile definitions
-and explicit grants have deterministic identities that survive serialization and
-replay. Player instance selection remains P24C2; source evidence records partial
-runtime support. Verify the pinned 24.02 source and audit offline with
-`uv run --no-sync python tools/build_core_duplicated_abilities_source.py --check`.
-
-Order 24 (P01B) adds source-authorized pre-battle unit splitting through finite
-membership decisions. The engine preserves model IDs and attached-component
-lineage, records two balanced successors, and authenticates their ownership
-through placement, damage and checkpoint/replay. See the
-[adapter contract](docs/ADAPTER_DECISION_CONTRACT.md#order-24-source-authorized-unit-splitting)
-and [scope record](docs/ORDER_24_SCOPE_PLAN.md).
-
-Order 23 (P01) resolves Command-phase Battle-shock for embarked and Strategic
-Reserve rules units through the existing candidate, sequencing, reroll and event
-path. Living model authority is independent of battlefield geometry and is
-revalidated for pending submissions and historical replay. Verify the reviewed
-01.02.04 location definition and Battle-shock paragraph with
-`uv run --no-sync python tools/build_core_off_battlefield_battle_shock_source.py --check`.
-The remaining clauses of 01.02.04 are outside this certification.
-
-The canonical Phase 18D language-neutral baseline and completed Phase 18E-18J
-session, command, reconnect, authentication, authorization, redaction,
-interaction, and battlefield contracts are in [`contracts/`](contracts/README.md).
-Phase 18L adds the closed `session-persistence-v3-weapon-instances` operator-only
-persistence checkpoint contract and fail-closed recovery semantics. Its
-runtime-tree build fingerprint, explicit first-boot initialization, locked and
-verified SQLite v2 transaction, and unpruned per-revision commitment chain keep
-missing, stale, or internally inconsistent durable state from being accepted as
-a recovered authority. The
-bundle includes Draft 2020-12 schemas, OpenAPI 3.1, real session-derived examples with explicit
-decision-family coverage status, proposal examples, versioned session metadata and idempotent
-command outcomes, protected opaque role-bound cursor/resync payloads, explicit principal-role policy,
-compatibility/redaction/session/coordinate/persistence semantics, and conformance scenarios.
-Verify schema, example, OpenAPI, Python-version, coverage, manifest, and compatibility drift with:
-
-```bash
-uv run --no-sync python scripts/build_engine_build_identity.py --check
-uv run --no-sync python scripts/build_external_contract.py --check
-uv run --no-sync python scripts/smoke_installed_contract_wheel.py
-```
-
-After an intentional change to packaged runtime Python/JSON resources or the
-packaged contract schemas, regenerate
-`src/warhammer40k_core/_engine_build_manifest.json` with
-`uv run python scripts/build_engine_build_identity.py` before regenerating the
-external examples that publish that build ID.
-
-The Phase 18M-A TypeScript client in
-[`conformance/typescript/`](conformance/typescript/README.md) generates models
-from that OpenAPI document, validates the canonical JSON Schemas, and completes
-the first certified HTTP-only scenario against two clean reference servers:
-
-```bash
-cd conformance/typescript
-npm ci
-npm test
-```
-
 # CORE V2 Architecture
 
 ## 1. Purpose
@@ -647,6 +13,9 @@ The legacy repository remains valuable as:
 - a comparison harness for deterministic replay and behavior.
 
 CORE V2 is not a blank rewrite. It is a strict reconstruction with enforced invariants.
+
+Source-linked model geometry requires representative model height with provenance
+before runtime catalog use.
 
 ## 2. Non-negotiable invariants
 
@@ -760,274 +129,19 @@ adapters -> may import engine, never the reverse
 
 ## 4. Build order
 
-The detailed phase roadmap belongs in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
-This README keeps only the build sequence and the current high-level status.
+Develop bottom-up; add the owning invariant and focused tests before dependent behavior:
 
-Build in this order:
+1. Governance, deterministic RNG/dice, attributes, modifiers and source normalization.
+2. Models, attached units, geometry, visibility, pathing, objectives and missions.
+3. Typed decisions, events, replay, lifecycle routing and shared adapter contracts.
+4. Movement, shooting, charge, fight, setup, reserves and transports.
+5. Source-backed catalogs, generic RuleIR execution and faction coverage.
+6. Viewer-safe headless, CLI, UI and network adapters.
+7. AI/rankers/training after deterministic rules and replay are trustworthy.
 
-1. Governance, quality gates, deterministic RNG, dice, attributes, modifiers,
-   and source-text normalization.
-2. Wargear, weapon profiles, model geometry, units, attached units, battlefield
-   geometry, visibility, pathing, objectives, and mission setup.
-3. Decision requests/results, event records, replay, lifecycle routing, and the
-   shared adapter contract.
-4. Movement, shooting, charge, fight, deployment, reserves, transports,
-   reactive movement, and grouped attack/damage resolution.
-5. Source packages, catalog generation, rule IR, generic rule execution,
-   faction coverage, and faction-specific runtime handlers.
-6. Adapters and interfaces: headless, CLI, UI, network, event streams,
-   viewer-safe projection, and trigger opportunity windows.
-7. AI, rankers and training only after the deterministic rules core and replay
-   records are trustworthy. Profiling, benchmarks and optimization of the current
-   rules-engine slice are authorized now under the
-   [standing performance policy](docs/performance/PERFORMANCE_POLICY.md).
-
-Current status:
-
-Performance validation uses the owner-approved
-[v3 tiered policy](docs/performance/PERFORMANCE_POLICY.md): immutable historical
-evidence, an exact-base change assessment and real current-runtime smoke on every
-PR, then matched detailed comparisons for relevant sensitive operations and
-complete-game profiling at rules-complete milestones. Before full quality tests,
-run `uv run --no-sync python -m scripts.check_performance_policy --base-ref <exact-PR-base-SHA>`
-serially. A changed global runtime identity alone does not refresh all history;
-missing applicable evidence still fails closed.
-
-- Core rules infrastructure through movement, shooting, charge, fight, setup,
-  reserves, transports, missions, replay, source ingestion, catalog generation,
-  rule IR, generic rule execution, and adapter decision submission is in place.
-- Phase 17O exposes a deterministic `capability-manifest-v2-directed-primary`
-  inside the `support-profile-v4-directed-primary` response. It reports load,
-  display, mustering, physical, semantic, full-game, network, and replay
-  capability independently for the
-  selected rosters, units, rules, mission, and geometry. Player views omit every
-  opponent-owned row, unsupported reason, count, and derived selection hash;
-  current full-game and release claims remain false without certified evidence.
-- Phase 18L persists the complete single-authority adapter server state as one
-  content-addressed operator artifact. The store distinguishes explicit
-  initialization from recovery, validates the exact SQLite v2 schema while
-  holding the writer transaction, and verifies the written singleton row before
-  publication. Checkpoints retain authoritative session state, accepted command
-  outcomes, replay inputs, RNG state, role bindings, protected cursor state, and
-  an unpruned revision commitment chain; restart verifies those histories plus
-  the generated immutable runtime-tree build fingerprint before exposing a
-  recovered session. These hashes detect accidental corruption and internal
-  inconsistency. They do not resist a malicious storage writer or prove that an
-  older, otherwise valid database was not rolled back; that threat requires an
-  external trusted anchor.
-- The checked-in Chaos Daemons Strike Force reprices to 2,075 points under the
-  July 2026 MFM package and is correctly rejected as 75 points over the
-  2,000-point limit; the original three six-model Bloodcrusher units remain
-  unchanged. A typed,
-  hashed reconciliation reviews its exact five datasheets against the current
-  official PDF and pins every historical generator input by hash without
-  importing its retired package identity into runtime. It enforces Be'lakor's
-  `DAMAGED 1-7` and keeps `SHADOW LEGION` as a detachment grant. Its
-  eight selected units, Cavalcade of Chaos and Shadow Legion runtime bundles,
-  selected abilities, and Apocalyptic Steeds assignments carry active semantic
-  runtime evidence independently of that mustering failure. The accepted
-  Bloodcrushers, Bloodhunter, and Be'lakor geometry records are applied at
-  runtime; only the four Bloodthirster, Lord of Change, Plaguebearers, and
-  Plagueridden representative heights remain review-blocked. Those four blockers
-  keep the roster from claiming `PHYSICALLY_PLAYABLE`. This is exact
-  selected-component semantic
-  support, not a whole-faction or Phase 20 full-game/replay claim.
-  Verify the committed catalog with
-  `uv run python tools/generate_chaos_daemons_roster_catalog.py --check`.
-- `uv run python tools/generate_ability_support_matrix.py` also regenerates the
-  typed cross-source semantic-equivalence artifact and report at
-  `data/generated/ability_coverage/cross_source_semantic_equivalence.json` and
-  `docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md`. Fully structured RuleIR uses a
-  provenance-free semantic hash; incomplete IR is grouped by exact normalized
-  text only and cannot transfer gameplay support. Every generated faction
-  support document consumes the same audit.
-- Datasheet RuleIR follows the stable, source-identified shard convention in
-  [`docs/FACTION_PACK_RULE_IR_ARTIFACTS.md`](docs/FACTION_PACK_RULE_IR_ARTIFACTS.md).
-  Physical shard labels are not faction-support assertions: exact datasheet
-  ownership is derived from the committed source snapshot and stored with typed
-  provenance. Datasheet work adds records to that registry instead of creating a
-  dated, datasheet-named runtime package. The generated Maulerfiend cross-faction
-  support report also makes explicit which mechanics are reusable and which
-  faction-local records remain unsupported.
-- Faction semantic execution is active incremental work. Current runtime
-  support includes selected Phase 17G faction slices across Chaos Daemons,
-  Chaos Space Marines, Aeldari, Death Guard, World Eaters, Orks,
-  Space Marines, Necrons, Leagues of Votann, Thousand Sons, and Tyranids.
-  Chaos Daemons Shadow Legion supports Thralls of the First Prince mustering restrictions and keyword
-  grants, Murderer's Cowl, Penumbral Puppetry, Gloam Rot, Shadow's Caress,
-  Leaping Shadows, Mantle of Gloom, Fade to Darkness, and Disciples of
-  Be'lakor Dark Pacts through shared advance, Scouts, objective-control aura,
-  target-restriction, runtime-modifier, selected-unit grant, attack-completion,
-  turn-end reserves, out-of-phase shooting, and Feel No Pain continuation
-  paths. Chaos Space Marines Dark
-  Pacts uses shared selected-to-shoot and selected-to-fight grant decisions,
-  out-of-phase selected-to-shoot grant routing, attack-sequence weapon keyword
-  modifiers, and post-attack Leadership-test D3 mortal-wound routing including
-  Feel No Pain continuation decisions. Aeldari Path of the Outcast supports
-  Far-reaching Doom,
-  Camouflaged Snipers, Assassins' Eye, Eldritch Suppression, Casting Back the
-  Veil, and Nomads of the Hidden Way through the shared Shooting, Stratagem,
-  Battle-shock, Hidden/detection, and triggered-movement paths. Aeldari
-  Corsair Coterie supports Veterans of the Void, Relentless Raiders, Void
-  Thieves, Infamy, Webway Pathstone, Archraider, Voidstone, and all six Corsair
-  Coterie Stratagems through shared mustering, objective-control, movement/charge-
-  completion, reserves, setup, turn-end, Stratagem-cost, attack-reroll,
-  triggered-movement, targeting-restriction, and generic RuleIR runtime paths. Space
-  Marines Oath of Moment supports Command phase target selection, target-scoped
-  Hit-roll rerolls, the Codex Space Marines Detachment Wound-roll bonus gate,
-  and Black Templars, Space Wolves, and Deathwatch Chapter mustering
-  restrictions. Necrons Reanimation Protocols supports Command phase
-  rules-unit activation, source-backed D3 healing, destroyed-model revival,
-  attached rules-unit identity, and owning-player healing selections through the
-  shared healing decision path. Leagues of Votann Prioritised Efficiency
-  supports deterministic Yield Point gains from Command phase objective control,
-  derived Hostile Acquisition/Fortify Takeover modes, and mode-scoped Hit/Wound
-  modifiers. Orks Waaagh! supports optional once-per-battle Command phase
-  activation, active-effect expiry at the next own Command phase, Advance-then-
-  Charge eligibility, melee Strength/Attacks modifiers, and a 5+ invulnerable
-  save through shared runtime hooks. Chaos Knights Harbingers of Dread supports
-  battle-round Dread selections/rolls, Deathly Terror/Despair Leadership auras,
-  Dismay forced below-starting Battle-shock tests, Delirium D3 mortal wounds,
-  Doom wound modifiers, and the Darkness Stealth model grant through shared
-  runtime hooks. Delirium mortal-wound Feel No Pain continuation is deferred
-  and emits a typed unsupported event without applying wounds. Thousand Sons
-  Cabal of Sorcerers supports Shooting-start Ritual selection, Psychic tests
-  with optional Channel the Warp perils, Destiny's Ruin hit rerolls, Temporal
-  Surge movement proposals and charge lockout, Doombolt mortal wounds, and Twist
-  of Fate AP modifiers through shared decision, movement, reroll, and
-  mortal-wound routing paths. Tyranids Shadow in the Warp and Synapse support
-  once-per-battle either-Command-phase activation, forced enemy Battle-shock
-  tests, Synapse 3D6 Battle-shock tests, Shadow Synapse-range penalties, and
-  melee Strength modifiers through shared hooks. Broad datasheet,
-  wargear, weapon, and remaining faction execution remains later Phase 17 work.
-- Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
-  sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for
-  HARLEQUINS and ANHRATHE units. Player-provided roster artifacts load through
-  a strict JSON boundary into the same `ArmyMusterRequest` path, require an
-  explicit Force Disposition, and validate declared per-unit and total points
-  against a source-identified MFM package before mustering. Artifact unit-array
-  order is the repeated-datasheet pricing order; source-backed unit and
-  Enhancement/Upgrade point records plus the MFM package identity remain
-  authoritative through the mustered army. Historical game result metadata is
-  optional so the same schema represents ordinary pre-game lists.
-- Drukhari `Power from Pain` runtime support includes a deterministic Pain token
-  ledger, token gain at the owning Command phase start, enemy Battle-shock
-  failures, and enemy unit destruction, plus Lithe Agility empowerment for
-  Advance and Charge rerolls and Hatred Eternal selected-to-shoot and
-  selected-to-fight hit-reroll empowerment through shared grant and dice-reroll
-  decision paths.
-- Local CLI/human decision entry, viewer-safe catalog/live unit-model projection,
-  and trigger opportunity-window intent support are documented in
-  [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) and
-  [docs/TRIGGER_OPPORTUNITY_WINDOWS.md](docs/TRIGGER_OPPORTUNITY_WINDOWS.md).
-- Official source evidence lives in `docs/source_rules`,
-  `data/source_manifests`, `data/raw/faction_packs`, and generated source
-  package artifacts. Runtime engine code must consume structured descriptors,
-  not raw PDFs, CSV rows, HTML, or prose parsing.
-- `tools/lookup_39k_reference.py` builds kind-specific HTTPS discovery paths
-  and verifies complete 11th Edition faction, detachment, and datasheet URLs
-  for 39k PRO. These links are secondary references only; official GW artifacts
-  and hashes remain authoritative provenance. Reviewed provider observations may
-  be retained as assignment-level evidence under `data/source_audits/39k_pro`,
-  but no provider content is loaded by the runtime.
-- The checked-in
-  [maintained App-data mirror review](docs/CORE_RULES_MAINTAINED_MIRROR_REVIEW.md)
-  records 40k.app and Game Datamissions as the two non-affiliated providers
-  accepted by the owner-approved
-  [Core Rules source authority policy](docs/CORE_RULES_SOURCE_POLICY.md).
-  Source-package validation requires the provider, canonical URL, App-data
-  version or timestamp, transcription SHA-256, and immutable observation
-  fingerprint, then authenticates the full audit tuple against the hash-pinned
-  [source-authority registry](src/warhammer40k_core/rules/source_authority_registry.json).
-  Each package carries a typed Core-Rules-only scope and must match a registered
-  package identity and stable source-ID inventory. Co-versioned observations
-  for one stable rule ID must agree or validation fails pending official-App
-  comparison. The earlier
-  [40k.app category comparison](docs/CORE_RULES_40K_APP_COMPARISON.md) remains
-  retained under `data/source_audits/40k_app` with its historical policy ID,
-  which is accepted only for the registry's exact immutable observation
-  inventory.
-  Neither provider is presented as Games Workshop-owned, and live provider
-  sites are never runtime input. These audits exclude factions, faction
-  detachments, and faction datasheet content.
-- Order 78 / P13A pins the complete reviewed 13.11.01 Gone to Ground source and
-  its September 23 unversioned 40k.app observation in
-  `core_gone_to_ground_2026_09/artifacts/package.json`. Regenerate offline with
-  `uv run python tools/build_core_gone_to_ground_source.py`; append `--check`
-  to verify committed bytes. The typed loader eagerly verifies the artifact and
-  registered provider identity; runtime queries use structured terrain policy.
-- P19's reviewed 19.01.01 Attached Units wording is pinned in
-  `core_attached_units_2026_09/artifacts/package.json`; refresh and verify it
-  offline with `uv run python tools/build_core_attached_units_source.py` and
-  the same command plus `--check`.
-- Order 30 / P05B's retained destruction sources are pinned as versioned JSON.
-  `uv run python tools/build_core_fight_on_death_source.py` regenerates 05.04.05
-  and the retained-presence FAQ with its maintained-mirror audit.
-  `uv run python tools/build_retained_attack_sources.py` regenerates the reviewed
-  For the Chapter! and Unending Fidelity RuleIR consumers from the observed
-  App-data 946 faction mirror texts and preserved historical official provenance.
-  Both generators operate offline; append `--check` to verify committed bytes.
-  The faction package uses its separate faction source policy and certifies these
-  two executable rule consumers without claiming complete faction fieldability.
-  See [the Order 30 implementation review](docs/ORDER_30_SCOPE_PLAN.md).
-- Order 57 / P05C's reviewed 05.04.06 Measuring To A Destroyed Model Or Unit
-  wording is pinned in
-  `core_measuring_to_destroyed_2026_09/artifacts/package.json`; refresh and
-  verify it offline with
-  `uv run python tools/build_core_measuring_to_destroyed_source.py` and the same
-  command plus `--check`.
-- Order 58 / P05D's reviewed App-data v931 incoming Damage-to-0 timing FAQ is
-  pinned in
-  `core_failed_save_damage_timing_2026_09/artifacts/package.json`; refresh and
-  verify it offline with
-  `uv run python tools/build_core_failed_save_damage_timing_source.py` and the
-  same command plus `--check`.
-- Order 59 / P18A's reviewed 18.01 empty Dedicated Transport wording is pinned in
-  `core_empty_dedicated_transport_2026_09/artifacts/package.json`; refresh and
-  verify it offline with
-  `uv run python tools/build_core_empty_dedicated_transport_source.py` and the
-  same command plus `--check`.
-- Order 60 / P18B's reviewed 18.05 Emergency Disembark placement wording is
-  pinned in
-  `core_emergency_disembark_placement_2026_09/artifacts/package.json`; refresh
-  and verify it offline with
-  `uv run python tools/build_core_emergency_disembark_placement_source.py` and
-  the same command plus `--check`.
-- P18C/P18D/P18E's reviewed 18.05 Emergency, v931 18.06 Assault and the
-  October 1 timestamped current 18.07 Shock Disembark wording are pinned in
-  `core_transports_2026_09/artifacts/package.json`; refresh and verify it
-  offline with `uv run python tools/build_core_transports_source.py` and the
-  same command plus `--check`.
-- P24F's reviewed App-data v931 24.08 Deadly Demise wording and model-destruction
-  timing, P24G's v931 FAQ ordering for alternating Scout and other pre-battle
-  unit rules from the first-turn player, and P24D's 24.15 physical-weapon
-  Hazardous accounting are pinned in
-  `core_abilities_2026_09/artifacts/package.json`; refresh and verify it offline
-  with `uv run python tools/build_core_abilities_source.py` and the same command
-  plus `--check`.
-- P15F's reviewed App-data v931 Insane Bravery FAQ is pinned alongside the
-  maintained Core Stratagem source rows in
-  `core_stratagems_2026_08/artifacts/package.json`; refresh and verify it
-  offline with `uv run python tools/build_core_stratagem_app_source.py` and the
-  same command plus `--check`.
-- Order 94 retains complete Heroic Intervention source evidence and reconciles
-  the historical GDM truncation without inventing App versions. Verify the
-  offline review with `uv run python -m tools.core_rules_order94_audit --check`;
-  see [scope and evidence](docs/ORDER_94_SCOPE_PLAN.md). PFINAL remains open.
-- The dependency-ordered
-  [Core Rules remediation roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md)
-  tracks the itemized implementation findings from the accompanying
-  25-category code review; the comparison artifact records each category's
-  assessed disposition and planned PR IDs without conflating source provenance
-  with semantic execution.
-- README milestone anchors retained for code-quality audits: Phase 14H is complete;
-  Phase 14I is complete; Phase 14K is complete; Phase 17A.1 is complete.
-  Phase 14H anchors: runtime Attached Unit formation; structured army-list Leader/Support declarations; first-class attached rules-unit formation records; healing, revival, persisting effects; Movement-phase Combat Disembark fallback with engine-owned evidence; setup-time Strategic Reserve declarations; repositioned-unit Advance/Fall Back/Disembark history.
-  Source-linked model geometry still requires a representative model height with provenance
-  before runtime catalog use.
-
-When a phase status changes, update the focused status document or contract
-for that subsystem instead of turning this README into a changelog.
+Use [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md) for the detailed roadmap and the
+[performance policy](docs/performance/PERFORMANCE_POLICY.md) for required assessments.
+Keep subsystem progress in its focused documentation instead of this README.
 
 ## 5. Test policy
 
@@ -1097,8 +211,8 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=50
-uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=64
+uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
 uv run pre-commit run --all-files
@@ -1112,136 +226,197 @@ and these invariants are enforced by tests:
 - dice replay round-trips;
 - event/decision serialization contains no memory-address reprs.
 
-Order 25 (P01C) centralizes ability availability for living embarked and reserve
-units independently of spatial eligibility. Typed restrictions still apply;
-self range/visibility survives, while geometry involving another off-battlefield
-unit fails. Firing Deck retains transport weapon ownership. The source package
-and mirror audit are reproducible with
-`uv run python tools/build_core_embarked_abilities_source.py --check`.
-See the Order 25 evidence in
-[`docs/CORE_RULES_REMEDIATION_ROADMAP.md`](docs/CORE_RULES_REMEDIATION_ROADMAP.md).
+## Getting started
 
+For faction coverage, start with the [faction support guides](docs/FACTION_SUPPORT.md).
+They list current army rules, detachments and unit costs, separate historical
+implementation evidence from fieldability/playability, and link the
+[faction remediation roadmap](docs/FACTION_RULES_REMEDIATION_ROADMAP.md).
 
-Order 33 / P10 Indirect Shooting implementation and review evidence are tracked
-in [the scope and acceptance matrix](docs/ORDER_33_SCOPE_PLAN.md). Reproduce its
-offline source artifacts with `uv run python tools/build_core_indirect_shooting_source.py --check`.
-The phase decision schemas remain in [the adapter contract](docs/ADAPTER_DECISION_CONTRACT.md).
+```bash
+uv python install 3.14.5
+uv sync --locked
+uv run pytest tests/unit/test_phase10i_terrain_movement.py -q --no-cov
+```
 
-### Order 51: Take to the Skies
+## Test commands
 
-Flight is a finite choice for each eligible move, before Advance or Charge dice.
-Only FLY models in the selected rules unit receive its transit and vertical-distance
-permissions; Hover retains the choice and waives its two-inch maximum-distance
-penalty. Per-model accepted distances persist across phases for Heavy's turn-long
-movement check. See [scope and evidence](docs/ORDER_51_SCOPE_PLAN.md) and
-[contract 22 migration](contracts/migrations/21-to-22.md).
+Pytest defaults are intentionally lightweight: narrow local and IDE runs do not start xdist
+workers or collect coverage unless requested.
 
-Check the reviewed timing source with
-`uv run python tools/build_core_flying_source.py --check`.
+Fast local feedback names the affected test files explicitly, for example:
 
-### Order 52: Surge movement
+```bash
+uv run pytest tests/unit/test_phase10i_terrain_movement.py -q --no-cov
+uv run pytest tests/rules/section04/test_completion_boundaries.py -k attack_mortal_choices -q --no-cov
+```
 
-Surge commits a closest target through finite options, validates each living
-model's witnessed approach, and locks subsequent movement in that phase.
-Source eligibility, attached models, retries, restore and replay share engine
-authority. See [scope and evidence](docs/ORDER_52_SCOPE_PLAN.md) and
-[contract 23 migration](contracts/migrations/22-to-23.md).
-Check the source with `uv run python tools/build_core_surge_source.py --check`.
+Architecture and source-shape audits run independently without behavioral coverage:
 
-Order 55 permits oversized disembark placement within one inch only after proving
-ordinary placement impossible due to base size, with the exceptional model
-unengaged. All modes and attached components share that validation. See
-[scope and proof](docs/ORDER_55_SCOPE_PLAN.md). Verify its reviewed source with
-`uv run python tools/build_core_large_model_disembark_source.py --check`.
+```bash
+uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
+```
 
-Order 57 measures to a destroyed model using that model's authenticated former
-base or hull, and to a destroyed unit using the last model destroyed. The query
-grants no living battlefield authority. Deadly Demise uses the same measurement
-after removal. See [scope and proof](docs/ORDER_57_SCOPE_PLAN.md). Verify its
-reviewed source with
-`uv run python tools/build_core_measuring_to_destroyed_source.py --check`.
+For final validation, run the behavioral suite once with coverage and the code-quality
+suite above once without coverage. A second no-coverage behavioral run is unnecessary.
+Focused subsets and `--lf` are for iteration, never replacements for this final gate:
 
-Order 58 applies incoming Damage-to-0 after the saving throw. Grouped allocation
-keeps that post-save order, records the replacement, and skips infliction. See
-[scope and proof](docs/ORDER_58_SCOPE_PLAN.md). Verify its reviewed source with
-`uv run python tools/build_core_failed_save_damage_timing_source.py --check`.
+```bash
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
+  uv run pytest tests --ignore=tests/code_quality \
+  -n auto --dist=worksteal \
+  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=64
+```
 
-Order 59 destroys empty Dedicated Transports at the end of Declare Battle
-Formations without triggering destroyed-model rules. See
-[scope and proof](docs/ORDER_59_SCOPE_PLAN.md). Verify its reviewed source with
-`uv run python tools/build_core_empty_dedicated_transport_source.py --check`.
+The `PATH` prefix exposes the Node.js runtime bundled with Codex desktop to the executable
+viewer-renderer regressions. It is safe when that directory is absent: an independently installed
+`node` later on the existing `PATH` remains available. Keep this prefix on full-suite runs so those
+tests do not fail only because the desktop shell omitted the bundled runtime.
 
-Order 60 sets up Emergency Disembark survivors wholly within 6 inches and as
-close as possible, prefers unengaged endpoints, and destroys only unplaceable
-models. Closest-possible and unengaged proofs include terrain-legal set-up and
-the shared 3D Engagement Range check. Floor-dependent proofs raise unresolved
-until floor collision and supported-elevation search are implemented. See
-[scope and proof](docs/ORDER_60_SCOPE_PLAN.md). Verify its reviewed source with
-`uv run python tools/build_core_emergency_disembark_placement_source.py --check`.
+CI shards this same behavioral suite, combines branch coverage, and applies the temporary 64%
+gate after every shard succeeds. Full type checking and architecture checks also remain required
+in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
+format for a shorter edit/commit loop.
 
-Order 61 rejects Embark after any rules-unit battlefield setup during the current
-turn, including another Transport's disembark and repositioned Ingress. Its
-shared history expires by actual turn owner and authenticates restore/replay.
-See [scope and proof](docs/ORDER_61_SCOPE_PLAN.md),
-[contract 27 migration](contracts/migrations/26-to-27.md), and verify the reviewed
-source with `uv run python tools/build_core_embark_setup_turn_source.py --check`.
+The current owner-approved coverage floor is 64%; later coverage work must restore 85%. The full
+warhammer40k_core package and branch metric remain unchanged, with no added coverage
+omissions or exclusions. This policy change does not claim either threshold has passed;
+all required tests and other gates must still succeed. See the
+[active review policy](docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
 
-Historical Order 62 permitted engaged Shock setup and forced enemy Fights.
-V963-SHOCK supersedes those consequences with ordinary unengaged setup and the
-current charge restriction. The [Order 62 source record](docs/ORDER_62_SCOPE_PLAN.md)
-and [contract 28 migration](contracts/migrations/27-to-28.md) remain historical.
+The twelve behavioral manifests in `ci/test_shards/` use deterministic
+largest-processing-time balancing. One heavy, source-bound module is partitioned
+into its twenty exact collected cases; every other file remains intact. The
+required quality guard checks that partition against real pytest collection.
+Verify that every selected file or declared case appears exactly once:
 
+```bash
+uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
+```
 
-Order 63 allows loaded reserve Transports to ingress while their cargo remains
-embarked. Rapid Disembark inherits every model's Transport ingress placement
-restriction, including source-conditioned regions. Private pre-ingress replay
-roots authenticate save/restore; shared viewer redaction protects source evidence.
-See [scope and source evidence](docs/ORDER_63_SCOPE_PLAN.md) and
-[contract migration 28 to 29](contracts/migrations/28-to-29.md).
+Download the `behavior-report-*` artifacts from each chosen successful run into a
+separate directory outside the checkout, then regenerate (repeat both options for
+additional runs). Downloaded profiles are supplied inputs, not generated source:
 
-Order 64 applies Core round-two arrival and round-three unarrived-reserve cleanup,
-with authenticated ingress/repositioning exemptions and independent final-turn
-cleanup. Shared movement checks enforce the next-Charge ingress lock. See
-[scope and proof](docs/ORDER_64_SCOPE_PLAN.md),
-[contract 30 migration](contracts/migrations/29-to-30.md), and the dedicated
-[restore/fork performance guard](docs/performance/order64/README.md).
-Verify the reviewed source with
-`uv run python tools/build_core_reserve_lifetimes_source.py --check`.
+```bash
+uv run --no-sync python scripts/build_test_shards.py \
+  --junit ../behavior-reports/run-one \
+  --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
+  --junit ../behavior-reports/run-two \
+  --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
+  --shard-count 12
+```
 
+The current weights use median durations from the complete covered hosted runs
+[40872329113](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40872329113)
+and [40874478610](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40874478610).
+Both executed all 4,886 selected cases on four-worker standard runners. JUnit
+weights include per-case setup and teardown; session startup, source-index setup,
+reporting and runner queues are assessed separately. Weight totals are scheduling
+inputs, not job wall times or proof of the temporary twelve-minute CI goal.
 
-Order 65 restricts every unit embarked when Firing Deck resolves from shooting
-until turn end, even with no borrowed weapons and after later disembarkation.
-Shared eligibility, accepted cargo snapshots and persistent-effect expiry cover
-all adapters and replay. See [scope and evidence](docs/ORDER_65_SCOPE_PLAN.md),
-[contract 31 migration](contracts/migrations/30-to-31.md), and verify source data
-with `uv run python tools/build_core_firing_deck_source.py --check`.
+A single complete local JUnit XML is also accepted; label its host accurately and
+do not mix local and hosted-runner timings in one representative CI profile.
+Every supplied run must cover the current behavioral file inventory. Missing files,
+duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts
+are rejected. Outside the explicit initial migration seed above, new test files
+require a fresh complete profile; timings are never filled with zero. `durations.json` preserves report SHA-256 hashes and run descriptions.
+Historical profiles measure their recorded case inventory; changed cases within an
+existing file require refreshed successful CI reports to reflect their new cost.
 
+Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing
+artifacts containing collection node IDs, collection time, setup/call/teardown times,
+outcomes, Python/platform/CPU/memory metadata, and commit/run IDs. Enable the same
+local evidence with `TEST_TIMING_DIR=reports/timing`. These artifacts distinguish
+collection overhead and long individual cases from aggregate file costs.
 
-Order 67 enforces Incursion's 1,000 points, 2 DP, 2 Enhancements and 2/4-copy
-limits, preserving the single 3-DP detachment exception and paid Upgrade copies.
-See [scope and validation](docs/ORDER_67_SCOPE_PLAN.md). Reproduce source evidence
-with `uv run python tools/build_core_mustering_limits_source.py --check`.
+`quality-fast` now aggregates concurrent lint, contract/conformance, code-quality,
+and the existing macOS semantic audit. Every child must succeed, including on draft
+PRs; failed, cancelled, and unexpectedly skipped children fail the aggregate.
+The contract lane executes TypeScript unit tests as well as generated-client checks,
+live conformance, base-ref compatibility, and installed-wheel smoke. Code-quality
+workers share read-only source/AST data within each process; mutable test fixtures
+and generated temporary output remain independently validated.
 
-Order 68 requires explicit Warlord and Enhancement bearer model selections,
-with model-specific eligibility, keyword ownership and stable split/restore identity.
-Contract 33 requires the model fields in new roster records; old saves stay on
-their matching release. See [Order 68 scope and validation](docs/ORDER_68_SCOPE_PLAN.md)
-and [the contract migration](contracts/migrations/32-to-33.md).
+Twelve standard runners increase behavioral parallel capacity without changing test
+selection or the combined branch-coverage measurement. Compare several successful CI
+runs before claiming a wall-time reduction: added capacity can increase total runner
+minutes, and cold caches or queued jobs can offset the idealized speedup. Keep main
+and merge-candidate verification; no previously tested tree is reused as authority.
 
+## Battlefield viewer
 
-Order 69 adds typed required/prohibited unit and other-detachment constraints,
-canonical duplicate-detachment checks, and shared Support attachment certification.
-Empty inventories remain legal and faction-specific records remain unpopulated.
-See [scope and source resolution](docs/ORDER_69_SCOPE_PLAN.md) and
-[contract 34 migration](contracts/migrations/33-to-34.md). Verify the reviewed
-source with `uv run python tools/build_core_roster_construction_source.py --check`.
+Inspect the Event Companion battlefield projection with an orbitable 3D camera:
 
-Order 71 preserves the distinct attacking-model and target-unit engagement
-penalties, exempting CLOSE-QUARTERS attacks only against an engaged target.
-Third-party shooting, attached ownership, modifiers and replay share the engine
-path. See [scope and validation](docs/ORDER_71_SCOPE_PLAN.md). Verify source data
-with `uv run python tools/build_core_engaged_shooting_source.py --check`.
+```powershell
+uv run python scripts/mock_event_layout_ui.py --host 127.0.0.1 --port 8765
+```
 
-Order117 records every mortal Select Model boundary and executes source-backed
-phase-bound prevention permissions through shared allocation. Named Stratagem
-activation remains load-only. See [scope and evidence](docs/ORDER_117_SCOPE_PLAN.md).
+Open `http://127.0.0.1:8765/`. All 15 Event Companion force-disposition
+pairings and every A/B/C variant are available: 45 of 45 source-hashed
+executable battlefield packages with terrain, regions, source-linked objective
+footprints, walls, and floors. Across the package, the viewer exposes 720
+physical terrain-area footprint pieces forming 608 logical rules areas, plus
+1,349 physical components. The PDF layout-page Single/Separate glyphs are
+rendered at their source coordinates using the page-8 legend; 112 Single joins
+pair 224 footprint pieces and the other 496 pieces remain individual areas.
+Page 9 contains the source-backed 29-component exception, while every other
+layout contains 30. See
+[docs/BATTLEFIELD_VIEWER.md](docs/BATTLEFIELD_VIEWER.md) for controls, data
+authority, complete battlefield geometry, executable Primary scoring for all 25
+Event Companion missions, and Step 5G lifecycle, restore, viewer-redaction, and
+replay certification of both players' ordinary Primary scoring boundaries on all
+45 A/B/C layouts. The 90 layout/direction cases begin at an engine-owned fight
+activation decision boundary, round-trip `replay-artifact-v9-sequencing`,
+and require exact `ReplayRunner` reproduction. All 18 Secondary Mission cards
+are source-backed and executable through turn-end scoring with lifecycle restore
+evidence; their lifecycle certification remains Layout-A-only. The broader
+mission runtime exposes all 14 Mission Actions.
+
+CI uploads each shard's JUnit report for future median-duration profiles. Full behavioral shards
+run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the
+faster quality and parallel type-check feedback without repeatedly running the complete suite.
+The stable `coverage-gate` aggregate fails closed when any behavioral shard does not succeed, then
+combines all twelve coverage artifacts and enforces the branch-coverage threshold. Repositories that
+enable branch protection can require `quality-fast`, `mypy`, `pyright`, and `coverage-gate` without
+encoding matrix shard names in the protection rule.
+
+## External adapter contract
+
+The canonical Phase 18D language-neutral baseline and completed Phase 18E-18J
+session, command, reconnect, authentication, authorization, redaction,
+interaction, and battlefield contracts are in [`contracts/`](contracts/README.md).
+Phase 18L adds the closed `session-persistence-v3-weapon-instances` operator-only
+persistence checkpoint contract and fail-closed recovery semantics. Its
+runtime-tree build fingerprint, explicit first-boot initialization, locked and
+verified SQLite v2 transaction, and unpruned per-revision commitment chain keep
+missing, stale, or internally inconsistent durable state from being accepted as
+a recovered authority. The
+bundle includes Draft 2020-12 schemas, OpenAPI 3.1, real session-derived examples with explicit
+decision-family coverage status, proposal examples, versioned session metadata and idempotent
+command outcomes, protected opaque role-bound cursor/resync payloads, explicit principal-role policy,
+compatibility/redaction/session/coordinate/persistence semantics, and conformance scenarios.
+Verify schema, example, OpenAPI, Python-version, coverage, manifest, and compatibility drift with:
+
+```bash
+uv run --no-sync python scripts/build_engine_build_identity.py --check
+uv run --no-sync python scripts/build_external_contract.py --check
+uv run --no-sync python scripts/smoke_installed_contract_wheel.py
+```
+
+After an intentional change to packaged runtime Python/JSON resources or the
+packaged contract schemas, regenerate
+`src/warhammer40k_core/_engine_build_manifest.json` with
+`uv run python scripts/build_engine_build_identity.py` before regenerating the
+external examples that publish that build ID.
+
+The Phase 18M-A TypeScript client in
+[`conformance/typescript/`](conformance/typescript/README.md) generates models
+from that OpenAPI document, validates the canonical JSON Schemas, and completes
+the first certified HTTP-only scenario against two clean reference servers:
+
+```bash
+cd conformance/typescript
+npm ci
+npm test
+```

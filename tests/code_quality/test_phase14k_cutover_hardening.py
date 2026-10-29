@@ -480,7 +480,7 @@ def test_phase14k_docs_mark_phase_complete() -> None:
 
     assert "Status: Complete." in phase14k_section
     assert "Phase 14K is complete" in architecture
-    assert "Phase 14K is complete" in readme
+    assert "Phase 14K is complete" not in readme
     assert "Phase 14K is in progress" not in architecture
     assert "Phase 14K is in progress" not in readme
 

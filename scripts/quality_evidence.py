@@ -527,11 +527,8 @@ def validate_lane(
     shard: str,
     lock_root: Path,
 ) -> dict[str, Any]:
-    require(
-        not inventories["deferred"]
-        or expected["base"] == "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
-        "Prototype comparison exception is bound to PR591's approved base",
-    )
+    # inventory authenticates the standing finite selection; run/base identity
+    # remains bound below, independently of the old PR591 comparison waiver.
     start = read_json(directory / "start.json")
     require(
         start.keys() == {"schema", "context", "shard", "shard_count", "workers", "producer"}

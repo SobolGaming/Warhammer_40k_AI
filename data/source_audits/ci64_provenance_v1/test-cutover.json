@@ -2375,7 +2375,7 @@
   },
   "comparison_disposition": "deferred",
   "coverage": {
-    "current_floor": 50,
+    "current_floor": 64,
     "metric": "coverage.py total with branch=true",
     "restoration_condition": "post-merge rebuild until complete selected behavioral coverage meets85; then restore85",
     "restoration_floor": 85,

@@ -104,7 +104,8 @@ or evidence reviews. Preserve both clean exact-head reviews, complete correctnes
 inventories, covered behavior at the active threshold below, quality/type/lint/contracts,
 required hosted CI and branch protections.
 
-On 28 October 2026, the owner authorized a temporary coverage floor of 50%,
+On 29 October 2026, the owner raised the temporary coverage floor to 64%
+(from the 50% floor approved on 28 October),
 superseding the active 85% requirement. Coverage still measures the complete
 warhammer40k_core package with branches; the denominator and default omissions
 and exclusions are unchanged. CI must combine all required successful behavioral
@@ -143,7 +144,7 @@ smoke with its unchanged 180-second complete-command allowance.
 
 For this PR only, focused local checks plus the required hosted twelve covered
 shards replace the duplicate complete local covered run. The hosted shards must
-all succeed and their combined full-package branch coverage must meet 50%. No
+all succeed and their combined full-package branch coverage must meet 64%. No
 local partial result substitutes for that gate. Preserve all other required CI
 checks and branch protections. Restore 85% through the documented post-merge work.
 

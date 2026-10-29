@@ -590,6 +590,10 @@ def test_complete_lane_admission_requires_authoritative_context_and_invocation(
         evidence.validate_lane(directory, expected, source, inventories, "4", ROOT)["source"]
         == source
     )
+    wrong_base = copy.deepcopy(expected)
+    wrong_base["base"] = "d" * 40
+    with pytest.raises(evidence.EvidenceError, match="Wrong producer/run/attempt/head/shard"):
+        evidence.validate_lane(directory, wrong_base, source, inventories, "4", ROOT)
 
 
 @pytest.mark.parametrize(
