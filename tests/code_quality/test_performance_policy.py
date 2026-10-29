@@ -756,11 +756,15 @@ def test_comparison_cannot_ignore_a_stricter_family_profile_or_host_qualificatio
 def test_operation_map_uses_real_driver_and_owner_paths() -> None:
     import fnmatch
 
+    from scripts.build_test_shards import behavioral_selection
     from tools.performance_policy import git
 
     paths = (
         git(ROOT, "ls-files", "--cached", "--others", "--exclude-standard").decode().splitlines()
     )
+    # Retired operation references remain authenticated archive selectors, not live tests.
+    selection = behavioral_selection(ROOT)
+    paths.extend(name for name in selection.inactive_files if not (ROOT / name).exists())
     mapping = read_object(ROOT / MAP)
     families = object_value(mapping["families"])
     for raw in families.values():

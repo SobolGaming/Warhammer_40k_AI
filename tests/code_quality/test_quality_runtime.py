@@ -88,7 +88,7 @@ def test_complete_inventory_preserves_every_ci53_case_and_whole_module() -> None
     baseline = evidence.lines(ROOT / "ci/quality_shards/baseline-ci53.txt")
     assert len(baseline) == 1696
     assert set(baseline) <= set(current["full_all"])
-    assert len(current["deferred"]) == 157
+    assert len(current["deferred"]) == 260
     assert set(current["all"]).isdisjoint(current["deferred"])
     assert sorted(current["all"] + current["deferred"]) == current["full_all"]
     modules = current["shards"]["2"]["modules"]

@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e19118bf4c23682ecf0a9cb30dfb1d6a5a8a4882e53061030189ede1b8f7af42",
-  "operation_map_sha256": "2570911cb20bf297d1b425519c500486e54ef4814f458f9e3f48ebe421d1d24b",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ce95991ea3858da5cbd281c3004cd0d0c66d0b2e7c21f6afcc0d8f07b6eff0f0",
+  "operation_map_sha256": "0352fb16fc66438a7962c5075c9bbf7aaf7ffc1ae89ba2413e1b055ddbac00cb",
   "changes": {
     ".github/pull_request_template.md": {
       "before_sha256": "50fd30af40ed199b0d8d99560496fcfcd02b1ff8dc2d0f22fd9971b48633fc09",
@@ -16,21 +16,21 @@
     },
     ".github/workflows/ci.yml": {
       "before_sha256": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
-      "after_sha256": "50a3ec676507b697134ae5458b29c7615b20845d89fd8555661745bad84dcd61",
+      "after_sha256": "6eb5458183556d5d33f1f787958d4721dd4ecf773a536190a70ae1e2ef6d330d",
       "owners": {
         "@document": {
           "before": "8e49742d623a6f595dc5190c98258143fe5260d59a7e7662f323f4b5c8349660",
-          "after": "50a3ec676507b697134ae5458b29c7615b20845d89fd8555661745bad84dcd61"
+          "after": "6eb5458183556d5d33f1f787958d4721dd4ecf773a536190a70ae1e2ef6d330d"
         }
       }
     },
     "AGENTS.md": {
       "before_sha256": "76801ae91602ab66a164e7d4500294977bd92725ca78026472ddfcd23f20e309",
-      "after_sha256": "deac25908c28e8ba782cf5f071a5674b66940162dd1f760405af44d1df190579",
+      "after_sha256": "ba2b751ed0d689cd0807309143cd23ebe926c7f8ed10f5ddbd9e85e43901cbba",
       "owners": {
         "@document": {
           "before": "76801ae91602ab66a164e7d4500294977bd92725ca78026472ddfcd23f20e309",
-          "after": "deac25908c28e8ba782cf5f071a5674b66940162dd1f760405af44d1df190579"
+          "after": "ba2b751ed0d689cd0807309143cd23ebe926c7f8ed10f5ddbd9e85e43901cbba"
         }
       }
     },
@@ -66,11 +66,11 @@
     },
     "ci/quality_shards/prototype-comparison-deferred.args": {
       "before_sha256": null,
-      "after_sha256": "30f0bd36867405d1ecb10183716bf962a1eb8c18e23d85c5951b8be83fe2e639",
+      "after_sha256": "b15074dd5729be688af390dcbb6b3232a1f32e3f9d85a49586c90706660743a8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "30f0bd36867405d1ecb10183716bf962a1eb8c18e23d85c5951b8be83fe2e639"
+          "after": "b15074dd5729be688af390dcbb6b3232a1f32e3f9d85a49586c90706660743a8"
         }
       }
     },
@@ -396,11 +396,11 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "355a9fc20e53c1d675db0d8ef38e9da2b9fcab608d9ee601da7dc0d8b0ffaca7",
-      "after_sha256": "b606f3c9b4454819a71544f874e9b7f62d403a8dedb62a3ad4a9873850b5b5b0",
+      "after_sha256": "bf3796e0a887f96b055ab0468c8c1e6757381ed0ae0752323a24795ef6967710",
       "owners": {
         "@document": {
           "before": "355a9fc20e53c1d675db0d8ef38e9da2b9fcab608d9ee601da7dc0d8b0ffaca7",
-          "after": "b606f3c9b4454819a71544f874e9b7f62d403a8dedb62a3ad4a9873850b5b5b0"
+          "after": "bf3796e0a887f96b055ab0468c8c1e6757381ed0ae0752323a24795ef6967710"
         }
       }
     },
@@ -506,21 +506,21 @@
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "342ae97187046486c752cc04d42c0c4aff866ca6575a014f6606019c9aa238cb",
-      "after_sha256": "51eb853916a6418f19848814550b96332ea9298bf6d6cbbc3849116d0b6cc292",
+      "after_sha256": "630ee0e07d59a74ee4bdfea5c7b31a1ebb585245b7dd9882689bbbc38edaf787",
       "owners": {
         "@document": {
           "before": "342ae97187046486c752cc04d42c0c4aff866ca6575a014f6606019c9aa238cb",
-          "after": "51eb853916a6418f19848814550b96332ea9298bf6d6cbbc3849116d0b6cc292"
+          "after": "630ee0e07d59a74ee4bdfea5c7b31a1ebb585245b7dd9882689bbbc38edaf787"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "017f8429503c3f6fd11c9f747b8ff1f912dcebc253d8bebc26771dc3a9455a11",
-      "after_sha256": "5bcb6a9314fbbaec40b6a0c9a61b69abfefd483ea56763d422bc738e6734b72b",
+      "after_sha256": "affb04bee4a4dd69294f462f2bbb50efa57ee8af6cb1214b759a60538e2cbd65",
       "owners": {
         "@document": {
           "before": "017f8429503c3f6fd11c9f747b8ff1f912dcebc253d8bebc26771dc3a9455a11",
-          "after": "5bcb6a9314fbbaec40b6a0c9a61b69abfefd483ea56763d422bc738e6734b72b"
+          "after": "affb04bee4a4dd69294f462f2bbb50efa57ee8af6cb1214b759a60538e2cbd65"
         }
       }
     },
@@ -536,51 +536,51 @@
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "a8a644e288685ced32a004c9a0b38076b64419a7fd8ac2d620860fd4e41cdfd3",
-      "after_sha256": "d0dff6921c48ea9fb823c58c0110685434710fcb2ef338cdff98e1aeb279f7d8",
+      "after_sha256": "77dcaa38283dff107c67d13e272a6eb52a993fe6bc861bc53289320bbc7849a4",
       "owners": {
         "@document": {
           "before": "a8a644e288685ced32a004c9a0b38076b64419a7fd8ac2d620860fd4e41cdfd3",
-          "after": "d0dff6921c48ea9fb823c58c0110685434710fcb2ef338cdff98e1aeb279f7d8"
+          "after": "77dcaa38283dff107c67d13e272a6eb52a993fe6bc861bc53289320bbc7849a4"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "ba77342ecc7b585c87fc1671874f7b5795bfc77cc4ef950fdd1f8be181daaff6",
-      "after_sha256": "1cbe1672f90f93a8277bb9eb9280a6f4a6ef8bc410cbc4cce6348c53bc338faf",
+      "after_sha256": "bf356ced71f2123c48c6cb04cce4f641997579b76d9cbd901040ad472758c566",
       "owners": {
         "@document": {
           "before": "ba77342ecc7b585c87fc1671874f7b5795bfc77cc4ef950fdd1f8be181daaff6",
-          "after": "1cbe1672f90f93a8277bb9eb9280a6f4a6ef8bc410cbc4cce6348c53bc338faf"
+          "after": "bf356ced71f2123c48c6cb04cce4f641997579b76d9cbd901040ad472758c566"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "fd6ad8fa8c399f9d8b27fe53c3fb47f88d39870c016a07916ca4c795681ecf6d",
-      "after_sha256": "e890f9d6a6249613c344eb6929f495cd4e34d761cddf484f0df6ee7ee5a0d6a5",
+      "after_sha256": "58cc00637fd792703265277af5228db5374291cf32f918003bc2cc1abcfa5b2a",
       "owners": {
         "@document": {
           "before": "fd6ad8fa8c399f9d8b27fe53c3fb47f88d39870c016a07916ca4c795681ecf6d",
-          "after": "e890f9d6a6249613c344eb6929f495cd4e34d761cddf484f0df6ee7ee5a0d6a5"
+          "after": "58cc00637fd792703265277af5228db5374291cf32f918003bc2cc1abcfa5b2a"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "f950b2d52c18390246725039632ca0766004ec3ad90f5a06f892684bce4ac968",
-      "after_sha256": "0a0c416e94d6d13a909b7fb9960a2ac6165d148e2c482721e38c0f0682b1b25b",
+      "after_sha256": "1faf0601784447ea6216599f4fab9bb4fe1a73491ed4889cba97502a6ff04612",
       "owners": {
         "@document": {
           "before": "f950b2d52c18390246725039632ca0766004ec3ad90f5a06f892684bce4ac968",
-          "after": "0a0c416e94d6d13a909b7fb9960a2ac6165d148e2c482721e38c0f0682b1b25b"
+          "after": "1faf0601784447ea6216599f4fab9bb4fe1a73491ed4889cba97502a6ff04612"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "3723e0bf79cc163c521f6c7636d903aef987237431116cc128539366849d7e66",
-      "after_sha256": "e6138ef974d173afeb7819dd11a33224fd34c399b9903acff0d2d2ca726aa455",
+      "after_sha256": "f8229cf1d9fa837612015956056ff37794063119a6899dfc868d7e74574a7187",
       "owners": {
         "@document": {
           "before": "3723e0bf79cc163c521f6c7636d903aef987237431116cc128539366849d7e66",
-          "after": "e6138ef974d173afeb7819dd11a33224fd34c399b9903acff0d2d2ca726aa455"
+          "after": "f8229cf1d9fa837612015956056ff37794063119a6899dfc868d7e74574a7187"
         }
       }
     },
@@ -2376,11 +2376,11 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": null,
-      "after_sha256": "081923b228b0417088c445b3f56560eff4be4e43bb2c2f6c49f77681ff1e8e8d",
+      "after_sha256": "e99d6c0641d19442f5c87abb5368a68e8cb77c5bc7265ad83085bae356550d3f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "081923b228b0417088c445b3f56560eff4be4e43bb2c2f6c49f77681ff1e8e8d"
+          "after": "e99d6c0641d19442f5c87abb5368a68e8cb77c5bc7265ad83085bae356550d3f"
         }
       }
     },
@@ -4526,11 +4526,11 @@
     },
     "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
       "before_sha256": "130c91bcc173640eae41ae3ea0e6b63ac70a49a059071f6ecbc930c0a7ea2297",
-      "after_sha256": "33c1a3546ee3d6784294d8bbe6a6d9177e74e1af4639ce3fd35203f6e768e1e2",
+      "after_sha256": "c4a61bdf043bbd1f873df55eed31e03d378f67322f1bd1023b5d29ac19082f91",
       "owners": {
         "@document": {
           "before": "130c91bcc173640eae41ae3ea0e6b63ac70a49a059071f6ecbc930c0a7ea2297",
-          "after": "33c1a3546ee3d6784294d8bbe6a6d9177e74e1af4639ce3fd35203f6e768e1e2"
+          "after": "c4a61bdf043bbd1f873df55eed31e03d378f67322f1bd1023b5d29ac19082f91"
         }
       }
     },
@@ -4566,11 +4566,11 @@
     },
     "docs/performance/PERFORMANCE_POLICY.md": {
       "before_sha256": "b3044601716ce9090e740d5b6bf7e6a1bafecdd5fcead24f8df10130ce0bbd77",
-      "after_sha256": "111f202ab17d92c09d6053a23821c8a7ffe9175a035577f6444bb395403241ce",
+      "after_sha256": "e604f17a4c8ff08598c15453109b0591db03c671131328f9426c6ab7bd5378f4",
       "owners": {
         "@document": {
           "before": "b3044601716ce9090e740d5b6bf7e6a1bafecdd5fcead24f8df10130ce0bbd77",
-          "after": "111f202ab17d92c09d6053a23821c8a7ffe9175a035577f6444bb395403241ce"
+          "after": "e604f17a4c8ff08598c15453109b0591db03c671131328f9426c6ab7bd5378f4"
         }
       }
     },
@@ -4926,11 +4926,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "059dbc7a20ee01faaef359768e4e48f6f1105780975fa3087f56b531974412f1",
+      "after_sha256": "519f39ebc7c7bcef776402700315b4ad9c3eb6f44177a364fd175f543b41b7ca",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "059dbc7a20ee01faaef359768e4e48f6f1105780975fa3087f56b531974412f1"
+          "after": "519f39ebc7c7bcef776402700315b4ad9c3eb6f44177a364fd175f543b41b7ca"
         }
       }
     },
@@ -4980,7 +4980,7 @@
     },
     "scripts/build_test_shards.py": {
       "before_sha256": "aa6a5dc19de51d207959545cf121a2f69179679baf54ec56585b72933929abc3",
-      "after_sha256": "16e4ed5aed7b4ba0de94b7e8804b4e0e79ced23c626fee7d2bbc56b5eb6bc1db",
+      "after_sha256": "0f82ab0b17d1916668470c488a7a99072be0a4cd78297d653caffc99cc7fbf0e",
       "owners": {
         "@module": {
           "before": "3ba5d173e339c8ecf38267fecba88ce7439f00a034b5b3efcdb965ee2b8ad431",
@@ -5040,7 +5040,7 @@
         },
         "deferred_comparison_cases": {
           "before": null,
-          "after": "500d883a0434ae41547d9c95c5c65c166b209af6ff8ab73b377df7585b5beb53"
+          "after": "feda7d4dd6b5d38a53f2c42d13e1b95e1d656e3a86eb2ad3ef5bcba7e757c8d2"
         },
         "main": {
           "before": "15ef66df8fa500f51ff5baf9a4dcd1919d75ffd954eff23125c3f9e2c89513d7",
@@ -5403,11 +5403,11 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "b3f45468657d97f8242ecfb4f49e5fa8becfca8b2f6957721228fb44d04a1f6f",
-      "after_sha256": "37dcbc1843baf53a3a09fb92ea3d18660a05f485b7504b8b4a680fdb2dc60e34",
+      "after_sha256": "56c02eb40afb910a0803a448ba1d8163393629cc93996f0d5c6873a2a47b23f9",
       "owners": {
         "@document": {
           "before": "b3f45468657d97f8242ecfb4f49e5fa8becfca8b2f6957721228fb44d04a1f6f",
-          "after": "37dcbc1843baf53a3a09fb92ea3d18660a05f485b7504b8b4a680fdb2dc60e34"
+          "after": "56c02eb40afb910a0803a448ba1d8163393629cc93996f0d5c6873a2a47b23f9"
         }
       }
     },
@@ -6395,7 +6395,7 @@
     },
     "src/warhammer40k_core/engine/model_destruction_cause_completion_restore.py": {
       "before_sha256": "f9f6b0cc8a54398b1d26e3d7362eb8cafad9a9a2b8c7e221c4b80ac5fc87c14b",
-      "after_sha256": "2eb590ef53d78824debc165b365bb779ad8aa58a80c2ade6aab6fa8025d1765c",
+      "after_sha256": "0b9cf7e5ff8cd8bd8de0c38881b4be5e86f599b9c7dc64669be6b72aa01f766a",
       "owners": {
         "@module": {
           "before": "0bad98ddc14dbd16f5e08d2e0de09d2558c20cfd652f34e050b1047e5335dc2d",
@@ -6404,10 +6404,6 @@
         "_attack_deadly_demise_parent_and_application": {
           "before": "df4ab20ef7ca16ace88048e3c78c50905e38cd19d0747e4af474a51928fc8a44",
           "after": null
-        },
-        "_consumed_retained_rule_mortal_request": {
-          "before": null,
-          "after": "58ac78840448308e9b9370998a700c0fb5b8f180ba2b91b9fc52f5d77b7f9cae"
         },
         "_validate_attack_deadly_demise_collateral_finalization": {
           "before": "3dea1a495b9651d2f9943c313b5136dab08ffde615bedbb334cfd21ceb836047",
@@ -6423,11 +6419,11 @@
         },
         "validate_pending_model_destruction_cause_inventory": {
           "before": "c975676c2b58e5f6c3d4fe9adf4da5d54a230078906850ac66238aa41d7ac67d",
-          "after": "04afaeba92e7c72388c65493b302a1c77b69ad3c394c28e8afd554860f26eee1"
+          "after": "fc1990f1647ee4721d75a9f0b8ff72ef0968db057854df7fd65a788d4a0e7977"
         },
         "validate_rule_effect_completion_or_pending_window": {
           "before": "caf97b2e9a8a0e115404766e344f785313a34c051a89f65448a3e3d17be828ca",
-          "after": "d2e76061ba9a64d1fc313be60498fe41355b5a860f81512246aa5fce6424f029"
+          "after": "db2e76d26bedcadd6a391368c955fe92ab0c7331d30daabc3839eac1a2347e1c"
         }
       }
     },
@@ -6849,11 +6845,15 @@
     },
     "src/warhammer40k_core/engine/retained_demise_removal.py": {
       "before_sha256": null,
-      "after_sha256": "48f911ed0726091b04dbd497dbab33f1952502578eed9d24dacf14b85d261c45",
+      "after_sha256": "f60e2237aeba1c949584f9ac9dc65a8c77ccf258ad610d0894551a44709bee21",
       "owners": {
         "@module": {
           "before": null,
-          "after": "fde9ffe9f023bf0d1fcbfed6c10bdf62481d0915bbaeda34462525a28e51ec79"
+          "after": "6677e47c2b67b21a6c6e0a74cdb1e1fd1ef89f625c6e99b1e163bb05ffca82c4"
+        },
+        "consumed_retained_rule_mortal_request": {
+          "before": null,
+          "after": "7dac3f7c8b166aff523b8d48fd790df4a900c9bee1a38a08fe6d3fccc151b860"
         },
         "finalize_attack_casualty": {
           "before": null,
@@ -8497,7 +8497,7 @@
     },
     "tests/code_quality/test_performance_policy.py": {
       "before_sha256": "f21c4726c30d75d7f8ddc534d0172d5a4485b98bdece6bac06bd2f64e349c6a3",
-      "after_sha256": "aa875e0bbd27936272484d8800b6c8e59b55bb3ef92deb8d38aa5dd6eeb781e3",
+      "after_sha256": "c0ba7bc7954a253620c3f7cee0b89ef77802754927256bd4f94df82f6f75b4dc",
       "owners": {
         "@module": {
           "before": "a49efcea4924e5b6afbd931551030bde32122441c0f66fad7932722ea46c6c84",
@@ -8522,6 +8522,10 @@
         "test_current_smoke_is_in_the_required_serial_ci_lane": {
           "before": "f501169ba91d2ef5faf1b099965630332381969d39bc671e511ee89e3fb4d3da",
           "after": "c2f729ec583bdd3cbfe85a31e37ca5ae92f17ebc90268b964fb3868c4e2a4c17"
+        },
+        "test_operation_map_uses_real_driver_and_owner_paths": {
+          "before": "18bc4712ccb5cfce7497932b7d367352470efee97b5922d63ef4ee95f800af98",
+          "after": "a87f2b70458ab7eb4dcafb4ce68e2172bbbb096208717a2d913c05252f795e59"
         },
         "test_prior_current_measurements_cannot_be_overwritten_as_fresh_evidence": {
           "before": "f56186af4b5a104494b73a69d7f195732aa5db3ebbb9e07dd2ec6946e2295808",
@@ -9455,7 +9459,7 @@
     },
     "tests/code_quality/test_quality_runtime.py": {
       "before_sha256": null,
-      "after_sha256": "7c5e6004deae0ab37e9381efd0da940bd981821103f862758353d05bf4f2c933",
+      "after_sha256": "b151333489c53d56f319f221aa2846a05737ac2aef4c9a6482e4ae600f090197",
       "owners": {
         "@module": {
           "before": null,
@@ -9527,7 +9531,7 @@
         },
         "test_complete_inventory_preserves_every_ci53_case_and_whole_module": {
           "before": null,
-          "after": "442abb251f081e2f05d4bf7fa5d403fedadcc50d7bd209866b52c94beb59b170"
+          "after": "9bffd6f530773969c6ffbc155647cd4fa7d00b5b43cb3ea11250f9b7cfcd4ed2"
         },
         "test_complete_lane_admission_requires_authoritative_context_and_invocation": {
           "before": null,
@@ -15227,11 +15231,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": null,
-      "after_sha256": "6b3dc8e23d79a4f77e3ab57a6e98f5c76d07509da8e6847ef29325c812dcb233",
+      "after_sha256": "0a149f7fe9a4fe35d17709e116d330437cc88f6e0b884fc9f211825e7cf6d9b0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6b3dc8e23d79a4f77e3ab57a6e98f5c76d07509da8e6847ef29325c812dcb233"
+          "after": "0a149f7fe9a4fe35d17709e116d330437cc88f6e0b884fc9f211825e7cf6d9b0"
         }
       }
     },
@@ -23291,7 +23295,7 @@
     },
     "tools/performance_ci69_members.py": {
       "before_sha256": null,
-      "after_sha256": "13d8cd063c7392eaf8289e39664ad9595f07c717788208501732a909fbe3039a",
+      "after_sha256": "be659462aaf3483ddfce23d43660c64f0424c46c4c9871f2bfa86a373248815e",
       "owners": {
         "@module": {
           "before": null,
@@ -23327,7 +23331,7 @@
         },
         "validate_cutover": {
           "before": null,
-          "after": "f80f4742fab03bbe918ae1e5c00eaa140f8cb2f4648dc663f9df83a06a42e07c"
+          "after": "11108e2b54784253f185c189123abbda4eebb045ef53383645aafd4136fdc414"
         }
       }
     },
@@ -23471,7 +23475,7 @@
     },
     "tools/performance_policy.py": {
       "before_sha256": "cbc427774b6d8bb1e30af96310bd94d48eeffd28c99a87254aa9c90e9a0ee37d",
-      "after_sha256": "19adf899c1d890eae2ccdd8cae749ce49208c76d61f140e1f13750080b22b920",
+      "after_sha256": "3b629b4c9c98b91b9140d172f635b1e6f6b558f80b95d74df09840d8096e3aba",
       "owners": {
         "@module": {
           "before": "ac784ef7f6a1db6326b5102add78a7434b1866cdadc45a9d358ecb09816d4685",
@@ -23491,7 +23495,7 @@
         },
         "prototype_comparison_deferral": {
           "before": null,
-          "after": "15b8c114b9c744be450ce7b3fe76776e77e142f11064a8e6fa5b9b1df8d07c4b"
+          "after": "37eda247cb897a58c5f1a2998399dac3449ff5370933e8f7a65eae355424f05e"
         },
         "validate_assessment": {
           "before": "53d590fecce950ad45ce0432739ba77a674c6f34326cde5e7494e259c5e9febb",
@@ -30855,14 +30859,15 @@
       "operations": [
         "cumulative-exact-038",
         "qualification40-exact-93d354756625daf0",
-        "ci60-exact-93d354756625daf0964ed6815eac07684298d940e72cc0a1def17710c92d1463"
+        "ci60-exact-93d354756625daf0964ed6815eac07684298d940e72cc0a1def17710c92d1463",
+        "ci78-current-owners-93d354756625daf0964ed6815eac07684298d940e72cc0a1def17710c92d1463"
       ],
       "selected_families": [
         "dice",
         "fight",
         "reconstruction"
       ],
-      "rationale": "CI57 preserves authenticated after-removal Deadly Demise parent/collateral continuations through shared restore authority. Original mandatory sensitive dice/Fight/reconstruction obligations and all current causal checks remain selected.",
+      "rationale": "The unchanged retained rule mortal-continuation validator moves to the existing FAQ20 retained-demise owner; both caller positions, all validation branches and causal ordering remain unchanged. Current absolute smoke remains required; comparative evidence is explicitly deferred.",
       "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
       "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
     },

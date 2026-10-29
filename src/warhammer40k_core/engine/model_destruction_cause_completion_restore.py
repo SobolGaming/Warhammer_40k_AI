@@ -58,7 +58,10 @@ def validate_pending_model_destruction_cause_inventory(
         is_mortal_wound_resolution_request,
         mortal_wound_resolution_source_context,
     )
-    from warhammer40k_core.engine.retained_demise_removal import is_post_removal_deadly_demise_child
+    from warhammer40k_core.engine.retained_demise_removal import (
+        consumed_retained_rule_mortal_request,
+        is_post_removal_deadly_demise_child,
+    )
     from warhammer40k_core.engine.retained_destruction_history import (
         retained_attack_sequence_for_cause,
         validate_retained_destruction_history,
@@ -281,7 +284,7 @@ def validate_pending_model_destruction_cause_inventory(
             )
             if authority is not None and authority.source_authority_finalized:
                 if (
-                    _consumed_retained_rule_mortal_request(
+                    consumed_retained_rule_mortal_request(
                         state=state,
                         authority=authority,
                         event_records=event_records,
@@ -1248,140 +1251,6 @@ def _retained_parent_owns_collateral_continuation(
     )
 
 
-def _consumed_retained_rule_mortal_request(
-    *,
-    state: GameState,
-    authority: ModelDestructionCauseAuthority,
-    event_records: tuple[EventRecord, ...],
-    pending_decision_requests: tuple[DecisionRequest, ...],
-) -> DecisionRequest | None:
-    """Recognize only the removed retained rule source's exact mortal continuation."""
-    from warhammer40k_core.engine.damage_allocation import DestructionReactionKind
-    from warhammer40k_core.engine.model_destruction_cause_producers import (
-        rule_effect_model_destruction_authority_context,
-        rule_effect_model_destruction_cause_id,
-    )
-    from warhammer40k_core.engine.mortal_wound_model_allocation import (
-        mortal_wound_resolution_progress,
-    )
-    from warhammer40k_core.engine.retained_attack_permissions import RetainedAttackAction
-    from warhammer40k_core.engine.retained_destruction_state import (
-        DestructionOwnerKind,
-        RetainedDestructionStage,
-        retained_destruction_for_model,
-        validate_retained_placement,
-    )
-    from warhammer40k_core.engine.rule_deadly_demise_mortal_wound_routing import (
-        is_rule_model_destruction_mortal_wound_request,
-        rule_deadly_demise_logical_death_binding,
-        rule_deadly_demise_source_context,
-    )
-
-    matches: list[DecisionRequest] = []
-    for request in pending_decision_requests:
-        if not is_rule_model_destruction_mortal_wound_request(request):
-            continue
-        source_context = rule_deadly_demise_source_context(request)
-        root_context = _mdcpv.json_object_value(
-            source_context.get("root_context"), "retained rule mortal root_context"
-        )
-        if (
-            rule_effect_model_destruction_cause_id(state=state, root_context=root_context)
-            == authority.cause_id
-        ):
-            matches.append(request)
-    if not matches:
-        return None
-    if len(matches) != 1:
-        raise GameLifecycleError("Retained rule mortal continuation is ambiguous.")
-    request = matches[0]
-    source_context = rule_deadly_demise_source_context(request)
-    root_context = _mdcpv.json_object_value(
-        source_context.get("root_context"), "retained rule mortal root_context"
-    )
-    retained = retained_destruction_for_model(
-        state=state, model_instance_id=authority.model_instance_id
-    )
-    if (
-        authority.cause_kind is not ModelDestructionCauseKind.RULE_EFFECT
-        or not authority.source_authority_finalized
-        or not authority.is_consumed
-        or retained is None
-        or retained.cause_id != authority.cause_id
-        or retained.owner_kind is not DestructionOwnerKind.RULE
-        or retained.selected_action is not RetainedAttackAction.FIGHT
-        or retained.stage is not RetainedDestructionStage.REMOVED
-        or retained.owner_context != root_context
-        or root_context.get("game_id") != authority.game_id
-        or retained.placement.unit_instance_id != authority.physical_unit_instance_id
-    ):
-        raise GameLifecycleError("Retained rule consumed cause continuation drift.")
-    validate_retained_placement(state=state, record=retained)
-    removed = _mdcpv.required_destroyed_event(authority)
-    removed_payload = _mdcpv.json_object_value(removed.payload, "retained rule model_destroyed")
-    expected_context = {
-        **rule_effect_model_destruction_authority_context(root_context=root_context),
-        "source_decision_record_ids": [
-            record.record_id for record in authority.source_decision_records
-        ],
-        "model_destroyed_payload": {
-            key: value
-            for key, value in removed_payload.items()
-            if key != MODEL_DESTRUCTION_CAUSE_ID_FIELD
-        },
-    }
-    if (
-        authority.producer_context != expected_context
-        or root_context.get("source_result_id") != authority.producer_id
-        or root_context.get("model_instance_id") != authority.model_instance_id
-        or root_context.get("target_unit_instance_id") != authority.physical_unit_instance_id
-        or root_context.get("rules_unit_instance_id") != authority.rules_unit_instance_id
-        or removed_payload.get(MODEL_DESTRUCTION_CAUSE_ID_FIELD) != authority.cause_id
-    ):
-        raise GameLifecycleError("Retained rule consumed cause context drift.")
-    sources = tuple(
-        source
-        for source in retained.sources
-        if not source.optional
-        and source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE
-        and source.to_payload() == source_context.get("source")
-    )
-    if len(sources) != 1:
-        raise GameLifecycleError("Retained rule mortal source drift.")
-    source = sources[0]
-    progress = mortal_wound_resolution_progress(request)
-    if (
-        progress.application_id
-        != (
-            f"{authority.producer_id}:deadly-demise:{source.source_id}:"
-            f"{progress.target_unit_instance_id}:mortal-wounds"
-        )
-        or progress.source_rule_id != source.source_rule_id
-        or progress.target_unit_instance_id != source_context.get("current_target_unit_instance_id")
-        or progress.mortal_wounds != source_context.get("current_target_mortal_wounds")
-        or not progress.spill_over
-        or progress.destruction_evidence is not None
-        or progress.logical_death_cause_binding != rule_deadly_demise_logical_death_binding()
-    ):
-        raise GameLifecycleError("Retained rule mortal application binding drift.")
-    request_events = tuple(
-        event
-        for event in event_records
-        if event.event_type == "decision_requested" and event.payload == request.to_payload()
-    )
-    if (
-        len(request_events) != 1
-        or tuple(event for event in event_records if event.event_id == removed.event_id)
-        != (removed,)
-        or _mdcpv.event_index(event_records, removed)
-        >= _mdcpv.event_index(event_records, request_events[0])
-    ):
-        raise GameLifecycleError("Retained rule consumed cause mortal request drift.")
-    # The enclosing restore still authenticates retained history and the mortal
-    # application/FNP allocation inventory; this only classifies its removed owner.
-    return request
-
-
 def validate_rule_effect_completion_or_pending_window(
     *,
     state: GameState,
@@ -1390,6 +1259,10 @@ def validate_rule_effect_completion_or_pending_window(
     event_records: tuple[EventRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
+    from warhammer40k_core.engine.retained_demise_removal import (
+        consumed_retained_rule_mortal_request,
+    )
+
     destroyed_event = _mdcpv.required_destroyed_event(authority)
     context = authority.producer_context
     finalization_events = tuple(
@@ -1412,7 +1285,7 @@ def validate_rule_effect_completion_or_pending_window(
         ):
             pending_request_values.append(request)
     pending_requests = tuple(pending_request_values)
-    mortal_request = _consumed_retained_rule_mortal_request(
+    mortal_request = consumed_retained_rule_mortal_request(
         state=state,
         authority=authority,
         event_records=event_records,

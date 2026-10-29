@@ -30038,6 +30038,21 @@
       ],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci78-current-owners-93d354756625daf0964ed6815eac07684298d940e72cc0a1def17710c92d1463": {
+      "paths": [
+        "src/warhammer40k_core/engine/retained_demise_removal.py"
+      ],
+      "owners": [
+        "consumed_retained_rule_mortal_request"
+      ],
+      "families": [
+        "dice",
+        "fight",
+        "reconstruction"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

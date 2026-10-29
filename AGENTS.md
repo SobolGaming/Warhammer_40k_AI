@@ -379,7 +379,7 @@ Legacy code containing broad exceptions, fallback behavior, ambiguous model acce
 
 For the finite Core + Faction cutover against exact base
 5f509724da25a2f6ded0c2739a8e7c84bdf59c91, the owner explicitly approved
-comparison_disposition: deferred and the 157 exact comparison-only quality
+comparison_disposition: deferred and the 260 exact comparison/preservation quality
 cases recorded in data/source_audits/ci64_provenance_v1/test-cutover.json.
 Fresh comparative reports and their historical qualification are not merge
 prerequisites for this cutover. Existing reports remain historical; deferred or
@@ -445,3 +445,10 @@ Stop before coding if the change would:
 - weaken a CORE V2 invariant.
 
 Agents should prefer review, tests, audit scripts, small typed modules, and migration plans over large production-code changes.
+
+On 29 October 2026, the owner separately approved deferring the exact 103
+historical-preservation controls in addition to the prior 157 comparison controls.
+The 260-case list remains finite and code-pinned. These include adversarial checks
+of retained historical helpers; they are not passing results. Keep helper code,
+active production and preflight/postflight validators, 1,848 active quality checks
+and all 4,886 selected gameplay cases. No additional omission is authorized.

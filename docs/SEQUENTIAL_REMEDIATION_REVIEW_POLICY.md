@@ -134,7 +134,7 @@ throughput or quality improvement from this model plan.
 ## PR591 prototype cutover exception — 28 October 2026
 
 The owner explicitly approved removing fresh comparative benchmark evidence as
-a prerequisite for this cutover and deferring the exact 157 comparison-dependent
+a prerequisite for this cutover and deferring the exact 260 comparison/preservation
 quality cases recorded in the cutover ledger. Preserve historical reports with
 their original outcomes; deferred comparisons and checks are not passing results.
 All 4,886 selected gameplay cases remain required. Keep active quality, both type
@@ -146,3 +146,10 @@ shards replace the duplicate complete local covered run. The hosted shards must
 all succeed and their combined full-package branch coverage must meet 50%. No
 local partial result substitutes for that gate. Preserve all other required CI
 checks and branch protections. Restore 85% through the documented post-merge work.
+
+On 29 October 2026, the owner separately approved deferring the exact 103
+historical-preservation controls in addition to the prior 157 comparison controls.
+The 260-case list remains finite and code-pinned. These include adversarial checks
+of retained historical helpers; they are not passing results. Keep helper code,
+active production and preflight/postflight validators, 1,848 active quality checks
+and all 4,886 selected gameplay cases. No additional omission is authorized.

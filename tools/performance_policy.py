@@ -390,11 +390,11 @@ def prototype_comparison_deferral(root: Path, *, base: str) -> dict[str, object]
     cases = _strings(record.get("deferred_quality_cases"))
     if (
         cases != sorted(cases)
-        or len(cases) != 157
+        or len(cases) != 260
         or canonical_digest(cases)
-        != "c10cb4d337c5876a562cb4afd5612e596498f90f68b720242b081d92cedd170e"
+        != "e419ac241cf7908e138b1bd78289a523416bddd51cb65a5356c60e6763d167c7"
     ):
-        raise ValueError("Prototype comparison-only quality deferrals changed.")
+        raise ValueError("Prototype comparison/preservation quality deferrals changed.")
     coverage = object_value(record["coverage"])
     restoration = coverage.get("restoration_condition")
     if (
