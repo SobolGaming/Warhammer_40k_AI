@@ -307,13 +307,20 @@ uv run --no-sync python scripts/build_test_shards.py \
   --shard-count 12
 ```
 
-The current weights use median durations from the complete covered hosted runs
+The initial measurements are the complete covered hosted runs
 [40872329113](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40872329113)
-and [40874478610](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40874478610).
-Both executed all 4,886 selected cases on four-worker standard runners. JUnit
-weights include per-case setup and teardown; session startup, source-index setup,
-reporting and runner queues are assessed separately. Weight totals are scheduling
-inputs, not job wall times or proof of the temporary twelve-minute CI goal.
+and [40874478610](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40874478610),
+each covering all 4,886 cases. Current scheduling estimates take each case's larger
+recorded cost, also including fully passed setup/call/teardown observations from
+[40888978899](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40888978899).
+That later run failed; it is not a passing profile. Its 277 failed or unreported
+cases keep authentic older measurements. The exact derivation and timing hashes
+are recorded in `ci/test_shards/case-partitions.json` under `evidence.weight_refresh`.
+
+Session startup, source-index setup, reporting and runner queues are assessed
+separately. Weight totals are planning inputs, not job wall times or proof of the
+temporary twelve-minute CI goal. Existing observation-based estimates do not
+relax the complete-profile validation below.
 
 A single complete local JUnit XML is also accepted; label its host accurately and
 do not mix local and hosted-runner timings in one representative CI profile.
