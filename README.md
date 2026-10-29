@@ -278,6 +278,12 @@ gate after every shard succeeds. Full type checking and architecture checks also
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
 
+The temporary CI goal is 12 minutes in total. Each behavioral shard has a 720-second
+cutoff covering source-index setup and its covered test run. The separate complete
+performance command remains limited to 180 seconds, and quality lanes retain their
+600-second limit. Report actual end-to-end time and queue overhead; a per-step
+cutoff does not establish that the total goal passed.
+
 The current owner-approved coverage floor is 64%; later coverage work must restore 85%. The full
 warhammer40k_core package and branch metric remain unchanged, with no added coverage
 omissions or exclusions. This policy change does not claim either threshold has passed;

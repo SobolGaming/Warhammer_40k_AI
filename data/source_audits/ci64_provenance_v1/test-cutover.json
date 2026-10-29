@@ -4726,6 +4726,21 @@
         "sha256": "13ae54dd779be2b6232a6dc82f8b04aca0efc0412f9c048e52c9f6eb73fbde31"
       },
       "recipe": "add-pending-decision-requests-v1"
+    },
+    "tests/unit/test_phase18e_server_api.py": {
+      "after": {
+        "blob_sha1": "216afecf87d22d41258aadfdd58334b2ea1cdcaf",
+        "bytes": 111941,
+        "mode": "100644",
+        "sha256": "5454f3be7f844d074c490c335cd1eaba94d6b7b3a936e03a6c4b7fe59e9844b8"
+      },
+      "before": {
+        "blob_sha1": "34969de3467cec3e9213b66132c9e10a98774893",
+        "bytes": 111691,
+        "mode": "100644",
+        "sha256": "334ce50fbb541155d2b40f51e8ede1276870065e55365b497d1a5a2990c1f766"
+      },
+      "recipe": "type-only-server-session-test-access-v1"
     }
   },
   "native_active_files": {

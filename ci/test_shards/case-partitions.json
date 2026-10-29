@@ -118,7 +118,91 @@
       },
       "planning_total_worker_seconds": 19537.175,
       "baseline_profile_evidence_location": "durations.json profiles; the two genuine complete passing profile entries remain unchanged.",
-      "preview_sha256": "318e0dec2d096b83ae5822d78360e17f09fb449d79406e48d9011c7b3a22668d"
+      "preview_sha256": "318e0dec2d096b83ae5822d78360e17f09fb449d79406e48d9011c7b3a22668d",
+      "selector_refreshes": [
+        {
+          "source_run": 40911416598,
+          "source_head": "e0a6b6b7befcbe3287c74701c14e0ef5b711fe61",
+          "source_merge_head": "ffedd4a57c43dd2203c2b8bdc9a0bfa7cf758360",
+          "source_controller_sha256": "3eabf45736d9b2ce7481f7357ae46814b97bb31c1fa43a7399fe861c899f2cfd",
+          "case_outcomes": "405 passed, 1215 complete phases; enclosing 600-second step FAILED",
+          "rule": "max(committed selector weight, sum of all current setup/call/teardown observations); round3; no reductions",
+          "changes": {
+            "tests/factions/world_eaters/unit/test_blessings_gameplay.py": {
+              "before": 34.083,
+              "after": 41.796
+            },
+            "tests/infrastructure/missions/unit/test_mission_pack.py": {
+              "before": 8.14,
+              "after": 9.517
+            },
+            "tests/infrastructure/missions/unit/test_step6g_secondary_certification.py": {
+              "before": 204.855,
+              "after": 220.285
+            },
+            "tests/rules/rules24/unit/test_facade_evidence.py": {
+              "before": 597.537,
+              "after": 779.451
+            },
+            "tests/rules/section00/test_conversion.py": {
+              "before": 29.414,
+              "after": 38.554
+            },
+            "tests/rules/section02/test_02_04_weapons.py": {
+              "before": 0.464,
+              "after": 3.737
+            },
+            "tests/rules/section04/test_visibility.py": {
+              "before": 0.898,
+              "after": 1.74
+            },
+            "tests/rules/section05/test_allocation_choices.py": {
+              "before": 4.418,
+              "after": 9.631
+            },
+            "tests/rules/section05/test_rule_effect_retention.py": {
+              "before": 36.106,
+              "after": 84.751
+            },
+            "tests/rules/section05/test_saves.py": {
+              "before": 6.325,
+              "after": 8.44
+            },
+            "tests/rules/section07/test_progression.py": {
+              "before": 25.278,
+              "after": 35.376
+            },
+            "tests/rules/section10/test_mixed_integration.py": {
+              "before": 10.524,
+              "after": 24.362
+            },
+            "tests/rules/section12/test_movement.py": {
+              "before": 62.441,
+              "after": 113.822
+            },
+            "tests/rules/section14/test_marker_axes.py": {
+              "before": 3.202,
+              "after": 4.324
+            },
+            "tests/rules/section18/test_isolation.py": {
+              "before": 3.128,
+              "after": 3.792
+            },
+            "tests/rules/section19/test_coverage.py": {
+              "before": 0.212,
+              "after": 0.213
+            },
+            "tests/rules/section22/test_damage.py": {
+              "before": 4.622,
+              "after": 6.011
+            },
+            "tests/unit/test_phase10i_terrain_movement.py": {
+              "before": 2.058,
+              "after": 2.522
+            }
+          }
+        }
+      ]
     }
   }
 }
