@@ -1,30 +1,30 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "2e18eeaa0d9485baa263c2dfb28900317dd9fa75",
+  "base": "06cda7604619f8bd4dcc6af2e74478475623f5f3",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ce95991ea3858da5cbd281c3004cd0d0c66d0b2e7c21f6afcc0d8f07b6eff0f0",
   "operation_map_sha256": "708b62b3af707d3e60d1d54c662e56c57c9151ce7f83bd277caef62700c0cd0d",
   "changes": {
-    "uv.lock": {
-      "before_sha256": "d02bdfda8582a5fbe2dce3a961ec5ee8a862eac3eb2265aae245caedadc8238f",
-      "after_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "conformance/typescript/package-lock.json": {
+      "before_sha256": "96a6a1493e0be69c2e0bea5dc3e2646d5c9d441a3c770d7c49a5e503fa2dc385",
+      "after_sha256": "06410a30fe60acc37b61863cc7bac2c2df2170496361bdd28ae5dffcc1a49294",
       "owners": {
         "@document": {
-          "before": "d02bdfda8582a5fbe2dce3a961ec5ee8a862eac3eb2265aae245caedadc8238f",
-          "after": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75"
+          "before": "96a6a1493e0be69c2e0bea5dc3e2646d5c9d441a3c770d7c49a5e503fa2dc385",
+          "after": "06410a30fe60acc37b61863cc7bac2c2df2170496361bdd28ae5dffcc1a49294"
         }
       }
     }
   },
   "rows": {
-    "uv.lock": {
+    "conformance/typescript/package-lock.json": {
       "category": "dependency_environment",
       "operations": [
         "development-dependency"
       ],
       "selected_families": [],
-      "rationale": "Dependabot593 updates only development-tool filelock3.29.0 to4.2.1 using its refreshed exact official lock. Verify real lock recursion, contention timeout and release, and no-download virtualenv creation with unchanged virtualenv21.14.13.",
-      "source_obligation": "Preserve all4886 selected behavioral cases,1848 active quality cases,260 approved historical deferrals, full-package branch coverage64%, current source/dependency identity checks, complete performance180seconds, behavior setup-and-test720seconds, unchangedquality600seconds and ordinary branch protections.",
-      "unchanged_work": "All application runtime package records, engine source, selected test workloads, assertions and shard manifests are identical to the actual merged main base. Virtualenv21.14.13 and all other package records are unchanged. Filelock serves pre-commit development tooling; no algorithm, search, cache or workload comparison family is changed. The complete serial current smoke and own full hosted CI remain required."
+      "rationale": "Dependabot PR595 changes only fast-uri 3.1.8 to 3.1.9 in the TypeScript conformance lock. fast-uri resolves JSON Schema identifiers for Ajv in this development-only HTTP conformance client. Validate the locked install, generated client, TypeScript types, all client unit tests, and the real two-server conformance scenario.",
+      "source_obligation": "Preserve all 4886 selected behavioral cases, 1848 active quality cases, and the exact 260 approved historical deferrals. Keep full-package branch coverage at 64%, behavior setup-and-test cutoff at 720 seconds, quality cutoff at 600 seconds, complete serial performance protocol at 180 seconds, and normal merge protections.",
+      "unchanged_work": "Python runtime dependencies, engine source, schemas, generated client source, test assertions, and shard inventories are identical to the exact main base. The npm lock changes only fast-uri version, official resolved tarball, and integrity; no engine algorithm, search, cache, replay implementation, or measured workload changes. The serial current-runtime smoke and complete exact-head CI remain required; no historical comparison or full-game performance result is claimed."
     }
   },
   "milestone": "ordinary",
