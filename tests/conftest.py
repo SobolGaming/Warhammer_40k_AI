@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -69,6 +70,19 @@ def _explicit_benchmark(config: pytest.Config) -> bool:
         if path.is_relative_to(REPOSITORY_ROOT / "tests/benchmarks"):
             return True
     return False
+
+
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    if (
+        not os.environ.get("SHARD_ID")
+        or os.environ.get("PYTEST_XDIST_WORKER_COUNT") != "4"
+        or config.getoption("dist") != "worksteal"
+    ):
+        return
+    from scripts.build_test_shards import worksteal_relevance_order
+
+    order = worksteal_relevance_order(tuple(item.nodeid for item in items), workers=4)
+    items[:] = [items[index] for index in order]
 
 
 def pytest_ignore_collect(collection_path: Path, config: pytest.Config) -> bool | None:

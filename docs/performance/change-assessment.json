@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ce95991ea3858da5cbd281c3004cd0d0c66d0b2e7c21f6afcc0d8f07b6eff0f0",
-  "operation_map_sha256": "0352fb16fc66438a7962c5075c9bbf7aaf7ffc1ae89ba2413e1b055ddbac00cb",
+  "operation_map_sha256": "29264cdd46851e23aa14d071ad3fdac85ae4672d99964594aec760c83b004b6d",
   "changes": {
     ".github/pull_request_template.md": {
       "before_sha256": "50fd30af40ed199b0d8d99560496fcfcd02b1ff8dc2d0f22fd9971b48633fc09",
@@ -4926,11 +4926,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "519f39ebc7c7bcef776402700315b4ad9c3eb6f44177a364fd175f543b41b7ca",
+      "after_sha256": "92c7ea52a2e2ddb5d03519f050311c1229cdf91ca47c3c866ae1c3900e0d5b2f",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "519f39ebc7c7bcef776402700315b4ad9c3eb6f44177a364fd175f543b41b7ca"
+          "after": "92c7ea52a2e2ddb5d03519f050311c1229cdf91ca47c3c866ae1c3900e0d5b2f"
         }
       }
     },
@@ -4980,7 +4980,7 @@
     },
     "scripts/build_test_shards.py": {
       "before_sha256": "aa6a5dc19de51d207959545cf121a2f69179679baf54ec56585b72933929abc3",
-      "after_sha256": "0f82ab0b17d1916668470c488a7a99072be0a4cd78297d653caffc99cc7fbf0e",
+      "after_sha256": "17205e6daf0aa72bd2f2ca7419dc4a3b33b3f12f945286e6702f626faa43c64c",
       "owners": {
         "@module": {
           "before": "3ba5d173e339c8ecf38267fecba88ce7439f00a034b5b3efcdb965ee2b8ad431",
@@ -5045,6 +5045,10 @@
         "main": {
           "before": "15ef66df8fa500f51ff5baf9a4dcd1919d75ffd954eff23125c3f9e2c89513d7",
           "after": "922e26e018fc83d2c3a5a4ff7b0f61338e450cfeb47ced734e4cd2adb0864ba1"
+        },
+        "worksteal_relevance_order": {
+          "before": null,
+          "after": "3971cfbfbe7cc0a13613db8aa06236f2ee7a4940ca8be15e830ab398b7b98119"
         }
       }
     },
@@ -7649,7 +7653,7 @@
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "before_sha256": "23dc913cc9d2def5a1a0625f4acd95881fb06fa3561d54feb21c158446a25267",
-      "after_sha256": "942385877956163654bc44974e53038d5f928dd9aed8d4b4af4f68cb1053dc9d",
+      "after_sha256": "c3d206e3f1c609ac4934d63d9ad6bade1624a2f574022aca042a2fb02d51018a",
       "owners": {
         "@module": {
           "before": "5f6e7450e2b71187ea696f4e6c5ec311062ec2e0645701c8e8e160a3506b7e6a",
@@ -7697,7 +7701,7 @@
         },
         "test_finite_partition_has_real_complete_pytest_collection": {
           "before": null,
-          "after": "d8b57d441373c8f681ebdd969980705a57262069ebac85d0126edf74c30a0ce2"
+          "after": "d0fcf0f826d616ad99ba314490d629e895790fc80f54ca0b082c7e3b0b0a9666"
         },
         "test_finite_partition_preserves_total_weight_and_other_file_weights": {
           "before": null,
@@ -9769,11 +9773,11 @@
     },
     "tests/conftest.py": {
       "before_sha256": "db7fe5a9246d0aa44cc115b59840781806bdd5228b115bbd9dce8309d28292b7",
-      "after_sha256": "6c2726259b6359f0a2f929e7326fa0dfce71d96e64823a0e0eb51db42ca4057f",
+      "after_sha256": "c1d324ff1ad8f6ba56d713afabbb7055fb97560e7c426c710033221225a37d0e",
       "owners": {
         "@module": {
           "before": "8957a5dde9d9009821741d4ababc17be4c5e26cae67c34b3b4be4a6970567156",
-          "after": "95e8d748ae0c17212b379c0f28958986eac642b878c8c4add4de16e037ecc36c"
+          "after": "232ef52fa89143a72698f93ec9e099bbbd1aae3c450eca2410ce0a5f95e9114e"
         },
         "_configured_selection": {
           "before": null,
@@ -9794,6 +9798,10 @@
         "pytest_collect_file": {
           "before": null,
           "after": "332b808933eb433b9aab10386d9b6431a50a6272eb5fc64a72dabccbb41ecf48"
+        },
+        "pytest_collection_modifyitems": {
+          "before": null,
+          "after": "eaeda68a7e31758c53b0d59b17e50e2f6dcd5cc7428ef804a76db2009d88fa2b"
         },
         "pytest_configure": {
           "before": null,
@@ -29567,14 +29575,15 @@
       "category": "measured_workload",
       "operations": [
         "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f",
-        "ci78-prototype-policy-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
+        "ci78-prototype-policy-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f",
+        "ci79-ordering-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
       ],
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "Finite prototype cutover input reviewed against the actual PR base; fresh comparative evidence is deferred while functional, static, source integrity and absolute timing gates remain required.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "CI79 scheduling-only correction: start the authenticated finite S25 cases on separate initial four-worker worksteal chunks in hosted behavioral shards; keep every selected item, assertion, relative group order, current validators and all deadlines unchanged. Existing finite collection regression exercises the actual failed layout.",
+      "source_obligation": "Preserve the exact 4,886 selected gameplay cases and 1,848 active quality cases, with no engine, catalog, fixture, coverage metric or threshold change.",
+      "unchanged_work": "All native workload, validation I/O, runtime identity, source-index preparation, four workers, scheduler and 180/600-second limits remain; only deterministic initial item order changes in the guarded hosted worker context."
     },
     "scripts/check_performance_policy.py": {
       "category": "governance",
@@ -31415,9 +31424,9 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI54 exact quality runtime orchestration, durable evidence and finite historical compatibility; no gameplay, workload, dependency or benchmark algorithm changes.",
-      "source_obligation": "Preserve every predecessor assertion, exact whole-module case membership and required phase, process and same-attempt evidence boundaries.",
-      "unchanged_work": "The operation map, engine runtime, smoke workloads, sample counts, behavioral selection, coverage floor and 180/600-second limits remain unchanged."
+      "rationale": "CI79 scheduling-only correction: start the authenticated finite S25 cases on separate initial four-worker worksteal chunks in hosted behavioral shards; keep every selected item, assertion, relative group order, current validators and all deadlines unchanged. Existing finite collection regression exercises the actual failed layout.",
+      "source_obligation": "Preserve the exact 4,886 selected gameplay cases and 1,848 active quality cases, with no engine, catalog, fixture, coverage metric or threshold change.",
+      "unchanged_work": "All native workload, validation I/O, runtime identity, source-index preparation, four workers, scheduler and 180/600-second limits remain; only deterministic initial item order changes in the guarded hosted worker context."
     },
     "tests/code_quality/test_ci_runtime_successor.py": {
       "category": "governance",
@@ -31751,14 +31760,15 @@
       "category": "measured_workload",
       "operations": [
         "qualification40-exact-e52e4ddd58b7ef88",
-        "ci78-cutover-owners-e52e4ddd58b7ef887ab03c04116e676f6280b824ab7469d5d3080e5cba4f2128"
+        "ci78-cutover-owners-e52e4ddd58b7ef887ab03c04116e676f6280b824ab7469d5d3080e5cba4f2128",
+        "ci79-ordering-e52e4ddd58b7ef887ab03c04116e676f6280b824ab7469d5d3080e5cba4f2128"
       ],
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "Exact PR587-to-current owner changes: tests/conftest.py. Literal operations cover each changed owner; complete mapped family obligations retained.",
-      "source_obligation": "Preserve the independently reviewed physical source, restore, decision, provenance and replay invariants for this exact input; current fixture identity is supported by its retained mirror observation.",
-      "unchanged_work": "No original operation, hard case, sample count, family profile or work/cache/timing limit is removed. The exact source and preserved semantic rows remain separately authenticated; measurements are current and independently bound."
+      "rationale": "CI79 scheduling-only correction: start the authenticated finite S25 cases on separate initial four-worker worksteal chunks in hosted behavioral shards; keep every selected item, assertion, relative group order, current validators and all deadlines unchanged. Existing finite collection regression exercises the actual failed layout.",
+      "source_obligation": "Preserve the exact 4,886 selected gameplay cases and 1,848 active quality cases, with no engine, catalog, fixture, coverage metric or threshold change.",
+      "unchanged_work": "All native workload, validation I/O, runtime identity, source-index preparation, four workers, scheduler and 180/600-second limits remain; only deterministic initial item order changes in the guarded hosted worker context."
     },
     "tests/d07_geometry_containment.py": {
       "category": "measured_workload",

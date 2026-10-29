@@ -616,6 +616,34 @@ def test_finite_partition_has_real_complete_pytest_collection() -> None:
         == expected
     )
 
+    # The actual failed 335-item layout queued both expensive cases on worker 1.
+    # Retain this and the four-heavy case without adding or selecting test cases.
+    for count, positions in ((335, (128, 129)), (398, (244, 245)), (248, (70, 71, 72, 73))):
+        nodes = [f"ordinary:{index}" for index in range(count)]
+        for position, node in zip(positions, expected, strict=False):
+            nodes[position] = node
+        ordered = sharding.worksteal_relevance_order(tuple(nodes), workers=4)
+        assert sorted(ordered) == list(range(count))
+        assert [index for index in ordered if index in positions] == list(positions)
+        assert [index for index in ordered if index not in positions] == [
+            index for index in range(count) if index not in positions
+        ]
+        start = 0
+        for worker in range(4):
+            width = (count - start) // (4 - worker)
+            chunk = ordered[start : start + width]
+            assert len(set(chunk) & set(positions)) <= 1
+            if worker < len(positions):
+                assert chunk[0] == positions[worker]
+            start += width
+        assert start == count
+        assert sharding.worksteal_relevance_order(tuple(nodes), workers=1) == tuple(range(count))
+    assert sharding.worksteal_relevance_order(
+        tuple("ordinary" for _ in range(8)), workers=4
+    ) == tuple(range(8))
+    assert sharding.worksteal_relevance_order(expected, workers=4) == tuple(range(20))
+    assert sharding.worksteal_relevance_order(expected[:2], workers=4) == (0, 1)
+
 
 @pytest.fixture
 def partition_root(tmp_path: Path) -> Path:

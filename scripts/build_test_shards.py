@@ -548,6 +548,32 @@ def _literal_partition_nodes(root: Path) -> tuple[str, ...]:
     return nodes
 
 
+def worksteal_relevance_order(nodeids: tuple[str, ...], *, workers: int) -> tuple[int, ...]:
+    """Start the finite expensive S25 cases on distinct existing worker chunks.
+
+    Worksteal initially sends floor(remaining / remaining workers) consecutive
+    items. Adjacent expensive cases otherwise become an unstealable serial tail.
+    Keep both relative orders and leave every other collection untouched.
+    """
+    original = tuple(range(len(nodeids)))
+    heavy = tuple(
+        index for index, node in enumerate(nodeids) if node.startswith(CASE_PARTITION_FILE + "::")
+    )
+    if workers != 4 or not 1 <= len(heavy) <= workers or len(nodeids) < 2 * workers:
+        return original
+    declared = frozenset(_literal_partition_nodes(REPOSITORY_ROOT))
+    if any(nodeids[index] not in declared for index in heavy):
+        raise SystemExit("Worksteal relevance ordering requires declared finite cases.")
+    ordinary = iter(index for index in original if index not in heavy)
+    ordered: list[int] = []
+    for worker in range(workers):
+        count = (len(nodeids) - len(ordered)) // (workers - worker)
+        first = (heavy[worker],) if worker < len(heavy) else ()
+        ordered.extend(first)
+        ordered.extend(next(ordinary) for _ in range(count - len(first)))
+    return tuple(ordered)
+
+
 def _case_partition(root: Path, files: frozenset[str]) -> dict[str, float]:
     if CASE_PARTITION_FILE not in files:
         return {}
