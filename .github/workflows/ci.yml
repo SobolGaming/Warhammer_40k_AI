@@ -301,7 +301,7 @@ jobs:
 
   semantic-audit-macos:
     name: semantic-audit-macos
-    runs-on: macos-latest
+    runs-on: macos-15-intel
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -434,7 +434,8 @@ jobs:
         run: uv sync --locked --no-default-groups --group test
 
       - name: Run behavioral coverage shard
-        timeout-minutes: 10
+        # Temporary owner-approved setup-and-test cutoff; total CI goal is 12 minutes.
+        timeout-minutes: 12
         env:
           TEST_TIMING_DIR: reports/behavior-timing
           COVERAGE_FILE: .coverage.${{ matrix.shard_id }}

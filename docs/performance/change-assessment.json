@@ -2,15 +2,25 @@
   "policy": "rules-engine-performance-v3",
   "base": "7f2bc25958b1297e0e246ab9a34aa04be8182cef",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ce95991ea3858da5cbd281c3004cd0d0c66d0b2e7c21f6afcc0d8f07b6eff0f0",
-  "operation_map_sha256": "beba81d15aab76e80a05ee7fd62a6cc5a5083fedf54d4f93c5d4ddc5f6eea761",
+  "operation_map_sha256": "708b62b3af707d3e60d1d54c662e56c57c9151ce7f83bd277caef62700c0cd0d",
   "changes": {
-    "uv.lock": {
-      "before_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
-      "after_sha256": "d02bdfda8582a5fbe2dce3a961ec5ee8a862eac3eb2265aae245caedadc8238f",
+    ".github/workflows/ci.yml": {
+      "before_sha256": "461dbc322a5d18a5f783084eee19a945cb59ab5806fdd590ae0487c948de14c1",
+      "after_sha256": "eb86b54a0df6cff7b6cdc8187dce619f8d9bc60494e65554f580bb8e3816044a",
       "owners": {
         "@document": {
-          "before": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
-          "after": "d02bdfda8582a5fbe2dce3a961ec5ee8a862eac3eb2265aae245caedadc8238f"
+          "before": "461dbc322a5d18a5f783084eee19a945cb59ab5806fdd590ae0487c948de14c1",
+          "after": "eb86b54a0df6cff7b6cdc8187dce619f8d9bc60494e65554f580bb8e3816044a"
+        }
+      }
+    },
+    "README.md": {
+      "before_sha256": "5128889a8404a7c0bb1b416b95a49790fdfd78759b78b69e7b158604d0f9f1bb",
+      "after_sha256": "6876c8b78d8736b86e2f5215981247bdb24d5b21c1056aee661ce6dd03c50932",
+      "owners": {
+        "@document": {
+          "before": "5128889a8404a7c0bb1b416b95a49790fdfd78759b78b69e7b158604d0f9f1bb",
+          "after": "6876c8b78d8736b86e2f5215981247bdb24d5b21c1056aee661ce6dd03c50932"
         }
       }
     },
@@ -41,6 +51,36 @@
         "@document": {
           "before": "eb532303907d5eab7ea2bdc80bb5708fe767a0f08d46b4e65795775b074f240e",
           "after": "a65ee8dc95c935904a6d0adb26019eaab45add4ce99fa4ea37613650e13ca5f9"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "8e0768d6ab3c86115192707f7364ba4ac26a2d223e1f094affb956a9fe669169",
+      "after_sha256": "600ecff5cbab5794401518628c158dbb2ce41b973f2396214cc4a17e890b6a46",
+      "owners": {
+        "@document": {
+          "before": "8e0768d6ab3c86115192707f7364ba4ac26a2d223e1f094affb956a9fe669169",
+          "after": "600ecff5cbab5794401518628c158dbb2ce41b973f2396214cc4a17e890b6a46"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "3fef00091839b4c393fc6a7f23bcd144040de3349fb6f78c254c155c7670d63d",
+      "after_sha256": "a43cd8f55f4070213458549ed1ee9ae74d640d3c993af4ff89a00ae835e3a793",
+      "owners": {
+        "@document": {
+          "before": "3fef00091839b4c393fc6a7f23bcd144040de3349fb6f78c254c155c7670d63d",
+          "after": "a43cd8f55f4070213458549ed1ee9ae74d640d3c993af4ff89a00ae835e3a793"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "47817589262f1888856b766260f6787be45dcab82b8671e5f9f12843c635c341",
+      "after_sha256": "181d41961284f2f164afc8ac272f74f0c68327ab49fbc8f3a9ab706bc590a9cf",
+      "owners": {
+        "@document": {
+          "before": "47817589262f1888856b766260f6787be45dcab82b8671e5f9f12843c635c341",
+          "after": "181d41961284f2f164afc8ac272f74f0c68327ab49fbc8f3a9ab706bc590a9cf"
         }
       }
     },
@@ -124,33 +164,65 @@
         }
       }
     },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "8e0768d6ab3c86115192707f7364ba4ac26a2d223e1f094affb956a9fe669169",
-      "after_sha256": "600ecff5cbab5794401518628c158dbb2ce41b973f2396214cc4a17e890b6a46",
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "512c8b0cc84faa881e1e32124b995c9bb875b56908458ffc27c7d338d3106183",
+      "after_sha256": "5769f8f4b23c5c7792261f44ce916625fbf97d4586d9a250d1e9bb994cfc9daf",
       "owners": {
         "@document": {
-          "before": "8e0768d6ab3c86115192707f7364ba4ac26a2d223e1f094affb956a9fe669169",
-          "after": "600ecff5cbab5794401518628c158dbb2ce41b973f2396214cc4a17e890b6a46"
+          "before": "512c8b0cc84faa881e1e32124b995c9bb875b56908458ffc27c7d338d3106183",
+          "after": "5769f8f4b23c5c7792261f44ce916625fbf97d4586d9a250d1e9bb994cfc9daf"
         }
       }
     },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "3fef00091839b4c393fc6a7f23bcd144040de3349fb6f78c254c155c7670d63d",
-      "after_sha256": "a43cd8f55f4070213458549ed1ee9ae74d640d3c993af4ff89a00ae835e3a793",
+    "tests/code_quality/test_quality_runtime.py": {
+      "before_sha256": "c81c324836e9f00f8f4ffb3d57cc18c1d3a58511df97328bf71bf6689e3741c1",
+      "after_sha256": "6f780f1e93e729432433e2ede199ed10b033c80f1337737012cee82d4235183c",
       "owners": {
-        "@document": {
-          "before": "3fef00091839b4c393fc6a7f23bcd144040de3349fb6f78c254c155c7670d63d",
-          "after": "a43cd8f55f4070213458549ed1ee9ae74d640d3c993af4ff89a00ae835e3a793"
+        "test_live_workflow_preserves_required_names_and_all_four_producer_controls": {
+          "before": "8fc78c5745518f96047f04de842342c6aeabfd5c5aaf65b95c35d4d4b5fda4de",
+          "after": "d424d60be649670cddb645b2a4cde835f0ec4c01fc726ded3c98454dc0cc25fa"
         }
       }
     },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "47817589262f1888856b766260f6787be45dcab82b8671e5f9f12843c635c341",
-      "after_sha256": "181d41961284f2f164afc8ac272f74f0c68327ab49fbc8f3a9ab706bc590a9cf",
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "34ef3e73ba290f4a77585dbf30ed5a8b28209960f5688cf7815bb467e650ca5d",
+      "after_sha256": "9c0d031999f886cd0c21bfd7ead0a233e485fb0cd005da26cab2282fa616efa7",
       "owners": {
         "@document": {
-          "before": "47817589262f1888856b766260f6787be45dcab82b8671e5f9f12843c635c341",
-          "after": "181d41961284f2f164afc8ac272f74f0c68327ab49fbc8f3a9ab706bc590a9cf"
+          "before": "34ef3e73ba290f4a77585dbf30ed5a8b28209960f5688cf7815bb467e650ca5d",
+          "after": "9c0d031999f886cd0c21bfd7ead0a233e485fb0cd005da26cab2282fa616efa7"
+        }
+      }
+    },
+    "tests/unit/test_phase18e_server_api.py": {
+      "before_sha256": "334ce50fbb541155d2b40f51e8ede1276870065e55365b497d1a5a2990c1f766",
+      "after_sha256": "5454f3be7f844d074c490c335cd1eaba94d6b7b3a936e03a6c4b7fe59e9844b8",
+      "owners": {
+        "@module": {
+          "before": "96f73e1b6be952bc87a708f0d6bca0d69b0042a4a3f70a84781fc7672cfba4f4",
+          "after": "c81a5c8be14b8ebf7605ee50bb3d9869d83165e2a773f208fc61fb135fc23177"
+        },
+        "_SessionInspectableServer": {
+          "before": null,
+          "after": "c6d5a4f51e80d494e9776f81d66d661ad16af5033a0abf5e3a7a3be6faf97d79"
+        },
+        "_SessionInspectableServer.authoritative_session_for_test": {
+          "before": null,
+          "after": "ebb7369f81e08413c0b8c60fcc39d6c3b9f66cf589e477747a30049568cdd689"
+        },
+        "test_phase18e_recorded_invalid_retry_commits_one_session_revision": {
+          "before": "6e378122852d1447100b378a90d84fa710e939baa00eedbd1f26eae97d7125d7",
+          "after": "6610c644f36463a716f30d73aac7d0c0cf6e5c9aae9c102301d0fb23ed89038b"
+        }
+      }
+    },
+    "uv.lock": {
+      "before_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+      "after_sha256": "d02bdfda8582a5fbe2dce3a961ec5ee8a862eac3eb2265aae245caedadc8238f",
+      "owners": {
+        "@document": {
+          "before": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+          "after": "d02bdfda8582a5fbe2dce3a961ec5ee8a862eac3eb2265aae245caedadc8238f"
         }
       }
     }
@@ -163,7 +235,7 @@
       ],
       "selected_families": [],
       "rationale": "Dependabot 592 updates virtualenv21.7.13 to21.14.13 and its development-only distlib0.4.0 to0.4.4 and packaging26.2 to26.3; preserve exact lock artifacts, public tool behavior and all project validation.",
-      "source_obligation": "Preserve every selected behavioral/quality case, full-package branch coverage64%, source/dependency admission and original180/600-second limits. All fifteen runtime dependency package records and all engine source remain identical to the actual merged main base.",
+      "source_obligation": "Preserve every selected behavioral/quality case, full-package branch coverage64%, source/dependency admission and 180-second complete performance, 720-second behavior setup/test, and 600-second quality limits. All fifteen runtime dependency package records and all engine source remain identical to the actual merged main base.",
       "unchanged_work": "Virtualenv is used by pre-commit; distlib is its development-tool dependency. Packaging serves pytest/development dependency parsing, outside the application runtime closure. The same smoke and full hosted gates remain required; no detailed algorithm/workload/cache comparisons are applicable."
     },
     "ci/test_shards/case-partitions.json": {
@@ -173,7 +245,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/durations.json": {
@@ -183,7 +255,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-1.txt": {
@@ -193,7 +265,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-2.txt": {
@@ -203,7 +275,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-3.txt": {
@@ -213,7 +285,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-4.txt": {
@@ -223,7 +295,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-5.txt": {
@@ -233,7 +305,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-6.txt": {
@@ -243,7 +315,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-7.txt": {
@@ -253,7 +325,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-8.txt": {
@@ -263,7 +335,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-9.txt": {
@@ -273,7 +345,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-10.txt": {
@@ -283,7 +355,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-11.txt": {
@@ -293,7 +365,7 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-12.txt": {
@@ -303,8 +375,62 @@
       ],
       "selected_families": [],
       "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
-      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and unchanged180/600-second limits.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
       "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
+    },
+    ".github/workflows/ci.yml": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Apply the owner-clarified720-second behavior setup-and-test cutoff; pin the unchanged macOS audit to supportedIntel after hostedARM allocation failed; reconcile the exact workflow guard and README binding; remove one unnecessary Pyright suppression without any Python AST change.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The same macOS semantic-audit cases and command remain required; Intel execution does not attest ARM behavior. Engine source, runtime dependency closure, assertions and scheduler remain unchanged. The new operation admits only AST-unchanged text edits of this one server test file."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Replace a mode-dependent private-usage suppression with a narrow test-local AdapterGameServer subclass exposing one inherited session read. Preserve real server initialization, exact session lookup, LocalGameSession cast, invalid witness and all assertions; no production interface changes.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The test subclass overrides no production method: its single accessor returns the inherited real session dictionary entry. The same factory, requests, lifecycle, validators, decisions and assertions execute. Only this exact test file and four changed AST owners receive finite explicit mapping; no engine or gameplay workload changes."
+    },
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Apply the owner-clarified720-second behavior setup-and-test cutoff; pin the unchanged macOS audit to supportedIntel after hostedARM allocation failed; reconcile the exact workflow guard and README binding; remove one unnecessary Pyright suppression without any Python AST change.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The same macOS semantic-audit cases and command remain required; Intel execution does not attest ARM behavior. Engine source, runtime dependency closure, assertions and scheduler remain unchanged. The new operation admits only AST-unchanged text edits of this one server test file."
+    },
+    "tests/unit/test_phase18e_server_api.py": {
+      "category": "dependency_environment",
+      "operations": [
+        "server-api-session-test-access"
+      ],
+      "selected_families": [],
+      "rationale": "Replace a mode-dependent private-usage suppression with a narrow test-local AdapterGameServer subclass exposing one inherited session read. Preserve real server initialization, exact session lookup, LocalGameSession cast, invalid witness and all assertions; no production interface changes.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The test subclass overrides no production method: its single accessor returns the inherited real session dictionary entry. The same factory, requests, lifecycle, validators, decisions and assertions execute. Only this exact test file and four changed AST owners receive finite explicit mapping; no engine or gameplay workload changes."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "dependency_environment",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Apply the owner-clarified720-second behavior setup-and-test cutoff; pin the unchanged macOS audit to supportedIntel after hostedARM allocation failed; reconcile the exact workflow guard and README binding; remove one unnecessary Pyright suppression without any Python AST change.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The same macOS semantic-audit cases and command remain required; Intel execution does not attest ARM behavior. Engine source, runtime dependency closure, assertions and scheduler remain unchanged. The new operation admits only AST-unchanged text edits of this one server test file."
+    },
+    "tests/code_quality/test_quality_runtime.py": {
+      "category": "dependency_environment",
+      "operations": [
+        "ci69-qualification-791593bfe3358a4b2494de163105067ce4a8b0311cd0f91b15629ec6395d030a"
+      ],
+      "selected_families": [],
+      "rationale": "Apply the owner-clarified720-second behavior setup-and-test cutoff; pin the unchanged macOS audit to supportedIntel after hostedARM allocation failed; reconcile the exact workflow guard and README binding; remove one unnecessary Pyright suppression without any Python AST change.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The same macOS semantic-audit cases and command remain required; Intel execution does not attest ARM behavior. Engine source, runtime dependency closure, assertions and scheduler remain unchanged. The new operation admits only AST-unchanged text edits of this one server test file."
     }
   },
   "milestone": "ordinary",

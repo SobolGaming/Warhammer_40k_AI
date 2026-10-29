@@ -33,10 +33,9 @@ def test_live_workflow_preserves_required_names_and_all_four_producer_controls()
         workflow.split("  quality-fast:\n")[1].split("  lint:\n")[0]
         == (before.split("  quality-fast:\n")[1].split("  lint:\n")[0])
     )
-    assert (
-        workflow.split("  semantic-audit-macos:\n")[1].split("  mypy:\n")[0]
-        == (before.split("  semantic-audit-macos:\n")[1].split("  mypy:\n")[0])
-    )
+    assert workflow.split("  semantic-audit-macos:\n")[1].split("  mypy:\n")[0] == before.split(
+        "  semantic-audit-macos:\n"
+    )[1].split("  mypy:\n")[0].replace("runs-on: macos-latest", "runs-on: macos-15-intel")
     aggregate = workflow.split("  code-quality:\n")[1].split("  quality-policy:\n")[0]
     assert "if: always()" in aggregate
     assert "needs: [quality-policy, quality-shards]" in aggregate
@@ -59,6 +58,8 @@ def test_live_workflow_preserves_required_names_and_all_four_producer_controls()
     assert 'uv run --no-sync python -B -m scripts.check_performance_policy "${args[@]}"' in policy
     assert "timeout-minutes: 3" in policy
     assert "timeout-minutes: 10" in policy
+    behavior = workflow.split("  behavior-tests:\n")[1].split("  coverage-gate:\n")[0]
+    assert "timeout-minutes: 12" in behavior
     matrix = workflow.split("  quality-shards:\n")[1].split("  semantic-audit-macos:\n")[0]
     assert 'shard: ["1", "3", "4"]' in matrix
     assert "fail-fast: false" in matrix
