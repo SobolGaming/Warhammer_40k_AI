@@ -17,7 +17,13 @@ def test_phase17a1_docs_mark_transition_patch_packages_complete() -> None:
 
     assert "Status: Complete." in phase17a1_section
     assert "Phase 17A.1 is complete" in architecture
-    assert "Phase 17A.1 is complete" in readme
+    assert "Phase 17A.1 is complete" not in readme
+    assert readme.startswith("# CORE V2 Architecture\n")
+    assert "[ARCHITECTURE_V2.md](ARCHITECTURE_V2.md)" in readme
+    build = readme.split("## 4. Build order\n", 1)[1].split("## 5. Test policy", 1)[0]
+    assert len(build.splitlines()) < 30
+    assert "Current status:" not in build
+    assert "\n### Order " not in readme
     assert "| 17A.1 | Complete |" in architecture
     assert "| 17A.1-17G | Planned |" not in architecture
     assert "target-drift diagnostics" in phase17a1_section

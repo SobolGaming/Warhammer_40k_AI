@@ -262,7 +262,7 @@ def test_phase14i_docs_mark_complete_without_overclaiming_ability_runtime() -> N
 
     assert "Status: Complete." in phase14i_section
     assert "Phase 14I is complete" in architecture
-    assert "Phase 14I is complete" in readme
+    assert "Phase 14I is complete" not in readme
     assert "explicit unsupported" in phase14i_section
     assert "descriptors with owning phase IDs" in phase14i_section
     assert "future ability-runtime families" in phase14i_section
@@ -611,29 +611,22 @@ def test_phase14h_docs_mark_complete_after_attached_formation_cutover() -> None:
 
     assert "Status: Complete." in phase14h_section
     assert "Phase 14H is complete" in architecture
-    assert "Phase 14H is complete" in readme
+    assert "Phase 14H is complete" not in readme
     assert "Phase 14H remains deferred" not in architecture
     assert "Phase 14H remains deferred" not in readme
     assert "runtime Attached Unit formation" in architecture
-    assert "runtime Attached Unit formation" in readme
     assert "structured army-list Leader/Support declarations" in architecture
-    assert "structured army-list Leader/Support declarations" in readme
     assert "first-class attached rules-unit formation records" in architecture
-    assert "first-class attached rules-unit formation records" in readme
     assert "Broader real-faction Leader/Support eligibility data" in architecture
     assert "runtime attached-unit formation;" not in readme
     assert "open blocker" not in phase14h_section
     assert "Healing Wounds primitive now iterates each healing amount" in architecture
-    assert "healing, revival, persisting effects" in readme
     assert "Movement-phase Combat Disembark fallback now accepts Combat mode" in architecture
-    assert "Movement-phase Combat Disembark fallback with engine-owned" in readme
     assert "Attached Unit formation" in architecture
     assert "full repositioned-unit effect persistence" not in architecture
     assert "setup-time reserve/transport declarations" not in architecture
     assert "setup-time Strategic Reserve declarations" in architecture
-    assert "setup-time Strategic Reserve declarations" in readme
     assert "repositioned-unit Advance/Fall Back/Disembark history" in architecture
-    assert "repositioned-unit Advance/Fall Back/Disembark history" in readme
     assert "destroyed-Transport orchestration from real destruction timing" not in architecture
     assert "destroyed-Transport orchestration from real destruction timing" not in readme
     adapter_contract = source_for(ADAPTER_CONTRACT_PATH)

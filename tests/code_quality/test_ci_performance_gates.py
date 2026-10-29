@@ -276,14 +276,14 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
         assert workflow.count(f"manifest: ci/test_shards/shard-{shard}.txt") == 1
     coverage = workflow.partition("\n  coverage-gate:\n")[2]
     assert "scripts/check_shard_coverage.py coverage-data --shard-count 12" in coverage
-    assert "uv run --no-sync coverage report --fail-under=50" in coverage
+    assert "uv run --no-sync coverage report --fail-under=64" in coverage
     configuration = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     coverage_config = configuration["tool"]["coverage"]
     assert coverage_config["run"] == {"branch": True, "source": ["warhammer40k_core"]}
     assert coverage_config["report"] == {
         "show_missing": True,
         "skip_covered": True,
-        "fail_under": 50,
+        "fail_under": 64,
     }
     assert "scripts/build_test_shards.py --check --shard-count 12" in workflow
 

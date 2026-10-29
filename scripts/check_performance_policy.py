@@ -186,11 +186,15 @@ def _base_manifest(root: Path, base: str) -> bytes:
 @invocation
 def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[str, object]:
     assessment = read_object(root / ASSESSMENT)
-    if assessment.get("comparison_disposition") == "deferred":
+    deferred = assessment.get("comparison_disposition") == "deferred"
+    ordinary_without_comparisons = (
+        assessment.get("milestone") == "ordinary" and assessment.get("comparisons") == {}
+    )
+    if deferred or ordinary_without_comparisons:
         from scripts.quality_evidence import dependency_identity, source_identity
 
         base = git(root, "rev-parse", "--verify", f"{base_ref}^{{commit}}").decode().strip()
-        if prototype_comparison_deferral(root, base=base) is None:
+        if deferred and prototype_comparison_deferral(root, base=base) is None:
             raise ValueError("Missing explicit finite prototype disposition.")
         if any(
             name in os.environ
@@ -209,7 +213,7 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
             root != root.resolve()
             or Path(git(root, "rev-parse", "--show-toplevel").decode().strip()).resolve() != root
         ):
-            raise ValueError("Prototype verification requires its canonical checkout root.")
+            raise ValueError("Current verification requires its canonical checkout root.")
         transaction_identity = ci60_repository_identity(root)
         repository = {
             key: str((root / git(root, "rev-parse", flag).decode().strip()).resolve(strict=True))
@@ -234,16 +238,26 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
             or dependencies != dependency_identity()
         ):
             raise ValueError("Current source/repository/dependencies changed during validation.")
-        return binding | {
-            "comparison_disposition": "deferred",
-            "historical_comparison_qualification": "deferred",
-            "repository_identity": repository,
-            "current_source_identity": before,
-            "stable_current_source_digest": owned,
-            "dependency_identity": json.loads(
-                json.dumps(dependencies, sort_keys=True, separators=(",", ":"), allow_nan=False)
-            ),
-        }
+        disposition = (
+            {
+                "comparison_disposition": "deferred",
+                "historical_comparison_qualification": "deferred",
+            }
+            if deferred
+            else {}
+        )
+        return (
+            binding
+            | disposition
+            | {
+                "repository_identity": repository,
+                "current_source_identity": before,
+                "stable_current_source_digest": owned,
+                "dependency_identity": json.loads(
+                    json.dumps(dependencies, sort_keys=True, separators=(",", ":"), allow_nan=False)
+                ),
+            }
+        )
 
     from tools.performance_history_snapshot import phase
 

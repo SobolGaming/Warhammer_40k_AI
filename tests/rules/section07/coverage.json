@@ -1525,9 +1525,9 @@
   ],
   "unadopted_gaps": [],
   "authenticated_inputs": {
-    "AGENTS.md": "ba2b751ed0d689cd0807309143cd23ebe926c7f8ed10f5ddbd9e85e43901cbba",
-    "README.md": "dc56745fbffccc97c257292ed367c5d2f3110b33d4926065df271fa583ad7897",
-    "pyproject.toml": "f11ef7317eb37d7ebb7eaba3766cafbeb9a422a123c9e77fdc208f960d675627",
+    "AGENTS.md": "b74cbd4b92504927db1d47cb87ed686fe552c844e751b72d8c0e1596f5cc3c28",
+    "README.md": "5128889a8404a7c0bb1b416b95a49790fdfd78759b78b69e7b158604d0f9f1bb",
+    "pyproject.toml": "42c1a1c4db411da62bba612820d1922dd50b838e7f93bfd3ceb11aa7b516f513",
     "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
     "data/source_audits/order97/categories/07.json": "52a349cc268a3c3e9cb0348ac9bb101a2c9a4d83ccde60f99a3d2ad071adc80d",
     "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
@@ -1572,5 +1572,5 @@
     "README.md": "ad52bc7e7e40aa9a7e2296f20c8726fcf63a5b92bd087100e09238572901a583",
     "pyproject.toml": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192"
   },
-  "authenticated_inputs_maintenance": "Three current governance/configuration inputs are refreshed to the exact reviewed coverage-50/behavioral-cutover source. Their former native5734 hashes remain historical_authenticated_inputs. Literal capture/source authorities and all gameplay bindings are unchanged; this update claims no qualification pass."
+  "authenticated_inputs_maintenance": "Three current governance/configuration inputs are refreshed for the reviewed 64% coverage floor, measured shard maintenance and architecture-first README. Historical authenticated inputs, literal capture authorities and gameplay bindings remain unchanged; this metadata update alone claims no qualification pass."
 }
