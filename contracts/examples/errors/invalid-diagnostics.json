@@ -1,0 +1,16 @@
+{
+  "error": {
+    "code": "proposal_invalid",
+    "diagnostics": {
+      "kind": "proposal_validation",
+      "violations": [
+        {
+          "field": "witness",
+          "violation_code": "movement_witness_model_inventory_mismatch"
+        }
+      ]
+    },
+    "message": "Submitted command was rejected."
+  },
+  "schema_version": "error-envelope-v2-diagnostics"
+}

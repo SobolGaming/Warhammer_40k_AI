@@ -115,3 +115,21 @@ The reference artifact's hashes and revision commitments certify internal
 consistency, not hostile storage. Equivalent malicious-writer or rollback
 resistance requires a separately trusted monotonic, signed, or append-only
 anchor and is outside the Phase 18L claim.
+
+
+## Issue 588: authenticated command rejection diagnostics
+
+Contract 45 / `error-envelope-v2-diagnostics` preserves typed uncommitted proposal
+rejections for the authenticated current-request owner. The shared redaction owner
+emits only violation codes and nullable fields, or a typed unsupported reason code;
+it omits diagnostics when absent. See [migration 44 to 45](../migrations/44-to-45.md) for the closed
+union, authority boundary, retry behavior and deployment support window.
+Selected authenticated HTTP movement coverage submits a wrong physical model
+inventory, requires `movement_witness_model_inventory_mismatch` on `witness`,
+proves full replay/state and pending-request equality, then accepts a corrected
+retry. Wrong-player, coach, spectator and changed authorization-context requests
+retain generic denial. Recorded-invalid HTTP 422 remains committed and advances
+the revision with a fresh request. Unsupported-with-reason and no-detail branches
+have pure typed response-assembly coverage; the public setup scenario has no
+deterministic native uncommitted unsupported route, so no such live certification
+is claimed.

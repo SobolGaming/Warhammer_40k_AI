@@ -3,5 +3,5 @@
     "code": "access_denied",
     "message": "Authenticated principal is not authorized for this resource."
   },
-  "schema_version": "error-envelope-v1"
+  "schema_version": "error-envelope-v2-diagnostics"
 }

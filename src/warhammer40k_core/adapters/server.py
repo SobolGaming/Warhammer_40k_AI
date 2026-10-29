@@ -22,7 +22,6 @@ from warhammer40k_core.adapters.access_control import (
 from warhammer40k_core.adapters.command_protocol import (
     SessionCommandEnvelope,
     SessionCommandJournalEntry,
-    SessionCommandOutcomeCode,
     SessionCommandProtocolError,
     SessionCommandSubmissionKind,
 )
@@ -74,6 +73,9 @@ from warhammer40k_core.adapters.server_commands import (
 )
 from warhammer40k_core.adapters.server_commands import (
     session_id_for_game as _session_id_for_game,
+)
+from warhammer40k_core.adapters.server_commands import (
+    uncommitted_command_response as _uncommitted_command_response,
 )
 from warhammer40k_core.adapters.server_mutations import (
     SessionCommandResponse as _SessionCommandResponse,
@@ -755,17 +757,12 @@ class AdapterGameServer:
             )
             response_payload = _json_object("session command outcome", response.payload)
             if response_payload.get("committed") is not True:
-                outcome_code = response_payload.get("outcome_code")
-                if outcome_code == SessionCommandOutcomeCode.RULE_PATH_UNSUPPORTED.value:
-                    return _error_response(
-                        status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                        code="rule_path_unsupported",
-                        message="Submitted command reached an unsupported rule path.",
-                    )
-                return _error_response(
-                    status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                    code="proposal_invalid",
-                    message="Submitted proposal was invalid.",
+                return _uncommitted_command_response(
+                    response_payload=response_payload,
+                    viewer=viewer,
+                    pending=record.adapter_session.view(viewer_player_id=player_id)[
+                        "pending_decision"
+                    ],
                 )
             entry = SessionCommandJournalEntry(
                 command_id=envelope.command_id,

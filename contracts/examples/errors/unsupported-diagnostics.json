@@ -1,0 +1,11 @@
+{
+  "error": {
+    "code": "rule_path_unsupported",
+    "diagnostics": {
+      "kind": "unsupported_reason",
+      "reason_code": "phase_body_not_implemented"
+    },
+    "message": "Submitted command was rejected."
+  },
+  "schema_version": "error-envelope-v2-diagnostics"
+}

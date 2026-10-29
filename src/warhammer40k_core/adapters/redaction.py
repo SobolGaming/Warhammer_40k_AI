@@ -292,16 +292,58 @@ def public_victory_point_ledger_payload(
     }
 
 
-def public_error_envelope(*, code: str, message: str) -> dict[str, JsonValue]:
+def public_command_rejection_diagnostics(
+    *,
+    lifecycle_status: Mapping[str, JsonValue],
+    request_actor_id: str | None,
+    viewer: ViewerContext,
+) -> JsonValue:
+    """Publish only typed diagnostic tokens to the submitting request owner.
+
+    The caller supplies the current authoritative request owner after command
+    authorization. Never copy messages, request/context IDs, or payload snapshots.
+    """
+    if not viewer.policy.may_submit_decision or not viewer.owns_player(request_actor_id):
+        return None
+    payload = lifecycle_status.get("payload")
+    if not isinstance(payload, dict):
+        return None
+    if lifecycle_status.get("status_kind") == LifecycleStatusKind.INVALID.value:
+        validation = payload.get("proposal_validation")
+        if not isinstance(validation, dict):
+            return None
+        violations = validation.get("violations")
+        if not isinstance(violations, list) or not violations:
+            return None
+        public_violations: list[JsonValue] = []
+        for violation in violations:
+            if not isinstance(violation, dict):
+                raise GameLifecycleError("Proposal diagnostic must be an object.")
+            code = _public_error_string("violation code", violation.get("violation_code"))
+            field = violation.get("field")
+            if field is not None:
+                field = _public_error_string("violation field", field)
+            public_violations.append({"violation_code": code, "field": field})
+        return {"kind": "proposal_validation", "violations": public_violations}
+    if lifecycle_status.get("status_kind") == LifecycleStatusKind.UNSUPPORTED.value:
+        reason = payload.get("unsupported_reason")
+        if reason is not None:
+            return {
+                "kind": "unsupported_reason",
+                "reason_code": _public_error_string("unsupported reason", reason),
+            }
+    return None
+
+
+def public_error_envelope(
+    *, code: str, message: str, diagnostics: JsonValue = None
+) -> dict[str, JsonValue]:
     public_code = _public_error_string("error code", code)
     public_message = _public_error_string("error message", message)
-    return {
-        "schema_version": ERROR_ENVELOPE_SCHEMA_VERSION,
-        "error": {
-            "code": public_code,
-            "message": public_message,
-        },
-    }
+    error: dict[str, JsonValue] = {"code": public_code, "message": public_message}
+    if diagnostics is not None:
+        error["diagnostics"] = validate_json_value(diagnostics)
+    return {"schema_version": ERROR_ENVELOPE_SCHEMA_VERSION, "error": error}
 
 
 def public_support_profile_payload(
