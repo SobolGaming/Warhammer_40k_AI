@@ -1237,6 +1237,41 @@ def _write_error_examples() -> None:
             },
         )
 
+    for name, code, diagnostics in (
+        (
+            "invalid-diagnostics",
+            "proposal_invalid",
+            {
+                "kind": "proposal_validation",
+                "violations": [
+                    {
+                        "violation_code": "movement_witness_model_inventory_mismatch",
+                        "field": "witness",
+                    }
+                ],
+            },
+        ),
+        (
+            "unsupported-diagnostics",
+            "rule_path_unsupported",
+            {
+                "kind": "unsupported_reason",
+                "reason_code": "phase_body_not_implemented",
+            },
+        ),
+    ):
+        _write_json(
+            ERROR_EXAMPLE_DIR / f"{name}.json",
+            {
+                "schema_version": ERROR_ENVELOPE_SCHEMA_VERSION,
+                "error": {
+                    "code": code,
+                    "message": "Submitted command was rejected.",
+                    "diagnostics": cast(JsonValue, diagnostics),
+                },
+            },
+        )
+
 
 def _contract_manifest() -> JsonValue:
     schemas = _schema_payloads()

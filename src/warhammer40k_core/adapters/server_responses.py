@@ -46,12 +46,15 @@ def status_response(
     )
 
 
-def error_response(*, status_code: HTTPStatus, code: str, message: str) -> ServerResponse:
+def error_response(
+    *, status_code: HTTPStatus, code: str, message: str, diagnostics: JsonValue = None
+) -> ServerResponse:
     return ServerResponse(
         status_code=int(status_code),
         payload=public_error_envelope(
             code=_validate_identifier("error code", code),
             message=_validate_identifier("error message", message),
+            diagnostics=diagnostics,
         ),
     )
 

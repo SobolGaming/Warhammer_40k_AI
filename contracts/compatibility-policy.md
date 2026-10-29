@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`44.5.0`, declared in `openapi.yaml`, `manifest.json`, and
+`45.0.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -27,8 +27,8 @@ The pull-request contract audit performs three independent checks:
    contract requires a major increase. This preserves compatible additions
    made anywhere in the current major line.
 2. The proposed contract is compared with the oldest committed baseline for
-   its current major, currently `compatibility/44.0.0-shape.json`. Breaking
-   changes are rejected while the bundle major remains `44`, preserving the
+   its current major, currently `compatibility/45.0.0-shape.json`. Breaking
+   changes are rejected while the bundle major remains `45`, preserving the
    original clients for the full supported major. The immutable 1.0.0,
    2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, 8.0.0, 9.0.0, 10.0.0, 11.0.0, 12.0.0,
    13.0.0, 14.0.0, 15.0.0, 16.0.0, 17.0.0, 18.0.0, 19.0.0 and 20.0.0 baselines
@@ -47,6 +47,12 @@ payload-family version changes, migration notes, and old-client support window
 must be reviewed in the same change.
 
 ## Support window
+
+Contract 45 publishes `error-envelope-v2-diagnostics`, a closed error union with
+optional owner-only diagnostic codes and fields. This is a major release because
+closed v1 clients reject the new discriminator and diagnostic properties.
+Retain 44.x through at least 2027-10-29 and one released 45.x minor line, whichever
+is later. See [migration 44 to 45](migrations/44-to-45.md).
 
 Contract 44 adds required current canonical rules-unit membership to battlefield
 models. Retain 43.x through at least 2027-10-02 and one released 44.x minor line,

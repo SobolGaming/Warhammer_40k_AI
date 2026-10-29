@@ -5,6 +5,8 @@ import socket
 import sys
 from typing import Protocol, cast
 
+from jsonschema.exceptions import ValidationError
+
 from tests.shared.category_migration.phase18f_session_commands import (
     DEV_ADMIN_TOKEN,
     DEV_PLAYER_A_TOKEN,
@@ -118,7 +120,16 @@ from tests.shared.category_migration.phase18f_session_commands import (
     urlopen,
     validate_json_value,
 )
+from warhammer40k_core.adapters.access_control import (
+    DEV_COACH_A_TOKEN,
+    DEV_SPECTATOR_TOKEN,
+    ViewerContext,
+)
 from warhammer40k_core.adapters.http_transport import create_http_server
+from warhammer40k_core.adapters.projection import DecisionRequestViewPayload
+from warhammer40k_core.adapters.redaction import redacted_lifecycle_status
+from warhammer40k_core.adapters.server_commands import uncommitted_command_response
+from warhammer40k_core.engine.phase import GameLifecycleStage, LifecycleStatus
 
 
 def test_phase18f_session_source_identity_publishes_active_rules_overlay() -> None:
@@ -367,15 +378,23 @@ def test_phase18f_recorded_invalid_retry_is_atomically_journaled() -> None:
         },
     )
 
-    response = _request_raw(
-        server,
-        session_id=session_id,
-        participant_id=_participant_for_player(player_id),
-        envelope=envelope,
-    )
-
-    assert response.status_code == 422
-    outcome = _json_object(response.payload)
+    http_server = _http_server(server)
+    host, port = cast(tuple[str, int], http_server.server_address)
+    thread = Thread(target=http_server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        status_code, outcome = _http_player_command(
+            f"http://{host}:{port}",
+            session_id,
+            envelope,
+            DEV_PLAYER_A_TOKEN if player_id == PLAYER_A else DEV_PLAYER_B_TOKEN,
+        )
+    finally:
+        http_server.shutdown()
+        http_server.server_close()
+        thread.join(timeout=5.0)
+    assert status_code == 422
+    response = ServerResponse(status_code=status_code, payload=outcome)
     _schema_validator("session-command-outcome.schema.json").validate(outcome)
     assert outcome["outcome_code"] == "proposal_invalid"
     assert outcome["committed"] is True
@@ -493,3 +512,270 @@ def test_http_listener_excludes_competitors_and_preserves_authenticated_session(
         # Preserve the existing POSIX quick-restart behavior after real HTTP traffic.
         with create_http_server(host=host, port=port, api=AdapterGameServer()) as restarted:
             assert restarted.server_address == (host, port)
+
+
+def _http_player_command(
+    base_url: str, session_id: str, envelope: dict[str, JsonValue], token: str
+) -> tuple[int, dict[str, JsonValue]]:
+    from urllib.error import HTTPError
+
+    request = Request(
+        f"{base_url}/sessions/{session_id}/commands",
+        data=json.dumps(envelope).encode(),
+        headers={
+            "Authorization": bearer_authorization(token),
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        response = urlopen(request, timeout=HTTP_REQUEST_TIMEOUT_SECONDS)
+    except HTTPError as exc:
+        response = exc
+    with response:
+        status_code = response.status
+        assert type(status_code) is int
+        return status_code, _json_object(validate_json_value(json.loads(response.read())))
+
+
+def test_authenticated_http_movement_inventory_rejection_preserves_diagnostics_and_retry() -> None:
+    server = AdapterGameServer()
+    compact = _compact_terminal_config(game_id="http-rejection")
+    config = replace(
+        compact,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="core-v2-http-rejection"
+        ),
+    )
+    created = _request(
+        server,
+        "POST",
+        "/sessions",
+        body=_session_create_body_from_config(config),
+        expected_status=201,
+    )
+    session_id = _field_string(created, "session_id")
+    _submit_command(
+        server,
+        participant_id=PARTICIPANT_A,
+        envelope=_command_envelope(
+            session_id=session_id,
+            command_id="http-rejection-start",
+            expected_revision=0,
+            submission_kind="start_session",
+        ),
+    )
+    movement_request = _advance_to_movement_selection(server, session_id=session_id)
+    player_id = _field_string(movement_request, "actor_id")
+    _submit_visible_option_command(
+        server,
+        session_id=session_id,
+        request=movement_request,
+        option_id=_first_option_id(movement_request),
+        command_id="http-rejection-unit",
+    )
+    action_request = _pending_decision_for_any_player(server, session_id=session_id)
+    assert action_request["decision_type"] == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    _submit_visible_option_command(
+        server,
+        session_id=session_id,
+        request=action_request,
+        option_id=NORMAL_MOVE_ACTION_OPTION_ID,
+        command_id="http-rejection-action",
+    )
+    proposal_request = _pending_decision_for_any_player(server, session_id=session_id)
+    proposal_view = _request(
+        server,
+        "GET",
+        f"/sessions/{session_id}/projection",
+        query={"viewer_player_id": player_id},
+    )
+    proposal = _field_object(proposal_view, "pending_proposal")
+
+    request_id = _field_string(proposal_request, "request_id")
+    revision = _session_revision(server, session_id=session_id)
+    legal_witness = _invalid_distance_witness(
+        projection=proposal_view, unit_instance_id=_field_string(proposal, "unit_instance_id")
+    )
+    for row in _field_list(legal_witness, "model_paths"):
+        model_path = _json_object(row)
+        origin = _field_list(model_path, "poses")[0]
+        model_path["poses"] = [origin, origin]
+    legal_payload: dict[str, JsonValue] = {
+        "proposal_request_id": _field_string(proposal, "request_id"),
+        "proposal_kind": _field_string(proposal, "proposal_kind"),
+        "unit_instance_id": _field_string(proposal, "unit_instance_id"),
+        "movement_phase_action": "normal_move",
+        "movement_mode": MovementMode.NORMAL.value,
+        "witness": legal_witness,
+    }
+    wrong_witness = _json_object(validate_json_value(json.loads(json.dumps(legal_witness))))
+    _json_object(_field_list(wrong_witness, "model_paths")[0])["model_id"] = "foreign-model"
+    envelope = _command_envelope(
+        session_id=session_id,
+        command_id="http-rejection-wrong-inventory",
+        expected_revision=revision,
+        submission_kind="parameterized_payload",
+        request_id=request_id,
+        result_id="http-rejection-wrong-result",
+        payload={**legal_payload, "witness": wrong_witness},
+    )
+    token = DEV_PLAYER_A_TOKEN if player_id == PLAYER_A else DEV_PLAYER_B_TOKEN
+    before = _request(server, "GET", f"/sessions/{session_id}/replay")
+    snapshot = _authoritative_snapshot(server, session_id=session_id)
+    http_server = _http_server(server)
+    host, port = cast(tuple[str, int], http_server.server_address)
+    thread = Thread(target=http_server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        base_url = f"http://{host}:{port}"
+        status, rejected = _http_player_command(base_url, session_id, envelope, token)
+        assert status == 422
+        _error_envelope_validator().validate(rejected)
+        assert _field_object(rejected, "error") == {
+            "code": "proposal_invalid",
+            "message": "Submitted proposal was invalid.",
+            "diagnostics": {
+                "kind": "proposal_validation",
+                "violations": [
+                    {
+                        "violation_code": "movement_witness_model_inventory_mismatch",
+                        "field": "witness",
+                    }
+                ],
+            },
+        }
+        assert _request(server, "GET", f"/sessions/{session_id}/replay") == before
+        assert _authoritative_snapshot(server, session_id=session_id) == snapshot
+        assert _pending_decision_for_any_player(server, session_id=session_id) == proposal_request
+        for denied_token in (
+            DEV_PLAYER_B_TOKEN if player_id == PLAYER_A else DEV_PLAYER_A_TOKEN,
+            DEV_COACH_A_TOKEN,
+            DEV_SPECTATOR_TOKEN,
+        ):
+            denied_status, denied = _http_player_command(
+                base_url, session_id, envelope, denied_token
+            )
+            assert denied_status == 403
+            assert _field_object(denied, "error") == {
+                "code": "access_denied",
+                "message": "Authenticated principal is not authorized for this resource.",
+            }
+            _error_envelope_validator().validate(denied)
+            assert _request(server, "GET", f"/sessions/{session_id}/replay") == before
+        retry = _command_envelope(
+            session_id=session_id,
+            command_id="http-rejection-corrected-command",
+            expected_revision=revision,
+            submission_kind="parameterized_payload",
+            request_id=request_id,
+            result_id="http-rejection-corrected-result",
+            payload=legal_payload,
+        )
+        status, accepted = _http_player_command(base_url, session_id, retry, token)
+        assert status == 200
+        assert accepted["accepted"] is True
+        assert accepted["committed"] is True
+        assert _field_int(_field_object(accepted, "session"), "session_revision") == revision + 1
+        after = _request(server, "GET", f"/sessions/{session_id}/replay")
+        server.principal_registry = replace(
+            server.principal_registry,
+            authorization_epoch=server.principal_registry.authorization_epoch + 1,
+        )
+        denied_status, denied = _http_player_command(base_url, session_id, retry, token)
+        assert denied_status == 403
+        assert _field_object(denied, "error")["code"] == "access_denied"
+        assert "diagnostics" not in _field_object(denied, "error")
+        assert _request(server, "GET", f"/sessions/{session_id}/replay") == after
+    finally:
+        http_server.shutdown()
+        http_server.server_close()
+        thread.join(timeout=5.0)
+
+
+def _error_envelope_validator() -> _PayloadValidator:
+    return cast(
+        _PayloadValidator,
+        Draft202012Validator(
+            cast(
+                Schema,
+                _read_json(REPO_ROOT / "contracts" / "schemas" / "error-envelope.schema.json"),
+            )
+        ),
+    )
+
+
+@pytest.mark.parametrize("reason", [None, "phase_body_not_implemented"])
+def test_uncommitted_unsupported_diagnostics_are_closed_and_optional(reason: str | None) -> None:
+    # Pure response assembly: the setup HTTP scenario has no native unsupported path.
+    server = AdapterGameServer()
+    session_id = _create_session(server, game_id="unsupported-diagnostics")
+    _start_command(server, session_id, "unsupported-diagnostics-start")
+    pending = cast(
+        DecisionRequestViewPayload,
+        _pending_decision(server, session_id=session_id, player_id=PLAYER_A),
+    )
+    viewer = ViewerContext.for_player(PLAYER_A)
+    status = LifecycleStatus.unsupported(
+        stage=GameLifecycleStage.SETUP,
+        message="private message must not escape",
+        payload=None
+        if reason is None
+        else {
+            "unsupported_reason": reason,
+            "private_snapshot": {"opponent_secret": "private sentinel"},
+        },
+    )
+    outcome: dict[str, JsonValue] = {
+        "outcome_code": "rule_path_unsupported",
+        "session": {
+            "lifecycle_status": cast(JsonValue, redacted_lifecycle_status(status, viewer=viewer))
+        },
+    }
+    response = uncommitted_command_response(
+        response_payload=outcome, viewer=viewer, pending=pending
+    )
+    assert response.status_code == 422
+    _error_envelope_validator().validate(response.payload)
+    error = _field_object(_json_object(response.payload), "error")
+    if reason is None:
+        assert "diagnostics" not in error
+    else:
+        assert error["diagnostics"] == {"kind": "unsupported_reason", "reason_code": reason}
+    assert "private" not in json.dumps(response.payload)
+    hidden = uncommitted_command_response(
+        response_payload=outcome, viewer=ViewerContext.for_player(PLAYER_B), pending=pending
+    )
+    assert "diagnostics" not in _field_object(_json_object(hidden.payload), "error")
+
+
+def test_error_diagnostic_schema_rejects_unknown_mixed_and_private_members() -> None:
+    validator = _error_envelope_validator()
+    base_error = {"code": "proposal_invalid", "message": "Proposal invalid."}
+    base = {
+        "schema_version": "error-envelope-v2-diagnostics",
+        "error": base_error,
+    }
+    diagnostics: dict[str, JsonValue] = {
+        "kind": "proposal_validation",
+        "violations": [
+            {"violation_code": "movement_witness_model_inventory_mismatch", "field": "witness"}
+        ],
+    }
+    validator.validate(base)
+    validator.validate({**base, "error": {**base_error, "diagnostics": diagnostics}})
+    invalid_diagnostics: list[JsonValue] = [
+        {},
+        {"kind": "unknown"},
+        {**diagnostics, "private_snapshot": {}},
+        {**diagnostics, "reason_code": "unsupported"},
+        {**diagnostics, "violations": []},
+        {
+            **diagnostics,
+            "violations": [{"violation_code": "bad", "field": None, "message": "private contents"}],
+        },
+        {"kind": "unsupported_reason", "reason_code": "unsupported"},
+    ]
+    for invalid in invalid_diagnostics:
+        with pytest.raises(ValidationError):
+            validator.validate({**base, "error": {**base_error, "diagnostics": invalid}})

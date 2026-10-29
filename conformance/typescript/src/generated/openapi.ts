@@ -77,9 +77,28 @@ export interface components {
         "error-envelope.schema": {
             error: {
                 code: string; message: string;
+            } | {
+                /** @constant */
+                code: "proposal_invalid";
+                diagnostics: {
+                    /** @constant */
+                    kind: "proposal_validation";
+                    violations: {
+                        field: string | null; violation_code: string;
+                    }[];
+                };
+                message: string;
+            } | {
+                /** @constant */
+                code: "rule_path_unsupported";
+                diagnostics: {
+                    /** @constant */
+                    kind: "unsupported_reason"; reason_code: string;
+                };
+                message: string;
             };
             /** @constant */
-            schema_version: "error-envelope-v1";
+            schema_version: "error-envelope-v2-diagnostics";
         };
         "rules-catalog--base_size.schema": {
             base_size_id: string; diameter_mm: number | null; kind: string; length_mm: number | null; width_mm: number | null;
@@ -272,7 +291,7 @@ export interface components {
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v44-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v45-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -679,7 +698,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v44-contract"; session: components["schemas"]["session-metadata.schema"];
+            schema_version: "session-command-outcome-v45-contract"; session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
             accepted?: true;

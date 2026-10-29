@@ -3,6 +3,7 @@ from __future__ import annotations
 from http import HTTPStatus
 from typing import cast
 
+from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.command_protocol import (
     SessionCommandEnvelope,
     SessionCommandOutcomeCode,
@@ -14,8 +15,12 @@ from warhammer40k_core.adapters.external_contract import (
     validate_external_request_payload,
 )
 from warhammer40k_core.adapters.projection import DecisionRequestViewPayload
-from warhammer40k_core.adapters.redaction import redacted_decision_type_for_hidden_viewer
+from warhammer40k_core.adapters.redaction import (
+    public_command_rejection_diagnostics,
+    redacted_decision_type_for_hidden_viewer,
+)
 from warhammer40k_core.adapters.server_authorization import actor_not_authorized
+from warhammer40k_core.adapters.server_responses import error_response
 from warhammer40k_core.adapters.server_types import ServerApiError, ServerResponse
 from warhammer40k_core.adapters.server_validation import json_object, validate_identifier
 from warhammer40k_core.adapters.session_protocol import (
@@ -141,4 +146,35 @@ def session_command_outcome_response(
     return ServerResponse(
         status_code=response.status_code,
         payload=validate_json_value(cast(JsonValue, payload)),
+    )
+
+
+def uncommitted_command_response(
+    *,
+    response_payload: dict[str, JsonValue],
+    viewer: ViewerContext,
+    pending: DecisionRequestViewPayload | None,
+) -> ServerResponse:
+    diagnostics: JsonValue = None
+    if pending is not None:
+        session = json_object("command outcome session", response_payload["session"])
+        lifecycle_status = json_object("command attempt status", session["lifecycle_status"])
+        diagnostics = public_command_rejection_diagnostics(
+            lifecycle_status=lifecycle_status,
+            request_actor_id=pending["actor_id"],
+            viewer=viewer,
+        )
+    unsupported = (
+        response_payload.get("outcome_code")
+        == SessionCommandOutcomeCode.RULE_PATH_UNSUPPORTED.value
+    )
+    return error_response(
+        status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+        code="rule_path_unsupported" if unsupported else "proposal_invalid",
+        message=(
+            "Submitted command reached an unsupported rule path."
+            if unsupported
+            else "Submitted proposal was invalid."
+        ),
+        diagnostics=diagnostics,
     )

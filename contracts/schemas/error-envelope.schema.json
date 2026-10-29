@@ -4,17 +4,131 @@
   "additionalProperties": false,
   "properties": {
     "error": {
-      "additionalProperties": false,
-      "properties": {
-        "code": {"minLength": 1, "type": "string"},
-        "message": {"minLength": 1, "type": "string"}
-      },
-      "required": ["code", "message"],
-      "type": "object"
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "message": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "const": "proposal_invalid",
+              "type": "string"
+            },
+            "diagnostics": {
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "proposal_validation",
+                  "type": "string"
+                },
+                "violations": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "field": {
+                        "minLength": 1,
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "violation_code": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "violation_code",
+                      "field"
+                    ],
+                    "type": "object"
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "kind",
+                "violations"
+              ],
+              "type": "object"
+            },
+            "message": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "diagnostics"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "const": "rule_path_unsupported",
+              "type": "string"
+            },
+            "diagnostics": {
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "unsupported_reason",
+                  "type": "string"
+                },
+                "reason_code": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "reason_code"
+              ],
+              "type": "object"
+            },
+            "message": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "diagnostics"
+          ],
+          "type": "object"
+        }
+      ]
     },
-    "schema_version": {"const": "error-envelope-v1", "type": "string"}
+    "schema_version": {
+      "const": "error-envelope-v2-diagnostics",
+      "type": "string"
+    }
   },
-  "required": ["schema_version", "error"],
+  "required": [
+    "schema_version",
+    "error"
+  ],
   "title": "CORE V2 ErrorEnvelopePayload",
   "type": "object"
 }
