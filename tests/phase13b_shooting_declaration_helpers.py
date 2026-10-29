@@ -6,6 +6,7 @@ from typing import Any, cast
 
 import warhammer40k_core.engine.attack_sequence as attack_sequence_module
 import warhammer40k_core.engine.phases.shooting as shooting_phase_module
+from tests.measurement_native_api import benchmark_shooting_update
 from tests.order60_emergency_disembark_helpers import (
     emergency_disembark_contact_poses,
     emergency_disembark_poses_around,
@@ -690,6 +691,43 @@ def _build_shooting_lifecycle(
         )
         if army_id == "army-alpha":
             friendly_unit_index += 1
+    # Default physical-unit slots must not split an attached rules unit.
+    # Keep every Bodyguard pose; 1.6-inch spacing clears the 32/40 mm bases.
+    for army in armies:
+        for formation in army.attached_units:
+            component_ids = (
+                *formation.leader_unit_instance_ids,
+                *formation.support_unit_instance_ids,
+            )
+            if any(
+                battlefield.unit_placement_or_none(component_id) is None
+                for component_id in (formation.bodyguard_unit_instance_id, *component_ids)
+            ):
+                continue
+            bodyguard = battlefield.unit_placement_by_id(formation.bodyguard_unit_instance_id)
+            anchor = bodyguard.model_placements[0].pose
+            next_row_y = (
+                anchor.position.y + 1.4 * ((len(bodyguard.model_placements) - 1) // 5) + 1.6
+            )
+            model_index = 0
+            for component_id in component_ids:
+                placement = battlefield.unit_placement_by_id(component_id)
+                models: list[ModelPlacement] = []
+                for model in placement.model_placements:
+                    models.append(
+                        model.with_pose(
+                            Pose.at(
+                                anchor.position.x + 1.6 * (model_index % 5),
+                                next_row_y + 1.6 * (model_index // 5),
+                                anchor.position.z,
+                                facing_degrees=model.pose.facing.degrees,
+                            )
+                        )
+                    )
+                    model_index += 1
+                battlefield = battlefield.with_unit_placement(
+                    placement.with_model_placements(tuple(models))
+                )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
     lifecycle.decision_controller.event_log = EventLog()
@@ -2224,9 +2262,11 @@ def _damage_model_choice_lifecycle(
             allocated_model_ids_this_phase=allocated_ids,
         )
     else:
-        state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+        state.shooting_phase_state = benchmark_shooting_update(
+            shooting_state,
             attack_sequence=remaining_sequence,
             allocated_model_ids_this_phase=allocated_ids,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
     return (
         lifecycle,
@@ -2551,9 +2591,11 @@ def _store_shooting_attack_sequence(
             allocated_model_ids_this_phase=allocated_ids,
         )
         return
-    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+    state.shooting_phase_state = benchmark_shooting_update(
+        shooting_state,
         attack_sequence=attack_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
 
 
@@ -2707,7 +2749,7 @@ def _paused_optional_fnp_lifecycle() -> tuple[GameLifecycle, DecisionRequest]:
         battle_round=state.battle_round,
         active_player_id="player-a",
         selected_unit_ids=(attacker.unit_instance_id,),
-        shot_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(),
         attack_pools=sequence.attack_pools,
         attack_sequence=sequence,
     )
@@ -2773,9 +2815,11 @@ def _paused_optional_fnp_lifecycle() -> tuple[GameLifecycle, DecisionRequest]:
     assert remaining_sequence.pending_grouped_damage is not None
     shooting_state = state.shooting_phase_state
     assert shooting_state is not None
-    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+    state.shooting_phase_state = benchmark_shooting_update(
+        shooting_state,
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     return lifecycle, request
 

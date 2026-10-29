@@ -4,6 +4,7 @@ from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldTransitionBatch,
+    ModelPlacement,
     ModelPlacementRecord,
 )
 from warhammer40k_core.engine.command_core_cp_history import (
@@ -25,6 +26,41 @@ from warhammer40k_core.engine.primary_turn_start_evidence import (
 )
 from warhammer40k_core.engine.setup_flow import army_mustered_event_payload
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
+from warhammer40k_core.geometry.pose import Pose
+
+
+def place_attached_components_coherently_for_fixture(state: GameState) -> None:
+    """Place fixture attachments together without collapsing physical ownership."""
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("Attached placement fixture requires battlefield state.")
+    for record in state.starting_attached_unit_records:
+        component_ids = (
+            record.bodyguard_unit_instance_id,
+            *record.leader_unit_instance_ids,
+            *record.support_unit_instance_ids,
+        )
+        anchor = battlefield.unit_placement_by_id(component_ids[0]).model_placements[0].pose
+        model_index = 0
+        for component_id in component_ids:
+            placement = battlefield.unit_placement_by_id(component_id)
+            models: list[ModelPlacement] = []
+            for model in placement.model_placements:
+                models.append(
+                    model.with_pose(
+                        Pose.at(
+                            anchor.position.x + 2.0 * (model_index % 3),
+                            anchor.position.y + 2.0 * (model_index // 3),
+                            anchor.position.z,
+                            facing_degrees=model.pose.facing.degrees,
+                        )
+                    )
+                )
+                model_index += 1
+            battlefield = battlefield.with_unit_placement(
+                placement.with_model_placements(tuple(models))
+            )
+    state.replace_battlefield_state(battlefield)
 
 
 def record_current_battlefield_placements_for_fixture(

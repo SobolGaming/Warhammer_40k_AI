@@ -35,7 +35,7 @@ def test_rules_overlay_identity_participates_in_descriptor_hash_and_serializatio
 
     assert base.rules_overlay_ids == ()
     assert (
-        base.descriptor_hash == "358ded485e5c9aab3619b2ac06048820dbc60ad96443737f0a4d1a2e21a31536"
+        base.descriptor_hash == "6f1b37df63b218433f568b2ddddabd4b6a4a34e939655266ad6f918d2d46f144"
     )
     former_default_payload = base.to_payload()
     former_default_payload["descriptor_hash"] = (

@@ -588,7 +588,7 @@ def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None
     )
     next_request = _decision_request(next_status)
     assert state.shooting_phase_state is not None
-    assert state.shooting_phase_state.shot_unit_ids == (units["intercessor-1"].unit_instance_id,)
+    assert state.shooting_phase_state.shot_unit_ids == ()
     assert state.shooting_phase_state.attack_pools[0].target_unit_instance_id == (
         units["enemy"].unit_instance_id
     )
@@ -1066,6 +1066,24 @@ def test_order113_blast_x_shared_declaration_count(random_attacks: bool, attache
         enemy_attachment_declarations=_attached_enemy_declarations() if attached else (),
     )
     state = _state(lifecycle)
+    if attached:
+        battlefield = state.battlefield_state
+        assert battlefield is not None
+        poses = _compact_test_unit_poses(origin=Pose.at(35.0, 35.0), model_count=6)
+        offset = 0
+        for key in ("bodyguard-unit", "leader-unit", "support-unit"):
+            unit = units[key]
+            count = len(unit.own_models)
+            battlefield = battlefield.with_unit_placement(
+                _unit_placement_at(
+                    unit,
+                    army_id="army-beta",
+                    player_id="player-b",
+                    poses=poses[offset : offset + count],
+                )
+            )
+            offset += count
+        state.replace_battlefield_state(battlefield)
     record_current_battlefield_placements_for_fixture(
         state, decisions=lifecycle.decision_controller
     )
@@ -2047,8 +2065,11 @@ def test_phase18b_command_reroll_window_opens_after_shooting_damage_roll() -> No
     defender = units["enemy"]
     battlefield = state.battlefield_state
     assert battlefield is not None
-    state.battlefield_state = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in defender.own_models[1:])
+    _reduce_unit_to_last_model_with_mortal_wounds(
+        lifecycle,
+        target_unit=defender,
+        source_unit=attacker,
+        application_id="phase18b-damage-reroll-preexisting-casualties",
     )
     _grant_command_reroll_cp(state, player_id="player-a")
     weapon_profile = replace(
@@ -2329,7 +2350,7 @@ def test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice() -
         battle_round=state.battle_round,
         active_player_id="player-a",
         selected_unit_ids=(attacker.unit_instance_id,),
-        shot_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(),
         attack_pools=remaining_sequence.attack_pools,
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
@@ -3848,6 +3869,7 @@ def test_phase14k_grouped_damage_requests_defender_model_choice_inside_current_g
         state.shooting_phase_state = shooting_state.with_attack_sequence_update(
             attack_sequence=remaining_sequence,
             allocated_model_ids_this_phase=allocated_ids,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
     selection_result = DecisionResult.for_request(
         result_id="phase14k-current-group-model-choice-select",
@@ -4044,6 +4066,7 @@ def test_phase14k_damage_model_choice_stale_pending_damage_rejects_before_queue_
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence.without_pending_grouped_damage(),
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     result = DecisionResult.for_request(
         result_id="phase14k-model-choice-stale-result",
@@ -7912,6 +7935,7 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
     state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
         attack_sequence=None,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     status = resolve_core_attack_completion_for_executor_fixture(
         state=state,
@@ -7938,6 +7962,7 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
     state.shooting_phase_state = current_shooting_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     checkpoint = cast(
         GameLifecyclePayload,
@@ -8116,6 +8141,7 @@ def test_p24d_hazardous_preserves_order_through_completion_and_restore(
         state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
             attack_sequence=None,
             allocated_model_ids_this_phase=(),
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
     record_models_attacked(state=state, decisions=lifecycle.decision_controller, sequence=sequence)
     record_attack_sequence_completed(
@@ -10671,6 +10697,7 @@ def test_phase14l_attack_sequence_selection_invalid_before_queue_pop() -> None:
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=shooting_state.attack_sequence.without_selected_target_unit(),
         allocated_model_ids_this_phase=shooting_state.allocated_model_ids_this_phase,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
 
     drift_status = _submit_result(
@@ -12402,6 +12429,7 @@ def test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle(
     state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
 
     from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -12532,6 +12560,7 @@ def test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection(
     state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
 
     assert request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
@@ -12755,7 +12784,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
         battle_round=state.battle_round,
         active_player_id="player-a",
         selected_unit_ids=(attacker.unit_instance_id,),
-        shot_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(),
         attack_pools=remaining.attack_pools,
         attack_sequence=remaining,
         allocated_model_ids_this_phase=allocated_ids,
@@ -13103,6 +13132,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=suffix_sequence,
         allocated_model_ids_this_phase=suffix_allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     suffix_restored = GameLifecycle.from_payload(
         cast(
@@ -13243,17 +13273,24 @@ def _retain_attack_casualty_for_fight_on_death(
         )
     else:
         target_model = defender.own_models[0]
-        _replace_unit_instance_in_state(
-            state=state,
-            replacement=replace(
-                defender,
-                own_models=(
-                    replace(target_model, wounds_remaining=1),
-                    *defender.own_models[1:],
-                ),
+    current_defender = (
+        rules_unit_view_by_id(state=state, unit_instance_id=defender.unit_instance_id)
+        .components[0]
+        .unit
+    )
+    _replace_unit_instance_in_state(
+        state=state,
+        replacement=replace(
+            current_defender,
+            own_models=tuple(
+                replace(model, wounds_remaining=1)
+                if model.model_instance_id == target_model.model_instance_id
+                else model
+                for model in current_defender.own_models
             ),
-        )
-        target_model = replace(target_model, wounds_remaining=1)
+        ),
+    )
+    target_model = replace(target_model, wounds_remaining=1)
     source = DestructionReactionSource(
         source_id=f"{fixture_id}-source",
         reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
@@ -13263,23 +13300,7 @@ def _retain_attack_casualty_for_fight_on_death(
         model_instance_id=target_model.model_instance_id,
         sources=(source,),
     )
-    weapon_profile = replace(
-        _first_weapon_profile(lifecycle, attacker),
-        damage_profile=DamageProfile.fixed(target_model.current_wounds),
-    )
-    sequence = AttackSequence.start(
-        sequence_id=f"attack-sequence:{fixture_id}-sequence",
-        attacker_player_id="player-a",
-        attacking_unit_instance_id=attacker.unit_instance_id,
-        attack_pools=(
-            _attack_pool_for_test(
-                attacker=attacker,
-                defender=defender,
-                weapon_profile=weapon_profile,
-                attacks=1,
-            ),
-        ),
-    )
+    weapon_profile = _first_weapon_profile(lifecycle, attacker)
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
     declaration_request = _select_shooting_unit_and_type(
         lifecycle,
@@ -13287,7 +13308,7 @@ def _retain_attack_casualty_for_fight_on_death(
         unit_instance_id=attacker.unit_instance_id,
         selection_result_id=f"{fixture_id}-selection",
     )
-    _apply_shooting_declaration_without_advancing(
+    sequence = _apply_shooting_declaration_without_advancing(
         lifecycle,
         request=declaration_request,
         proposal=_proposal_from_request(
@@ -13297,14 +13318,8 @@ def _retain_attack_casualty_for_fight_on_death(
         ),
         result_id=f"{fixture_id}-sequence",
     )
-    state.shooting_phase_state = ShootingPhaseState(
-        battle_round=state.battle_round,
-        active_player_id="player-a",
-        selected_unit_ids=(attacker.unit_instance_id,),
-        shot_unit_ids=(attacker.unit_instance_id,),
-        attack_pools=sequence.attack_pools,
-        attack_sequence=sequence,
-    )
+    assert len(sequence.attack_pools) == 1
+    weapon_profile = sequence.attack_pools[0].weapon_profile
     attack_context_id = f"{sequence.sequence_id}:pool-001:attack-001"
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
@@ -13335,6 +13350,22 @@ def _retain_attack_casualty_for_fight_on_death(
             event_log=lifecycle.decision_controller.event_log,
             injected_results=(
                 _fixed_roll_result(roll_id=f"{fixture_id}-hit", spec=hit_spec, value=6),
+                *(
+                    _fixed_roll_result(
+                        roll_id=f"{fixture_id}-miss-{index}",
+                        spec=DiceRollSpec(
+                            expression=DiceExpression(quantity=1, sides=6),
+                            reason=(
+                                f"Hit roll for {weapon_profile.profile_id} attack "
+                                f"{sequence.sequence_id}:pool-001:attack-{index:03d}"
+                            ),
+                            roll_type="attack_sequence.hit",
+                            actor_id="player-a",
+                        ),
+                        value=1,
+                    )
+                    for index in range(2, sequence.attack_pools[0].attacks + 1)
+                ),
                 _fixed_roll_result(
                     roll_id=f"{fixture_id}-wound",
                     spec=wound_spec,
@@ -13350,6 +13381,7 @@ def _retain_attack_casualty_for_fight_on_death(
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     reaction_record = lifecycle.decision_controller.submit_result(
         DecisionResult.for_request(
@@ -13373,6 +13405,7 @@ def _retain_attack_casualty_for_fight_on_death(
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=continued_sequence,
         allocated_model_ids_this_phase=continued_allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     assert continued_status is None
     assert model_is_present_on_battlefield(
@@ -13933,6 +13966,7 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
         shooting_phase_state.with_attack_sequence_update(
             attack_sequence=remaining_sequence,
             allocated_model_ids_this_phase=allocated_ids,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
     )
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
@@ -14083,7 +14117,7 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
     assert event_disembarked_state.player_id == "player-b"
     assert event_disembarked_state.turn_player_id == "player-a"
     assert event_disembarked_state.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
-    assert event_disembarked_state.battle_shocked_until == "end_of_turn"
+    assert event_disembarked_state.battle_shocked_until == "until_cleared"
     assert event_records.index(hazard_event) < event_types.index(
         "destroyed_transport_disembark_placement_requested"
     )
@@ -16587,6 +16621,7 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
         state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
             attack_sequence=remaining_sequence,
             allocated_model_ids_this_phase=allocated_ids,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
         restored = GameLifecycle.from_payload(lifecycle.to_payload())
         session = LocalGameSession(lifecycle=restored)
@@ -16888,6 +16923,7 @@ def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> N
     state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     assert request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
     status = lifecycle.submit_decision(
@@ -17105,6 +17141,7 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     assert request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
     status = lifecycle.submit_decision(
@@ -17597,6 +17634,7 @@ def test_phase13e_destruction_reaction_invalid_submission_does_not_mutate_queue(
     state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
+        pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
     )
     before_records = len(lifecycle.decision_controller.records)
 

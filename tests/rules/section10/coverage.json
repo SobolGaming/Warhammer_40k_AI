@@ -1,0 +1,1928 @@
+{
+  "schema": "section10-clause-corpus-v1",
+  "source_authority": "Previously adopted maintained mirror; no new GW/App observation",
+  "observed_at": "2026-10-01T12:04:31.127429+00:00",
+  "qualification": "Retained timestamped maintained-mirror body; no independent Games Workshop publication or App export certification; no new provider observation.",
+  "sources": [
+    {
+      "source_id": "rule:10:10.00:1",
+      "locator": "10.00",
+      "title": "Shooting Phase",
+      "source_sha256": "1fa76d6d9777c22afeb8179f01eac1c173fb7f1b9e9e0ccfaea404a47080bfbd",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "78c9a2e1990c44b7fc9023d09f14b8f1e9925f81726d77122cab5828d6c1ad7e",
+          "value": "In the Shooting phase, your units will take aim and use their ranged weapons to fire at their chosen targets."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "a388a8f80a0972e6251cccb8a0c664e208f904964cf0dc923455a51bd3210575",
+          "value": "The Shooting phase is resolved by following these steps:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "8c645a201703d6959ee46a2a905eb8066254997063afa4972696b5b5c5211269",
+          "value": "1. START OF SHOOTING PHASE"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "45bf3eef239066030bf6b3418ae6f38167d49dad86cd1b5e4b3837cad0e6e96d",
+          "value": "2. SHOOT"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "399766c8b51d1d941eae766e6d8fdc5a017f852b641b5aac8bf7c024bfe1b135",
+          "value": "3. END OF SHOOTING PHASE"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "10.00-obligation-01",
+          "source_blocks": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "obligation": "Resolve start, optional unit activations and end rules in source order",
+          "engine_owners": [
+            "engine/battle_round_flow.py",
+            "engine/runtime_event_phase_hooks.py",
+            "engine/catalog_command_point_runtime.py",
+            "engine/phase_start_sequencing.py",
+            "engine/boundary_rule_flow.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_phase_flow.py::test_nonempty_compiled_rules_surround_shooting_once",
+              "function_ast_sha256": "ac782b47c4d979126acf2e88513fd2885943d227b33120a9ccd794b7147beac6",
+              "assertions": [
+                "assert seen == ['select_shooting_unit', 'select_shooting_type']",
+                "assert len(gains) == int(active == 'owner')",
+                "assert types.index('shooting_unit_selected') < types.index('shooting_without_attacks_completed')",
+                "assert types.index('shooting_without_attacks_completed') < types.index('shooting_phase_completed') < types.index('battle_phase_completed')",
+                "assert len(events(session, 'shooting_phase_completed')) == 1",
+                "assert request is not None",
+                "assert request.actor_id == active",
+                "assert gains[0]['passed'] is True",
+                "assert state.command_point_total('owner') == 1",
+                "assert effect < types.index('shooting_unit_selected') if position == 'start' else types.index('shooting_phase_completed') < effect < types.index('battle_phase_completed')",
+                "assert request.decision_type == 'select_shooting_type'"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        }
+      ]
+    },
+    {
+      "source_id": "rule:10:10.01:1",
+      "locator": "10.01",
+      "title": "Start Of Shooting Phase",
+      "source_sha256": "195715f15f3010beab2594f7834ae1a7129358cefa04ca386feeec8876eb8939",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "f474a2cbfec5c04c30cdee3b6b79932e16b4e635ae779c5e3573a8c1861bfdf0",
+          "value": "Rules that are triggered at the start of the Shooting phase are resolved now."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "10.01-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Resolve actual nonempty start rule before Shooting selection",
+          "engine_owners": [
+            "engine/battle_round_flow.py",
+            "engine/runtime_event_phase_hooks.py",
+            "engine/catalog_command_point_runtime.py",
+            "engine/phase_start_sequencing.py",
+            "engine/boundary_rule_flow.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_phase_flow.py::test_nonempty_compiled_rules_surround_shooting_once",
+              "function_ast_sha256": "ac782b47c4d979126acf2e88513fd2885943d227b33120a9ccd794b7147beac6",
+              "assertions": [
+                "assert seen == ['select_shooting_unit', 'select_shooting_type']",
+                "assert len(gains) == int(active == 'owner')",
+                "assert types.index('shooting_unit_selected') < types.index('shooting_without_attacks_completed')",
+                "assert types.index('shooting_without_attacks_completed') < types.index('shooting_phase_completed') < types.index('battle_phase_completed')",
+                "assert len(events(session, 'shooting_phase_completed')) == 1",
+                "assert request is not None",
+                "assert request.actor_id == active",
+                "assert gains[0]['passed'] is True",
+                "assert state.command_point_total('owner') == 1",
+                "assert effect < types.index('shooting_unit_selected') if position == 'start' else types.index('shooting_phase_completed') < effect < types.index('battle_phase_completed')",
+                "assert request.decision_type == 'select_shooting_type'"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:10:10.02:1",
+      "locator": "10.02",
+      "title": "Shoot Step",
+      "source_sha256": "852b23a61a9a31f37646f3f7b0f5a19fb54a53766fab45791d8340fca0fe0bd6",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "6cbf2dd8ef40adbeceacebbe199be3997b799d3911dd7ebf4ed34817c4778338",
+          "value": "The active player shoots with their eligible units one at a time, using the sequence below, until all the units they choose to shoot with have been \u0005selected to shoot\u0006 and their attacks have been resolved."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "6a8e5994ab414d44d95d91c8edb5a69b4b1f836e936905f4b07f42fb6b7bb717",
+          "value": "A unit is \u0005eligible to shoot\u0006 if it is on the battlefield and has not already been \u0005selected to shoot\u0006 this phase."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "a6f4e53e8265a46b6bec80e2a52cc5f3a6d893a5de44edf01523f15e0809b343",
+          "value": "\u00051. Select Unit:\u0006 Select one friendly unit that is \u0005eligible to shoot\u0006; that unit is \u0005selected to shoot\u0006."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "207c5f01cc70da5e9ad48ea9bf8dd1d34e00417ac5ceb397fc170ee7babcde16",
+          "value": "\u00052. Select Shooting Type:\u0006 Select one \u0005shooting type\u0006 that unit is eligible to make, and resolve it with that unit. This can be one listed below, or one presented elsewhere:"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "21e2d5a6a05f87db46607a37cd807167bdada75b748f3099429859f341d39397",
+          "value": "▫ \u0005Normal shooting\u0006 (10.04)"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "d70e7a59cc2a88218f18967641a731b0ce64a1061d8739df17a06b39077f2ca5",
+          "value": "▫ \u0005Assault shooting\u0006(10.05)"
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "06ff18e47412b5aab98efa4a67e6ee829d48e2aa2cd67469a10b0613fb402634",
+          "value": "▫ \u0005Close‑quarters shooting\u0006 (10.06)"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "54819fef3ca3be55a770aec2f8393428ae8c58e9a804a6db9f7b34e66634c6e9",
+          "value": "▫ \u0005Indirect shooting\u0006 (10.07)"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "10.02-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Active player chooses units one at a time; finish attacks before next activation, may decline all attacks",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_model.py",
+            "engine/phases/shooting_unit_selection.py",
+            "engine/shooting_without_attacks.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_each_type_resolves_native_attacks_before_next_selection_and_blocks_action",
+              "function_ast_sha256": "701e6f4ea2ade9d4db28ab8b36bd2bacb0d6e85fb9c138951058ef13888abc33",
+              "assertions": [
+                "assert state.shooting_phase_state is not None",
+                "assert (unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids) is completed",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert len([e for e in events if e.event_type == 'attack_sequence_completed']) == 1",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert accepted_pools(session)[0]['shooting_type'] == kind",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert reason is not None",
+                "assert has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert not has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert pending(session).decision_type != 'select_shooting_unit'"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_selection.py::test_optional_declaration_completes_before_next_unit_is_selected",
+              "function_ast_sha256": "ca721a6ef045d4b0d2690668d9aaa0aa4898ba3f582c3c9e263b9a666ecef0da",
+              "assertions": [
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}",
+                "assert state.shooting_phase_state is not None",
+                "assert unit.unit_instance_id not in state.shooting_phase_state.shot_unit_ids",
+                "assert not any((e.event_type == 'attack_sequence_step' for e in session.lifecycle.decision_controller.event_log.records))"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_selection.py::test_player_can_end_shooting_with_eligible_units_unselected",
+              "function_ast_sha256": "c65cc2aa1877afee658ba865873b4c16bffeba7fb4f40e92248a14220b5d6a8e",
+              "assertions": [
+                "assert unit.unit_instance_id in {o.option_id for o in request.options}",
+                "assert status.status_kind is LifecycleStatusKind.ADVANCED",
+                "assert state.shooting_phase_state is not None",
+                "assert state.shooting_phase_state.phase_complete",
+                "assert state.shooting_phase_state.selected_unit_ids == ()",
+                "assert state.shooting_phase_state.shot_unit_ids == ()",
+                "assert not any((e.event_type == 'attack_sequence_step' for e in decisions.event_log.records))"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.02-obligation-02",
+          "source_blocks": [
+            2,
+            3
+          ],
+          "obligation": "Only fresh friendly battlefield rules units; consume selection even weaponless or no targets; reject actor/stale/foreign without mutation",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_model.py",
+            "engine/phases/shooting_unit_selection.py",
+            "engine/shooting_without_attacks.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_selection.py::test_offboard_friendly_units_are_absent_from_shooting_selection",
+              "function_ast_sha256": "e0f828696a479a260570c09868481793251a6f101579babedd8f2632f1669f3b",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}",
+                "assert all((not o.option_id.startswith('enemy:') for o in pending(session).options))"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_selection.py::test_invalid_selection_preserves_state_and_legal_retry",
+              "function_ast_sha256": "a74cc60f2a90305a8b8d463174f0b66cf55a6095a85db8e5673df6172d1aacc5",
+              "assertions": [
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending(session) == request",
+                "assert pending(session).decision_type == 'select_shooting_type'",
+                "assert state.shooting_phase_state is not None",
+                "assert state.shooting_phase_state.selected_unit_ids == (unit.unit_instance_id,)"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_selection.py::test_faq02_no_weapon_or_target_still_consumes_selected_type_without_attacks",
+              "function_ast_sha256": "84e790ab2e3047f17fa8c3208767682ab4624f8bea72464c21b05bc6a41d630d",
+              "assertions": [
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert state.shooting_phase_state is not None",
+                "assert unit.unit_instance_id in state.shooting_phase_state.selected_unit_ids",
+                "assert unit.unit_instance_id not in state.shooting_phase_state.shot_unit_ids",
+                "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}",
+                "assert any((e.event_type == 'shooting_without_attacks_completed' for e in events))",
+                "assert not any((e.event_type == 'attack_sequence_step' for e in events))"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.02-obligation-03",
+          "source_blocks": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "obligation": "Choose exactly one eligible type; invalid type and declaration drift preserve legal retry",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_model.py",
+            "engine/phases/shooting_unit_selection.py",
+            "engine/shooting_without_attacks.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_selection.py::test_native_type_eligibility_is_independent_of_targets",
+              "function_ast_sha256": "11a2bcbf7631bdcda18f40a8c0877ccb67d78846bc5637456e31f062b485ca42",
+              "assertions": [
+                "assert request.decision_type == 'select_shooting_unit'",
+                "assert (unit.unit_instance_id in {o.option_id for o in request.options}) is bool(expected)",
+                "assert request.decision_type == 'select_shooting_type'",
+                "assert {o.option_id for o in request.options} == expected",
+                "assert state.shooting_phase_state is not None",
+                "assert state.shooting_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert state.shooting_phase_state is not None",
+                "assert unit.unit_instance_id not in state.shooting_phase_state.selected_unit_ids"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_selection.py::test_ineligible_type_is_rejected_before_valid_choice",
+              "function_ast_sha256": "ef4c3d11e5e1b12731478b3eae21d9d53b49537f558a3404d51007195fc34d0f",
+              "assertions": [
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending(session).decision_type == 'submit_shooting_declaration'"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_declaration_cannot_change_the_selected_type",
+              "function_ast_sha256": "e1ae2454380ee61a775353677b0e0a404d0d5a64698aadec7fe347a8e863980e",
+              "assertions": [
+                "assert result.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:10:10.03:1",
+      "locator": "10.03",
+      "title": "End of Shooting Phase",
+      "source_sha256": "d0b7e0caf5078ce7b85665c1ec7b2956f10341d61e3afd127aade39e62051d6a",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "47920f9440fb8a83ed9bdf5b6de5c12d3c1861edbbb066f553bf11de52ec03ca",
+          "value": "Rules that are triggered at the end of the Shooting phase are resolved now."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "10.03-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "obligation": "Resolve actual nonempty end rule after Shooting body and before phase completion",
+          "engine_owners": [
+            "engine/battle_round_flow.py",
+            "engine/runtime_event_phase_hooks.py",
+            "engine/catalog_command_point_runtime.py",
+            "engine/phase_start_sequencing.py",
+            "engine/boundary_rule_flow.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_phase_flow.py::test_nonempty_compiled_rules_surround_shooting_once",
+              "function_ast_sha256": "ac782b47c4d979126acf2e88513fd2885943d227b33120a9ccd794b7147beac6",
+              "assertions": [
+                "assert seen == ['select_shooting_unit', 'select_shooting_type']",
+                "assert len(gains) == int(active == 'owner')",
+                "assert types.index('shooting_unit_selected') < types.index('shooting_without_attacks_completed')",
+                "assert types.index('shooting_without_attacks_completed') < types.index('shooting_phase_completed') < types.index('battle_phase_completed')",
+                "assert len(events(session, 'shooting_phase_completed')) == 1",
+                "assert request is not None",
+                "assert request.actor_id == active",
+                "assert gains[0]['passed'] is True",
+                "assert state.command_point_total('owner') == 1",
+                "assert effect < types.index('shooting_unit_selected') if position == 'start' else types.index('shooting_phase_completed') < effect < types.index('battle_phase_completed')",
+                "assert request.decision_type == 'select_shooting_type'"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:10:10.04:1",
+      "locator": "10.04",
+      "title": "Normal Shooting",
+      "source_sha256": "29d43603691f596cd9bc810f97753e18f7be7710f2df3824e9d05215895fe479",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "019c11948efbbebc1375f1cccb3f8be9be715972ed4aeb46b2a774e2a4581d6a",
+          "value": "Your unit is \u0005unengaged\u0006 and did not make an \u0005advance move\u0006 this turn."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "38b41a7c109a1b8284d8e745e38e4126a9e29d9623214f11f1fb6e4a5e9abeb0",
+          "value": "Your unit shoots as described in Making Attacks (04)."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "3b0a419e0638b6172804599e28804af4b97411ddb84b2d8841739bdcf771bef4",
+          "value": "\u000eAfter Shooting"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "f4667158419ad2a3efc7c444c5c7d03bd092647ae1acda8c7500d39fcc92ad78",
+          "value": "Until the end of the phase, your unit is \u0001not\u0002 \u0005eligible to start an action\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "10.04-obligation-01",
+          "source_blocks": [
+            2
+          ],
+          "obligation": "Unengaged and not Advanced; exact shared engagement limits and history consumed",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_selection.py::test_native_type_eligibility_is_independent_of_targets",
+              "function_ast_sha256": "11a2bcbf7631bdcda18f40a8c0877ccb67d78846bc5637456e31f062b485ca42",
+              "assertions": [
+                "assert request.decision_type == 'select_shooting_unit'",
+                "assert (unit.unit_instance_id in {o.option_id for o in request.options}) is bool(expected)",
+                "assert request.decision_type == 'select_shooting_type'",
+                "assert {o.option_id for o in request.options} == expected",
+                "assert state.shooting_phase_state is not None",
+                "assert state.shooting_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert state.shooting_phase_state is not None",
+                "assert unit.unit_instance_id not in state.shooting_phase_state.selected_unit_ids"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_boundaries.py::test_native_engagement_boundary_changes_normal_and_close_quarters_choices",
+              "function_ast_sha256": "bfeb86c4123d1233d2bc021ac218dcc1205d07350520afe52e7e0179342f7cf7",
+              "assertions": [
+                "assert isinstance(model.base, CircularBase)",
+                "assert abs(measured - (1.5 if vertical else 2 + delta)) <= 1e-12",
+                "assert {o.option_id for o in pending(session).options} == ({'close_quarters'} if delta <= 0 else {'normal'})"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.04-obligation-02",
+          "source_blocks": [
+            4
+          ],
+          "obligation": "Native ranged declarations execute through shared attack owner",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_each_type_resolves_native_attacks_before_next_selection_and_blocks_action",
+              "function_ast_sha256": "701e6f4ea2ade9d4db28ab8b36bd2bacb0d6e85fb9c138951058ef13888abc33",
+              "assertions": [
+                "assert state.shooting_phase_state is not None",
+                "assert (unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids) is completed",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert len([e for e in events if e.event_type == 'attack_sequence_completed']) == 1",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert accepted_pools(session)[0]['shooting_type'] == kind",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert reason is not None",
+                "assert has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert not has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert pending(session).decision_type != 'select_shooting_unit'"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.04-obligation-03",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "After the type resolves, Action prohibition lasts through this phase, including empty attacks",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_each_type_resolves_native_attacks_before_next_selection_and_blocks_action",
+              "function_ast_sha256": "701e6f4ea2ade9d4db28ab8b36bd2bacb0d6e85fb9c138951058ef13888abc33",
+              "assertions": [
+                "assert state.shooting_phase_state is not None",
+                "assert (unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids) is completed",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert len([e for e in events if e.event_type == 'attack_sequence_completed']) == 1",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert accepted_pools(session)[0]['shooting_type'] == kind",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert reason is not None",
+                "assert has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert not has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert pending(session).decision_type != 'select_shooting_unit'"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_boundaries.py::test_empty_selection_resolves_after_shooting_action_restriction",
+              "function_ast_sha256": "5e1fee889cfebbcc0d3f3d1b72f77cefec0028021c4e924fff2b70ef79136041",
+              "assertions": [
+                "assert has_activity_restriction(state=state, rules_unit=view, activity='completed_shooting')",
+                "assert state.shooting_phase_state is not None",
+                "assert unit.unit_instance_id not in state.shooting_phase_state.shot_unit_ids"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        },
+        {
+          "source_blocks": [
+            3
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        },
+        {
+          "source_blocks": [
+            5
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        }
+      ]
+    },
+    {
+      "source_id": "rule:10:10.05:1",
+      "locator": "10.05",
+      "title": "Assault Shooting",
+      "source_sha256": "8307e2e12636507e6901601fb56782b1d233d42855ddd15508916ccb64605c62",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "327e2c8b2bfbdfb34feb6f2233d9d06b559fadf8d15c96ff3147b8bd0adfa7f7",
+          "value": "\u0001All\u0002 of the following apply to your unit:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "b6c30f6a22a4b359912fd0741a0bfde345ec3329ac395d8594c05abe496d1c67",
+          "value": "• \u0005Unengaged\u0006 and made an \u0005advance move\u0006 this turn."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "48446e6d5c3583e99a7232f1873eda96a87d4651ed336a42f91bbcf294b2a3ca",
+          "value": "• Has one or more \u0005[ASSAULT]\u0006 weapons."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "437caf5f75cd706929968d1f7b450c536c3ca2dfeec0133957ccdf6fd1c10612",
+          "value": "\u000eWhile Shooting"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "040c388972ba17502bd331f109a390471d18ce131477448acef2ee9534e829f5",
+          "value": "You can only select \u0005[ASSAULT]\u0006 weapons to make attacks with."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "38b41a7c109a1b8284d8e745e38e4126a9e29d9623214f11f1fb6e4a5e9abeb0",
+          "value": "Your unit shoots as described in Making Attacks (04)."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "3b0a419e0638b6172804599e28804af4b97411ddb84b2d8841739bdcf771bef4",
+          "value": "\u000eAfter Shooting"
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "f4667158419ad2a3efc7c444c5c7d03bd092647ae1acda8c7500d39fcc92ad78",
+          "value": "Until the end of the phase, your unit is \u0001not\u0002 \u0005eligible to start an action\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "10.05-obligation-01",
+          "source_blocks": [
+            2,
+            3,
+            4
+          ],
+          "obligation": "Unengaged Advanced unit requires at least one Assault weapon",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_selection.py::test_native_type_eligibility_is_independent_of_targets",
+              "function_ast_sha256": "11a2bcbf7631bdcda18f40a8c0877ccb67d78846bc5637456e31f062b485ca42",
+              "assertions": [
+                "assert request.decision_type == 'select_shooting_unit'",
+                "assert (unit.unit_instance_id in {o.option_id for o in request.options}) is bool(expected)",
+                "assert request.decision_type == 'select_shooting_type'",
+                "assert {o.option_id for o in request.options} == expected",
+                "assert state.shooting_phase_state is not None",
+                "assert state.shooting_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert state.shooting_phase_state is not None",
+                "assert unit.unit_instance_id not in state.shooting_phase_state.selected_unit_ids"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.05-obligation-02",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "Only Assault weapons can be declared; non-Assault rejection then legal retry",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_assault_only_native_assault_weapons_are_admitted_then_legal_retry",
+              "function_ast_sha256": "c8070f559439850509dc853b9cfd0953dc58418e9554129a0e9473a4df78705d",
+              "assertions": [
+                "assert all((r['wargear_id'] == f'{SPINNER}:twin-shuriken-catapult' for r in rows))",
+                "assert result.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert accepted_pools(session)[0]['wargear_id'] == rows[0]['wargear_id']"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.05-obligation-03",
+          "source_blocks": [
+            8
+          ],
+          "obligation": "Accepted Assault attacks execute through native source weapons",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_each_type_resolves_native_attacks_before_next_selection_and_blocks_action",
+              "function_ast_sha256": "701e6f4ea2ade9d4db28ab8b36bd2bacb0d6e85fb9c138951058ef13888abc33",
+              "assertions": [
+                "assert state.shooting_phase_state is not None",
+                "assert (unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids) is completed",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert len([e for e in events if e.event_type == 'attack_sequence_completed']) == 1",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert accepted_pools(session)[0]['shooting_type'] == kind",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert reason is not None",
+                "assert has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert not has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert pending(session).decision_type != 'select_shooting_unit'"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.05-obligation-04",
+          "source_blocks": [
+            10
+          ],
+          "obligation": "Action prohibition after Assault type until phase end",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_each_type_resolves_native_attacks_before_next_selection_and_blocks_action",
+              "function_ast_sha256": "701e6f4ea2ade9d4db28ab8b36bd2bacb0d6e85fb9c138951058ef13888abc33",
+              "assertions": [
+                "assert state.shooting_phase_state is not None",
+                "assert (unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids) is completed",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert len([e for e in events if e.event_type == 'attack_sequence_completed']) == 1",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert accepted_pools(session)[0]['shooting_type'] == kind",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert reason is not None",
+                "assert has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert not has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert pending(session).decision_type != 'select_shooting_unit'"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_boundaries.py::test_empty_selection_resolves_after_shooting_action_restriction",
+              "function_ast_sha256": "5e1fee889cfebbcc0d3f3d1b72f77cefec0028021c4e924fff2b70ef79136041",
+              "assertions": [
+                "assert has_activity_restriction(state=state, rules_unit=view, activity='completed_shooting')",
+                "assert state.shooting_phase_state is not None",
+                "assert unit.unit_instance_id not in state.shooting_phase_state.shot_unit_ids"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        },
+        {
+          "source_blocks": [
+            5
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        },
+        {
+          "source_blocks": [
+            7
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        },
+        {
+          "source_blocks": [
+            9
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        }
+      ]
+    },
+    {
+      "source_id": "rule:10:10.06:1",
+      "locator": "10.06",
+      "title": "Close-Quarters Shooting",
+      "source_sha256": "5694e8d8e65ca0117b5da41426a9fba8cf7f1962823a075cff8cb2b66b388c79",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "327e2c8b2bfbdfb34feb6f2233d9d06b559fadf8d15c96ff3147b8bd0adfa7f7",
+          "value": "\u0001All\u0002 of the following apply to your unit:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "95ac24ced4398fac7542244f73bee073e66c2b33d251e6635facd220c2c9bc01",
+          "value": "• \u0005Engaged\u0006 and did not make an \u0005advance move\u0006 this turn."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "82e3ee535a1e5111e050ffab925a1e9f5cfc43ef00835b3be77ceea73724120d",
+          "value": "• Has one or more \u0005[CLOSE‑QUARTERS]\u0006 weapons or is a \u0003MONSTER/VEHICLE\u0004 unit."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "437caf5f75cd706929968d1f7b450c536c3ca2dfeec0133957ccdf6fd1c10612",
+          "value": "\u000eWhile Shooting"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "3310df6427db618c2f87a8950f5b0a997160bbf36893f318c2bb961ac55cc397",
+          "value": "Models in your unit can target enemy units your unit is \u0005engaged\u0006 with."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "8c6b67b098a428a4356346f47600f6ed35ca3868b83c146c007b84388bfd0101",
+          "value": "• \u0003MONSTER/VEHICLE\u0004 \u0005Models\u0006: Each time a \u0003MONSTER/VEHICLE\u0004 model in your unit makes an attack:"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "78b3b8978a308597020bc0178ba28b659d8e9e1c2ef09b1ba752ca7847947059",
+          "value": "◦ Unless that attack is made with a \u0003[CLOSE‑QUARTERS]\u0004 weapon and targets a unit your unit is \u0005engaged\u0006 with, subtract 1 from the \u0005hit roll\u0006."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "137b13b80c979df44b6002974cde8f3ae4e359e24ec248237f62bf4304b0721d",
+          "value": "◦ If that attack is made with a \u0005[BLAST]\u0006 weapon, it still cannot target a unit your unit is \u0005engaged\u0006 with."
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "716b434198fec7f6637de49d8e31da069ae04e8502d4c8a8df407e021ae35ccb",
+          "value": "• Non‑\u0003MONSTER\u0004/Non‑\u0003VEHICLE\u0004\u0005Models:\u0006 You can only select \u0005[CLOSE‑QUARTERS]\u0006 weapons to make attacks with and you can only select enemy units that are \u0005engaged\u0006 with your unit as targets"
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 12,
+          "kind": "text",
+          "sha256": "38b41a7c109a1b8284d8e745e38e4126a9e29d9623214f11f1fb6e4a5e9abeb0",
+          "value": "Your unit shoots as described in Making Attacks (04)."
+        },
+        {
+          "ordinal": 13,
+          "kind": "text",
+          "sha256": "3b0a419e0638b6172804599e28804af4b97411ddb84b2d8841739bdcf771bef4",
+          "value": "\u000eAfter Shooting"
+        },
+        {
+          "ordinal": 14,
+          "kind": "text",
+          "sha256": "f4667158419ad2a3efc7c444c5c7d03bd092647ae1acda8c7500d39fcc92ad78",
+          "value": "Until the end of the phase, your unit is \u0001not\u0002 \u0005eligible to start an action\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "10.06-obligation-01",
+          "source_blocks": [
+            2,
+            3,
+            4
+          ],
+          "obligation": "Engaged, not Advanced, with CQ weapon or Monster/Vehicle unit; source eligibility boundaries",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/shooting_engagement.py",
+            "geometry/volume.py",
+            "geometry/base.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_selection.py::test_native_type_eligibility_is_independent_of_targets",
+              "function_ast_sha256": "11a2bcbf7631bdcda18f40a8c0877ccb67d78846bc5637456e31f062b485ca42",
+              "assertions": [
+                "assert request.decision_type == 'select_shooting_unit'",
+                "assert (unit.unit_instance_id in {o.option_id for o in request.options}) is bool(expected)",
+                "assert request.decision_type == 'select_shooting_type'",
+                "assert {o.option_id for o in request.options} == expected",
+                "assert state.shooting_phase_state is not None",
+                "assert state.shooting_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert state.shooting_phase_state is not None",
+                "assert unit.unit_instance_id not in state.shooting_phase_state.selected_unit_ids"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_boundaries.py::test_native_engagement_boundary_changes_normal_and_close_quarters_choices",
+              "function_ast_sha256": "bfeb86c4123d1233d2bc021ac218dcc1205d07350520afe52e7e0179342f7cf7",
+              "assertions": [
+                "assert isinstance(model.base, CircularBase)",
+                "assert abs(measured - (1.5 if vertical else 2 + delta)) <= 1e-12",
+                "assert {o.option_id for o in pending(session).options} == ({'close_quarters'} if delta <= 0 else {'normal'})"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.06-obligation-02",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "Models may target their own engaged enemy unit",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/shooting_engagement.py",
+            "geometry/volume.py",
+            "geometry/base.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_close_quarters_model_weapon_target_and_hit_penalty_policy",
+              "function_ast_sha256": "b55eda07e91c4210b24bb9b3b9b89f0d7f310278bb4f3c09c8b0a24660f82707",
+              "assertions": [
+                "assert (result.status_kind is not LifecycleStatusKind.INVALID) is valid",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pool['hit_roll_modifier'] == modifier",
+                "assert pool['target_unit_instance_id'] == target_id"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_mixed_integration.py::test_native_mixed_target_producer_keeps_physical_keywords",
+              "function_ast_sha256": "deb7ce478afd23418ac480ba8ed818247da283dcc8a6ae855e4103bb4f3c5d42",
+              "assertions": [
+                "assert 'MONSTER' in view.keywords",
+                "assert 'MONSTER' not in leader.own_models[0].keywords",
+                "assert result.is_legal is valid",
+                "assert result.observer_model_id == unit.own_model_ids()[0]",
+                "assert result.target_visible_model_ids",
+                "assert result.line_of_sight_witness is not None",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert result.hit_roll_modifier == (-1 if physical == 'monster' else 0)",
+                "assert result.violation_code is None",
+                "assert result.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_mixed_integration.py::test_mixed_public_declaration_rejects_infantry_outside_then_resolves_legal_split",
+              "function_ast_sha256": "4770b8b8a9c855151200d233476bcf19ee6bbfb35f2423fe05049336984bc050",
+              "assertions": [
+                "assert not a.base_overlaps(b)",
+                "assert a.base_distance_to(b) < 2",
+                "assert {o.option_id for o in pending(session).options} == {'close_quarters'}",
+                "assert request.decision_type == 'submit_shooting_declaration'",
+                "assert monster['model_instance_id'] == body.own_model_ids()[0]",
+                "assert infantry['model_instance_id'] == leader.own_model_ids()[0]",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending(session) == request",
+                "assert len(pools) == 2",
+                "assert by_model[body.own_model_ids()[0]]['hit_roll_modifier'] == -1",
+                "assert by_model[leader.own_model_ids()[0]]['hit_roll_modifier'] == 0",
+                "assert by_model[body.own_model_ids()[0]]['target_unit_instance_id'] == 'enemy:outside'",
+                "assert by_model[leader.own_model_ids()[0]]['target_unit_instance_id'] == 'enemy:target'",
+                "assert state.shooting_phase_state is not None",
+                "assert formation.attached_unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert pending(session).decision_type == 'select_shooting_unit'"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.06-obligation-03",
+          "source_blocks": [
+            7,
+            8
+          ],
+          "obligation": "Monster/Vehicle physical model gets -1 except CQ against its engaged target",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/shooting_engagement.py",
+            "geometry/volume.py",
+            "geometry/base.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_close_quarters_model_weapon_target_and_hit_penalty_policy",
+              "function_ast_sha256": "b55eda07e91c4210b24bb9b3b9b89f0d7f310278bb4f3c09c8b0a24660f82707",
+              "assertions": [
+                "assert (result.status_kind is not LifecycleStatusKind.INVALID) is valid",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pool['hit_roll_modifier'] == modifier",
+                "assert pool['target_unit_instance_id'] == target_id"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_boundaries.py::test_constructed_vehicle_sidearm_exception_is_specific_to_engaged_target",
+              "function_ast_sha256": "1446e9e50436011bc87d065b2bf1c103164507e775461e5a18b2be55b60b6111",
+              "assertions": [
+                "assert result.is_legal",
+                "assert result.hit_roll_modifier == expected",
+                "assert (CLOSE_QUARTERS_SHOOTING_SOURCE_ID in result.targeting_rule_ids) is (expected == -1)"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_boundaries.py::test_constructed_mixed_attachment_preserves_each_models_shooting_permissions",
+              "function_ast_sha256": "5959b469b44878c6c7469b12b2a13bcca6ea45c65a24bd23953153b63e6ec3f2",
+              "assertions": [
+                "assert 'VEHICLE' in rules_unit_view_by_id(state=state, unit_instance_id=formation.attached_unit_instance_id).keywords",
+                "assert 'VEHICLE' not in leader.own_models[0].keywords",
+                "assert (result is None) is expected"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_mixed_integration.py::test_native_mixed_target_producer_keeps_physical_keywords",
+              "function_ast_sha256": "deb7ce478afd23418ac480ba8ed818247da283dcc8a6ae855e4103bb4f3c5d42",
+              "assertions": [
+                "assert 'MONSTER' in view.keywords",
+                "assert 'MONSTER' not in leader.own_models[0].keywords",
+                "assert result.is_legal is valid",
+                "assert result.observer_model_id == unit.own_model_ids()[0]",
+                "assert result.target_visible_model_ids",
+                "assert result.line_of_sight_witness is not None",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert result.hit_roll_modifier == (-1 if physical == 'monster' else 0)",
+                "assert result.violation_code is None",
+                "assert result.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_mixed_integration.py::test_mixed_public_declaration_rejects_infantry_outside_then_resolves_legal_split",
+              "function_ast_sha256": "4770b8b8a9c855151200d233476bcf19ee6bbfb35f2423fe05049336984bc050",
+              "assertions": [
+                "assert not a.base_overlaps(b)",
+                "assert a.base_distance_to(b) < 2",
+                "assert {o.option_id for o in pending(session).options} == {'close_quarters'}",
+                "assert request.decision_type == 'submit_shooting_declaration'",
+                "assert monster['model_instance_id'] == body.own_model_ids()[0]",
+                "assert infantry['model_instance_id'] == leader.own_model_ids()[0]",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending(session) == request",
+                "assert len(pools) == 2",
+                "assert by_model[body.own_model_ids()[0]]['hit_roll_modifier'] == -1",
+                "assert by_model[leader.own_model_ids()[0]]['hit_roll_modifier'] == 0",
+                "assert by_model[body.own_model_ids()[0]]['target_unit_instance_id'] == 'enemy:outside'",
+                "assert by_model[leader.own_model_ids()[0]]['target_unit_instance_id'] == 'enemy:target'",
+                "assert state.shooting_phase_state is not None",
+                "assert formation.attached_unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert pending(session).decision_type == 'select_shooting_unit'"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.06-obligation-04",
+          "source_blocks": [
+            9
+          ],
+          "obligation": "Blast cannot target engaged enemy even for Vehicle; outside target control",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/shooting_engagement.py",
+            "geometry/volume.py",
+            "geometry/base.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_close_quarters_model_weapon_target_and_hit_penalty_policy",
+              "function_ast_sha256": "b55eda07e91c4210b24bb9b3b9b89f0d7f310278bb4f3c09c8b0a24660f82707",
+              "assertions": [
+                "assert (result.status_kind is not LifecycleStatusKind.INVALID) is valid",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pool['hit_roll_modifier'] == modifier",
+                "assert pool['target_unit_instance_id'] == target_id"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.06-obligation-05",
+          "source_blocks": [
+            10
+          ],
+          "obligation": "Non-Monster/non-Vehicle physical models only CQ weapons and only own engaged targets; attachment does not promote model keywords",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/shooting_engagement.py",
+            "geometry/volume.py",
+            "geometry/base.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_close_quarters_model_weapon_target_and_hit_penalty_policy",
+              "function_ast_sha256": "b55eda07e91c4210b24bb9b3b9b89f0d7f310278bb4f3c09c8b0a24660f82707",
+              "assertions": [
+                "assert (result.status_kind is not LifecycleStatusKind.INVALID) is valid",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pool['hit_roll_modifier'] == modifier",
+                "assert pool['target_unit_instance_id'] == target_id"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_boundaries.py::test_constructed_mixed_attachment_preserves_each_models_shooting_permissions",
+              "function_ast_sha256": "5959b469b44878c6c7469b12b2a13bcca6ea45c65a24bd23953153b63e6ec3f2",
+              "assertions": [
+                "assert 'VEHICLE' in rules_unit_view_by_id(state=state, unit_instance_id=formation.attached_unit_instance_id).keywords",
+                "assert 'VEHICLE' not in leader.own_models[0].keywords",
+                "assert (result is None) is expected"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_mixed_integration.py::test_native_mixed_target_producer_keeps_physical_keywords",
+              "function_ast_sha256": "deb7ce478afd23418ac480ba8ed818247da283dcc8a6ae855e4103bb4f3c5d42",
+              "assertions": [
+                "assert 'MONSTER' in view.keywords",
+                "assert 'MONSTER' not in leader.own_models[0].keywords",
+                "assert result.is_legal is valid",
+                "assert result.observer_model_id == unit.own_model_ids()[0]",
+                "assert result.target_visible_model_ids",
+                "assert result.line_of_sight_witness is not None",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert result.hit_roll_modifier == (-1 if physical == 'monster' else 0)",
+                "assert result.violation_code is None",
+                "assert result.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_mixed_integration.py::test_mixed_public_declaration_rejects_infantry_outside_then_resolves_legal_split",
+              "function_ast_sha256": "4770b8b8a9c855151200d233476bcf19ee6bbfb35f2423fe05049336984bc050",
+              "assertions": [
+                "assert not a.base_overlaps(b)",
+                "assert a.base_distance_to(b) < 2",
+                "assert {o.option_id for o in pending(session).options} == {'close_quarters'}",
+                "assert request.decision_type == 'submit_shooting_declaration'",
+                "assert monster['model_instance_id'] == body.own_model_ids()[0]",
+                "assert infantry['model_instance_id'] == leader.own_model_ids()[0]",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending(session) == request",
+                "assert len(pools) == 2",
+                "assert by_model[body.own_model_ids()[0]]['hit_roll_modifier'] == -1",
+                "assert by_model[leader.own_model_ids()[0]]['hit_roll_modifier'] == 0",
+                "assert by_model[body.own_model_ids()[0]]['target_unit_instance_id'] == 'enemy:outside'",
+                "assert by_model[leader.own_model_ids()[0]]['target_unit_instance_id'] == 'enemy:target'",
+                "assert state.shooting_phase_state is not None",
+                "assert formation.attached_unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert pending(session).decision_type == 'select_shooting_unit'"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.06-obligation-06",
+          "source_blocks": [
+            12
+          ],
+          "obligation": "Accepted CQ declarations execute through native weapon attacks",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/shooting_engagement.py",
+            "geometry/volume.py",
+            "geometry/base.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_each_type_resolves_native_attacks_before_next_selection_and_blocks_action",
+              "function_ast_sha256": "701e6f4ea2ade9d4db28ab8b36bd2bacb0d6e85fb9c138951058ef13888abc33",
+              "assertions": [
+                "assert state.shooting_phase_state is not None",
+                "assert (unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids) is completed",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert len([e for e in events if e.event_type == 'attack_sequence_completed']) == 1",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert accepted_pools(session)[0]['shooting_type'] == kind",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert reason is not None",
+                "assert has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert not has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert pending(session).decision_type != 'select_shooting_unit'"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_mixed_integration.py::test_mixed_public_declaration_rejects_infantry_outside_then_resolves_legal_split",
+              "function_ast_sha256": "4770b8b8a9c855151200d233476bcf19ee6bbfb35f2423fe05049336984bc050",
+              "assertions": [
+                "assert not a.base_overlaps(b)",
+                "assert a.base_distance_to(b) < 2",
+                "assert {o.option_id for o in pending(session).options} == {'close_quarters'}",
+                "assert request.decision_type == 'submit_shooting_declaration'",
+                "assert monster['model_instance_id'] == body.own_model_ids()[0]",
+                "assert infantry['model_instance_id'] == leader.own_model_ids()[0]",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending(session) == request",
+                "assert len(pools) == 2",
+                "assert by_model[body.own_model_ids()[0]]['hit_roll_modifier'] == -1",
+                "assert by_model[leader.own_model_ids()[0]]['hit_roll_modifier'] == 0",
+                "assert by_model[body.own_model_ids()[0]]['target_unit_instance_id'] == 'enemy:outside'",
+                "assert by_model[leader.own_model_ids()[0]]['target_unit_instance_id'] == 'enemy:target'",
+                "assert state.shooting_phase_state is not None",
+                "assert formation.attached_unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert pending(session).decision_type == 'select_shooting_unit'"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.06-obligation-07",
+          "source_blocks": [
+            14
+          ],
+          "obligation": "Action prohibition after CQ type until phase end",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/shooting_engagement.py",
+            "geometry/volume.py",
+            "geometry/base.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_each_type_resolves_native_attacks_before_next_selection_and_blocks_action",
+              "function_ast_sha256": "701e6f4ea2ade9d4db28ab8b36bd2bacb0d6e85fb9c138951058ef13888abc33",
+              "assertions": [
+                "assert state.shooting_phase_state is not None",
+                "assert (unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids) is completed",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert len([e for e in events if e.event_type == 'attack_sequence_completed']) == 1",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert accepted_pools(session)[0]['shooting_type'] == kind",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert reason is not None",
+                "assert has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert not has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert pending(session).decision_type != 'select_shooting_unit'"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_boundaries.py::test_empty_selection_resolves_after_shooting_action_restriction",
+              "function_ast_sha256": "5e1fee889cfebbcc0d3f3d1b72f77cefec0028021c4e924fff2b70ef79136041",
+              "assertions": [
+                "assert has_activity_restriction(state=state, rules_unit=view, activity='completed_shooting')",
+                "assert state.shooting_phase_state is not None",
+                "assert unit.unit_instance_id not in state.shooting_phase_state.shot_unit_ids"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        },
+        {
+          "source_blocks": [
+            5
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        },
+        {
+          "source_blocks": [
+            11
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        },
+        {
+          "source_blocks": [
+            13
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        }
+      ]
+    },
+    {
+      "source_id": "rule:10:10.07:1",
+      "locator": "10.07",
+      "title": "Indirect Shooting",
+      "source_sha256": "520a42f2021e1d3d1e635f46d977bac590827888f008f2b603d28c348dd9e6c3",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "327e2c8b2bfbdfb34feb6f2233d9d06b559fadf8d15c96ff3147b8bd0adfa7f7",
+          "value": "\u0001All\u0002 of the following apply to your unit:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "06c2c3d7022466856bbb7c7a52f84ef43317e353767d76717c042d5ebf50fdf3",
+          "value": "• \u0005Unengaged\u0006 and did not make an \u0005advance move\u0006 this turn."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "46a2623033e5ad68e3bc809e802cefca4b299c9fe124aff65837de8e60ffa7d3",
+          "value": "• Has one or more \u0003[INDIRECT FIRE]\u0004 weapons."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "437caf5f75cd706929968d1f7b450c536c3ca2dfeec0133957ccdf6fd1c10612",
+          "value": "\u000eWhile Shooting"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "5b79e5bf80103c69cd8732a3462641850b93ec7326a446bef7f9fd908cb50852",
+          "value": "• \u0003[INDIRECT FIRE]\u0004 weapons in your unit can target units that are not \u0005visible\u0006 to the attacking model."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "ca70b53f218e920fe21e05adde0bce34c379e4ae9b8ad58d5c838c10ddbee951",
+          "value": "• Each time an \u0003[INDIRECT FIRE]\u0004 weapon makes an attack:"
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "28788c37ee6dd0d00853e2a005ce086f2a16386561c6b64a9420ec1e2919d599",
+          "value": "◦ The target has the \u0005benefit of cover\u0006 against that attack (13.08)."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "277ecd812f5af489606f3332186a352d2c21ce2a0925f2ccd3ebf5caf496d01b",
+          "value": "◦ You cannot re‑roll \u0005hit rolls\u0006."
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "c0c87b2ad8e329cdbdee8b3c2000286752c0880b94c3a0a2af23549d0363d5b5",
+          "value": "◦ An unmodified \u0005hit roll\u0006 of 1‑5 fails, unless your unit \u0005remained stationary\u0006 this turn and the target is \u0005visible\u0006 to one or more friendly units, in which case an unmodified \u0005hit roll\u0006 of 1‑3 fails instead."
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 12,
+          "kind": "text",
+          "sha256": "38b41a7c109a1b8284d8e745e38e4126a9e29d9623214f11f1fb6e4a5e9abeb0",
+          "value": "Your unit shoots as described in Making Attacks (04)."
+        },
+        {
+          "ordinal": 13,
+          "kind": "text",
+          "sha256": "3b0a419e0638b6172804599e28804af4b97411ddb84b2d8841739bdcf771bef4",
+          "value": "\u000eAfter Shooting"
+        },
+        {
+          "ordinal": 14,
+          "kind": "text",
+          "sha256": "f4667158419ad2a3efc7c444c5c7d03bd092647ae1acda8c7500d39fcc92ad78",
+          "value": "Until the end of the phase, your unit is \u0001not\u0002 \u0005eligible to start an action\u0006."
+        },
+        {
+          "ordinal": 15,
+          "kind": "callout",
+          "sha256": "71629a6a036165c74791fc288631ecdb6752756ebc86c2627ed0f05f31ebe5ef",
+          "value": {
+            "title": "Indirect Fire",
+            "body": "When you select indirect shooting for a unit, its [INDIRECT FIRE] weapons can launch punishing barrages on targets that are not visible, but don’t forget that its other weapons can still target other visible targets."
+          }
+        }
+      ],
+      "requirements": [
+        {
+          "id": "10.07-obligation-01",
+          "source_blocks": [
+            2,
+            3,
+            4
+          ],
+          "obligation": "Unengaged, not Advanced, and at least one Indirect Fire weapon; normal and indirect remain distinct types",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/attack_sequence_hit_wound.py",
+            "engine/phases/shooting_targeting.py",
+            "engine/decision.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_selection.py::test_native_type_eligibility_is_independent_of_targets",
+              "function_ast_sha256": "11a2bcbf7631bdcda18f40a8c0877ccb67d78846bc5637456e31f062b485ca42",
+              "assertions": [
+                "assert request.decision_type == 'select_shooting_unit'",
+                "assert (unit.unit_instance_id in {o.option_id for o in request.options}) is bool(expected)",
+                "assert request.decision_type == 'select_shooting_type'",
+                "assert {o.option_id for o in request.options} == expected",
+                "assert state.shooting_phase_state is not None",
+                "assert state.shooting_phase_state.selected_unit_ids == (unit.unit_instance_id,)",
+                "assert state.shooting_phase_state is not None",
+                "assert unit.unit_instance_id not in state.shooting_phase_state.selected_unit_ids"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.07-obligation-02",
+          "source_blocks": [
+            6
+          ],
+          "obligation": "Only Indirect Fire weapons gain invisible-target permission; native public type selection and normal controls",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/attack_sequence_hit_wound.py",
+            "engine/phases/shooting_targeting.py",
+            "engine/decision.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_indirect.py::test_native_indirect_selection_records_cover_no_rerolls_and_spotting",
+              "function_ast_sha256": "669c7c0782672c74a74aa2c0a4b74c893ffb5d6dca270ecbe500d7730986a5bb",
+              "assertions": [
+                "assert bool(pool.target_visible_model_ids) is visible",
+                "assert INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in pool.targeting_rule_ids",
+                "assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids",
+                "assert (INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in pool.targeting_rule_ids) is (stationary and visible)",
+                "assert _benefit_of_cover_ballistic_skill_penalty(state=state, pool=pool) == 1",
+                "assert state.battlefield_state is not None"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_indirect.py::test_normal_type_does_not_gain_indirect_visibility_or_attack_restrictions",
+              "function_ast_sha256": "d6b451a0137767bcb3e2c414335182fee70de839fbfb94fad0ceea13828a25f9",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert request.decision_type == 'select_shooting_unit'",
+                "assert not any((e.event_type == 'attack_sequence_step' for e in session.lifecycle.decision_controller.event_log.records))",
+                "assert isinstance(rules, list)",
+                "assert INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID not in rules",
+                "assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID not in rules",
+                "assert INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID not in rules"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.07-obligation-03",
+          "source_blocks": [
+            7,
+            8
+          ],
+          "obligation": "Each Indirect Fire attack grants cover at actual BS modifier consumer even against visible targets",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/attack_sequence_hit_wound.py",
+            "engine/phases/shooting_targeting.py",
+            "engine/decision.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_indirect.py::test_native_indirect_selection_records_cover_no_rerolls_and_spotting",
+              "function_ast_sha256": "669c7c0782672c74a74aa2c0a4b74c893ffb5d6dca270ecbe500d7730986a5bb",
+              "assertions": [
+                "assert bool(pool.target_visible_model_ids) is visible",
+                "assert INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in pool.targeting_rule_ids",
+                "assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids",
+                "assert (INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in pool.targeting_rule_ids) is (stationary and visible)",
+                "assert _benefit_of_cover_ballistic_skill_penalty(state=state, pool=pool) == 1",
+                "assert state.battlefield_state is not None"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.07-obligation-04",
+          "source_blocks": [
+            9
+          ],
+          "obligation": "Actual hit-roll spec forbids rerolls and live manager rejects them without mutation",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/attack_sequence_hit_wound.py",
+            "engine/phases/shooting_targeting.py",
+            "engine/decision.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_indirect.py::test_indirect_unmodified_failure_threshold_and_no_hit_reroll_are_enforced",
+              "function_ast_sha256": "5bb4de3b68f120c4b2a670159d2e9ba98800cb1ae39238dca12703369bf10978",
+              "assertions": [
+                "assert hit.unmodified_roll == raw",
+                "assert hit.successful is (raw >= (4 if spotted else 6) and (raw == 6 or raw + modifier >= 4))",
+                "assert hit.final_roll == max(1, raw + modifier)",
+                "assert isinstance(rolled, dict)",
+                "assert actual.spec.reroll_forbidden_rule_ids == (INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,)",
+                "assert manager.event_log.records == before"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.07-obligation-05",
+          "source_blocks": [
+            10
+          ],
+          "obligation": "Unmodified1-5 fail unless stationary and a friendly unit spots target; then1-3 fail; own/other spotters and moved controls",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/attack_sequence_hit_wound.py",
+            "engine/phases/shooting_targeting.py",
+            "engine/decision.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_indirect.py::test_native_indirect_selection_records_cover_no_rerolls_and_spotting",
+              "function_ast_sha256": "669c7c0782672c74a74aa2c0a4b74c893ffb5d6dca270ecbe500d7730986a5bb",
+              "assertions": [
+                "assert bool(pool.target_visible_model_ids) is visible",
+                "assert INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in pool.targeting_rule_ids",
+                "assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids",
+                "assert (INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in pool.targeting_rule_ids) is (stationary and visible)",
+                "assert _benefit_of_cover_ballistic_skill_penalty(state=state, pool=pool) == 1",
+                "assert state.battlefield_state is not None"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_indirect.py::test_hidden_target_can_be_spotted_by_a_different_friendly_unit",
+              "function_ast_sha256": "581a0906c1f434798cad49154a2e1859da3b1ac24f8f419d8c655ad04cd85148",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert pool['target_visible_model_ids'] == []",
+                "assert isinstance(pool['targeting_rule_ids'], list)",
+                "assert (INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in pool['targeting_rule_ids']) is (stationary and observer)"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_indirect.py::test_indirect_unmodified_failure_threshold_and_no_hit_reroll_are_enforced",
+              "function_ast_sha256": "5bb4de3b68f120c4b2a670159d2e9ba98800cb1ae39238dca12703369bf10978",
+              "assertions": [
+                "assert hit.unmodified_roll == raw",
+                "assert hit.successful is (raw >= (4 if spotted else 6) and (raw == 6 or raw + modifier >= 4))",
+                "assert hit.final_roll == max(1, raw + modifier)",
+                "assert isinstance(rolled, dict)",
+                "assert actual.spec.reroll_forbidden_rule_ids == (INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,)",
+                "assert manager.event_log.records == before"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.07-obligation-06",
+          "source_blocks": [
+            12
+          ],
+          "obligation": "Accepted indirect attacks execute through shared native attack owner",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/attack_sequence_hit_wound.py",
+            "engine/phases/shooting_targeting.py",
+            "engine/decision.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_each_type_resolves_native_attacks_before_next_selection_and_blocks_action",
+              "function_ast_sha256": "701e6f4ea2ade9d4db28ab8b36bd2bacb0d6e85fb9c138951058ef13888abc33",
+              "assertions": [
+                "assert state.shooting_phase_state is not None",
+                "assert (unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids) is completed",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert len([e for e in events if e.event_type == 'attack_sequence_completed']) == 1",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert accepted_pools(session)[0]['shooting_type'] == kind",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert reason is not None",
+                "assert has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert not has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert pending(session).decision_type != 'select_shooting_unit'"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.07-obligation-07",
+          "source_blocks": [
+            14
+          ],
+          "obligation": "Action prohibition after Indirect type until phase end",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/attack_sequence_hit_wound.py",
+            "engine/phases/shooting_targeting.py",
+            "engine/decision.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_shooting_types.py::test_each_type_resolves_native_attacks_before_next_selection_and_blocks_action",
+              "function_ast_sha256": "701e6f4ea2ade9d4db28ab8b36bd2bacb0d6e85fb9c138951058ef13888abc33",
+              "assertions": [
+                "assert state.shooting_phase_state is not None",
+                "assert (unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids) is completed",
+                "assert pending(session).decision_type == 'select_shooting_unit'",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert len([e for e in events if e.event_type == 'attack_sequence_completed']) == 1",
+                "assert unit.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert accepted_pools(session)[0]['shooting_type'] == kind",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='owner')",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id='opponent')",
+                "assert reason is not None",
+                "assert has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert not has_activity_restriction(state=state, rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id), activity='completed_shooting')",
+                "assert pending(session).decision_type != 'select_shooting_unit'"
+              ]
+            },
+            {
+              "node": "tests/rules/section10/test_boundaries.py::test_empty_selection_resolves_after_shooting_action_restriction",
+              "function_ast_sha256": "5e1fee889cfebbcc0d3f3d1b72f77cefec0028021c4e924fff2b70ef79136041",
+              "assertions": [
+                "assert has_activity_restriction(state=state, rules_unit=view, activity='completed_shooting')",
+                "assert state.shooting_phase_state is not None",
+                "assert unit.unit_instance_id not in state.shooting_phase_state.shot_unit_ids"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "10.07-callout",
+          "source_blocks": [
+            15
+          ],
+          "obligation": "Other non-Indirect weapons may target different visible units during Indirect Shooting; only Indirect Fire bypasses visibility and receives its restrictions",
+          "engine_owners": [
+            "engine/phases/shooting_eligibility.py",
+            "engine/phases/shooting_requests.py",
+            "engine/phases/shooting_declaration_validation.py",
+            "engine/shooting_targets.py",
+            "engine/phases/shooting_decisions.py",
+            "engine/attack_sequence_dispatch.py",
+            "engine/activity_restrictions.py",
+            "engine/mission_action_eligibility.py",
+            "engine/attack_sequence_hit_wound.py",
+            "engine/phases/shooting_targeting.py",
+            "engine/decision.py"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section10/test_indirect.py::test_indirect_callout_other_weapons_can_shoot_different_visible_targets",
+              "function_ast_sha256": "8a09d400cb1f233e15bb898f6a9dc1d3509c5b488ff532f5b0d20c9d9f3fa8bb",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert result.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending(session) == request",
+                "assert len(pools) == 2",
+                "assert pool['target_unit_instance_id'] == ('enemy:target' if is_indirect else 'enemy:visible')",
+                "assert isinstance(rules, list)",
+                "assert (INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in rules) is is_indirect",
+                "assert (INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in rules) is is_indirect"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        },
+        {
+          "source_blocks": [
+            5
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        },
+        {
+          "source_blocks": [
+            11
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        },
+        {
+          "source_blocks": [
+            13
+          ],
+          "role": "introductory prose or Eligible/Effect/While/After heading; obligations mapped in this row"
+        }
+      ]
+    }
+  ],
+  "faq_ownership": {
+    "reviewed_current_faq_count": 64,
+    "locally_owned": [
+      {
+        "id": "9bfa47ed-be8d-4e11-80de-f3832d507ca1",
+        "question": "Can I select a unit to shoot or fight if it doesn't have melee or ranged weapons?",
+        "answer": "Yes, it just makes no attacks and then the fight type or shoot type is resolved.",
+        "source_sha256": "8d4f6b7b01b92637f2848b261fe07f970ef819f1ee867b889e885d1bdcbb1ada",
+        "engine_owners": [
+          "engine/phases/shooting_eligibility.py",
+          "engine/phases/shooting_requests.py",
+          "engine/phases/shooting_declaration_validation.py",
+          "engine/shooting_targets.py",
+          "engine/phases/shooting_model.py",
+          "engine/phases/shooting_unit_selection.py",
+          "engine/shooting_without_attacks.py"
+        ],
+        "semantic_assertions": [
+          {
+            "node": "tests/rules/section10/test_selection.py::test_faq02_no_weapon_or_target_still_consumes_selected_type_without_attacks",
+            "function_ast_sha256": "84e790ab2e3047f17fa8c3208767682ab4624f8bea72464c21b05bc6a41d630d",
+            "assertions": [
+              "assert pending(session).decision_type == 'select_shooting_unit'",
+              "assert state.shooting_phase_state is not None",
+              "assert unit.unit_instance_id in state.shooting_phase_state.selected_unit_ids",
+              "assert unit.unit_instance_id not in state.shooting_phase_state.shot_unit_ids",
+              "assert unit.unit_instance_id not in {o.option_id for o in pending(session).options}",
+              "assert any((e.event_type == 'shooting_without_attacks_completed' for e in events))",
+              "assert not any((e.event_type == 'attack_sequence_step' for e in events))"
+            ]
+          }
+        ],
+        "scope": "Shooting half owned10; Fight half12; foundational attack-choice cross-reference04. Existing04 FAQ assertions preserved as dependency evidence."
+      }
+    ],
+    "cross_references": {
+      "02": "weaponless Shooting10; Fight12; foundational attack choices04",
+      "03,21,30,44,53,55,56,63": "04 attack target/visibility/critical machinery",
+      "46": "24 Heavy movement distance",
+      "49,51,64": "01/02 physical model and attached-unit ownership",
+      "62": "01 effect expiry",
+      "13": "09 Desperate Escape"
+    }
+  },
+  "authenticated_inputs": {
+    "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+    "data/source_audits/v963_shock/captures/core-page.js": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026"
+  },
+  "claim_limits": [
+    "Semantic assertions counted separately from metadata authentication.",
+    "Native selected real definitions; constructed prior histories, mixed attachment, CQ Vehicle profile and compiled timing text labelled in tests.",
+    "No new external-source, faction-admission, full-turn, replay or aggregate certification."
+  ]
+}

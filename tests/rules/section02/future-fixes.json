@@ -1,0 +1,11 @@
+{
+  "confirmed_incorrect_rule_outcomes": [],
+  "execution_crash_fixes": [],
+  "source_test_prerequisites": "prerequisites.json",
+  "policy": {
+    "2026-10-16T20:59": "Incorrect engine rule behavior: preserve minimal failing regression and source/expected/actual evidence for future fix PRs; no semantic repair in this milestone.",
+    "2026-10-16T21:00": "errors meaning incorrect engine rule behavior - if you find errors that break engine execution (as in \"it's crashing or failing to continue\") you have my approval to fix those as found",
+    "interpretation": "Narrow crash/continuation repair authorized with regression. Legitimate rejection and an assertion failure alone are not execution blockers. No production fix was made."
+  },
+  "handoff_sequence": "02 -> 01 -> 03 -> 04 -> 05 -> 06; 00 deferred; this task performs02 only."
+}

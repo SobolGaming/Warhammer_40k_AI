@@ -1,0 +1,61 @@
+{
+  "section": "04",
+  "policy": "Keep enabled source-correct regressions; no semantic engine changes in this corpus task.",
+  "findings": [
+    {
+      "id": "SF04-002",
+      "status": "OPEN_FUTURE_FIX_PR",
+      "title": "Shooting eligibility reports shot before declared attacks resolve",
+      "requirement_ids": [
+        "04.03.04-obligation-03"
+      ],
+      "source_rows": [
+        "rule:04:04.03.04:1"
+      ],
+      "expected": "A unit has shot only after all declared ranged attacks by its participating models resolve. Accepted declaration alone must not make the unit count as having shot.",
+      "actual": "With two authentic Lord Exultant ranged weapons declared and the group-selection request still pending, no attack_sequence_step or completion event exists and model participation is false, but ShootingPhaseState.shot_unit_ids already contains the unit and _unit_has_already_shot returns true.",
+      "production_path": [
+        "engine/phases/shooting_model.py:ShootingPhaseState.with_completed_declaration",
+        "engine/phases/shooting_eligibility.py:_unit_has_already_shot"
+      ],
+      "failed_nodes": [
+        "tests/rules/section04/test_completion_boundaries.py::test_native_unit_is_not_shot_before_any_declared_attack_resolves"
+      ],
+      "controls": "Pre-declaration false; genuine completed attacks true; empty/weaponless and no-target shooting not shot. Completion events are not alleged to fire early.",
+      "future_fix_scope": "Separate declaration reservation/eligibility bookkeeping from source-defined shot status. Preserve source/physical ownership, optional targeting, Firing Deck and reaction timing. Fix in a future PR."
+    },
+    {
+      "id": "SF04-003",
+      "status": "OPEN_FUTURE_FIX_PR_PENDING_NARROW_REVIEW",
+      "title": "Completed model participation delayed until whole attack sequence completes",
+      "requirement_ids": [
+        "04.03.04-obligation-02",
+        "04.03.05-obligation-02"
+      ],
+      "expected": "A model counts as having shot/fought once its selected required attacks finish, independently of other models still attacking.",
+      "actual": "After native bearer pool0 finishes, pools1/2 remain unresolved and model_has_attacked_this_phase is false for the finished bearer in both shooting and fight. At full completion all three bearers report true.",
+      "failed_nodes": [
+        "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[shooting]",
+        "tests/rules/section04/test_completion_boundaries.py::test_finished_native_model_counts_before_other_models_complete[fight]"
+      ],
+      "production_path": [
+        "engine/model_attack_history.py:model_has_attacked_this_phase",
+        "engine/attack_sequence.py:resolve_attack_sequence_until_blocked"
+      ],
+      "qualification": "Actual executor/participation consumer with native weapons and bodies; explicit already-selected pools. This is distinct from premature unit shot SF04-002. No semantic behavior changed.",
+      "future_fix_scope": "Review model-level completion event timing and consumers separately; preserve weapon grouping and unit completion boundaries."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "id": "SF04-001-provisional-withdrawn",
+      "candidate": "cross-bearer grouping",
+      "reason": "Native resolver passes three canonical physical-bearer controls; the same-bearer compatibility helper was not the native owner."
+    }
+  ],
+  "predecessor_findings_preserved": [
+    "SF01-001",
+    "SF03-001"
+  ],
+  "execution_repairs": []
+}

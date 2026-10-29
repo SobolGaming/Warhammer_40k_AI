@@ -726,14 +726,13 @@ def _consolidation_rule_validation(
     enemies_within_three = tuple(
         target.unit_instance_id
         for target in _enemy_rules_units(state=state, rules_unit=rules_unit)
-        if _closest_distance(
-            source_models,
-            _measurement_target_geometry_models_for_rules_unit(
-                scenario=scenario,
-                rules_unit=target,
-            ),
+        if any(
+            first.is_within_range(second, CONSOLIDATE_ENEMY_DISTANCE_INCHES)
+            for first in source_models
+            for second in _measurement_target_geometry_models_for_rules_unit(
+                scenario=scenario, rules_unit=target
+            )
         )
-        <= CONSOLIDATE_ENEMY_DISTANCE_INCHES
     )
     if enemies_within_three:
         if mode is not ConsolidationModeKind.ENGAGING:
@@ -1386,15 +1385,6 @@ def _canonical_rules_unit(
     if rules_unit.unit_instance_id != requested_id:
         raise GameLifecycleError("Fight movement rules-unit identity must be canonical.")
     return rules_unit
-
-
-def _closest_distance(
-    first_models: tuple[GeometryModel, ...],
-    second_models: tuple[GeometryModel, ...],
-) -> float:
-    if not first_models or not second_models:
-        raise GameLifecycleError("Fight rules-unit distance requires present models.")
-    return min(first.range_to(second) for first in first_models for second in second_models)
 
 
 def _objective_markers_from_request(

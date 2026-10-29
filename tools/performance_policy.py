@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import cast
 
 from tools.performance_order103_exception import RECOGNITION, validate_owner_recognition
+from tools.performance_preflight import owner_proof
 from tools.performance_s25_rule_semantics import s25_rule_semantics_smoke_operations
 from tools.performance_tool_inputs import binding_enabled, validate_binding
 
@@ -84,6 +85,7 @@ def _strings(value: object) -> list[str]:
     return result
 
 
+@owner_proof
 def owner_hashes(path: str, content: bytes | None) -> dict[str, str]:
     if content is None:
         return {}
@@ -102,7 +104,8 @@ def owner_hashes(path: str, content: bytes | None) -> dict[str, str]:
             ]
             for method in methods:
                 owners[f"{node.name}.{method.name}"] = digest(ast.dump(method).encode())
-            node.body = [n for n in node.body if n not in methods]
+            method_identities = {id(method) for method in methods}
+            node.body = [n for n in node.body if id(n) not in method_identities]
             owners[node.name] = digest(ast.dump(node).encode())
         else:
             module.append(node)
@@ -176,9 +179,26 @@ def runtime_inputs(root: Path) -> dict[str, str]:
 def _governance(path: str) -> bool:
     return path in {
         "AGENTS.md",
+        "scripts/quality_evidence.py",
+        "scripts/quality_reporter.py",
+        "scripts/quality_runner.py",
+        "tools/quality_runtime_successor.py",
+        "ci/quality_shards/all.txt",
+        "ci/quality_shards/prototype-comparison-deferred.args",
+        "ci/quality_shards/baseline-ci53.txt",
+        "ci/quality_shards/shard-1.txt",
+        "ci/quality_shards/shard-1-modules.txt",
+        "ci/quality_shards/shard-2.txt",
+        "ci/quality_shards/shard-2-modules.txt",
+        "ci/quality_shards/shard-3.txt",
+        "ci/quality_shards/shard-3-modules.txt",
+        "ci/quality_shards/shard-4.txt",
+        "ci/quality_shards/shard-4-modules.txt",
         "README.md",
         ".pre-commit-config.yaml",
         ".gitignore",
+        "tools/thousand_sons_perils_preservation.py",
+        "data/source_audits/order135/current-inventory-category-migration.json",
     } or path.startswith(
         (
             "docs/",
@@ -319,6 +339,80 @@ def d02_rule_semantics_smoke_operations(
     return operations
 
 
+def prototype_comparison_deferral(root: Path, *, base: str) -> dict[str, object] | None:
+    """Explicit finite prototype exception; never measurement certification."""
+    path = root / "data/source_audits/ci64_provenance_v1/test-cutover.json"
+    if not path.is_file():
+        return None
+    record = read_object(path)
+    if "comparison_disposition" not in record:
+        return None
+    _keys(
+        record,
+        {
+            "schema",
+            "source_base",
+            "active_roots",
+            "native_active_files",
+            "active_files",
+            "retained_active_files",
+            "inactive_legacy_files",
+            "inactive_updates",
+            "benchmark_files",
+            "retirements",
+            "coverage",
+            "comparison_disposition",
+            "deferred_quality_cases",
+        },
+    )
+    if (
+        base != "5f509724da25a2f6ded0c2739a8e7c84bdf59c91"
+        or record.get("schema") != "finite-test-cutover-v1"
+        or record["comparison_disposition"] != "deferred"
+    ):
+        raise ValueError("Prototype comparison deferral is outside its exact cutover/base.")
+    baseline = {
+        name: record[name]
+        for name in (
+            "source_base",
+            "active_roots",
+            "native_active_files",
+            "retained_active_files",
+            "inactive_legacy_files",
+            "benchmark_files",
+        )
+    }
+    if (
+        canonical_digest(baseline)
+        != "207e59b1e4f56c209ca35f1839823a3dfa94e0ad71e231334549b3ce74945217"
+    ):
+        raise ValueError("Prototype native selection baseline changed.")
+    cases = _strings(record.get("deferred_quality_cases"))
+    if (
+        cases != sorted(cases)
+        or len(cases) != 260
+        or canonical_digest(cases)
+        != "e419ac241cf7908e138b1bd78289a523416bddd51cb65a5356c60e6763d167c7"
+    ):
+        raise ValueError("Prototype comparison/preservation quality deferrals changed.")
+    coverage = object_value(record["coverage"])
+    restoration = coverage.get("restoration_condition")
+    if (
+        coverage.keys()
+        != {"metric", "source", "current_floor", "restoration_floor", "restoration_condition"}
+        or coverage["metric"] != "coverage.py total with branch=true"
+        or coverage["source"] != ["warhammer40k_core"]
+        or type(coverage["current_floor"]) is not int
+        or coverage["current_floor"] != 50
+        or type(coverage["restoration_floor"]) is not int
+        or coverage["restoration_floor"] != 85
+        or not isinstance(restoration, str)
+        or len(restoration.strip()) < 30
+    ):
+        raise ValueError("Prototype full-package coverage/restoration policy changed.")
+    return record
+
+
 def validate_assessment(
     assessment: dict[str, object],
     *,
@@ -327,6 +421,7 @@ def validate_assessment(
     runtime_id: str,
     operation_map: dict[str, object],
 ) -> set[str]:
+    deferred = assessment.get("comparison_disposition") == "deferred"
     _keys(
         assessment,
         {
@@ -339,8 +434,15 @@ def validate_assessment(
             "milestone",
             "comparisons",
             "full_game",
-        },
+        }
+        | ({"comparison_disposition"} if deferred else set()),
     )
+    if deferred and (
+        base != "5f509724da25a2f6ded0c2739a8e7c84bdf59c91"
+        or assessment["milestone"] != "ordinary"
+        or assessment["full_game"] is not None
+    ):
+        raise ValueError("Prototype deferral requires its exact ordinary PR base.")
     if assessment["policy"] != POLICY or assessment["base"] != base:
         raise ValueError("Missing/stale policy assessment or exact base.")
     if assessment["runtime_build_id"] != runtime_id or assessment["changes"] != changes:
@@ -353,6 +455,12 @@ def validate_assessment(
     if rows.keys() != changes.keys():
         raise ValueError("Every changed input needs exactly one reviewed assessment.")
     selected: set[str] = set()
+    # Prepared only at the first row's original matching boundary. Empty rows
+    # retain the original lazy handling of operation fields.
+    prepared: dict[str, tuple[int, dict[str, object]]] = {}
+    literal_paths: dict[str, list[str]] = {}
+    glob_paths: list[tuple[str, tuple[str, ...]]] = []
+    owner_patterns: dict[str, tuple[str, ...]] = {}
     for path, raw in rows.items():
         row = object_value(raw)
         _keys(
@@ -372,19 +480,49 @@ def validate_assessment(
         if not isinstance(row["rationale"], str) or len(row["rationale"].strip()) < 30:
             raise ValueError(f"Missing bounded assessment rationale: {path}")
         owner_names = object_value(object_value(changes[path])["owners"])
-        matching = {
-            key: object_value(value)
-            for key, value in operations.items()
-            if any(
-                fnmatch.fnmatchcase(path, pattern)
-                for pattern in _strings(object_value(value)["paths"])
+        matching: dict[str, dict[str, object]] = {}
+        if not prepared:
+            # Keep the first complete traversal in original operation order,
+            # including each path/owner validation's conditional boundary.
+            for ordinal, (key, value) in enumerate(operations.items()):
+                operation = object_value(value)
+                paths = _strings(operation["paths"])
+                if any(fnmatch.fnmatchcase(path, pattern) for pattern in paths):
+                    patterns = tuple(_strings(operation["owners"]))
+                    owner_patterns[key] = patterns
+                    if any(
+                        fnmatch.fnmatchcase(owner, pattern)
+                        for owner in owner_names or {"@text": None}
+                        for pattern in patterns
+                    ):
+                        matching[key] = operation
+                prepared[key] = ordinal, operation
+                globs = []
+                for pattern in paths:
+                    if any(character in pattern for character in "*?["):
+                        globs.append(pattern)
+                    else:
+                        literal_paths.setdefault(pattern, []).append(key)
+                if globs:
+                    glob_paths.append((key, tuple(globs)))
+        else:
+            candidates = set(literal_paths.get(path, ()))
+            candidates.update(
+                key
+                for key, patterns in glob_paths
+                if any(fnmatch.fnmatchcase(path, pattern) for pattern in patterns)
             )
-            and any(
-                fnmatch.fnmatchcase(owner, pattern)
-                for owner in owner_names or {"@text": None}
-                for pattern in _strings(object_value(value)["owners"])
-            )
-        }
+            # Distinct keys remain distinct even when their values share a dict.
+            for key in sorted(candidates, key=lambda name: prepared[name][0]):
+                operation = prepared[key][1]
+                if key not in owner_patterns:
+                    owner_patterns[key] = tuple(_strings(operation["owners"]))
+                if any(
+                    fnmatch.fnmatchcase(owner, pattern)
+                    for owner in owner_names or {"@text": None}
+                    for pattern in owner_patterns[key]
+                ):
+                    matching[key] = operation
         chosen_operations = _strings(row["operations"])
         chosen_families = set(_strings(row["selected_families"]))
         if category == "governance":
@@ -469,7 +607,7 @@ def validate_assessment(
             raise ValueError("Rules-complete profiling is missing.")
     elif assessment["full_game"] is not None:
         raise ValueError("Full-game certification must be explicitly assessed as a milestone.")
-    if object_value(assessment["comparisons"]).keys() != selected:
+    if object_value(assessment["comparisons"]).keys() != (set() if deferred else selected):
         raise ValueError("Missing or extraneous current detailed comparison evidence.")
     referenced = set(object_value(assessment["comparisons"]).values())
     if assessment["full_game"] is not None:
@@ -479,7 +617,12 @@ def validate_assessment(
             if object_value(change)["before_sha256"] is not None:
                 raise ValueError("Existing measurement records are immutable; use a new path.")
             if path not in referenced:
-                raise ValueError("New current evidence is not an assessed obligation.")
+                from tools.performance_ci60_qualification import retained_historical_report
+
+                if not retained_historical_report(
+                    base=base, path=path, change=object_value(change)
+                ):
+                    raise ValueError("New current evidence is not an assessed obligation.")
     return selected
 
 
@@ -539,13 +682,21 @@ def _validate_single_comparison(
 ) -> list[dict[str, object]]:
     tool_binding = binding_enabled(family, specification)
     from tools import performance_tool_inputs_v2 as fresh
+    from tools import performance_tool_inputs_v3 as current
 
+    current_binding = (
+        tool_binding and object_value(specification["input_binding"])["schema"] == current.SCHEMA
+    )
     fresh_binding = (
         tool_binding and object_value(specification["input_binding"])["schema"] == fresh.SCHEMA
     )
     if tool_binding:
         validate_binding(observed=report.get("input_binding"), expected=expected_binding)
-        if fresh_binding:
+        if current_binding:
+            current.validate_generated_evidence(
+                report.get("generated_output_binding"), object_value(expected_binding)
+            )
+        elif fresh_binding:
             fresh.validate_generated_evidence(
                 report.get("generated_output_binding"), object_value(expected_binding)
             )
@@ -567,7 +718,7 @@ def _validate_single_comparison(
         }
         | ({"owner_exception"} if "owner_exception" in report else set())
         | ({"input_binding"} if tool_binding else set())
-        | ({"generated_output_binding"} if fresh_binding else set()),
+        | ({"generated_output_binding"} if fresh_binding or current_binding else set()),
     )
     if (
         report["policy"],

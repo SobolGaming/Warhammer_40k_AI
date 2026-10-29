@@ -6,6 +6,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import cast
 
+from tests.measurement_native_api import benchmark_shooting_update
 from tests.order60_emergency_disembark_helpers import emergency_disembark_contact_poses
 from tests.phase13b_shooting_declaration_helpers import (
     _apply_shooting_declaration_without_advancing,
@@ -251,8 +252,11 @@ def emergency_geometry_session(
     phase = state.shooting_phase_state
     assert phase is not None
     state.replace_shooting_phase_state(
-        phase.with_attack_sequence_update(
-            attack_sequence=remaining_sequence, allocated_model_ids_this_phase=allocated
+        benchmark_shooting_update(
+            phase,
+            attack_sequence=remaining_sequence,
+            allocated_model_ids_this_phase=allocated,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
     )
     request = MovementProposalRequest.from_decision_request_payload(

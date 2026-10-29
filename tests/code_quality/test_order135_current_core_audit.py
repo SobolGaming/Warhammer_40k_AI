@@ -1,6 +1,7 @@
 """Current Core bindings must be complete and preserve original source evidence."""
 
 import ast
+import hashlib
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -28,8 +29,21 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 
 
 def test_complete_order135_inventory_matches_current_live_source_owners_and_assertions() -> None:
-    expected = json.dumps(build(), ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+    """The legacy node ID now verifies historical OUTPUT, not current live owners."""
+    from tools import performance_ci69_members as ci69
+
+    raw = (ROOT / OUTPUT).read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == (
+        "8817035cbe6581e8ac2f5a9f8d16afdaa67158bfcda022927737933ab95f3b74"
+    )
+    payload = json.loads(raw)
+    expected = json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
     assert (ROOT / OUTPUT).read_bytes() == expected.encode()
+    record = json.loads((ROOT / ci69.CUTOVER_PATH).read_bytes())
+    retired = ci69.retirement_rows(record)
+    assert len(retired.keys() & payload["current_files_observed"].keys()) == 75
+    assert retired.keys().isdisjoint(record["active_files"])
+    assert payload["runtime_pass_claimed"] is False
 
 
 def test_order135_selected_input_identity_rejects_a_changed_acceptance(tmp_path: Path) -> None:
@@ -175,3 +189,51 @@ def test_every_engine_visibility_context_uses_authoritative_battlefield_factory(
     assert all(
         "scenario" in {keyword.arg for keyword in call.keywords} for _, call in factory_calls
     )
+
+
+@pytest.mark.parametrize(
+    "corruption", ["current_positive", "original_archive", "wrong_requirement"]
+)
+def test_integration_emergency_assertion_exception_rejects_obligation_drift(
+    corruption: str,
+    tmp_path: Path,
+) -> None:
+    """Historical retired-fixture maintenance; isolated files give no ROOT live credit."""
+    from tools.core_rules_order135_audit import integration_emergency_assertion_exception
+
+    filename = "tests/unit/test_order60_emergency_disembark.py"
+    archive = "data/source_audits/integration_2026_10_19/order97/" + filename + ".before.py.txt"
+    for relative in [filename, archive]:
+        target = tmp_path / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        from tools.performance_ci69_members import retired_test_source
+
+        retired = retired_test_source(ROOT, relative)
+        target.write_bytes(retired[1] if retired is not None else (ROOT / relative).read_bytes())
+    changed = [
+        {
+            "requirement_id": "18.05-battle-shock",
+            "original": {
+                "nodeid": filename
+                + "::test_emergency_disembark_places_every_survivor_on_the_closest_ring",
+                "assertion": (
+                    "assert result.disembarked_unit_state.battle_shocked_until == 'end_of_turn'"
+                ),
+            },
+        }
+    ]
+    assert integration_emergency_assertion_exception(tmp_path, changed) == 1
+    if corruption == "current_positive":
+        path = tmp_path / filename
+        raw = path.read_bytes()
+        assert b"assert result.is_valid, result.violations" in raw
+        path.write_bytes(
+            raw.replace(b"assert result.is_valid, result.violations", b"assert False", 1)
+        )
+    elif corruption == "original_archive":
+        path = tmp_path / archive
+        path.write_bytes(path.read_bytes() + b"\n")
+    else:
+        changed[0]["requirement_id"] = "unlisted-requirement"
+    with pytest.raises(CurrentAuditError, match="Emergency"):
+        integration_emergency_assertion_exception(tmp_path, changed)

@@ -27,7 +27,8 @@ def scenario_for_required_restore_coherency(
     survivors to regain coherency through end-turn cleanup, not immediately.
     """
     if state.stage is not GameLifecycleStage.BATTLE or any(
-        cleanup.battle_round == state.battle_round
+        cleanup.completes_boundary
+        and cleanup.battle_round == state.battle_round
         and cleanup.active_player_id == state.active_player_id
         for cleanup in state.end_turn_cleanup_states
     ):
@@ -40,6 +41,14 @@ def scenario_for_required_restore_coherency(
         and departure.active_player_id == state.active_player_id
         for component_id in departure.affected_component_unit_instance_ids
     }
+    from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
+
+    pending_components.update(
+        component_id
+        for view in rules_unit_views_from_armies(armies=scenario.armies)
+        if pending_components.intersection(view.component_unit_instance_ids)
+        for component_id in view.component_unit_instance_ids
+    )
     placed_armies: list[PlacedArmy] = []
     for army in scenario.battlefield_state.placed_armies:
         placements = tuple(

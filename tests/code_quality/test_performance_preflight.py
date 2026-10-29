@@ -1,0 +1,2119 @@
+"""Fresh physical scans, pure proof isolation, and independent smoke revalidation."""
+
+from __future__ import annotations
+
+import ast
+import hashlib
+import json
+import os
+import subprocess
+from collections.abc import Callable, Mapping, MutableMapping
+from contextlib import AbstractContextManager
+from contextvars import ContextVar
+from pathlib import Path
+from types import SimpleNamespace
+from typing import Any, Protocol, cast
+
+import pytest
+from scripts import check_performance_policy as gate
+from tools import performance_preflight as preflight
+from tools.performance_history_snapshot import Domain, Member, Snapshot
+
+
+class _DigestProbe(Protocol):
+    @property
+    def limit(self) -> int: ...
+
+    @property
+    def retained(self) -> int: ...
+
+    @property
+    def entries(self) -> Mapping[tuple[Callable[..., Any], str], tuple[bytes, str]]: ...
+
+    def digest(self, path: str, raw: bytes) -> str: ...
+
+
+class _DigestScope(Protocol):
+    def get(self) -> _DigestProbe | None: ...
+
+
+class _PreflightMechanisms(Protocol):
+    @property
+    def _DIGEST_LIMIT(self) -> int: ...
+
+    @property
+    def _DIGESTS(self) -> _DigestScope: ...
+
+    def _Digests(self, limit: int = ...) -> _DigestProbe: ...
+
+    def _source_digest(self, path: str, raw: bytes) -> str: ...
+
+    def _same_read(
+        self,
+        before: os.stat_result,
+        opened: os.stat_result,
+        closed: os.stat_result,
+        after: os.stat_result,
+        *,
+        windows: bool,
+    ) -> bool: ...
+
+    def digest_limit(self) -> int:
+        return self._DIGEST_LIMIT
+
+    def digest_scope(self) -> _DigestScope:
+        return self._DIGESTS
+
+    def digests(self, limit: int) -> _DigestProbe:
+        return self._Digests(limit)
+
+    def source_digest(self, path: str, raw: bytes) -> str:
+        return self._source_digest(path, raw)
+
+    def same_read(
+        self,
+        before: os.stat_result,
+        opened: os.stat_result,
+        closed: os.stat_result,
+        after: os.stat_result,
+        *,
+        windows: bool,
+    ) -> bool:
+        return self._same_read(before, opened, closed, after, windows=windows)
+
+
+class _GateMechanisms(Protocol):
+    def _check_and_run(
+        self, base_ref: str, pr_head: str | None, output: Path
+    ) -> dict[str, object]: ...
+
+    def check_and_run(self, base_ref: str, pr_head: str | None, output: Path) -> dict[str, object]:
+        return self._check_and_run(base_ref, pr_head, output)
+
+
+class _PolicyMechanisms(Protocol):
+    def _governance(self, path: str) -> bool: ...
+
+    def governance(self, path: str) -> bool:
+        return self._governance(path)
+
+
+class _GitCommand(Protocol):
+    def __call__(self, root: Path, *args: str, payload: bytes | None = None) -> bytes: ...
+
+
+class _SuccessorMechanisms(Protocol):
+    def _git(self, root: Path, *args: str, payload: bytes | None = None) -> bytes: ...
+
+    def _freeze(self, root: Path) -> str: ...
+
+    def _blobs(self, root: Path, revision: str, names: list[str]) -> dict[str, bytes]: ...
+
+    def git(self, root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        return self._git(root, *args, payload=payload)
+
+    def git_function(self) -> _GitCommand:
+        return self._git
+
+    def freeze(self, root: Path) -> str:
+        return self._freeze(root)
+
+    def blobs(self, root: Path, revision: str, names: list[str]) -> dict[str, bytes]:
+        return self._blobs(root, revision, names)
+
+
+# These views keep the real module objects and their monkeypatch targets. They
+# describe only the private mechanisms whose boundaries these tests exercise.
+# Unbound methods keep private access inside its declaring Protocol and forward
+# to the same production functions; function capture returns the original object.
+_preflight = cast(_PreflightMechanisms, preflight)
+_gate = cast(_GateMechanisms, gate)
+
+
+def test_recipe_cache_is_local_exact_and_validator_specific() -> None:
+    calls: list[str] = []
+
+    @preflight.recipe_proof
+    def first(before: bytes, current: bytes, recipe: dict[str, Any]) -> None:
+        calls.append("first")
+        if before != current or recipe != {"edits": []}:
+            raise ValueError("changed proof")
+
+    @preflight.recipe_proof
+    def second(before: bytes, current: bytes, recipe: dict[str, Any]) -> None:
+        calls.append("second")
+        raise ValueError("independent validator")
+
+    @preflight.invocation
+    def validate() -> None:
+        first(b"source", b"source", {"edits": []})
+        first(b"source", b"source", {"edits": []})
+        with pytest.raises(ValueError, match="changed proof"):
+            first(b"source", b"changed", {"edits": []})
+        with pytest.raises(ValueError, match="changed proof"):
+            first(b"source", b"source", {"edits": [1]})
+        with pytest.raises(ValueError, match="independent validator"):
+            second(b"source", b"source", {"edits": []})
+
+    validate()
+    validate()
+    assert calls == ["first", "first", "first", "second"] * 2
+    first(b"source", b"source", {"edits": []})
+    first(b"source", b"source", {"edits": []})
+    assert calls[-2:] == ["first", "first"]
+
+
+@preflight.invocation
+def test_owned_scan_reads_new_bytes_even_with_restored_mtime(tmp_path: Path) -> None:
+    path = tmp_path / "source.py"
+    path.write_bytes(b"before")
+    before = path.stat()
+    assert preflight.source_hashes(tmp_path, {"source.py"}) == {
+        "source.py": hashlib.sha256(b"before").hexdigest()
+    }
+    path.write_bytes(b"edited")
+    os.utime(path, ns=(before.st_atime_ns, before.st_mtime_ns))
+    assert preflight.source_hashes(tmp_path, {"source.py"}) == {
+        "source.py": hashlib.sha256(b"edited").hexdigest()
+    }
+
+
+@pytest.mark.parametrize("kind", ["file_link", "directory_link", "hardlink", "root_link"])
+def test_owned_scan_rejects_aliases(tmp_path: Path, kind: str) -> None:
+    root = tmp_path / "root"
+    root.mkdir()
+    directory = root / "nested"
+    directory.mkdir()
+    path = directory / "source.py"
+    path.write_bytes(b"original")
+    if kind == "file_link":
+        target = tmp_path / "target.py"
+        path.rename(target)
+        path.symlink_to(target)
+    elif kind == "directory_link":
+        target = tmp_path / "target"
+        directory.rename(target)
+        directory.symlink_to(target, target_is_directory=True)
+    elif kind == "hardlink":
+        os.link(path, tmp_path / "alias.py")
+    else:
+        link = tmp_path / "root-alias"
+        link.symlink_to(root, target_is_directory=True)
+        root = link
+    with pytest.raises(ValueError, match=r"Aliased|owned regular"):
+        preflight.source_hashes(root, {"nested/source.py"})
+
+
+@preflight.invocation
+def test_owned_scan_rejects_midread_change(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    path = tmp_path / "source.py"
+    path.write_bytes(b"before")
+    original = os.fstat
+    calls = 0
+
+    def mutate(fd: int) -> os.stat_result:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            path.write_bytes(b"edited")
+        return original(fd)
+
+    assert preflight.source_hashes(tmp_path, {"source.py"}) == {
+        "source.py": hashlib.sha256(b"before").hexdigest()
+    }
+    monkeypatch.setattr(os, "fstat", mutate)
+    with pytest.raises(ValueError, match="changed during owned read"):
+        preflight.source_hashes(tmp_path, {"source.py"})
+
+
+@pytest.mark.parametrize("same_bytes", [False, True])
+def test_owned_windows_scan_rejects_write_at_final_path_query(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, same_bytes: bool
+) -> None:
+    path = tmp_path / "source.py"
+    original = b"before"
+    path.write_bytes(original)
+    metadata = path.stat()
+    observations: list[os.stat_result] = []
+    reader_fd: int | None = None
+    mutated = False
+    final_path_observed = False
+    final_handle_observed = False
+
+    def observe_handle(fd: int) -> os.stat_result:
+        nonlocal reader_fd, final_handle_observed
+        reader_fd = fd
+        result = os.fstat(fd)
+        observations.append(result)
+        if final_path_observed:
+            final_handle_observed = True
+        return result
+
+    def observe_path(name: str) -> os.stat_result:
+        nonlocal mutated, final_path_observed
+        if name == path.as_posix() and len(observations) == 2:
+            assert reader_fd is not None
+            # The reader must remain open across this real final-query write.
+            assert os.fstat(reader_fd) == observations[-1]
+            path.write_bytes(original if same_bytes else b"edited")
+            os.utime(path, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+            assert os.fstat(reader_fd).st_ctime_ns != observations[-1].st_ctime_ns
+            mutated = True
+            final_path_observed = True
+        return os.lstat(name)
+
+    # Select the Windows path without changing os.name used by pathlib/pytest.
+    monkeypatch.setattr(
+        preflight,
+        "os",
+        SimpleNamespace(name="nt", path=os.path, lstat=observe_path, fstat=observe_handle),
+    )
+    with pytest.raises(ValueError, match="changed during owned read"):
+        preflight.source_hashes(tmp_path, {path.name})
+    assert mutated
+    assert final_handle_observed
+    assert len(observations) == 3
+    assert path.stat().st_mtime_ns == metadata.st_mtime_ns
+    assert path.read_bytes() == (original if same_bytes else b"edited")
+
+
+def _read_metadata(*, ctime: int, changed: str = "") -> os.stat_result:
+    fields = {"mode": 0o100644, "ino": 2, "dev": 3, "nlink": 1, "size": 6, "mtime": 5}
+    if changed:
+        fields[changed] += 1
+    return os.stat_result(
+        (
+            fields["mode"],
+            fields["ino"],
+            fields["dev"],
+            fields["nlink"],
+            0,
+            0,
+            fields["size"],
+            0,
+            0,
+            0,
+        ),
+        {"st_mtime_ns": fields["mtime"], "st_ctime_ns": ctime},
+    )
+
+
+def test_owned_read_compares_windows_ctime_within_each_api_channel() -> None:
+    path = _read_metadata(ctime=10)
+    handle = _read_metadata(ctime=20)
+    assert _PreflightMechanisms.same_read(_preflight, path, handle, handle, path, windows=True)
+    assert not _PreflightMechanisms.same_read(_preflight, path, handle, handle, path, windows=False)
+    for windows in (False, True):
+        assert _PreflightMechanisms.same_read(_preflight, path, path, path, path, windows=windows)
+
+
+def test_owned_read_rejects_ctime_drift_in_either_api_channel() -> None:
+    for windows in (False, True):
+        times = [10, 20 if windows else 10, 20 if windows else 10, 10]
+        for index in range(4):
+            observations = [_read_metadata(ctime=value) for value in times]
+            observations[index] = _read_metadata(ctime=times[index] + 1)
+            assert not _PreflightMechanisms.same_read(_preflight, *observations, windows=windows)
+
+
+@pytest.mark.parametrize("field", ["mode", "ino", "dev", "nlink", "size", "mtime"])
+def test_owned_read_rejects_cross_api_metadata_drift(field: str) -> None:
+    path = _read_metadata(ctime=10)
+    for windows in (False, True):
+        handle = _read_metadata(ctime=20 if windows else 10, changed=field)
+        assert not _PreflightMechanisms.same_read(
+            _preflight, path, handle, handle, path, windows=windows
+        )
+
+
+def test_public_smoke_gate_revalidates_and_refuses_midrun_change(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "source.py"
+    source.write_bytes(b"before")
+    calls: list[bytes] = []
+    receipts: list[dict[str, object]] = []
+
+    def validate(root: Path, base_ref: str, *, pr_head: str | None) -> dict[str, object]:
+        current = source.read_bytes()
+        calls.append(current)
+        return {"input_digest": hashlib.sha256(current).hexdigest()}
+
+    def smoke(root: Path, output: Path, *, binding: dict[str, object]) -> dict[str, object]:
+        source.write_bytes(b"edited")
+        return {"status": "passed"}
+
+    def receipt(output: Path, report: dict[str, object]) -> None:
+        receipts.append(dict(report))
+
+    monkeypatch.setattr(gate, "ROOT", tmp_path)
+    monkeypatch.setattr(gate, "validate_current", validate)
+    monkeypatch.setattr(gate, "run_smoke", smoke)
+    monkeypatch.setattr(gate, "_write_receipt", receipt)
+    with pytest.raises(ValueError, match="changed during the required smoke"):
+        _GateMechanisms.check_and_run(_gate, "exact-base", None, tmp_path / "receipt.json")
+    assert calls == [b"before", b"edited"]
+    assert receipts == [{"status": "failed", "inputs_unchanged": False}]
+
+
+def test_perils_admission_has_only_an_exact_governance_exception() -> None:
+    from tools import performance_policy as policy
+
+    policy_probe = cast(_PolicyMechanisms, policy)
+
+    assert _PolicyMechanisms.governance(policy_probe, "tools/thousand_sons_perils_preservation.py")
+    assert not _PolicyMechanisms.governance(
+        policy_probe, "tools/thousand_sons_unreviewed_runtime.py"
+    )
+
+
+def test_owner_cache_uses_exact_inputs_defensive_copies_and_exception_cleanup() -> None:
+    calls: list[tuple[str, bytes | None]] = []
+
+    @preflight.owner_proof
+    def owner(path: str, content: bytes | None) -> dict[str, str]:
+        calls.append((path, content))
+        return {"owner": repr((path, content))}
+
+    @preflight.invocation
+    def validate() -> None:
+        result = owner("a.py", b"one")
+        expected = dict(result)
+        result["owner"] = "caller mutation"
+        assert owner("a.py", b"one") == expected
+        assert owner("b.py", b"one") != expected
+        assert owner("a.py", b"two") != expected
+        assert owner("a.py", None) != expected
+        raise ValueError("scope ended")
+
+    with pytest.raises(ValueError, match="scope ended"):
+        validate()
+    assert len(calls) == 4
+    owner("a.py", b"one")
+    owner("a.py", b"one")
+    assert len(calls) == 6
+
+
+@preflight.invocation
+def test_owned_scan_matches_independent_original_reader(tmp_path: Path) -> None:
+    from tests.d07_geometry_containment import read_owned_geometry_member
+
+    contents = {
+        "source.py": b"# exact source\r\n",
+        "nested/deep/evidence.bin": bytes(range(256)),
+        "nested/a spaced name.txt": b"immutable evidence\n",
+    }
+    for name, raw in contents.items():
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+    expected = {
+        name: hashlib.sha256(read_owned_geometry_member(tmp_path, name)).hexdigest()
+        for name in contents
+    }
+    assert preflight.source_hashes(tmp_path, set(contents)) == expected
+    assert preflight.source_hashes(tmp_path, set(contents)) == expected
+
+
+def test_native_discovery_matches_original_ignored_and_symlink_membership(tmp_path: Path) -> None:
+    root = tmp_path / "repository"
+    files = (
+        "src/deep/.ignored.data",
+        "src/deep/source.py",
+        "tests/.hidden/ignored.py",
+        "tests/nested/UPPER.PY",
+        "tests/nested/not-selected.txt",
+        "tools/.ignored/tool.py",
+        "scripts/nested/script.py",
+        "contracts/.hidden/schema.json",
+        "conformance/typescript/src/.ignored/input.ts",
+        "conformance/typescript/src/UPPER.TS",
+        "conformance/typescript/src/not-selected.py",
+        "outside/not-selected.py",
+    )
+    for name in files:
+        path = root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"source")
+    external = tmp_path / "external"
+    external.mkdir()
+    (external / "must-not-follow.py").write_bytes(b"outside")
+    (root / "tests/nested/linked.py").symlink_to(external, target_is_directory=True)
+    (root / "tests/nested/unselected-link").symlink_to(external, target_is_directory=True)
+    (root / "src/linked-directory").symlink_to(external, target_is_directory=True)
+    (root / "scripts/missing.py").symlink_to(external / "missing.py")
+    (root / "tools/linked.py").symlink_to(external / "must-not-follow.py")
+    (root / "tests/nested/ordinary-directory.py").mkdir()
+    original: set[str] = set()
+    for prefix, pattern in (
+        ("src", "*"),
+        ("tests", "*.py"),
+        ("tools", "*.py"),
+        ("scripts", "*.py"),
+        ("contracts", "*"),
+        ("conformance/typescript/src", "*.ts"),
+    ):
+        original.update(
+            path.relative_to(root).as_posix()
+            for path in (root / prefix).rglob(pattern)
+            if path.is_file() or path.is_symlink()
+        )
+    actual = preflight.discovered_sources(root)
+    assert actual == original
+    assert "tests/nested/linked.py" in actual
+    assert "src/linked-directory" in actual
+    assert "scripts/missing.py" in actual
+    assert not any("must-not-follow" in name for name in actual)
+    assert "tests/nested/ordinary-directory.py" not in actual
+    assert "outside/not-selected.py" not in actual
+    assert preflight.discovered_sources(tmp_path / "absent") == set()
+
+
+def test_generated_inventory_changes_only_reviewed_perils_metadata() -> None:
+    from tools import performance_preflight_successor as successor
+    from tools import thousand_sons_perils_preservation as perils
+    from tools.core_rules_order135_audit import LiveSymbols
+
+    root = Path(__file__).resolve().parents[2]
+    old_raw = subprocess.check_output(
+        ["git", "show", successor.BASE + ":" + successor.INVENTORY], cwd=root
+    )
+    expected = json.loads(old_raw)
+    live = LiveSymbols(root)
+    node = perils.TEST + "::test_twist_of_fate_modifies_ap_and_rejects_drift_or_closed_window"
+    current = live.test(node)
+    original_assertions = expected["tests"][node]["assertions"]
+    assertions = iter(current["assertions"])
+    assert all(
+        any(assertion == candidate for candidate in assertions) for assertion in original_assertions
+    )
+    old_test = perils.preceding_test(root, perils.TEST, (root / perils.TEST).read_bytes())
+    old_tree = ast.parse(old_test)
+    old_function = next(
+        child
+        for child in old_tree.body
+        if isinstance(child, ast.FunctionDef) and child.name == node.split("::")[1]
+    )
+    assert expected["tests"][node]["complete_current_body"] == ast.unparse(old_function)
+    assert expected["current_files_observed"][perils.TEST] == {
+        "bytes": len(old_test),
+        "sha256": hashlib.sha256(old_test).hexdigest(),
+    }
+    expected["current_files_observed"][perils.TEST] = live.files[perils.TEST]
+    for reference, record in expected["tests"].items():
+        if reference.startswith(perils.TEST + "::"):
+            record["file_sha256"] = live.files[perils.TEST]["sha256"]
+    expected["tests"][node] = current
+    from tools import performance_ci60_qualification as ci60
+
+    actual = ci60.preceding_control(
+        root, successor.INVENTORY, (root / successor.INVENTORY).read_bytes()
+    )
+    assert (
+        actual
+        == (json.dumps(expected, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
+    )
+    assert hashlib.sha256(actual).hexdigest() == successor.PINS[successor.INVENTORY]
+
+
+@preflight.invocation
+def test_inventory_history_projection_revalidates_live_bytes_and_rejects_unrelated_input(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tools import performance_preflight_successor as successor
+
+    successor_probe = cast(_SuccessorMechanisms, successor)
+
+    root = Path(__file__).resolve().parents[2]
+    direct_git = _SuccessorMechanisms.git_function(successor_probe)
+    from tools import performance_ci60_qualification as ci60
+
+    current = ci60.preceding_control(
+        root, successor.INVENTORY, (root / successor.INVENTORY).read_bytes()
+    )
+    old = direct_git(root, "show", successor.BASE + ":" + successor.INVENTORY)
+    assert current != old
+    target = tmp_path / successor.INVENTORY
+    target.parent.mkdir(parents=True)
+    target.write_bytes(current)
+
+    def original_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        return direct_git(root, *args, payload=payload)
+
+    monkeypatch.setattr(successor, "_git", original_git)
+    for supplied in (current, old):
+        assert successor.preceding_control(tmp_path, successor.INVENTORY, supplied) == old
+    with pytest.raises(ValueError, match="caller supplied unrelated bytes"):
+        successor.preceding_control(tmp_path, successor.INVENTORY, current + b" ")
+
+    # Neither a warm invocation nor authenticated historical caller bytes may
+    # hide subsequent live drift, even when the file's timestamps are restored.
+    metadata = target.stat()
+    changed = current.replace(b'"runtime_pass_claimed": false', b'"runtime_pass_claimed": true ')
+    assert changed != current
+    assert len(changed) == len(current)
+    target.write_bytes(changed)
+    os.utime(target, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+    for supplied in (current, old):
+        with pytest.raises(ValueError, match="Preflight source"):
+            successor.preceding_control(tmp_path, successor.INVENTORY, supplied)
+
+
+@pytest.mark.parametrize("coordinated_pin", [False, True])
+def test_generated_inventory_freeze_rejects_unlisted_leaf_and_repin(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, coordinated_pin: bool
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+    from tools import performance_preflight_successor as successor
+    from tools import quality_runtime_successor as ci54
+
+    successor_probe = cast(_SuccessorMechanisms, successor)
+
+    root = Path(__file__).resolve().parents[2]
+    direct_git = _SuccessorMechanisms.git_function(successor_probe)
+    historical_members = ci60.control_projection(root)
+    historical_members[successor.INVENTORY] = ci60.preceding_control(
+        root, successor.INVENTORY, (root / successor.INVENTORY).read_bytes()
+    )
+    historical_admit = ci60.historical_ci54_admission(root)
+    historical_previous = ci60.historical_ci54_previous(root)
+    owned = (
+        successor.PINS.keys()
+        | successor.ANCHORS.keys()
+        | {successor.SELF}
+        | ci54.PINS.keys()
+        | {ci54.SELF, ci54.ASSESSMENT}
+    )
+    for name in owned:
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(historical_members.get(name, (root / name).read_bytes()))
+    git_directory = (
+        subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=root)
+        .decode()
+        .strip()
+    )
+    (tmp_path / ".git").write_text("gitdir: " + git_directory + chr(10))
+
+    def original_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        return direct_git(root, *args, payload=payload)
+
+    monkeypatch.setattr(successor, "_git", original_git)
+    monkeypatch.setattr(ci54, "admit", historical_admit)
+    monkeypatch.setattr(ci54, "previous", historical_previous)
+    assert _SuccessorMechanisms.freeze(successor_probe, tmp_path) == successor.FREEZE_COMMIT
+    path = tmp_path / successor.INVENTORY
+    payload = json.loads(path.read_bytes())
+    assert payload["runtime_pass_claimed"] is False
+    payload["runtime_pass_claimed"] = True
+    changed = (json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
+    path.write_bytes(changed)
+    if coordinated_pin:
+        old_pin = successor.PINS[successor.INVENTORY]
+        new_pin = hashlib.sha256(changed).hexdigest()
+        monkeypatch.setattr(successor, "PINS", successor.PINS | {successor.INVENTORY: new_pin})
+        control = tmp_path / successor.SELF
+        raw = control.read_bytes()
+        assert raw.count(old_pin.encode()) == 1
+        control.write_bytes(raw.replace(old_pin.encode(), new_pin.encode(), 1))
+    with pytest.raises(ValueError, match=r"Preflight successor activation|Preflight source"):
+        _SuccessorMechanisms.freeze(successor_probe, tmp_path)
+
+
+def test_pure_source_hash_memo_is_exact_bounded_and_validator_specific(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    assert _PreflightMechanisms.digest_limit(_preflight) == 512 * 1024 * 1024
+    calls: list[str] = []
+    sha = hashlib.sha256
+
+    def first(raw: bytes) -> Any:
+        calls.append("first")
+        return sha(raw)
+
+    def second(raw: bytes) -> Any:
+        calls.append("second")
+        return sha(raw)
+
+    monkeypatch.setattr(preflight, "hashlib", SimpleNamespace(sha256=first))
+    memo = _PreflightMechanisms.digests(_preflight, 8)
+    assert memo.digest("a", b"1234") == sha(b"1234").hexdigest()
+    assert memo.digest("a", b"1234") == sha(b"1234").hexdigest()
+    assert calls == ["first"]
+    assert memo.digest("b", b"1234") == sha(b"1234").hexdigest()
+    assert len(calls) == 2
+    assert memo.retained == 8
+    assert memo.digest("a", b"5678") == sha(b"5678").hexdigest()
+    assert len(calls) == 3
+    assert memo.retained == 8
+    assert memo.digest("overflow", b"more") == sha(b"more").hexdigest()
+    assert len(memo.entries) == 2
+    assert memo.retained == 8
+    assert memo.digest("a", b"larger-than-cap") == sha(b"larger-than-cap").hexdigest()
+    assert memo.retained == 4
+    assert (first, "a") not in memo.entries
+    monkeypatch.setattr(preflight, "hashlib", SimpleNamespace(sha256=second))
+    assert memo.digest("b", b"1234") == sha(b"1234").hexdigest()
+    assert calls[-1] == "second"
+    assert memo.retained == 8
+    assert sum(len(raw) for raw, _ in memo.entries.values()) == memo.retained <= memo.limit
+
+
+def test_pure_source_hash_memo_resets_after_nested_exceptions_and_new_invocations() -> None:
+    assert _PreflightMechanisms.digest_scope(_preflight).get() is None
+    scopes: list[_DigestProbe] = []
+
+    @preflight.invocation
+    def outer() -> None:
+        current = _PreflightMechanisms.digest_scope(_preflight).get()
+        assert current is not None
+        assert current.retained == 0
+        scopes.append(current)
+        _PreflightMechanisms.source_digest(_preflight, "a", b"original")
+        assert current.retained == len(b"original")
+
+        @preflight.invocation
+        def inner() -> None:
+            nested = _PreflightMechanisms.digest_scope(_preflight).get()
+            assert nested is not None
+            assert nested is not current
+            assert nested.retained == 0
+            _PreflightMechanisms.source_digest(_preflight, "a", b"changed")
+            raise ValueError("nested failure")
+
+        with pytest.raises(ValueError, match="nested failure"):
+            inner()
+        assert _PreflightMechanisms.digest_scope(_preflight).get() is current
+        assert current.retained == len(b"original")
+        raise ValueError("outer failure")
+
+    for _ in range(2):
+        with pytest.raises(ValueError, match="outer failure"):
+            outer()
+        assert _PreflightMechanisms.digest_scope(_preflight).get() is None
+    assert scopes[0] is not scopes[1]
+    assert all(scope.retained == 0 and not scope.entries for scope in scopes)
+
+
+def test_frozen_blob_batch_matches_git_show_and_revalidates_each_call(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tools import performance_preflight_successor as successor
+
+    successor_probe = cast(_SuccessorMechanisms, successor)
+
+    contents = {"a.txt": b"exact\n", "nested/a spaced[1].bin": bytes(range(256)), "empty": b""}
+    _SuccessorMechanisms.git(successor_probe, tmp_path, "init", "--quiet")
+    for name, content in contents.items():
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(content)
+    _SuccessorMechanisms.git(successor_probe, tmp_path, "add", "--all")
+    _SuccessorMechanisms.git(successor_probe, tmp_path, "update-index", "--chmod=+x", "a.txt")
+    _SuccessorMechanisms.git(
+        successor_probe,
+        tmp_path,
+        "-c",
+        "user.name=Blob test",
+        "-c",
+        "user.email=blob@example.invalid",
+        "-c",
+        "commit.gpgsign=false",
+        "commit",
+        "--quiet",
+        "-m",
+        "Exact blob fixture",
+    )
+    revision = (
+        _SuccessorMechanisms.git(successor_probe, tmp_path, "rev-parse", "HEAD").decode().strip()
+    )
+    expected = {
+        name: _SuccessorMechanisms.git(successor_probe, tmp_path, "show", revision + ":" + name)
+        for name in contents
+    }
+    assert expected == contents
+    direct_git = _SuccessorMechanisms.git_function(successor_probe)
+    calls: list[tuple[str, ...]] = []
+
+    def tracked(root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        calls.append(args)
+        return direct_git(root, *args, payload=payload)
+
+    monkeypatch.setattr(successor, "_git", tracked)
+    assert (
+        _SuccessorMechanisms.blobs(successor_probe, tmp_path, revision, list(contents)) == expected
+    )
+    (tmp_path / "a.txt").write_bytes(b"uncommitted live drift")
+    assert (
+        _SuccessorMechanisms.blobs(successor_probe, tmp_path, revision, list(contents)) == expected
+    )
+    assert len(calls) == 4
+    assert calls[0] == calls[2]
+    assert calls[1] == calls[3] == ("cat-file", "--batch")
+    with pytest.raises(ValueError, match="Preflight Git tree membership"):
+        _SuccessorMechanisms.blobs(successor_probe, tmp_path, revision, [*contents, "absent.txt"])
+
+
+@pytest.mark.parametrize(
+    "kind",
+    [
+        "missing_member",
+        "extra_member",
+        "duplicate_member",
+        "nonregular",
+        "tree_type",
+        "tree_oid",
+        "tree_framing",
+        "missing_blob",
+        "blob_oid",
+        "blob_type",
+        "negative_size",
+        "noncanonical_size",
+        "truncated",
+        "separator",
+        "trailing",
+        "content",
+    ],
+)
+def test_frozen_blob_batch_rejects_changed_members_and_malformed_payloads(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+) -> None:
+    from tools import performance_preflight_successor as successor
+
+    successor_probe = cast(_SuccessorMechanisms, successor)
+
+    content = b"exact\0payload\n"
+    size = str(len(content)).encode()
+    oid = (
+        hashlib.sha1(b"blob " + size + b"\0" + content, usedforsecurity=False).hexdigest().encode()
+    )
+    row = b"100644 blob " + oid + b"\ta.txt\0"
+    batch = oid + b" blob " + size + b"\n" + content + b"\n"
+    tree_changes = {
+        "missing_member": b"",
+        "extra_member": row + row.replace(b"a.txt", b"extra.txt"),
+        "duplicate_member": row + row,
+        "nonregular": row.replace(b"100644", b"120000"),
+        "tree_type": row.replace(b"blob", b"tree"),
+        "tree_oid": row.replace(oid, b"g" * 40),
+        "tree_framing": row[:-1],
+    }
+    blob_changes = {
+        "missing_blob": oid + b" missing\n",
+        "blob_oid": batch.replace(oid, b"0" * 40, 1),
+        "blob_type": batch.replace(b" blob ", b" tree ", 1),
+        "negative_size": batch.replace(b" blob " + size, b" blob -1", 1),
+        "noncanonical_size": batch.replace(b" blob " + size, b" blob 0" + size, 1),
+        "truncated": batch[:-2],
+        "separator": batch[:-1] + b"x",
+        "trailing": batch + b"unrequested\n",
+        "content": batch.replace(b"exact", b"other", 1),
+    }
+
+    def changed_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        if args == ("cat-file", "--batch"):
+            assert payload == oid + b"\n"
+            return blob_changes.get(kind, batch)
+        assert args == ("--literal-pathspecs", "ls-tree", "-r", "-z", "1" * 40, "--", "a.txt")
+        assert payload is None
+        return tree_changes.get(kind, row)
+
+    monkeypatch.setattr(successor, "_git", changed_git)
+    with pytest.raises(ValueError, match="Preflight Git"):
+        _SuccessorMechanisms.blobs(successor_probe, tmp_path, "1" * 40, ["a.txt"])
+
+
+def test_frozen_blob_batch_rejects_nonliteral_or_ambiguous_selection(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tools import performance_preflight_successor as successor
+
+    successor_probe = cast(_SuccessorMechanisms, successor)
+
+    def unexpected_git(_root: Path, *args: str, payload: bytes | None = None) -> bytes:
+        raise AssertionError("Invalid selectors must fail before Git access.")
+
+    monkeypatch.setattr(successor, "_git", unexpected_git)
+    for revision, names in (
+        ("HEAD", ["a.txt"]),
+        ("1" * 40, []),
+        ("1" * 40, ["a.txt", "a.txt"]),
+        ("1" * 40, ["../a.txt"]),
+        ("1" * 40, ["/a.txt"]),
+        ("1" * 40, ["nested//a.txt"]),
+        ("1" * 40, ["a.txt\nother"]),
+    ):
+        with pytest.raises(ValueError, match="Preflight Git"):
+            _SuccessorMechanisms.blobs(successor_probe, tmp_path, revision, names)
+
+
+def _history_fixture(tmp_path: Path, *, packed: bool) -> tuple[Path, str, dict[str, bytes]]:
+    root = tmp_path / "native"
+    root.mkdir()
+    contents = {"a": b"first\n", "nested/b": b"\0second\n", "empty": b""}
+    subprocess.run(["git", "init", "--quiet", str(root)], check=True)
+    for name, raw in contents.items():
+        target = root / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(raw)
+    subprocess.run(["git", "add", "--all"], cwd=root, check=True)
+    subprocess.run(["git", "update-index", "--chmod=+x", "a"], cwd=root, check=True)
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=History fixture",
+            "-c",
+            "user.email=history@example.invalid",
+            "-c",
+            "commit.gpgsign=false",
+            "commit",
+            "--quiet",
+            "-m",
+            "Native history control",
+        ],
+        cwd=root,
+        check=True,
+    )
+    revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root).decode().strip()
+    if packed:
+        subprocess.run(["git", "repack", "-ad"], cwd=root, check=True)
+    return root, revision, contents
+
+
+@pytest.mark.parametrize("domain", ["plain60", "safe60", "plain30"])
+@pytest.mark.parametrize("packed", [False, True])
+def test_history_native_domains_preserve_complete_commit_tree_blob_bindings(
+    tmp_path: Path, domain: Domain, packed: bool
+) -> None:
+    from tools import performance_history_snapshot
+
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
+    root, revision, contents = _history_fixture(tmp_path, packed=packed)
+    builder = _HistoryMechanisms.builder(history, root)
+    pins = {name: hashlib.sha256(raw).hexdigest() for name, raw in contents.items()}
+    assert builder.add(domain, revision, pins, "native-test-authority") == contents
+    assert builder.all_paths(domain, revision) == set(contents)
+    builder.finish()
+    assert builder.members.keys() == builder.contents.keys()
+    for key, member in builder.members.items():
+        assert key == (domain, revision, member.path)
+        assert member.sha256 == pins[member.path]
+        assert member.size == len(contents[member.path])
+        assert member.mode == ("100755" if member.path == "a" else "100644")
+        expected_oid = (
+            subprocess.check_output(["git", "rev-parse", revision + ":" + member.path], cwd=root)
+            .decode()
+            .strip()
+        )
+        assert member.oid == expected_oid
+    assert len(builder.roots) == 1
+    assert builder.objects[domain, revision][0] == "commit"
+
+
+@pytest.mark.parametrize("bad", ["pin", "missing", "commit", "domain", "nonliteral", "symlink"])
+def test_history_native_acquisition_rejects_wrong_authority_or_member(
+    tmp_path: Path, bad: str
+) -> None:
+    from tools import performance_history_snapshot
+
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
+    root, revision, contents = _history_fixture(tmp_path, packed=False)
+    builder = _HistoryMechanisms.builder(history, root)
+    assert builder.add(
+        "plain60", revision, {"a": hashlib.sha256(contents["a"]).hexdigest()}, "original"
+    ) == {"a": contents["a"]}
+    domain, selected = "plain60", revision
+    pins: dict[str, str | None] = {"a": None}
+    if bad == "pin":
+        pins = {"a": "0" * 64}
+    elif bad == "missing":
+        pins = {"missing": None}
+    elif bad == "commit":
+        selected = "HEAD"
+    elif bad == "domain":
+        domain = "other"
+    elif bad == "nonliteral":
+        pins = {"../a": None}
+    else:
+        subprocess.run(
+            [
+                "git",
+                "update-index",
+                "--add",
+                "--cacheinfo",
+                "120000," + builder.members["plain60", revision, "a"].oid + ",link",
+            ],
+            cwd=root,
+            check=True,
+        )
+        tree = subprocess.check_output(["git", "write-tree"], cwd=root).decode().strip()
+        selected = (
+            subprocess.check_output(
+                [
+                    "git",
+                    "-c",
+                    "user.name=History fixture",
+                    "-c",
+                    "user.email=history@example.invalid",
+                    "commit-tree",
+                    tree,
+                    "-p",
+                    revision,
+                ],
+                cwd=root,
+                input=b"Symlink rejection\n",
+            )
+            .decode()
+            .strip()
+        )
+        pins = {"link": None}
+    with pytest.raises(ValueError, match=r"History|history"):
+        builder.add(cast(Domain, domain), selected, pins, "negative")
+    assert builder.add("plain60", revision, {"a": None}, "restored") == {"a": contents["a"]}
+
+
+@pytest.mark.parametrize("kind", ["nonzero", "surplus", "truncated", "hash", "type", "size"])
+def test_history_closed_protocol_rejects_synthetic_malformed_native_response(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+) -> None:
+    from tools import performance_history_snapshot
+
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
+    root, revision, contents = _history_fixture(tmp_path, packed=False)
+    original = _HistoryMechanisms.closed(history)
+    positive = _HistoryMechanisms.builder(history, root)
+    assert positive.add("plain60", revision, {"a": None}, "positive") == {"a": contents["a"]}
+
+    def corrupt(root: Path, domain: Domain, args: tuple[str, ...], **kwargs: Any) -> bytes:
+        raw = original(root, domain, args, **kwargs)
+        if args != ("cat-file", "--batch"):
+            return raw
+        if kind == "nonzero":
+            raise subprocess.CalledProcessError(3, args, raw)
+        if kind == "surplus":
+            return raw + b"extra"
+        if kind == "truncated":
+            return raw[:-1]
+        if kind == "hash":
+            split = raw.index(b"\n") + 1
+            return raw[:split] + bytes([raw[split] ^ 1]) + raw[split + 1 :]
+        if kind == "type":
+            return raw.replace(b" commit ", b" blob ", 1)
+        return raw.replace(b" commit ", b" commit 0", 1)
+
+    monkeypatch.setattr(history, "_closed", corrupt)
+    with pytest.raises((ValueError, subprocess.CalledProcessError)):
+        _HistoryMechanisms.builder(history, root).add("plain60", revision, {"a": None}, "negative")
+    monkeypatch.setattr(history, "_closed", original)
+    assert _HistoryMechanisms.builder(history, root).add(
+        "plain60", revision, {"a": None}, "restored"
+    ) == {"a": contents["a"]}
+
+
+@pytest.mark.parametrize("mode", ["nonzero", "timeout", "overflow", "cancellation", "blocked_pipe"])
+def test_history_closed_process_requires_eof_zero_exit_and_reaps_child(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mode: str
+) -> None:
+    import sys
+
+    from tools import performance_history_snapshot
+
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
+    children: list[subprocess.Popen[bytes]] = []
+    original_popen = subprocess.Popen
+    original_read = os.read
+
+    def tracked(
+        command: list[str],
+        *,
+        cwd: Path,
+        stdin: int,
+        stdout: int,
+        stderr: int,
+        start_new_session: bool,
+    ) -> subprocess.Popen[bytes]:
+        child = original_popen(
+            command,
+            cwd=cwd,
+            stdin=stdin,
+            stdout=stdout,
+            stderr=stderr,
+            start_new_session=start_new_session,
+        )
+        children.append(child)
+        if mode == "cancellation":
+            monkeypatch.setattr(os, "read", cancelled)
+        return child
+
+    program = {
+        "nonzero": "import sys; print('complete'); sys.exit(7)",
+        "timeout": "import time; print('complete', flush=True); time.sleep(10)",
+        "overflow": "import sys; sys.stdout.write('x'*100000)",
+        "cancellation": "import time; time.sleep(10)",
+        "blocked_pipe": (
+            "import subprocess,sys; "
+            "subprocess.Popen([sys.executable, '-c', 'import time;time.sleep(10)']); "
+            "print('complete',flush=True)"
+        ),
+    }[mode]
+
+    def command(*_: object) -> list[str]:
+        return [sys.executable, "-B", "-c", program]
+
+    monkeypatch.setattr(history, "_argv", command)
+    monkeypatch.setattr(subprocess, "Popen", tracked)
+    monkeypatch.setattr(history, "_LIMITS", {"plain60": 0.2})
+
+    def cancelled(descriptor: int, count: int) -> bytes:
+        raise KeyboardInterrupt("synthetic cancellation")
+
+    error = {
+        "nonzero": subprocess.CalledProcessError,
+        "timeout": subprocess.TimeoutExpired,
+        "overflow": ValueError,
+        "cancellation": KeyboardInterrupt,
+        "blocked_pipe": subprocess.TimeoutExpired,
+    }[mode]
+    with pytest.raises(error):
+        _HistoryMechanisms.closed(history)(tmp_path, "plain60", ("synthetic",), limit=16)
+    monkeypatch.setattr(os, "read", original_read)
+    assert len(children) == 1
+    assert children[0].poll() is not None
+    assert children[0].stdin is not None
+    assert children[0].stdin.closed
+    assert children[0].stdout is not None
+    assert children[0].stdout.closed
+    assert children[0].stderr is not None
+    assert children[0].stderr.closed
+
+
+def test_history_native_completion_detects_missing_object_after_acquisition(
+    tmp_path: Path,
+) -> None:
+    from tools import performance_history_snapshot
+
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
+    root, revision, contents = _history_fixture(tmp_path, packed=False)
+    builder = _HistoryMechanisms.builder(history, root)
+    assert builder.add("plain60", revision, {"a": None}, "positive") == {"a": contents["a"]}
+    oid = builder.members["plain60", revision, "a"].oid
+    path = root / ".git/objects" / oid[:2] / oid[2:]
+    original = path.read_bytes()
+    path.unlink()
+    try:
+        with pytest.raises(ValueError, match="availability"):
+            builder.finish()
+    finally:
+        path.write_bytes(original)
+    builder.finish()
+
+
+@pytest.mark.parametrize("packed", [False, True])
+def test_history_phase_owns_immutable_bytes_revokes_copied_context_and_reacquires(
+    tmp_path: Path, packed: bool
+) -> None:
+    import contextvars
+    from concurrent.futures import ThreadPoolExecutor
+
+    from tools import performance_history_snapshot
+
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
+    root, revision, contents = _history_fixture(tmp_path, packed=packed)
+    builder = _HistoryMechanisms.builder(history, root)
+    assert builder.add("plain60", revision, {"a": None}, "native-authority") == {"a": contents["a"]}
+    builder.finish()
+    first = _HistoryMechanisms.seal(
+        history, builder, {"root": str(root)}, "fixture-runtime", "phase-one"
+    )
+    original_certificate = first.certificate
+    builder.contents.clear()
+    builder.members.clear()
+    with _HistoryMechanisms.activate(history, first):
+        assert first.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
+        copied = contextvars.copy_context()
+        view = first.blobs(root, "plain60", revision, ["a"])
+        view["a"] = b"caller mutation"
+        assert first.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
+        with pytest.raises(TypeError):
+            # Deliberately cross the immutable mapping boundary for this rejection control.
+            cast(MutableMapping[tuple[Domain, str, str], bytes], first.contents)[
+                "plain60", revision, "a"
+            ] = b"mutation"
+        with pytest.raises(TypeError):
+            vars(first)
+        with pytest.raises(TypeError):
+            vars(first.members["plain60", revision, "a"])
+        for domain, commit, names, selected_root in (
+            ("safe60", revision, ["a"], root),
+            ("plain60", "0" * 40, ["a"], root),
+            ("plain60", revision, ["empty"], root),
+            ("plain60", revision, ["a", "a"], root),
+            ("plain60", revision, ["a"], tmp_path),
+        ):
+            with pytest.raises(ValueError, match=r"History|history"):
+                first.blobs(selected_root, cast(Domain, domain), commit, names)
+        with pytest.raises(ValueError, match="Nested"), _HistoryMechanisms.activate(history, first):
+            raise AssertionError("Nested phase must never publish.")
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(first.blobs, root, "plain60", revision, ["a"])
+            with pytest.raises(ValueError, match="owner"):
+                future.result()
+        assert first.certificate == original_certificate
+    assert performance_history_snapshot.eligible_blobs(root, revision, ["a"]) is None
+    with pytest.raises(ValueError, match="inactive"):
+        first.blobs(root, "plain60", revision, ["a"])
+    with pytest.raises(ValueError, match="inactive"):
+        copied.run(first.blobs, root, "plain60", revision, ["a"])
+    second_builder = _HistoryMechanisms.builder(history, root)
+    second_builder.add("plain60", revision, {"a": None}, "native-authority")
+    second_builder.finish()
+    second = _HistoryMechanisms.seal(
+        history, second_builder, {"root": str(root)}, "fixture-runtime", "phase-two"
+    )
+    assert first.semantic_digest == second.semantic_digest
+    assert first.phase_id != second.phase_id
+    with _HistoryMechanisms.activate(history, second):
+        assert second.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
+        with pytest.raises(ValueError, match="inactive"):
+            copied.run(first.blobs, root, "plain60", revision, ["a"])
+    third = _HistoryMechanisms.seal(
+        history, second_builder, {"root": str(root)}, "fixture-runtime", "phase-three"
+    )
+    with (
+        pytest.raises(RuntimeError, match="body failure"),
+        _HistoryMechanisms.activate(history, third),
+    ):
+        raise RuntimeError("body failure")
+    assert performance_history_snapshot.eligible_blobs(root, revision, ["a"]) is None
+    assert _LeasedSnapshot.valid(cast(_LeasedSnapshot, third)) is False
+
+
+@pytest.mark.parametrize("packed", [False, True])
+def test_history_published_operands_remain_stable_but_next_acquisition_is_fresh(
+    tmp_path: Path, packed: bool
+) -> None:
+    from tools import performance_history_snapshot
+
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
+    root, revision, contents = _history_fixture(tmp_path, packed=packed)
+    builder = _HistoryMechanisms.builder(history, root)
+    builder.add("plain60", revision, {"a": None}, "native-authority")
+    builder.finish()
+    snapshot = _HistoryMechanisms.seal(
+        history, builder, {"root": str(root)}, "fixture-runtime", "phase-one"
+    )
+    objects = root / ".git/objects"
+    held = root / ".git/objects-withheld"
+    with _HistoryMechanisms.activate(history, snapshot):
+        objects.rename(held)
+        objects.mkdir()
+        try:
+            assert snapshot.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
+            with pytest.raises((ValueError, subprocess.CalledProcessError)):
+                _HistoryMechanisms.builder(history, root).add(
+                    "plain60", revision, {"a": None}, "fresh-phase"
+                )
+            assert snapshot.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
+        finally:
+            objects.rmdir()
+            held.rename(objects)
+    restored = _HistoryMechanisms.builder(history, root)
+    assert restored.add("plain60", revision, {"a": None}, "restored") == {"a": contents["a"]}
+    restored.finish()
+
+
+@pytest.mark.parametrize("failure", ["timeout", "nonzero", "cancellation"])
+def test_history_postflight_failure_replaces_successful_smoke_receipt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: str
+) -> None:
+    from tools import performance_history_snapshot
+
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
+    calls = 0
+    output = tmp_path / "receipt.json"
+    attempt = tmp_path / "attempt.json"
+    binding: dict[str, object] = {"input_digest": "positive-current-inputs"}
+
+    def validate(root: Path, base_ref: str, *, pr_head: str | None) -> dict[str, object]:
+        nonlocal calls
+        calls += 1
+        records = _HistoryMechanisms.records(history)
+        assert records is not None
+        records.append({"role": "preflight" if calls == 1 else "postflight"})
+        if calls == 2:
+            if failure == "timeout":
+                raise subprocess.TimeoutExpired(["git", "cat-file"], 60)
+            if failure == "cancellation":
+                raise KeyboardInterrupt
+            raise subprocess.CalledProcessError(2, ["git", "cat-file"])
+        return dict(binding)
+
+    def smoke(root: Path, path: Path, *, binding: dict[str, object]) -> dict[str, object]:
+        report = binding | {"status": "passed", "attempt_receipt": str(attempt)}
+        _ReceiptWriter.write(cast(_ReceiptWriter, gate), path, report)
+        assert json.loads(path.read_text())["status"] == "passed"
+        return report
+
+    monkeypatch.setattr(gate, "ROOT", tmp_path)
+    monkeypatch.setattr(gate, "validate_current", validate)
+    monkeypatch.setattr(gate, "run_smoke", smoke)
+    error = {
+        "timeout": subprocess.TimeoutExpired,
+        "nonzero": subprocess.CalledProcessError,
+        "cancellation": KeyboardInterrupt,
+    }[failure]
+    with pytest.raises(error):
+        _GateMechanisms.check_and_run(_gate, "exact-base", None, output)
+    receipt = json.loads(output.read_text())
+    assert receipt == json.loads(attempt.read_text())
+    assert receipt["status"] == "failed"
+    assert receipt["inputs_unchanged"] is False
+    assert receipt["history_phase_witnesses"] == [{"role": "preflight"}, {"role": "postflight"}]
+    assert calls == 2
+    assert _HistoryMechanisms.records(history) is None
+
+
+def test_history_portable_digest_ignores_local_clone_and_pytest_identity(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tools import performance_history_snapshot
+
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
+    root, revision, contents = _history_fixture(tmp_path, packed=False)
+    clone = tmp_path / "clone"
+    subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", str(root), str(clone)], check=True)
+    for checkout in (root, clone):
+        (checkout / "pyproject.toml").write_text("[project]\nname='native-history'\n")
+        (checkout / "uv.lock").write_text("version = 1\n")
+    first_identity = _HistoryMechanisms.identity(history, root, revision, None, domain_state=True)
+    monkeypatch.setenv("PYTEST_CURRENT_TEST", "another-consumer")
+    second_identity = _HistoryMechanisms.identity(history, clone, revision, None, domain_state=True)
+    assert first_identity != second_identity
+    first_builder, second_builder = (
+        _HistoryMechanisms.builder(history, root),
+        _HistoryMechanisms.builder(history, clone),
+    )
+    pins = {"a": hashlib.sha256(contents["a"]).hexdigest()}
+    first_builder.add("plain60", revision, pins, "native-authority")
+    second_builder.add("plain60", revision, pins, "native-authority")
+    first = _HistoryMechanisms.seal(history, first_builder, first_identity, "same-runtime", "one")
+    second = _HistoryMechanisms.seal(
+        history, second_builder, second_identity, "same-runtime", "two"
+    )
+    assert first.semantic_digest == second.semantic_digest
+    assert first.certificate != second.certificate
+    with _HistoryMechanisms.activate(history, first):
+        with pytest.raises(ValueError, match="another repository"):
+            first.blobs(clone, "plain60", revision, ["a"])
+        assert first.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
+
+
+@pytest.mark.parametrize("mutation", ["missing", "extra", "bytes", "mode", "oid", "authority"])
+def test_history_publication_reconciles_native_members_and_original_declarations(
+    tmp_path: Path, mutation: str
+) -> None:
+    from dataclasses import replace
+
+    from tools import performance_history_snapshot
+
+    history = cast(_HistoryMechanisms, performance_history_snapshot)
+    root, revision, contents = _history_fixture(tmp_path, packed=False)
+    builder = _HistoryMechanisms.builder(history, root)
+    builder.add(
+        "plain60", revision, {"a": hashlib.sha256(contents["a"]).hexdigest()}, "native-authority"
+    )
+    builder.finish()
+    positive = _HistoryMechanisms.seal(history, builder, {}, "runtime", "positive")
+    with _HistoryMechanisms.activate(history, positive):
+        assert positive.blobs(root, "plain60", revision, ["a"]) == {"a": contents["a"]}
+    key: tuple[Domain, str, str] = "plain60", revision, "a"
+    if mutation == "missing":
+        del builder.contents[key]
+    elif mutation == "extra":
+        builder.contents["plain60", revision, "extra"] = b"extra"
+    elif mutation == "bytes":
+        builder.contents[key] = b"wrong"
+    elif mutation == "mode":
+        builder.members[key] = replace(builder.members[key], mode="120000")
+    elif mutation == "oid":
+        builder.members[key] = replace(builder.members[key], oid="0" * 40)
+    else:
+        builder.members[key] = replace(builder.members[key], authorities=("self-invented",))
+    with pytest.raises(ValueError, match="History"):
+        _HistoryMechanisms.seal(history, builder, {}, "runtime", "negative")
+
+
+def test_history_cumulative_transport_requires_explicit_opt_in_and_preserves_live_calls(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tools import cumulative_preservation as cumulative
+    from tools import performance_history_snapshot as history
+
+    class CumulativeTransport(Protocol):
+        def _git(
+            self,
+            root: Path,
+            *args: str,
+            payload: bytes | None = None,
+            historical: bool = False,
+        ) -> bytes: ...
+
+        def git(
+            self,
+            root: Path,
+            *args: str,
+            payload: bytes | None = None,
+            historical: bool = False,
+        ) -> bytes:
+            return self._git(root, *args, payload=payload, historical=historical)
+
+    transport = cast(CumulativeTransport, cumulative)
+    commands: list[tuple[list[str], dict[str, Any]]] = []
+    selected: list[tuple[Path, str, tuple[str, ...]]] = []
+
+    def execute(command: list[str], **kwargs: Any) -> bytes:
+        commands.append((command, kwargs))
+        return b"native bytes"
+
+    def historical(
+        root: Path, domain: str, args: tuple[str, ...], fresh: Callable[[], bytes]
+    ) -> bytes:
+        selected.append((root, domain, args))
+        return fresh()
+
+    monkeypatch.setattr(subprocess, "check_output", execute)
+    monkeypatch.setattr(history, "historical", historical)
+    assert (
+        CumulativeTransport.git(transport, tmp_path, "ls-files", payload=b"input")
+        == b"native bytes"
+    )
+    assert commands == [
+        (
+            ["git", "-c", f"safe.directory={tmp_path.as_posix()}", "ls-files"],
+            {"cwd": tmp_path, "input": b"input", "timeout": 60},
+        )
+    ]
+    assert selected == []
+    args = ("show", "a" * 40 + ":control.py")
+    assert CumulativeTransport.git(transport, tmp_path, *args, historical=True) == b"native bytes"
+    assert selected == [(tmp_path, "safe60", args)]
+    assert commands[-1] == (
+        ["git", "-c", f"safe.directory={tmp_path.as_posix()}", *args],
+        {"cwd": tmp_path, "input": None, "timeout": 60},
+    )
+    with pytest.raises(ValueError, match="does not accept a mutable payload"):
+        CumulativeTransport.git(transport, tmp_path, *args, payload=b"input", historical=True)
+    assert len(commands) == 2
+    assert len(selected) == 1
+
+
+class _HistoryBuilder(Protocol):
+    objects: dict[tuple[Domain, str], tuple[str, bytes]]
+    roots: dict[tuple[Domain, str], str]
+    members: dict[tuple[Domain, str, str], Member]
+    contents: dict[tuple[Domain, str, str], bytes]
+
+    def add(
+        self, domain: Domain, revision: str, pins: Mapping[str, str | None], authority: str
+    ) -> dict[str, bytes]: ...
+    def all_paths(self, domain: Domain, revision: str) -> set[str]: ...
+    def finish(self) -> None: ...
+
+
+class _ClosedHistory(Protocol):
+    def __call__(
+        self, root: Path, domain: Domain, args: tuple[str, ...], *, limit: int, payload: bytes = b""
+    ) -> bytes: ...
+
+
+class _HistoryIdentity(Protocol):
+    def __call__(
+        self, root: Path, base_ref: str, pr_head: str | None, *, domain_state: bool
+    ) -> dict[str, object]: ...
+
+
+class _HistoryMechanisms(Protocol):
+    _Builder: Callable[[Path], _HistoryBuilder]
+    _closed: _ClosedHistory
+    _seal: Callable[[_HistoryBuilder, dict[str, object], str, str], Snapshot]
+    _activate: Callable[[Snapshot], AbstractContextManager[Snapshot]]
+    _identity: _HistoryIdentity
+    _WITNESSES: ContextVar[list[dict[str, object]] | None]
+
+    def builder(self, root: Path) -> _HistoryBuilder:
+        return self._Builder(root)
+
+    def closed(self) -> _ClosedHistory:
+        return self._closed
+
+    def seal(
+        self, builder: _HistoryBuilder, identity: dict[str, object], runtime: str, phase_id: str
+    ) -> Snapshot:
+        return self._seal(builder, identity, runtime, phase_id)
+
+    def activate(self, snapshot: Snapshot) -> AbstractContextManager[Snapshot]:
+        return self._activate(snapshot)
+
+    def identity(
+        self, root: Path, base_ref: str, pr_head: str | None, *, domain_state: bool
+    ) -> dict[str, object]:
+        return self._identity(root, base_ref, pr_head, domain_state=domain_state)
+
+    def records(self) -> list[dict[str, object]] | None:
+        return self._WITNESSES.get()
+
+
+class _LeaseState(Protocol):
+    def valid(self) -> bool: ...
+
+
+class _LeasedSnapshot(Protocol):
+    _lease: _LeaseState
+
+    def valid(self) -> bool:
+        return self._lease.valid()
+
+
+class _ReceiptWriter(Protocol):
+    def _write_receipt(self, output: Path, report: dict[str, object]) -> None: ...
+    def write(self, output: Path, report: dict[str, object]) -> None:
+        self._write_receipt(output, report)
+
+
+@pytest.mark.parametrize("root_kind", ["absolute", "double-slash", "relative"])
+def test_ci64_owned_scan_preserves_native_root_flavours(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, root_kind: str
+) -> None:
+    if os.name != "posix":
+        pytest.skip("POSIX root equivalence; Windows tests remain independently required.")
+    raw = subprocess.check_output(
+        ["git", "show", "620cbe91ae3ddd356eaf7effa7455b931882a39e:tools/performance_preflight.py"],
+        cwd=Path(__file__).resolve().parents[2],
+    )
+    nodes = [
+        node
+        for node in ast.parse(raw).body
+        if isinstance(node, ast.FunctionDef) and node.name == "_source_members"
+    ]
+    assert len(nodes) == 1
+    namespace: dict[str, Any] = dict(vars(preflight))
+    body: list[ast.stmt] = list(nodes)
+    exec(compile(ast.Module(body=body, type_ignores=[]), "<native-E61-scan>", "exec"), namespace)
+    original = cast(Callable[..., Any], namespace["_source_members"])
+    root = tmp_path / "root"
+    root.mkdir()
+    (root / "child.py").write_bytes(b"original\n")
+    if root_kind == "double-slash":
+        root = Path("//" + str(root).lstrip("/"))
+    elif root_kind == "relative":
+        monkeypatch.chdir(tmp_path)
+        root = Path("root")
+
+    def observe(function: Callable[..., Any]) -> tuple[object, ...]:
+        try:
+            return (
+                "returned",
+                tuple(function(root, ["child.py", "child.py"], observe_ancestors=True)),
+            )
+        except (ValueError, OSError) as error:
+            return (type(error), str(error))
+
+    current = cast(Callable[..., Any], vars(preflight)["_source_members"])
+    assert observe(current) == observe(original)
+
+
+@pytest.mark.parametrize("candidate", ["/", "//", "/tmp", "/tmp/root", "/tmp/rootish", "/tmp/ü"])
+def test_ci64_posix_containment_parts_equal_path_semantics(candidate: str) -> None:
+    from pathlib import PurePosixPath
+
+    resolved = PurePosixPath(candidate)
+    for root in map(PurePosixPath, ["/", "//", "/tmp", "/tmp/root", "/tmp/ü"]):
+        assert (resolved.parts[: len(root.parts)] == root.parts) == resolved.is_relative_to(root)
+
+
+@pytest.mark.parametrize("outcome", ["complete", "error", "cancel"])
+def test_ci65_handoff_uses_real_native_phase_lease(tmp_path: Path, outcome: str) -> None:
+    """Small native Git fixture; this is a lease control, not current-cohort admission."""
+    import contextvars
+
+    from tools import performance_history_snapshot as history
+    from tools.performance_preflight import AdmissionOperands
+
+    mechanisms = cast(_HistoryMechanisms, history)
+    root, revision, contents = _history_fixture(tmp_path, packed=False)
+    builder = _HistoryMechanisms.builder(mechanisms, root)
+    pins = {name: hashlib.sha256(raw).hexdigest() for name, raw in contents.items()}
+    builder.add("plain60", revision, pins, "ci65-native-lease-control")
+    builder.finish()
+    snapshot = _HistoryMechanisms.seal(mechanisms, builder, {}, "runtime", "ci65-lease")
+    calls: list[str] = []
+    copied: list[contextvars.Context] = []
+    operands: AdmissionOperands = (("source", 0o100644, b"same"),)
+
+    def first(raw: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        assert raw == operands
+        calls.append("first")
+
+    def second(raw: AdmissionOperands, identity: tuple[str, ...]) -> None:
+        assert raw == operands
+        calls.append("second")
+
+    validators = first, second
+
+    def acquire() -> None:
+        for validator in validators:
+            preflight.admission_proof(validator, operands, None, (), repository=root)
+
+    def finish_body() -> None:
+        if outcome == "error":
+            raise RuntimeError("native lease body")
+        if outcome == "cancel":
+            raise KeyboardInterrupt("native lease body")
+
+    @preflight.invocation
+    def run() -> None:
+        handled_errors = (RuntimeError, KeyboardInterrupt)
+        try:
+            with preflight.ci60_bootstrap_admission(root, validators, acquire):
+                with (
+                    pytest.raises(ValueError, match="authenticated history phase"),
+                    preflight.ci60_phase_admission(root, ("forged",)),
+                ):
+                    raise AssertionError("Preactivation promotion must reject.")
+                with _HistoryMechanisms.activate(mechanisms, snapshot):
+                    identity = history.proof_identity(root)
+                    assert identity is not None
+                    with (
+                        pytest.raises(ValueError, match="authenticated history phase"),
+                        preflight.ci60_phase_admission(root, ("forged",)),
+                    ):
+                        raise AssertionError("Wrong phase must reject.")
+                    with preflight.ci60_phase_admission(root, identity):
+                        for validator in validators:
+                            preflight.admission_proof(
+                                validator, operands, identity, (), repository=root
+                            )
+                        assert calls == ["first", "second"]
+                        copied.append(contextvars.copy_context())
+                        finish_body()
+        except handled_errors:
+            if outcome == "complete":
+                raise
+        assert history.proof_identity(root) is None
+        with pytest.raises(ValueError, match="inactive"):
+            copied[0].run(history.proof_identity, root)
+        # An expired copied context cannot promote or reuse the old bootstrap.
+        copied[0].run(preflight.admission_proof, first, operands, None, (), repository=root)
+        assert calls == ["first", "second", "first"]
+
+    run()
+
+
+# CI66 reuses only pure lexical construction; every physical observation stays live.
+class _Ci66Storage(Protocol):
+    limit: int
+    retained: int
+    active: bool
+    owner: tuple[int, int]
+    path_plan_charge: int
+    path_plans: dict[tuple[Any, ...], tuple[tuple[str, ...], str]] | None
+
+
+def _ci66_storage() -> _Ci66Storage:
+    scope = cast(ContextVar[_Ci66Storage | None], vars(preflight)["_DIGESTS"])
+    value = scope.get()
+    assert value is not None
+    return value
+
+
+def _ci66_original_reader() -> Callable[..., Any]:
+    source = subprocess.check_output(
+        ["git", "show", "1ef132beb50518bc727a6bf134eb3ab44f3d94e7:tools/performance_preflight.py"],
+        cwd=Path(__file__).resolve().parents[2],
+        env=os.environ | {"GIT_OPTIONAL_LOCKS": "0"},
+        text=True,
+    )
+    node = next(
+        node
+        for node in ast.parse(source).body
+        if isinstance(node, ast.FunctionDef) and node.name == "_source_members"
+    )
+    namespace = dict(vars(preflight))
+    exec(
+        compile(ast.Module(body=[node], type_ignores=[]), "<ci66-original-reader>", "exec"),
+        namespace,
+    )
+    return cast(Callable[..., Any], namespace["_source_members"])
+
+
+@pytest.mark.parametrize(
+    "names",
+    [
+        ["d/ü.bin", "other", "d/ü.bin"],
+        ["d/ü.bin", "../bad"],
+        ["d/ü.bin", "/absolute"],
+        ["d/ü.bin", "d//bad"],
+        ["d/ü.bin", "d/./bad"],
+        ["d/ü.bin", ""],
+    ],
+)
+def test_ci66_warm_plans_preserve_original_observation_order(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    names: list[str],
+) -> None:
+    (tmp_path / "d").mkdir()
+    (tmp_path / "d/ü.bin").write_bytes(b"first")
+    (tmp_path / "other").write_bytes(b"second")
+    original = _ci66_original_reader()
+    events: list[tuple[str, str]] = []
+    lstat, fstat, junction, resolve, opened = (
+        os.lstat,
+        os.fstat,
+        os.path.isjunction,
+        Path.resolve,
+        Path.open,
+    )
+
+    def observed_lstat(path: Any, *args: Any, **kwargs: Any) -> os.stat_result:
+        events.append(("lstat", cast(str, os.fspath(path))))
+        return lstat(path, *args, **kwargs)
+
+    def observed_fstat(fd: int) -> os.stat_result:
+        events.append(("fstat", ""))
+        return fstat(fd)
+
+    def observed_junction(path: Any) -> bool:
+        events.append(("junction", cast(str, os.fspath(path))))
+        return junction(path)
+
+    def observed_resolve(path: Path, *args: Any, **kwargs: Any) -> Path:
+        events.append(("resolve", str(path)))
+        return resolve(path, *args, **kwargs)
+
+    class Stream:
+        def __init__(self, stream: Any) -> None:
+            self.stream = stream
+
+        def __enter__(self) -> Stream:
+            self.stream.__enter__()
+            return self
+
+        def __exit__(self, *args: Any) -> Any:
+            return self.stream.__exit__(*args)
+
+        def fileno(self) -> int:
+            return cast(int, self.stream.fileno())
+
+        def read(self) -> bytes:
+            events.append(("read", ""))
+            return cast(bytes, self.stream.read())
+
+    def observed_open(path: Path, *args: Any, **kwargs: Any) -> Stream:
+        events.append(("open", str(path)))
+        return Stream(opened(path, *args, **kwargs))
+
+    with monkeypatch.context() as patch:
+        patch.setattr(os, "lstat", observed_lstat)
+        patch.setattr(os, "fstat", observed_fstat)
+        patch.setattr(os.path, "isjunction", observed_junction)
+        patch.setattr(Path, "resolve", observed_resolve)
+        patch.setattr(Path, "open", observed_open)
+
+        def observe(
+            reader: Callable[..., Any],
+        ) -> tuple[list[Any], tuple[str, str] | None, list[Any]]:
+            events.clear()
+            values: list[Any] = []
+            error = None
+            try:
+                values.extend(reader(tmp_path, names, observe_ancestors=True))
+            except ValueError as exc:
+                error = type(exc).__name__, str(exc)
+            return values, error, list(events)
+
+        expected = observe(original)
+
+        @preflight.invocation
+        def run() -> None:
+            current = cast(Callable[..., Any], vars(preflight)["_source_members"])
+            assert observe(current) == expected
+            before = _ci66_storage().path_plan_charge
+            assert before > 0
+            assert observe(current) == expected
+            assert _ci66_storage().path_plan_charge == before
+
+        run()
+
+
+def test_ci66_path_plan_charge_and_full_budget_fallback(tmp_path: Path) -> None:
+    import sys
+
+    for index in range(12):
+        (tmp_path / str(index)).write_bytes(b"owned")
+
+    @preflight.invocation
+    def run() -> None:
+        storage = _ci66_storage()
+        for index in range(11):
+            preflight.source_members(tmp_path, [str(index)])
+        plans = storage.path_plans
+        assert plans is not None
+        assert len(plans) == 11
+        charge = sys.getsizeof(plans)
+        for key, plan in plans.items():
+            assert all(type(value) is str for value in (*plan[0], plan[1]))
+            charge += (
+                sys.getsizeof(key)
+                + sys.getsizeof(key[1])
+                + sys.getsizeof(key[2])
+                + sys.getsizeof(key[3])
+                + sys.getsizeof(plan)
+                + sys.getsizeof(plan[0])
+                + sum(sys.getsizeof(value) for value in plan[0])
+                + sys.getsizeof(plan[1])
+            )
+        assert storage.path_plan_charge == storage.retained == charge
+        storage.limit = charge
+        assert preflight.source_members(tmp_path, ["11"])[0][2] == b"owned"
+        assert storage.path_plans is plans
+        assert storage.retained == storage.path_plan_charge == charge
+        assert len(plans) == 11
+        assert preflight.source_members(tmp_path, ["0"])[0][2] == b"owned"
+        assert storage.retained == charge
+
+    run()
+
+
+@pytest.mark.parametrize("cancel", [False, True])
+def test_ci66_path_plans_revoke_with_invocation_and_copied_context(
+    tmp_path: Path,
+    cancel: bool,
+) -> None:
+    import contextvars
+
+    (tmp_path / "source").write_bytes(b"before")
+    contexts: list[contextvars.Context] = []
+    held: list[_Ci66Storage] = []
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.source_members(tmp_path, ["source"])
+        held.append(_ci66_storage())
+        contexts.append(contextvars.copy_context())
+        assert held[-1].path_plans
+        if cancel:
+            raise KeyboardInterrupt("ci66 cancellation")
+
+    if cancel:
+        with pytest.raises(KeyboardInterrupt, match="ci66 cancellation"):
+            run()
+    else:
+        run()
+    assert not held[0].active
+    assert held[0].path_plans is None
+    assert held[0].retained == held[0].path_plan_charge == 0
+    (tmp_path / "source").write_bytes(b"edited")
+    assert contexts[0].run(preflight.source_members, tmp_path, ["source"])[0][2] == b"edited"
+    assert held[0].path_plans is None
+    assert held[0].retained == 0
+
+
+@pytest.mark.parametrize("wrong", ["pid", "thread"])
+def test_ci66_wrong_owner_bypasses_path_plan_retention(tmp_path: Path, wrong: str) -> None:
+    (tmp_path / "source").write_bytes(b"owned")
+
+    @preflight.invocation
+    def run() -> None:
+        storage = _ci66_storage()
+        owner = storage.owner
+        storage.owner = (owner[0] + 1, owner[1]) if wrong == "pid" else (owner[0], owner[1] + 1)
+        assert preflight.source_members(tmp_path, ["source"])[0][2] == b"owned"
+        assert storage.path_plans is None
+        assert storage.retained == 0
+
+    run()
+
+
+def test_ci66_warm_plan_keeps_same_size_restored_mtime_read_fresh(tmp_path: Path) -> None:
+    path = tmp_path / "source"
+    path.write_bytes(b"before")
+
+    @preflight.invocation
+    def run() -> None:
+        assert preflight.source_members(tmp_path, ["source"])[0][2] == b"before"
+        plans = _ci66_storage().path_plans
+        metadata = path.stat()
+        path.write_bytes(b"edited")
+        os.utime(path, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+        assert preflight.source_members(tmp_path, ["source"])[0][2] == b"edited"
+        assert _ci66_storage().path_plans is plans
+
+    run()
+
+
+def test_ci66_warm_plan_rejects_above_root_alias_between_members(tmp_path: Path) -> None:
+    container, alternate = tmp_path / "container", tmp_path / "alternate"
+    root = container / "repo"
+    root.mkdir(parents=True)
+    (alternate / "repo").mkdir(parents=True)
+    for directory in [root, alternate / "repo"]:
+        for name in ["a", "b"]:
+            (directory / name).write_bytes(b"same")
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.source_members(root, ["a", "b"])
+        reader = cast(Callable[..., Any], vars(preflight)["_source_members"])
+        scan = reader(root, ["a", "b"], observe_ancestors=True)
+        assert next(scan)[2] == b"same"
+        retained = tmp_path / "retained"
+        container.rename(retained)
+        container.symlink_to(alternate, target_is_directory=True)
+        try:
+            with pytest.raises(ValueError, match=r"owned regular file|directory changed"):
+                next(scan)
+        finally:
+            container.unlink()
+            retained.rename(container)
+
+    run()
+
+
+def test_ci66_changed_is_absolute_uses_original_lazy_fallback(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (tmp_path / "source").write_bytes(b"same")
+    original = Path.is_absolute
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.source_members(tmp_path, ["source"])
+        storage = _ci66_storage()
+        plans = storage.path_plans
+        observed: list[str] = []
+
+        def changed(path: Path) -> bool:
+            observed.append(str(path))
+            if path == tmp_path:
+                raise AssertionError("extra eligibility call")
+            return original(path)
+
+        patch.setattr(Path, "is_absolute", changed)
+        # Exercise the pure seam: the physical scanner legitimately uses Path methods too.
+        member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+        assert member(tmp_path, str(tmp_path), "source", owned=True)[1] == str(tmp_path / "source")
+        assert observed == ["source"]
+        assert storage.path_plans is plans
+
+    with monkeypatch.context() as patch:
+        run()
+        member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+        assert member(tmp_path, str(tmp_path), "source", owned=True)[1] == str(tmp_path / "source")
+
+
+@pytest.mark.parametrize("changed", ["constructor", "parts", "splitroot", "fspath"])
+def test_ci66_changed_path_dependencies_rebuild_without_retention(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    changed: str,
+) -> None:
+    from pathlib import PosixPath
+
+    (tmp_path / "source").write_bytes(b"same")
+    member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+    builder = cast(Callable[..., Any], vars(preflight)["_literal_member_plan"])
+    built: list[str] = []
+
+    def observed(root_name: str, name: str) -> Any:
+        built.append(name)
+        return builder(root_name, name)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(preflight, "_literal_member_plan", observed)
+
+        @preflight.invocation
+        def run() -> None:
+            first = member(tmp_path, str(tmp_path), "source", owned=True)
+            assert member(tmp_path, str(tmp_path), "source", owned=True) is first
+            assert built == ["source"]
+            storage = _ci66_storage()
+            plans, charge = storage.path_plans, storage.retained
+            if changed == "constructor":
+
+                def constructor(*args: Any, **kwargs: Any) -> Path:
+                    return Path(*args, **kwargs)
+
+                patch.setattr(preflight, "Path", constructor)
+            elif changed == "parts":
+                descriptor = Path.parts
+
+                def parts(value: Path) -> tuple[str, ...]:
+                    result: tuple[str, ...] = descriptor.__get__(value)
+                    return result
+
+                patch.setattr(PosixPath, "parts", property(parts))
+            elif changed == "splitroot":
+                parser = cast(Any, PosixPath).parser
+                splitroot = parser.splitroot
+
+                def split(path: Any) -> Any:
+                    return splitroot(path)
+
+                patch.setattr(parser, "splitroot", split)
+            else:
+                fspath = os.fspath
+
+                def filesystem_path(path: Any) -> str | bytes:
+                    return cast(str | bytes, fspath(path))
+
+                patch.setattr(os, "fspath", filesystem_path)
+            assert member(tmp_path, str(tmp_path), "source", owned=True) == first
+            assert built == ["source", "source"]
+            assert storage.path_plans is plans
+            assert storage.retained == charge
+
+        run()
+
+
+@pytest.mark.parametrize("root", ["/", "//", "relative"])
+def test_ci66_path_plan_root_spelling_and_relative_fallback(root: str) -> None:
+    member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+
+    @preflight.invocation
+    def run() -> None:
+        path = Path(root)
+        member(path, path.as_posix().rstrip("/") or "/", "source", owned=True)
+        plans = _ci66_storage().path_plans
+        if root == "relative":
+            assert plans is None
+        else:
+            assert plans is not None
+            assert next(iter(plans))[1] == root
+
+    run()
+
+
+@pytest.mark.parametrize("kind", ["windows", "relative", "subclass", "hash-scan"])
+def test_ci66_ineligible_path_plans_keep_original_uncached_semantics(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    kind: str,
+) -> None:
+    from pathlib import PosixPath
+
+    member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+    builder = cast(Callable[..., Any], vars(preflight)["_literal_member_plan"])
+
+    class DerivedPath(PosixPath):
+        pass
+
+    @preflight.invocation
+    def run() -> None:
+        root = Path("relative") if kind == "relative" else tmp_path
+        if kind == "subclass":
+            root = DerivedPath(root)
+        root_name = root.as_posix().rstrip("/") or "/"
+        expected = builder(root_name, "dir/source")
+        with monkeypatch.context() as patch:
+            if kind == "windows":
+                patch.setattr(preflight, "os", SimpleNamespace(name="nt"))
+            assert member(root, root_name, "dir/source", owned=kind != "hash-scan") == expected
+            assert member(root, root_name, "dir/source", owned=kind != "hash-scan") == expected
+        assert _ci66_storage().path_plans is None
+        assert _ci66_storage().retained == 0
+
+    run()
+
+
+def test_ci66_nested_invocations_and_active_other_thread_keep_plans_isolated(
+    tmp_path: Path,
+) -> None:
+    import contextvars
+    from concurrent.futures import ThreadPoolExecutor
+
+    for name in ["outer", "inner", "thread"]:
+        (tmp_path / name).write_bytes(name.encode())
+    held: list[_Ci66Storage] = []
+
+    @preflight.invocation
+    def inner() -> None:
+        storage = _ci66_storage()
+        held.append(storage)
+        assert storage.path_plans is None
+        assert storage.retained == 0
+        preflight.source_members(tmp_path, ["inner"])
+        assert storage.path_plans
+
+    @preflight.invocation
+    def outer() -> None:
+        preflight.source_members(tmp_path, ["outer"])
+        storage = _ci66_storage()
+        plans, charge = storage.path_plans, storage.retained
+        inner()
+        assert held[0] is not storage
+        assert not held[0].active
+        assert held[0].path_plans is None
+        assert held[0].retained == 0
+        assert storage.path_plans is plans
+        assert storage.retained == charge
+        copied = contextvars.copy_context()
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            result = executor.submit(copied.run, preflight.source_members, tmp_path, ["thread"])
+            assert result.result()[0][2] == b"thread"
+        assert storage.path_plans is plans
+        assert storage.retained == charge
+
+    outer()
+
+
+def test_ci66_dependency_change_between_warm_members_keeps_lazy_rejection(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    for name in ["first", "second"]:
+        (tmp_path / name).write_bytes(b"same")
+    reader = cast(Callable[..., Any], vars(preflight)["_source_members"])
+    original = Path.as_posix
+
+    @preflight.invocation
+    def run() -> None:
+        preflight.source_members(tmp_path, ["first", "second"])
+        plans = _ci66_storage().path_plans
+        scan = reader(tmp_path, ["first", "second"], observe_ancestors=True)
+        assert next(scan)[0] == "first"
+
+        def changed(path: Path) -> str:
+            value = original(path)
+            return "altered" if value == "second" else value
+
+        with monkeypatch.context() as patch:
+            patch.setattr(Path, "as_posix", changed)
+            with pytest.raises(ValueError, match="Noncanonical D07 member: second"):
+                next(scan)
+        assert _ci66_storage().path_plans is plans
+
+    run()
+
+
+def test_ci66_invalid_plan_is_not_retained_and_root_spellings_remain_distinct() -> None:
+    member = cast(Callable[..., Any], vars(preflight)["_member_plan"])
+
+    @preflight.invocation
+    def run() -> None:
+        storage = _ci66_storage()
+        with pytest.raises(ValueError, match="Noncanonical D07 member"):
+            member(Path("/"), "/", "../bad", owned=True)
+        assert storage.path_plans is None
+        assert storage.retained == 0
+        first = member(Path("/"), "/", "source", owned=True)
+        second = member(Path("//"), "/", "source", owned=True)
+        assert first == second
+        plans = _ci66_storage().path_plans
+        assert plans is not None
+        assert len(plans) == 2
+        assert {key[1] for key in plans} == {"/", "//"}
+
+    run()

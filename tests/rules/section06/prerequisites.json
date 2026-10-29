@@ -1,0 +1,32 @@
+{
+  "native_definition_ids": [
+    "000004080",
+    "000004078",
+    "000000968",
+    "000000599",
+    "000000613",
+    "000000602"
+  ],
+  "native_names": [
+    "Infractors",
+    "Lord Exultant",
+    "Maulerfiend",
+    "Wave Serpent",
+    "Wraithlord",
+    "Shining Spears"
+  ],
+  "loader": "Integrated selected-army loader; one immutable selected catalog build, final package-digest equality. Shared Section02Definitions deep-copies each newly instantiated native graph.",
+  "source_index": "C:/Users/nostr/Documents/Codex/2026-10-16/task-7/integration-source-index-v2",
+  "mutable_state": "Fresh unit/model/ability graphs, GameState, placements, effects, decisions, event logs, dice managers and attack sequences. Snapshot isolation and illegal-choice/defender atomicity guards pass.",
+  "contracts_and_qualifications": [
+    "Six supported native definitions reused once through integrated selected-army loader: Infractors, Lord Exultant, Maulerfiend, Wave Serpent, Wraithlord, Shining Spears. Native physical models, wounds, keywords, plasma option and weapon identity remain authoritative; no legal-army or official miniature measurement certification.",
+    "Constructed contracts: two-leader and cross-datasheet attached rules units, already-suffered wounds/casualties, pooled attack count, provider-authorized additional-mortal/allocation-prevention descriptors, analytic terrain and rational-prism body overhang. They enter real production owners and do not claim named faction activation or native attachment permissions.",
+    "No mission, full-game creation, mustering, prior phase traversal or replay reconstruction. Visibility context, rule-unit exclusion, source-unit filter, mortal allocator, attack-sequence and Hazardous completion owners are used directly.",
+    "The historical P06D all-model hazard, P06E additional mortals and allocation-trigger qualifications are preserved verbatim in each requirement. Current assertions address bounded native inputs; no wholesale retirement of old facade/replay families is implied.",
+    "FAQ63 is adopted by order135 current_new_faqs category06, although omitted from historical order97 category06. All current visibility-related FAQ rows were scanned; the remaining related FAQs retain their owning-section links.",
+    "No runtime repair, source mutation, skip, xfail or rule-expectation weakening. Corpus completion differs from engine compliance; independent semantic/equivalence review and Linux integration remain gates."
+  ],
+  "costs": "Selected-source compilation and native definition import are required preparation. The all-hidden two-model visibility case takes3.926796s at the real exact geometry owner. Startup/plugin/reporting overhead outside test timers is not separately attributed. No mission/mustering/prior phases/replay. The exploratory compound-body boundary scene was interrupted without a rule outcome; the final equivalent clause boundary uses explicitly analytic rational prisms at the exact production evaluator.",
+  "native_geometry_guard": "An exploratory Avatar of Khaine selection correctly failed required height validation. It was replaced with already-supported Wraithlord; no invented override or production fallback.",
+  "faq63_scope": "Explicit rational-prism contract at resolve_physical_visibility; tests clipping and arbitrary incoming endpoints. Does not certify native overhang setup or the earlier compound-body scene."
+}

@@ -15,7 +15,6 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
-from scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_SECONDS, WORKLOAD
 from tools.performance_category_migration import applies as migration_applies
 from tools.performance_order103_exception import retained_comparison_inputs
 from tools.performance_policy import (
@@ -27,12 +26,14 @@ from tools.performance_policy import (
     digest,
     git,
     object_value,
+    prototype_comparison_deferral,
     read_object,
     runtime_inputs,
     validate_assessment,
     validate_comparison,
     validate_full_game,
 )
+from tools.performance_preflight import ci60_repository_identity, invocation, source_hashes
 from tools.performance_tool_inputs import (
     SCHEMA as HISTORICAL_TOOL_SCHEMA,
 )
@@ -41,6 +42,8 @@ from tools.performance_tool_inputs import (
     comparison_inputs,
     retained_tool_comparison_inputs,
 )
+
+from scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_SECONDS, WORKLOAD
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -173,7 +176,83 @@ def validate_smoke_report(report: dict[str, object], *, binding: dict[str, objec
             raise ValueError("Smoke case limit exceeded.")
 
 
+def _base_manifest(root: Path, base: str) -> bytes:
+    from tools.performance_history_snapshot import historical
+
+    args = ("show", f"{base}:src/warhammer40k_core/_engine_build_manifest.json")
+    return historical(root, "safe60", args, lambda: git(root, *args))
+
+
+@invocation
 def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[str, object]:
+    assessment = read_object(root / ASSESSMENT)
+    if assessment.get("comparison_disposition") == "deferred":
+        from scripts.quality_evidence import dependency_identity, source_identity
+
+        base = git(root, "rev-parse", "--verify", f"{base_ref}^{{commit}}").decode().strip()
+        if prototype_comparison_deferral(root, base=base) is None:
+            raise ValueError("Missing explicit finite prototype disposition.")
+        if any(
+            name in os.environ
+            for name in (
+                "GIT_DIR",
+                "GIT_WORK_TREE",
+                "GIT_COMMON_DIR",
+                "GIT_INDEX_FILE",
+                "GIT_OBJECT_DIRECTORY",
+                "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+                "GIT_NAMESPACE",
+            )
+        ):
+            raise ValueError("Inherited Git repository role override is unsupported.")
+        if (
+            root != root.resolve()
+            or Path(git(root, "rev-parse", "--show-toplevel").decode().strip()).resolve() != root
+        ):
+            raise ValueError("Prototype verification requires its canonical checkout root.")
+        transaction_identity = ci60_repository_identity(root)
+        repository = {
+            key: str((root / git(root, "rev-parse", flag).decode().strip()).resolve(strict=True))
+            for key, flag in (("git_dir", "--git-dir"), ("common_dir", "--git-common-dir"))
+        }
+        names = set(git(root, "ls-files", "-z").decode().split("\0")) - {""}
+        before = source_identity(root)
+        owned = canonical_digest(source_hashes(root, names))
+        dependencies = dependency_identity()
+        binding = _validate_current(root, base_ref, pr_head=pr_head)
+        after_names = set(git(root, "ls-files", "-z").decode().split("\0")) - {""}
+        after_repository = {
+            key: str((root / git(root, "rev-parse", flag).decode().strip()).resolve(strict=True))
+            for key, flag in (("git_dir", "--git-dir"), ("common_dir", "--git-common-dir"))
+        }
+        if (
+            transaction_identity != ci60_repository_identity(root)
+            or before != source_identity(root)
+            or names != after_names
+            or owned != canonical_digest(source_hashes(root, after_names))
+            or repository != after_repository
+            or dependencies != dependency_identity()
+        ):
+            raise ValueError("Current source/repository/dependencies changed during validation.")
+        return binding | {
+            "comparison_disposition": "deferred",
+            "historical_comparison_qualification": "deferred",
+            "repository_identity": repository,
+            "current_source_identity": before,
+            "stable_current_source_digest": owned,
+            "dependency_identity": json.loads(
+                json.dumps(dependencies, sort_keys=True, separators=(",", ":"), allow_nan=False)
+            ),
+        }
+
+    from tools.performance_history_snapshot import phase
+
+    with phase(root, base_ref, pr_head) as snapshot:
+        binding = _validate_current(root, base_ref, pr_head=pr_head)
+        return binding | {"history_snapshot_digest": snapshot.semantic_digest}
+
+
+def _validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[str, object]:
     from warhammer40k_core.build_identity import verified_engine_build_identity
 
     base, changes = changed_inputs(root, base_ref)
@@ -183,6 +262,9 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
     runtime_id = verified_engine_build_identity().build_id
     assessment = read_object(root / ASSESSMENT)
     operation_map = read_object(root / MAP)
+    deferred = assessment.get("comparison_disposition") == "deferred"
+    if deferred and prototype_comparison_deferral(root, base=base) is None:
+        raise ValueError("Missing finite prototype comparison disposition.")
     selected = validate_assessment(
         assessment, base=base, changes=changes, runtime_id=runtime_id, operation_map=operation_map
     )
@@ -190,14 +272,12 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
     input_digest = canonical_digest(inputs)
     comparisons = object_value(assessment["comparisons"])
     families = object_value(operation_map["families"])
-    base_identity = object_value(
-        json.loads(git(root, "show", f"{base}:src/warhammer40k_core/_engine_build_manifest.json"))
-    )["build_id"]
+    base_identity = object_value(json.loads(_base_manifest(root, base)))["build_id"]
     if not isinstance(base_identity, str):
         raise TypeError("Base runtime identity missing.")
     approved_failures: list[dict[str, object]] = []
     retained_applicability: dict[str, str] = {}
-    for family in sorted(selected):
+    for family in sorted(set() if deferred else selected):
         path = comparisons[family]
         if (
             not isinstance(path, str)
@@ -216,7 +296,22 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
             migration_applies(base=base, runtime_id=runtime_id, family=family)
             and (root / "docs/performance/policy-v3/category-migration-20261015").exists()
         )
-        if migration:
+        from tools import performance_ci60_qualification as ci60
+        from tools import performance_qualification_measurements as qualification
+
+        successor_current = ci60.applies(root, base=base, family=family, path=path)
+        qualified_current = successor_current or qualification.applies(base=base, path=path)
+        comparison_runtime = runtime_id
+        current_binding: dict[str, object] | None = None
+        if successor_current:
+            measured_inputs, current_binding, applicability_sha, comparison_runtime = (
+                ci60.measurement(root, current=inputs, report=comparison, family=family)
+            )
+        elif qualified_current:
+            measured_inputs, current_binding, applicability_sha = qualification.retained_inputs(
+                root, current=inputs, report=comparison, family=family
+            )
+        elif migration:
             from tools.performance_category_migration import retained_inputs as migration_inputs
 
             measured_inputs, migration_binding, applicability_sha = migration_inputs(
@@ -247,7 +342,9 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
         if applicability_sha is not None:
             retained_applicability[family] = applicability_sha
         tool_inputs = (
-            migration_binding
+            current_binding
+            if qualified_current
+            else migration_binding
             if migration
             else (
                 comparison_inputs(
@@ -280,7 +377,7 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
             validate_comparison(
                 comparison,
                 base=base,
-                runtime_id=runtime_id,
+                runtime_id=comparison_runtime,
                 input_digest=canonical_digest(measured_inputs),
                 family=family,
                 specification=specification,
@@ -325,10 +422,40 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
 
 
 def _check_and_run(base_ref: str, pr_head: str | None, output: Path) -> dict[str, object]:
-    binding = validate_current(ROOT, base_ref, pr_head=pr_head)
+    from tools.performance_history_snapshot import witnesses
+
+    records: list[dict[str, object]] = []
+    with witnesses(records):
+        binding = validate_current(ROOT, base_ref, pr_head=pr_head)
     report = run_smoke(ROOT, output, binding=binding)
     # An edit during measurements cannot inherit the completed receipt.
-    if binding != validate_current(ROOT, base_ref, pr_head=pr_head):
+    try:
+        with witnesses(records):
+            after = validate_current(ROOT, base_ref, pr_head=pr_head)
+    except (
+        ValueError,
+        TypeError,
+        OSError,
+        subprocess.CalledProcessError,
+        subprocess.TimeoutExpired,
+        KeyboardInterrupt,
+    ):
+        report["status"] = "failed"
+        report["inputs_unchanged"] = False
+        if records:
+            report["history_phase_witnesses"] = records
+        _write_receipt(output, report)
+        raise
+    if records:
+        report["history_phase_witnesses"] = records
+    if binding != after or (
+        records
+        and (
+            len(records) != 2
+            or records[0]["domain_identity"] != records[1]["domain_identity"]
+            or any(record["status"] != "completed" for record in records)
+        )
+    ):
         report["status"] = "failed"
         report["inputs_unchanged"] = False
         _write_receipt(output, report)
@@ -347,7 +474,13 @@ def main() -> None:
     output = args.output.resolve()
     try:
         binding = _check_and_run(args.base_ref, args.pr_head, output)
-    except (ValueError, TypeError, OSError, subprocess.CalledProcessError) as error:
+    except (
+        ValueError,
+        TypeError,
+        OSError,
+        subprocess.CalledProcessError,
+        subprocess.TimeoutExpired,
+    ) as error:
         stamp = dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%S%fZ")
         failure_path = output.parent / "performance-attempts" / f"{stamp}-gate-failure.json"
         failure_path.parent.mkdir(parents=True, exist_ok=True)

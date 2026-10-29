@@ -42,8 +42,10 @@ cannot be completed locally before asking for expansion.
 
 Preserve required regression tests, positive legal-path controls, truthful source
 evidence, shared engine authority and exact-head validation. This approval removes
-neither the complete local covered behavioral gate nor complete remote CI. Both
-type checkers, all other applicable quality/generated/contract/package gates,
+neither complete covered behavioral validation nor complete remote CI. For PR591,
+the owner-approved exception below uses required hosted covered shards as the
+final complete run, without a duplicate local full run. Both type checkers and
+all other applicable quality/generated/contract/package gates,
 required behavior shards and coverage thresholds remain mandatory.
 
 Independent coding and fresh parent Astra reviews must be clean under this scoped
@@ -99,8 +101,21 @@ review alongside validation and the fresh parent audit alongside hosted CI.
 Keep automatic evidence capture off the critical path; archive transfers are not
 publication prerequisites. Do not add repeated intermediate planning, benchmark,
 or evidence reviews. Preserve both clean exact-head reviews, complete correctness
-inventories, local covered behavior at 85%, quality/type/lint/contracts, required
-hosted CI and branch protections.
+inventories, covered behavior at the active threshold below, quality/type/lint/contracts,
+required hosted CI and branch protections.
+
+On 28 October 2026, the owner authorized a temporary coverage floor of 50%,
+superseding the active 85% requirement. Coverage still measures the complete
+warhammer40k_core package with branches; the denominator and default omissions
+and exclusions are unchanged. CI must combine all required successful behavioral
+shards before enforcing the threshold. Retained test failures and every other
+required gate continue to block merge. This authorization is not a coverage,
+CI, publication or merge success claim.
+
+Post-merge coverage work must rebuild coverage and restore the 85% requirement
+in configuration, CI and active documented commands. Historical 85% receipts,
+source pins and prior qualification records retain their original meaning and
+bytes; the temporary floor does not reclassify a historical failure as a pass.
 
 For these bounded repairs, the default performance evidence is the existing
 serial current-runtime smoke and exact-base assessment. Detailed benchmarks are
@@ -115,3 +130,26 @@ cycles, invalidated evidence, interruptions and first/final head identities. Tra
 elapsed time and rework separately. Concurrent command sums are not wall time;
 unknown active time remains unknown. Evaluate measured results before claiming a
 throughput or quality improvement from this model plan.
+
+## PR591 prototype cutover exception — 28 October 2026
+
+The owner explicitly approved removing fresh comparative benchmark evidence as
+a prerequisite for this cutover and deferring the exact 260 comparison/preservation
+quality cases recorded in the cutover ledger. Preserve historical reports with
+their original outcomes; deferred comparisons and checks are not passing results.
+All 4,886 selected gameplay cases remain required. Keep active quality, both type
+checkers, lint, source/dependency integrity and the serial absolute performance
+smoke with its unchanged 180-second complete-command allowance.
+
+For this PR only, focused local checks plus the required hosted twelve covered
+shards replace the duplicate complete local covered run. The hosted shards must
+all succeed and their combined full-package branch coverage must meet 50%. No
+local partial result substitutes for that gate. Preserve all other required CI
+checks and branch protections. Restore 85% through the documented post-merge work.
+
+On 29 October 2026, the owner separately approved deferring the exact 103
+historical-preservation controls in addition to the prior 157 comparison controls.
+The 260-case list remains finite and code-pinned. These include adversarial checks
+of retained historical helpers; they are not passing results. Keep helper code,
+active production and preflight/postflight validators, 1,848 active quality checks
+and all 4,886 selected gameplay cases. No additional omission is authorized.

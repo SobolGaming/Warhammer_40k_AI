@@ -1,9 +1,34 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from warhammer40k_core.rules.source_overlay import OverlaySourceArtifact
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow, WahapediaJsonArtifact
 
 BridgeSourceArtifact = WahapediaJsonArtifact | OverlaySourceArtifact
+
+
+@dataclass(frozen=True, slots=True)
+class SelectedSourceRows:
+    """Validated index projection; deliberately not a complete source artifact."""
+
+    tables: tuple[tuple[str, tuple[NormalizedSourceRow, ...]], ...]
+    datasheet_ids: tuple[str, ...]
+
+
+def selected_or_full_bridge_rows(
+    source_artifacts: tuple[BridgeSourceArtifact, ...] | SelectedSourceRows,
+    *,
+    datasheet_ids: tuple[str, ...],
+    error_type: type[ValueError],
+) -> dict[str, tuple[NormalizedSourceRow, ...]]:
+    if type(source_artifacts) is SelectedSourceRows:
+        if set(datasheet_ids) != set(source_artifacts.datasheet_ids):
+            raise error_type("Source projection does not match selected datasheets.")
+        return dict(source_artifacts.tables)
+    if type(source_artifacts) is not tuple or not source_artifacts:
+        raise error_type("source_artifacts must be a non-empty tuple or selected source rows.")
+    return bridge_rows_by_table(source_artifacts, error_type=error_type)
 
 
 def bridge_rows_by_table(

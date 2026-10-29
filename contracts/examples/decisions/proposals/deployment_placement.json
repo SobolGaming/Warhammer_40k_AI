@@ -90,7 +90,7 @@
   "player_id": "player-b",
   "proposal_kind": "deployment_placement",
   "proposal_request_id": "decision-request-000004",
-  "ruleset_descriptor_hash": "12c5157254f383c0f583d9cad0f4d00ecca27af10aad4df73e430f742b080e76",
+  "ruleset_descriptor_hash": "df0373e1f00f2ac50e5dd785a146fa29dc6cf173275d942ac497b4fb60dfbb68",
   "setup_step": "deploy_armies",
   "unit_instance_id": "army-beta:intercessor-unit-2"
 }

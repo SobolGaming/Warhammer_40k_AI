@@ -114,7 +114,7 @@ generic lifecycle orchestration does not branch on rule names or factions.
   state and facade submissions; scoring event order and frozen evidence are checked.
 - `test_phase10s_triggered_movement.py` covers temporary movement authority,
   nested out-of-phase shooting, invalid paths and restoration. The source-loaded
-  Spirit Mark regression in `test_phase17g_aeldari_army_rule.py` exercises three
+  Spirit Mark regression in `tests/factions/aeldari/unit/test_aeldari_army_rule.py` exercises three
   real facade moves, use/decline, fork and replay.
 - Existing Emperor's Children post-shoot tests exercise source-loaded mixed
   Battle-shock/mortal-wound completion and changed target populations. Phase 14B

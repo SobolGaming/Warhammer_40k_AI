@@ -1,5 +1,70 @@
 # Adapter Decision Contract
 
+## Section 25 public roster disclosure (44.5)
+
+The existing viewer-scoped GameView adds optional `public_army_rosters`. It is
+emitted after native mustering admits each army, from its recorded config roster.
+It carries faction/detachment selections, dispositions, unit composition and
+options, point ledgers, Warlord and Enhancement assignments. Physical bearers use
+the original unit-selection ID, model-profile ID and one-based model index;
+public unit/model displays provide the physical-instance join. Selected roster
+data remains stable across later casualties, formations and splits.
+
+Attachment declarations and starting cargo manifests follow the shared formation
+privacy predicate: null for non-owning non-omniscient viewers until reveal. No
+reserve/split declaration, hidden request or pending choice is copied into this
+roster surface. Hashing, local/network projections and persistence/replay use the
+same existing projection. No decision or mutation path is added.
+
+This optional additive property is Contract 44.5, retaining the v13 projection
+family and all its required fields. Clients may ignore the new property; no
+existing identifier, accepted input, required property or released baseline is
+changed. Old persistence/replay artifacts still require their producing runtime.
+
+## Section 16 delayed secondary Action completion
+
+Pending source-backed delayed secondary Actions join the existing finite
+`resolve_sequencing_order` mission-boundary family. Their participant identity is
+`secondary-action:<action_id>`; clients choose the engine-enumerated option and
+continue through the existing lifecycle dispatch. Completion adds no player choice.
+The existing `score_tactical_secondary_mission` family subsequently offers the
+normal score/retain options for a held achieved card. Existing JSON payload,
+visibility, submission and replay contracts apply without a new decision type or
+proposal schema. Section 16 native regressions submit all these choices through
+LocalGameSession and retain exact public Action/effect/event identities.
+
+## SF03-001 / D13: coherency casualty choice
+
+`select_coherency_casualty` is a finite model entity selection. The controlling
+player chooses one engine-enumerated physical model ID in a broken rules unit.
+The request context binds the cleanup/phase, descriptor, coherency result,
+component IDs, physical model payloads and placements. Its deterministic request
+ID contains the context digest. Existing `FiniteOptionSubmission` routing and
+viewer policies apply; the shared lifecycle validator rejects actor, request,
+option, payload and current-state drift before recording or mutation.
+
+After accepted no-reaction destruction, the engine records one typed casualty
+cleanup plus `coherency_cleanup_model_removed`, then requests another casualty
+only if a group remains broken. The final ordinary cleanup record completes the
+turn boundary without repeating casualties. A `coherency_casualty_required`
+Primary scoring wait retains the existing frozen control authority while the
+choice is pending. Existing persistence containers remain strict-runtime bound;
+there is no compatibility migration. See [source/scope](SF03_001_COHERENCY_CHOICE_SCOPE.md).
+
+
+## SF04: model and unit attack completion
+
+The existing decision families, viewer scopes and persistence envelopes cover
+this repair. `attack_sequence_models_attacked` keeps its payload shape but can
+occur once per newly completed model subset, with an immediately preceding
+`attack_sequence_model_completion_state_recorded` carrying the existing
+AttackSequence payload, kept internal by the shared event redactor. Whole-unit
+consumers use the complete authenticated
+union. `shot_unit_ids` represents completed ordinary ranged attacks rather than
+accepted declarations. Empty selections retain their separate restriction
+authority. Exact runtime identity is required; old artifacts are neither
+relabelled nor migrated. See [source and scope](SF04_COMPLETION_REPAIR.md).
+
 ## Order135: physical visibility and battlefield-edge origins
 
 Contract44.3.22 retains existing decision and persistence envelopes for full3D
@@ -1231,6 +1296,19 @@ distance locally, invent candidate units, move models from the finite option
 payload, spend source resources locally, or continue the Movement phase while
 either request is pending.
 
+Aeldari Opportunity Seized and Fade Back use `movement_kind: "triggered"`
+and `movement_mode: "normal"`, with `triggered:<unit_instance_id>` choices.
+Their D6+1 allowance permits a shorter legal path in any direction; it does
+not impose Surge's closest-target or maximum-approach requirements. The
+shooting-end grant carries its typed `movement_kind` through the existing
+JSON-safe grant/event envelopes. Battle Focus spend payloads carry
+`turn_player_id` so per-unit and per-manoeuvre restrictions distinguish each
+player's actual phase occurrence, while expenditure still lasts through the
+battle round. Selection spends one token; an invalid path preserves that
+single spend and offers legal retry. Declining selection spends none.
+Existing finite/proposal, event, persistence and replay envelopes apply;
+artifacts remain tied to the exact producing runtime identity.
+
 When a selected triggered movement carries a source-backed whole-roll reroll,
 the finite selection does not proceed directly to the movement proposal. The
 engine first emits the existing `select_dice_reroll` request with
@@ -1664,9 +1742,11 @@ Participant records bind stable participant/source/owner IDs and an explicit
 Unowned automatic mission participants use `player_id: null`, `origin: "mission"`
 and `requirement: "mandatory"`; the active player orders them before player rules.
 The pinned 07.02/07.03 exceptions put non-mission rules before mission rules at
-end of turn and end of battle round. The conflict payload's required
-`sequence_exception_source_id` is null for ordinary timing and the exact pinned
-exception ID at either exceptional boundary. `label` is presentation only; `secret`
+end of turn and end of battle round. Retained 08.05 applies the same priority at
+the end of the Command phase, with `sequence_exception_source_id: "rule:08:08.05:1"`.
+The conflict payload's required `sequence_exception_source_id` is null for
+ordinary timing and the exact source ID at each exceptional boundary. Other
+phase ends and Command phase start/body retain their ordinary priorities. `label` is presentation only; `secret`
 is an explicit visibility flag. Optional use/decline remains the selected rule's
 own finite choice and follows the same lifecycle submission path.
 
@@ -1679,6 +1759,15 @@ only after the original batch completes. Automatic single-candidate progress
 and rules made ineligible by earlier resolution retain internal transition
 records. A batch's selected rule must finish its nested resolution decisions
 before the next rule can be chosen.
+
+The existing private Primary pending window `turn_end_faction_rule_required`
+also admits a native `resolve_sequencing_order` request while non-mission
+phase-end or turn-end rules await ordering. It retains the exact
+`turn_end_faction_rule_requested` event, queue identity and reconstructed loaded
+batch/source authority. At Command end, source mission scoring follows the
+completed non-mission boundary during phase advancement; it is not injected as
+a mission participant into that native batch. No new decision family or payload
+shape is introduced.
 
 Cross-window trigger records retain typed source context and the exact parent
 batch and selected participant identities. Battle-shock outcomes, move completion
@@ -7870,3 +7959,62 @@ viewer redaction, persistence and replay schemas cover this timing correction.
 No decision family, field or option shape is added. Runtime identity and generated
 examples are refreshed; old-runtime artifacts still require their producing
 runtime. See [source and scope](D02_SAVE_STEP_SCOPE.md).
+
+## Focused hazard and Fight continuation corrections
+
+Desperate Escape failures use the existing shared mortal-wound model allocation and Feel No Pain decision families. Hazard failures inflict the model-aware shared mortal-wound count before movement; the engine no longer emits a whole-model casualty-selection request for them. A completed packet retains the original proposal/action identity, rolls and destruction authority. If damage makes a proposed survivor endpoint incoherent, the engine requests a fresh survivor witness using that packet; invalid and legal retries do not reroll hazards or repeat wounds. Current physical witness inventory and ordinary path validation remain mandatory. The existing free-form proposal context carries the completed packet identity; no new public decision type or schema is introduced.
+
+Ordered Retreat has no implicit enemy-model transit permission. Selected Desperate Escape and independently source-authorized native permissions retain their own transit rules. Auto-pass inventory is explicit and disjoint from rolled model inventory. Optional out-of-phase no-move charge responses remain distinct from a move requiring its prescribed target. Fight activations clear consecutive-pass state while retaining historical pass receipts.
+
+For the specifically adopted FAQ20 interaction, completed retained Fight-on-Death casualties are removed by their original authenticated destruction owner before Deadly Demise. Interruption reuses that exact removal cause, and the shared former-footprint query preserves measurement from before destruction. Independent enemy retention and ordinary destruction timing keep their own owners.
+
+### Section14 terrain objective feasibility evidence
+
+The existing Movement and Fight proposal families keep the same submission and mutation authority. Internal MovementGoalPayload evidence now requires the strictly boolean ignore_polygon_height field. It can be true only for polygon membership goals; model/disk and spatial-distance goals reject it. Serialization and restore use the same strict typed loader, with no missing-field fallback. No new player choice, proposal kind, option family or viewer visibility behavior is introduced.
+
+### Section17 Core movement capability repair
+
+The normal runtime content builder includes the existing source-backed Core ability
+records alongside catalog and contribution records. Physical MONSTER/VEHICLE models
+retain the Core Normal/Advance transit permission and its model exclusions; siblings
+do not inherit that permission from a unit keyword union. Existing witnessed
+Movement proposals, validation, retry, event and viewer contracts apply. The repair
+adds no decision type, proposal field, option family or compatibility translation.
+
+# Section18 Emergency status correction
+
+An accepted existing Emergency `unit_disembarked` occurrence now applies the shared
+direct Battle-shock state before completion rules and objective preparation. Its
+existing `disembarked_unit_state.battle_shocked_until` value is `until_cleared`;
+the existing charge prohibition still ends with the actual turn. The event also
+supplies exact decision-bound historical reconstruction. No new decision, option,
+proposal envelope, viewer policy or serialized field is introduced. Existing
+parameterized placement validation, rejected-attempt and retry contracts apply.
+
+### Source-backed horizontal terrain transit
+
+Existing witnessed Movement proposals keep their decision, witness, retry and
+viewer contracts. Internal MovementCapabilitySet and TerrainPathLegalityContext
+payloads now require a strictly boolean horizontal_terrain_feature_transit field.
+Only admitted catalog terrain-transit permissions or active unit effects derive
+it; intrinsic ruins-wall and flight flags retain their own policies. It permits
+horizontal transit through typed terrain features, while endpoint placement,
+support, vertical-floor and movement-distance validation remain authoritative.
+The typed loader requires the field; no historical-payload translation is added.
+No player choice, proposal envelope, option family or visibility policy changes.
+
+
+
+## Explicit retained-checkpoint reconstruction
+
+The separately authorized offline profile documented in
+[A32 historical checkpoint reconstruction](A32_HISTORICAL_CHECKPOINT_RECONSTRUCTION.md)
+admits exactly one retained source digest. Its new
+`local-checkpoint-reconstruction-v1` package is tooling provenance plus an ordinary
+strict local checkpoint, not a replacement server/session persistence envelope.
+The operator explicitly selects the recipe and preserves the original. Regenerated
+completion evidence is identified as new; every original event, choice, RNG state
+and gameplay field is matched under the declared event-ID mapping. Verification
+uses ordinary strict restore and exact replay of the reconstructed representation.
+No automatic fallback, original-byte cross-version replay claim, player-visible
+payload, public operation or released contract family change is introduced.

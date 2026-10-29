@@ -1,0 +1,20 @@
+{
+  "base": "599161cc0f76010c5ade3e257d6f700d72fc5c0b",
+  "changes": {
+    "tools/cumulative_preservation.py": {
+      "after_sha256": "0aed6e5a524e891710bc85c2eda40565ca1f5cfc5c07f268acdb6ec727c060f3",
+      "before_sha256": "fd56f9037e9b5c1ae1466eed49195ee40be44ba32772a729c9ff724bc0c734e0",
+      "edits": [
+        {
+          "after": "        raw = frozen_members[name]\n",
+          "before": "        raw = _git(root, \"show\", str(SOURCE_COMMIT) + \":\" + name)\n"
+        },
+        {
+          "after": "    # is frozen as an exact Git blob in the genuine local implementation commit.\n    from tools.performance_preflight_successor import read_frozen_blobs\n\n    frozen_members = read_frozen_blobs(root, str(SOURCE_COMMIT), record[\"integration_members\"])\n",
+          "before": "    # is frozen as an exact Git blob in the genuine local implementation commit.\n"
+        }
+      ]
+    }
+  },
+  "schema": "exact-ci-successor-v1"
+}

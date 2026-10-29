@@ -369,26 +369,13 @@ class ChargeMoveProposal:
                 message="Charge Move selected a target that is not currently reachable.",
                 field="charge_target_unit_instance_ids",
             )
-        if self.is_no_move_choice:
-            if required_target_ids:
-                return ProposalValidationResult.invalid(
-                    proposal_request_id=request.request_id,
-                    proposal_kind=request.proposal_kind,
-                    violation_code="charge_required_target_not_selected",
-                    message="Charge Move must select a required reachable target.",
-                    field="charge_target_unit_instance_ids",
-                )
-            if self.witness is not None:
-                return ProposalValidationResult.invalid(
-                    proposal_request_id=request.request_id,
-                    proposal_kind=request.proposal_kind,
-                    violation_code="no_move_witness_forbidden",
-                    message="Charge no-move submissions must not include a witness.",
-                    field="witness",
-                )
-            return ProposalValidationResult.valid(
+        if self.is_no_move_choice and self.witness is not None:
+            return ProposalValidationResult.invalid(
                 proposal_request_id=request.request_id,
                 proposal_kind=request.proposal_kind,
+                violation_code="no_move_witness_forbidden",
+                message="Charge no-move submissions must not include a witness.",
+                field="witness",
             )
         if not required_target_ids.issubset(selected_target_ids):
             return ProposalValidationResult.invalid(
@@ -397,6 +384,11 @@ class ChargeMoveProposal:
                 violation_code="charge_required_target_not_selected",
                 message="Charge Move selected targets did not include every required target.",
                 field="charge_target_unit_instance_ids",
+            )
+        if self.is_no_move_choice:
+            return ProposalValidationResult.valid(
+                proposal_request_id=request.request_id,
+                proposal_kind=request.proposal_kind,
             )
         if self.witness is None:
             return ProposalValidationResult.invalid(

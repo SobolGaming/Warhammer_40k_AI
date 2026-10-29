@@ -1,0 +1,353 @@
+{
+  "scope": "Section07 only",
+  "outcomes": {
+    "cases": 44,
+    "passed": 44,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "xfails": 0,
+    "nodeids_and_order_equal": true,
+    "all_setup_call_teardown_outcomes_equal": true,
+    "differences": [],
+    "file_case_counts": {
+      "tests/rules/section07/test_coverage_map.py": 2,
+      "tests/rules/section07/test_facade.py": 2,
+      "tests/rules/section07/test_isolation.py": 1,
+      "tests/rules/section07/test_mission_boundary.py": 2,
+      "tests/rules/section07/test_mission_order.py": 8,
+      "tests/rules/section07/test_out_of_phase.py": 6,
+      "tests/rules/section07/test_progression.py": 18,
+      "tests/rules/section07/test_round_effect.py": 4,
+      "tests/rules/section07/test_trigger_effects.py": 1
+    },
+    "windows_source_modules": 1332,
+    "linux_source_modules": 1332
+  },
+  "source_rows": 6,
+  "source_blocks": 27,
+  "adopted_obligations": 22,
+  "semantic_cases": 42,
+  "metadata_cases": 2,
+  "locally_owned_faqs": [],
+  "cross_section_faqs": [
+    {
+      "faq": 11,
+      "id": "9657bb5d-72da-4d42-9927-731c9fc0e315",
+      "owner": "12",
+      "reason": "Additional Fight movement distance remains limited to the matching Fight steps; no duplicate ownership in07."
+    },
+    {
+      "faq": 27,
+      "id": "fdefb262-1eb9-43fd-a2c8-70cf3bd2a621",
+      "owner": "11",
+      "reason": "Out-of-phase charge still resolves Charge steps2 and3;07 owns suppression of other phase-locked rules."
+    },
+    {
+      "faq": 62,
+      "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+      "owner": "01",
+      "reason": "Effect remains active through its named end boundary; Section01 owns expiry assertions,07 owns timing sequence."
+    }
+  ],
+  "coverage_statuses": [
+    {
+      "id": "07.00-stage-3",
+      "source_id": "rule:07:07.00:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_round_effect.py::test_constructed_round_permission_resolves_real_effect_before_command_once"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.00-stage-4",
+      "source_id": "rule:07:07.00:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_progression.py::test_first_turn_ends_before_opponent_and_never_ends_round"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.00-stage-5",
+      "source_id": "rule:07:07.00:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_progression.py::test_second_turn_starts_same_first_player_or_ends_at_mission_limit"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.01-start",
+      "source_id": "rule:07:07.01:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_round_effect.py::test_constructed_round_permission_resolves_real_effect_before_command_once",
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+      ],
+      "retained_prior_qualifications": [
+        "The lower-level lifecycle consumer supplies the non-empty rule effect; the facade round-order assertion supplies the shared adapter progression."
+      ]
+    },
+    {
+      "id": "07.02-fixed-first",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_progression.py::test_second_turn_starts_same_first_player_or_ends_at_mission_limit"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02-opponent-next",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_progression.py::test_first_turn_ends_before_opponent_and_never_ends_round"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02-seven-parts",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02-part-3",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02-part-4",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02-part-5",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02-part-6",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02-part-7",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02-part-8",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02-part-9",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02-nonmission-first",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02-mission-after",
+      "source_id": "rule:07:07.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_mission_boundary.py::test_actual_eligible_mission_commits_and_achieved_condition_at_turn_end",
+        "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02.01-phase-lock",
+      "source_id": "rule:07:07.02.01:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_out_of_phase.py::test_actual_weapon_modifier_consumer_suppresses_phase_locked_heavy"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02.02-every-boundary",
+      "source_id": "rule:07:07.02.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+        "tests/rules/section07/test_trigger_effects.py::test_unqualified_phase_trigger_applies_real_effect_at_each_boundary",
+        "tests/rules/section07/test_round_effect.py::test_constructed_round_permission_resolves_real_effect_before_command_once"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.02.02-both-players",
+      "source_id": "rule:07:07.02.02:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_trigger_effects.py::test_unqualified_phase_trigger_applies_real_effect_at_each_boundary",
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.03-nonmission-first",
+      "source_id": "rule:07:07.03:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+      ],
+      "retained_prior_qualifications": []
+    },
+    {
+      "id": "07.03-mission-after",
+      "source_id": "rule:07:07.03:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+      ],
+      "retained_prior_qualifications": [
+        "The sequencing assertion covers participant priority; this clause does not certify individual mission scoring formulas."
+      ]
+    },
+    {
+      "id": "07.03-next-round",
+      "source_id": "rule:07:07.03:1",
+      "status": "passing semantic assertions with documented fixture/source qualifications",
+      "tests": [
+        "tests/rules/section07/test_progression.py::test_second_turn_starts_same_first_player_or_ends_at_mission_limit",
+        "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+      ],
+      "retained_prior_qualifications": []
+    }
+  ],
+  "quality": {
+    "ruff": true,
+    "format": true,
+    "mypy": true,
+    "pyright": true,
+    "scoped_python_files": 13
+  },
+  "direct_dependency_controls": {
+    "cases": 5,
+    "passed": 5,
+    "receipt": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-17\\task\\runs\\dependencies\\receipt.json"
+  },
+  "timings": {
+    "windows": {
+      "subprocess_wall_seconds": 45.311231400002725,
+      "pytest_controller_elapsed_seconds": 35.17728790000547,
+      "collection_seconds": 0.1280047000036575,
+      "phase_seconds": {
+        "setup": 5.930383599974448,
+        "call": 29.04307929999777,
+        "teardown": 0.007734099926892668
+      },
+      "session_fixture_preparation": [
+        {
+          "fixture": "section07_definitions",
+          "seconds": 1.8038151999935508
+        },
+        {
+          "fixture": "section07_mission",
+          "seconds": 4.114652499993099
+        }
+      ],
+      "semantic_call_seconds": 28.896008900017478
+    },
+    "linux": {
+      "subprocess_wall_seconds": 46.771818999999994,
+      "pytest_controller_elapsed_seconds": 31.077854099999996,
+      "collection_seconds": 0.12483749999999816,
+      "phase_seconds": {
+        "setup": 5.293032099999962,
+        "call": 25.56599710000002,
+        "teardown": 0.0060478000000045995
+      },
+      "session_fixture_preparation": [
+        {
+          "fixture": "section07_definitions",
+          "seconds": 1.6292861000000016
+        },
+        {
+          "fixture": "section07_mission",
+          "seconds": 3.653449800000004
+        }
+      ],
+      "semantic_call_seconds": 25.426998400000016
+    },
+    "linux_fresh_index_seconds": 22.303107999999995,
+    "linux_copy_verification_seconds": 10.144975200000005,
+    "qualification": "Correctness receipts only. Preparation is within setup, not additive to it. OS caches not flushed. Source hashing overlapped part of Windows stable run. Existing environments reused; Windows and WSL1 userland are not hosted CI or a controlled comparison."
+  },
+  "engine_semantic_edits": false,
+  "new_confirmed_rule_failures": [],
+  "prior_enabled_failures": "The 11 prior Section01-06 failures and their six future-fix groups remain byte-preserved; not re-executed in this Section07 task.",
+  "evidence_root": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-17\\task",
+  "linux_exact_executed_file_count": 6630,
+  "post_run_documentation": "This validation.json is the sole later source-file addition after the exact Linux source copy/run; executable tests and engine files are unchanged.",
+  "review_limits": [
+    "Retained maintained mirror is unversioned; no new live-site or official App export authentication.",
+    "The retained Overwatch example mentions inconsistent Movement/Shooting phases. Preserve text verbatim; the operative phase-lock prohibition is tested independently.",
+    "Round effect uses an explicit World Eaters source-permission contract on a supported native EC body. The selected loader correctly rejected the WE datasheet without representative height; no geometry guard was changed. This is not native WE admission proof.",
+    "Nonempty unqualified Fight effects use compiled constructed text because native selected sheets lack this exact boundary. Qualified variants are outside this selected-target consumer support contract and are not claimed implemented by that owner.",
+    "The phase-permission Heavy test begins at a typed out-of-phase outcome; it does not certify granting ability activation.",
+    "Mission participant priority is exercised at the shared production sequencing owner. It does not certify all mission formulas or invent an end-of-round mission provider.",
+    "Two-round adapter progression covers normal empty phase completion and viewer event deltas, not full-game startup, mustering, replay or universal fixture order independence."
+  ]
+}

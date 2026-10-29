@@ -1,0 +1,1926 @@
+{
+  "schema": "section20-source-behavior-inventory-v1",
+  "source_authority": "Accepted retained adopted capture authenticated against literal JS; no fresh external/App-version claim.",
+  "category_hierarchy": {
+    "number": "20",
+    "title": "Strategic Reserves",
+    "subsections": [
+      {
+        "ref": "20.01",
+        "title": "Placing Units In Strategic Reserves",
+        "text": [
+          "Before the battle, in the Declare Battle Formations step, you can select one or more friendly units (excluding \u0003FORTIFICATIONS\u0004) to place in \u0005strategic reserves\u0006. Instead of setting up these units on the battlefield during deployment, place them to one side; they are \u0005strategic reserves\u0006 units, and will arrive later in the battle.",
+          "Unless otherwise stated, the combined points value of all of your \u0005strategic reserves\u0006 units (including those embarked within \u0003TRANSPORTS\u0004 that are themselves placed in \u0005strategic reserves\u0006) cannot exceed 50% of your points limit for your battle size."
+        ],
+        "accordions": [
+          {
+            "ref": "20.01.01",
+            "title": "Reserves",
+            "text": [
+              "The term 'Reserves' is the same as \u0005strategic reserves\u0006."
+            ]
+          },
+          {
+            "ref": "20.01.02",
+            "title": "Strategic Reserves at the End of the Battle",
+            "text": [
+              "At the end of the final turn, units in \u0005strategic reserves\u0006 are \u0005destroyed\u0006, but they do not trigger rules that apply when a model is \u0005destroyed\u0006."
+            ]
+          }
+        ]
+      },
+      {
+        "ref": "20.02",
+        "title": "Repositioned Units",
+        "text": [
+          "Some rules allow units to be removed from the battlefield and placed in \u0005strategic reserves\u0006 during the battle. Units that use such rules are known as \u0005repositioned\u0006 units. In addition to any other rules that apply to such units (such as where they can or cannot arrive), \u0001all\u0002 of the following rules apply to them:",
+          "• If used in the Movement phase, such rules can be used on units that have already moved that phase.",
+          "• A \u0005repositioned\u0006 unit that is set up in the same turn in which it made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 has still made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 that turn.",
+          "• When they are removed from the battlefield, any rules that are affecting such units for a specified duration or under specified circumstances continue to affect them while that duration and/or those circumstances apply.",
+          "\u0005Example:\u0006 \u0007A unit that was within range of an \u0005aura ability\u0006 when removed from the battlefield would no longer be affected by that \u0005aura ability\u0006 if it is no longer within range of it when it makes an \u0005ingress move\u0006, but a unit that was \u0005battle-shocked\u0006 when removed from the battlefield would still be \u0005battle-shocked\u0006 if it makes an \u0005ingress move\u0006 in the same turn.\b"
+        ]
+      },
+      {
+        "ref": "20.03",
+        "title": "Arriving From Strategic Reserves",
+        "text": [
+          "To arrive on the battlefield, each \u0005strategic reserves\u0006 unit must make an \u0005ingress move\u0006 (20.04). Unless otherwise stated, they can only do so from the second battle round onwards.",
+          "At the end of the third battle round, unless otherwise stated, all \u0005strategic reserves\u0006 units that have not made one or more \u0005ingress moves\u0006 are \u0005destroyed\u0006, with the following exceptions:",
+          "• Units embarked within \u0003TRANSPORTS\u0004 that have made an \u0005ingress move\u0006 during the battle.",
+          "• Repositioned units (20.02)."
+        ],
+        "accordions": [
+          {
+            "ref": "20.03.01",
+            "title": "Set Up As Reinforcements",
+            "text": [
+              "If a rule mentions a unit being set up on the battlefield as Reinforcements, it means a unit that made an \u0005ingress move\u0006."
+            ]
+          }
+        ]
+      },
+      {
+        "ref": "20.04",
+        "title": "Ingress Move",
+        "text": [
+          "\u000eEligible If",
+          "Your unit is in \u0005strategic reserves\u0006 (excluding units that are embarked within \u0003TRANSPORTS\u0004 that are themselves in \u0005strategic reserves\u0006)",
+          "\u000eSet-up Distance",
+          "6\"",
+          "\u000eWhile Moving",
+          "Set up your unit wholly within the \u0005set-up distance\u0006 of one or more battlefield edges and more than 8\" horizontally from all enemy units.",
+          "• \u0005Before the Third Battle Round:\u0006 While doing so, no models can be set up within your opponent’s deployment zone.",
+          "\u000eEffect",
+          "Your unit is set up as described in Set Up (03.02)",
+          "\u000eAfter Moving",
+          "Unless otherwise stated, until the start of the next Charge phase, your unit is \u0001not\u0002 eligible to make any other type of move."
+        ]
+      }
+    ]
+  },
+  "source_rows": 7,
+  "literal_blocks": 25,
+  "text_blocks": 25,
+  "table_count": 0,
+  "table_cells": 0,
+  "table_semantic_rows": 0,
+  "diagram_count": 0,
+  "semantic_obligations": 21,
+  "sources": [
+    {
+      "row_id": "rule:20:20.01:1",
+      "category": "20",
+      "locator": "20.01",
+      "title": "Placing Units In Strategic Reserves",
+      "occurrence": 1,
+      "source_sha256": "ff3fb6100903af36701ecf461912105fd6c22a94ca459c5f32d9a7772ab85714",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "fb3dc8ef7e683abcf690dc14e876de0b07b0a6c0fccfa7227db1085b1e0a5792",
+          "value": "Before the battle, in the Declare Battle Formations step, you can select one or more friendly units (excluding \u0003FORTIFICATIONS\u0004) to place in \u0005strategic reserves\u0006. Instead of setting up these units on the battlefield during deployment, place them to one side; they are \u0005strategic reserves\u0006 units, and will arrive later in the battle."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "962f74cceeac35a6deb0f40197a2f634f776c160b2aa9ec07e6eaf8b2e4411d9",
+          "value": "Unless otherwise stated, the combined points value of all of your \u0005strategic reserves\u0006 units (including those embarked within \u0003TRANSPORTS\u0004 that are themselves placed in \u0005strategic reserves\u0006) cannot exceed 50% of your points limit for your battle size."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "20.01:formation-friendly-excludes-fortifications",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "At the Declare Battle Formations boundary friendly units may be reserved; exclude Fortification and deployed/enemy/embarked units. Native bodies, explicit keyword contract for unavailable Fortification.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_declarations.py::test_prebattle_half_battle_size_cap_includes_embarked_points",
+              "function_ast_sha256": "b782d5aa9363dc02f45cd67f9028f2e247893f4bd09c285084c253acecea077f",
+              "assertions": [
+                "assert context.strategic_reserves_points_limit == cap",
+                "assert bool(matching) is (excess == 0)",
+                "assert not any((s.passenger.unit_instance_id == o.option_id.split(':', 1)[-1] for o in options))",
+                "assert not any(('enemy' in o.option_id for o in options))",
+                "assert isinstance(matching[0].payload, dict)",
+                "assert matching[0].payload['points_contribution'] == cap",
+                "assert matching[0].payload['embarked_unit_points'] == 100",
+                "assert matching[0].payload['embarked_unit_instance_ids'] == [s.passenger.unit_instance_id]"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_declarations.py::test_declaration_engine_boundary_is_atomic_and_uses_explicit_native_units",
+              "function_ast_sha256": "2fe433f3f636bfd376b6e1823f2657d1c47db50ffa89cbaaa3479a1b7b28670c",
+              "assertions": [
+                "assert s.state.to_payload() == before",
+                "assert len(rows) == 2",
+                "assert all((r.points_contribution == 500 for r in rows))"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='FORTIFICATIONS'):\n    StrategicReserveDeclaration.for_unit(unit=unit, player_id='owner', unit_points=100, embarked_unit_points=0, points_limit=1000)",
+                "with pytest.raises(GameLifecycleError, match='player_id drift|duplicate'):\n    s.state.apply_strategic_reserve_declarations(declarations=tuple(declarations), destruction_deadline_policy=ReserveDestructionTimingPolicy.core_rules_default())"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "20.01:reserved-units-are-not-deployed",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Reserved models are absent until accepted Ingress setup. Invalid attempts leave prior location unchanged.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_facade.py::test_public_ingress_rejects_malformed_then_bad_geometry_and_commits_fresh_retry",
+              "function_ast_sha256": "696db50c541f716d434090e3411a6bee930efafecedfad9554fe911e5eafaa0c",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == records",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.battlefield_state is not None",
+                "assert s.state.battlefield_state.unit_placement_or_none(s.unit.unit_instance_id) is None",
+                "assert s.state.reserve_states[0].status is ReserveStatus.IN_RESERVES",
+                "assert not s.state.phase_movement_history",
+                "assert retry is not None",
+                "assert retry.decision_type == 'select_movement_unit'",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert arrived is not None",
+                "assert arrived.status is ReserveStatus.ARRIVED",
+                "assert tuple((p.model_instance_id for p in s.state.battlefield_state.unit_placement_by_id(s.unit.unit_instance_id).model_placements)) == s.unit.own_model_ids()",
+                "assert history.is_ingress",
+                "assert history.setup_kind is not None",
+                "assert history.model_instance_ids == s.unit.own_model_ids()",
+                "assert events(session, 'reinforcement_unit_arrived')[-1]['unit_instance_id'] == s.unit.unit_instance_id",
+                "assert json.loads(json.dumps(session.lifecycle.decision_controller.to_payload())) == session.lifecycle.decision_controller.to_payload()",
+                "assert ingress_movement_locked(s.state, s.unit.unit_instance_id) is locked",
+                "assert json.loads(json.dumps(view)) == view"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.01:combined-half-battle-size-including-cargo",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "50% of battle size cap includes transported units; exact cap allowed, one point over rejected, combined existing/new reservations bounded atomically.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_declarations.py::test_prebattle_half_battle_size_cap_includes_embarked_points",
+              "function_ast_sha256": "b782d5aa9363dc02f45cd67f9028f2e247893f4bd09c285084c253acecea077f",
+              "assertions": [
+                "assert context.strategic_reserves_points_limit == cap",
+                "assert bool(matching) is (excess == 0)",
+                "assert not any((s.passenger.unit_instance_id == o.option_id.split(':', 1)[-1] for o in options))",
+                "assert not any(('enemy' in o.option_id for o in options))",
+                "assert isinstance(matching[0].payload, dict)",
+                "assert matching[0].payload['points_contribution'] == cap",
+                "assert matching[0].payload['embarked_unit_points'] == 100",
+                "assert matching[0].payload['embarked_unit_instance_ids'] == [s.passenger.unit_instance_id]"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_declarations.py::test_combined_friendly_declarations_include_existing_reserves_and_reject_over_cap",
+              "function_ast_sha256": "9cb76f0ca35f878330e22e6696e6e1138f6703b8d8d14159bcbd9dd1b019ea50",
+              "assertions": [
+                "assert s.state.to_payload() == before",
+                "assert len(s.state.reserve_states) == 1"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match=\"exceed the player's points limit\"):\n    s.state.apply_strategic_reserve_declarations(declarations=declarations, destruction_deadline_policy=ReserveDestructionTimingPolicy.core_rules_default())",
+                "with pytest.raises(GameLifecycleError, match=\"exceed the player's points limit\"):\n    s.state.apply_strategic_reserve_declarations(declarations=(declarations[1],), destruction_deadline_policy=ReserveDestructionTimingPolicy.core_rules_default())"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:20:20.01.01:1",
+      "category": "20",
+      "locator": "20.01.01",
+      "title": "Reserves",
+      "occurrence": 1,
+      "source_sha256": "24264461633a47e5fb797be549672675fd4fbea7a2f7089997322bb4fcc851d5",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "72ef2510165b97050f6c0f517f9bf8f8cf3bee4c14da69b438ca29d62eb764e8",
+          "value": "The term 'Reserves' is the same as \u0005strategic reserves\u0006."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "20.01.01:reserves-synonym",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Reserves, Strategic Reserves and Deep Strike reserve routes share the same Core deadline and final cleanup semantics.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_deadlines.py::test_synonymous_reserves_deadlines_and_final_cleanup_use_logical_death_without_model_triggers",
+              "function_ast_sha256": "8a67e26e96d9210940ab3055aa6299fd6b66d26ec4b8118903548655325ba077",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert bool(result.destroyed_model_instance_ids) is dies",
+                "assert (result.updated_reserve_states[0].status is ReserveStatus.DESTROYED) is dies",
+                "assert not any((m.is_alive for m in models))",
+                "assert set(s.unit.own_model_ids()).issubset(s.state.battlefield_state.removed_model_ids)",
+                "assert not s.state.pending_return_on_death"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:20:20.01.02:1",
+      "category": "20",
+      "locator": "20.01.02",
+      "title": "Strategic Reserves at the End of the Battle",
+      "occurrence": 1,
+      "source_sha256": "5ea41186372f9e3baee61d988bff8e66f2666590b4af7cc8e078ba33e09795ce",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "704ea2955b1a7f4ba56e176ddef448eac29d23489b98e3ce95dd5aa7e3591e4e",
+          "value": "At the end of the final turn, units in \u0005strategic reserves\u0006 are \u0005destroyed\u0006, but they do not trigger rules that apply when a model is \u0005destroyed\u0006."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "20.01.02:final-turn-independent-cleanup",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Final cleanup destroys all still-reserved units despite earlier deadline exemption, without destroyed-model reactions. Already-arrived units survive.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_deadlines.py::test_synonymous_reserves_deadlines_and_final_cleanup_use_logical_death_without_model_triggers",
+              "function_ast_sha256": "8a67e26e96d9210940ab3055aa6299fd6b66d26ec4b8118903548655325ba077",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert bool(result.destroyed_model_instance_ids) is dies",
+                "assert (result.updated_reserve_states[0].status is ReserveStatus.DESTROYED) is dies",
+                "assert not any((m.is_alive for m in models))",
+                "assert set(s.unit.own_model_ids()).issubset(s.state.battlefield_state.removed_model_ids)",
+                "assert not s.state.pending_return_on_death"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_deadlines.py::test_arrived_reserve_is_not_destroyed_at_either_deadline",
+              "function_ast_sha256": "e03ac28424750bff62dc7b970ccfd88550bb465895c9ea6d839d334e5ee38df8",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert result.updated_reserve_states == (arrived,)",
+                "assert not result.destroyed_model_instance_ids"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_cargo_attached.py::test_native_carrier_and_cargo_deadlines_preserve_route_and_suppress_model_reactions",
+              "function_ast_sha256": "d354185ff0450523c3a269ac2cfcfda909273544f80cb61feed28c5239cc67b4",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert set(result.destroyed_unit_instance_ids) == {s.transport.unit_instance_id, s.passenger.unit_instance_id}",
+                "assert state.reserve_states[0].status is ReserveStatus.DESTROYED",
+                "assert not state.transport_cargo_states",
+                "assert all((not model_by_id(state=state, model_instance_id=mid).is_alive for u in (s.transport, s.passenger) for mid in u.own_model_ids()))",
+                "assert not state.pending_return_on_death",
+                "assert s.session.lifecycle.decision_controller.event_log.records == events"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:20:20.02:1",
+      "category": "20",
+      "locator": "20.02",
+      "title": "Repositioned Units",
+      "occurrence": 1,
+      "source_sha256": "ad97af012624a8749e35c9c5dc5c7c28e24cdbe9da99ee8a63702ead8a3fc439",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "21d8e8debdb0c604081f6f8299235496c91e7aa4c9262d827368f37258e51ce3",
+          "value": "Some rules allow units to be removed from the battlefield and placed in \u0005strategic reserves\u0006 during the battle. Units that use such rules are known as \u0005repositioned\u0006 units. In addition to any other rules that apply to such units (such as where they can or cannot arrive), \u0001all\u0002 of the following rules apply to them:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "97cd299e32eca0cf9b334f1c87f37da8d0a1aacf9bb033d1c93a432216fc2995",
+          "value": "• If used in the Movement phase, such rules can be used on units that have already moved that phase."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "dfef29c308f6592e845e45b998efff2862b53f31fc86ec27b27d2e93f2420870",
+          "value": "• A \u0005repositioned\u0006 unit that is set up in the same turn in which it made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 has still made an \u0005advance\u0006, \u0005fall-back\u0006 or \u0005disembark move\u0006 that turn."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "2cb3542982f3eade5d383c7ee0ba580b1219f69f7de2cd3a0b677e9b41c1d8ce",
+          "value": "• When they are removed from the battlefield, any rules that are affecting such units for a specified duration or under specified circumstances continue to affect them while that duration and/or those circumstances apply."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "e9e48432cb545e105210a074bd291f56430efed617d358b429500ce00962d7ff",
+          "value": "\u0005Example:\u0006 \u0007A unit that was within range of an \u0005aura ability\u0006 when removed from the battlefield would no longer be affected by that \u0005aura ability\u0006 if it is no longer within range of it when it makes an \u0005ingress move\u0006, but a unit that was \u0005battle-shocked\u0006 when removed from the battlefield would still be \u0005battle-shocked\u0006 if it makes an \u0005ingress move\u0006 in the same turn.\b"
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "20.02:source-permitted-removal",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Existing explicit source-owned permission removes the complete physical unit into Strategic Reserves; no native named provider admission claimed.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_reposition.py::test_moved_native_unit_can_use_explicit_reposition_permission_without_resetting_status",
+              "function_ast_sha256": "8aa036d6f6b15c6a76eff0f28c1e6e3c8ad25c449a550ff6ba36d4160f63d162",
+              "assertions": [
+                "assert sum((p.points for p in session.lifecycle.config.reserve_unit_points)) == 1001",
+                "assert unit.unit_instance_id in affected()",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert status.decision_request is not None",
+                "assert status.decision_request.decision_type == 'select_source_reposition'",
+                "assert movement",
+                "assert movement[0].unit_instance_id == unit.unit_instance_id",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert tuple(state.normal_move_states) == movement",
+                "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is None",
+                "assert unit.unit_instance_id not in affected()",
+                "assert reserve_round_deadline_exempt_ids(state) == frozenset({unit.unit_instance_id})",
+                "assert reserve is not None",
+                "assert reserve.entered_reserves_battle_round == 2",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert tuple(state.normal_move_states) == movement",
+                "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert unit.unit_instance_id not in affected()",
+                "assert duration in removed",
+                "assert duration not in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert state.reserve_state_for_unit(unit.unit_instance_id) is None",
+                "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is not None",
+                "assert unit.unit_instance_id in affected()"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.02:already-moved",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "An actual completed reactive Normal Move does not prevent a separately permitted source reposition in Movement.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_reposition.py::test_moved_native_unit_can_use_explicit_reposition_permission_without_resetting_status",
+              "function_ast_sha256": "8aa036d6f6b15c6a76eff0f28c1e6e3c8ad25c449a550ff6ba36d4160f63d162",
+              "assertions": [
+                "assert sum((p.points for p in session.lifecycle.config.reserve_unit_points)) == 1001",
+                "assert unit.unit_instance_id in affected()",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert status.decision_request is not None",
+                "assert status.decision_request.decision_type == 'select_source_reposition'",
+                "assert movement",
+                "assert movement[0].unit_instance_id == unit.unit_instance_id",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert tuple(state.normal_move_states) == movement",
+                "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is None",
+                "assert unit.unit_instance_id not in affected()",
+                "assert reserve_round_deadline_exempt_ids(state) == frozenset({unit.unit_instance_id})",
+                "assert reserve is not None",
+                "assert reserve.entered_reserves_battle_round == 2",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert tuple(state.normal_move_states) == movement",
+                "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert unit.unit_instance_id not in affected()",
+                "assert duration in removed",
+                "assert duration not in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert state.reserve_state_for_unit(unit.unit_instance_id) is None",
+                "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is not None",
+                "assert unit.unit_instance_id in affected()"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.02:advance-fallback-disembark-history",
+          "source_blocks": [
+            3
+          ],
+          "acceptance": "Actual native Advance, Fall Back and Tactical Disembark receipts remain active after source removal and Ingress return that turn. Charge and shooting consumers retain restrictions.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_reposition.py::test_completed_advance_fallback_and_disembark_keep_their_turn_restrictions_after_return",
+              "function_ast_sha256": "544e7d1d1e7e6b4c4bf0d19dcb57f626b6d65781f8abf10a95a1c3d4701a8b26",
+              "assertions": [
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert original",
+                "assert result.is_valid, result.to_payload()",
+                "assert state.battlefield_state is not None",
+                "assert tuple(state.disembarked_unit_states) == original",
+                "assert state.disembarked_unit_state_for_unit(player_id='owner', battle_round=1, unit_instance_id=unit.unit_instance_id) == original[0]",
+                "assert (tuple(state.advanced_unit_states) if action == 'advance' else tuple(state.fell_back_unit_states)) == original",
+                "assert charge_unit_ineligibility_reason(state=state, unit_instance_id=unit.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor(), charge_state=ChargePhaseState(1, 'owner'), ignore_already_selected=False) == ('charge_unit_advanced' if action == 'advance' else 'charge_unit_fell_back')"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.02:lasting-effects",
+          "source_blocks": [
+            4
+          ],
+          "acceptance": "Specified-duration effects survive departure/return through their original expiry boundary; removal does not renew or truncate them.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_reposition.py::test_moved_native_unit_can_use_explicit_reposition_permission_without_resetting_status",
+              "function_ast_sha256": "8aa036d6f6b15c6a76eff0f28c1e6e3c8ad25c449a550ff6ba36d4160f63d162",
+              "assertions": [
+                "assert sum((p.points for p in session.lifecycle.config.reserve_unit_points)) == 1001",
+                "assert unit.unit_instance_id in affected()",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert status.decision_request is not None",
+                "assert status.decision_request.decision_type == 'select_source_reposition'",
+                "assert movement",
+                "assert movement[0].unit_instance_id == unit.unit_instance_id",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert tuple(state.normal_move_states) == movement",
+                "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is None",
+                "assert unit.unit_instance_id not in affected()",
+                "assert reserve_round_deadline_exempt_ids(state) == frozenset({unit.unit_instance_id})",
+                "assert reserve is not None",
+                "assert reserve.entered_reserves_battle_round == 2",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert tuple(state.normal_move_states) == movement",
+                "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert unit.unit_instance_id not in affected()",
+                "assert duration in removed",
+                "assert duration not in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert state.reserve_state_for_unit(unit.unit_instance_id) is None",
+                "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is not None",
+                "assert unit.unit_instance_id in affected()"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.02:aura-and-battleshock-example",
+          "source_blocks": [
+            5
+          ],
+          "acceptance": "Range-dependent Aura affects native recipient before departure, not while off-board or after returning out of range; actual direct Battle-shock persists across same-turn Ingress.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_reposition.py::test_moved_native_unit_can_use_explicit_reposition_permission_without_resetting_status",
+              "function_ast_sha256": "8aa036d6f6b15c6a76eff0f28c1e6e3c8ad25c449a550ff6ba36d4160f63d162",
+              "assertions": [
+                "assert sum((p.points for p in session.lifecycle.config.reserve_unit_points)) == 1001",
+                "assert unit.unit_instance_id in affected()",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert status.decision_request is not None",
+                "assert status.decision_request.decision_type == 'select_source_reposition'",
+                "assert movement",
+                "assert movement[0].unit_instance_id == unit.unit_instance_id",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert tuple(state.normal_move_states) == movement",
+                "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is None",
+                "assert unit.unit_instance_id not in affected()",
+                "assert reserve_round_deadline_exempt_ids(state) == frozenset({unit.unit_instance_id})",
+                "assert reserve is not None",
+                "assert reserve.entered_reserves_battle_round == 2",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert tuple(state.normal_move_states) == movement",
+                "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert unit.unit_instance_id not in affected()",
+                "assert duration in removed",
+                "assert duration not in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert state.reserve_state_for_unit(unit.unit_instance_id) is None",
+                "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is not None",
+                "assert unit.unit_instance_id in affected()"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:20:20.03:1",
+      "category": "20",
+      "locator": "20.03",
+      "title": "Arriving From Strategic Reserves",
+      "occurrence": 1,
+      "source_sha256": "78afcb894b42abbc0a8cb3df046e645056b3b2152f4f6b8a544539f7fac9728e",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "f801edcde81a04f1243c1d6ca6873694a1cc8e79bd878161569899a3e2ec30d9",
+          "value": "To arrive on the battlefield, each \u0005strategic reserves\u0006 unit must make an \u0005ingress move\u0006 (20.04). Unless otherwise stated, they can only do so from the second battle round onwards."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "3cc59eb1d68e436c53a715e913477a7c618ce6f0ffa9f1b7e2329b26d0d7708d",
+          "value": "At the end of the third battle round, unless otherwise stated, all \u0005strategic reserves\u0006 units that have not made one or more \u0005ingress moves\u0006 are \u0005destroyed\u0006, with the following exceptions:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "cde2409b135181eab9d2a02ba69953b43e3c4d3cea49eb54929377bbd5495946",
+          "value": "• Units embarked within \u0003TRANSPORTS\u0004 that have made an \u0005ingress move\u0006 during the battle."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "439da5b91f1d04fa1141439ef0257965f24e5e1247ae3db7f8fbbc2ed6b9cd4b",
+          "value": "• Repositioned units (20.02)."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "20.03:requires-ingress-second-round",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Default arrival is forbidden in round one and legal from round two via Ingress; explicit source override remains bounded.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_geometry.py::test_default_arrival_requires_second_round_then_ingress",
+              "function_ast_sha256": "935408e3d39212814f3169171872774734262367dc4db52f9b64c53073a6a138",
+              "assertions": [
+                "assert result.is_valid is (round_number >= 2)",
+                "assert (result.transition_batch is not None) is (round_number >= 2)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_facade.py::test_public_ingress_rejects_malformed_then_bad_geometry_and_commits_fresh_retry",
+              "function_ast_sha256": "696db50c541f716d434090e3411a6bee930efafecedfad9554fe911e5eafaa0c",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == records",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.battlefield_state is not None",
+                "assert s.state.battlefield_state.unit_placement_or_none(s.unit.unit_instance_id) is None",
+                "assert s.state.reserve_states[0].status is ReserveStatus.IN_RESERVES",
+                "assert not s.state.phase_movement_history",
+                "assert retry is not None",
+                "assert retry.decision_type == 'select_movement_unit'",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert arrived is not None",
+                "assert arrived.status is ReserveStatus.ARRIVED",
+                "assert tuple((p.model_instance_id for p in s.state.battlefield_state.unit_placement_by_id(s.unit.unit_instance_id).model_placements)) == s.unit.own_model_ids()",
+                "assert history.is_ingress",
+                "assert history.setup_kind is not None",
+                "assert history.model_instance_ids == s.unit.own_model_ids()",
+                "assert events(session, 'reinforcement_unit_arrived')[-1]['unit_instance_id'] == s.unit.unit_instance_id",
+                "assert json.loads(json.dumps(session.lifecycle.decision_controller.to_payload())) == session.lifecycle.decision_controller.to_payload()",
+                "assert ingress_movement_locked(s.state, s.unit.unit_instance_id) is locked",
+                "assert json.loads(json.dumps(view)) == view"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.03:third-round-destruction",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "At end round3 never-ingressed reserves are destroyed; earlier rounds unchanged.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_deadlines.py::test_synonymous_reserves_deadlines_and_final_cleanup_use_logical_death_without_model_triggers",
+              "function_ast_sha256": "8a67e26e96d9210940ab3055aa6299fd6b66d26ec4b8118903548655325ba077",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert bool(result.destroyed_model_instance_ids) is dies",
+                "assert (result.updated_reserve_states[0].status is ReserveStatus.DESTROYED) is dies",
+                "assert not any((m.is_alive for m in models))",
+                "assert set(s.unit.own_model_ids()).issubset(s.state.battlefield_state.removed_model_ids)",
+                "assert not s.state.pending_return_on_death"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.03:ingressed-transport-cargo-exception",
+          "source_blocks": [
+            3
+          ],
+          "acceptance": "Cargo cannot Ingress independently while carrier reserved; carrier Ingress does not release cargo and protects it at round3.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_cargo_attached.py::test_carrier_ingress_keeps_cargo_off_board_and_protects_its_deadline",
+              "function_ast_sha256": "0d71ae7ed5310994ee628102d681d56b7da1b5cee5aefc9ae88c412a5886c738",
+              "assertions": [
+                "assert s.passenger.unit_instance_id not in {o.option_id for o in request.options}",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert s.state.battlefield_state is not None",
+                "assert s.state.battlefield_state.unit_placement_or_none(s.passenger.unit_instance_id) is None",
+                "assert s.state.transport_cargo_states[0].embarked_unit_instance_ids == (s.passenger.unit_instance_id,)",
+                "assert s.state.reserve_state_for_unit(s.passenger.unit_instance_id) is None",
+                "assert s.state.battlefield_state == before",
+                "assert all((model_by_id(state=s.state, model_instance_id=mid).is_alive for mid in s.passenger.own_model_ids()))"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.03:reposition-exception",
+          "source_blocks": [
+            4
+          ],
+          "acceptance": "Actual accepted departure records establish round3 exemption; final cleanup still applies.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_reposition.py::test_moved_native_unit_can_use_explicit_reposition_permission_without_resetting_status",
+              "function_ast_sha256": "8aa036d6f6b15c6a76eff0f28c1e6e3c8ad25c449a550ff6ba36d4160f63d162",
+              "assertions": [
+                "assert sum((p.points for p in session.lifecycle.config.reserve_unit_points)) == 1001",
+                "assert unit.unit_instance_id in affected()",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert status.decision_request is not None",
+                "assert status.decision_request.decision_type == 'select_source_reposition'",
+                "assert movement",
+                "assert movement[0].unit_instance_id == unit.unit_instance_id",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert tuple(state.normal_move_states) == movement",
+                "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is None",
+                "assert unit.unit_instance_id not in affected()",
+                "assert reserve_round_deadline_exempt_ids(state) == frozenset({unit.unit_instance_id})",
+                "assert reserve is not None",
+                "assert reserve.entered_reserves_battle_round == 2",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert tuple(state.normal_move_states) == movement",
+                "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert unit.unit_instance_id not in affected()",
+                "assert duration in removed",
+                "assert duration not in state.persisting_effects_for_unit(unit.unit_instance_id)",
+                "assert state.reserve_state_for_unit(unit.unit_instance_id) is None",
+                "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is not None",
+                "assert unit.unit_instance_id in affected()"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_deadlines.py::test_synonymous_reserves_deadlines_and_final_cleanup_use_logical_death_without_model_triggers",
+              "function_ast_sha256": "8a67e26e96d9210940ab3055aa6299fd6b66d26ec4b8118903548655325ba077",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert bool(result.destroyed_model_instance_ids) is dies",
+                "assert (result.updated_reserve_states[0].status is ReserveStatus.DESTROYED) is dies",
+                "assert not any((m.is_alive for m in models))",
+                "assert set(s.unit.own_model_ids()).issubset(s.state.battlefield_state.removed_model_ids)",
+                "assert not s.state.pending_return_on_death"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:20:20.03.01:1",
+      "category": "20",
+      "locator": "20.03.01",
+      "title": "Set Up As Reinforcements",
+      "occurrence": 1,
+      "source_sha256": "bb039e63c071960d2ccbb253cec915db8ba6e3d17a6b88d623520998749ef7a2",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "b1ade7f0c890ce631ae02f9e1935931ad5e276a0a62e021f710d998ab98a1b75",
+          "value": "If a rule mentions a unit being set up on the battlefield as Reinforcements, it means a unit that made an \u0005ingress move\u0006."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "20.03.01:reinforcement-ingress-alias",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Accepted reserve arrival records actual Ingress and physical setup, not merely a generic setup move.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_facade.py::test_public_ingress_rejects_malformed_then_bad_geometry_and_commits_fresh_retry",
+              "function_ast_sha256": "696db50c541f716d434090e3411a6bee930efafecedfad9554fe911e5eafaa0c",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == records",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.battlefield_state is not None",
+                "assert s.state.battlefield_state.unit_placement_or_none(s.unit.unit_instance_id) is None",
+                "assert s.state.reserve_states[0].status is ReserveStatus.IN_RESERVES",
+                "assert not s.state.phase_movement_history",
+                "assert retry is not None",
+                "assert retry.decision_type == 'select_movement_unit'",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert arrived is not None",
+                "assert arrived.status is ReserveStatus.ARRIVED",
+                "assert tuple((p.model_instance_id for p in s.state.battlefield_state.unit_placement_by_id(s.unit.unit_instance_id).model_placements)) == s.unit.own_model_ids()",
+                "assert history.is_ingress",
+                "assert history.setup_kind is not None",
+                "assert history.model_instance_ids == s.unit.own_model_ids()",
+                "assert events(session, 'reinforcement_unit_arrived')[-1]['unit_instance_id'] == s.unit.unit_instance_id",
+                "assert json.loads(json.dumps(session.lifecycle.decision_controller.to_payload())) == session.lifecycle.decision_controller.to_payload()",
+                "assert ingress_movement_locked(s.state, s.unit.unit_instance_id) is locked",
+                "assert json.loads(json.dumps(view)) == view"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_facade.py::test_supported_core_checkpoint_ingress_preserves_restore_and_exact_replay",
+              "function_ast_sha256": "525bf4c479bd9331293f464424cdc0c3884afd53fa1e0c24702c0a00e484478a",
+              "assertions": [
+                "assert restored.lifecycle.to_payload() == final",
+                "assert replay.reproduced_exactly, replay"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:20:20.04:1",
+      "category": "20",
+      "locator": "20.04",
+      "title": "Ingress Move",
+      "occurrence": 1,
+      "source_sha256": "7d8393a489a1669d5eca4f44c99ea4dcdebadde4edcd3ae36f670106c9dea902",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538",
+          "value": "\u000eEligible If"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "99ab2228933baaadbfdf4054c52548aafa1a2827dcf392aa03d5c2f71f7ce071",
+          "value": "Your unit is in \u0005strategic reserves\u0006 (excluding units that are embarked within \u0003TRANSPORTS\u0004 that are themselves in \u0005strategic reserves\u0006)"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "246e8e2a3323d6176f0e973b99132e4dd0f3a2d32b6ea38914cf8871f1ba7bce",
+          "value": "\u000eSet-up Distance"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "ee224853c1d582bea38d6a4d78ef45fda9360563201fa673a4cc63651894343a",
+          "value": "6\""
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "e71c12176330a1cb6bd961af93620cfe60c68b59704dac7bff9b61bc09d3c041",
+          "value": "\u000eWhile Moving"
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "5e5c936b444a6db1aeee55e3f7c732649f8fdb7e5cfdc7741a8575eea42f3317",
+          "value": "Set up your unit wholly within the \u0005set-up distance\u0006 of one or more battlefield edges and more than 8\" horizontally from all enemy units."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "b44e3dba6f8d5dba1add2427544faeeeb7a7b79c7434e652269fef4d409795ca",
+          "value": "• \u0005Before the Third Battle Round:\u0006 While doing so, no models can be set up within your opponent’s deployment zone."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d",
+          "value": "\u000eEffect"
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "ef02c618a2220f1ea24ed599421dadd931e35924307b54fce16c6d7ffed9f942",
+          "value": "Your unit is set up as described in Set Up (03.02)"
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315",
+          "value": "\u000eAfter Moving"
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "0db1975506886db48ff9c528edbb7a7789aafaeda3717fc3399f6130f82cac14",
+          "value": "Unless otherwise stated, until the start of the next Charge phase, your unit is \u0001not\u0002 eligible to make any other type of move."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "20.04:eligible-reserved-excludes-embarked",
+          "source_blocks": [
+            1,
+            2
+          ],
+          "acceptance": "Only reserved units are selected for Ingress; cargo remains on its carrier route. Whole attached rules unit arrives atomically.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_facade.py::test_public_ingress_rejects_malformed_then_bad_geometry_and_commits_fresh_retry",
+              "function_ast_sha256": "696db50c541f716d434090e3411a6bee930efafecedfad9554fe911e5eafaa0c",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == records",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.battlefield_state is not None",
+                "assert s.state.battlefield_state.unit_placement_or_none(s.unit.unit_instance_id) is None",
+                "assert s.state.reserve_states[0].status is ReserveStatus.IN_RESERVES",
+                "assert not s.state.phase_movement_history",
+                "assert retry is not None",
+                "assert retry.decision_type == 'select_movement_unit'",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert arrived is not None",
+                "assert arrived.status is ReserveStatus.ARRIVED",
+                "assert tuple((p.model_instance_id for p in s.state.battlefield_state.unit_placement_by_id(s.unit.unit_instance_id).model_placements)) == s.unit.own_model_ids()",
+                "assert history.is_ingress",
+                "assert history.setup_kind is not None",
+                "assert history.model_instance_ids == s.unit.own_model_ids()",
+                "assert events(session, 'reinforcement_unit_arrived')[-1]['unit_instance_id'] == s.unit.unit_instance_id",
+                "assert json.loads(json.dumps(session.lifecycle.decision_controller.to_payload())) == session.lifecycle.decision_controller.to_payload()",
+                "assert ingress_movement_locked(s.state, s.unit.unit_instance_id) is locked",
+                "assert json.loads(json.dumps(view)) == view"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_cargo_attached.py::test_carrier_ingress_keeps_cargo_off_board_and_protects_its_deadline",
+              "function_ast_sha256": "0d71ae7ed5310994ee628102d681d56b7da1b5cee5aefc9ae88c412a5886c738",
+              "assertions": [
+                "assert s.passenger.unit_instance_id not in {o.option_id for o in request.options}",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert s.state.battlefield_state is not None",
+                "assert s.state.battlefield_state.unit_placement_or_none(s.passenger.unit_instance_id) is None",
+                "assert s.state.transport_cargo_states[0].embarked_unit_instance_ids == (s.passenger.unit_instance_id,)",
+                "assert s.state.reserve_state_for_unit(s.passenger.unit_instance_id) is None",
+                "assert s.state.battlefield_state == before",
+                "assert all((model_by_id(state=s.state, model_instance_id=mid).is_alive for mid in s.passenger.own_model_ids()))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_cargo_attached.py::test_native_attached_ingress_requires_every_component_and_complete_physical_inventory",
+              "function_ast_sha256": "320364aff4f7ba603b9a8ea56b2136c603c61e93c8b838eba23fe970faee82b3",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert result.is_valid is complete",
+                "assert (result.transition_batch is not None) is complete",
+                "assert result.transition_batch is not None",
+                "assert {p.model_instance_id for p in result.transition_batch.placements} == {m.model_instance_id for m in view.own_models}",
+                "assert 'unit_placement_drift' in {v.violation_code.value for v in result.violations}"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.04:six-inch-whole-unit-multiple-edges",
+          "source_blocks": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "acceptance": "All physical models wholly within six inches of one or more edges; separate models may use different edges while obeying setup.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_geometry.py::test_every_edge_measures_whole_native_base_inclusive_six_inches",
+              "function_ast_sha256": "cdb50cde8cf9e8c75205a5255200212a6740d01d38ce29b76230af45a3fd89f1",
+              "assertions": [
+                "assert result.is_valid is (not outside)",
+                "assert (result.transition_batch is not None) is (not outside)",
+                "assert s.state.to_payload() == before",
+                "assert 'strategic_reserves_edge_distance' in {v.violation_code.value for v in result.violations}"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_geometry.py::test_all_models_can_use_different_edges_but_must_complete_legal_setup",
+              "function_ast_sha256": "99bf6f72821417a3416477de10845c5c68f73158b4dabd7f8d4f55073ba95d69",
+              "assertions": [
+                "assert result.is_valid is (case == 'two-edges')",
+                "assert s.state.to_payload() == before",
+                "assert {'incoherent': 'unit_coherency_broken', 'overlap': 'end_on_model_overlap', 'missing': 'unit_placement_drift', 'off-board': 'battlefield_edge_crossed'}[case] in codes"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.04:strict-eight-horizontal",
+          "source_blocks": [
+            6
+          ],
+          "acceptance": "Every arrival model stays strictly more than8 inches horizontally from every enemy model, irrespective of height.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_geometry.py::test_enemy_distance_is_strictly_more_than_eight_horizontally",
+              "function_ast_sha256": "2fe9f4356495e576bcbf0516bd323d2097d6b8b7b594640c8229b9b78bf98939",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert result.is_valid is valid",
+                "assert ('reserve_enemy_distance' in {v.violation_code.value for v in result.violations}) is (not valid)"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.04:pre-third-enemy-zone",
+          "source_blocks": [
+            7
+          ],
+          "acceptance": "Before round3 no Strategic Ingress model can touch opponent deployment zone. Round1 permission changes eligibility only; retained Rapid Disembark policy preserves same limit.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_geometry.py::test_early_arrival_permission_does_not_erase_pre_third_round_enemy_zone_exclusion",
+              "function_ast_sha256": "48e37aa4ee74c2f4f3608f6e858a5a23c40ce706cf1a3d0487512e23472cfbe1",
+              "assertions": [
+                "assert result.is_valid is (not forbidden)",
+                "assert ('strategic_reserves_enemy_deployment_zone' in {v.violation_code.value for v in result.violations}) is forbidden"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_geometry.py::test_retained_ingress_policy_preserves_early_enemy_zone_exclusion",
+              "function_ast_sha256": "4f509c73cbd97d92b542e8e913c8cc597ff3bb9990ad1e96ad70617ec98f3978",
+              "assertions": [
+                "assert result.excludes_enemy_deployment_zone is (kind is BattlefieldPlacementKind.STRATEGIC_RESERVES and round_number < 3)"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.04:setup-rules",
+          "source_blocks": [
+            8,
+            9
+          ],
+          "acceptance": "Complete physical inventory, coherency, no overlap and battlefield containment apply through shared setup validation; facade rejection permits real reselection/retry.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_geometry.py::test_all_models_can_use_different_edges_but_must_complete_legal_setup",
+              "function_ast_sha256": "99bf6f72821417a3416477de10845c5c68f73158b4dabd7f8d4f55073ba95d69",
+              "assertions": [
+                "assert result.is_valid is (case == 'two-edges')",
+                "assert s.state.to_payload() == before",
+                "assert {'incoherent': 'unit_coherency_broken', 'overlap': 'end_on_model_overlap', 'missing': 'unit_placement_drift', 'off-board': 'battlefield_edge_crossed'}[case] in codes"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section20/test_facade.py::test_public_ingress_rejects_malformed_then_bad_geometry_and_commits_fresh_retry",
+              "function_ast_sha256": "696db50c541f716d434090e3411a6bee930efafecedfad9554fe911e5eafaa0c",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == records",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.battlefield_state is not None",
+                "assert s.state.battlefield_state.unit_placement_or_none(s.unit.unit_instance_id) is None",
+                "assert s.state.reserve_states[0].status is ReserveStatus.IN_RESERVES",
+                "assert not s.state.phase_movement_history",
+                "assert retry is not None",
+                "assert retry.decision_type == 'select_movement_unit'",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert arrived is not None",
+                "assert arrived.status is ReserveStatus.ARRIVED",
+                "assert tuple((p.model_instance_id for p in s.state.battlefield_state.unit_placement_by_id(s.unit.unit_instance_id).model_placements)) == s.unit.own_model_ids()",
+                "assert history.is_ingress",
+                "assert history.setup_kind is not None",
+                "assert history.model_instance_ids == s.unit.own_model_ids()",
+                "assert events(session, 'reinforcement_unit_arrived')[-1]['unit_instance_id'] == s.unit.unit_instance_id",
+                "assert json.loads(json.dumps(session.lifecycle.decision_controller.to_payload())) == session.lifecycle.decision_controller.to_payload()",
+                "assert ingress_movement_locked(s.state, s.unit.unit_instance_id) is locked",
+                "assert json.loads(json.dumps(view)) == view"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "20.04:next-charge-movement-lock",
+          "source_blocks": [
+            10,
+            11
+          ],
+          "acceptance": "Actual Ingress blocks further movement through Shooting until next Charge; every arrival phase/turn and reactive consumer checked in bounded unchanged dependencies.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section20/test_facade.py::test_public_ingress_rejects_malformed_then_bad_geometry_and_commits_fresh_retry",
+              "function_ast_sha256": "696db50c541f716d434090e3411a6bee930efafecedfad9554fe911e5eafaa0c",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == records",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.battlefield_state is not None",
+                "assert s.state.battlefield_state.unit_placement_or_none(s.unit.unit_instance_id) is None",
+                "assert s.state.reserve_states[0].status is ReserveStatus.IN_RESERVES",
+                "assert not s.state.phase_movement_history",
+                "assert retry is not None",
+                "assert retry.decision_type == 'select_movement_unit'",
+                "assert status.decision_request is not None",
+                "assert status.decision_request is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert arrived is not None",
+                "assert arrived.status is ReserveStatus.ARRIVED",
+                "assert tuple((p.model_instance_id for p in s.state.battlefield_state.unit_placement_by_id(s.unit.unit_instance_id).model_placements)) == s.unit.own_model_ids()",
+                "assert history.is_ingress",
+                "assert history.setup_kind is not None",
+                "assert history.model_instance_ids == s.unit.own_model_ids()",
+                "assert events(session, 'reinforcement_unit_arrived')[-1]['unit_instance_id'] == s.unit.unit_instance_id",
+                "assert json.loads(json.dumps(session.lifecycle.decision_controller.to_payload())) == session.lifecycle.decision_controller.to_payload()",
+                "assert ingress_movement_locked(s.state, s.unit.unit_instance_id) is locked",
+                "assert json.loads(json.dumps(view)) == view"
+              ],
+              "expected_exceptions": []
+            }
+          ],
+          "historical_nonselected_evidence": [
+            {
+              "node": "tests/unit/test_order64_reserve_lifetimes.py::test_next_charge_boundary_uses_actual_turn_and_phase",
+              "function_ast_sha256": "4471f23c31bc1387096e662d0ff17ff5ec745f9ac11bc9b40af6024bb8b44e82",
+              "assertions": [
+                "assert state is not None",
+                "assert ingress_movement_locked(state, TRANSPORT_ID)",
+                "assert ingress_movement_locked(state, TRANSPORT_ID) is (arrival_phase in {BattlePhase.CHARGE, BattlePhase.FIGHT})",
+                "assert ingress_movement_locked(state, TRANSPORT_ID) is (arrival_phase in {BattlePhase.CHARGE, BattlePhase.FIGHT})",
+                "assert not ingress_movement_locked(state, TRANSPORT_ID)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/unit/test_order64_reserve_lifetimes.py::test_reactive_movement_selection_excludes_ingressed_units_until_charge",
+              "function_ast_sha256": "8613eca42d022d19729865421bce6bad43406a534ef559569b46985ed754bccf",
+              "assertions": [
+                "assert state is not None",
+                "assert [option.option_id for option in request.options] == [DECLINE_TRIGGERED_MOVEMENT_OPTION_ID]"
+              ],
+              "expected_exceptions": []
+            }
+          ],
+          "coverage_status": "partial",
+          "coverage_gaps": [
+            {
+              "kind": "nonselected_assertion_evidence",
+              "nodes": [
+                "tests/unit/test_order64_reserve_lifetimes.py::test_next_charge_boundary_uses_actual_turn_and_phase",
+                "tests/unit/test_order64_reserve_lifetimes.py::test_reactive_movement_selection_excludes_ingressed_units_until_charge"
+              ],
+              "reason": "These exact former assertion bindings are not selected after the approved legacy-test cutover. Their former native/continuation checks are historical; equivalent complete current behavioral coverage is not claimed."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "all_current_faqs_screened": 64,
+  "faq_screen": [
+    {
+      "ordinal": 1,
+      "id": "c2df3e97-f21e-4fc9-943e-37072c08c10e",
+      "question": "Aerialists ability allows you to get into a transport even though they disembarked a transport this turn?",
+      "answer": "Yes, as the unit embarking is not making a normal, advance or fall-back move as part of this embarkation.",
+      "source_sha256": "5dde776b1cf69f6b47b71219938b51665eb2d8a42e8392befa07e5afdea855e2",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section18; no new Strategic Reserves exception. Transport embark occasion belongs to Section18; attachment does not grant a new embark occasion."
+    },
+    {
+      "ordinal": 2,
+      "id": "9bfa47ed-be8d-4e11-80de-f3832d507ca1",
+      "question": "Can I select a unit to shoot or fight if it doesn't have melee or ranged weapons?",
+      "answer": "Yes, it just makes no attacks and then the fight type or shoot type is resolved.",
+      "source_sha256": "8d4f6b7b01b92637f2848b261fe07f970ef819f1ee867b889e885d1bdcbb1ada",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section10/12; no new Strategic Reserves exception. Weaponless activation is owned by Sections10/12; public attached activation is tested without inventing attacks."
+    },
+    {
+      "ordinal": 3,
+      "id": "7f767dd0-3996-417e-bba2-b7a5828b2430",
+      "question": "Can a model be within range of a weapon if it is not visible",
+      "answer": "Yes",
+      "source_sha256": "4cfeea846d7a2e135d7eb728147265987cc1adf54ca93657427474d44fe9ce56",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section04; no new Strategic Reserves exception. Visibility/range independence is Section04; no attached-only exception."
+    },
+    {
+      "ordinal": 4,
+      "id": "904b8b36-09f0-4449-a9c3-45892664ef60",
+      "question": "Do models destroyed when a unit is out of coherency count for mission objectives?",
+      "answer": "Yes.",
+      "source_sha256": "4d6f85a577496676241ac385c0cb4fa2e672c8c679d56ff363d7344279670845",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section01/03; no new Strategic Reserves exception. Mission credit for coherency casualties is Section01/mission scope; frozen attached destruction boundary is local."
+    },
+    {
+      "ordinal": 5,
+      "id": "e5941469-5653-49b2-919e-9c9246e811d4",
+      "question": "Does my model or unit become engaged while moving through a enemy units engagement range during a move?",
+      "answer": "No",
+      "source_sha256": "819dd65da567f7dae1c13e61e2e2a43c02b1188d605f1458b3c5778eefe50b36",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section01/03; no new Strategic Reserves exception. Engaged while moving is Section03; no attachment-specific exception."
+    },
+    {
+      "ordinal": 6,
+      "id": "5928ab6e-7113-42c8-9085-4291faddae09",
+      "question": "How many mortals do you take from Hazardous tests for a combined vehicle/monster and Infantry unit",
+      "answer": "The roll would be all at once and it would be 1 MW per fail",
+      "source_sha256": "3baf6215041a9e32c26f4544ae11dc0907a480bc3e2b1f3b30f0dfd8a8f53efe",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section06; no new Strategic Reserves exception. Mixed-unit Hazard amount is Section06; components do not change the owning hazard rule."
+    },
+    {
+      "ordinal": 7,
+      "id": "6b074ac1-8a03-43ac-8669-3bac17d372ab",
+      "question": "I failed hazard rolls from [Hazardous] weapons, do those mortal wounds have to be allocated to the models with the [Hazardous] weapons?",
+      "answer": "No, you allocate the mortal wounds to the unit as per Mortal Wounds(06.02). (This represents Bob the guardsmen picking up his fallen squad mates plasma gun or that the twisting power of James the Chaos Sorcerer pulling his followers into the warp.)",
+      "source_sha256": "ce792ca90e1fcdfb597549aaba5c9c7fa227850068b1581a6b00492e993aafb7",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section06; no new Strategic Reserves exception. Mortal allocation/weapon ownership is Section06; attachment introduces no Hazardous bearer lock."
+    },
+    {
+      "ordinal": 8,
+      "id": "e58d31bc-b6eb-4db1-b319-dc27dd60154f",
+      "question": "I have a rule that triggers when a mortal wound is allocated to a model, when does this happen?",
+      "answer": "When you select a model in the Select Model step of Mortal Wounds (06.02).",
+      "source_sha256": "6cb474a554ba766f84b3bf678656f25876bec6fb41905666e7e3a0697b89e3fb",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section06; no new Strategic Reserves exception. Mortal Select Model timing is Section06; no new Section19 timing rule."
+    },
+    {
+      "ordinal": 9,
+      "id": "814f382c-d6b7-4a30-a78b-1247b57ac133",
+      "question": "I have a unit being attacked with weapons that will modify some of their save rolls to be worse then 6 should I make those save rolls?",
+      "answer": "Yes, because other models in your unit may have Sv's that are better those models you've mentioned, this means that enough save rolls could be allocated to the those models that the rest of the results are not greater then the Sv's of the other models in your unit.",
+      "source_sha256": "0c6ab46362def6aac110116ddd1f38ac0efee475fdefeeeac74b6291198e1f87",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section05; no new Strategic Reserves exception. Heterogeneous Save allocation is shared Section05; highest-T distinction is locally asserted."
+    },
+    {
+      "ordinal": 10,
+      "id": "acdcfb0c-5b84-4b41-b271-751c4204bf56",
+      "question": "If I have a rule that says my unit can move up to 6\" when it makes a pile-in move or consolidation move, does this also mean it changes the maximum distance of those moves to 6\"?",
+      "answer": "Yes",
+      "source_sha256": "e8193326f2f9d7e3fb0a5d65ea64a96b7d6d2d5a3051487cc84a7c94bbef51d1",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section12; no new Strategic Reserves exception. Pile-in/consolidation maximum is Section12, not changed by attachment."
+    },
+    {
+      "ordinal": 11,
+      "id": "9657bb5d-72da-4d42-9927-731c9fc0e315",
+      "question": "If a rule allows my unit to pile-in or consolidate an extra distance in the Fight phase, when can I use that rule?",
+      "answer": "For pile-in moves, during the Pile-in step(12.02), and for consolidation moves, during the Consolidate step(12.07) of the Fight phase.",
+      "source_sha256": "cade2b4fcf8c180e7fccd7db3cda6b1d9af1dcf01e2d728abbb3011d7bc286f2",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section12; no new Strategic Reserves exception. Fight step-specific movement grant remains Section12."
+    },
+    {
+      "ordinal": 12,
+      "id": "55ea7d23-2f9e-45bf-bf6c-d98bf682549f",
+      "question": "If a rule modifies how far a unit or model can move during a pile-in move or consolidation move does it also change the distance of the target units?",
+      "answer": "No",
+      "source_sha256": "5b0a2ff2b97ec653c19ef9a0b2b903cefe44903aae6ce26174360afd342a5b16",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section12; no new Strategic Reserves exception. Target distances for movement grants remain Section12."
+    },
+    {
+      "ordinal": 13,
+      "id": "4978f15f-2b4a-4805-aacd-db9b5cad71bd",
+      "question": "If a rule says a unit auto passes Desperate Escape tests does that mean it would auto pass the hazard rolls from a desperate escape move?",
+      "answer": "Yes",
+      "source_sha256": "418d349eaf7304a61d3dd28047950280deee139fe1a1f4a68b3c71f5414183a3",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section03; no new Strategic Reserves exception. Desperate Escape Hazard equivalence remains Section03."
+    },
+    {
+      "ordinal": 14,
+      "id": "fae8a959-9cbe-46e3-a721-029b23b24e24",
+      "question": "If a rule says a unit can embark into a Transport in a turn that unit disembarked, does this ignore the core rules restriction on embarking in a turn that unit made a set up move (see 18.02)?",
+      "answer": "Yes",
+      "source_sha256": "203efbd7887644a4d4a986b7b38ecf618e7a775677f1b61a1726ae0954da4f17",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section18; no new Strategic Reserves exception. Embark exception remains Section18."
+    },
+    {
+      "ordinal": 15,
+      "id": "81bf7082-3ef5-47b9-bfc4-f2021fff1d4f",
+      "question": "If a rule says my unit must make a hazard roll does every model in the unit make a hazard roll?",
+      "answer": "No, the unit would make 1 single hazard roll.",
+      "source_sha256": "63e2958a2a4ffb22895f940904bf6956f11e89ba2717bab129d341a8b6f60e6c",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section18; no new Strategic Reserves exception. One unit hazard versus explicit each-model roll remains Section06/18."
+    },
+    {
+      "ordinal": 16,
+      "id": "bbe268a2-b1fd-43ab-8b24-fd4363730c3f",
+      "question": "If a unit becomes battle-shocked after starting an action does it stop performing that action?",
+      "answer": "Yes",
+      "source_sha256": "1912cbae65dddd8e8799e7e7a82a5ec5984533152aae9239745831f9dfed89ae",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section16; no new Strategic Reserves exception. Battle-shock Action interruption remains Section16."
+    },
+    {
+      "ordinal": 17,
+      "id": "4c654d00-318d-4665-9e46-26cfab179a29",
+      "question": "If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action?",
+      "answer": "Yes",
+      "source_sha256": "fef99387330cc3df5d34f0f94c59f49ddd403bffc2bb46936e4b80d8214f46bb",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section16; no new Strategic Reserves exception. Battle-shocked Action permission remains Section16."
+    },
+    {
+      "ordinal": 18,
+      "id": "b49d0004-1dd8-4746-a971-0b6656719dd3",
+      "question": "If a unit makes any disembark move in a turn (i.e. Disembark move, Emergency Disembark move etc.) has it disembarked that turn?",
+      "answer": "Yes.",
+      "source_sha256": "1eb39b2856a8e102482e905b7bc7fb8392e71ad6d043627414f7a7c4a69fcc21",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct: every actual disembark mode marks disembarked this turn; local Tactical producer/return preserves receipt; other modes retained Section18."
+    },
+    {
+      "ordinal": 19,
+      "id": "a89dddb3-7930-4704-9f7a-0a7664da4d84",
+      "question": "If my unit has taken control of an objective at the end of my movement phase and that unit has as an ability that secures an objective they control, can they secure that objective?",
+      "answer": "Yes",
+      "source_sha256": "5ec36166d98fd4e9d6031f8f85a631801253c6a65f26008c6e58d8cec6e72b1c",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section17; no new Strategic Reserves exception. Objective securing timing remains Section17."
+    },
+    {
+      "ordinal": 20,
+      "id": "ab92e97b-be2b-4125-9ded-fcfa6abe092e",
+      "question": "If my unit has the Deadly Demise ability and has an ability that allows it to Fight on Death, how do I resolve this?",
+      "answer": "Fight on Death rules are resolved before Deadly Demise abilities, meaning that your unit's Deadly Demise will resolve after your unit has fought/at the end of the phase and the relevant models have been removed from the battlefield.",
+      "source_sha256": "6c0d66fac9785c64b585ccf535fece6c50738787459f61ccff18d7b4d54f22fc",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section05/DD-FoD decision; no new Strategic Reserves exception. Current adopted DD/FoD decision preserved unchanged; attachment creates no new removal ordering."
+    },
+    {
+      "ordinal": 21,
+      "id": "ee9a398d-3acb-4440-b63a-68bed3e6e217",
+      "question": "If my unit has weapons that are identical in characteristics, but some of those weapons have [PRECISION] and those weapons targeted a unit without the character keyword, do I roll all of those weapons together?",
+      "answer": "Yes, the [PRECISION] ability is not an applicable ability for those attacks as there is no CHARACTER in the target unit for the ability to trigger its rule.",
+      "source_sha256": "a46aec7c497acd207755a6a220760722b4b41ab05aa0b4936cd98911abbdb641",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section05; no new Strategic Reserves exception. Precision applicability remains Section05; actual attached model Precision dependency executes."
+    },
+    {
+      "ordinal": 22,
+      "id": "bb42e060-31e1-46bc-ba52-85cd5ea8c6cf",
+      "question": "If the [ANTI] ability on my unit is ANTI-non-Monster/Vehicle does it mean the [ANTI] rule triggers when targeting units that do not have the Monster or Vehicle keyword?",
+      "answer": "Yes, ANTI-non-(any keyword) will trigger on any unit that does not have the specified keyword.",
+      "source_sha256": "2c17122ffb565c8449dcae5b2f4ca29654cb327c39f61e112cadfb49b73f0993",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section24; no new Strategic Reserves exception. Anti negative keyword semantics belong to weapon ability authority; local exact Anti-Psyker example binds live union."
+    },
+    {
+      "ordinal": 23,
+      "id": "66be2ad9-24af-4edf-890a-c0e55004bf76",
+      "question": "My rule says that \"this units ranged attacks have +1 A\", do each of my attacks get an extra attack dice?",
+      "answer": "No, it increases the A characteristics of the unit's ranged weapons by 1.",
+      "source_sha256": "9377700d849a18e73f6f58830a215dfe1b122e65b7e115d5ceecd9ca34a46feb",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section02; no new Strategic Reserves exception. Weapon A modifier remains Section02."
+    },
+    {
+      "ordinal": 24,
+      "id": "c7a83b0a-e8c3-44b5-a3ca-bb3dfba98c2d",
+      "question": "The Munitorium Field Manual shows my unit can attach to different units then are on it's datasheet, which do I use?",
+      "answer": "Use the Munitorium Field Manual.",
+      "source_sha256": "e1ebb8a68e7f4c31e1672e4801af152cb6355b84d975b7329c57de930f5a61c1",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section19; no new Strategic Reserves exception. Direct attachment source-precedence rule: execute actual MFM replacement owner for both Leader and Support."
+    },
+    {
+      "ordinal": 25,
+      "id": "3103e536-8fb8-4fa3-800c-c0d159115bba",
+      "question": "What does the X\" in Lone Operative X\" mean?",
+      "answer": "The X is a placeholder for a number of inches that the ability might appear in a rule with, like Lone Operative 15\" where the X has been replaced with 15\"",
+      "source_sha256": "5b6592050979bbcee593897a953177ea6ff01143998be6aaa82d94cec6e0e28f",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section24; no new Strategic Reserves exception. Lone Operative numeric placeholder is Section24; bounded consumer uses native12 and explicit native15 controls."
+    },
+    {
+      "ordinal": 26,
+      "id": "ba488672-92ec-443d-9087-85a999342589",
+      "question": "When a move says that a model or unit must move in a way if it is able, can that requirement force the unit to end their move not in coherency?",
+      "answer": "No, when a model or unit is making a move it must follow requirements while ending that move in coherency",
+      "source_sha256": "0f27aa55b21c0ddb344b8c753eda2ed864b0618ef79c02ce24ac11d7a0cc9213",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section01/03; no new Strategic Reserves exception. Movement coherency remains Section03; no weakening for attached groups."
+    },
+    {
+      "ordinal": 27,
+      "id": "fdefb262-1eb9-43fd-a2c8-70cf3bd2a621",
+      "question": "When a rule instructs you to perform a charge outside of the charge phase, do I resolve step 2 and 3 of the Charge step(11.02)?",
+      "answer": "Yes",
+      "source_sha256": "08639241469c28315db54217af96362204e61b52d0bd272d16a40bab54e25fe8",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section11; no new Strategic Reserves exception. Out-of-phase charge sequencing remains Section11."
+    },
+    {
+      "ordinal": 28,
+      "id": "a7ba0395-6635-45cd-aeec-1cc3c0607a0b",
+      "question": "When checking coherency for my unit can my unit be in multiple groups?",
+      "answer": "No, it must be in a single contiguous group as per Units and Models (01.02) and What is Coherency in the core rules.",
+      "source_sha256": "4eff6df1baf7b221cf03ed213f78a6cd38284f178f611bd883e448388f12eb9d",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section01/03; no new Strategic Reserves exception. One connected group coherency remains Section01/03; no split on bodyguard death."
+    },
+    {
+      "ordinal": 29,
+      "id": "06c896b8-bf06-40bd-a892-b56cb3cde9d3",
+      "question": "When declaring the allocation order of groups in my unit I have more than one non-CHARACTER groups that contain a model with a missing wound, how must I select the order?",
+      "answer": "Those groups can be selected in an order of your choosing but must be in an order that makes them come before any non-CHARACTER groups that do not contain a model with a missing wound.",
+      "source_sha256": "e8c435f8a7716a35d41f4a7522b6d87d156c108f9ba88195bdab4b27d00897c1",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section05; no new Strategic Reserves exception. Wounded allocation-group priority remains Section05; no Section19 exception."
+    },
+    {
+      "ordinal": 30,
+      "id": "5553f538-6182-4e72-905a-67855489bb1d",
+      "question": "When selecting a target unit can the enemy model that is visible to my model and the enemy model that is in range of my model's weapon be different enemy models in the same unit?",
+      "answer": "Yes",
+      "source_sha256": "5c88c04e13b99a324290f8726e470f1e4fb93152c890c597b9b16906cdd4e3e4",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section04; no new Strategic Reserves exception. Different visible/range models remain Section04; attacks target canonical units."
+    },
+    {
+      "ordinal": 31,
+      "id": "019feac1-cd25-4644-b855-2ce3fa048fee",
+      "question": "Can an attached unit be given an Upgrade?",
+      "answer": "Yes.",
+      "source_sha256": "0726dff38f240002912d8730e11af4be7e4f1c14c17d67b797855e597dd88a42",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section19; no new Strategic Reserves exception. Direct: actual attached unit accepts one Upgrade in executed roster validator."
+    },
+    {
+      "ordinal": 32,
+      "id": "38785a5c-16ba-41c5-b936-723a385f57aa",
+      "question": "Can a unit have both an Upgrade and an enhancement?",
+      "answer": "No, units are prevented from having two enhancements, and Upgrades are enhancements.",
+      "source_sha256": "7ee44f5393615f9102f2df97ea71badbd468f7b02b9f968aa1ec0c30da3ce524",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section19; no new Strategic Reserves exception. Direct: shared attached squad enhancement cap forbids Upgrade plus leader Enhancement."
+    },
+    {
+      "ordinal": 33,
+      "id": "3de45ba4-435e-4f58-a50c-fbda3f71bdc5",
+      "question": "Are Upgrades enhancements?",
+      "answer": "Yes, Upgrades are a type of enhancement (but not all enhancements are Upgrades).",
+      "source_sha256": "00e5a5e21fcdab4cfe98c30af6341386425851e952d8b85aa2febc27b4d2104e",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section19; no new Strategic Reserves exception. Direct: Upgrade is Enhancement; shared validation executes the same cap."
+    },
+    {
+      "ordinal": 34,
+      "id": "603e9b2f-cc24-498c-ac2e-08ad3068f257",
+      "question": "Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area?",
+      "answer": "Yes",
+      "source_sha256": "f12df889b0db17cfacf6358aea3dcd1a3d2725660c8a159eabad35f6f6c9fef3",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Terrain area vertical membership remains Section14."
+    },
+    {
+      "ordinal": 35,
+      "id": "6575ee89-b92a-456d-8e59-4ee513df8f4e",
+      "question": "Do rules that affect a keyword include multi-word keywords that contain that keyword? For example, would rules that affect Commissar units affect a unit that has the Commissar Graves keyword?",
+      "answer": "No.",
+      "source_sha256": "4246aa2cdf23333e8213aeef87c4224f0f2ff31b5f8c80229f9c9f3b7c648fa4",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section02; no new Strategic Reserves exception. Direct exact keyword matching; no partial multiword Anti match."
+    },
+    {
+      "ordinal": 36,
+      "id": "7a982686-03ff-4565-8d5a-2549e5650268",
+      "question": "After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available?",
+      "answer": "Yes.",
+      "source_sha256": "83a20d1e25f2befd445e81a037eddc1fbae6799e634efe2a95b7b1724d5de541",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section15; no new Strategic Reserves exception. Increased CP cost payment remains Section15."
+    },
+    {
+      "ordinal": 37,
+      "id": "88fc6c54-a3a6-4757-947b-b2dab8b7f3bf",
+      "question": "In what step during the attack sequence do I roll for Feel No Pain?",
+      "answer": "In the Resolve Damage step of the Inflict Damage step (05.04).",
+      "source_sha256": "f76c805bcfca3c48fd1702c593c0b7ae45b19cb075e805878fa90d19c9fbf2c3",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section05; no new Strategic Reserves exception. Feel No Pain damage timing remains Section05; no attachment-specific timing."
+    },
+    {
+      "ordinal": 38,
+      "id": "9aea2cef-c9db-4a30-bbfb-6b07c1f148a2",
+      "question": "Can an Epic Hero unit form an attached unit with a unit that has an enhancement?",
+      "answer": "Yes.",
+      "source_sha256": "d4d4f6a90669f72253ba254163280068e061623dfd51e1989df9d53a3797f45d",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section19; no new Strategic Reserves exception. Direct: Epic Hero may attach to bodyguard with Upgrade; executed canonical roster control."
+    },
+    {
+      "ordinal": 39,
+      "id": "9b1c81f5-2ea0-40eb-9015-6a005367cd75",
+      "question": "While making a move type other than a normal/advance move, can my MONSTER/VEHICLE unit move through friendly units?",
+      "answer": "Yes.",
+      "source_sha256": "f3c9e8b3182c4e2071fac4e28a5f24038296b51c1e9815e075078612dfa184ee",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section01/03; no new Strategic Reserves exception. Friendly movement traversal remains Section03."
+    },
+    {
+      "ordinal": 40,
+      "id": "9e243f82-42e9-4f0d-9e4b-3f5b74cd68bc",
+      "question": "If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)?",
+      "answer": "Yes. That restriction is applicable before the battle, in the Declare Battle Formations step.",
+      "source_sha256": "4a48d283634e5425caf54f2f8426b8c64351a15d8772e58a6c3ee0cff47b7031",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct: existing accepted prebattle cap is not reapplied to actual during-battle source removal. Local source consumer and explicit Core price premises; named native provider admission remains unproven."
+    },
+    {
+      "ordinal": 41,
+      "id": "adf7c2cd-b765-4e84-abb7-f0ed45d52841",
+      "question": "Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round?",
+      "answer": "Yes.",
+      "source_sha256": "fcbf7560ed5887e51b590721ed9949d9d631d5f5c22e4bd49886aba684e0dbfa",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct: half-points restriction is prebattle; actual during-battle source reposition bypasses prebattle declaration admission while preserving route."
+    },
+    {
+      "ordinal": 42,
+      "id": "beaeca32-9701-45f7-9461-879d8ae3d78f",
+      "question": "After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens?",
+      "answer": "No CP are spent and that stratagem's effects are not resolved (but that stratagem still counts as having been used this phase).",
+      "source_sha256": "e5ea7a06664adae76ec6f30368df75c64a03655b158375bbea49637e51d3c53a",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section15; no new Strategic Reserves exception. Insufficient increased CP remains Section15."
+    },
+    {
+      "ordinal": 43,
+      "id": "c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e",
+      "question": "Is being within range of a terrain objective the same as being within range of an objective marker?",
+      "answer": "Yes.",
+      "source_sha256": "b071da95e8e4f7b784d6b56260bc20d1f99d1dee892c93e49694be55146a9f6e",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Terrain Objective/marker equivalence remains primary adopted Companion convention."
+    },
+    {
+      "ordinal": 44,
+      "id": "e01c8a02-7a36-4d3b-b168-976b11bd47e8",
+      "question": "When my unit shoots at another unit, how does it work if some models in the target unit are fully visible to some models in my unit, while others are within a terrain area/not fully visible?",
+      "answer": "For each attacking model in your unit, determine whether the target unit has the benefit of cover, as described in Terrain and Visibility. In this scenario, the target unit will likely have the benefit of cover against some of the attacking models, but not all. This means that, in an example unit where all attacking models are using the same weapon, when you get to the Resolve Attacks step of the Attack Sequence, you will collect dice for attacks made by models against which the target unit has the benefit of cover separately from the dice for attacks made by models against which the target unit does not have the benefit of cover.",
+      "source_sha256": "8c5268b2b6d5a355b36634065359e05eec587d8ad7541cfbe7a7ed5144c48031",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Cover is per attacking model in Section14; native geometry ownership is retained."
+    },
+    {
+      "ordinal": 45,
+      "id": "e43402db-7c49-4cd6-acf7-fa6cac83acb0",
+      "question": "If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier?",
+      "answer": "No, a stratagem that costs 1CP and is making use of an optional +1CP section has an original cost of 2CP.",
+      "source_sha256": "82f9c28b646f5734f69e5e94c22a2a9a1df8761eaf463c1510f301294963c5f0",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section15; no new Strategic Reserves exception. Optional Stratagem base cost remains Section15."
+    },
+    {
+      "ordinal": 46,
+      "id": "e846db5e-3138-4ac6-b7ee-ca2ff7fe303e",
+      "question": "Does vertical movement in a unit that has taken to the skies count towards the distance a model has used for the purposes of [Heavy]?",
+      "answer": "No.",
+      "source_sha256": "5fc6e6bf0de94e1cd61c8e9c98f520b0c863d4b728c5e4c19654f1b8c4a61368",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section03; no new Strategic Reserves exception. Flying vertical Heavy distance remains Section03/24."
+    },
+    {
+      "ordinal": 47,
+      "id": "fc49644c-cc46-47a0-892b-284a4c4ec018",
+      "question": "Can I group or allocate a wound to a destroyed model?",
+      "answer": "No.",
+      "source_sha256": "6c644170715564c73a7148e873c64fb055afa4031065a1027f319016ba4b6bee",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section05; no new Strategic Reserves exception. Direct living-model membership: dead models cannot supply attack toughness/allocation; casualty producer and presence consumers are local."
+    },
+    {
+      "ordinal": 48,
+      "id": "04f15433-3ee1-4c6d-8546-29e4247dee5b",
+      "question": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?",
+      "answer": "After.",
+      "source_sha256": "13028847f833da09851ea0172c574d87efff63f06d924d31f67bf2fb42574b60",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section05; no new Strategic Reserves exception. Post-save Damage-to-zero remains Section05."
+    },
+    {
+      "ordinal": 49,
+      "id": "2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+      "question": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?",
+      "answer": "Models awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models: They can be measured to by friendly/enemy abilities. They can be considered visible to friendly/enemy models where relevant. They can use their datasheet abilities. They can be targeted by stratagems. Enemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight).",
+      "source_sha256": "47c3d8041c00d1755fd01c8fc8149fccadfbd89cb238fa5d8184cadaeaaea455",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section05; no new Strategic Reserves exception. Direct required Core boundary: explicit physical FoD retention keeps recipient/selection/shooting authority; ordinary casualties remain absent. Native Support/FoD provider admission is unproven."
+    },
+    {
+      "ordinal": 50,
+      "id": "421a6f30-63e2-4e1f-b352-99b643637c53",
+      "question": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+      "answer": "No, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+      "source_sha256": "c5ad1503a94c734aa9f1d0dadca11d1daa19dc63928131659eb8214c5f4c7724",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section15; no new Strategic Reserves exception. Friendly battle-shocked Stratagem denial remains Section01/15."
+    },
+    {
+      "ordinal": 51,
+      "id": "60232b79-7a10-44a0-ac68-e27312c7ba60",
+      "question": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+      "answer": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit.",
+      "source_sha256": "a4fb6955c73cae19a4d09415f8b77188b6fd8542fbb0448084db0db2c56c392f",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section02; no new Strategic Reserves exception. Direct: dead keyword source ceases unit contribution; native Psyker and Anti example asserted."
+    },
+    {
+      "ordinal": 52,
+      "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+      "question": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+      "answer": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead).",
+      "source_sha256": "736b6d704a27951f968fbcc84f7b0eca6840b08a451d353390367442244b1766",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section18; no new Strategic Reserves exception. Direct inherited boundary: embarked abilities and borrowed weapons preserve physical ownership; execute shared Firing Deck consumer."
+    },
+    {
+      "ordinal": 53,
+      "id": "7f238e23-cd3f-40ad-aa91-c75274cc655e",
+      "question": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?",
+      "answer": "Line of sight is drawn from any part of the observing model to any part of the model being observed.",
+      "source_sha256": "cf0fd95bcbcfb3ff78f04318e141c735309cc69f5f3815ab946d5a4245563333",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Physical line of sight remains Section14."
+    },
+    {
+      "ordinal": 54,
+      "id": "80182be3-1a44-464b-9ef6-cd9212429603",
+      "question": "If both players have units with the Scouts ability, do they alternate resolving scout moves?",
+      "answer": "Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn.",
+      "source_sha256": "5d5056a4966de981a21706e962e5c9ea70f05377ff20fd4962f7cc7a01d5290b",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section01/03; no new Strategic Reserves exception. Scouts alternation remains Section03/prebattle."
+    },
+    {
+      "ordinal": 55,
+      "id": "aab10e23-6433-42ca-86e7-ddc829f16c47",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting?",
+      "answer": "Unless otherwise stated, no: when snap shooting, each attack only hits on a roll of 6.",
+      "source_sha256": "b26dfcd0cc3f76a41e680b3bedaf3ba6a299fa135400cea6cbd42e493ea2e057",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section05; no new Strategic Reserves exception. Snap shooting threshold remains Section05/10."
+    },
+    {
+      "ordinal": 56,
+      "id": "b7d3d760-a167-44b2-9c91-32ce86684225",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit?",
+      "answer": "Yes, except when snap shooting: when snap shooting, each attack only hits on a roll of 6.",
+      "source_sha256": "9bfda5c1d2a514b705e9feeec17efef3325815360389fe267537521350a557ac",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section05; no new Strategic Reserves exception. Critical hit thresholds remain Section05."
+    },
+    {
+      "ordinal": 57,
+      "id": "ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+      "question": "When do the effects of a FLYING unit taking to the skies apply?",
+      "answer": "When that unit is selected to make a normal/advance/fall-back/charge move. Note that for an advance/charge move, this means you must declare that a unit will take to the skies before rolling for that advance/charge move.",
+      "source_sha256": "2202a3d04b20b42997b9a0e9a19177697bf42ee7b2b1923c4674b43faa676e9b",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section03; no new Strategic Reserves exception. Take to Skies declaration remains Section03."
+    },
+    {
+      "ordinal": 58,
+      "id": "dc9911da-e156-4b48-bf9b-18f9d96d037e",
+      "question": "If a rule refers to an 'objective marker', does this mean an 'objective'?",
+      "answer": "Yes (excluding rules in the Core Rules)'.",
+      "source_sha256": "f084d1e31353f70020957e67d0ad8821f406be29c8251048d27bf81e6664f4b3",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Non-Core objective terminology and current Companion policy remain unchanged."
+    },
+    {
+      "ordinal": 59,
+      "id": "fb3b2776-c954-471b-b448-b70caa91929d",
+      "question": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?",
+      "answer": "A charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03). Example: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\". Example: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\".",
+      "source_sha256": "18f33a49e6d2f3f401aefb615c84a2d4d373c9b382b5bb38252504d517bc8662",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section11; no new Strategic Reserves exception. Charge maximum and target reselection remain Section11."
+    },
+    {
+      "ordinal": 60,
+      "id": "db020803-7564-45c9-a6d4-e4cdf463da32",
+      "question": "Can a unit be controlling more than one objective at once?",
+      "answer": "Yes.",
+      "source_sha256": "8352b49b9fbfaceb630ac21dc45eac4d9fdf112bd15de3e50ec2f0fbd30ca36e",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section17; no new Strategic Reserves exception. Multiple-objective control remains Section17."
+    },
+    {
+      "ordinal": 61,
+      "id": "8c51d370-70b2-46c7-abaa-228b55c830c3",
+      "question": "When determining control over an objective, can the same model's OC count towards more than one objective that model is within range of?",
+      "answer": "Yes.",
+      "source_sha256": "cda9f83e49d0006eef29aeb0e17f388472db9fa391be2ea4a96e6ce4850e80a6",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section17; no new Strategic Reserves exception. OC may count for multiple in-range objectives remains Section17."
+    },
+    {
+      "ordinal": 62,
+      "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+      "question": "If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle?",
+      "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn.",
+      "source_sha256": "f1569a6a16420f52ff3a4cc89c61762db7467cba6bdc320c8a4e3fa8ceec239f",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct: original lasting effect survives removal/return and exists through end-turn query until shared expiry boundary; no renewed lifetime."
+    },
+    {
+      "ordinal": 63,
+      "id": "9638115f-b94b-4d05-ba62-df9fba2805ac",
+      "question": "When a model overhangs the edge of the battlefield, how does that affect its visibility?",
+      "answer": "That model's controlling player can draw line of sight from any part of that model that is not overhanging the edge of the battlefield. Their opponent can draw line of sight to any part of that model.",
+      "source_sha256": "1c43f713b930f8f51c7d429991f40174c22eb30bbf4bd56773993b4a8e319cd8",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section14/Companion policy; no new Strategic Reserves exception. Overhanging visibility remains Section14."
+    },
+    {
+      "ordinal": 64,
+      "id": "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+      "question": "When does a model's or unit's ability in an attached unit apply to all models in that unit?",
+      "answer": "A rule that applies to 'this/that unit' or 'models in this/that unit' applies to all models in an attached unit. Rules that just apply to one model in an attached unit (for example, a rule that grants a model Feel No Pain or Lone Operative) only apply to that model, not to all models in the attached unit.",
+      "source_sha256": "cbf7e42f41f0d4cce05a0f084c6982e8899da06ac0a71c7339ad6845ef0acc47",
+      "disposition": "bounded_owning_section",
+      "reason": "Screened: owned by Section19; no new Strategic Reserves exception. Direct: every unit-wide grant includes group models while specified-model grants stay local; actual recipient, targeting and model-only Epic controls execute."
+    }
+  ],
+  "locally_owned_faqs": [
+    {
+      "ordinal": 18,
+      "id": "b49d0004-1dd8-4746-a971-0b6656719dd3",
+      "question": "If a unit makes any disembark move in a turn (i.e. Disembark move, Emergency Disembark move etc.) has it disembarked that turn?",
+      "answer": "Yes.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section20/test_reposition.py::test_completed_advance_fallback_and_disembark_keep_their_turn_restrictions_after_return",
+          "function_ast_sha256": "544e7d1d1e7e6b4c4bf0d19dcb57f626b6d65781f8abf10a95a1c3d4701a8b26",
+          "assertions": [
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert original",
+            "assert result.is_valid, result.to_payload()",
+            "assert state.battlefield_state is not None",
+            "assert tuple(state.disembarked_unit_states) == original",
+            "assert state.disembarked_unit_state_for_unit(player_id='owner', battle_round=1, unit_instance_id=unit.unit_instance_id) == original[0]",
+            "assert (tuple(state.advanced_unit_states) if action == 'advance' else tuple(state.fell_back_unit_states)) == original",
+            "assert charge_unit_ineligibility_reason(state=state, unit_instance_id=unit.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor(), charge_state=ChargePhaseState(1, 'owner'), ignore_already_selected=False) == ('charge_unit_advanced' if action == 'advance' else 'charge_unit_fell_back')"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 40,
+      "id": "9e243f82-42e9-4f0d-9e4b-3f5b74cd68bc",
+      "question": "If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)?",
+      "answer": "Yes. That restriction is applicable before the battle, in the Declare Battle Formations step.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section20/test_reposition.py::test_moved_native_unit_can_use_explicit_reposition_permission_without_resetting_status",
+          "function_ast_sha256": "8aa036d6f6b15c6a76eff0f28c1e6e3c8ad25c449a550ff6ba36d4160f63d162",
+          "assertions": [
+            "assert sum((p.points for p in session.lifecycle.config.reserve_unit_points)) == 1001",
+            "assert unit.unit_instance_id in affected()",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert status.decision_request is not None",
+            "assert status.decision_request.decision_type == 'select_source_reposition'",
+            "assert movement",
+            "assert movement[0].unit_instance_id == unit.unit_instance_id",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert tuple(state.normal_move_states) == movement",
+            "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+            "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+            "assert state.battlefield_state is not None",
+            "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is None",
+            "assert unit.unit_instance_id not in affected()",
+            "assert reserve_round_deadline_exempt_ids(state) == frozenset({unit.unit_instance_id})",
+            "assert reserve is not None",
+            "assert reserve.entered_reserves_battle_round == 2",
+            "assert status.decision_request is not None",
+            "assert status.decision_request is not None",
+            "assert status.decision_request is not None",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert tuple(state.normal_move_states) == movement",
+            "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+            "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+            "assert unit.unit_instance_id not in affected()",
+            "assert duration in removed",
+            "assert duration not in state.persisting_effects_for_unit(unit.unit_instance_id)",
+            "assert state.reserve_state_for_unit(unit.unit_instance_id) is None",
+            "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is not None",
+            "assert unit.unit_instance_id in affected()"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 41,
+      "id": "adf7c2cd-b765-4e84-abb7-f0ed45d52841",
+      "question": "Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round?",
+      "answer": "Yes.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section20/test_reposition.py::test_moved_native_unit_can_use_explicit_reposition_permission_without_resetting_status",
+          "function_ast_sha256": "8aa036d6f6b15c6a76eff0f28c1e6e3c8ad25c449a550ff6ba36d4160f63d162",
+          "assertions": [
+            "assert sum((p.points for p in session.lifecycle.config.reserve_unit_points)) == 1001",
+            "assert unit.unit_instance_id in affected()",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert status.decision_request is not None",
+            "assert status.decision_request.decision_type == 'select_source_reposition'",
+            "assert movement",
+            "assert movement[0].unit_instance_id == unit.unit_instance_id",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert tuple(state.normal_move_states) == movement",
+            "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+            "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+            "assert state.battlefield_state is not None",
+            "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is None",
+            "assert unit.unit_instance_id not in affected()",
+            "assert reserve_round_deadline_exempt_ids(state) == frozenset({unit.unit_instance_id})",
+            "assert reserve is not None",
+            "assert reserve.entered_reserves_battle_round == 2",
+            "assert status.decision_request is not None",
+            "assert status.decision_request is not None",
+            "assert status.decision_request is not None",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert tuple(state.normal_move_states) == movement",
+            "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+            "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+            "assert unit.unit_instance_id not in affected()",
+            "assert duration in removed",
+            "assert duration not in state.persisting_effects_for_unit(unit.unit_instance_id)",
+            "assert state.reserve_state_for_unit(unit.unit_instance_id) is None",
+            "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is not None",
+            "assert unit.unit_instance_id in affected()"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 62,
+      "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+      "question": "If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle?",
+      "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section20/test_reposition.py::test_moved_native_unit_can_use_explicit_reposition_permission_without_resetting_status",
+          "function_ast_sha256": "8aa036d6f6b15c6a76eff0f28c1e6e3c8ad25c449a550ff6ba36d4160f63d162",
+          "assertions": [
+            "assert sum((p.points for p in session.lifecycle.config.reserve_unit_points)) == 1001",
+            "assert unit.unit_instance_id in affected()",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert status.decision_request is not None",
+            "assert status.decision_request.decision_type == 'select_source_reposition'",
+            "assert movement",
+            "assert movement[0].unit_instance_id == unit.unit_instance_id",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert tuple(state.normal_move_states) == movement",
+            "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+            "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+            "assert state.battlefield_state is not None",
+            "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is None",
+            "assert unit.unit_instance_id not in affected()",
+            "assert reserve_round_deadline_exempt_ids(state) == frozenset({unit.unit_instance_id})",
+            "assert reserve is not None",
+            "assert reserve.entered_reserves_battle_round == 2",
+            "assert status.decision_request is not None",
+            "assert status.decision_request is not None",
+            "assert status.decision_request is not None",
+            "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+            "assert tuple(state.normal_move_states) == movement",
+            "assert duration in state.persisting_effects_for_unit(unit.unit_instance_id)",
+            "assert rules_unit_is_battle_shocked(state=state, unit_instance_id=unit.unit_instance_id)",
+            "assert unit.unit_instance_id not in affected()",
+            "assert duration in removed",
+            "assert duration not in state.persisting_effects_for_unit(unit.unit_instance_id)",
+            "assert state.reserve_state_for_unit(unit.unit_instance_id) is None",
+            "assert state.battlefield_state.unit_placement_or_none(unit.unit_instance_id) is not None",
+            "assert unit.unit_instance_id in affected()"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    }
+  ],
+  "metadata_is_not_semantic_coverage": true,
+  "unresolved_source_interpretations": [],
+  "cutover_qualification": "Literal/source inventory remains complete. Current behavioral evidence is partial after the approved legacy-test cutover. Only selected active tests are live semantic bindings; historical_nonselected_evidence preserves former records without current gameplay or coverage credit. Explicit gaps remain for unselected checks; archives are historical evidence, never current test sources."
+}

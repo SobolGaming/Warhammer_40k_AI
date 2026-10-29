@@ -1,0 +1,250 @@
+{
+  "schema": "section12-future-fixes-v1",
+  "policy": "Enabled source-correct expectations. No semantic repair, guard weakening, skip/xfail or compatibility shim. Runtime c92d093a unchanged.",
+  "findings": [
+    {
+      "id": "SF12-001",
+      "title": "Shared native floating distance edge excludes a mathematical3-inch Consolidation target",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "source": [
+        "rule:12:12.08:1 block6",
+        "rule:03:03.04:1"
+      ],
+      "expected": "Exactly3 inches admits Engaging Consolidation and the subject receives its proposal.",
+      "actual": "At translated origin10 native circular radius arithmetic produces a range just above3; mode becomes Objective or subject is omitted in favor of the later eligible sentinel.",
+      "tests": [
+        "tests/rules/section12/test_consolidation.py::test_consolidation_mode_precedence_and_three_inch_target_boundary[3]",
+        "tests/rules/section12/test_consolidation.py::test_engaging_consolidation_requires_every_selected_enemy_at_endpoint[3]"
+      ],
+      "owners": [
+        "geometry/base.py",
+        "geometry/volume.py",
+        "engine/fight_movement_mode_authority.py"
+      ],
+      "cross_reference": "Same numerical threshold family exposed by SF10-001 and SF11-001; two new Fight consumers, not two new independent root causes. No broader tolerance policy established.",
+      "qualification": "Native bases, explicit later Consolidation checkpoint; preceding reachability is not reconstructed.",
+      "pre_repair_observation": {
+        "id": "SF12-001",
+        "title": "Shared native floating distance edge excludes a mathematical3-inch Consolidation target",
+        "status": "OPEN_ENABLED_FAILURE_NO_REPAIR",
+        "source": [
+          "rule:12:12.08:1 block6",
+          "rule:03:03.04:1"
+        ],
+        "expected": "Exactly3 inches admits Engaging Consolidation and the subject receives its proposal.",
+        "actual": "At translated origin10 native circular radius arithmetic produces a range just above3; mode becomes Objective or subject is omitted in favor of the later eligible sentinel.",
+        "tests": [
+          "tests/rules/section12/test_consolidation.py::test_consolidation_mode_precedence_and_three_inch_target_boundary[3]",
+          "tests/rules/section12/test_consolidation.py::test_engaging_consolidation_requires_every_selected_enemy_at_endpoint[3]"
+        ],
+        "owners": [
+          "geometry/base.py",
+          "geometry/volume.py",
+          "engine/fight_movement_mode_authority.py"
+        ],
+        "cross_reference": "Same numerical threshold family exposed by SF10-001 and SF11-001; two new Fight consumers, not two new independent root causes. No broader tolerance policy established.",
+        "qualification": "Native bases, explicit later Consolidation checkpoint; preceding reachability is not reconstructed."
+      },
+      "repair_performed": true,
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": "SF10-001",
+        "independent_review_revision": {
+          "finding": "R1",
+          "prior_verdict": "SCOPED_NOT_CLEAN",
+          "prior_source_map": "cd334b13a3a8102dddbfc0f79de8e38d4999f38df3f376f7971f5aca2db26534",
+          "revision": "task11/revision-2",
+          "status": "REPAIRED_AWAITING_RENEWED_REVIEW",
+          "comparison": "exact authoritative binary input ratios; no exterior tolerance",
+          "fixture_correction": "nearest legal native placement; original assertions/parameters preserved"
+        }
+      }
+    },
+    {
+      "id": "SF12-002",
+      "title": "A passed player is not reconsidered after enemy Overrun brings a target within5",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "source": [
+        "rule:12:12.04.01:1 blocks1/2"
+      ],
+      "expected": "After a non-consecutive pass and an opponent combat, return to the waiting eligible player; a now-near target permits that unit to select Overrun.",
+      "actual": "Three real native activations and a legal witnessed enemy Overrun bring the nearest enemy from beyond5 to about4.326. The waiting unit is alive and unselected. The engine retains owner in passed_player_ids and ends Fight step, offering Consolidation.",
+      "tests": [
+        "tests/rules/section12/test_phase.py::test_pass_waits_for_enemy_overrun_to_bring_a_target_near_then_unit_fights"
+      ],
+      "owners": [
+        "engine/fight_order_records.py:FightOrderState.with_activation",
+        "engine/phases/fight.py:FightPhaseHandler._request_fight_activation"
+      ],
+      "qualification": "Constructed initial Fight-step eligibility inventory after an initially engaged scene; all movements and attacks after checkpoint use native public decisions. Tail expecting the waiting unit attacks remains enabled but is not executed beyond this failed assertion.",
+      "not_duplicate": "Separate from shared numerical distance, SF11-002 optional out-of-phase charge and earlier Command sequencing findings.",
+      "pre_repair_observation": {
+        "id": "SF12-002",
+        "title": "A passed player is not reconsidered after enemy Overrun brings a target within5",
+        "status": "OPEN_ENABLED_FAILURE_NO_REPAIR",
+        "source": [
+          "rule:12:12.04.01:1 blocks1/2"
+        ],
+        "expected": "After a non-consecutive pass and an opponent combat, return to the waiting eligible player; a now-near target permits that unit to select Overrun.",
+        "actual": "Three real native activations and a legal witnessed enemy Overrun bring the nearest enemy from beyond5 to about4.326. The waiting unit is alive and unselected. The engine retains owner in passed_player_ids and ends Fight step, offering Consolidation.",
+        "tests": [
+          "tests/rules/section12/test_phase.py::test_pass_waits_for_enemy_overrun_to_bring_a_target_near_then_unit_fights"
+        ],
+        "owners": [
+          "engine/fight_order_records.py:FightOrderState.with_activation",
+          "engine/phases/fight.py:FightPhaseHandler._request_fight_activation"
+        ],
+        "qualification": "Constructed initial Fight-step eligibility inventory after an initially engaged scene; all movements and attacks after checkpoint use native public decisions. Tail expecting the waiting unit attacks remains enabled but is not executed beyond this failed assertion.",
+        "not_duplicate": "Separate from shared numerical distance, SF11-002 optional out-of-phase charge and earlier Command sequencing findings."
+      },
+      "repair_performed": true,
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": null
+      }
+    },
+    {
+      "id": "SF12-003",
+      "title": "Blocked objective fallback cannot complete because reachability is unresolved",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "source": [
+        "rule:12:12.08:1 block11",
+        "rule:03:03.01:1"
+      ],
+      "expected": "A moved model unable to reach the selected objective in3 inches may finish closer while its rules unit ends coherent, unengaged and in range.",
+      "actual": "The real objective per-model reachability query returns UNRESOLVED for the native attached member behind a solid8-inch-high sealed wall; the otherwise legal0.1-inch closer proposal is rejected consolidation_reachability_unresolved. The unobstructed and legal-decline siblings distinguish the if-able branch and legal continuation.",
+      "tests": [
+        "tests/rules/section12/test_ownership.py::test_objective_member_unable_to_reach_range_may_move_closer_behind_solid_wall[blocked]"
+      ],
+      "owners": [
+        "engine/consolidation_model_constraints.py",
+        "geometry/movement_reachability.py"
+      ],
+      "geometric_reason": "Lord radius40mm/2: leader starts(10,12.5), objective(16,10). Marker40mm with3-inch control. Wall x11.10..11.20,y9..30,z0..8. A whole base must cross to objective side, pass south below8.213, north above30.787 or above wall8. Each is beyond3 inches from the initial pose. Proposed leader(10.1,12.5) is closer, remains on its side; body(12.1,10) remains in objective range and group distance is sqrt(2^2+2.5^2)<2+40mm.",
+      "qualification": "Constructed already-permitted native attachment, objective and terrain checkpoint after an engaged start. No claim that an unresolved result proves unreachable; the geometric proof above is independent. No general solver performance bound or solver repair.",
+      "not_duplicate": "No prior register owns this objective fallback computational gap.",
+      "pre_repair_observation": {
+        "id": "SF12-003",
+        "title": "Blocked objective fallback cannot complete because reachability is unresolved",
+        "status": "OPEN_ENABLED_COMPUTATIONAL_GAP_NO_REPAIR",
+        "source": [
+          "rule:12:12.08:1 block11",
+          "rule:03:03.01:1"
+        ],
+        "expected": "A moved model unable to reach the selected objective in3 inches may finish closer while its rules unit ends coherent, unengaged and in range.",
+        "actual": "The real objective per-model reachability query returns UNRESOLVED for the native attached member behind a solid8-inch-high sealed wall; the otherwise legal0.1-inch closer proposal is rejected consolidation_reachability_unresolved. The unobstructed and legal-decline siblings distinguish the if-able branch and legal continuation.",
+        "tests": [
+          "tests/rules/section12/test_ownership.py::test_objective_member_unable_to_reach_range_may_move_closer_behind_solid_wall[blocked]"
+        ],
+        "owners": [
+          "engine/consolidation_model_constraints.py",
+          "geometry/movement_reachability.py"
+        ],
+        "geometric_reason": "Lord radius40mm/2: leader starts(10,12.5), objective(16,10). Marker40mm with3-inch control. Wall x11.10..11.20,y9..30,z0..8. A whole base must cross to objective side, pass south below8.213, north above30.787 or above wall8. Each is beyond3 inches from the initial pose. Proposed leader(10.1,12.5) is closer, remains on its side; body(12.1,10) remains in objective range and group distance is sqrt(2^2+2.5^2)<2+40mm.",
+        "qualification": "Constructed already-permitted native attachment, objective and terrain checkpoint after an engaged start. No claim that an unresolved result proves unreachable; the geometric proof above is independent. No general solver performance bound or solver repair.",
+        "not_duplicate": "No prior register owns this objective fallback computational gap."
+      },
+      "repair_performed": true,
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": null
+      }
+    },
+    {
+      "id": "SF05-002",
+      "title": "Existing Section05 after-removal Deadly Demise defect exposed by independent retained enemy interaction",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "source": [
+        "faq:ab92e97b-be2b-4125-9ded-fcfa6abe092e",
+        "docs/SECTION05_DEADLY_DEMISE_DECISION.md"
+      ],
+      "expected": "At Deadly Demise resolution the completed FOD casualty has been physically removed, while the independent enemy FOD casualty remains present.",
+      "actual": "Native lethal melee and accepted retention, plus a separate rule-death retention checkpoint, reach DD. The independent enemy remains WAITING and present, but the DD source casualty is still present: observer reports (False, True).",
+      "tests": [
+        "tests/rules/section12/test_retained_interactions.py::test_section05_faq20_independent_enemy_retention_survives_other_cleanup_and_demise"
+      ],
+      "owners": [
+        "engine/retained_destruction_cleanup.py",
+        "engine/attack_destruction_reactions.py",
+        "engine/attack_destruction_completion.py"
+      ],
+      "cross_reference": "Same already registered SF05-002; not a new Section12 root. Approved later interpretation only.",
+      "qualification": "The independent retention protection is observed under current incorrect ordering. Approved after-removal interaction remains unvalidated. The separate relocated-retained measurement pilot is unsupported fixed-placement drift, preserved as attempt, not adopted failure.",
+      "pre_repair_observation": {
+        "id": "SF05-002",
+        "title": "Existing Section05 after-removal Deadly Demise defect exposed by independent retained enemy interaction",
+        "status": "INHERITED_ENABLED_FAILURE_NO_REPAIR",
+        "source": [
+          "faq:ab92e97b-be2b-4125-9ded-fcfa6abe092e",
+          "docs/SECTION05_DEADLY_DEMISE_DECISION.md"
+        ],
+        "expected": "At Deadly Demise resolution the completed FOD casualty has been physically removed, while the independent enemy FOD casualty remains present.",
+        "actual": "Native lethal melee and accepted retention, plus a separate rule-death retention checkpoint, reach DD. The independent enemy remains WAITING and present, but the DD source casualty is still present: observer reports (False, True).",
+        "tests": [
+          "tests/rules/section12/test_retained_interactions.py::test_section05_faq20_independent_enemy_retention_survives_other_cleanup_and_demise"
+        ],
+        "owners": [
+          "engine/retained_destruction_cleanup.py",
+          "engine/attack_destruction_reactions.py",
+          "engine/attack_destruction_completion.py"
+        ],
+        "cross_reference": "Same already registered SF05-002; not a new Section12 root. Approved later interpretation only.",
+        "qualification": "The independent retention protection is observed under current incorrect ordering. Approved after-removal interaction remains unvalidated. The separate relocated-retained measurement pilot is unsupported fixed-placement drift, preserved as attempt, not adopted failure."
+      },
+      "repair_performed": true,
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": null
+      }
+    }
+  ],
+  "inherited": {
+    "registers": [
+      "tests/rules/section01/future-fixes.json",
+      "tests/rules/section02/future-fixes.json",
+      "tests/rules/section03/future-fixes.json",
+      "tests/rules/section04/future-fixes.json",
+      "tests/rules/section05/future-fixes.json",
+      "tests/rules/section06/future-fixes.json",
+      "tests/rules/section07/future-fixes.json",
+      "tests/rules/section08/future-fixes.json",
+      "tests/rules/section09/future-fixes.json",
+      "tests/rules/section10/future-fixes.json",
+      "tests/rules/section11/future-fixes.json"
+    ],
+    "status": "All predecessor files unchanged. Includes prior Stealth, Epic Challenge, approved after-removal Deadly Demise/FOD SF05-002, qualified Command-end, Ordered Retreat transit, whole-model hazard removal, partial Defiler auto-pass, numerical engagement and SF11-002.",
+    "approved_interpretation": "docs/SECTION05_DEADLY_DEMISE_DECISION.md; do not reopen superseded before-removal interpretation.",
+    "remaining_SF05_002_gaps": [
+      "Distinguishing pre-destruction measurement reference after retained movement.",
+      "Independent retention of enemy casualties in combined interaction."
+    ],
+    "no_combined_certification": true
+  },
+  "execution_repairs": [],
+  "development": "All unsuccessful pilots and raw diagnostics retained in task-10/runs. Missing fixture APIs, native start-hook binding, mandatory armed declarations, terrain MissionSetup identity and required Ruins floors corrected only in new fixtures. Invalid integer movement-mode token raised a typed domain error; final context drift uses an otherwise valid token. No production fix.",
+  "revision2_unadopted_attempts": [
+    {
+      "test": "test_section05_faq20_pre_destruction_measurement_survives_later_retained_position",
+      "reason": "Counterfactual relocation of retained destroyed model violates fixed-placement invariant. Next add-native operation rejects Retained destruction fixed placement drift; this is fixture invalidity, not a source-correct semantic defect.",
+      "evidence": "runs/interactions-pilot/raw.txt and attempts/unsupported-retained-relocation-pilot.py",
+      "remaining_gap": "No distinguished pre-death versus changed-retained-position measurement validation."
+    }
+  ],
+  "current_checkpoint_note": "User-approved focused repair checkpoint supersedes this file's historical no-repair milestone policy only for marked findings; original observations and source qualifications remain retained. Independent review pending."
+}

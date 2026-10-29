@@ -1,4 +1,4 @@
-"""Current fixture evolution must not hide altered original test obligations."""
+"""Exact fixture history, including retired RANDOM, cannot hide original obligations."""
 
 from __future__ import annotations
 
@@ -28,17 +28,81 @@ TARGETS = {
 
 def _sources(path: str) -> tuple[bytes, bytes]:
     original = ROOT / cast(str, preservation.FILE_PINS[path]["baseline_archive"])
-    return original.read_bytes(), (ROOT / path).read_bytes()
+    from tools.performance_ci69_members import retired_test_source
+
+    retired = retired_test_source(ROOT, path)
+    current = retired[1] if retired is not None else (ROOT / path).read_bytes()
+    return original.read_bytes(), current
 
 
 @pytest.mark.parametrize("path", PATHS)
-def test_current_complete_bytes_and_literal_ast_join_unchanged_historical_chain(path: str) -> None:
+def test_current_complete_bytes_and_literal_ast_join_unchanged_historical_chain(
+    path: str, tmp_path: Path
+) -> None:
+    """Retired RANDOM is source-history evidence, without current engine/runtime credit."""
     original, current = _sources(path)
     preservation.assert_s25_fixture_only_ast(path, original, current)
     assert preservation.preserved_s25_predecessor_test_bytes(path, current) == original
     assert preserved_d10_predecessor_test_bytes(path, current) == original
     assert preserved_d09_predecessor_test_bytes(path, current) == original
     assert current != original
+    if path == RANDOM:
+        from tools import performance_ci69_members as ci69
+
+        # This is a native retired-source reader control, not current engine credit.
+        fixture = tmp_path / "retirement"
+        record = fixture / ci69.CUTOVER_PATH
+        archive_name = ci69.RETIREMENT_NAMESPACE + path + ".txt"
+        archive = fixture / archive_name
+        original_path = fixture / path
+        record.parent.mkdir(parents=True)
+        archive.parent.mkdir(parents=True)
+        original_path.parent.mkdir(parents=True)
+        native_record = (ROOT / ci69.CUTOVER_PATH).read_bytes()
+        record.write_bytes(native_record)
+        archive.write_bytes(current)
+        observed = ci69.retired_test_source(fixture, path)
+        assert observed is not None
+        assert observed == (archive, current)
+        assert ci69.retired_test_source(fixture, "tests/unit/unlisted.py") is None
+        for changed in (
+            "archive_bytes",
+            "native_row",
+            "reappeared",
+            "broken_original",
+            "archive_symlink",
+            "archive_hardlink",
+            "missing_archive",
+        ):
+            archive.unlink(missing_ok=True)
+            original_path.unlink(missing_ok=True)
+            other = fixture / "same-native.txt"
+            other.unlink(missing_ok=True)
+            record.write_bytes(native_record)
+            archive.write_bytes(current)
+            if changed == "archive_bytes":
+                archive.write_bytes(current + b"\n")
+            elif changed == "native_row":
+                invalid = json.loads(native_record)
+                invalid["retirements"][0]["native"]["sha256"] = "0" * 64
+                record.write_text(json.dumps(invalid))
+            elif changed == "reappeared":
+                original_path.write_bytes(b"")
+            elif changed == "broken_original":
+                original_path.symlink_to(fixture / "absent")
+            elif changed == "archive_symlink":
+                archive.unlink()
+                other.write_bytes(current)
+                archive.symlink_to(other)
+            elif changed == "archive_hardlink":
+                archive.unlink()
+                other.write_bytes(current)
+                archive.hardlink_to(other)
+            else:
+                archive.unlink()
+            with pytest.raises((ValueError, FileNotFoundError)):
+                ci69.retired_test_source(fixture, path)
+        assert original_path.is_symlink() is False
 
 
 @pytest.mark.parametrize(
@@ -138,6 +202,36 @@ def _mutated_current(path: str, kind: str) -> bytes:
     elif kind in {"pause_false", "pause_one"}:
         keyword = next(item for item in call.keywords if item.arg == "pause_at_first_hit")
         keyword.value = ast.Constant(value=False if kind == "pause_false" else 1)
+    elif kind in {"fixed_identity", "random_identity", "fixed_predicate", "cleave_identity"}:
+        fixture_name = (
+            "test_random_cleave_is_a_single_target_bonus_never_a_splittable_budget"
+            if kind == "cleave_identity"
+            else "_lethal_extra_session"
+        )
+        fixture = next(
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == fixture_name
+        )
+        call_name = "random_melee_session" if kind == "cleave_identity" else "fight_lifecycle"
+        fixture_call = next(
+            node
+            for node in ast.walk(fixture)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == call_name
+        )
+        identity = next(keyword for keyword in fixture_call.keywords if keyword.arg == "game_id")
+        if kind == "cleave_identity":
+            identity.value = ast.Constant(value="unapproved-cleave-identity")
+        else:
+            assert isinstance(identity.value, ast.IfExp)
+            if kind == "fixed_identity":
+                identity.value.orelse = ast.Constant(value="unapproved-fixed-identity")
+            elif kind == "random_identity":
+                identity.value.body = ast.Constant(value="unapproved-random-identity")
+            else:
+                identity.value.test = ast.Constant(value=False)
     elif kind == "leader_literal":
         keyword = next(item for item in call.keywords if item.arg == "enemy_unit_specs")
         assert isinstance(keyword.value, ast.IfExp)
@@ -197,6 +291,10 @@ AST_CONTROLS = (
     *[(path, kind) for path in PATHS for kind in COMMON_MUTATIONS],
     (RANDOM, "pause_false"),
     (RANDOM, "pause_one"),
+    *[
+        (RANDOM, kind)
+        for kind in ("fixed_identity", "random_identity", "fixed_predicate", "cleave_identity")
+    ],
     *[
         (RETAINED, kind)
         for kind in (
@@ -271,7 +369,8 @@ def test_actual_manifest_layout_guard_rejects_drift_independently_of_byte_pin(ki
 
 
 @pytest.mark.parametrize(
-    "tamper", ["current", "retained_helper", "random_helper", "archive", "manifest"]
+    "tamper",
+    ["current", "retained_helper", "random_helper", "archive", "manifest", "integration_archive"],
 )
 def test_actual_projection_rejects_complete_byte_tamper_before_returning_history(
     tamper: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -279,6 +378,7 @@ def test_actual_projection_rejects_complete_byte_tamper_before_returning_history
     files = {
         *PATHS,
         *preservation.HELPER_PINS,
+        preservation.INTEGRATION_RANDOM_PREIMAGE,
         *(cast(str, row["baseline_archive"]) for row in preservation.FILE_PINS.values()),
         preservation.ARCHIVE_DIRECTORY + "/test-preservation.json",
     }
@@ -288,6 +388,7 @@ def test_actual_projection_rejects_complete_byte_tamper_before_returning_history
         shutil.copyfile(ROOT / relative, target)
     target_path = {
         "current": RANDOM,
+        "integration_archive": preservation.INTEGRATION_RANDOM_PREIMAGE,
         "retained_helper": "tests/s25_original_fixture_controls.py",
         "random_helper": "tests/random_melee_helpers.py",
         "archive": cast(str, preservation.FILE_PINS[RANDOM]["baseline_archive"]),

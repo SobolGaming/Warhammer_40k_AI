@@ -1,0 +1,622 @@
+from __future__ import annotations
+
+import ast
+from pathlib import Path
+
+from tests.code_quality.source_index import ast_for, source_for
+
+ROOT = Path(__file__).resolve().parents[2]
+SRC_ROOT = ROOT / "src" / "warhammer40k_core"
+ATTACK_SEQUENCE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "attack_sequence.py"
+ATTACK_SEQUENCE_SPLIT_PATHS = tuple(sorted(ATTACK_SEQUENCE_PATH.parent.glob("attack_sequence*.py")))
+MODEL_DESTROYED_EMITTER_PATHS = {
+    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
+    "src/warhammer40k_core/engine/mortal_wound_destruction_evidence.py",
+    "src/warhammer40k_core/engine/rule_model_destruction.py",
+}
+DIRECT_MODEL_DESTROYED_EVENT_OWNERS = {
+    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
+    "src/warhammer40k_core/engine/model_destruction_cause_producers.py",
+    "src/warhammer40k_core/engine/mortal_wound_destruction_evidence.py",
+}
+MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH = (
+    "src/warhammer40k_core/engine/model_destruction_cause_producers.py"
+)
+
+
+def test_retained_attack_paths_share_selection_dice_presence_and_removal_owners() -> None:
+    engine = SRC_ROOT / "engine"
+    selection = source_for(engine / "retained_destruction_selection.py")
+    permissions = source_for(engine / "retained_attack_permissions.py")
+    assert "RETAINED_ATTACK_REACTION_KINDS" in selection
+    assert "retained_attack_selection(" in selection
+    assert "DiceRollManager(" not in selection
+    assert "SHOOT_OR_FIGHT_ON_DEATH" in permissions
+    for filename in ("attack_sequence_destruction_boundary.py", "retained_destruction_attack.py"):
+        tree = ast_for(engine / filename)
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "offer_fight_on_death_retention"
+        ]
+        assert calls
+        assert all(any(keyword.arg == "manager" for keyword in call.keywords) for call in calls)
+    shooting = source_for(engine / "retained_shooting.py")
+    grants = source_for(engine / "retained_attack_grants.py")
+    assert "rules_unit_effect_applications_from_inventory(" in grants
+    assert ".applies_to_unit(" not in grants
+    assert "parent_cause_id" in shooting
+    history = source_for(engine / "retained_shooting_history.py")
+    assert "retained_shooting_executions(state=state)" in history
+    hazardous = source_for(engine / "hazardous_retention.py")
+    assert "begin_retained_destruction_cleanup(" in shooting
+    request_builder = next(
+        node
+        for node in ast.walk(ast_for(engine / "phases" / "shooting_requests.py"))
+        if isinstance(node, ast.FunctionDef) and node.name == "_request_shooting_declaration"
+    )
+    completion = next(
+        node
+        for node in ast.walk(request_builder)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "complete_shooting_without_attacks"
+    )
+    enqueue = next(
+        node
+        for node in ast.walk(request_builder)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "request_decision"
+    )
+    assert completion.lineno < enqueue.lineno
+    empty_owner = next(
+        node
+        for node in ast.walk(ast_for(engine / "shooting_without_attacks.py"))
+        if isinstance(node, ast.FunctionDef) and node.name == "complete_shooting_without_attacks"
+    )
+    retained_completion = [
+        node
+        for node in ast.walk(empty_owner)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "_complete_out_of_phase_shooting"
+    ]
+    assert len(retained_completion) == 1
+    assert any(keyword.arg == "completed_state" for keyword in retained_completion[0].keywords)
+    assert "continue_applied_mortal_wound_destruction_with_rule_reactions(" in hazardous
+    assert not (engine / "rule_model_destruction_fight_on_death.py").exists()
+    assert not (engine / "rule_model_destruction_fight_continuation.py").exists()
+
+
+ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH = (
+    "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py"
+)
+ATTACK_DESTRUCTION_CAUSE_SHARED_OWNER_PATH = (
+    "src/warhammer40k_core/engine/attack_sequence_destruction_authority.py"
+)
+ATTACK_DESTRUCTION_BOUNDARY_PATH = (
+    "src/warhammer40k_core/engine/attack_sequence_destruction_boundary.py"
+)
+ATTACK_DESTRUCTION_RESTORE_PATH = (
+    "src/warhammer40k_core/engine/model_destruction_cause_attack_restore.py"
+)
+PRIMARY_UNIT_DESTRUCTION_TRACKING_CALLERS = {
+    "src/warhammer40k_core/engine/attack_sequence_destroyed_transport.py",
+    "src/warhammer40k_core/engine/reserve_lifetime_boundary.py",
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
+    "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py",
+}
+PRIMARY_EVENT_DESTRUCTION_SHARED_OWNERS = {
+    "src/warhammer40k_core/engine/model_destruction_primary_events.py",
+    "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py",
+}
+UNATTRIBUTED_PRIMARY_DESTRUCTION_CAUSES_BY_CALLER = {
+    "src/warhammer40k_core/engine/attack_sequence_destroyed_transport.py": ("EMERGENCY_DISEMBARK"),
+    "src/warhammer40k_core/engine/reserve_lifetime_boundary.py": "RESERVE_DEADLINE",
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": ("DESPERATE_ESCAPE"),
+    "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py": ("UNIT_COHERENCY"),
+}
+PRIMARY_DESTRUCTION_LEFT_BATTLEFIELD_BY_CALLER = {
+    relative_path: relative_path != "src/warhammer40k_core/engine/reserve_lifetime_boundary.py"
+    for relative_path in PRIMARY_UNIT_DESTRUCTION_TRACKING_CALLERS
+}
+PRIMARY_BATTLEFIELD_DEPARTURE_CALLS = {
+    "src/warhammer40k_core/engine/game_state.py": (
+        "BattlefieldRemovalKind.INTO_RESERVES",
+        "provider.occurrence_id",
+    ),
+    "src/warhammer40k_core/engine/transport_embark_mutation.py": (
+        "BattlefieldRemovalKind.EMBARK",
+        "result.result_id",
+    ),
+    "src/warhammer40k_core/engine/aircraft_turn_end.py": (
+        "BattlefieldRemovalKind.INTO_RESERVES",
+        "source.event_id",
+    ),
+    "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py": (
+        "BattlefieldRemovalKind.DESTROYED",
+        "edge_source_id",
+    ),
+}
+PRIMARY_BATTLEFIELD_DEPARTURE_CALL_NAMES = {
+    relative_path: (
+        "prepare_primary_battlefield_departure"
+        if relative_path == "src/warhammer40k_core/engine/game_state.py"
+        else "record_primary_battlefield_departure"
+    )
+    for relative_path in PRIMARY_BATTLEFIELD_DEPARTURE_CALLS
+}
+PRIMARY_BATTLEFIELD_DEPARTURE_OCCURRENCES = {
+    "src/warhammer40k_core/engine/game_state.py": "provider.occurrence_id",
+    "src/warhammer40k_core/engine/transport_embark_mutation.py": "result.result_id",
+    "src/warhammer40k_core/engine/aircraft_turn_end.py": "source.event_id",
+    "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py": ("edge_occurrence_id"),
+}
+DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS = {
+    "with_removed_models": {
+        "src/warhammer40k_core/engine/destruction_removal.py": 1,
+        "src/warhammer40k_core/engine/fight_activation_history_integrity.py": 1,
+        "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": 1,
+        "src/warhammer40k_core/engine/reserves.py": 1,
+        "src/warhammer40k_core/engine/turn_cleanup.py": 1,
+    },
+    "with_unplaced_models_marked_removed": {
+        "src/warhammer40k_core/engine/damage_allocation.py": 1,
+        "src/warhammer40k_core/engine/destroyed_transport_rules_unit_disembark.py": 1,
+        "src/warhammer40k_core/engine/empty_dedicated_transport_destruction.py": 1,
+        "src/warhammer40k_core/engine/reserves.py": 1,
+        "src/warhammer40k_core/engine/transports.py": 1,
+    },
+    "without_unit_placement": {
+        "src/warhammer40k_core/engine/aircraft_turn_end.py": 1,
+        "src/warhammer40k_core/engine/fight_movement_source.py": 1,
+        "src/warhammer40k_core/engine/prebattle.py": 1,
+        "src/warhammer40k_core/engine/rules_unit_placement.py": 1,
+        "src/warhammer40k_core/engine/transport_embark_groups.py": 1,
+    },
+    "without_from_battlefield": {
+        "src/warhammer40k_core/engine/catalog_prebattle_redeploy.py": 1,
+        "src/warhammer40k_core/engine/game_state.py": 1,
+    },
+}
+
+
+def test_phase14h_single_save_resolution_entry_point() -> None:
+    trees = tuple(ast_for(path) for path in ATTACK_SEQUENCE_SPLIT_PATHS)
+    function_names = {
+        node.name for tree in trees for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
+
+    retired_symbols = {
+        "_resolve_save_and_damage",
+        "_resolve_allocation_stage",
+        "_continue_after_allocation_group",
+        "_attack_pool_can_use_grouped_allocation_host",
+        "_allocation_group_has_interrupting_damage_choices",
+    }
+    assert function_names.isdisjoint(retired_symbols)
+    assert "_resolve_grouped_damage_from" in function_names
+
+    saving_throw_callers: list[str] = []
+    for tree in trees:
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.FunctionDef):
+                continue
+            if any(
+                isinstance(child, ast.Call)
+                and isinstance(child.func, ast.Name)
+                and child.func.id == "resolve_saving_throw"
+                for child in ast.walk(node)
+            ):
+                saving_throw_callers.append(node.name)
+
+    assert saving_throw_callers == ["_resolve_grouped_damage_from"]
+
+
+def test_phase14h_retired_attack_allocation_surface_is_absent() -> None:
+    retired_text = (
+        "select_attack_allocation",
+        "SELECT_ATTACK_ALLOCATION_DECISION_TYPE",
+        "AttackAllocationDecision",
+        "build_attack_allocation_request",
+    )
+    offenders: list[str] = []
+    for path in SRC_ROOT.rglob("*.py"):
+        text = source_for(path)
+        if any(symbol in text for symbol in retired_text):
+            offenders.append(str(path.relative_to(ROOT)))
+
+    assert offenders == []
+
+
+def test_p05a_attack_destruction_reactions_share_one_end_of_attacks_boundary() -> None:
+    damage_source = source_for(ROOT / ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH)
+    boundary_source = source_for(ROOT / ATTACK_DESTRUCTION_BOUNDARY_PATH)
+    restore_source = source_for(ROOT / ATTACK_DESTRUCTION_RESTORE_PATH)
+    dispatch_source = source_for(SRC_ROOT / "engine" / "attack_sequence_dispatch.py")
+
+    assert "defer_destroyed_attack_damage_if_required(" in damage_source
+    assert "attack_destruction_requires_end_of_attacks_boundary(" in boundary_source
+    assert boundary_source.count('"attack_model_destruction_deferred"') == 1
+    assert '"attack_pool_sha256"' in boundary_source
+    assert 'deferred_payload.get("attack_pool_sha256")' in restore_source
+    assert "pending.attack_pool_evidence_sha256" in restore_source
+    assert "if attack_sequence.attacks_resolved_event_id is None:" in restore_source
+    assert "if not attack_sequence.is_complete:" in restore_source
+    assert "_validate_pending_attack_destruction_queue_order(" in restore_source
+    assert "pending_order != expected_order" in restore_source
+    assert "remove_destroyed_model_from_battlefield(" in boundary_source
+    assert "resolve_pending_attack_destruction_until_blocked(" in dispatch_source
+    assert (
+        dispatch_source.index("_apply_deferred_mortal_wounds(")
+        < dispatch_source.index('"attack_sequence_attacks_resolved"')
+        < dispatch_source.index("resolve_pending_attack_destruction_until_blocked(")
+    )
+    assert dispatch_source.index(
+        "resolve_pending_attack_destruction_until_blocked("
+    ) < dispatch_source.index("record_attack_sequence_completed(")
+
+    for host_path in (
+        SRC_ROOT / "engine" / "fight_attack_completion.py",
+        SRC_ROOT / "engine" / "phases" / "shooting_handler.py",
+    ):
+        assert "resolve_attack_sequence_until_blocked(" in source_for(host_path)
+
+
+def test_model_destruction_emitters_remain_converged_on_typed_evidence() -> None:
+    direct_event_owners: set[str] = set()
+    wrapped_rule_emitters: set[str] = set()
+    for path in (SRC_ROOT / "engine").rglob("*.py"):
+        tree = ast_for(path)
+        if any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "append"
+            and bool(node.args)
+            and (
+                (isinstance(node.args[0], ast.Constant) and node.args[0].value == "model_destroyed")
+                or (
+                    isinstance(node.args[0], ast.Name)
+                    and node.args[0].id == "MODEL_DESTROYED_EVENT_TYPE"
+                )
+            )
+            for node in ast.walk(tree)
+        ):
+            direct_event_owners.add(path.relative_to(ROOT).as_posix())
+        if any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "_append_model_destroyed"
+            for node in ast.walk(tree)
+        ):
+            wrapped_rule_emitters.add(path.relative_to(ROOT).as_posix())
+
+    assert direct_event_owners == DIRECT_MODEL_DESTROYED_EVENT_OWNERS
+    assert (
+        direct_event_owners - {MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH}
+    ) | wrapped_rule_emitters == MODEL_DESTROYED_EMITTER_PATHS
+    for relative_path in MODEL_DESTROYED_EMITTER_PATHS:
+        emitter_source = source_for(ROOT / relative_path)
+        assert "ModelDestructionAttribution" in emitter_source
+        assert "transition_batch" in emitter_source
+        assert "source_rules_unit_objective_proximity_witness" in emitter_source
+        assert "destroyed_rules_unit_objective_proximity_witness" in emitter_source
+
+
+def test_model_destruction_emitters_register_and_consume_typed_cause_authority() -> None:
+    calls_by_path: dict[str, set[str]] = {}
+    for relative_path in (
+        *MODEL_DESTROYED_EMITTER_PATHS,
+        MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH,
+        ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH,
+        ATTACK_DESTRUCTION_CAUSE_SHARED_OWNER_PATH,
+    ):
+        calls_by_path[relative_path] = {
+            (node.func.id if isinstance(node.func, ast.Name) else node.func.attr)
+            for node in ast.walk(ast_for(ROOT / relative_path))
+            if isinstance(node, ast.Call) and isinstance(node.func, (ast.Attribute, ast.Name))
+        }
+
+    assert {
+        "finalize_attack_damage_model_destruction_cause",
+        "consume_attack_damage_model_destruction_cause",
+        "observe_model_destruction",
+    } <= calls_by_path["src/warhammer40k_core/engine/attack_sequence_hit_wound.py"]
+    assert {
+        "reserve_destroyed_attack_damage_authority",
+        "reserve_attack_deadly_demise_secondary_authorities",
+    } <= calls_by_path[ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH]
+    assert (
+        "reserve_attack_damage_model_destruction_cause"
+        in calls_by_path[ATTACK_DESTRUCTION_CAUSE_SHARED_OWNER_PATH]
+    )
+    assert {
+        "record_mortal_wound_model_destruction_cause",
+        "consume_mortal_wound_model_destruction_cause",
+        "observe_model_destruction",
+    } <= calls_by_path["src/warhammer40k_core/engine/mortal_wound_destruction_evidence.py"]
+    assert {"_reserve_destruction_cause", "_append_model_destroyed"} <= calls_by_path[
+        "src/warhammer40k_core/engine/rule_model_destruction.py"
+    ]
+    assert {
+        "record_model_destruction_cause",
+        "finalize_model_destruction_cause",
+        "consume_model_destruction_cause",
+        "observe_model_destruction",
+    } <= calls_by_path[MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH]
+
+    attack_source = source_for(ROOT / "src/warhammer40k_core/engine/attack_sequence_hit_wound.py")
+    mortal_source = source_for(
+        ROOT / "src/warhammer40k_core/engine/mortal_wound_destruction_evidence.py"
+    )
+    rule_source = source_for(ROOT / "src/warhammer40k_core/engine/rule_model_destruction.py")
+    producer_source = source_for(ROOT / MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH)
+    assert "MODEL_DESTRUCTION_CAUSE_ID_FIELD" in attack_source
+    assert "MODEL_DESTRUCTION_CAUSE_ID_FIELD" in mortal_source
+    assert "append_rule_effect_model_destroyed_event as _append_model_destroyed" in rule_source
+    assert "MODEL_DESTRUCTION_CAUSE_ID_FIELD" in producer_source
+    assert "-> ModelDestructionCauseAuthority" in producer_source
+    flow_source = source_for(ROOT / "src/warhammer40k_core/engine/battle_round_flow.py")
+    assert "_apply_phase_end_unit_destroyed_hooks" not in flow_source
+    assert "advance_model_destruction_triggers" in flow_source
+    registry_source = source_for(ROOT / "src/warhammer40k_core/engine/unit_destroyed_hooks.py")
+    assert "def candidates_for(" in registry_source
+    assert "binding.handler(context)" not in registry_source
+    assert "Occurrence maintenance cannot request player choices" in registry_source
+
+
+def test_primary_unit_destruction_tracking_covers_event_and_transition_owners() -> None:
+    callers: set[str] = set()
+    for path in (SRC_ROOT / "engine").rglob("*.py"):
+        tree = ast_for(path)
+        if any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "record_primary_unit_destructions_for_destroyed_models"
+            for node in ast.walk(tree)
+        ):
+            callers.add(path.relative_to(ROOT).as_posix())
+
+    assert callers == PRIMARY_UNIT_DESTRUCTION_TRACKING_CALLERS
+    for shared_function_name in (
+        "record_primary_destroyed_model_departures",
+        "record_primary_unit_destruction_for_logical_completion",
+    ):
+        shared_callers = {
+            path.relative_to(ROOT).as_posix()
+            for path in (SRC_ROOT / "engine").rglob("*.py")
+            if any(
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id == shared_function_name
+                for node in ast.walk(ast_for(path))
+            )
+        }
+        assert shared_callers == PRIMARY_EVENT_DESTRUCTION_SHARED_OWNERS
+    for (
+        relative_path,
+        expected_left_battlefield,
+    ) in PRIMARY_DESTRUCTION_LEFT_BATTLEFIELD_BY_CALLER.items():
+        calls = tuple(
+            node
+            for node in ast.walk(ast_for(ROOT / relative_path))
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "record_primary_unit_destructions_for_destroyed_models"
+        )
+        assert calls
+        assert {
+            keyword.value.value
+            for call in calls
+            for keyword in call.keywords
+            if keyword.arg == "left_battlefield"
+            and isinstance(keyword.value, ast.Constant)
+            and isinstance(keyword.value.value, bool)
+        } == {expected_left_battlefield}
+    for relative_path, cause_name in UNATTRIBUTED_PRIMARY_DESTRUCTION_CAUSES_BY_CALLER.items():
+        assert f"PrimaryUnattributedDestructionCause.{cause_name}" in source_for(
+            ROOT / relative_path
+        )
+    assert "record_primary_unit_destructions_for_end_turn_cleanup" in source_for(
+        SRC_ROOT / "engine" / "game_state.py"
+    )
+
+
+def test_primary_unit_destruction_tracking_uses_occurrence_identity() -> None:
+    tracking_source = source_for(SRC_ROOT / "engine" / "primary_unit_destruction_tracking.py")
+    departure_source = source_for(SRC_ROOT / "engine" / "primary_battlefield_departure.py")
+
+    assert "existing_unit_ids" not in tracking_source
+    assert "requested_occurrence_id" in tracking_source
+    assert "edge_occurrence_id" in tracking_source
+    assert "expected_departure_id" in tracking_source
+    assert "expected.occurrence_id != edge_occurrence_id" in tracking_source
+    assert "occurrence_source_id" in tracking_source
+    assert "destruction.source_id == occurrence_source_id" in tracking_source
+    assert "primary_unit_destruction_id(" in tracking_source
+    assert "destruction_id drift" in tracking_source
+    assert '"occurrence_id": requested_occurrence_id' in departure_source
+    assert "occurrence_id=requested_occurrence_id" in departure_source
+
+
+def test_primary_battlefield_departure_callers_and_provenance_are_fail_closed() -> None:
+    audited_call_names = set(PRIMARY_BATTLEFIELD_DEPARTURE_CALL_NAMES.values())
+    calls_by_path: dict[str, list[ast.Call]] = {}
+    for path in (SRC_ROOT / "engine").rglob("*.py"):
+        if path.name == "primary_battlefield_departure.py":
+            continue
+        calls = [
+            node
+            for node in ast.walk(ast_for(path))
+            if isinstance(node, ast.Call)
+            and (
+                (isinstance(node.func, ast.Name) and node.func.id in audited_call_names)
+                or (isinstance(node.func, ast.Attribute) and node.func.attr in audited_call_names)
+            )
+        ]
+        if calls:
+            calls_by_path[path.relative_to(ROOT).as_posix()] = calls
+
+    assert set(calls_by_path) == set(PRIMARY_BATTLEFIELD_DEPARTURE_CALLS)
+    required_keywords = {
+        "state",
+        "rules_unit_instance_id",
+        "affected_component_unit_instance_ids",
+        "departed_component_unit_instance_ids",
+        "removed_model_instance_ids",
+        "removal_kind",
+        "occurrence_id",
+        "source_id",
+    }
+    for relative_path, (
+        expected_kind,
+        expected_source,
+    ) in PRIMARY_BATTLEFIELD_DEPARTURE_CALLS.items():
+        calls = calls_by_path[relative_path]
+        assert len(calls) == 1
+        keyword_expressions = {
+            keyword.arg: ast.unparse(keyword.value)
+            for keyword in calls[0].keywords
+            if keyword.arg is not None
+        }
+        expected_keywords = set(required_keywords)
+        if relative_path == "src/warhammer40k_core/engine/game_state.py":
+            expected_keywords.add("battlefield_state")
+            assert keyword_expressions["battlefield_state"] == "updated_battlefield"
+        assert set(keyword_expressions) == expected_keywords
+        call_function = calls[0].func
+        assert isinstance(call_function, (ast.Name, ast.Attribute))
+        call_name = call_function.id if isinstance(call_function, ast.Name) else call_function.attr
+        assert call_name == PRIMARY_BATTLEFIELD_DEPARTURE_CALL_NAMES[relative_path]
+        assert keyword_expressions["removal_kind"] == expected_kind
+        assert keyword_expressions["source_id"] == expected_source
+        assert (
+            keyword_expressions["occurrence_id"]
+            == (PRIMARY_BATTLEFIELD_DEPARTURE_OCCURRENCES[relative_path])
+        )
+
+
+def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative() -> None:
+    calls_by_method: dict[str, dict[str, int]] = {
+        method_name: {} for method_name in DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS
+    }
+    for path in (SRC_ROOT / "engine").rglob("*.py"):
+        relative_path = path.relative_to(ROOT).as_posix()
+        tree = ast_for(path)
+        for method_name in calls_by_method:
+            count = sum(
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr == method_name
+                for node in ast.walk(tree)
+            )
+            if count:
+                calls_by_method[method_name][relative_path] = count
+
+    assert calls_by_method == DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS
+
+    # Fight movement and restore validation construct temporary scenario views.
+    # They never replace authoritative GameState battlefield state.
+    fight_movement_source = source_for(SRC_ROOT / "engine" / "fight_movement_source.py")
+    fight_restore_integrity_source = source_for(
+        SRC_ROOT / "engine" / "fight_activation_history_integrity.py"
+    )
+    assert "Build the resolver view with only living source models" in fight_movement_source
+    assert "battlefield = battlefield.without_unit_placement(component_id)" in (
+        fight_movement_source
+    )
+    assert "battlefield_scenario_for_living_model_coherency" in (fight_restore_integrity_source)
+    assert "scenario.battlefield_state.with_removed_models(" in (fight_restore_integrity_source)
+    assert "replace_battlefield_state" not in fight_movement_source
+    assert "replace_battlefield_state" not in fight_restore_integrity_source
+
+    aircraft_owner_source = source_for(SRC_ROOT / "engine" / "aircraft_turn_end.py")
+    assert "BattlefieldRemovalKind.INTO_RESERVES" in aircraft_owner_source
+    assert "source_event_id=source.event_id" in aircraft_owner_source
+    assert "record_primary_battlefield_departure(" in aircraft_owner_source
+    assert "TimingTriggerKind.END_TURN" in aircraft_owner_source
+
+    embark_helper_source = source_for(SRC_ROOT / "engine" / "transport_embark_groups.py")
+    embark_owner_source = source_for(SRC_ROOT / "engine" / "transport_embark_mutation.py")
+    assert "BattlefieldRemovalKind.EMBARK" in embark_helper_source
+    assert "apply_embark_to_battlefield(" in embark_owner_source
+    assert "record_primary_battlefield_departure(" in embark_owner_source
+    for consumer in (
+        SRC_ROOT / "engine" / "phases" / "movement_fall_back_embark.py",
+        SRC_ROOT / "engine" / "transport_source_embark.py",
+    ):
+        assert "apply_embark_mutation(" in source_for(consumer)
+
+    reserve_owner_source = source_for(SRC_ROOT / "engine" / "game_state.py")
+    assert "rules_unit_placement.without_from_battlefield(self.battlefield_state)" in (
+        reserve_owner_source
+    )
+    assert "prepare_primary_battlefield_departure(" in reserve_owner_source
+    assert "record_prepared_primary_battlefield_departure(" in reserve_owner_source
+
+    # Every destructive placement mutation converges on either the shared
+    # model-destroyed event owner or an explicit unattributed transition owner.
+    damage_source = source_for(SRC_ROOT / "engine" / "damage_allocation.py")
+    battle_round_source = source_for(SRC_ROOT / "engine" / "battle_round_flow.py")
+    fight_on_death_source = source_for(SRC_ROOT / "engine" / "fight_on_death.py")
+    fall_back_source = source_for(SRC_ROOT / "engine" / "phases" / "movement_fall_back_embark.py")
+    reserve_source = source_for(SRC_ROOT / "engine" / "reserves.py")
+    cleanup_source = source_for(SRC_ROOT / "engine" / "turn_cleanup.py")
+    assert "remove_destroyed_model_from_battlefield(" in damage_source
+    retention_source = source_for(SRC_ROOT / "engine" / "retained_destruction_cleanup.py")
+    removal_source = source_for(SRC_ROOT / "engine" / "destruction_removal.py")
+    assert "retained_destructions(state=state)" in fight_on_death_source
+    # Phase-end cleanup is an owned mandatory rule in the shared timing batch.
+    # Its original physical-removal owner still resolves the selected continuation.
+    retained_boundary_source = source_for(SRC_ROOT / "engine" / "retained_phase_end_sequencing.py")
+    boundary_source = source_for(SRC_ROOT / "engine" / "boundary_rule_flow.py")
+    authority_source = source_for(SRC_ROOT / "engine" / "boundary_rule_authority.py")
+    assert "retained_phase_end_binding()" in boundary_source
+    assert "compose_core_end_rule_registry(" in battle_round_source
+    assert "compose_core_end_rule_registry(" in authority_source
+    assert "begin_retained_destruction_cleanup(" not in battle_round_source
+    assert "SequencingRequirement.MANDATORY" in retained_boundary_source
+    assert "player_id=record.placement.player_id" in retained_boundary_source
+    assert "start_retained_cleanup" in retained_boundary_source
+    assert "gw-11e-core-fight-on-death:fight-on-death" in retained_boundary_source
+    assert "resolve_pending_attack_destruction_until_blocked(" in retention_source
+    assert "resume_retained_rule_destruction(" in retention_source
+    assert "battlefield.with_removed_models(" in removal_source
+    assert "with_returned_model_placement(" not in fight_on_death_source
+    assert "replace_battlefield_state(" not in fight_on_death_source
+    primary_death_source = source_for(SRC_ROOT / "engine" / "model_destruction_primary_events.py")
+    assert "record_primary_destroyed_model_departures(" in primary_death_source
+    assert "record_primary_unit_destruction_for_logical_completion(" in primary_death_source
+    assert "record_primary_unit_destructions_for_destroyed_models(" not in battle_round_source
+    assert "PrimaryUnattributedDestructionCause.DESPERATE_ESCAPE" in fall_back_source
+    assert "apply_reserve_destruction_to_battlefield(" in reserve_source
+    reserve_boundary_source = source_for(SRC_ROOT / "engine" / "reserve_lifetime_boundary.py")
+    assert "apply_destruction(self, destruction=destruction)" in reserve_owner_source
+    assert "apply_reserve_destruction_to_battlefield(" in reserve_boundary_source
+    assert "destroy_unplaced_model_without_reactions(" in reserve_boundary_source
+    assert "PrimaryUnattributedDestructionCause.RESERVE_DEADLINE" in reserve_boundary_source
+    assert "CoherencyCleanupRemoval(" in cleanup_source
+    assert "state.resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)" in source_for(
+        SRC_ROOT / "engine" / "turn_end_boundary.py"
+    )
+    assert "record_primary_unit_destructions_for_end_turn_cleanup(state=self, cleanup=cleanup)" in (
+        reserve_owner_source
+    )
+    assert "record_primary_unit_destructions_for_end_turn_cleanup(" in reserve_owner_source
+
+    # Redeploy removes and replaces the same models inside one pre-battle operation.
+    # TEMPORARILY_REMOVED therefore is not a historical battlefield departure.
+    prebattle_source = source_for(SRC_ROOT / "engine" / "prebattle.py")
+    assert "BattlefieldRemovalKind.TEMPORARILY_REMOVED" in prebattle_source
+    assert "battlefield.without_unit_placement(" in prebattle_source
+    assert "battlefield.with_added_unit_placement(" in prebattle_source
+    assert "record_primary_battlefield_departure(" not in prebattle_source
+
+    # Redeploy-to-reserves also occurs during setup, before turn-start history exists.
+    setup_reserve_source = source_for(SRC_ROOT / "engine" / "catalog_prebattle_redeploy.py")
+    assert "state.stage is not GameLifecycleStage.SETUP" in setup_reserve_source
+    assert "SetupStep.REDEPLOY_UNITS" in setup_reserve_source
+    assert "record_primary_battlefield_departure(" not in setup_reserve_source

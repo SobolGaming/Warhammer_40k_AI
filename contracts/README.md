@@ -1,4 +1,12 @@
+Contract 44.5 adds optional viewer-safe public roster selections and physical bearer records. Shared formation redaction still conceals attachments and cargo until reveal. See docs/ADAPTER_DECISION_CONTRACT.md.
+
 # CORE V2 external contract
+
+Contract 44.4 adds native controlling-player coherency casualty choices and an
+authenticated pending scoring window through the existing finite model-selection,
+decision, event and persistence envelopes. See
+[44.4](migrations/44.3.33-to-44.4.0.md). Old artifacts require their producing
+runtime; no compatibility converter is provided.
 
 Contract44.3.25 gathers original Hit and Wound rolls at their respective steps,
 checks whole-unit Tactical feasibility before Combat disembark, and strictly

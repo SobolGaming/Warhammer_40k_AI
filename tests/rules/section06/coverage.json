@@ -1,0 +1,1918 @@
+{
+  "schema": "section06-semantic-map-v1",
+  "scope": "36 obligations:34 original ledger obligations plus2 adopted current FAQ63 clauses. Metadata is not behavioral coverage.",
+  "authentication": {
+    "retained_capture": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-15\\task-2\\audit-v981\\sources\\live-core-rows.json",
+    "sha256": "61c8b96565754220a7be60b350bb0f554cbee7356f072966c6a174a2131e2e64",
+    "observed_utc": "2026-10-15T15:36:12.248781+00:00",
+    "qualification": "Retained unversioned Game Datamissions Core body; changelog981 is context, not body version. Not fresh web or official-App export certification.",
+    "authority": [
+      "data/source_audits/order97/categories/06.json",
+      "data/source_audits/order135/current-bindings.json",
+      "data/source_audits/order135/visibility-source.audit.json"
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "rule:06:06.01:1",
+      "section": "06.01",
+      "title": "Visibility",
+      "source_sha256": "b84cbcfa5c3c6034951794c22ec443a60e6a58c5be9f98a658e15d7fc96b2a11",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "2f4101f7cf07e93aecaa5f40da3952c0efc328cfc4ab5ccf1df27f0237bfc7f6",
+          "value": "\u0005Line of sight\u0006 is used to determine visibility between models. For an observing model to have \u0005line of sight\u0006, it must be possible to draw an imaginary straight line, 1 mm wide, from any part of that model to any part of the model being observed. This line is the \u0005line of sight\u0006. While doing so, other models in the observing model\u2019s unit and in the observed model\u2019s unit are ignored. Other models and units can be either \u0005visible\u0006 or \u0005fully visible\u0006 to the observing model, as shown in the example. Note that terrain applies additional rules to visibility (13.07)."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "97e636809c36e36d2a342fe356581c6fd0cb67aaf8dd1fcf74e1b2f1e5b698fd",
+          "value": "\u000eModel Visible"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "965e8a80955e3f87ee5bf20469af9ca59bbee8412fdb472c17f1a34d7fa541ef",
+          "value": "If any part of another model is \u0005\u0007visible\b\u0006 to the observing model, that model is \u0005\u0007visible\b\u0006."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "f198947b15e83dbb22b4d9f51d9a5f52d77d922f91d87b19d1313927248ff8c1",
+          "value": "\u000eModel Fully Visible"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "1fe09192d1aa5d089ff3fc7d613bef195388e900c659b9977364e42112ce66e8",
+          "value": "If every part of another model that is facing the observing model is \u0005\u0007visible\b\u0006 to the observing model (so the only thing blocking visibility to any part of that other model is that model itself), that model is \u0005\u0007fully visible\b\u0006."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "f7867a54d1f081bf6953611cda9172de372c90209db7a40ab6d2f190e23acff6",
+          "value": "\u000eUnit Visible"
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "245f9dfdd5161752ccf4a4ab8400d57bde47ab124b20fc69aea1ab13c0457bf8",
+          "value": "If one or more models in a unit are \u0005\u0007visible\b\u0006 to the observing model, that unit is \u0005\u0007visible\b\u0006."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "423cadf4982193598786f38d1dd603b7bf6532eab751a6420985a1a3378fb48a",
+          "value": "\u000eUnit Fully Visible"
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "9c2c9428307bb141137cabe517c6aef547738186f440d2bfffebfef98d5bfd55",
+          "value": "If every model in a unit is \u0005\u0007fully visible\b\u0006 to the observing model, that unit is \u0005\u0007fully visible\b\u0006. When determining this, the observing model can see through other models in that unit."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "06.01-obligation-01",
+          "summary": "Line of sight uses a straight corridor one millimetre wide.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+            "src/warhammer40k_core/geometry/visibility_corridor.py:line_of_sight_corridor_bounds"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility.py::test_one_millimetre_corridor_and_vertical_clearance"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility.py::test_one_millimetre_corridor_and_vertical_clearance",
+              "assertions": [
+                "assert result.has_line_of_sight is (clear or height > 3)"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.01-obligation-02",
+          "summary": "The observer may choose any part of its physical model as the line origin.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
+            "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
+              "assertions": [
+                "assert witness.unit_visible is visible",
+                "assert witness.unit_fully_visible is fully",
+                "assert witness.visible_model_ids == ((target.model_id,) if visible else ())",
+                "with pytest.raises(GeometryError, match='geometry|evidence'):\n    changed.benefit_of_cover(witness)",
+                "assert not VisibilityQuery.from_segment(Point3(10, 10, 0), Point3(20, 10, 0), static_terrain=walls).resolve().has_line_of_sight",
+                "assert witness.unit_fully_visible"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin",
+              "assertions": [
+                "assert incoming.model_visible",
+                "assert not incoming.model_fully_visible",
+                "assert incoming.clear_corridor is not None",
+                "assert incoming.clear_corridor[1][1] < 0",
+                "assert outgoing.model_visible is (not bounded)",
+                "assert resolve_physical_visibility((body,), (opponent,), (), (), bounds).model_fully_visible",
+                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.01-obligation-03",
+          "summary": "The target endpoint may be any part of the observed model.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
+            "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
+              "assertions": [
+                "assert witness.unit_visible is visible",
+                "assert witness.unit_fully_visible is fully",
+                "assert witness.visible_model_ids == ((target.model_id,) if visible else ())",
+                "with pytest.raises(GeometryError, match='geometry|evidence'):\n    changed.benefit_of_cover(witness)",
+                "assert not VisibilityQuery.from_segment(Point3(10, 10, 0), Point3(20, 10, 0), static_terrain=walls).resolve().has_line_of_sight",
+                "assert witness.unit_fully_visible"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin",
+              "assertions": [
+                "assert incoming.model_visible",
+                "assert not incoming.model_fully_visible",
+                "assert incoming.clear_corridor is not None",
+                "assert incoming.clear_corridor[1][1] < 0",
+                "assert outgoing.model_visible is (not bounded)",
+                "assert resolve_physical_visibility((body,), (opponent,), (), (), bounds).model_fully_visible",
+                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.01-obligation-04",
+          "summary": "Members of the observing rules unit do not block this line.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility_ownership.py::test_observer_and_target_members_are_excluded_but_other_units_block"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility_ownership.py::test_observer_and_target_members_are_excluded_but_other_units_block",
+              "assertions": [
+                "assert not {m.model_id for m in blockers}.intersection((*observer.own_model_ids(), *target.own_model_ids()))",
+                "assert len(blockers) == int(third_unit)",
+                "assert witness.unit_visible is (not third_unit)",
+                "assert witness.unit_fully_visible is (not third_unit)",
+                "assert state.battlefield_state is not None"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.01-obligation-05",
+          "summary": "Members of the observed rules unit do not block this line.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility_ownership.py::test_observer_and_target_members_are_excluded_but_other_units_block"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility_ownership.py::test_observer_and_target_members_are_excluded_but_other_units_block",
+              "assertions": [
+                "assert not {m.model_id for m in blockers}.intersection((*observer.own_model_ids(), *target.own_model_ids()))",
+                "assert len(blockers) == int(third_unit)",
+                "assert witness.unit_visible is (not third_unit)",
+                "assert witness.unit_fully_visible is (not third_unit)",
+                "assert state.battlefield_state is not None"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.01-obligation-06",
+          "summary": "Terrain-specific visibility rules still apply.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility.py::test_ruins_rules_footprint_can_block_without_physical_wall"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility.py::test_ruins_rules_footprint_can_block_without_physical_wall",
+              "assertions": [
+                "assert VisibilityQuery.from_segment(Point3(10, 10, 1), Point3(20, 10, 1), static_terrain=ruin.terrain_volumes()).resolve().has_line_of_sight",
+                "assert not context.resolve_line_of_sight().unit_visible",
+                "assert replace(context, terrain_features=(), terrain_volumes=()).resolve_line_of_sight().unit_fully_visible"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.01-obligation-07",
+          "summary": "A model is visible when any part is visible.",
+          "source_blocks": [
+            3
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
+              "assertions": [
+                "assert witness.unit_visible is visible",
+                "assert witness.unit_fully_visible is fully",
+                "assert witness.visible_model_ids == ((target.model_id,) if visible else ())",
+                "with pytest.raises(GeometryError, match='geometry|evidence'):\n    changed.benefit_of_cover(witness)",
+                "assert not VisibilityQuery.from_segment(Point3(10, 10, 0), Point3(20, 10, 0), static_terrain=walls).resolve().has_line_of_sight",
+                "assert witness.unit_fully_visible"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.01-obligation-08",
+          "summary": "A model is fully visible when every observer-facing part is unobscured except by itself.",
+          "source_blocks": [
+            5
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
+              "assertions": [
+                "assert witness.unit_visible is visible",
+                "assert witness.unit_fully_visible is fully",
+                "assert witness.visible_model_ids == ((target.model_id,) if visible else ())",
+                "with pytest.raises(GeometryError, match='geometry|evidence'):\n    changed.benefit_of_cover(witness)",
+                "assert not VisibilityQuery.from_segment(Point3(10, 10, 0), Point3(20, 10, 0), static_terrain=walls).resolve().has_line_of_sight",
+                "assert witness.unit_fully_visible"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.01-obligation-09",
+          "summary": "A unit is visible when at least one member is visible.",
+          "source_blocks": [
+            7
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+            "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility.py::test_unit_visible_any_and_fully_visible_all_native_members"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility.py::test_unit_visible_any_and_fully_visible_all_native_members",
+              "assertions": [
+                "assert witness.unit_visible is (blocked < 2)",
+                "assert witness.unit_fully_visible is (blocked == 0)",
+                "assert set(witness.visible_model_ids) == {m.model_id for m in targets[blocked:]}"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.01-obligation-10",
+          "summary": "A unit is fully visible when every member is fully visible.",
+          "source_blocks": [
+            9
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+            "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility.py::test_unit_visible_any_and_fully_visible_all_native_members"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility.py::test_unit_visible_any_and_fully_visible_all_native_members",
+              "assertions": [
+                "assert witness.unit_visible is (blocked < 2)",
+                "assert witness.unit_fully_visible is (blocked == 0)",
+                "assert set(witness.visible_model_ids) == {m.model_id for m in targets[blocked:]}"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.01-obligation-11",
+          "summary": "Target-unit members do not obscure one another for fully-visible determination.",
+          "source_blocks": [
+            9
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+            "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility_ownership.py::test_observer_and_target_members_are_excluded_but_other_units_block"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility_ownership.py::test_observer_and_target_members_are_excluded_but_other_units_block",
+              "assertions": [
+                "assert not {m.model_id for m in blockers}.intersection((*observer.own_model_ids(), *target.own_model_ids()))",
+                "assert len(blockers) == int(third_unit)",
+                "assert witness.unit_visible is (not third_unit)",
+                "assert witness.unit_fully_visible is (not third_unit)",
+                "assert state.battlefield_state is not None"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            2
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        },
+        {
+          "source_blocks": [
+            4
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        },
+        {
+          "source_blocks": [
+            6
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        },
+        {
+          "source_blocks": [
+            8
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:06:06.01.01:1",
+      "section": "06.01.01",
+      "title": "Describing Visible Units",
+      "source_sha256": "7595fa55b1e32390b16fb0a0a1fe3eef3f9842b6a198262097cfc04da67aec41",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "ed35a9d5f28bfb616a464231c1b0b4880ce5be7a3a171336fdac3b843dc40e5e",
+          "value": "When a rule references a \u0005visible\u0006 unit but does not state which units that unit must be \u0005visible\u0006 to, it must be \u0005visible\u0006 to the unit that is using that rule."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "aa8660f53d624a16aac2f747352f828691cef5eaa573a380a25bb1e541a2afb9",
+          "value": "\u0005Example:\u0006 \u0007You target a friendly unit with a \u0005stratagem\u0006 that says 'select one \u0005visible\u0006 enemy unit'. That enemy unit must be \u0005visible\u0006 to the friendly unit you targeted with the \u0005stratagem\u0006.\b"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "06.01.01-obligation-01",
+          "summary": "An unspecified visible-unit reference uses the rule-using unit as observer.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/stratagems_geometry.py:visible_enemy_unit_ids_for_source",
+            "src/warhammer40k_core/engine/shooting_targets.py:unit_has_line_of_sight_to_target"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility_ownership.py::test_unspecified_visible_unit_uses_rule_owner_not_another_friend"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility_ownership.py::test_unspecified_visible_unit_uses_rule_owner_not_another_friend",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert visible_enemy_unit_ids_for_source(state=state, player_id='owner', source_unit_instance_id=owner.unit_instance_id, range_inches=48) == ()",
+                "assert visible_enemy_unit_ids_for_source(state=state, player_id='owner', source_unit_instance_id=friend.unit_instance_id, range_inches=48) == (enemy.unit_instance_id,)",
+                "assert visible_enemy_unit_ids_for_source(state=state, player_id='opponent', source_unit_instance_id=friend.unit_instance_id, range_inches=48) == ()"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [
+            "The semantic visibility consumer receives the stable source-unit identity and chooses its observing models; this assertion does not claim to test arbitrary free-text normalization."
+          ],
+          "successor_binding": null,
+          "finding": null
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            2
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:06:06.02:1",
+      "section": "06.02",
+      "title": "Mortal Wounds",
+      "source_sha256": "039064052b2edb0a33276d6f02fc4a3bca671f87b3a3af9799c6d86c8211cbba",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "359a2e17a5c0e028c5db5adb7d5ca8ee119647a916768f9d16bace019a2f6898",
+          "value": "Some attacks or rules inflict \u0005mortal wounds\u0006 on units. Each time a unit suffers one or more \u0005mortal wounds\u0006, its controlling player must resolve the following sequence for each of those \u0005mortal wounds\u0006, until either all of them have been inflicted or that unit is \u0005destroyed\u0006:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "42b52d754de77338b18994dfb82885b4cf2889de9d419be0dda5aca0f196c886",
+          "value": "\u00051. Select Model\u0006: Select one model in that unit by following the first instruction below that applies:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "251f67ca200527381f3664b98e297a8e31fb8920cbb43f3cab974e03cae246f4",
+          "value": "\u2022 If a non\u2011\u0003CHARACTER\u0004 model in that unit has lost one or more wounds, you must select that model."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "170dd399b8e93994ad3668e40f048946432c068399195a46b528b31f9c9d1111",
+          "value": "\u2022 Otherwise, if that unit contains one or more non\u2011\u0003CHARACTER\u0004 models, you must select one of those models."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "287d5c94b43c121ab24214f9dfa512fdcf34617e7097ec3c5b4a18da3daa79ba",
+          "value": "\u2022 Otherwise, if one or more \u0003CHARACTER\u0004 models in that unit have lost one or more wounds, you must select one of those models."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "e8f6627e74c012312b600ebb974ba9e6ca7f3b7cfa9fe938a0707a0e7053f445",
+          "value": "\u2022 Otherwise, you must select one \u0003CHARACTER\u0004 model in that unit."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "1d1077a1420904d164b7db440cd830105ee1e06cad5aeae07e78166f0293f46c",
+          "value": "\u00052. Resolve Damage\u0006: The selected model loses 1 wound. If this reduces that model\u2019s remaining wounds to 0, it is destroyed."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "969c572dd7eff3bd29ca395c4adeb481894c26a66a25e493045e6e27aefc48c4",
+          "value": "\u0005MORTAL WOUNDS AND NORMAL DAMAGE\u0006"
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "4a041dbf4661e64ce5dd071f3ed4f987f5bf13e529bcab2474ab9e68af8bd9c9",
+          "value": "When resolving \u0005attack dice\u0006, if those attacks inflict a mixture of both \u0005mortal wounds\u0006 and normal damage, resolve all of the normal damage first, then resolve all of the \u0005mortal wounds\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "06.02-obligation-01",
+          "summary": "Resolve mortal wounds one at a time until the wound budget is exhausted or the unit is destroyed.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:continue_mortal_wound_application"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_mortals.py::test_single_native_character_each_wound_and_overkill",
+            "tests/rules/section06/test_mortals.py::test_controlling_player_choice_then_spillover"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_mortals.py::test_single_native_character_each_wound_and_overkill",
+              "assertions": [
+                "assert app is not None",
+                "assert result.request is None",
+                "assert len(app.applications) == min(5, wounds)",
+                "assert [a.wounds_lost for a in app.applications] == [1] * min(5, wounds)",
+                "assert app.remaining_mortal_wounds_lost == max(0, wounds - 5)",
+                "assert model.current_wounds == max(0, 5 - wounds)",
+                "assert model.is_alive is (wounds < 5)",
+                "assert [a['wound_index'] for a in allocated] == list(range(1, min(5, wounds) + 1))",
+                "assert {cast(str, a['selected_model_id']) for a in allocated} == set(target.own_model_ids())",
+                "assert len(payloads(decisions, 'model_destroyed')) == int(wounds >= 5)"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_mortals.py::test_controlling_player_choice_then_spillover",
+              "assertions": [
+                "assert request is not None",
+                "assert request.actor_id == 'owner'",
+                "assert {o.option_id for o in request.options} == set(target.own_model_ids())",
+                "assert all((model_by_id(state=state, model_instance_id=m).current_wounds == 2 for m in target.own_model_ids()))",
+                "assert not model_by_id(state=state, model_instance_id=chosen).is_alive",
+                "assert routed.request is not None",
+                "assert chosen not in {o.option_id for o in routed.request.options}",
+                "assert routed.progress.remaining_mortal_wounds == 1",
+                "assert [o['selected_model_id'] for o in occurrences] == [chosen, chosen]",
+                "assert occurrences[0]['selection_disposition'] == 'player_decision'",
+                "assert occurrences[1]['priority_tier'] == 'wounded_non_character'",
+                "assert finished.request is None",
+                "assert finished.application is not None",
+                "assert [a.model_instance_id for a in finished.application.applications] == [chosen, chosen, next_chosen]",
+                "assert model_by_id(state=state, model_instance_id=next_chosen).current_wounds == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.02-obligation-02",
+          "summary": "A wounded non-CHARACTER has first mortal-wound allocation priority.",
+          "source_blocks": [
+            3
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_priority_selection"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_mortals.py::test_native_attached_mortal_priority_tiers",
+            "tests/rules/section06/test_mortals.py::test_controlling_player_choice_then_spillover"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_mortals.py::test_native_attached_mortal_priority_tiers",
+              "assertions": [
+                "assert set(ids) == set(expected)",
+                "assert priority.value == tier",
+                "assert state.battlefield_state is not None"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_mortals.py::test_controlling_player_choice_then_spillover",
+              "assertions": [
+                "assert request is not None",
+                "assert request.actor_id == 'owner'",
+                "assert {o.option_id for o in request.options} == set(target.own_model_ids())",
+                "assert all((model_by_id(state=state, model_instance_id=m).current_wounds == 2 for m in target.own_model_ids()))",
+                "assert not model_by_id(state=state, model_instance_id=chosen).is_alive",
+                "assert routed.request is not None",
+                "assert chosen not in {o.option_id for o in routed.request.options}",
+                "assert routed.progress.remaining_mortal_wounds == 1",
+                "assert [o['selected_model_id'] for o in occurrences] == [chosen, chosen]",
+                "assert occurrences[0]['selection_disposition'] == 'player_decision'",
+                "assert occurrences[1]['priority_tier'] == 'wounded_non_character'",
+                "assert finished.request is None",
+                "assert finished.application is not None",
+                "assert [a.model_instance_id for a in finished.application.applications] == [chosen, chosen, next_chosen]",
+                "assert model_by_id(state=state, model_instance_id=next_chosen).current_wounds == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.02-obligation-03",
+          "summary": "If no non-CHARACTER is wounded, select a surviving non-CHARACTER.",
+          "source_blocks": [
+            4
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_priority_selection"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_mortals.py::test_native_attached_mortal_priority_tiers",
+            "tests/rules/section06/test_mortals.py::test_controlling_player_choice_then_spillover"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_mortals.py::test_native_attached_mortal_priority_tiers",
+              "assertions": [
+                "assert set(ids) == set(expected)",
+                "assert priority.value == tier",
+                "assert state.battlefield_state is not None"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_mortals.py::test_controlling_player_choice_then_spillover",
+              "assertions": [
+                "assert request is not None",
+                "assert request.actor_id == 'owner'",
+                "assert {o.option_id for o in request.options} == set(target.own_model_ids())",
+                "assert all((model_by_id(state=state, model_instance_id=m).current_wounds == 2 for m in target.own_model_ids()))",
+                "assert not model_by_id(state=state, model_instance_id=chosen).is_alive",
+                "assert routed.request is not None",
+                "assert chosen not in {o.option_id for o in routed.request.options}",
+                "assert routed.progress.remaining_mortal_wounds == 1",
+                "assert [o['selected_model_id'] for o in occurrences] == [chosen, chosen]",
+                "assert occurrences[0]['selection_disposition'] == 'player_decision'",
+                "assert occurrences[1]['priority_tier'] == 'wounded_non_character'",
+                "assert finished.request is None",
+                "assert finished.application is not None",
+                "assert [a.model_instance_id for a in finished.application.applications] == [chosen, chosen, next_chosen]",
+                "assert model_by_id(state=state, model_instance_id=next_chosen).current_wounds == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.02-obligation-04",
+          "summary": "With no non-CHARACTER remaining, select a wounded CHARACTER if possible.",
+          "source_blocks": [
+            5
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_priority_selection"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_mortals.py::test_native_attached_mortal_priority_tiers"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_mortals.py::test_native_attached_mortal_priority_tiers",
+              "assertions": [
+                "assert set(ids) == set(expected)",
+                "assert priority.value == tier",
+                "assert state.battlefield_state is not None"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.02-obligation-05",
+          "summary": "Otherwise select a surviving CHARACTER.",
+          "source_blocks": [
+            6
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_priority_selection"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_mortals.py::test_native_attached_mortal_priority_tiers"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_mortals.py::test_native_attached_mortal_priority_tiers",
+              "assertions": [
+                "assert set(ids) == set(expected)",
+                "assert priority.value == tier",
+                "assert state.battlefield_state is not None"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.02-obligation-06",
+          "summary": "Each mortal wound removes one wound.",
+          "source_blocks": [
+            7
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/damage_allocation.py:MortalWoundApplicationProgress.after_wound_resolution"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_mortals.py::test_single_native_character_each_wound_and_overkill"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_mortals.py::test_single_native_character_each_wound_and_overkill",
+              "assertions": [
+                "assert app is not None",
+                "assert result.request is None",
+                "assert len(app.applications) == min(5, wounds)",
+                "assert [a.wounds_lost for a in app.applications] == [1] * min(5, wounds)",
+                "assert app.remaining_mortal_wounds_lost == max(0, wounds - 5)",
+                "assert model.current_wounds == max(0, 5 - wounds)",
+                "assert model.is_alive is (wounds < 5)",
+                "assert [a['wound_index'] for a in allocated] == list(range(1, min(5, wounds) + 1))",
+                "assert {cast(str, a['selected_model_id']) for a in allocated} == set(target.own_model_ids())",
+                "assert len(payloads(decisions, 'model_destroyed')) == int(wounds >= 5)"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.02-obligation-07",
+          "summary": "Reaching zero wounds destroys the selected model.",
+          "source_blocks": [
+            7
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/damage_allocation.py:MortalWoundApplicationProgress.after_wound_resolution"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_mortals.py::test_single_native_character_each_wound_and_overkill"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_mortals.py::test_single_native_character_each_wound_and_overkill",
+              "assertions": [
+                "assert app is not None",
+                "assert result.request is None",
+                "assert len(app.applications) == min(5, wounds)",
+                "assert [a.wounds_lost for a in app.applications] == [1] * min(5, wounds)",
+                "assert app.remaining_mortal_wounds_lost == max(0, wounds - 5)",
+                "assert model.current_wounds == max(0, 5 - wounds)",
+                "assert model.is_alive is (wounds < 5)",
+                "assert [a['wound_index'] for a in allocated] == list(range(1, min(5, wounds) + 1))",
+                "assert {cast(str, a['selected_model_id']) for a in allocated} == set(target.own_model_ids())",
+                "assert len(payloads(decisions, 'model_destroyed')) == int(wounds >= 5)"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.02-obligation-08",
+          "summary": "For a mixed attack pool, resolve normal damage before mortal wounds.",
+          "source_blocks": [
+            9
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/attack_sequence_group_selection.py:_apply_deferred_mortal_wounds"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_mixed_damage.py::test_normal_damage_precedes_additional_mortals_and_keeps_attack_identity"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_mixed_damage.py::test_normal_damage_precedes_additional_mortals_and_keeps_attack_identity",
+              "assertions": [
+                "assert remaining is None",
+                "assert status is None",
+                "assert len(applied) == 2",
+                "assert len(normal) == saves.count(1)",
+                "assert all((a['requested_damage'] == a['wounds_lost'] == 1 and a['damage_kind'] == 'normal' for a in normal))",
+                "assert pool.weapon_profile.damage_profile.fixed_damage == 1",
+                "assert model_by_id(state=state, model_instance_id=target.own_model_ids()[0]).current_wounds == 5 - saves.count(1) - 2",
+                "assert len(mortal_indices) == 2",
+                "assert all((n < m for n in normal_indices for m in mortal_indices))",
+                "assert [a['attack_context_ids'] for a in applied] == [['s05:pool-001:attack-001'], ['s05:pool-001:attack-002']]",
+                "assert a['source_rule_id'] == source",
+                "assert a['mortal_wounds'] == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            2
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        },
+        {
+          "source_blocks": [
+            8
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:06:06.02.01:1",
+      "section": "06.02.01",
+      "title": "Normal Damage",
+      "source_sha256": "f46848b97f8a9f877592549b86c0880ffebb702bcfeabd86abbc5a7ed8146152",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "9ddcaddb24eb64e46d1ab5bc70e50f4a09dfaf42e92bb8e1ea7423d2ec08a1f7",
+          "value": "Normal Damage is damage that was inflicted on a model as a result of a weapon\u2019s \u0005D\u0006 characteristic, rather than by other means such as \u0005mortal wounds\u0006. \u0005Mortal wounds\u0006 dealt in addition to normal damage from an attack are part of that same attack."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "06.02.01-obligation-01",
+          "summary": "Normal damage is the attack weapon's D-derived damage.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/damage_allocation.py:apply_damage_to_model"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_mixed_damage.py::test_normal_damage_precedes_additional_mortals_and_keeps_attack_identity"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_mixed_damage.py::test_normal_damage_precedes_additional_mortals_and_keeps_attack_identity",
+              "assertions": [
+                "assert remaining is None",
+                "assert status is None",
+                "assert len(applied) == 2",
+                "assert len(normal) == saves.count(1)",
+                "assert all((a['requested_damage'] == a['wounds_lost'] == 1 and a['damage_kind'] == 'normal' for a in normal))",
+                "assert pool.weapon_profile.damage_profile.fixed_damage == 1",
+                "assert model_by_id(state=state, model_instance_id=target.own_model_ids()[0]).current_wounds == 5 - saves.count(1) - 2",
+                "assert len(mortal_indices) == 2",
+                "assert all((n < m for n in normal_indices for m in mortal_indices))",
+                "assert [a['attack_context_ids'] for a in applied] == [['s05:pool-001:attack-001'], ['s05:pool-001:attack-002']]",
+                "assert a['source_rule_id'] == source",
+                "assert a['mortal_wounds'] == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.02.01-obligation-02",
+          "summary": "Additional mortal wounds belong to the same originating attack.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/attack_sequence_post_roll.py:defer_grouped_devastating_wounds",
+            "src/warhammer40k_core/engine/attack_sequence_group_selection.py:_apply_deferred_mortal_wounds"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_mixed_damage.py::test_normal_damage_precedes_additional_mortals_and_keeps_attack_identity"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_mixed_damage.py::test_normal_damage_precedes_additional_mortals_and_keeps_attack_identity",
+              "assertions": [
+                "assert remaining is None",
+                "assert status is None",
+                "assert len(applied) == 2",
+                "assert len(normal) == saves.count(1)",
+                "assert all((a['requested_damage'] == a['wounds_lost'] == 1 and a['damage_kind'] == 'normal' for a in normal))",
+                "assert pool.weapon_profile.damage_profile.fixed_damage == 1",
+                "assert model_by_id(state=state, model_instance_id=target.own_model_ids()[0]).current_wounds == 5 - saves.count(1) - 2",
+                "assert len(mortal_indices) == 2",
+                "assert all((n < m for n in normal_indices for m in mortal_indices))",
+                "assert [a['attack_context_ids'] for a in applied] == [['s05:pool-001:attack-001'], ['s05:pool-001:attack-002']]",
+                "assert a['source_rule_id'] == source",
+                "assert a['mortal_wounds'] == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [
+            "Gameplay gap: no source-backed additional-mortal producer routes normal damage plus extra mortal wounds with the same originating attack identity. The sole DeferredMortalWounds constructor is gated by Devastating Wounds, replacing normal damage; its consumer hardcodes that source and cannot certify this distinct source clause. Implement an additional-mortal consumer with shared attack identity and a real facade regression before PFINAL."
+          ],
+          "successor_binding": {
+            "current_test_nodes": [
+              "tests/unit/test_order116_additional_mortals.py::test_source_backed_additional_mortals_preserve_attack_identity_and_damage_order",
+              "tests/unit/test_order116_additional_mortals.py::test_additional_mortal_pending_retry_restore_and_lethal_continuation",
+              "tests/unit/test_order116_additional_mortals.py::test_additional_mortal_weapon_scope_is_source_owned",
+              "tests/unit/test_order116_additional_mortals.py::test_additional_mortal_permission_validates_schema_and_occurrence",
+              "tests/unit/test_order116_additional_mortals.py::test_successful_wounds_generate_additional_mortals_even_after_successful_saves",
+              "tests/unit/test_order116_additional_mortals.py::test_additional_permission_id_cannot_alias_native_mortal_application",
+              "tests/unit/test_order116_additional_mortals.py::test_additional_mortals_coexist_with_native_devastating_wounds",
+              "tests/unit/test_order116_additional_mortals.py::test_attack_mortal_producers_resume_once_after_command_reroll_windows",
+              "tests/unit/test_order116_additional_mortals.py::test_gathered_additional_mortals_keep_each_physical_weapon_through_lethal_restore",
+              "tests/unit/test_order116_additional_mortals.py::test_attack_mortal_fnp_keeps_psychic_weapon_classification"
+            ],
+            "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+            "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+          },
+          "finding": null
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:06:06.03:1",
+      "section": "06.03",
+      "title": "Hazard Rolls",
+      "source_sha256": "0edce95045a10290c9b6f2f514bbcb7ba5b6ba35cb0585ff3bc0019f19d6b7fa",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "71086ccc653dc46bcf452dfbe889cd84a1dfee0df9279eb29bfbcad82f047bba",
+          "value": "To make a \u0005hazard roll\u0006 for a unit, roll one D6: on a 1-2, that roll fails and that unit suffers:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "1b45ae7adcb5469e3731a8a06409558d4f34e0871248a92be8c9d0a728777eb2",
+          "value": "\u2022 1 \u0005mortal wound\u0006 (06.02)"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "dad1d89a431fd6190971f378a526e2dc24e6af305320376ac6d26d57d004e193",
+          "value": "\u2022 Or 3 \u0005mortal wounds\u0006 instead if each model in that unit is a \u0003MONSTER/VEHICLE model\u0004."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "89575adcffe53a30475713213c60b8d8d97855b936917e325f1e721ef8b6ada5",
+          "value": "If more than one \u0005hazard roll\u0006 is required for a unit, make all of those rolls simultaneously."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "06.03-obligation-01",
+          "summary": "One requested unit hazard roll rolls one D6.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/hazard.py:hazard_roll_spec"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_hazard.py::test_unit_hazard_single_d6_faces_and_alias",
+            "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_unit_hazard_single_d6_faces_and_alias",
+              "assertions": [
+                "assert roll.current_values == (face,)",
+                "assert roll.original_result.spec.expression.quantity == 1",
+                "assert roll.original_result.spec.expression.sides == 6",
+                "assert hazard_roll_failed(roll) is (face in (1, 2))",
+                "assert failed_hazard_roll_indices(roll) == ((0,) if face in (1, 2) else ())"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member",
+              "assertions": [
+                "assert status is None",
+                "assert event['mortal_wounds'] == int(face <= 2)",
+                "assert model_by_id(state=state, model_instance_id=bearer.model_instance_id).current_wounds == bearer.current_wounds",
+                "assert model_by_id(state=state, model_instance_id=recipient.model_instance_id).current_wounds == (0 if face <= 2 else 1)",
+                "assert [a['selected_model_id'] for a in allocated] == ([recipient.model_instance_id] if face <= 2 else [])",
+                "assert len(payloads(decisions, 'dice_rolled')) == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.03-obligation-02",
+          "summary": "A hazard roll fails on one or two.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/hazard.py:failed_hazard_roll_indices"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_hazard.py::test_unit_hazard_single_d6_faces_and_alias",
+            "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_unit_hazard_single_d6_faces_and_alias",
+              "assertions": [
+                "assert roll.current_values == (face,)",
+                "assert roll.original_result.spec.expression.quantity == 1",
+                "assert roll.original_result.spec.expression.sides == 6",
+                "assert hazard_roll_failed(roll) is (face in (1, 2))",
+                "assert failed_hazard_roll_indices(roll) == ((0,) if face in (1, 2) else ())"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member",
+              "assertions": [
+                "assert status is None",
+                "assert event['mortal_wounds'] == int(face <= 2)",
+                "assert model_by_id(state=state, model_instance_id=bearer.model_instance_id).current_wounds == bearer.current_wounds",
+                "assert model_by_id(state=state, model_instance_id=recipient.model_instance_id).current_wounds == (0 if face <= 2 else 1)",
+                "assert [a['selected_model_id'] for a in allocated] == ([recipient.model_instance_id] if face <= 2 else [])",
+                "assert len(payloads(decisions, 'dice_rolled')) == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.03-obligation-03",
+          "summary": "A failed hazard roll inflicts one mortal wound on an ordinary unit.",
+          "source_blocks": [
+            2
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/hazard.py:hazard_mortal_wounds_per_failed_roll"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_hazard.py::test_every_native_model_determines_hazard_damage",
+            "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_every_native_model_determines_hazard_damage",
+              "assertions": [
+                "assert hazard_mortal_wounds_per_failed_roll(unit) == expected"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member",
+              "assertions": [
+                "assert status is None",
+                "assert event['mortal_wounds'] == int(face <= 2)",
+                "assert model_by_id(state=state, model_instance_id=bearer.model_instance_id).current_wounds == bearer.current_wounds",
+                "assert model_by_id(state=state, model_instance_id=recipient.model_instance_id).current_wounds == (0 if face <= 2 else 1)",
+                "assert [a['selected_model_id'] for a in allocated] == ([recipient.model_instance_id] if face <= 2 else [])",
+                "assert len(payloads(decisions, 'dice_rolled')) == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.03-obligation-04",
+          "summary": "A failed hazard roll inflicts three mortal wounds only if every model is MONSTER or VEHICLE.",
+          "source_blocks": [
+            3
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/hazard.py:hazard_mortal_wounds_per_failed_roll"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_hazard.py::test_every_native_model_determines_hazard_damage",
+            "tests/rules/section06/test_hazard.py::test_faq06_mixed_native_attached_unit_all_model_condition"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_every_native_model_determines_hazard_damage",
+              "assertions": [
+                "assert hazard_mortal_wounds_per_failed_roll(unit) == expected"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_faq06_mixed_native_attached_unit_all_model_condition",
+              "assertions": [
+                "assert 'VEHICLE' in body.own_models[0].keywords",
+                "assert keyword in leader.own_models[0].keywords",
+                "assert hazard_mortal_wounds_per_failed_roll(view) == expected"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [
+            "Gameplay gap: The cited tests prove homogeneous model kinds and the specific mixed INFANTRY/VEHICLE FAQ. The general all-model MONSTER/VEHICLE condition fails for mixed MOUNTED/VEHICLE: tests/order97_gap_probes_04_06.py records three wounds instead of one. P06D must repair the shared count owner."
+          ],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "06.03-obligation-05",
+          "summary": "Multiple requested hazard rolls are made together.",
+          "source_blocks": [
+            4
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/hazard.py:hazard_roll_spec"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_hazard.py::test_requested_hazards_are_one_simultaneous_batch"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_requested_hazards_are_one_simultaneous_batch",
+              "assertions": [
+                "assert failed_hazard_roll_indices(roll) == (0, 1)",
+                "assert len(events) == 1",
+                "assert roll.current_values == (1, 2, 3, 4, 5, 6)"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:06:06.03.01:1",
+      "section": "06.03.01",
+      "title": "Hazardous Test",
+      "source_sha256": "c6bb89fb84ad0c310b6a6f730210a3b61db82543f1123d7f21de6d30024c8042",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "16ea6bcba1c7962ab833b76ebeb87962b84e080f70fb25f05ce7f6a3e1e0353e",
+          "value": "The term 'Hazardous test' is the same as \u0005hazard roll\u0006."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "06.03.01-obligation-01",
+          "summary": "Hazardous test and hazard roll denote the same operation.",
+          "source_blocks": [
+            1
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/hazard.py:hazard_roll_spec"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_hazard.py::test_unit_hazard_single_d6_faces_and_alias",
+            "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_unit_hazard_single_d6_faces_and_alias",
+              "assertions": [
+                "assert roll.current_values == (face,)",
+                "assert roll.original_result.spec.expression.quantity == 1",
+                "assert roll.original_result.spec.expression.sides == 6",
+                "assert hazard_roll_failed(roll) is (face in (1, 2))",
+                "assert failed_hazard_roll_indices(roll) == ((0,) if face in (1, 2) else ())"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member",
+              "assertions": [
+                "assert status is None",
+                "assert event['mortal_wounds'] == int(face <= 2)",
+                "assert model_by_id(state=state, model_instance_id=bearer.model_instance_id).current_wounds == bearer.current_wounds",
+                "assert model_by_id(state=state, model_instance_id=recipient.model_instance_id).current_wounds == (0 if face <= 2 else 1)",
+                "assert [a['selected_model_id'] for a in allocated] == ([recipient.model_instance_id] if face <= 2 else [])",
+                "assert len(payloads(decisions, 'dice_rolled')) == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "faq:5928ab6e-7113-42c8-9085-4291faddae09",
+      "section": "FAQ 06",
+      "title": "FAQ 06",
+      "source_sha256": "3baf6215041a9e32c26f4544ae11dc0907a480bc3e2b1f3b30f0dfd8a8f53efe",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "question",
+          "sha256": "cfdcf0918cf5093277a2e056005b68750464e6cb3922a9d54cba94f5629c5528",
+          "value": "How many mortals do you take from Hazardous tests for a combined vehicle/monster and Infantry unit"
+        },
+        {
+          "ordinal": 2,
+          "kind": "answer",
+          "sha256": "eb8692c895ee346f91697296f7fe8ce82a31afc3939379fd5e34d88b4cba4d25",
+          "value": "The roll would be all at once and it would be 1 MW per fail"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "faq-5928ab6e-7113-42c8-9085-4291faddae09-obligation-01",
+          "summary": "Mixed INFANTRY and MONSTER/VEHICLE units suffer one mortal wound per failed hazard roll.",
+          "source_blocks": [
+            2
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/hazard.py:hazard_mortal_wounds_per_failed_roll"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_hazard.py::test_faq06_mixed_native_attached_unit_all_model_condition"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_faq06_mixed_native_attached_unit_all_model_condition",
+              "assertions": [
+                "assert 'VEHICLE' in body.own_models[0].keywords",
+                "assert keyword in leader.own_models[0].keywords",
+                "assert hazard_mortal_wounds_per_failed_roll(view) == expected"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        },
+        {
+          "id": "faq-5928ab6e-7113-42c8-9085-4291faddae09-obligation-02",
+          "summary": "All requested hazard dice roll simultaneously.",
+          "source_blocks": [
+            2
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/hazard.py:hazard_roll_spec"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_hazard.py::test_requested_hazards_are_one_simultaneous_batch"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_requested_hazards_are_one_simultaneous_batch",
+              "assertions": [
+                "assert failed_hazard_roll_indices(roll) == (0, 1)",
+                "assert len(events) == 1",
+                "assert roll.current_values == (1, 2, 3, 4, 5, 6)"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        }
+      ]
+    },
+    {
+      "source_id": "faq:6b074ac1-8a03-43ac-8669-3bac17d372ab",
+      "section": "FAQ 07",
+      "title": "FAQ 07",
+      "source_sha256": "ce792ca90e1fcdfb597549aaba5c9c7fa227850068b1581a6b00492e993aafb7",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "question",
+          "sha256": "25bf31a47d2be4852eaf9e72dcfe5a0fa249279c632515a6a041ec9012120444",
+          "value": "I failed hazard rolls from [Hazardous] weapons, do those mortal wounds have to be allocated to the models with the [Hazardous] weapons?"
+        },
+        {
+          "ordinal": 2,
+          "kind": "answer",
+          "sha256": "3415363842191431ad25f3d9502aaa387230a96d5fbe78519edad11f23cf82e5",
+          "value": "No, you allocate the mortal wounds to the unit as per Mortal Wounds(06.02). (This represents Bob the guardsmen picking up his fallen squad mates plasma gun or that the twisting power of James the Chaos Sorcerer pulling his followers into the warp.)"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "faq-6b074ac1-8a03-43ac-8669-3bac17d372ab-obligation-01",
+          "summary": "Hazardous casualties use ordinary unit mortal-wound allocation and need not select Hazardous weapon bearers.",
+          "source_blocks": [
+            2
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:mortal_wound_priority_selection"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member",
+              "assertions": [
+                "assert status is None",
+                "assert event['mortal_wounds'] == int(face <= 2)",
+                "assert model_by_id(state=state, model_instance_id=bearer.model_instance_id).current_wounds == bearer.current_wounds",
+                "assert model_by_id(state=state, model_instance_id=recipient.model_instance_id).current_wounds == (0 if face <= 2 else 1)",
+                "assert [a['selected_model_id'] for a in allocated] == ([recipient.model_instance_id] if face <= 2 else [])",
+                "assert len(payloads(decisions, 'dice_rolled')) == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        }
+      ]
+    },
+    {
+      "source_id": "faq:e58d31bc-b6eb-4db1-b319-dc27dd60154f",
+      "section": "FAQ 08",
+      "title": "FAQ 08",
+      "source_sha256": "6cb474a554ba766f84b3bf678656f25876bec6fb41905666e7e3a0697b89e3fb",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "question",
+          "sha256": "f657b8d346a939f2b7b7b739b480f3b71d1033cfa9ef85647ed9b666cc73522a",
+          "value": "I have a rule that triggers when a mortal wound is allocated to a model, when does this happen?"
+        },
+        {
+          "ordinal": 2,
+          "kind": "answer",
+          "sha256": "b18080da8230450f96b5bd8258736bac58baa3d8752d35975572b17a13af74c0",
+          "value": "When you select a model in the Select Model step of Mortal Wounds (06.02)."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "faq-e58d31bc-b6eb-4db1-b319-dc27dd60154f-obligation-01",
+          "summary": "A mortal-wound allocation trigger occurs when Select Model selects its recipient.",
+          "source_blocks": [
+            2
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:resolve_mortal_wound_model_decision",
+            "src/warhammer40k_core/engine/mortal_wound_model_allocation.py:_continue_mortal_wound_application_for_model",
+            "src/warhammer40k_core/engine/timing_windows.py:TimingTriggerKind"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_mortals.py::test_faq08_allocation_occurs_before_prevention_and_damage"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_mortals.py::test_faq08_allocation_occurs_before_prevention_and_damage",
+              "assertions": [
+                "assert routed.application is not None",
+                "assert types.count('mortal_wound_model_allocated') == 1",
+                "assert allocated['selected_model_id'] == target.own_model_ids()[0]",
+                "assert types.index('mortal_wound_model_allocated') < types.index('mortal_wound_allocation_rule_applied') < types.index('dice_rolled')",
+                "assert len(routed.application.feel_no_pain_resolutions) == 1",
+                "assert routed.application.ignored_mortal_wounds == resolution.ignored_wounds",
+                "assert resolution.ignored_wounds == int(face >= 2)",
+                "assert model_by_id(state=state, model_instance_id=target.own_model_ids()[0]).current_wounds == resolution.ignored_wounds",
+                "assert types.index('mortal_wound_model_allocated') < types.index('model_destroyed')",
+                "assert not model_by_id(state=state, model_instance_id=target.own_model_ids()[0]).is_alive"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [
+            "Gameplay gap: Select Model does not dispatch a general mortal-wound-allocation timing trigger. The existing mortal_wound_model_allocated occurrence is recorded only for optional or multiple Feel No Pain sources; ordinary selected recipients emit no occurrence. Add a source-backed allocation-trigger consumer at Select Model and prove it precedes prevention or damage before PFINAL."
+          ],
+          "successor_binding": {
+            "current_test_nodes": [
+              "tests/unit/test_order117_mortal_allocation.py::test_order120_real_psychic_damage_source_and_historical_core_pins",
+              "tests/unit/test_order117_mortal_allocation.py::test_order120_classifies_explicit_source_title_once",
+              "tests/unit/test_order117_mortal_allocation.py::test_order120_ability_classification_survives_real_pending_fork_viewers_and_replay",
+              "tests/unit/test_order117_mortal_allocation.py::test_order120_non_psychic_ability_never_uses_psychic_only_protection",
+              "tests/unit/test_order117_mortal_allocation.py::test_order120_ordinary_extra_mortals_keep_the_originating_psychic_weapon",
+              "tests/unit/test_order117_mortal_allocation.py::test_order120_non_attack_direct_ability_damage_preserves_classification_before_mutation",
+              "tests/unit/test_order117_mortal_allocation.py::test_order120_malformed_or_wrong_source_descriptor_fails_closed",
+              "tests/unit/test_order117_mortal_allocation.py::test_order120_invalid_descriptor_rejects_before_zero_prevention_mutation",
+              "tests/unit/test_order117_mortal_allocation.py::test_allocation_trigger_executes_source_backed_prevention_before_wound_loss",
+              "tests/unit/test_order117_mortal_allocation.py::test_allocation_trigger_pending_choice_retry_fork_and_lethal_continuation",
+              "tests/unit/test_order117_mortal_allocation.py::test_allocation_boundary_is_independent_of_prevention_configuration",
+              "tests/unit/test_order117_mortal_allocation.py::test_allocation_permission_does_not_protect_another_rules_unit",
+              "tests/unit/test_order117_mortal_allocation.py::test_allocation_permission_factory_and_schema_fail_closed",
+              "tests/unit/test_order117_mortal_allocation.py::test_direct_route_executes_the_same_prevention_or_rejects_choice_before_mutation",
+              "tests/unit/test_order117_mortal_allocation.py::test_allocation_permission_freezes_all_attached_physical_models",
+              "tests/unit/test_order117_mortal_allocation.py::test_source_permission_survives_real_save_reroll_and_lethal_continuation",
+              "tests/unit/test_order117_mortal_allocation.py::test_missing_prevention_dice_authority_fails_before_allocation_and_allows_retry",
+              "tests/unit/test_order117_mortal_allocation.py::test_direct_unconditional_allocation_keeps_existing_prevention_dice_sequence"
+            ],
+            "disposition": "Reviewed current successor family; individual assertion/body inventories retained; runtime pass established only by separately authenticated complete current cohort.",
+            "qualification_reference": "data/source_audits/order135/current-consumer-dispositions.md"
+          },
+          "finding": null
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        }
+      ]
+    },
+    {
+      "source_id": "faq:81bf7082-3ef5-47b9-bfc4-f2021fff1d4f",
+      "section": "FAQ 15",
+      "title": "FAQ 15",
+      "source_sha256": "63e2958a2a4ffb22895f940904bf6956f11e89ba2717bab129d341a8b6f60e6c",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "question",
+          "sha256": "ebf7d5670dd6584d837b8e3bef61a815e0c6f658e501a70ba49c9415c700afee",
+          "value": "If a rule says my unit must make a hazard roll does every model in the unit make a hazard roll?"
+        },
+        {
+          "ordinal": 2,
+          "kind": "answer",
+          "sha256": "3be401597e70110717f3b732e365a53302fcf104a6aa7a8206f4131c2efa40e9",
+          "value": "No, the unit would make 1 single hazard roll."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "faq-81bf7082-3ef5-47b9-bfc4-f2021fff1d4f-obligation-01",
+          "summary": "A rule requiring one unit hazard roll produces a single roll, not one per model.",
+          "source_blocks": [
+            2
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/hazard.py:hazard_roll_spec"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_hazard.py::test_unit_hazard_single_d6_faces_and_alias",
+            "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_unit_hazard_single_d6_faces_and_alias",
+              "assertions": [
+                "assert roll.current_values == (face,)",
+                "assert roll.original_result.spec.expression.quantity == 1",
+                "assert roll.original_result.spec.expression.sides == 6",
+                "assert hazard_roll_failed(roll) is (face in (1, 2))",
+                "assert failed_hazard_roll_indices(roll) == ((0,) if face in (1, 2) else ())"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_hazard.py::test_faq07_native_plasma_failure_wounds_unarmed_unit_member",
+              "assertions": [
+                "assert status is None",
+                "assert event['mortal_wounds'] == int(face <= 2)",
+                "assert model_by_id(state=state, model_instance_id=bearer.model_instance_id).current_wounds == bearer.current_wounds",
+                "assert model_by_id(state=state, model_instance_id=recipient.model_instance_id).current_wounds == (0 if face <= 2 else 1)",
+                "assert [a['selected_model_id'] for a in allocated] == ([recipient.model_instance_id] if face <= 2 else [])",
+                "assert len(payloads(decisions, 'dice_rolled')) == 1"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        }
+      ]
+    },
+    {
+      "source_id": "faq:7f238e23-cd3f-40ad-aa91-c75274cc655e",
+      "section": "FAQ 53",
+      "title": "FAQ 53",
+      "source_sha256": "cf0fd95bcbcfb3ff78f04318e141c735309cc69f5f3815ab946d5a4245563333",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "question",
+          "sha256": "ffa7b7df6ce4d7349f32e20829a2384d1df1eaf4de3848e5ebf51fbce76cd9db",
+          "value": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?"
+        },
+        {
+          "ordinal": 2,
+          "kind": "answer",
+          "sha256": "1854fc2c1b8e35847e2d793664e9082f6e0127760087eef993775a1fc86bef69",
+          "value": "Line of sight is drawn from any part of the observing model to any part of the model being observed."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "faq-7f238e23-cd3f-40ad-aa91-c75274cc655e-obligation-01",
+          "summary": "Line of sight uses arbitrary parts of both models, not just their bases.",
+          "source_blocks": [
+            2
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
+            "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
+              "assertions": [
+                "assert witness.unit_visible is visible",
+                "assert witness.unit_fully_visible is fully",
+                "assert witness.visible_model_ids == ((target.model_id,) if visible else ())",
+                "with pytest.raises(GeometryError, match='geometry|evidence'):\n    changed.benefit_of_cover(witness)",
+                "assert not VisibilityQuery.from_segment(Point3(10, 10, 0), Point3(20, 10, 0), static_terrain=walls).resolve().has_line_of_sight",
+                "assert witness.unit_fully_visible"
+              ]
+            },
+            {
+              "node": "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin",
+              "assertions": [
+                "assert incoming.model_visible",
+                "assert not incoming.model_fully_visible",
+                "assert incoming.clear_corridor is not None",
+                "assert incoming.clear_corridor[1][1] < 0",
+                "assert outgoing.model_visible is (not bounded)",
+                "assert resolve_physical_visibility((body,), (opponent,), (), (), bounds).model_fully_visible",
+                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [],
+          "successor_binding": null,
+          "finding": null
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        }
+      ]
+    },
+    {
+      "source_id": "faq:9638115f-b94b-4d05-ba62-df9fba2805ac",
+      "section": "FAQ 63",
+      "title": "FAQ 63",
+      "source_sha256": "1c43f713b930f8f51c7d429991f40174c22eb30bbf4bd56773993b4a8e319cd8",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "question",
+          "sha256": "e44fbe12b4ba06d51fec78907879b637cd59d57d3b3ff00cfbf12b81043a9a08",
+          "value": "When a model overhangs the edge of the battlefield, how does that affect its visibility?"
+        },
+        {
+          "ordinal": 2,
+          "kind": "answer",
+          "sha256": "9cca59d123fc37e953f0b0000e0b191c29f49582925ac19e8e40cdfd3e945dde",
+          "value": "That model's controlling player can draw line of sight from any part of that model that is not overhanging the edge of the battlefield. Their opponent can draw line of sight to any part of that model."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "faq-9638115f-b94b-4d05-ba62-df9fba2805ac-obligation-01",
+          "summary": "Outgoing line of sight may originate only on in-bounds physical parts.",
+          "source_blocks": [
+            2
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+            "src/warhammer40k_core/geometry/physical_visibility.py:resolve_physical_visibility"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin",
+              "assertions": [
+                "assert incoming.model_visible",
+                "assert not incoming.model_fully_visible",
+                "assert incoming.clear_corridor is not None",
+                "assert incoming.clear_corridor[1][1] < 0",
+                "assert outgoing.model_visible is (not bounded)",
+                "assert resolve_physical_visibility((body,), (opponent,), (), (), bounds).model_fully_visible",
+                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [
+            "Constructed rational physical prisms at the exact production visibility evaluator; native geometry tests are separate. No new setup-permission or exact miniature measurement certification. Retained order135 facade/setup/replay gates remain separate."
+          ],
+          "successor_binding": {
+            "category": "06",
+            "owners": [
+              "src/warhammer40k_core/geometry/physical_visibility.py:resolve_physical_visibility",
+              "src/warhammer40k_core/engine/battlefield_visibility_context.py:battlefield_visibility_context",
+              "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+              "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py:source_packages",
+              "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py:battlefield_edge_source_package",
+              "src/warhammer40k_core/rules/source_authority_registry.py:SourceAuthorityScopeRegistry.all_source_packages",
+              "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext._rng_compatibility_projection",
+              "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness",
+              "src/warhammer40k_core/core/visibility_rng_projection.py:VisibilityRngProjection",
+              "src/warhammer40k_core/core/visibility_rng_projection.py:legacy_scalar_input_fingerprint",
+              "src/warhammer40k_core/engine/decision.py:_legacy_los_rng_payload",
+              "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history",
+              "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+              "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+              "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
+            ],
+            "test_files": [
+              "tests/unit/test_order135_physical_visibility.py",
+              "tests/unit/test_order135_visibility_facade.py",
+              "tests/code_quality/test_order135_current_core_audit.py",
+              "tests/unit/test_order135_visibility_rng_projection.py",
+              "tests/unit/test_order135_shooting_boundary.py"
+            ],
+            "qualification": "Approved V963-VISIBILITY repair with actual retained maintained-mirror observation and native catalog ingress; analytical body dimensions remain synthetic/source-linked geometry, not official miniature measurements.",
+            "rng_compatibility_qualification": "Explicitly approved typed/versioned unchanged-scalar-only RNG projection. Current complete physical/bounds evidence remains authoritative; changed composite/clipped geometry retains current RNG metadata. Live/save/fork/replay and authentic BASE token are bound, never implied by static presence.",
+            "boundary_persistence_repair_qualification": "Explicitly approved B01: accepted empty/no-attack and selected-targetless declarations remain completed selections without becoming shots in reconstructed boundary history. Only nonempty typed actual attack pools mark the unit as shot; all decision/proposal/source/causal/identity/phase/ineligible guards remain. BASE-identical old owner; no regression-introduction claim. Native scalar/physical last-shooter boundaries, saves/forks/all views/events/exact replay and positive actual-attack controls bind runtime behavior; static presence is not certification."
+          },
+          "finding": null
+        },
+        {
+          "id": "faq-9638115f-b94b-4d05-ba62-df9fba2805ac-obligation-02",
+          "summary": "Incoming line of sight may end on any physical part, including overhang.",
+          "source_blocks": [
+            2
+          ],
+          "status": "asserted",
+          "owner_section": "06",
+          "engine_owners": [
+            "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+            "src/warhammer40k_core/geometry/physical_visibility.py:resolve_physical_visibility"
+          ],
+          "asserting_tests": [
+            "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin",
+              "assertions": [
+                "assert incoming.model_visible",
+                "assert not incoming.model_fully_visible",
+                "assert incoming.clear_corridor is not None",
+                "assert incoming.clear_corridor[1][1] < 0",
+                "assert outgoing.model_visible is (not bounded)",
+                "assert resolve_physical_visibility((body,), (opponent,), (), (), bounds).model_fully_visible",
+                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible"
+              ]
+            }
+          ],
+          "retained_prior_qualifications": [
+            "Constructed rational physical prisms at the exact production visibility evaluator; native geometry tests are separate. No new setup-permission or exact miniature measurement certification. Retained order135 facade/setup/replay gates remain separate."
+          ],
+          "successor_binding": {
+            "category": "06",
+            "owners": [
+              "src/warhammer40k_core/geometry/physical_visibility.py:resolve_physical_visibility",
+              "src/warhammer40k_core/engine/battlefield_visibility_context.py:battlefield_visibility_context",
+              "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext",
+              "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py:source_packages",
+              "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_other_concepts_2026_08/__init__.py:battlefield_edge_source_package",
+              "src/warhammer40k_core/rules/source_authority_registry.py:SourceAuthorityScopeRegistry.all_source_packages",
+              "src/warhammer40k_core/core/visibility.py:TerrainVisibilityContext._rng_compatibility_projection",
+              "src/warhammer40k_core/core/visibility_records.py:LineOfSightWitness",
+              "src/warhammer40k_core/core/visibility_rng_projection.py:VisibilityRngProjection",
+              "src/warhammer40k_core/core/visibility_rng_projection.py:legacy_scalar_input_fingerprint",
+              "src/warhammer40k_core/engine/decision.py:_legacy_los_rng_payload",
+              "src/warhammer40k_core/engine/decision.py:DiceRollManager._seed_existing_event_history",
+              "src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:_shooting_declaration_ids",
+              "src/warhammer40k_core/engine/phases/shooting_model.py:ShootingPhaseState.with_declaration",
+              "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py:validate_primary_mission_shooting_event_decision_authority"
+            ],
+            "test_files": [
+              "tests/unit/test_order135_physical_visibility.py",
+              "tests/unit/test_order135_visibility_facade.py",
+              "tests/code_quality/test_order135_current_core_audit.py",
+              "tests/unit/test_order135_visibility_rng_projection.py",
+              "tests/unit/test_order135_shooting_boundary.py"
+            ],
+            "qualification": "Approved V963-VISIBILITY repair with actual retained maintained-mirror observation and native catalog ingress; analytical body dimensions remain synthetic/source-linked geometry, not official miniature measurements.",
+            "rng_compatibility_qualification": "Explicitly approved typed/versioned unchanged-scalar-only RNG projection. Current complete physical/bounds evidence remains authoritative; changed composite/clipped geometry retains current RNG metadata. Live/save/fork/replay and authentic BASE token are bound, never implied by static presence.",
+            "boundary_persistence_repair_qualification": "Explicitly approved B01: accepted empty/no-attack and selected-targetless declarations remain completed selections without becoming shots in reconstructed boundary history. Only nonempty typed actual attack pools mark the unit as shot; all decision/proposal/source/causal/identity/phase/ineligible guards remain. BASE-identical old owner; no regression-introduction claim. Native scalar/physical last-shooter boundaries, saves/forks/all views/events/exact replay and positive actual-attack controls bind runtime behavior; static presence is not certification."
+          },
+          "finding": null
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "heading_question_or_example",
+          "explanation": "Context retained; operative clauses are mapped separately."
+        }
+      ]
+    }
+  ],
+  "unadopted_gaps": [],
+  "cross_section_faq_links": [
+    {
+      "faq": "03,30",
+      "owner": "04",
+      "links": [
+        "tests/rules/section04/coverage.json"
+      ],
+      "reason": "Weapon range/visibility selection is owned04."
+    },
+    {
+      "faq": "44",
+      "owner": "13",
+      "links": [
+        "data/source_audits/order97/categories/13.json"
+      ],
+      "reason": "Per-attacker cover and associated attack grouping; visibility definition owned06."
+    },
+    {
+      "faq": "13",
+      "owner": "09",
+      "links": [
+        "data/source_audits/order97/categories/09.json"
+      ],
+      "reason": "Desperate Escape automatic-pass rule;06 owns the shared hazard semantics only."
+    },
+    {
+      "faq": "20,37,48,49",
+      "owner": "05",
+      "links": [
+        "tests/rules/section05/coverage.json",
+        "tests/rules/section05/future-fixes.json"
+      ],
+      "reason": "Retained models, damage/FNP and removal timing. SF05-002 remains an unresolved source-versus-user-authority conflict, not a confirmed defect."
+    },
+    {
+      "faq": "52",
+      "owner": "01",
+      "consumer_owner": "18",
+      "links": [
+        "tests/rules/section01/coverage.json"
+      ],
+      "reason": "Not On Battlefield restrictions and Firing Deck consumer."
+    }
+  ],
+  "scope_qualifications": [
+    "Six supported native definitions reused once through integrated selected-army loader: Infractors, Lord Exultant, Maulerfiend, Wave Serpent, Wraithlord, Shining Spears. Native physical models, wounds, keywords, plasma option and weapon identity remain authoritative; no legal-army or official miniature measurement certification.",
+    "Constructed contracts: two-leader and cross-datasheet attached rules units, already-suffered wounds/casualties, pooled attack count, provider-authorized additional-mortal/allocation-prevention descriptors, analytic terrain and rational-prism body overhang. They enter real production owners and do not claim named faction activation or native attachment permissions.",
+    "No mission, full-game creation, mustering, prior phase traversal or replay reconstruction. Visibility context, rule-unit exclusion, source-unit filter, mortal allocator, attack-sequence and Hazardous completion owners are used directly.",
+    "The historical P06D all-model hazard, P06E additional mortals and allocation-trigger qualifications are preserved verbatim in each requirement. Current assertions address bounded native inputs; no wholesale retirement of old facade/replay families is implied.",
+    "FAQ63 is adopted by order135 current_new_faqs category06, although omitted from historical order97 category06. All current visibility-related FAQ rows were scanned; the remaining related FAQs retain their owning-section links.",
+    "No runtime repair, source mutation, skip, xfail or rule-expectation weakening. Corpus completion differs from engine compliance; independent semantic/equivalence review and Linux integration remain gates."
+  ],
+  "predecessor_equivalence": "No predecessor retired. The full suites were not rerun for report assembly."
+}

@@ -50,6 +50,8 @@ def resolve_gathered_attack_dice(
     again nor trusts a client-supplied attack cursor.
     """
     pool = attack_sequence.current_pool()
+    from warhammer40k_core.engine.model_attack_history import record_models_attacked
+
     originals = tuple(replace(attack_sequence, attack_index=index) for index in range(pool.attacks))
     wound_sequences: list[tuple[AttackSequence, HitRoll]] = []
     stages: tuple[Literal["prepare", "roll", "resolve"], ...] = (
@@ -87,6 +89,8 @@ def resolve_gathered_attack_dice(
                 return (), status
             if stage == "prepare":
                 continue
+            if stage == "resolve":
+                record_models_attacked(state=state, decisions=decisions, sequence=attack_sequence)
             if hit is None:
                 raise GameLifecycleError("Gathered Hit step lost its original roll.")
             if stage == "roll" or not hit.successful:
@@ -124,6 +128,7 @@ def resolve_gathered_attack_dice(
             if status is not None:
                 return (), status
             if stage == "resolve":
+                record_models_attacked(state=state, decisions=decisions, sequence=attack_sequence)
                 if context is None:
                     raise GameLifecycleError("Gathered Wound step lost its successful Hit.")
                 if context["wound_roll"]["successful"]:

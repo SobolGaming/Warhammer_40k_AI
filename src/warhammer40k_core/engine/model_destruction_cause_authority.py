@@ -19,8 +19,10 @@ from warhammer40k_core.engine.event_log import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.decision_request import DecisionRequest
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.model_logical_death import ModelLogicalDeathRecord
+    from warhammer40k_core.engine.retained_destruction_state import RetainedModelDestruction
 
 
 MODEL_DESTROYED_EVENT_TYPE = "model_destroyed"
@@ -706,6 +708,7 @@ def validate_model_destruction_cause_authority_restore(
     state: GameState,
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
+    pending_decision_requests: tuple[DecisionRequest, ...] = (),
 ) -> None:
     authorities = validate_model_destruction_cause_authorities(
         state.model_destruction_cause_authorities,
@@ -770,6 +773,7 @@ def validate_model_destruction_cause_authority_restore(
     # its authority, so unrelated registrations need not follow death chronology.
     # Parent/child chronology remains mandatory below.
     authorities_by_id = {authority.cause_id: authority for authority in authorities}
+    retained_history: tuple[RetainedModelDestruction, ...] | None = None
     for child in authorities:
         for parent_cause_id in child.parent_cause_ids:
             parent = authorities_by_id[parent_cause_id]
@@ -783,6 +787,33 @@ def validate_model_destruction_cause_authority_restore(
             parent_event = parent.model_destroyed_event
             if parent_event is None:
                 continue
+            if (
+                event_indexes[parent_event.event_id]
+                < event_indexes[child.logical_death_event.event_id]
+            ):
+                from warhammer40k_core.engine.retained_demise_removal import (
+                    is_post_removal_deadly_demise_child,
+                )
+                from warhammer40k_core.engine.retained_destruction_history import (
+                    validate_retained_destruction_history,
+                )
+
+                if retained_history is None:
+                    retained_history = validate_retained_destruction_history(
+                        state=state,
+                        event_records=event_records,
+                        decision_records=decision_records,
+                        pending_decision_requests=pending_decision_requests,
+                        include_completed=True,
+                    )
+                if is_post_removal_deadly_demise_child(
+                    state=state,
+                    parent=parent,
+                    child=child,
+                    event_records=event_records,
+                    retained_history=retained_history,
+                ):
+                    continue
             child_event = child.model_destroyed_event
             if child_event is None:
                 raise GameLifecycleError(

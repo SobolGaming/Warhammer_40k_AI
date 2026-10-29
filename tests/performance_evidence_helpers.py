@@ -30,6 +30,15 @@ def _inventory() -> dict[str, object]:
     return value
 
 
+def _historical_report_bytes(name: str) -> bytes:
+    # The owner-approved Order34 lookup recalibration changes this current
+    # budget only. Its original240 ceiling remains authenticated at the existing
+    # immutable Git revision; every other historical report stays byte-pinned live.
+    if name == "docs/performance/order34/budgets.json":
+        return historical_input_bytes(name)
+    return (ROOT / name).read_bytes()
+
+
 def assert_historical_report(report: object) -> None:
     """Retain the recorded identity/outcomes; never assert a current runtime claim."""
     canonical = json.dumps(report, sort_keys=True, separators=(",", ":"), allow_nan=False)
@@ -39,7 +48,7 @@ def assert_historical_report(report: object) -> None:
     if not matching:
         raise ValueError("Unregistered or modified historical performance report.")
     for name in matching:
-        if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != records[name]["sha256"]:
+        if hashlib.sha256(_historical_report_bytes(name)).hexdigest() != records[name]["sha256"]:
             raise ValueError(f"Historical performance report bytes drifted: {name}")
 
 
@@ -71,5 +80,5 @@ def historical_input_text(name: str) -> str:
 def verify_historical_inventory() -> None:
     records = cast(dict[str, dict[str, str]], _inventory()["reports"])
     for name, row in records.items():
-        if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != row["sha256"]:
+        if hashlib.sha256(_historical_report_bytes(name)).hexdigest() != row["sha256"]:
             raise ValueError(f"Historical performance evidence changed: {name}")

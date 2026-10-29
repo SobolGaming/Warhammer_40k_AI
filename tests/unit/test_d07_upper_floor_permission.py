@@ -82,7 +82,7 @@ def test_upper_floor_setup_and_movement_are_model_owned(keyword: str) -> None:
     )
     assert "MONSTER" in ruins.upper_floor_allowed_keywords
     assert "MONSTER" not in ruins.through_terrain_allowed_keywords
-    assert "SWARM" not in ruins.upper_floor_allowed_keywords
+    assert "SWARM" in ruins.upper_floor_allowed_keywords
     if keyword == "VEHICLE":
         # An explicit all-model grant is distinct from intrinsic siblings' keywords.
         granted = model_movement_terrain_context(

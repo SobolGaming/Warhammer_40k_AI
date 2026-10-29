@@ -17,10 +17,14 @@ def horizontal_section_transit_permitted(
     return (
         maximum_height_inches is not None
         and top_inches <= maximum_height_inches
-        and all(
-            math.isclose(pose.position.z, poses[0].position.z, rel_tol=0, abs_tol=1e-9)
-            for pose in poses[1:]
-        )
+        and path_is_horizontal(poses)
+    )
+
+
+def path_is_horizontal(poses: tuple[Pose, ...]) -> bool:
+    return all(
+        math.isclose(pose.position.z, poses[0].position.z, rel_tol=0, abs_tol=1e-9)
+        for pose in poses[1:]
     )
 
 

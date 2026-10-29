@@ -4,20 +4,93 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
+import sys
+from collections.abc import Iterator, Mapping
 from copy import deepcopy
+from functools import wraps
 from pathlib import Path
-from typing import cast
+from types import MappingProxyType
+from typing import Any, cast
 
 import pytest
-from tools import performance_category_migration as migration
+from tools import cumulative_preservation as migration
 from tools import performance_policy as policy
+from tools import performance_preflight as preflight
+from tools import performance_qualification_successor as successor
 from tools import performance_reconstruction_campaign as reconstruction
 from tools import performance_tool_inputs as original
 from tools import performance_tool_inputs_v2 as fresh
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def _copy_ignore(directory: str, names: list[str]) -> set[str]:
+    ignored = set(
+        shutil.ignore_patterns(
+            ".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"
+        )(directory, names)
+    )
+    if Path(directory) == ROOT:
+        ignored.add("reports")
+    if Path(directory) == ROOT and ".venv" in names:
+        if any(
+            name in os.environ
+            for name in (
+                "GIT_DIR",
+                "GIT_WORK_TREE",
+                "GIT_COMMON_DIR",
+                "GIT_INDEX_FILE",
+                "GIT_OBJECT_DIRECTORY",
+                "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+                "GIT_NAMESPACE",
+                "GIT_CONFIG",
+                "GIT_CONFIG_COUNT",
+                "GIT_CONFIG_PARAMETERS",
+                "GIT_CONFIG_GLOBAL",
+                "GIT_CONFIG_SYSTEM",
+                "GIT_REPLACE_REF_BASE",
+            )
+        ):
+            raise ValueError("Root environment ownership refuses redirected Git roles.")
+        environment = ROOT / ".venv"
+        first = environment.lstat()
+        if (
+            environment.is_symlink()
+            or environment.is_junction()
+            or environment.resolve(strict=True) != environment
+        ):
+            raise ValueError("Root environment must not be an alias.")
+        command = [
+            "git",
+            "--literal-pathspecs",
+            "--work-tree=" + str(ROOT),
+            "ls-files",
+            "--with-tree=HEAD",
+            "--error-unmatch",
+            "-z",
+            "--",
+            ".venv",
+        ]
+        result = subprocess.run(command, cwd=ROOT, stdout=subprocess.DEVNULL, timeout=30)
+        if result.returncode == 0:
+            raise ValueError("Tracked root environment must not be omitted.")
+        if result.returncode != 1:
+            raise subprocess.CalledProcessError(result.returncode, command)
+        second = environment.lstat()
+        if (
+            (first.st_dev, first.st_ino, first.st_mode)
+            != (second.st_dev, second.st_ino, second.st_mode)
+            or environment.is_symlink()
+            or environment.is_junction()
+            or environment.resolve(strict=True) != environment
+        ):
+            raise ValueError("Root environment identity changed during ownership admission.")
+        if environment.is_dir():
+            ignored.add(".venv")
+    return ignored
 
 
 def read_archive() -> dict[str, object]:
@@ -33,36 +106,81 @@ def _controls() -> dict[str, str]:
 
 
 def _current(archive: dict[str, object]) -> tuple[dict[str, str], dict[str, str]]:
-    controls = _controls()
-    return (
-        _inputs(archive, "POLICY_CURRENT_INPUTS.json.txt") | controls,
-        _inputs(archive, "TOOL_CURRENT_INPUTS.json.txt") | controls,
-    )
+    return migration.expected_inputs(ROOT)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def private_expected_input_reference() -> Iterator[None]:
+    """Reuse only fixed expected test data; all production validation stays fresh."""
+    original_current = _current
+    reference: tuple[Mapping[str, str], Mapping[str, str]] | None = None
+
+    def reference_inputs(archive: dict[str, object]) -> tuple[dict[str, str], dict[str, str]]:
+        nonlocal reference
+        if reference is None:
+            current, tools = original_current(archive)
+            assert all(
+                isinstance(key, str) and isinstance(value, str)
+                for values in (current, tools)
+                for key, value in values.items()
+            )
+            reference = MappingProxyType(dict(current)), MappingProxyType(dict(tools))
+        return dict(reference[0]), dict(reference[1])
+
+    with pytest.MonkeyPatch.context() as private:
+        private.setattr(sys.modules[__name__], "_current", reference_inputs)
+        try:
+            yield
+        finally:
+            reference = None
+
+
+@pytest.fixture(autouse=True)
+def private_computation_scope(request: pytest.FixtureRequest) -> Iterator[None]:
+    """Restore the temporary validator and callable before outer reporter hooks."""
+    node = cast(pytest.Item, cast(Any, request).node)
+    if not isinstance(node, pytest.Function):
+        yield
+        return
+    original_test = node.obj
+    original_verify = migration.verify_current_inventory
+
+    @wraps(original_test)
+    def run_original(*args: Any, **kwargs: Any) -> Any:
+        @wraps(original_verify)
+        def verify(root: Path, **values: Any) -> None:
+            return preflight.ci60_computation(root, lambda: original_verify(root, **values))
+
+        try:
+            with pytest.MonkeyPatch.context() as private:
+                private.setattr(migration, "verify_current_inventory", verify)
+                return original_test(*args, **kwargs)
+        finally:
+            node.obj = original_test
+
+    node.obj = run_original
+    try:
+        yield
+    finally:
+        node.obj = original_test
 
 
 @pytest.fixture(scope="module")
 def copied_migration(tmp_path_factory: pytest.TempPathFactory) -> Path:
     root = tmp_path_factory.mktemp("category-applicability")
-    archive = read_archive()
-    names = set(_inputs(archive, "MIGRATION_FILES.json.txt"))
-    preservation = policy.read_object(
-        ROOT / "data/source_audits/category_migration/preservation.json"
+    # Copy exact live inputs, including transitive fixtures and the new evidence
+    # namespace. A read-only Git pointer retains authenticated object identity.
+    shutil.copytree(
+        ROOT,
+        root,
+        dirs_exist_ok=True,
+        ignore=_copy_ignore,
     )
-    for record in policy.object_value(preservation["originals"]).values():
-        names.update(policy.object_value(policy.object_value(record)["successors"]))
-    external = policy.object_value(archive[migration.EXTERNAL])
-    names.update(policy.object_value(external["measured"]))
-    for name in sorted(names):
-        target = root / name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / name, target)
-    shutil.copytree(ROOT / migration.ARCHIVE, root / migration.ARCHIVE)
     git_dir = (
         subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=ROOT)
         .decode()
         .strip()
     )
-    # Only read-only Git inventory/show commands use this pointer; no fixture Git mutations.
     (root / ".git").write_text("gitdir: " + git_dir + "\n", encoding="utf-8")
     return root
 
@@ -136,13 +254,31 @@ def test_original_reconstruction_bridge_remains_separate() -> None:
         )
 
 
-def test_direct_v2_api_still_rejects_migrated_current_source() -> None:
+def test_direct_v2_api_still_rejects_migrated_current_source(tmp_path: Path) -> None:
+    # The legacy API requires actual worker ancestry. A deliberately dirty
+    # checkout at that genuine historical commit reaches its separate inventory
+    # refusal; the cumulative qualification HEAD is never reparented or relabeled.
+    root = tmp_path / "historical-dirty-checkout"
+    shutil.copytree(
+        ROOT,
+        root,
+        ignore=_copy_ignore,
+    )
+    shutil.copytree(ROOT / ".git", root / ".git")
+    subprocess.run(
+        ["git", "update-ref", "--no-deref", "HEAD", migration.MEASURED], cwd=root, check=True
+    )
+    subprocess.run(["git", "read-tree", migration.MEASURED], cwd=root, check=True)
+    assert (
+        subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root).decode().strip()
+        == migration.MEASURED
+    )
     with pytest.raises(ValueError, match="do not equal the current source inventory"):
         original.comparison_inputs(
-            ROOT,
+            root,
             base=migration.BASE,
             family=original.FAMILY,
-            head_input_digest=original.digest(policy.runtime_inputs(ROOT)),
+            head_input_digest=original.digest(policy.runtime_inputs(root)),
             measured_head=migration.MEASURED,
             schema=fresh.SCHEMA,
         )
@@ -468,10 +604,11 @@ def test_external_proof_is_separately_pinned_without_repinning_old_measurement_m
 
 @pytest.fixture
 def assessment_map_root(tmp_path: Path) -> Path:
-    shutil.copytree(ROOT / migration.ASSESSMENT_MAP, tmp_path / migration.ASSESSMENT_MAP)
+    shutil.copytree(ROOT / migration.NAMESPACE, tmp_path / migration.NAMESPACE)
     target = tmp_path / original.MAP_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(ROOT / original.MAP_PATH, target)
+    # This fixture tests the preceding finite map proof after current extension admission.
+    target.write_bytes(successor.prior_operation_map_bytes(ROOT))
     return tmp_path
 
 
@@ -560,3 +697,104 @@ def test_assessment_map_actual_input_hashes_cannot_be_omitted_or_forged(
         migration.assessment_map_inputs(
             assessment_map_root, archive=read_archive(), current=current, tools=tools
         )
+
+
+def test_fixture_copy_omits_only_generated_root_reports(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    copied = tmp_path / "copied"
+    generated = source / "reports" / "quality-timing" / "active.json.tmp"
+    nested = source / "data" / "reports" / "owned.json"
+    ordinary = source / "src" / "owned.py"
+    for path, raw in (
+        (generated, b"ephemeral reporter output\n"),
+        (nested, b'{"owned": true}\n'),
+        (ordinary, b"VALUE = 1\n"),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+
+    def copy_owned(source_name: str, target_name: str) -> str:
+        if Path(source_name).is_relative_to(source / "reports"):
+            raise FileNotFoundError("Reporter temporary file disappeared before copy")
+        return shutil.copy2(source_name, target_name)
+
+    with pytest.MonkeyPatch.context() as private:
+        private.setitem(globals(), "ROOT", source)
+        shutil.copytree(source, copied, ignore=_copy_ignore, copy_function=copy_owned)
+    assert not (copied / "reports").exists()
+    assert (copied / "data" / "reports" / "owned.json").read_bytes() == nested.read_bytes()
+    assert (copied / "src" / "owned.py").read_bytes() == ordinary.read_bytes()
+
+
+def test_root_environment_copy_filter_preserves_owned_and_nested_sources(tmp_path: Path) -> None:
+    source, copied = tmp_path / "source", tmp_path / "copied"
+    environment = source / ".venv" / "environment.py"
+    nested = source / "data" / ".venv" / "owned.py"
+    ordinary = source / "src" / "owned.py"
+    for path, raw in (
+        (environment, b"ENV = 1\n"),
+        (nested, b"NESTED = 1\n"),
+        (ordinary, b"OWNED = 1\n"),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+    subprocess.run(["git", "init", "-q"], cwd=source, check=True)
+    subprocess.run(
+        ["git", "add", "-f", "data/.venv/owned.py", "src/owned.py"], cwd=source, check=True
+    )
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=quality-control",
+            "-c",
+            "user.email=quality-control@example.invalid",
+            "commit",
+            "-qm",
+            "owned nested fixture",
+        ],
+        cwd=source,
+        check=True,
+    )
+    with pytest.MonkeyPatch.context() as private:
+        private.setitem(globals(), "ROOT", source)
+        shutil.copytree(source, copied, ignore=_copy_ignore)
+        assert not (copied / ".venv").exists()
+        assert (copied / "data/.venv/owned.py").read_bytes() == nested.read_bytes()
+        assert (copied / "src/owned.py").read_bytes() == ordinary.read_bytes()
+        subprocess.run(["git", "add", "-f", ".venv/environment.py"], cwd=source, check=True)
+        with pytest.raises(ValueError, match="Tracked root environment"):
+            _copy_ignore(str(source), [".venv"])
+        subprocess.run(
+            [
+                "git",
+                "-c",
+                "user.name=quality-control",
+                "-c",
+                "user.email=quality-control@example.invalid",
+                "commit",
+                "-qm",
+                "owned root fixture",
+            ],
+            cwd=source,
+            check=True,
+        )
+        subprocess.run(["git", "rm", "--cached", "-qr", ".venv"], cwd=source, check=True)
+        with pytest.raises(ValueError, match="Tracked root environment"):
+            _copy_ignore(str(source), [".venv"])
+        with pytest.MonkeyPatch.context() as redirected:
+            redirected.setenv("GIT_INDEX_FILE", str(tmp_path / "unrelated-index"))
+            with pytest.raises(ValueError, match="redirected Git roles"):
+                _copy_ignore(str(source), [".venv"])
+    alias_root = tmp_path / "alias-source"
+    alias_root.mkdir()
+    (alias_root / ".venv").symlink_to(environment.parent, target_is_directory=True)
+    subprocess.run(["git", "init", "-q"], cwd=alias_root, check=True)
+    subprocess.run(["git", "add", "-f", ".venv"], cwd=alias_root, check=True)
+    assert subprocess.check_output(
+        ["git", "ls-files", "--stage", "--", ".venv"], cwd=alias_root
+    ).startswith(b"120000")
+    with pytest.MonkeyPatch.context() as private:
+        private.setitem(globals(), "ROOT", alias_root)
+        with pytest.raises(ValueError, match="must not be an alias"):
+            _copy_ignore(str(alias_root), [".venv"])

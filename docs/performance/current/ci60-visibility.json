@@ -1,0 +1,178 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "visibility",
+  "workload_id": "order78-gone-to-ground-v2",
+  "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
+  "head_input_digest": "3b35246076c4f6226dc4630eb92850a44d3c92d71147e0d4b87ff5c559533a80",
+  "budget_profile": "current-change-relative-v1",
+  "historical_failures": [
+    "Original visibility99/100 completed but host memory differs8192bytes; both retained and excluded. Approved fresh pair108/109 supplies unchanged49samples per arm.",
+    "Earlier failed source/control attempts and watched69 missing outer receipt remain retained under original identities.",
+    "These comparisons bind native measured M2702631. Full-cohort staging does not activateF or create a current receipt or claim final quality qualification."
+  ],
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359395840,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fdf2689406de0469904b7af9d24c8e15246e29eb31c37503b0e0fdd8b6b80f1d",
+    "fixture_sha256": "3c12b3e376db2c2190c00bdd8df81e6ca52e0f856f569e10bb73cfaaf664f161",
+    "samples": {
+      "dense-outside": [
+        0.1555053369999655,
+        0.10021880900001179,
+        0.09955674700000827,
+        0.09974189800004751,
+        0.100120392000008,
+        0.10070541600003935,
+        0.10016357000000653
+      ],
+      "dense-inside": [
+        0.30805672799999684,
+        0.09982897399999047,
+        0.09965525299998035,
+        0.09962912299999971,
+        0.10086599900000692,
+        0.10093355600002951,
+        0.1015081809999856
+      ],
+      "attached-outside": [
+        0.2729595600000039,
+        0.19584970599998996,
+        0.19716580799996564,
+        0.19659547399999155,
+        0.19817643400000406,
+        0.19634711399999105,
+        0.19642732300002308
+      ],
+      "light-outside": [
+        0.07416500299996187,
+        0.06463947999998254,
+        0.06571751300003825,
+        0.06805171999997128,
+        0.06472769599997719,
+        0.06540634800001044,
+        0.06500468400003001
+      ],
+      "not-hidden": [
+        0.061868990999983,
+        0.06226163500002713,
+        0.062126260000013644,
+        0.061986316999991686,
+        0.06266928599995936,
+        0.0628146509999965,
+        0.06174638799996046
+      ],
+      "fully-visible": [
+        0.027543149999985417,
+        0.02457383899997012,
+        0.024599690000002283,
+        0.024406298999963383,
+        0.024691634000021168,
+        0.024784450999959518,
+        0.024591990000033093
+      ],
+      "associated-policy-only-woods": [
+        0.1504452599999695,
+        0.10476661800004194,
+        0.10511629299998049,
+        0.10633520599998292,
+        0.1057835230000137,
+        0.10651392199997645,
+        0.10544749799998954
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359395840,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "fdf2689406de0469904b7af9d24c8e15246e29eb31c37503b0e0fdd8b6b80f1d",
+    "fixture_sha256": "3c12b3e376db2c2190c00bdd8df81e6ca52e0f856f569e10bb73cfaaf664f161",
+    "samples": {
+      "dense-outside": [
+        0.155475263000028,
+        0.10092533600004572,
+        0.10579256400001213,
+        0.10165832699999555,
+        0.10012954399996943,
+        0.10041544799997837,
+        0.09945251499999586
+      ],
+      "dense-inside": [
+        0.30383164699998133,
+        0.09959018899996863,
+        0.09968657100000655,
+        0.10013033500001711,
+        0.10035677199999782,
+        0.10027700800003458,
+        0.10030577700001686
+      ],
+      "attached-outside": [
+        0.27575050799998735,
+        0.2001205359999858,
+        0.19978536999997232,
+        0.2022419520000085,
+        0.20360311199999614,
+        0.20243586300000516,
+        0.19884339200001477
+      ],
+      "light-outside": [
+        0.07500773599997501,
+        0.06732370600002469,
+        0.06615692799999806,
+        0.06619627200001332,
+        0.0664132959999506,
+        0.06599998399997276,
+        0.06655321600004527
+      ],
+      "not-hidden": [
+        0.06248698699999977,
+        0.06379951799999617,
+        0.06293285800001058,
+        0.06330777199997328,
+        0.0635502289999863,
+        0.06262320100000807,
+        0.06311595099998613
+      ],
+      "fully-visible": [
+        0.027245574999994915,
+        0.025145224999960192,
+        0.024761884999975337,
+        0.02494430300004069,
+        0.024584201999971356,
+        0.025063609000028464,
+        0.02473959499997136
+      ],
+      "associated-policy-only-woods": [
+        0.15021305600004098,
+        0.10405530299999555,
+        0.10337205100000801,
+        0.10401898299994627,
+        0.1038339230000247,
+        0.10357365400000162,
+        0.10378142500002241
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  }
+}

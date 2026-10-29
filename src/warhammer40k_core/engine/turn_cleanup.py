@@ -11,15 +11,14 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
     BattlefieldTransitionBatchPayload,
-    ModelPlacement,
     ModelRemovalRecord,
-    UnitPlacement,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
     UnitCoherencyResultPayload,
-    unit_placement_coherency_result,
+    rules_unit_coherency_result,
 )
 
 
@@ -41,6 +40,7 @@ class EndTurnCleanupStatePayload(TypedDict):
     removals: list[CoherencyCleanupRemovalPayload]
     coherency_results: list[UnitCoherencyResultPayload]
     transition_batch: BattlefieldTransitionBatchPayload
+    completes_boundary: bool
 
 
 _COHERENCY_CLEANUP_RULE_ID = "core_rules_unit_coherency_cleanup"
@@ -132,6 +132,7 @@ class EndTurnCleanupState:
     removals: tuple[CoherencyCleanupRemoval, ...]
     coherency_results: tuple[UnitCoherencyResult, ...]
     transition_batch: BattlefieldTransitionBatch
+    completes_boundary: bool = True
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -176,6 +177,11 @@ class EndTurnCleanupState:
             raise GameLifecycleError(
                 "EndTurnCleanupState transition_batch must be BattlefieldTransitionBatch."
             )
+        object.__setattr__(
+            self,
+            "completes_boundary",
+            _validate_bool("EndTurnCleanupState completes_boundary", self.completes_boundary),
+        )
 
     @property
     def removed_model_instance_ids(self) -> tuple[str, ...]:
@@ -191,6 +197,7 @@ class EndTurnCleanupState:
             "removals": [removal.to_payload() for removal in self.removals],
             "coherency_results": [result.to_payload() for result in self.coherency_results],
             "transition_batch": self.transition_batch.to_payload(),
+            "completes_boundary": self.completes_boundary,
         }
 
     @classmethod
@@ -208,6 +215,7 @@ class EndTurnCleanupState:
                 UnitCoherencyResult.from_payload(result) for result in payload["coherency_results"]
             ),
             transition_batch=BattlefieldTransitionBatch.from_payload(payload["transition_batch"]),
+            completes_boundary=payload["completes_boundary"],
         )
 
 
@@ -219,6 +227,7 @@ def resolve_end_turn_cleanup(
     battle_round: int,
     active_player_id: str,
     phase: BattlePhase,
+    chosen_model_instance_ids: tuple[str, ...] = (),
 ) -> tuple[EndTurnCleanupState, BattlefieldRuntimeState]:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("End-turn cleanup requires a BattlefieldScenario.")
@@ -233,41 +242,40 @@ def resolve_end_turn_cleanup(
     battlefield_state = scenario.battlefield_state
     removals: list[CoherencyCleanupRemoval] = []
     coherency_results: list[UnitCoherencyResult] = []
-    initial_unit_ids = tuple(
-        unit_placement.unit_instance_id
-        for placed_army in battlefield_state.placed_armies
-        for unit_placement in placed_army.unit_placements
-    )
-    for unit_instance_id in initial_unit_ids:
-        while _unit_is_placed(battlefield_state, unit_instance_id):
-            current_scenario = BattlefieldScenario(
-                armies=scenario.armies,
-                battlefield_state=battlefield_state,
+    if type(chosen_model_instance_ids) is not tuple:
+        raise GameLifecycleError("Cleanup choices must be a tuple.")
+    for model_id in chosen_model_instance_ids:
+        current_scenario = BattlefieldScenario(
+            armies=scenario.armies, battlefield_state=battlefield_state
+        )
+        matching = tuple(
+            view
+            for view in rules_unit_views_from_armies(armies=scenario.armies)
+            if model_id in {model.model_instance_id for model in view.own_models}
+        )
+        if len(matching) != 1:
+            raise GameLifecycleError("Cleanup choice requires one current rules unit.")
+        result = rules_unit_coherency_result(
+            scenario=current_scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            rules_unit=matching[0],
+        )
+        if result.is_coherent or model_id not in result.model_instance_ids:
+            raise GameLifecycleError(
+                "Cleanup choice requires a placed model in a broken rules unit."
             )
-            unit_placement = battlefield_state.unit_placement_by_id(unit_instance_id)
-            result = unit_placement_coherency_result(
-                scenario=current_scenario,
-                ruleset_descriptor=ruleset_descriptor,
-                unit_placement=unit_placement,
+        placement = battlefield_state.model_placement_or_none(model_id)
+        if placement is None:
+            raise GameLifecycleError("Cleanup choice model must be placed.")
+        coherency_results.append(result)
+        removals.append(
+            CoherencyCleanupRemoval(
+                player_id=placement.player_id,
+                unit_instance_id=placement.unit_instance_id,
+                model_instance_id=model_id,
             )
-            if result.is_coherent:
-                break
-            coherency_results.append(result)
-            model_id = _next_cleanup_model_id(
-                result,
-                scenario=current_scenario,
-                ruleset_descriptor=ruleset_descriptor,
-                unit_placement=unit_placement,
-            )
-            model_placement = _model_placement_for_unit(unit_placement, model_id)
-            removals.append(
-                CoherencyCleanupRemoval(
-                    player_id=model_placement.player_id,
-                    unit_instance_id=unit_placement.unit_instance_id,
-                    model_instance_id=model_id,
-                )
-            )
-            battlefield_state = battlefield_state.with_removed_models((model_id,))
+        )
+        battlefield_state = battlefield_state.with_removed_models((model_id,))
 
     transition_batch = BattlefieldTransitionBatch(
         removals=tuple(
@@ -297,64 +305,6 @@ def resolve_end_turn_cleanup(
         transition_batch=transition_batch,
     )
     return cleanup, battlefield_state
-
-
-def _next_cleanup_model_id(
-    result: UnitCoherencyResult,
-    *,
-    scenario: BattlefieldScenario,
-    ruleset_descriptor: RulesetDescriptor,
-    unit_placement: UnitPlacement,
-) -> str:
-    if type(result) is not UnitCoherencyResult:
-        raise GameLifecycleError("Cleanup model selection requires UnitCoherencyResult.")
-    if type(scenario) is not BattlefieldScenario:
-        raise GameLifecycleError("Cleanup model selection requires a BattlefieldScenario.")
-    if type(ruleset_descriptor) is not RulesetDescriptor:
-        raise GameLifecycleError("Cleanup model selection requires a RulesetDescriptor.")
-    if type(unit_placement) is not UnitPlacement:
-        raise GameLifecycleError("Cleanup model selection requires a UnitPlacement.")
-    if result.unit_instance_id != unit_placement.unit_instance_id:
-        raise GameLifecycleError("Cleanup coherency result unit drift.")
-    offending_ids = result.offending_model_instance_ids
-    if not offending_ids:
-        raise GameLifecycleError("Broken coherency result must identify offending models.")
-    for candidate_id in offending_ids:
-        candidate_placement = unit_placement.with_model_placements(
-            tuple(
-                placement
-                for placement in unit_placement.model_placements
-                if placement.model_instance_id != candidate_id
-            )
-        )
-        candidate_result = unit_placement_coherency_result(
-            scenario=scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            unit_placement=candidate_placement,
-        )
-        if candidate_result.is_coherent:
-            return candidate_id
-    return offending_ids[0]
-
-
-def _model_placement_for_unit(
-    unit_placement: UnitPlacement,
-    model_instance_id: str,
-) -> ModelPlacement:
-    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
-    for model_placement in unit_placement.model_placements:
-        if model_placement.model_instance_id == requested_model_id:
-            return model_placement
-    raise GameLifecycleError("Cleanup model must be present in unit placement.")
-
-
-def _unit_is_placed(battlefield_state: BattlefieldRuntimeState, unit_instance_id: str) -> bool:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    return any(
-        unit_placement.unit_instance_id == requested_unit_id
-        for placed_army in battlefield_state.placed_armies
-        for unit_placement in placed_army.unit_placements
-    )
 
 
 def battlefield_removal_kind_from_token(token: object) -> BattlefieldRemovalKind:

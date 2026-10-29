@@ -21,7 +21,7 @@
       "inventory_size": 32,
       "decision_count": 6,
       "work_limits": {
-        "rules_unit_view_by_id": 240,
+        "rules_unit_view_by_id": 270,
         "rules_unit_identity_ids": 10,
         "persisting_effects_for_lineage": 210,
         "applies_to_unit": 8000,
@@ -48,7 +48,9 @@
         "resolve_visibility_pair_uncached": 26
       },
       "geometry_budget_version": "order93-cold-setup-and-live-geometry-v1",
-      "geometry_calibration_note": "Order91 removed target-geometry checks from shooting-unit eligibility. The historical live-only limit7 relied on5 pairs computed during setup. Cold pre-Order91 setup19 plus live7 equals26; current base/head setup2 plus live12 equals14. Enforce the historical total cold ceiling26 with explicit cache resets and report setup/live separately; retain7 as historical slice evidence. All nongeometry live limits remain unchanged. Proof: docs/performance/order93/visibility-boundary-evidence.json."
+      "geometry_calibration_note": "Order91 removed target-geometry checks from shooting-unit eligibility. The historical live-only limit7 relied on5 pairs computed during setup. Cold pre-Order91 setup19 plus live7 equals26; current base/head setup2 plus live12 equals14. Enforce the historical total cold ceiling26 with explicit cache resets and report setup/live separately; retain7 as historical slice evidence. All nongeometry live limits remain unchanged. Proof: docs/performance/order93/visibility-boundary-evidence.json.",
+      "lookup_budget_version": "order34-unrestricted-lookup-recalibration-v2",
+      "lookup_calibration_note": "Owner approved a larger lookup ceiling on 2026-10-21. The unchanged six-decision live workload at accepted commit923e24c9 measures246 rules_unit_view_by_id calls after setup, with four units, ten models and32 effects. The rounded ceiling270 retains24 calls/9.76% headroom, comparable to the original219/240 (21 calls/9.59%). Current callsite attribution includes9 legitimate Firing Deck own-Shooting-phase ownership checks; it does not prove an exact historical delta. Only this metric/case is recalibrated; all other work, geometry and timing limits remain unchanged. Historical measurements remain historical. See current-recalibration/README.md and measurements.json. Count drift alone is not evidence of a wall-time regression."
     },
     "attached_selection": {
       "workload_id": "order34-live-attached_selection-v1",

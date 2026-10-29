@@ -483,6 +483,13 @@ def _resolve_grouped_damage_from(
     pool = attack_sequence.current_pool()
     current_pending = attack_sequence.pending_grouped_damage
     while current_pending.next_index < len(current_pending.sorted_save_dice):
+        from warhammer40k_core.engine.model_attack_history import record_models_attacked
+
+        record_models_attacked(
+            state=state,
+            decisions=decisions,
+            sequence=attack_sequence.with_pending_grouped_damage(current_pending),
+        )
         save_die = current_pending.sorted_save_dice[current_pending.next_index]
         attack_context = save_die["attack_context"]
         save_attack_sequence = _attack_sequence_for_context(

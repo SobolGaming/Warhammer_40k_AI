@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.movement_model_blockers import vehicle_monster_model_ids_for_player
+
 from warhammer40k_core.engine.sequential_movement import sequential_friendly_models
 
 from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword
@@ -226,6 +228,8 @@ def _desperate_escape_requirements_for_fall_back(
     )
     requirements: list[DesperateEscapeRequirement] = []
     for index, placement in enumerate(unit_placement.model_placements, start=1):
+        if placement.model_instance_id in auto_pass_model_ids:
+            continue
         reasons: list[DesperateEscapeRequirementReason] = []
         enemy_model_ids: tuple[str, ...] = ()
         if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
@@ -237,7 +241,7 @@ def _desperate_escape_requirements_for_fall_back(
             reasons.append(DesperateEscapeRequirementReason.BATTLE_SHOCKED)
         if forced_source_ids:
             reasons.append(DesperateEscapeRequirementReason.FORCED_BY_RULE)
-        if not overflight_exempt:
+        if not overflight_exempt and fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
             moving_model = geometry_model_for_placement(
                 model=scenario.model_instance_for_placement(placement),
                 placement=placement,
@@ -435,22 +439,12 @@ def _friendly_vehicle_monster_model_ids(
     player_id: str,
     moving_model_instance_id: str,
 ) -> tuple[str, ...]:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
-    model_ids: list[str] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != requested_player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            unit = scenario.unit_instance_for_placement(unit_placement)
-            if not _unit_has_vehicle_or_monster_keyword(unit.keywords):
-                continue
-            model_ids.extend(
-                placement.model_instance_id
-                for placement in unit_placement.model_placements
-                if placement.model_instance_id != moving_model_id
-            )
-    return tuple(sorted(model_ids))
+    return vehicle_monster_model_ids_for_player(
+        scenario=scenario,
+        player_id=player_id,
+        friendly=True,
+        moving_model_instance_id=moving_model_instance_id,
+    )
 
 
 def _enemy_vehicle_monster_model_ids_for_player(
@@ -458,19 +452,11 @@ def _enemy_vehicle_monster_model_ids_for_player(
     scenario: BattlefieldScenario,
     player_id: str,
 ) -> tuple[str, ...]:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    model_ids: list[str] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id == requested_player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            unit = scenario.unit_instance_for_placement(unit_placement)
-            if not _unit_has_vehicle_or_monster_keyword(unit.keywords):
-                continue
-            model_ids.extend(
-                placement.model_instance_id for placement in unit_placement.model_placements
-            )
-    return tuple(sorted(model_ids))
+    return vehicle_monster_model_ids_for_player(
+        scenario=scenario,
+        player_id=player_id,
+        friendly=False,
+    )
 
 
 def _friendly_model_ids_with_keyword_any(

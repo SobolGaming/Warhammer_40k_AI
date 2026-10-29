@@ -151,9 +151,9 @@ def test_p14_shared_query_measures_marker_edge_and_terrain_without_marker_radius
 
 
 @pytest.mark.parametrize(
-    ("z", "expected"), [(5.0, True), (5.00001, False), (-7.0, True), (-7.00001, False)]
+    ("z", "marker_expected"), [(5.0, True), (5.00001, False), (-7.0, True), (-7.00001, False)]
 )
-def test_p14_objective_query_uses_closest_vertical_part(z: float, expected: bool) -> None:
+def test_p14_objective_query_uses_closest_vertical_part(z: float, marker_expected: bool) -> None:
     from warhammer40k_core.engine.objective_geometry import (
         ObjectiveGeometry,
         measure_model_to_objective,
@@ -162,11 +162,15 @@ def test_p14_objective_query_uses_closest_vertical_part(z: float, expected: bool
     from warhammer40k_core.geometry.volume import ModelVolume
 
     model = GeometryModel("model", Pose.at(0, 0, z), CircularBase(0.5), ModelVolume(2))
-    for objective in (
-        ObjectiveGeometry.from_marker(ObjectiveMarker("marker", "Marker", 0, 0)),
-        ObjectiveGeometry.from_terrain(
-            objective_id="terrain",
-            footprint_polygons=(((-1.0, -1.0), (1.0, -1.0), (1.0, 1.0), (-1.0, 1.0)),),
+    # Negative z remains an abstract geometry boundary, not admitted battlefield setup.
+    for objective, expected in (
+        (ObjectiveGeometry.from_marker(ObjectiveMarker("marker", "Marker", 0, 0)), marker_expected),
+        (
+            ObjectiveGeometry.from_terrain(
+                objective_id="terrain",
+                footprint_polygons=(((-1.0, -1.0), (1.0, -1.0), (1.0, 1.0), (-1.0, 1.0)),),
+            ),
+            True,
         ),
     ):
         result = measure_model_to_objective(model=model, objective=objective)
@@ -342,7 +346,10 @@ def test_p14_objective_query_rejects_missing_shape_and_drifted_marker_identity()
         )
     with pytest.raises(GameLifecycleError, match="non-negative"):
         ObjectiveModelDistance(
-            horizontal_distance_inches=-1, vertical_gap_inches=0, within_control_range=False
+            horizontal_distance_inches=-1,
+            vertical_gap_inches=0,
+            within_control_range=False,
+            closest_distance_inches=0,
         )
 
 
@@ -1164,7 +1171,9 @@ def test_battlefield_state_replacement_requires_existing_battlefield_state() -> 
 
 
 def test_objective_control_records_update_at_phase_and_turn_end() -> None:
-    state = _battle_state_with_center_objective_positions(player_a_offsets=((2.0, 0.0),))
+    state = _battle_state_with_center_objective_positions(
+        player_a_offsets=((2.0, 0.0), (3.4, 0.0), (4.8, 0.0), (2.0, 1.4), (3.4, 1.4))
+    )
 
     completed_phase = state.advance_to_next_battle_phase()
 

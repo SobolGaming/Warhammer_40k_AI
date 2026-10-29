@@ -260,6 +260,7 @@ def resolve_fall_back_move(
         ability_index=ability_index,
         temporary_movement_keywords=temporary_movement_keywords,
         rules_unit_instance_id=resolved_unit_id,
+        fall_back_mode=fall_back_mode,
     )
     desperate_escape_requirements = _desperate_escape_requirements_for_fall_back(
         scenario=scenario,
@@ -281,6 +282,9 @@ def resolve_fall_back_move(
             [requirement.to_payload() for requirement in desperate_escape_requirements]
         ),
         "desperate_escape_rolls": [],
+        "desperate_escape_auto_pass_model_ids": validate_json_value(
+            list(resolved.desperate_escape_auto_pass_model_ids)
+        ),
     }
     if forced_source_ids:
         movement_payload["forced_desperate_escape_source_rule_ids"] = list(forced_source_ids)
@@ -321,6 +325,7 @@ def _resolve_unit_move(
     ignores_vertical_distance: bool = False,
     rules_unit_instance_id: str | None = None,
     occupancy_witness: PathWitness | None = None,
+    fall_back_mode: FallBackModeKind | None = None,
 ) -> _ResolvedUnitMove:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError(f"{action_label} requires a BattlefieldScenario.")
@@ -511,6 +516,8 @@ def _resolve_unit_move(
                 movement_distance_budget_inches=movement_distance_budget_inches,
             ),
         )
+        if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
+            path_context = replace(path_context, may_transit_enemy_models=True)
         path_result = path_context.validate()
         if legality_context.capabilities.desperate_escape_tests_auto_passed:
             desperate_escape_auto_pass_model_ids.append(placement.model_instance_id)

@@ -193,6 +193,52 @@ def bases_overlap(
     )
 
 
+def bases_within_distance(
+    first: BaseShape,
+    first_pose: Pose,
+    second: BaseShape,
+    second_pose: Pose,
+    inches: float,
+) -> bool:
+    """Compare circular proximity exactly for the authoritative binary inputs.
+
+    A float coordinate has no construction history: a rounded translated sum
+    cannot be distinguished from a deliberately exterior placement. Compare
+    squared lengths after scaling the input ratios to one power-of-two
+    denominator. This avoids subtraction, hypot and threshold-sum rounding,
+    without admitting an exterior band. Distance scalars remain unchanged;
+    polygon distances retain their existing comparison.
+    """
+    limit = validate_finite_number("base proximity inches", inches)
+    if limit < 0:
+        raise GeometryError("Base proximity inches must be non-negative.")
+    first_base = validate_base_shape("first", first)
+    second_base = validate_base_shape("second", second)
+    a = validate_pose("first_pose", first_pose)
+    b = validate_pose("second_pose", second_pose)
+    if type(first_base) is not CircularBase or type(second_base) is not CircularBase:
+        return base_distance(first_base, a, second_base, b) <= limit
+    ratios = tuple(
+        value.as_integer_ratio()
+        for value in (
+            a.position.x,
+            a.position.y,
+            b.position.x,
+            b.position.y,
+            first_base.radius,
+            second_base.radius,
+            limit,
+        )
+    )
+    denominator = max(d for _, d in ratios)
+    ax, ay, bx, by, first_radius, second_radius, distance = (
+        n * (denominator // d) for n, d in ratios
+    )
+    dx, dy = ax - bx, ay - by
+    reach = first_radius + second_radius + distance
+    return dx * dx + dy * dy <= reach * reach
+
+
 def base_shape_from_payload(payload: BaseShapePayload) -> BaseShape:
     kind = payload["kind"]
     if type(kind) is not str:

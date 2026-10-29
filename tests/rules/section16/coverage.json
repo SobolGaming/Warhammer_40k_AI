@@ -1,0 +1,1080 @@
+{
+  "schema": "section16-source-behavior-inventory-v1",
+  "source_authority": "Accepted adopted literal capture; no fresh official observation claimed.",
+  "category_hierarchy": {
+    "number": "16",
+    "title": "Actions",
+    "subsections": [
+      {
+        "ref": "16.01",
+        "title": "Performing Actions",
+        "text": [
+          "Some rules allow units to perform \u0005actions\u0006. Each \u0005action\u0006 states:",
+          "\u25a0 \u0005STARTS\u0006: When it is started.",
+          "\u25a0 \u0005UNITS\u0006: Which friendly units can perform it.",
+          "\u25a0 \u0005USE LIMIT\u0006: How many times friendly units can start it.",
+          "\u25a0 \u0005COMPLETES\u0006: When it completes.",
+          "\u25a0 \u0005EFFECT\u0006: What the effects of completing it are.",
+          "\u25a0 Any additional restrictions that may apply.",
+          "\u0005STARTING AN ACTION\u0006",
+          "A unit is \u0005eligible to start an action\u0006 unless one or more of the following apply to that unit:",
+          "\u25a0 It is not on the battlefield.",
+          "\u25a0 It is an \u0003AIRCRAFT/FORTIFICATION\u0004 unit.",
+          "\u25a0 It is \u0005battle-shocked\u0006.",
+          "\u25a0 It has an \u0005OC\u0006 characteristic of 0 or \u2018-\u2019.",
+          "\u25a0 It is \u0005engaged\u0006 (unless it is a \u0003TITANIC\u0004 unit).",
+          "\u25a0 It made an \u0005advance\u0006 or\u0006fall-back\u0006 move this turn.",
+          "\u25a0 It started another \u0005action\u0006 this turn.",
+          "If a unit starts an \u0005action\u0006, until the end of the turn:",
+          "\u25a0 It is not \u0005eligible to shoot\u0006 (excluding \u0003TITANIC\u0004 units).",
+          "\u25a0 It is not \u0005eligible to declare a charge.\u0006",
+          "\u0005COMPLETING AN ACTION\u0006",
+          "If a unit performing an \u0005action\u0006 makes a move (excluding \u0005pile-in\u0006 and \u0005consolidation moves\u0006) or leaves the battlefield, that unit does not complete that \u0005action\u0006. Otherwise, when an \u0005action\u0006 is completed, its \u2018Effect\u2019 section is triggered."
+        ]
+      }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "rule:16:16.01:1",
+      "locator": "16.01",
+      "title": "Performing Actions",
+      "source_sha256": "19b3cd2eaa9f36060d8eff197121cfc0989562ece20f01ec1c31970796d76241",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "ef261d8adc04210e71573d666c9d32b644ee4c0ffb4a3793151f2dc647f45dda",
+          "value": "Some rules allow units to perform \u0005actions\u0006. Each \u0005action\u0006 states:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "91de304ec8e3f9f088a4db408db11d0439851071afd4e54146039ec1630f3c56",
+          "value": "\u25a0 \u0005STARTS\u0006: When it is started."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "e723e2c4c2d727113e247445ff64e5fc646e31e9fb97882ff0e5818f6a8ef7bb",
+          "value": "\u25a0 \u0005UNITS\u0006: Which friendly units can perform it."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "c2095c661a12787c95262bd9dff1cd6ff88a5052697fbb63a15113d1ff2cf32f",
+          "value": "\u25a0 \u0005USE LIMIT\u0006: How many times friendly units can start it."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "f9b330bd7ac49cf5ea10cb929aaba5013b34cfb16cfac234feb7c912467a3b05",
+          "value": "\u25a0 \u0005COMPLETES\u0006: When it completes."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "519e6437a65191ef1cb90e94c97baedc141e9ec0fcfa1046fcda7c27fd0b81bd",
+          "value": "\u25a0 \u0005EFFECT\u0006: What the effects of completing it are."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "39b30d4371bfd30e31fd046053b74015233ad26f3f8cbacc07d7570cc8ee86f6",
+          "value": "\u25a0 Any additional restrictions that may apply."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "4820b09f14a591d7b3692cf51652bfd0cafe23f1642d18c7af0a0cc0634cfb98",
+          "value": "\u0005STARTING AN ACTION\u0006"
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "788d75a74f93d9c415652e7ab9b8e52ea7b978dec21b662031ba730091970ab7",
+          "value": "A unit is \u0005eligible to start an action\u0006 unless one or more of the following apply to that unit:"
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "aa1270c5752220250f6b3ede7eb62a05fb30e753245ad57d76f2b750f47edb87",
+          "value": "\u25a0 It is not on the battlefield."
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "3463515bf98175b3be8c2d5ab9fc1b0618e83bf2111b3ac270641d7ba739716d",
+          "value": "\u25a0 It is an \u0003AIRCRAFT/FORTIFICATION\u0004 unit."
+        },
+        {
+          "ordinal": 12,
+          "kind": "text",
+          "sha256": "d2b31c302424847c2681339659a53e366544826fc39128cb0321a2064cbf0cda",
+          "value": "\u25a0 It is \u0005battle-shocked\u0006."
+        },
+        {
+          "ordinal": 13,
+          "kind": "text",
+          "sha256": "408162c4f8ac8913618e6e649bba85a1a305edc11054bf3c746474492e0fde79",
+          "value": "\u25a0 It has an \u0005OC\u0006 characteristic of 0 or \u2018-\u2019."
+        },
+        {
+          "ordinal": 14,
+          "kind": "text",
+          "sha256": "092d3007742bd0fcbfe037b67b4a077987fde0ee36d187acb859e904068d304b",
+          "value": "\u25a0 It is \u0005engaged\u0006 (unless it is a \u0003TITANIC\u0004 unit)."
+        },
+        {
+          "ordinal": 15,
+          "kind": "text",
+          "sha256": "c583e6816f725f36ffa961e2fdbd670753de593be711f3250588d41aeb8009ac",
+          "value": "\u25a0 It made an \u0005advance\u0006 or\u0006fall-back\u0006 move this turn."
+        },
+        {
+          "ordinal": 16,
+          "kind": "text",
+          "sha256": "bf17213af1f0ee1f4cc7d5779e67e1f5bfa512a05cae9523ac9af876cb4ecfbe",
+          "value": "\u25a0 It started another \u0005action\u0006 this turn."
+        },
+        {
+          "ordinal": 17,
+          "kind": "text",
+          "sha256": "12aeaede60492ea5ce0909c9e9b71f90948646c9aa98d733d415ae09de359006",
+          "value": "If a unit starts an \u0005action\u0006, until the end of the turn:"
+        },
+        {
+          "ordinal": 18,
+          "kind": "text",
+          "sha256": "cb3d69be514576b611c32da55b716957ea81788188dc9d3c3ed6358f0c57e27d",
+          "value": "\u25a0 It is not \u0005eligible to shoot\u0006 (excluding \u0003TITANIC\u0004 units)."
+        },
+        {
+          "ordinal": 19,
+          "kind": "text",
+          "sha256": "c0c9c652a873be50288f75f99405622f0b4910125a873472751322eb0ca7e585",
+          "value": "\u25a0 It is not \u0005eligible to declare a charge.\u0006"
+        },
+        {
+          "ordinal": 20,
+          "kind": "text",
+          "sha256": "be1cd406d7f06d2ad78add54218fb301108dbc80b4f9355efe6819363d8a33c8",
+          "value": "\u0005COMPLETING AN ACTION\u0006"
+        },
+        {
+          "ordinal": 21,
+          "kind": "text",
+          "sha256": "47e0a220c982502a5b2ab5777d351437522614a512155519f4315ed3a0c8a570",
+          "value": "If a unit performing an \u0005action\u0006 makes a move (excluding \u0005pile-in\u0006 and \u0005consolidation moves\u0006) or leaves the battlefield, that unit does not complete that \u0005action\u0006. Otherwise, when an \u0005action\u0006 is completed, its \u2018Effect\u2019 section is triggered."
+        },
+        {
+          "ordinal": 22,
+          "kind": "callout",
+          "sha256": "e2ef9d530aaf7cf34cb0578284925d326f74d80cb2ec6ddfe2e96efcca7285f7",
+          "value": {
+            "title": "Where To Find Actions",
+            "body": "The actions players can use can be found in other publications such as mission packs. All players can use core actions, while other actions may have restrictions such as army faction."
+          }
+        }
+      ],
+      "obligations": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "literal": "Some rules allow units to perform \u0005actions\u0006. Each \u0005action\u0006 states:",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_facade.py::test_native_action_start_uses_finite_request_and_shared_facade",
+              "function_ast_sha256": "10afa57f7bea50b26148c0ca6048824086259a6039841045daab48657282739c",
+              "assertions": [
+                "assert request is not None, status",
+                "assert request.decision_type == 'start_mission_action'",
+                "assert not state.mission_action_states",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result",
+                "assert len(state.mission_action_states) == 1",
+                "assert state.mission_action_states[0].unit_instance_id == unit.unit_instance_id",
+                "assert started.start_timing == 'shooting_phase_action_start'",
+                "assert started.completion_timing == 'turn_end'",
+                "assert started.scoring_source_id == 'cleanse'",
+                "assert started.victory_points == 0",
+                "assert started.target_id in selected.option_id",
+                "assert len(session.lifecycle.decision_controller.records) == 1",
+                "assert recorded.request == request",
+                "assert recorded.result.selected_option_id == selected.option_id",
+                "assert json.loads(json.dumps(recorded.to_payload())) == recorded.to_payload()",
+                "assert any((e.event_type == 'mission_action_started' for e in session.lifecycle.decision_controller.event_log.records))"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            2
+          ],
+          "literal": "\u25a0 \u0005STARTS\u0006: When it is started.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_facade.py::test_action_specific_start_and_ownership_requirements_are_enforced",
+              "function_ast_sha256": "f5950779bda719b56c744ef35a5f6c610bf0347ed4470f5524baa71704c37d05",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.UNSUPPORTED",
+                "assert session.lifecycle.to_payload() == before"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_facade.py::test_native_action_start_uses_finite_request_and_shared_facade",
+              "function_ast_sha256": "10afa57f7bea50b26148c0ca6048824086259a6039841045daab48657282739c",
+              "assertions": [
+                "assert request is not None, status",
+                "assert request.decision_type == 'start_mission_action'",
+                "assert not state.mission_action_states",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result",
+                "assert len(state.mission_action_states) == 1",
+                "assert state.mission_action_states[0].unit_instance_id == unit.unit_instance_id",
+                "assert started.start_timing == 'shooting_phase_action_start'",
+                "assert started.completion_timing == 'turn_end'",
+                "assert started.scoring_source_id == 'cleanse'",
+                "assert started.victory_points == 0",
+                "assert started.target_id in selected.option_id",
+                "assert len(session.lifecycle.decision_controller.records) == 1",
+                "assert recorded.request == request",
+                "assert recorded.result.selected_option_id == selected.option_id",
+                "assert json.loads(json.dumps(recorded.to_payload())) == recorded.to_payload()",
+                "assert any((e.event_type == 'mission_action_started' for e in session.lifecycle.decision_controller.event_log.records))"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            3
+          ],
+          "literal": "\u25a0 \u0005UNITS\u0006: Which friendly units can perform it.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_source_limits_review.py::test_native_cleanse_excludes_core_eligible_spawn_beside_eligible_lord",
+              "function_ast_sha256": "bd37079f7fef4bf40e69c59644520fe75456c8c3d60158469ad30bc8e13c1c18",
+              "assertions": [
+                "assert not {'INFANTRY', 'BATTLELINE'}.intersection(spawn.keywords)",
+                "assert mission_action_unit_ineligibility_reason(state=state, player_id='owner', unit_instance_id=spawn.unit_instance_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) is None",
+                "assert any((f':{lord.unit_instance_id}:' in o.option_id for o in request.options))",
+                "assert not any((f':{spawn.unit_instance_id}:' in o.option_id for o in request.options))",
+                "assert any((o.unit_instance_id == spawn.unit_instance_id for o in options))"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_source_limits_review.py::test_stale_action_unit_policy_loss_rejects_before_queue_pop",
+              "function_ast_sha256": "459770e0f8802c571e67ee2c53aef082c7c840ce629bc54d6390d2506a3ac74d",
+              "assertions": [
+                "assert mission_action_unit_ineligibility_reason(state=state, player_id='owner', unit_instance_id=lord.unit_instance_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) is None",
+                "assert result.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert session.lifecycle.decision_controller.queue.peek_next() == request"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_eligibility.py::test_unit_must_belong_to_player",
+              "function_ast_sha256": "9f3d776968a516280740f47c23e4ad2013e3251e6813306c93a6de3c95b1f87b",
+              "assertions": [
+                "assert reason(state, unit.unit_instance_id) is None",
+                "assert reason(state, unit.unit_instance_id, 'opponent') == 'mission_action_unit_wrong_owner'"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            4
+          ],
+          "literal": "\u25a0 \u0005USE LIMIT\u0006: How many times friendly units can start it.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_source_limits_review.py::test_once_per_turn_source_limit_blocks_distinct_unit_stale_option_and_resets_next_occurrence",
+              "function_ast_sha256": "46d1320f9a4b435fdc9293de6a42d6f916213b78fab70339816d6fd3ac53c50e",
+              "assertions": [
+                "assert mission_action_policy_for_id('maintain-control').use_limit == 'once_per_turn'",
+                "assert all((any((f':{u.unit_instance_id}:' in o.option_id for o in first_request.options)) for u in (first, second)))",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result",
+                "assert mission_action_unit_ineligibility_reason(state=state, player_id='owner', unit_instance_id=second.unit_instance_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) is None",
+                "assert mission_action_start_options(state=state, player_id='owner', action=definition, runtime_modifier_registry=RuntimeModifierRegistry.empty()) == ()",
+                "assert rejected.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert session.lifecycle.decision_controller.queue.peek_next() == stale_request",
+                "assert state.mission_action_states[0].battle_round_started == 1",
+                "assert mission_action_unit_ineligibility_reason(state=state, player_id='owner', unit_instance_id=second.unit_instance_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) is None",
+                "assert any((o.unit_instance_id == second.unit_instance_id for o in options))"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_source_limits_review.py::test_cleanse_distinct_unit_same_target_limit_and_different_target_positive",
+              "function_ast_sha256": "60e62eaa4ee6cec49216710bd7c30129db32d7fbaf8647707a8f64cea74ad39d",
+              "assertions": [
+                "assert all((any((f':{u.unit_instance_id}:' in o.option_id for o in req.options)) for u in (first, second, third)))",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID",
+                "assert mission_action_unit_ineligibility_reason(state=state, player_id='owner', unit_instance_id=second.unit_instance_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) is None",
+                "assert not any((o.unit_instance_id == second.unit_instance_id for o in options))",
+                "assert any((o.unit_instance_id == third.unit_instance_id for o in options))",
+                "assert all((o.target_id != state.mission_action_states[0].target_id for o in options))"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            5
+          ],
+          "literal": "\u25a0 \u0005COMPLETES\u0006: When it completes.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_turn_end_review.py::test_native_cleanse_completes_at_real_turn_end_once",
+              "function_ast_sha256": "115c2a5087bc972799df50aa2bc76894bbedd6dbe63d4a543809c2aa0edafc3f",
+              "assertions": [
+                "assert action.status is MissionActionStatus.STARTED",
+                "assert not state.secondary_objective_cleanse_states",
+                "assert not any((e.event_type == 'mission_action_completed' for e in session.lifecycle.decision_controller.event_log.records))",
+                "assert completed.status is MissionActionStatus.COMPLETED",
+                "assert completed.player_id == active",
+                "assert completed.unit_instance_id == unit.unit_instance_id",
+                "assert len(state.secondary_objective_cleanse_states) == 1",
+                "assert (effect.action_id, effect.player_id, effect.objective_marker_id) == (identity, active, action.target_id)",
+                "assert len(terminal) == 1",
+                "assert isinstance(terminal[0].payload, dict)",
+                "assert terminal[0].payload['mission_action_state'] == completed.to_payload()",
+                "assert terminal[0].payload['source_id'] == effect.source_id",
+                "assert session.lifecycle.to_payload() == before",
+                "assert session.lifecycle.to_payload() == before",
+                "assert len(transactions) == 1",
+                "assert transactions[0].player_id == active",
+                "assert transactions[0].amount == 2",
+                "assert len(state.secondary_objective_cleanse_states) == 1",
+                "assert len([e for e in session.lifecycle.decision_controller.event_log.records if e.event_type == 'mission_action_completed']) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_completion.py::test_completion_requires_exact_timing_and_is_single_use",
+              "function_ast_sha256": "1ce820a93d831949ac2f9d973e62ca1c1d2e8995ce845570d9ad9e5246a44d76",
+              "assertions": [
+                "assert completed.status is MissionActionStatus.COMPLETED",
+                "assert completed.completed_phase == 'fight'",
+                "assert completed.completed_battle_round == 1",
+                "assert MissionActionState.from_payload(completed.to_payload()) == completed"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            6
+          ],
+          "literal": "\u25a0 \u0005EFFECT\u0006: What the effects of completing it are.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_turn_end_review.py::test_native_cleanse_completes_at_real_turn_end_once",
+              "function_ast_sha256": "115c2a5087bc972799df50aa2bc76894bbedd6dbe63d4a543809c2aa0edafc3f",
+              "assertions": [
+                "assert action.status is MissionActionStatus.STARTED",
+                "assert not state.secondary_objective_cleanse_states",
+                "assert not any((e.event_type == 'mission_action_completed' for e in session.lifecycle.decision_controller.event_log.records))",
+                "assert completed.status is MissionActionStatus.COMPLETED",
+                "assert completed.player_id == active",
+                "assert completed.unit_instance_id == unit.unit_instance_id",
+                "assert len(state.secondary_objective_cleanse_states) == 1",
+                "assert (effect.action_id, effect.player_id, effect.objective_marker_id) == (identity, active, action.target_id)",
+                "assert len(terminal) == 1",
+                "assert isinstance(terminal[0].payload, dict)",
+                "assert terminal[0].payload['mission_action_state'] == completed.to_payload()",
+                "assert terminal[0].payload['source_id'] == effect.source_id",
+                "assert session.lifecycle.to_payload() == before",
+                "assert session.lifecycle.to_payload() == before",
+                "assert len(transactions) == 1",
+                "assert transactions[0].player_id == active",
+                "assert transactions[0].amount == 2",
+                "assert len(state.secondary_objective_cleanse_states) == 1",
+                "assert len([e for e in session.lifecycle.decision_controller.event_log.records if e.event_type == 'mission_action_completed']) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_turn_end_review.py::test_native_consumer_preserves_interruptions_and_faq17_continuation",
+              "function_ast_sha256": "aef064e0baa6ea8897038a567f28de710e285d07c2500f765c32dafef13fd740",
+              "assertions": [
+                "assert not state.secondary_objective_cleanse_states",
+                "assert result_action.status is (MissionActionStatus.COMPLETED if permission else MissionActionStatus.INTERRUPTED)",
+                "assert len(state.secondary_objective_cleanse_states) == int(permission)",
+                "assert len(completed_events) == int(permission)",
+                "assert [t.amount for t in scores] == ([2] if permission else [])",
+                "assert result.status_kind.value != 'invalid', result",
+                "assert result_action.interrupted_reason == {'move': 'unit_moved', 'departure': 'unit_left_battlefield', 'shock': 'unit_battle_shocked'}[interruption]",
+                "assert result.status_kind.value != 'invalid', result",
+                "assert state.battlefield_state is not None",
+                "assert departure is not None",
+                "assert unit.unit_instance_id in state.battle_shocked_unit_ids"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            7
+          ],
+          "literal": "\u25a0 Any additional restrictions that may apply.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_facade.py::test_action_specific_start_and_ownership_requirements_are_enforced",
+              "function_ast_sha256": "f5950779bda719b56c744ef35a5f6c610bf0347ed4470f5524baa71704c37d05",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.UNSUPPORTED",
+                "assert session.lifecycle.to_payload() == before"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            8
+          ],
+          "literal": "\u0005STARTING AN ACTION\u0006",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_facade.py::test_native_action_start_uses_finite_request_and_shared_facade",
+              "function_ast_sha256": "10afa57f7bea50b26148c0ca6048824086259a6039841045daab48657282739c",
+              "assertions": [
+                "assert request is not None, status",
+                "assert request.decision_type == 'start_mission_action'",
+                "assert not state.mission_action_states",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result",
+                "assert len(state.mission_action_states) == 1",
+                "assert state.mission_action_states[0].unit_instance_id == unit.unit_instance_id",
+                "assert started.start_timing == 'shooting_phase_action_start'",
+                "assert started.completion_timing == 'turn_end'",
+                "assert started.scoring_source_id == 'cleanse'",
+                "assert started.victory_points == 0",
+                "assert started.target_id in selected.option_id",
+                "assert len(session.lifecycle.decision_controller.records) == 1",
+                "assert recorded.request == request",
+                "assert recorded.result.selected_option_id == selected.option_id",
+                "assert json.loads(json.dumps(recorded.to_payload())) == recorded.to_payload()",
+                "assert any((e.event_type == 'mission_action_started' for e in session.lifecycle.decision_controller.event_log.records))"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            9
+          ],
+          "literal": "A unit is \u0005eligible to start an action\u0006 unless one or more of the following apply to that unit:",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_eligibility.py::test_each_start_exclusion_has_native_positive_and_atomic_query",
+              "function_ast_sha256": "41af9fa8351b34b9e9d56638c4ab5f05bc824b28fb85e9fac3112f9bd2a2a481",
+              "assertions": [
+                "assert reason(control, native.unit_instance_id) is None",
+                "assert unit.own_model_ids() == native.own_model_ids()",
+                "assert reason(state, unit.unit_instance_id) == expected",
+                "assert state.to_payload() == before",
+                "assert state.battlefield_state is not None"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            10
+          ],
+          "literal": "\u25a0 It is not on the battlefield.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_eligibility.py::test_each_start_exclusion_has_native_positive_and_atomic_query",
+              "function_ast_sha256": "41af9fa8351b34b9e9d56638c4ab5f05bc824b28fb85e9fac3112f9bd2a2a481",
+              "assertions": [
+                "assert reason(control, native.unit_instance_id) is None",
+                "assert unit.own_model_ids() == native.own_model_ids()",
+                "assert reason(state, unit.unit_instance_id) == expected",
+                "assert state.to_payload() == before",
+                "assert state.battlefield_state is not None"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_facade.py::test_pending_action_revalidates_exclusions_before_queue_pop_or_mutation",
+              "function_ast_sha256": "191f1fd647e2d10324b3afb5695558374490cd1be0aa7fa805b8909d94a45204",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.INVALID, status",
+                "assert session.lifecycle.to_payload() == before",
+                "assert session.lifecycle.decision_controller.queue.peek_next() == req",
+                "assert state.battlefield_state is not None",
+                "assert drift == 'already_started'"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            11
+          ],
+          "literal": "\u25a0 It is an \u0003AIRCRAFT/FORTIFICATION\u0004 unit.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_eligibility.py::test_each_start_exclusion_has_native_positive_and_atomic_query",
+              "function_ast_sha256": "41af9fa8351b34b9e9d56638c4ab5f05bc824b28fb85e9fac3112f9bd2a2a481",
+              "assertions": [
+                "assert reason(control, native.unit_instance_id) is None",
+                "assert unit.own_model_ids() == native.own_model_ids()",
+                "assert reason(state, unit.unit_instance_id) == expected",
+                "assert state.to_payload() == before",
+                "assert state.battlefield_state is not None"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_eligibility.py::test_titanic_does_not_override_other_keyword_exclusions",
+              "function_ast_sha256": "93051c953123d835e67545ed056c8e002ec5b175f53d22e6876d9f212cd3ac7b",
+              "assertions": [
+                "assert reason(state, unit.unit_instance_id) == f'mission_action_unit_{other.lower()}'"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            12
+          ],
+          "literal": "\u25a0 It is \u0005battle-shocked\u0006.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_eligibility.py::test_each_start_exclusion_has_native_positive_and_atomic_query",
+              "function_ast_sha256": "41af9fa8351b34b9e9d56638c4ab5f05bc824b28fb85e9fac3112f9bd2a2a481",
+              "assertions": [
+                "assert reason(control, native.unit_instance_id) is None",
+                "assert unit.own_model_ids() == native.own_model_ids()",
+                "assert reason(state, unit.unit_instance_id) == expected",
+                "assert state.to_payload() == before",
+                "assert state.battlefield_state is not None"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_faqs.py::test_faq16_17_failed_battle_shock_immediately_interrupts_except_explicit_permission",
+              "function_ast_sha256": "10ee480e6dfad12eeef27a13cc08b201e1c62d49adc81032c9451e6c67b0de07",
+              "assertions": [
+                "assert started.status is MissionActionStatus.STARTED",
+                "assert action_battle_shock_permission_sources(state=state, unit_instance_id=unit.unit_instance_id) == ((ACTION_BATTLE_SHOCK_PERMISSION_SOURCE_ID,) if permission else ())",
+                "assert unit.unit_instance_id in state.battle_shocked_unit_ids",
+                "assert current.status is (MissionActionStatus.STARTED if permission else MissionActionStatus.INTERRUPTED)",
+                "assert current.interrupted_reason == (None if permission else 'unit_battle_shocked')",
+                "assert events[-1].event_type == 'battle_shock_test_resolved'",
+                "assert completed.status is MissionActionStatus.COMPLETED",
+                "assert any((c.action_id == started.action_id for c in state.secondary_objective_cleanse_states))",
+                "assert events[-2].event_type == 'mission_action_interrupted'",
+                "assert state.mission_action_state_by_id(started.action_id) == current"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_faqs.py::test_faq17_shocked_start_is_accepted_through_real_finite_facade",
+              "function_ast_sha256": "bea160c6f1a3f2ae1878daa872222f1cc450eb67e48f2bc17a1f870377c6bbd0",
+              "assertions": [
+                "assert unit.unit_instance_id in state.battle_shocked_unit_ids",
+                "assert pending.decision_type == 'start_mission_action'",
+                "assert session.lifecycle.decision_controller.queue.peek_next() == pending",
+                "assert status.status_kind.value != 'invalid', status",
+                "assert state.mission_action_states[0].unit_instance_id == unit.unit_instance_id"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            13
+          ],
+          "literal": "\u25a0 It has an \u0005OC\u0006 characteristic of 0 or \u2018-\u2019.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_eligibility.py::test_zero_and_dash_oc_excluded_positive_oc_eligible",
+              "function_ast_sha256": "1673106fcf1136d1961b039df6d7fadc1e2e9a79a9ef0604d8220cea0c984c0b",
+              "assertions": [
+                "assert reason(state, unit.unit_instance_id) == (None if oc == 1 else 'mission_action_unit_zero_objective_control')"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            14
+          ],
+          "literal": "\u25a0 It is \u0005engaged\u0006 (unless it is a \u0003TITANIC\u0004 unit).",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_eligibility.py::test_engagement_exception_is_only_titanic",
+              "function_ast_sha256": "9d79c01299ebded1f6c614ef06379c2020bf9ef657a3d0e3c1eb35918c86eb7f",
+              "assertions": [
+                "assert unit_within_enemy_engagement_range(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert reason(state, unit.unit_instance_id) == (None if titanic else 'mission_action_unit_engaged')"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            15
+          ],
+          "literal": "\u25a0 It made an \u0005advance\u0006 or\u0006fall-back\u0006 move this turn.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_eligibility.py::test_each_start_exclusion_has_native_positive_and_atomic_query",
+              "function_ast_sha256": "41af9fa8351b34b9e9d56638c4ab5f05bc824b28fb85e9fac3112f9bd2a2a481",
+              "assertions": [
+                "assert reason(control, native.unit_instance_id) is None",
+                "assert unit.own_model_ids() == native.own_model_ids()",
+                "assert reason(state, unit.unit_instance_id) == expected",
+                "assert state.to_payload() == before",
+                "assert state.battlefield_state is not None"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_facade.py::test_pending_action_revalidates_exclusions_before_queue_pop_or_mutation",
+              "function_ast_sha256": "191f1fd647e2d10324b3afb5695558374490cd1be0aa7fa805b8909d94a45204",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.INVALID, status",
+                "assert session.lifecycle.to_payload() == before",
+                "assert session.lifecycle.decision_controller.queue.peek_next() == req",
+                "assert state.battlefield_state is not None",
+                "assert drift == 'already_started'"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            16
+          ],
+          "literal": "\u25a0 It started another \u0005action\u0006 this turn.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_facade.py::test_completion_triggers_effect_once_and_does_not_allow_second_start",
+              "function_ast_sha256": "d43a9f2c36cc836827f67148bccea5730d5ac294144dcd2a4f05f6170a5c70c7",
+              "assertions": [
+                "assert not state.secondary_objective_cleanse_states",
+                "assert state.mission_action_state_by_id(started.action_id) == started",
+                "assert completed.status.value == 'completed'",
+                "assert len(state.secondary_objective_cleanse_states) == 1",
+                "assert effect.action_id == started.action_id",
+                "assert effect.objective_marker_id == started.target_id",
+                "assert effect.player_id == 'owner'",
+                "assert status.status_kind is LifecycleStatusKind.UNSUPPORTED",
+                "assert len(state.mission_action_states) == 1",
+                "assert len(state.secondary_objective_cleanse_states) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_eligibility.py::test_each_start_exclusion_has_native_positive_and_atomic_query",
+              "function_ast_sha256": "41af9fa8351b34b9e9d56638c4ab5f05bc824b28fb85e9fac3112f9bd2a2a481",
+              "assertions": [
+                "assert reason(control, native.unit_instance_id) is None",
+                "assert unit.own_model_ids() == native.own_model_ids()",
+                "assert reason(state, unit.unit_instance_id) == expected",
+                "assert state.to_payload() == before",
+                "assert state.battlefield_state is not None"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            17
+          ],
+          "literal": "If a unit starts an \u0005action\u0006, until the end of the turn:",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_restrictions.py::test_shooting_exception_and_charge_lock_are_independent_of_action_terminal_status",
+              "function_ast_sha256": "702e7df465e4c2bb8aed4aa3604795908315e70fe702076163e710db81b9f824",
+              "assertions": [
+                "assert shooting_unit_can_select_to_shoot(state=state, unit=unit, army_catalog=section16_definitions.package.army_catalog, player_id='owner')",
+                "assert mission_action_prevents_rules_unit_from_shooting_this_phase(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id) is (not titanic)",
+                "assert shooting_unit_can_select_to_shoot(state=state, unit=unit, army_catalog=section16_definitions.package.army_catalog, player_id='owner') is titanic",
+                "assert charge_unit_ineligibility_reason(state=state, unit_instance_id=unit.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor(), charge_state=charge, ignore_already_selected=False) == 'charge_unit_started_action'",
+                "assert rules_unit_started_mission_action_this_turn(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_restrictions.py::test_accepted_start_restriction_is_turn_scoped_not_phase_scoped",
+              "function_ast_sha256": "a41b57626a268a909a63741088c5c799191b854578537f864aadb96a45e2d67e",
+              "assertions": [
+                "assert mission_action_prevents_rules_unit_from_shooting_this_phase(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)",
+                "assert not mission_action_prevents_rules_unit_from_shooting_this_phase(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)",
+                "assert not rules_unit_started_mission_action_this_turn(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_restrictions.py::test_faq62_action_lock_remains_at_turn_end_then_expires_at_own_exact_boundary",
+              "function_ast_sha256": "544cd3ca703eff50e3e1172cdfd5604d3d343f99898ca65d9314329fb054bba7",
+              "assertions": [
+                "assert state.expire_persisting_effects_at_boundary(EffectExpirationBoundary.turn_end(battle_round=1, player_id='opponent')) == ()",
+                "assert tuple(state.persisting_effects) == before",
+                "assert rules_unit_started_mission_action_this_turn(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)",
+                "assert expired == before",
+                "assert not rules_unit_started_mission_action_this_turn(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            18
+          ],
+          "literal": "\u25a0 It is not \u0005eligible to shoot\u0006 (excluding \u0003TITANIC\u0004 units).",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_restrictions.py::test_shooting_exception_and_charge_lock_are_independent_of_action_terminal_status",
+              "function_ast_sha256": "702e7df465e4c2bb8aed4aa3604795908315e70fe702076163e710db81b9f824",
+              "assertions": [
+                "assert shooting_unit_can_select_to_shoot(state=state, unit=unit, army_catalog=section16_definitions.package.army_catalog, player_id='owner')",
+                "assert mission_action_prevents_rules_unit_from_shooting_this_phase(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id) is (not titanic)",
+                "assert shooting_unit_can_select_to_shoot(state=state, unit=unit, army_catalog=section16_definitions.package.army_catalog, player_id='owner') is titanic",
+                "assert charge_unit_ineligibility_reason(state=state, unit_instance_id=unit.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor(), charge_state=charge, ignore_already_selected=False) == 'charge_unit_started_action'",
+                "assert rules_unit_started_mission_action_this_turn(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_restrictions.py::test_accepted_start_restriction_is_turn_scoped_not_phase_scoped",
+              "function_ast_sha256": "a41b57626a268a909a63741088c5c799191b854578537f864aadb96a45e2d67e",
+              "assertions": [
+                "assert mission_action_prevents_rules_unit_from_shooting_this_phase(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)",
+                "assert not mission_action_prevents_rules_unit_from_shooting_this_phase(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)",
+                "assert not rules_unit_started_mission_action_this_turn(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            19
+          ],
+          "literal": "\u25a0 It is not \u0005eligible to declare a charge.\u0006",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_restrictions.py::test_shooting_exception_and_charge_lock_are_independent_of_action_terminal_status",
+              "function_ast_sha256": "702e7df465e4c2bb8aed4aa3604795908315e70fe702076163e710db81b9f824",
+              "assertions": [
+                "assert shooting_unit_can_select_to_shoot(state=state, unit=unit, army_catalog=section16_definitions.package.army_catalog, player_id='owner')",
+                "assert mission_action_prevents_rules_unit_from_shooting_this_phase(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id) is (not titanic)",
+                "assert shooting_unit_can_select_to_shoot(state=state, unit=unit, army_catalog=section16_definitions.package.army_catalog, player_id='owner') is titanic",
+                "assert charge_unit_ineligibility_reason(state=state, unit_instance_id=unit.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor(), charge_state=charge, ignore_already_selected=False) == 'charge_unit_started_action'",
+                "assert rules_unit_started_mission_action_this_turn(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            20
+          ],
+          "literal": "\u0005COMPLETING AN ACTION\u0006",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_completion.py::test_completion_requires_exact_timing_and_is_single_use",
+              "function_ast_sha256": "1ce820a93d831949ac2f9d973e62ca1c1d2e8995ce845570d9ad9e5246a44d76",
+              "assertions": [
+                "assert completed.status is MissionActionStatus.COMPLETED",
+                "assert completed.completed_phase == 'fight'",
+                "assert completed.completed_battle_round == 1",
+                "assert MissionActionState.from_payload(completed.to_payload()) == completed"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            21
+          ],
+          "literal": "If a unit performing an \u0005action\u0006 makes a move (excluding \u0005pile-in\u0006 and \u0005consolidation moves\u0006) or leaves the battlefield, that unit does not complete that \u0005action\u0006. Otherwise, when an \u0005action\u0006 is completed, its \u2018Effect\u2019 section is triggered.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_completion.py::test_every_move_kind_interrupts_except_pile_in_and_consolidation",
+              "function_ast_sha256": "a9d9796b46c2d3b17d4940fa075b6387a3fdb88cf5ec653844740c7f95a78dab",
+              "assertions": [
+                "assert started.to_payload() == before",
+                "assert result is None",
+                "assert completed.status is MissionActionStatus.COMPLETED",
+                "assert result is not None",
+                "assert result.status is MissionActionStatus.INTERRUPTED",
+                "assert result.interrupted_reason == 'unit_moved'"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_turn_end_review.py::test_native_cleanse_completes_at_real_turn_end_once",
+              "function_ast_sha256": "115c2a5087bc972799df50aa2bc76894bbedd6dbe63d4a543809c2aa0edafc3f",
+              "assertions": [
+                "assert action.status is MissionActionStatus.STARTED",
+                "assert not state.secondary_objective_cleanse_states",
+                "assert not any((e.event_type == 'mission_action_completed' for e in session.lifecycle.decision_controller.event_log.records))",
+                "assert completed.status is MissionActionStatus.COMPLETED",
+                "assert completed.player_id == active",
+                "assert completed.unit_instance_id == unit.unit_instance_id",
+                "assert len(state.secondary_objective_cleanse_states) == 1",
+                "assert (effect.action_id, effect.player_id, effect.objective_marker_id) == (identity, active, action.target_id)",
+                "assert len(terminal) == 1",
+                "assert isinstance(terminal[0].payload, dict)",
+                "assert terminal[0].payload['mission_action_state'] == completed.to_payload()",
+                "assert terminal[0].payload['source_id'] == effect.source_id",
+                "assert session.lifecycle.to_payload() == before",
+                "assert session.lifecycle.to_payload() == before",
+                "assert len(transactions) == 1",
+                "assert transactions[0].player_id == active",
+                "assert transactions[0].amount == 2",
+                "assert len(state.secondary_objective_cleanse_states) == 1",
+                "assert len([e for e in session.lifecycle.decision_controller.event_log.records if e.event_type == 'mission_action_completed']) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_turn_end_review.py::test_native_consumer_preserves_interruptions_and_faq17_continuation",
+              "function_ast_sha256": "aef064e0baa6ea8897038a567f28de710e285d07c2500f765c32dafef13fd740",
+              "assertions": [
+                "assert not state.secondary_objective_cleanse_states",
+                "assert result_action.status is (MissionActionStatus.COMPLETED if permission else MissionActionStatus.INTERRUPTED)",
+                "assert len(state.secondary_objective_cleanse_states) == int(permission)",
+                "assert len(completed_events) == int(permission)",
+                "assert [t.amount for t in scores] == ([2] if permission else [])",
+                "assert result.status_kind.value != 'invalid', result",
+                "assert result_action.interrupted_reason == {'move': 'unit_moved', 'departure': 'unit_left_battlefield', 'shock': 'unit_battle_shocked'}[interruption]",
+                "assert result.status_kind.value != 'invalid', result",
+                "assert state.battlefield_state is not None",
+                "assert departure is not None",
+                "assert unit.unit_instance_id in state.battle_shocked_unit_ids"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_completion.py::test_leaving_battlefield_prevents_completion_and_roundtrips",
+              "function_ast_sha256": "c66c694eeadff23d0c4572fff7b0c145a545bd8e05afc52156762fec1532171d",
+              "assertions": [
+                "assert interrupted.status is MissionActionStatus.INTERRUPTED",
+                "assert interrupted.interrupted_reason == 'unit_left_battlefield'",
+                "assert MissionActionState.from_payload(interrupted.to_payload()) == interrupted"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_movement.py::test_native_departure_record_interrupts_and_suppresses_effect",
+              "function_ast_sha256": "0c3ec970cae3ca0e1075ea7755ab2f96730d606848a149198961c2b4099189d0",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert departure is not None",
+                "assert len(interrupted) == 1",
+                "assert interrupted[0].action_id == started.action_id",
+                "assert interrupted[0].interrupted_reason == 'unit_left_battlefield'",
+                "assert state.mission_action_state_by_id(started.action_id) == interrupted[0]",
+                "assert not set(unit.own_model_ids()).intersection(state.battlefield_state.placed_model_ids())",
+                "assert terminal.event_type == 'mission_action_interrupted'",
+                "assert isinstance(terminal.payload, dict)",
+                "assert terminal.payload['source_evidence_event_id'] == event.event_id",
+                "assert not state.secondary_objective_cleanse_states"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_movement.py::test_completed_witnessed_move_interrupts_even_at_same_endpoint_and_with_faq_permission",
+              "function_ast_sha256": "fb3de12f0bfc5fc4873e322a834c4d5279115f8c8716c15bd26a4477badef13a",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert current.status is MissionActionStatus.INTERRUPTED",
+                "assert current.interrupted_reason == 'unit_moved'",
+                "assert {h.model_instance_id for h in history} == set(unit.own_model_ids())",
+                "assert {h.distance_inches for h in history} == ({0.25} if case in {'translation', 'return'} else {0.0})",
+                "assert not state.secondary_objective_cleanse_states",
+                "assert after == before",
+                "assert after != before",
+                "assert len([e for e in delta['events'] if e['event_type'] == 'mission_action_interrupted']) == 1",
+                "assert json.loads(json.dumps(delta, allow_nan=False)) == delta"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_movement.py::test_declined_move_does_not_interrupt_and_completion_applies_effect",
+              "function_ast_sha256": "aa641ebba19e5e83f192a15e1ab5be8f60643589ad99afcbf6da122dc49e4475",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert state.battlefield_state.to_payload() == before",
+                "assert state.mission_action_state_by_id(started.action_id).status is MissionActionStatus.STARTED",
+                "assert completed.status is MissionActionStatus.COMPLETED",
+                "assert len(state.secondary_objective_cleanse_states) == 1"
+              ]
+            }
+          ]
+        },
+        {
+          "source_blocks": [
+            22
+          ],
+          "literal": {
+            "title": "Where To Find Actions",
+            "body": "The actions players can use can be found in other publications such as mission packs. All players can use core actions, while other actions may have restrictions such as army faction."
+          },
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section16/test_eligibility.py::test_both_players_have_same_native_action_eligibility",
+              "function_ast_sha256": "711e38d49c625835212f3cfd30a0427b92a3fd50e5c6efdad598a6b994fc4b04",
+              "assertions": [
+                "assert unit.datasheet_id == enemy.datasheet_id",
+                "assert reason(state, unit.unit_instance_id, 'owner') is None",
+                "assert reason(state, enemy.unit_instance_id, 'opponent') is None"
+              ]
+            },
+            {
+              "node": "tests/rules/section16/test_facade.py::test_action_specific_start_and_ownership_requirements_are_enforced",
+              "function_ast_sha256": "f5950779bda719b56c744ef35a5f6c610bf0347ed4470f5524baa71704c37d05",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.UNSUPPORTED",
+                "assert session.lifecycle.to_payload() == before"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "locally_owned_faqs": [
+    {
+      "ordinal": 16,
+      "id": "bbe268a2-b1fd-43ab-8b24-fd4363730c3f",
+      "question": "If a unit becomes battle-shocked after starting an action does it stop performing that action?",
+      "answer": "Yes",
+      "source_sha256": "1912cbae65dddd8e8799e7e7a82a5ec5984533152aae9239745831f9dfed89ae",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section16/test_faqs.py::test_faq16_17_failed_battle_shock_immediately_interrupts_except_explicit_permission",
+          "function_ast_sha256": "10ee480e6dfad12eeef27a13cc08b201e1c62d49adc81032c9451e6c67b0de07",
+          "assertions": [
+            "assert started.status is MissionActionStatus.STARTED",
+            "assert action_battle_shock_permission_sources(state=state, unit_instance_id=unit.unit_instance_id) == ((ACTION_BATTLE_SHOCK_PERMISSION_SOURCE_ID,) if permission else ())",
+            "assert unit.unit_instance_id in state.battle_shocked_unit_ids",
+            "assert current.status is (MissionActionStatus.STARTED if permission else MissionActionStatus.INTERRUPTED)",
+            "assert current.interrupted_reason == (None if permission else 'unit_battle_shocked')",
+            "assert events[-1].event_type == 'battle_shock_test_resolved'",
+            "assert completed.status is MissionActionStatus.COMPLETED",
+            "assert any((c.action_id == started.action_id for c in state.secondary_objective_cleanse_states))",
+            "assert events[-2].event_type == 'mission_action_interrupted'",
+            "assert state.mission_action_state_by_id(started.action_id) == current"
+          ]
+        },
+        {
+          "node": "tests/rules/section16/test_turn_end_review.py::test_native_consumer_preserves_interruptions_and_faq17_continuation",
+          "function_ast_sha256": "aef064e0baa6ea8897038a567f28de710e285d07c2500f765c32dafef13fd740",
+          "assertions": [
+            "assert not state.secondary_objective_cleanse_states",
+            "assert result_action.status is (MissionActionStatus.COMPLETED if permission else MissionActionStatus.INTERRUPTED)",
+            "assert len(state.secondary_objective_cleanse_states) == int(permission)",
+            "assert len(completed_events) == int(permission)",
+            "assert [t.amount for t in scores] == ([2] if permission else [])",
+            "assert result.status_kind.value != 'invalid', result",
+            "assert result_action.interrupted_reason == {'move': 'unit_moved', 'departure': 'unit_left_battlefield', 'shock': 'unit_battle_shocked'}[interruption]",
+            "assert result.status_kind.value != 'invalid', result",
+            "assert state.battlefield_state is not None",
+            "assert departure is not None",
+            "assert unit.unit_instance_id in state.battle_shocked_unit_ids"
+          ]
+        }
+      ]
+    },
+    {
+      "ordinal": 17,
+      "id": "4c654d00-318d-4665-9e46-26cfab179a29",
+      "question": "If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action?",
+      "answer": "Yes",
+      "source_sha256": "fef99387330cc3df5d34f0f94c59f49ddd403bffc2bb46936e4b80d8214f46bb",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section16/test_faqs.py::test_faq16_17_failed_battle_shock_immediately_interrupts_except_explicit_permission",
+          "function_ast_sha256": "10ee480e6dfad12eeef27a13cc08b201e1c62d49adc81032c9451e6c67b0de07",
+          "assertions": [
+            "assert started.status is MissionActionStatus.STARTED",
+            "assert action_battle_shock_permission_sources(state=state, unit_instance_id=unit.unit_instance_id) == ((ACTION_BATTLE_SHOCK_PERMISSION_SOURCE_ID,) if permission else ())",
+            "assert unit.unit_instance_id in state.battle_shocked_unit_ids",
+            "assert current.status is (MissionActionStatus.STARTED if permission else MissionActionStatus.INTERRUPTED)",
+            "assert current.interrupted_reason == (None if permission else 'unit_battle_shocked')",
+            "assert events[-1].event_type == 'battle_shock_test_resolved'",
+            "assert completed.status is MissionActionStatus.COMPLETED",
+            "assert any((c.action_id == started.action_id for c in state.secondary_objective_cleanse_states))",
+            "assert events[-2].event_type == 'mission_action_interrupted'",
+            "assert state.mission_action_state_by_id(started.action_id) == current"
+          ]
+        },
+        {
+          "node": "tests/rules/section16/test_faqs.py::test_faq17_permission_allows_shocked_start_without_erasing_other_eligibility_rules",
+          "function_ast_sha256": "c3ef9cd82931e85126ad7548141bc1b5acfec118b2771aad8387379d11297362",
+          "assertions": [
+            "assert reason == (None if permission else 'mission_action_unit_battle_shocked')",
+            "assert mission_action_unit_ineligibility_reason(state=blocked, player_id='owner', unit_instance_id=same_unit.unit_instance_id, runtime_modifier_registry=RuntimeModifierRegistry.empty()) == 'mission_action_unit_aircraft'"
+          ]
+        },
+        {
+          "node": "tests/rules/section16/test_faqs.py::test_faq17_shocked_start_is_accepted_through_real_finite_facade",
+          "function_ast_sha256": "bea160c6f1a3f2ae1878daa872222f1cc450eb67e48f2bc17a1f870377c6bbd0",
+          "assertions": [
+            "assert unit.unit_instance_id in state.battle_shocked_unit_ids",
+            "assert pending.decision_type == 'start_mission_action'",
+            "assert session.lifecycle.decision_controller.queue.peek_next() == pending",
+            "assert status.status_kind.value != 'invalid', status",
+            "assert state.mission_action_states[0].unit_instance_id == unit.unit_instance_id"
+          ]
+        },
+        {
+          "node": "tests/rules/section16/test_turn_end_review.py::test_native_consumer_preserves_interruptions_and_faq17_continuation",
+          "function_ast_sha256": "aef064e0baa6ea8897038a567f28de710e285d07c2500f765c32dafef13fd740",
+          "assertions": [
+            "assert not state.secondary_objective_cleanse_states",
+            "assert result_action.status is (MissionActionStatus.COMPLETED if permission else MissionActionStatus.INTERRUPTED)",
+            "assert len(state.secondary_objective_cleanse_states) == int(permission)",
+            "assert len(completed_events) == int(permission)",
+            "assert [t.amount for t in scores] == ([2] if permission else [])",
+            "assert result.status_kind.value != 'invalid', result",
+            "assert result_action.interrupted_reason == {'move': 'unit_moved', 'departure': 'unit_left_battlefield', 'shock': 'unit_battle_shocked'}[interruption]",
+            "assert result.status_kind.value != 'invalid', result",
+            "assert state.battlefield_state is not None",
+            "assert departure is not None",
+            "assert unit.unit_instance_id in state.battle_shocked_unit_ids"
+          ]
+        }
+      ]
+    },
+    {
+      "ordinal": 62,
+      "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+      "question": "If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle?",
+      "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn.",
+      "source_sha256": "f1569a6a16420f52ff3a4cc89c61762db7467cba6bdc320c8a4e3fa8ceec239f",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section16/test_restrictions.py::test_faq62_action_lock_remains_at_turn_end_then_expires_at_own_exact_boundary",
+          "function_ast_sha256": "544cd3ca703eff50e3e1172cdfd5604d3d343f99898ca65d9314329fb054bba7",
+          "assertions": [
+            "assert state.expire_persisting_effects_at_boundary(EffectExpirationBoundary.turn_end(battle_round=1, player_id='opponent')) == ()",
+            "assert tuple(state.persisting_effects) == before",
+            "assert rules_unit_started_mission_action_this_turn(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)",
+            "assert expired == before",
+            "assert not rules_unit_started_mission_action_this_turn(state=state, player_id='owner', unit_instance_id=unit.unit_instance_id)"
+          ]
+        }
+      ]
+    }
+  ],
+  "all_current_faqs_screened": 64,
+  "bounded_cross_section_faqs": {
+    "51": "Live keywords remain shared RulesUnitView authority; inherited Section01/15 controls retain ownership.",
+    "62": "Action restrictions are effective throughout end-turn; occurrence controls test phases, next active player and next round. Existing shared expiry controls remain dependencies."
+  },
+  "metadata_is_not_semantic_coverage": true,
+  "unresolved_source_interpretations": [],
+  "authenticated_inputs": {
+    "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+    "data/source_audits/v963_shock/captures/core-page.js": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026"
+  },
+  "scenario_qualifications": [
+    "Native Lord, Infractors and Spawn selected resources are immutable and separately hash checked; mutable units/state/decisions are fresh.",
+    "Explicit AIRCRAFT/FORTIFICATION/TITANIC, OC0/dash, Battle-shock status and reactive movement/FAQ permissions are constructed Core boundary premises, not faction or provider admission.",
+    "Companion Terrain Objectives remain primary for complete games/training. Cleanse uses an explicitly declared minimal marker geometry kernel, preserving the approved same-physical-point convention.",
+    "No roster admission, preceding-phase execution, full lifecycle replay, native compound-FRAME or whole-engine certification is implied.",
+    "Introductory labels and callout locate the Action contract; no unspecified Core or faction Action catalogue is invented. Mission/faction-specific Use Limit and Effect implementations remain owned by their source publications.",
+    "Review repair consumer controls use a complete native Companion MissionSetup and a canonical held Tactical Cleanse selection; the Fight body alone is an explicit minimal checkpoint. Lifecycle phase-end, turn-end Action completion and optional Tactical scoring execute through actual engine decisions. Original marker-kernel cases remain separately qualified."
+  ],
+  "review_corrections": {
+    "SF16-R001": "Native completion consumer and actual Tactical scoring, both active players; event/effect identity and interruption/FAQ controls.",
+    "SF16-R002": "Native Spawn/Lord unit-policy discrimination and atomic stale policy loss.",
+    "SF16-R003": "Distinct-unit source once-per-turn, next-occurrence positive, stale rejection and shared Cleanse target limits."
+  }
+}

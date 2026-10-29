@@ -3291,7 +3291,7 @@ def test_primary_destruction_capture_does_not_complete_attached_unit_for_bodygua
     )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
-    state = _battle_state_from_config(config)
+    state = _battle_state_from_config(config, coherent_attached_units=True)
     lifecycle.state = state
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     seed_completed_fight_phase(state)
@@ -7204,9 +7204,21 @@ def test_local_session_exposes_held_mission_action_and_decline_continues_shootin
     for index in range(30):
         if action_state.active_player_id != "player-a":
             break
-        assert rules_unit_started_mission_action_this_turn(
-            state=action_state, player_id="player-a", unit_instance_id=started.unit_instance_id
+        cleanup_complete = any(
+            cleanup.completes_boundary
+            and cleanup.battle_round == started.battle_round_started
+            and cleanup.active_player_id == "player-a"
+            for cleanup in action_state.end_turn_cleanup_states
         )
+        # Mission sequencing can pause after turn cleanup, before the player changes.
+        if not cleanup_complete:
+            assert rules_unit_started_mission_action_this_turn(
+                state=action_state, player_id="player-a", unit_instance_id=started.unit_instance_id
+            )
+        else:
+            assert not rules_unit_started_mission_action_this_turn(
+                state=action_state, player_id="player-a", unit_instance_id=started.unit_instance_id
+            )
         pending = action_session.advance_until_decision_or_terminal().decision_request
         assert pending is not None
         if action_state.active_player_id != "player-a":
@@ -7664,17 +7676,21 @@ def test_attached_rules_unit_has_one_canonical_action_option_and_state_identity(
     assert payload["unit_instance_id"] == attached_id
     assert payload["eligible_unit_instance_ids"] == [attached_id]
 
-    session.submit_option(
+    status = session.submit_option(
         request_id=request.request_id,
         option_id=action_options[0].option_id,
         result_id="phase11e-attached-start-cleanse",
     )
+    from tests.movement_submission_helpers import resolve_ordering_for_fixture
+
+    # Resolve the real mandatory mission ordering after non-mission turn cleanup.
+    resolve_ordering_for_fixture(lifecycle, status)
 
     action_state = state.mission_action_state_by_id(
         "mission-action:phase11e-attached-start-cleanse"
     )
     assert action_state.unit_instance_id == attached_id
-    # With no other eligible activation, the facade reaches the opponent's turn.
+    # With mission ordering complete, the facade reaches the opponent's turn.
     assert state.active_player_id == "player-b"
     assert (
         mission_action_unit_ineligibility_reason(
@@ -8010,6 +8026,7 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
     lifecycle.state = _battle_state_from_config(
         config,
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+        coherent_attached_units=True,
         decisions=lifecycle.decision_controller,
     )
     state = lifecycle.state
@@ -8021,7 +8038,6 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
     independent_id = "army-alpha:intercessor-unit-2"
     enemy_id = "army-beta:intercessor-unit-3"
     for unit_id, x_inches, y_inches in (
-        (leader_id, 20.0, 20.0),
         (independent_id, 20.0, 30.0),
         (enemy_id, 27.0, 25.0),
     ):
@@ -8030,6 +8046,24 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
             unit_instance_id=unit_id,
             x_inches=x_inches,
             y_inches=y_inches,
+        )
+    _place_unit_near_objective(state, unit_instance_id=bodyguard_id, target_suffix="center")
+    assert state.mission_setup is not None
+    marker = next(
+        marker
+        for marker in state.mission_setup.objective_markers
+        if _objective_marker_matches_suffix(marker.objective_marker_id, "center")
+    )
+    component_offsets = [(leader_id, (4.4, 1.6))]
+    if with_support:
+        component_offsets.append(("army-alpha:support-unit", (6.0, 1.6)))
+    # Keep both characters outside the objective and coherent after bodyguard loss.
+    for component_id, offset in component_offsets:
+        placement = state.battlefield_state.unit_placement_by_id(component_id)
+        state.replace_battlefield_state(
+            state.battlefield_state.with_unit_placement(
+                _with_model_offsets(placement, marker, offsets=(offset,))
+            )
         )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     action = _start_mission_action_via_lifecycle(
@@ -9485,6 +9519,21 @@ def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() 
         LifecycleStatusKind.WAITING_FOR_DECISION,
         LifecycleStatusKind.TERMINAL,
     }
+    request = lifecycle.pending_decision_request()
+    assert request is not None
+    assert request.decision_type == "select_coherency_casualty"
+    assert request.actor_id == "player-a"
+    assert {option.option_id for option in request.options} == {
+        row.model_instance_id for row in broken.model_placements
+    }
+    assert removed_model_id not in state.battlefield_state.removed_model_ids
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            request=request,
+            result_id="explicit-coherency-choice",
+            selected_option_id=removed_model_id,
+        )
+    )
     assert state.current_battle_phase is not BattlePhase.FIGHT
     cleanup = state.end_turn_cleanup_states[-1]
 
@@ -9551,13 +9600,32 @@ def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() 
             event["event_type"] = "battle_phase_boundary_tampered"
     with pytest.raises(
         GameLifecycleError,
-        match="Unit Coherency departure requires an authoritative phase-boundary event",
+        match=(
+            "ObjectiveControlRecord phase-start history lacks exactly one prior "
+            "completed phase event"
+        ),
+    ):
+        GameLifecycle.from_payload(forged_payload)
+
+    forged_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    forged_events = forged_payload["decisions"]["event_log"]
+    for event in forged_events:
+        if event["event_type"] == "coherency_cleanup_model_removed":
+            event["event_type"] = "battle_phase_boundary_tampered"
+    with pytest.raises(
+        GameLifecycleError,
+        match="Coherency casualty requires one preceding owner decision",
     ):
         GameLifecycle.from_payload(forged_payload)
 
 
 def test_turn_end_control_and_primary_scoring_use_pre_cleanup_battlefield() -> None:
-    state = _battle_state_for_primary("primary-immovable-object")
+    lifecycle = _battle_lifecycle_for_primary("primary-immovable-object")
+    state = lifecycle.state
+    assert state is not None
     assert state.battlefield_state is not None
     marker = _center_marker_definition(state)
     unit_placement = state.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
@@ -9571,7 +9639,19 @@ def test_turn_end_control_and_primary_scoring_use_pre_cleanup_battlefield() -> N
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     seed_completed_fight_phase(state)
 
-    state.advance_to_next_battle_phase()
+    status = lifecycle.advance_until_decision_or_terminal()
+    status = _decline_stratagem_window_if_pending(lifecycle, status, result_id="control-decline")
+    request = lifecycle.pending_decision_request()
+    assert request is not None
+    assert request.decision_type == "select_coherency_casualty"
+    assert isolated_objective_model_id not in state.battlefield_state.removed_model_ids
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            request=request,
+            result_id="control-chosen",
+            selected_option_id=isolated_objective_model_id,
+        )
+    )
 
     assert isolated_objective_model_id in state.battlefield_state.removed_model_ids
     turn_end_record = next(

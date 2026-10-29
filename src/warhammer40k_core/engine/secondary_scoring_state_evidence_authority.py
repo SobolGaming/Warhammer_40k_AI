@@ -51,6 +51,9 @@ from warhammer40k_core.engine.scoring import (
 from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
     enemy_unit_ids_in_player_deployment_zone_from_model_placements,
 )
+from warhammer40k_core.engine.secondary_mission_action_resolution import (
+    secondary_action_completions_after_control,
+)
 from warhammer40k_core.engine.secondary_mission_selection import (
     secondary_mission_selection_from_json,
 )
@@ -550,10 +553,24 @@ def _secondary_mission_action_projections_for_boundary(
         state=state,
     )
     completed_at_boundary = completed_mission_action_states_from_checkpoint(checkpoint)
-    relevant_at_boundary = tuple(
+    earlier_relevant = tuple(
         action
         for action in completed_at_boundary
         if action.mission_action_id in source_by_action_id
+    )
+    relevant_at_boundary = tuple(
+        sorted(
+            (
+                *earlier_relevant,
+                *secondary_action_completions_after_control(
+                    state=state,
+                    record=record,
+                    checkpoint=checkpoint,
+                    earlier_action_ids=frozenset(a.action_id for a in completed_at_boundary),
+                ),
+            ),
+            key=lambda a: a.action_id,
+        )
     )
     current_relevant = tuple(
         sorted(

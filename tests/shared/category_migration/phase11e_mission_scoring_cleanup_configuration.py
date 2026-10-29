@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from tests.setup_completion_helpers import place_attached_components_coherently_for_fixture
 from tests.shared.category_migration.phase11e_mission_scoring_cleanup_bindings import (
     SCORING_TERRAIN_FEATURE_ID,
     ArmyCatalog,
@@ -66,6 +67,7 @@ def _battle_state_from_config(
     player_a_fixed_mission_ids: tuple[str, str] = ("assassination", "bring-it-down"),
     turn_start_unit_positions: tuple[tuple[str, float, float], ...] = (),
     turn_start_unplaced_unit_ids: tuple[str, ...] = (),
+    coherent_attached_units: bool = False,
     decisions: DecisionController | None = None,
 ) -> GameState:
     state = GameState.from_config(config)
@@ -80,6 +82,8 @@ def _battle_state_from_config(
         terrain_features=config.mission_setup.terrain_features,
     )
     state.record_battlefield_state(scenario.battlefield_state)
+    if coherent_attached_units:
+        place_attached_components_coherently_for_fixture(state)
     for unit_instance_id, x_inches, y_inches in turn_start_unit_positions:
         _place_unit_near_point(
             state,

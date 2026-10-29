@@ -1,0 +1,119 @@
+{
+  "scope": "Section06 adopted corpus complete within declared boundaries; not global engine compliance",
+  "source_rows": 12,
+  "rule_rows": 6,
+  "faq_rows": 6,
+  "obligations": 36,
+  "original_ledger_obligations": 34,
+  "current_faq63_clauses": 2,
+  "obligation_statuses": {
+    "asserted": 36
+  },
+  "unimplemented_adopted_obligations": 0,
+  "unadopted06_rule_rows": 0,
+  "tests": {
+    "total": 64,
+    "passed": 64,
+    "failed": 0,
+    "skipped": 0,
+    "xfail": 0,
+    "errors": 0,
+    "rule_semantic_cases": 58,
+    "inventory_checks": 3,
+    "isolation_checks": 1,
+    "identity_choice_controls": 2
+  },
+  "stable_junit": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\section06-stable.xml",
+  "performance": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\section06-complete-performance.json",
+  "scoped_quality": {
+    "ruff": {
+      "command": [
+        "C:\\Users\\nostr\\Documents\\Codex\\2026-10-15\\task\\behavior-rebuild\\.venv\\Scripts\\ruff.exe",
+        "check",
+        "tests/rules/section06",
+        "tests/support/section06_fixtures.py"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.06936300001689233,
+      "log": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\ruff-final.txt"
+    },
+    "format": {
+      "command": [
+        "C:\\Users\\nostr\\Documents\\Codex\\2026-10-15\\task\\behavior-rebuild\\.venv\\Scripts\\ruff.exe",
+        "format",
+        "--check",
+        "tests/rules/section06",
+        "tests/support/section06_fixtures.py"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.060044099984224886,
+      "log": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\format-final.txt"
+    },
+    "mypy": {
+      "command": [
+        "C:\\Users\\nostr\\Documents\\Codex\\2026-10-15\\task\\behavior-rebuild\\.venv\\Scripts\\mypy.exe",
+        "--follow-imports=silent",
+        "--cache-dir",
+        "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\mypy-cache",
+        "tests/rules/section06",
+        "tests/support/section06_fixtures.py"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 1.7737336000136565,
+      "log": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\mypy-final.txt"
+    },
+    "pyright": {
+      "command": [
+        "C:\\Users\\nostr\\Documents\\Codex\\2026-10-15\\task\\behavior-rebuild\\.venv\\Scripts\\pyright.exe",
+        "tests/rules/section06",
+        "tests/support/section06_fixtures.py"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 3.6275985999964178,
+      "log": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\pyright-final.txt"
+    }
+  },
+  "direct_dependencies": {
+    "passed": 17,
+    "receipt": {
+      "command": [
+        "C:\\Users\\nostr\\Documents\\Codex\\2026-10-15\\task\\behavior-rebuild\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/rules/section02/test_02_02_04_healing.py",
+        "tests/rules/section05/test_sequence.py",
+        "tests/rules/section05/test_critical_consumers.py",
+        "tests/unit/test_order135_physical_visibility.py::test_complete_physical_input_and_clipping_have_distinct_fingerprints",
+        "tests/unit/test_order135_physical_visibility.py::test_disconnected_physical_parts_are_a_union_without_a_filled_gap",
+        "--selected-army-source-index",
+        "C:/Users/nostr/Documents/Codex/2026-10-16/task-7/integration-source-index-v2",
+        "--no-cov",
+        "-q",
+        "-o",
+        "cache_dir=C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\pytest-cache",
+        "--junitxml",
+        "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\dependencies.xml"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 14.26340870000422,
+      "log": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\dependencies-final.txt"
+    }
+  },
+  "runtime_identity": {
+    "command": [
+      "C:\\Users\\nostr\\Documents\\Codex\\2026-10-15\\task\\behavior-rebuild\\.venv\\Scripts\\python.exe",
+      "scripts/build_engine_build_identity.py",
+      "--check"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 2.3291379000002053,
+    "log": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-13\\identity-final.txt"
+  },
+  "remaining_gates": [
+    "Independent retained-source clause and legacy-equivalence review",
+    "Broader Linux integration and CI timing",
+    "Prior defect fixes and SF05-002 authority reconciliation",
+    "Compound-body diagnostic review"
+  ],
+  "stop": "Final authorized section06 delivered. Do not start00 or07."
+}

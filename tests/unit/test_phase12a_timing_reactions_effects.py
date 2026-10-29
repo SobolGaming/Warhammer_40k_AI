@@ -27,6 +27,7 @@ from warhammer40k_core.engine import (
     fight_unit_selected_grant_resolution,
     rule_model_destruction,
     rule_model_destruction_applied_damage,
+    rule_model_destruction_removal,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.attached_unit_reconciliation import (
@@ -3369,19 +3370,19 @@ def test_rule_model_destruction_payload_scalar_validators_fail_closed() -> None:
         rule_model_destruction._payload_string({}, "value")  # pyright: ignore[reportPrivateUsage]
 
     assert (
-        rule_model_destruction._optional_payload_string(  # pyright: ignore[reportPrivateUsage]
+        rule_model_destruction_removal._optional_payload_string(  # pyright: ignore[reportPrivateUsage]
             {}, "value"
         )
         is None
     )
     assert (
-        rule_model_destruction._optional_payload_string(  # pyright: ignore[reportPrivateUsage]
+        rule_model_destruction_removal._optional_payload_string(  # pyright: ignore[reportPrivateUsage]
             {"value": "identifier"}, "value"
         )
         == "identifier"
     )
     with pytest.raises(GameLifecycleError, match="value must be a string"):
-        rule_model_destruction._optional_payload_string(  # pyright: ignore[reportPrivateUsage]
+        rule_model_destruction_removal._optional_payload_string(  # pyright: ignore[reportPrivateUsage]
             {"value": 1}, "value"
         )
 

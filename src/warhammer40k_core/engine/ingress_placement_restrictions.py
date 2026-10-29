@@ -79,6 +79,11 @@ class IngressPlacementRestrictions(msgspec.Struct, frozen=True, forbid_unknown_f
             raise GameLifecycleError("Ingress placement restriction schema drift.") from exc
 
 
+def strategic_reserves_exclude_enemy_deployment_zone(battle_round: int) -> bool:
+    """20.04 retains this limit even when a source permits first-round Ingress."""
+    return battle_round < 3
+
+
 def restrictions_for_arrival(
     *,
     placement_kind: BattlefieldPlacementKind,
@@ -128,7 +133,9 @@ def restrictions_for_arrival(
             if deep_strike_enemy_distance is not None
             else DEFAULT_RESERVE_ENEMY_DISTANCE_INCHES
         ),
-        excludes_enemy_deployment_zone=strategic and battle_round == 2,
+        excludes_enemy_deployment_zone=(
+            strategic and strategic_reserves_exclude_enemy_deployment_zone(battle_round)
+        ),
         source_distances=tuple(IngressSourceDistance(*row) for row in sorted(distances)),
         distance_grant_source_ids=tuple(sorted({grant.source_id for grant in used_grants})),
         placement_conditions=tuple(

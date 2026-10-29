@@ -22,7 +22,7 @@ def test_order95_inventory_and_report_are_complete() -> None:
         audit["source_selection"]["heroic_intervention_override"]["audit_id"]
         == "order94-2026-09-28"
     )
-    assert REPORT.read_text() == markdown(audit)
+    assert REPORT.read_text(encoding="utf-8") == markdown(audit)
     assert "| 931:change:15 | FAQ 55 |" in markdown(audit)
     validate_audit(audit)
 
@@ -88,7 +88,7 @@ def test_order95_keeps_older_changes_and_resolved_exceptions_distinct() -> None:
 def test_order95_requires_every_new_repair_before_pfinal() -> None:
     from tools.core_rules_order95_audit import ROOT
 
-    roadmap = (ROOT / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text()
+    roadmap = (ROOT / "docs/CORE_RULES_REMEDIATION_ROADMAP.md").read_text(encoding="utf-8")
     for owner in ("P04E", "P24K", "PEVIDENCE"):
         line = next(line for line in roadmap.splitlines() if f"| {owner} |" in line)
         with pytest.raises(ValueError, match="Order 95"):

@@ -1,0 +1,74 @@
+Accept all ten semantic rows within the explicit bounds below. No production defect or unresolved semantic question was found in the current supported scope. Independent acceptance is complete; cumulative activation and publication remain unexecuted.
+
+The review covers the ten additional exact semantic rows. The prior 97/97 guard acceptance from task-33/task-35 is inherited, not re-performed. No production, maintained-test, source-data, dependency, selection, contract, shard, cumulative activation or publication change is made here. The original checkout is untouched. Review source, Git objects and dependencies are separately copied into `/tmp/task37-independent-semantic-review`.
+
+Exact identity and authority
+
+Task-36 input ZIP is `fdf70ddb84b1853f21e7af396fed975d0ee9693b52116258241a501980215e49`; all 322 archive members / 320 payloads and seal `0f73f1a36577d7a843829985f0914fca025f5ee850016d51ab5cc9474cb3e1ad` authenticate. Task-35 and task-32 ZIPs independently match `36b366d8aed77e1b6467b21586d6baa61c31c864ebcd02e3399a88e612f99f34` and `aa4a1d90f12b6c5b0b21596df5b4185f37d540872895e9c340345c4ca5dc0c34`, including their complete seals.
+
+Baseline is PR587 commit `5f509724da25a2f6ded0c2739a8e7c84bdf59c91`, tree `1fa709a167abb369932e651f89babbd0034941c5`. All 6,442 blob bodies were independently hashed and the complete canonical tree reconstructed; the commit object body also hashes correctly. Current commit is `b75bfcf352e3e8bb5346e210a6b427a7af3a4242`, tree `b7ddfc490c12f86244f55ba606770cfdc8ce5d20`; all 7,048 current blobs match the separate extracted source. Source identity remains `12e945f358deceff8ba7fc32c7ca7e9d325eecf0e39728c12c684311b4f7b5fb`. No historical full-engine admission is inferred from those checks.
+
+The accepted source has no `.agents/skills`. AGENTS.md, README.md, pyproject.toml, source policy, exact owners, downstream consumers and relevant tests were read. All ten authored old/new owner AST bodies structurally match the independently read Git payloads, including absent added modules. Every historical before/after AST hash also reproduces exactly with the original Python 3.12.6 static serializer; that interpreter runs no gameplay test. All supplied scoped old/current payloads match their authenticated full-tree manifests. The exact full-file diff is retained separately because surrounding builder changes are relevant context, not additional unreviewed rows.
+
+The pinned JavaScript literal capture decodes exactly to the retained 350-row App mirror inventory. The 18 selected full rule bodies, every cited per-row source hash/block and source-transcription metadata authenticate. This is the existing owner-approved maintained-mirror authority under the checked-in Core source policy, with its retained observation timestamp/non-affiliation qualification. It is not a fresh official App observation, App995 update, or new faction-source certificate.
+
+Per-row review
+
+Paths below are relative to `src/warhammer40k_core/`.
+
+| Row | Exact owner | Independent conclusion and bound |
+|---|---|---|
+| 1 | `core/ruleset_descriptor.py::TerrainMovementPolicy.policy_for_feature_kind` | Accept classified endpoint extension as a genuine 13.06 correction. Omitted classification retains the feature-policy route; invalid kinds still refuse. All-kind native eligible/ineligible endpoints and legacy controls cover the consumer. |
+| 2 | `core/terrain_endpoint_policy.py::@module` | Accept addition of typed imports and constants without registration/mutation. Existing Ruins exceptions are retained; SWARM is additionally source-backed. The tuple is not byte-equivalent to the old builder tuple. Physical narrowing remains required. |
+| 3 | Same file `::classified_terrain_endpoint_policy` | Accept exact three-field transform for EXPOSED/LIGHT/DENSE; UNKNOWN/MIXED return the identical supplied policy. All other fields, narrowed keyword lists and explicit grants remain exact. Endpoint support does not grant Dense transit. |
+| 4 | `engine/charge_move_geometry.py::_friendly_vehicle_monster_model_ids` | Accept the query's documented semantic change to present physical-model keywords, friendly ownership and moving-model exclusion. Baseline/current repository references are only its definition, export, re-export and export list. There is no active charge-resolution caller. No gameplay Charge fix or 17.01 Charge permission is credited. |
+| 5 | `engine/faction_content/catalog_generic_hooks.py::@module` | Accept the single new continuation import, reconciled to row 6. No recipient selector or import-time permission is added. |
+| 6 | Same file `::mortal_wound_feel_no_pain` | Accept one Desperate Escape continuation binding between the unchanged Core and catalog routes. It completes the approved whole-model-loss-to-shared-mortal repair, rather than proving an old mortal dispatcher defect. Real datasheet FNP prevents one wound and movement continues once in the declared phase kernel. No invented Leader/Bodyguard grant or full-muster/restoration certification. |
+| 7 | `engine/faction_content/runtime.py::@module` | Accept import only with its mapped additive bundle builder, merge and unchanged per-player selected admission. Native bundle controls admit Infantry and exclude unselected Vehicle/Monster/Fly/Leader records; casualty controls distinguish retained membership from dead live keywords. Import itself is no permission grant. |
+| 8 | `engine/primary_scoring_boundary_lifecycle.py::_pending_window_decision_types` | Accept both independently justified deltas: controlling-player coherency choice family (03.03 block 5), and sequencing inside the existing faction end-rule family. Actual Command-end Sticky Objectives uses the second. Queue-head family expansion retains event/source/actor/boundary authority checks. |
+| 9 | `engine/sequencing.py::@module` | Accept `BattlePhaseKind` import supplying row 10's comparison; no separate behavioral grant or certification. |
+| 10 | Same file `::SequencingConflictContext.sequence_exception_source_id` | Accept exact Command END_PHASE exception `rule:08:08.05:1`, preserving END_TURN/END_BATTLE_ROUND and other-window behavior. Generic mixed ordering is source-correct and independently sensitive. Native supported flow finishes player rules before actual scoring; it provides no native mixed candidate batch. |
+
+Command scope is an acceptance boundary, not a waived rule obligation. All nine mission-origin factory sites in four files were independently inventoried. The central provider admits only START_TURN; remaining mission factories belong to END_TURN or movement completion. Current Command END_PHASE reconstructs loaded player/Core end rules and performs actual mission scoring afterward. The native case explicitly offers only player-origin Sticky Objectives. Removing row 10 changes constructed mixed ordering but leaves that native flow passing. Source 08.05 explicitly requires non-mission rules before either player's mission; its generic correction therefore has direct authority even without a supported native mixed provider. A future provider must bring a genuine native mixed-batch integration guard before extending this claim.
+
+Aeldari is not a numerical correction: baseline/current `Abilities.json` is byte-identical, SHA256 `ad836ea16f2e2e1b5ab64a03e6731ad99a2d27994ab01c0df01ec267c71ea39c`, blob `7ba48aabc06155e0569696eaa0e76ba4f1e7647d`. Row `Abilities:000009894:AE` already prescribes Normal Move D6+1 for Opportunity Seized and Fade Back. The 15 native cases and 30 helper assertions address movement kind, trigger/window, shorter-away movement, retry, spend, phase ownership, restore and replay without inventing a new numeric rule or broadening its historical provider provenance.
+
+Author evidence reconciliation
+
+| Workload | Final cases | Whole-process seconds | Credit |
+|---|---:|---:|---|
+| Initial terrain/blockers | 154 completed of 221 | 597.104049021 | None; warning/termination retained, no final JUnit/capture |
+| Terrain/blockers retry | 221 | 136.652541171 | Focused semantics only |
+| Sequencing/admission | 39 | 491.527493968 | Focused semantics only |
+| Hazards/coherency | 40 | 498.508121077 | Focused semantics only |
+| External native controls | 33 | 112.712777908 | Focused semantics only |
+
+The four successful runs are serial and reconcile to 333 unique cases, 999 complete passing phase reports and exact JUnit case identities. Independent reconstruction checked all 321 direct assertion statements against raw test line contexts and all 30 Aeldari helper assertion spans, including the multiline replay assertion. Those are applicable union contexts, not global branch/context completeness.
+
+Capture changes cache the path-prefix strings and trace call-phase execution instead of setup/collection. They do not change test bodies, selection, fixtures, engine inputs or assertions. The open/read audit and file hashes remain in place; fixture setup loses call-line tracing, not substantive execution. The timeout remains a failed diagnostic; the faster retry is not a matched engine performance result. All recorded imported/read project inputs match the frozen source. The isolated CPython 3.14.5 executable and all 2,784 copied dependency files match task-36's pins; exact fresh import closures are retained for final reviewer runs.
+
+The independent qualification has 61 distinct unmutated passes: 55 reuses from the authenticated author cohort plus six additional review controls. It also rejects all seven intended in-memory semantic reversions. The separately reverted native Command case passes, confirming that it cannot demonstrate mixed-batch behavior. Each qualified workload is serial against every retained attempt, uses the 600-second process-group watchdog/500-second warning, finishes below 500 seconds, and retains stdout/JUnit/receipt; final runs additionally retain exact control snapshots/hashes and imported source/dependency closures. No successful mutant-internal case is counted as an unmutated pass.
+
+| Reviewer workload | Cases | Expected failures | Whole-process seconds |
+|---|---:|---:|---:|
+| `positive-controls` | 37 | 0 | 84.514265 |
+| `final-native-positives-clean` | 22 | 0 | 192.348405 |
+| `final-pending-positives` | 2 | 0 | 62.083816 |
+| `final-terrain` | 2 | 1 | 24.934258 |
+| `final-charge` | 1 | 1 | 24.534334 |
+| `final-mortal` | 1 | 1 | 30.939762 |
+| `final-runtime` | 1 | 1 | 31.040634 |
+| `final-pending-sequencing` | 1 | 1 | 32.042079 |
+| `final-pending-coherency` | 1 | 1 | 33.647475 |
+| `final-sequencing` | 1 | 1 | 24.533326 |
+| `final-sequencing-native-insensitivity` | 1 | 0 | 50.565731 |
+
+Terrain reversion fails a real Woods elevated endpoint; restoring the exact old charge query over-collects four models in the attached physical-query control. Removing the Desperate Escape continuation loses the native mortal decision route. Removing Core inventory loses selected Infantry admission. Removing each pending-family delta separately rejects its actual native valid queue/restore authority. Removing the Command exception breaks constructed mixed ordering. These are deliberate reviewer mutations, not seven production defects.
+
+All preliminary campaign runs, the stopped overlap attempt, and the 26-pass/one-fixture-error mixed workload receive no final qualification credit. FAILED-ATTEMPTS37.json preserves the exact tooling failures, the brief overlap and its process-group stop, corrections and raw artifact locations. The final campaign enforces an exclusive nonblocking test lock and checks JUnit errors separately from intended failures. The earlier 37-control run was unaffected. Final source/dependency attestation verifies both the independent and author source trees are still the exact 7,048-file identity and all 2,784 dependency files remain unchanged. No action is currently blocked. The requested parent-message forward returned thread-not-found and was not delivered or retried; local checkpoint and final platform handoff carry the result.
+
+Unchanged broader gates and recommended next step
+
+No redundant full aggregate was run: runtime, imported source/data, maintained selection, contracts, shards and dependencies remain compatible with the sealed producing inputs. Historical selected aggregate remains 3,632 passes in 466.165109891 seconds; full quality remains 1,472 pass / 24 fail / 1,496 cases in 414.553087579 seconds. Raw coverage is 57.9705996417293% against 85%, with incomplete global per-test contexts. None of the focused controls replaces those gates, a current performance smoke, full CI, full roster/lifecycle certification or full-game qualification. Ruff, mypy, pyright, import-linter, pre-commit, generators, conformance and hosted CI were not newly run here.
+
+After this independent acceptance, the parent can record these ten bounded dispositions beside the existing 97 accepted guards in the exact cumulative preservation ledger, retaining every limitation above. Then repair the 24 actual quality failures in a scoped change, independently review it, and complete the required exact-base performance assessment/current serial smoke, one final complete behavioral coverage run with contexts, full quality and actual CI timing. Any resulting production/input change invalidates affected final runtime evidence and must be revalidated. This recommendation is not executed here.

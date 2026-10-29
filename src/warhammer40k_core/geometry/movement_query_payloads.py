@@ -25,6 +25,7 @@ class MovementGoalPayload(TypedDict):
     vertical_inches: float
     z_inches: float
     range_inches: float | None
+    ignore_polygon_height: bool
 
 
 class MovementQueryPayload(TypedDict):
@@ -54,6 +55,7 @@ def goal_payload(goal: MovementGoal) -> MovementGoalPayload:
         "vertical_inches": goal.vertical_inches,
         "z_inches": goal.z_inches,
         "range_inches": goal.range_inches,
+        "ignore_polygon_height": goal.ignore_polygon_height,
     }
 
 
@@ -74,6 +76,7 @@ def goal_from_payload(raw: MovementGoalPayload) -> MovementGoal:
         vertical_inches=raw["vertical_inches"],
         z_inches=raw["z_inches"],
         range_inches=raw["range_inches"],
+        ignore_polygon_height=raw["ignore_polygon_height"],
     )
 
 

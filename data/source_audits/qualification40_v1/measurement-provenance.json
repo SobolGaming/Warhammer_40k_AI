@@ -1,0 +1,1312 @@
+{
+  "dice": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-dice-base.json",
+      "canonical_sha256": "63cb9e4830bf65186984ee4adc4bc67a44797983b455d6f03c457c6e6cdada0b",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "shooting/false": [
+          1.8549138909997964,
+          1.8160787140000139,
+          1.7289943260002474,
+          1.7300353390000964,
+          1.8083060240001032
+        ],
+        "shooting/true": [
+          1.7583885250001003,
+          1.7648821139996471,
+          1.8433697499999653,
+          1.7546020280001358,
+          1.7701048270000683
+        ],
+        "fight/false": [
+          1.2592393269997046,
+          1.2713457310001104,
+          1.253935934999845,
+          1.2642082209999899,
+          1.2576281080000626
+        ],
+        "fight/true": [
+          1.3058405710003171,
+          1.3050166279999758,
+          1.3014470389998678,
+          1.3211161859999265,
+          1.3084024199997657
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-dice-base.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-dice-head.json",
+      "canonical_sha256": "1fe0104727424824b4640d29a5951b449acf92c076708c1de85d437917f4cf95",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "shooting/false": [
+          1.906671501999881,
+          1.828929381999842,
+          1.758776348000083,
+          1.7486855649999598,
+          1.8402349419998245
+        ],
+        "shooting/true": [
+          1.8194697690000794,
+          1.8086320289999094,
+          1.9051797199999783,
+          1.8048232000001008,
+          1.8141786779997346
+        ],
+        "fight/false": [
+          1.2849332229998254,
+          1.2748171910002384,
+          1.280917977000172,
+          1.365769535000254,
+          1.270893919000173
+        ],
+        "fight/true": [
+          1.2955416360000527,
+          1.3853400339999098,
+          1.2968804669999372,
+          1.2986222670001553,
+          1.403854327999852
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-dice-head.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  },
+  "dice_sustained": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-dice_sustained-base.json",
+      "canonical_sha256": "f180d846c948a2c63dfcbefed7b07c31ddbecd19495585095527655809b54d52",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "shooting/false": [
+          3.018865672999709,
+          2.9655232609998166,
+          2.8903514850003376,
+          2.892287425000177,
+          2.9724342670001533
+        ],
+        "shooting/true": [
+          2.5890905149999526,
+          2.6619202159999986,
+          2.5920217259999845,
+          2.5721323140001005,
+          2.59251089899999
+        ],
+        "fight/false": [
+          1.8076275029998214,
+          1.8873883520000163,
+          1.797172626000247,
+          1.8200322840002627,
+          1.8050851890002377
+        ],
+        "fight/true": [
+          1.901852340000005,
+          1.9057419840000875,
+          1.8948631670000395,
+          1.8976748310001312,
+          1.8971026259996506
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-dice_sustained-base.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-dice_sustained-head.json",
+      "canonical_sha256": "45e05673941ce730852af04d70fc0038361da247b72fc1c7bc4cd353d964dcc2",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "shooting/false": [
+          2.664175969000098,
+          2.626743712000007,
+          2.520385639000324,
+          2.518824653000138,
+          2.607493423000051
+        ],
+        "shooting/true": [
+          2.5971815140001127,
+          2.5826696960002664,
+          2.6587807580003755,
+          2.6603135290001774,
+          2.573229180999988
+        ],
+        "fight/false": [
+          1.935173959000167,
+          1.9319565769997098,
+          1.927293488000032,
+          1.9584697069999493,
+          1.9339263669999127
+        ],
+        "fight/true": [
+          2.027673522999976,
+          2.019935223000175,
+          2.0472540979999394,
+          2.1477878890000284,
+          2.02338218199975
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-dice_sustained-head.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  },
+  "external_contract_source_reuse": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-external_contract_source_reuse-base.json",
+      "canonical_sha256": "e838ac21a1ab115530a4fa7b6ea319bd317855e964fcc1f87515fc49ace0fc41",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "orphan-write-independent-check": [
+          149.544,
+          147.26,
+          145.827
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-base-0.json",
+        "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-base-1.json",
+        "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-base-2.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-external_contract_source_reuse-head.json",
+      "canonical_sha256": "09a2dfef5b3dafdd6a3868f6b3e7e33b54d49c888e99fe2733f3cfea88374dfc",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "orphan-write-independent-check": [
+          148.472,
+          146.354,
+          146.102
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-head-0.json",
+        "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-head-1.json",
+        "data/source_audits/qualification40_v1/receipt-external_contract_source_reuse-head-2.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  },
+  "fight": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-fight-base.json",
+      "canonical_sha256": "1ecc52716b6107d903d34e7ce1394ca52d859d51c0694723e104a20eb237dcb5",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "complete-fight-phase": [
+          18.61586222799997,
+          17.17642256199997,
+          16.882833692000077
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-fight-base.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-fight-head.json",
+      "canonical_sha256": "513c87dc99405212c4e3003ebfceba3fb390672ecd664282cfab775421d1ca8a",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "complete-fight-phase": [
+          17.347707276999927,
+          17.30696540300005,
+          17.142107707999912
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-fight-head.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  },
+  "movement": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-movement-base.json",
+      "canonical_sha256": "61d1094b587f6fcb06c8fb369bad14a7e5d110c73833b6a8b654c31cb5bd0901",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "finite": [
+          4.881471229999988,
+          4.858034343000099,
+          4.931164949000049
+        ],
+        "parameterized": [
+          4.517786806999993,
+          4.534345278000046,
+          4.553283273000034
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-movement-base.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-movement-head.json",
+      "canonical_sha256": "dfebab82c4222334546bb57707d98e5b21396c7390202153218b9659b2eb5f59",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "finite": [
+          4.92827385999999,
+          4.8968069049999485,
+          4.901743262999844
+        ],
+        "parameterized": [
+          4.620145742999966,
+          4.574256646000094,
+          4.539973809000003
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-movement-head.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  },
+  "objective_control": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-objective_control-base.json",
+      "canonical_sha256": "785145a2bc306d0f2c8117b48ffe780462910f64a3d070a3e674d22476a88408",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "0.01": [
+          5.5583299999852894e-05,
+          5.362766999951418e-05,
+          5.427105000080701e-05,
+          5.4702929999166374e-05,
+          5.459594000058132e-05,
+          5.3283590000319235e-05,
+          5.428565000102026e-05,
+          5.349719000150799e-05,
+          5.452942999909283e-05,
+          5.465663999984827e-05
+        ],
+        "0.01968503937007874": [
+          5.5137809999905586e-05,
+          5.6138170000394895e-05,
+          5.4439939999610944e-05,
+          5.65632400002869e-05,
+          5.598928000154046e-05,
+          5.503351000015755e-05,
+          5.456534000131796e-05,
+          5.566368000017974e-05,
+          5.532131000109075e-05,
+          5.579828999998426e-05
+        ],
+        "0.02": [
+          0.00023073388999819144,
+          0.00022740324000096733,
+          0.00022356100000024527,
+          0.00022132671000008486,
+          0.0002197382800000014,
+          0.00022162108999964402,
+          0.00022279913999909696,
+          0.0002218339899991406,
+          0.00022233108000136782,
+          0.0002195559899996624
+        ],
+        "4.0": [
+          0.00022450515999935305,
+          0.00022166749000007257,
+          0.00021997477000013533,
+          0.000218879819999529,
+          0.00022084433000145508,
+          0.00022116801000038322,
+          0.00022050145000093835,
+          0.00022049325999887515,
+          0.00021960608999961552,
+          0.00022007256000051713
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-objective_control-base.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-objective_control-head.json",
+      "canonical_sha256": "bd175b314a1472d544b6ecd8779ad720faafb6ad4a0f8780fc8108db76b70058",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "0.01": [
+          5.333799999789335e-05,
+          5.094490000146834e-05,
+          5.203694999863728e-05,
+          5.1990450001540014e-05,
+          5.192544999999882e-05,
+          5.1445680001052096e-05,
+          5.1893659999677766e-05,
+          5.1215290000072855e-05,
+          5.242403000011109e-05,
+          5.1509669999632026e-05
+        ],
+        "0.01968503937007874": [
+          5.265782999913426e-05,
+          5.232183999851259e-05,
+          5.2218749999610736e-05,
+          5.143797999835442e-05,
+          5.217705000177375e-05,
+          5.11793900000157e-05,
+          5.261591999897064e-05,
+          5.216195000002699e-05,
+          5.1422869998987155e-05,
+          5.140318000030675e-05
+        ],
+        "0.02": [
+          0.00022035547000086807,
+          0.0002123336099998596,
+          0.0002144569200004298,
+          0.00021240581000029124,
+          0.000212233820000165,
+          0.00021387074000131178,
+          0.0002137718499989205,
+          0.00021265429999857587,
+          0.00021472000999892772,
+          0.0002161635499987824
+        ],
+        "4.0": [
+          0.0002158751599995412,
+          0.00021033640000041486,
+          0.00021139185999800248,
+          0.00021211714000173742,
+          0.00021191762999933417,
+          0.00021338216999993164,
+          0.00021746198000073492,
+          0.00021361436000006507,
+          0.00021535276999884445,
+          0.00021297989000004235
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-objective_control-head.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  },
+  "reconstruction": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-reconstruction-base.json",
+      "canonical_sha256": "450831f4ba5f99e19618c4d3fda5e176df81c406b09d07f53dfa497264e74903",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "ingress/restore": [
+          2.2180919390000327,
+          2.1885941400000775,
+          2.275691738999967,
+          2.188077094999926,
+          2.188735347999909,
+          2.1873668390001058,
+          2.195456504000049
+        ],
+        "ingress/fork": [
+          2.221684180000011,
+          2.312012950999815,
+          2.208990741999969,
+          2.2109845120000955,
+          2.235147821999817,
+          2.219511338000075,
+          2.298593446999803
+        ],
+        "rapid_disembark/restore": [
+          2.3407575339999767,
+          2.2575794970000516,
+          2.322821449999992,
+          2.2313272000001234,
+          2.225467715999912,
+          2.2238584409999476,
+          2.2268346070000007
+        ],
+        "rapid_disembark/fork": [
+          2.259799350000094,
+          2.356748684999957,
+          2.2617271299998265,
+          2.3529615500001455,
+          2.267287127999907,
+          2.380216738999934,
+          2.2547167779998745
+        ],
+        "later_decision/restore": [
+          2.2377523750001274,
+          2.233192767999981,
+          2.2557666090001476,
+          2.2363239090000206,
+          2.374850246999813,
+          2.248842151999952,
+          2.3427442750000864
+        ],
+        "later_decision/fork": [
+          2.371051519000048,
+          2.2590243690001444,
+          2.2649526100001367,
+          2.2643380590000106,
+          2.260605546000079,
+          2.2606102469999314,
+          2.2651659910000035
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-reconstruction-base.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-reconstruction-head.json",
+      "canonical_sha256": "cc1a993288bf36ee57d1ab289bc5a01c455cf4bded98052069aae0a948baef58",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "ingress/restore": [
+          2.220804457999975,
+          2.199901356000055,
+          2.3184632819998114,
+          2.198726865000026,
+          2.2091531060000307,
+          2.2047191630001635,
+          2.2119250179998744
+        ],
+        "ingress/fork": [
+          2.244301657000051,
+          2.326347245000079,
+          2.233771840999907,
+          2.235062059000029,
+          2.226343290999921,
+          2.233375245999923,
+          2.3246375109999917
+        ],
+        "rapid_disembark/restore": [
+          2.3513526490000913,
+          2.2520814810000047,
+          2.369645433999949,
+          2.254396414999974,
+          2.248313489000111,
+          2.2579175440000654,
+          2.2595386519999465
+        ],
+        "rapid_disembark/fork": [
+          2.297285595000176,
+          2.376733202999958,
+          2.2824570840000433,
+          2.388775911000039,
+          2.280192298999964,
+          2.3724890989999494,
+          2.288402374000043
+        ],
+        "later_decision/restore": [
+          2.254391643999952,
+          2.357871859999932,
+          2.254121036000015,
+          2.256807837999986,
+          2.356696680999903,
+          2.2581284049999795,
+          2.3603529950000848
+        ],
+        "later_decision/fork": [
+          2.409556016000124,
+          2.28393278700014,
+          2.3818997860000763,
+          2.2906917969999085,
+          2.384700230000135,
+          2.282255924000083,
+          2.283076363999953
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-reconstruction-head.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  },
+  "roster": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-roster-base.json",
+      "canonical_sha256": "149d6bbae04fe635aa1e2e41329dff7526ce70bd8a54abbeeaf1d2cef792e43c",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "2": [
+          0.03873358200007715,
+          0.03824169100016661,
+          0.038157577999982095,
+          0.03833214900009807,
+          0.038448684000059075,
+          0.03823552400012886,
+          0.038280512000028466
+        ],
+        "4": [
+          0.04645083299988073,
+          0.046465811999951256,
+          0.046615855000027295,
+          0.0463846459999786,
+          0.04641831499998261,
+          0.046250952000036705,
+          0.046413024000003134
+        ],
+        "20": [
+          0.11112074299990127,
+          0.11065578399984588,
+          0.11149415500017312,
+          0.1110742250000385,
+          0.11063700500017148,
+          0.11047496200012574,
+          0.11102236800002174
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-roster-base.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-roster-head.json",
+      "canonical_sha256": "14b5bda6881d5fed17bbb5524201870fe72325320a24e0f595a9d4eaec22e7c6",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "2": [
+          0.038004194999984975,
+          0.03760727199983194,
+          0.03734747500016056,
+          0.03737551299991537,
+          0.03742935199989006,
+          0.03718317100015156,
+          0.037250979999953415
+        ],
+        "4": [
+          0.04533938300005502,
+          0.045091685999977926,
+          0.045411100000137594,
+          0.044991540999944846,
+          0.045307385999876715,
+          0.04518774999996822,
+          0.04521031100011896
+        ],
+        "20": [
+          0.10884716800001115,
+          0.10941921099993124,
+          0.10991833200000656,
+          0.10790393100000983,
+          0.10779836500000783,
+          0.10743713300007585,
+          0.1076409719998992
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-roster-head.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  },
+  "setup": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-setup-base.json",
+      "canonical_sha256": "7925f5eb310659c5ef9727acd42a7c65d70ff32eb8ca24a5347a4027c26f63a9",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "cargo-5": [
+          2.8906514410000455,
+          2.7677924059998986,
+          2.843518263000078,
+          2.7697451940002793,
+          2.751469208999879,
+          2.853842256000007,
+          2.7521393880001597
+        ],
+        "cargo-100": [
+          2.7767348069996842,
+          2.865693083000224,
+          2.7541727269999683,
+          2.7615445030000956,
+          2.8543741439998485,
+          2.767071875000056,
+          2.8516368780001358
+        ],
+        "loaded-deep-strike": [
+          4.471189346000301,
+          4.5482525300003545,
+          4.567911044000084,
+          4.456598184999621,
+          4.575197611000021,
+          4.546567622999646,
+          4.469013609000285
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-setup-base.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-setup-head.json",
+      "canonical_sha256": "283d52da812017260a9c564f0b96b6341978ef6384291f72ea228cc9bc452b3b",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "cargo-5": [
+          2.9184431070002574,
+          2.7731210919996556,
+          2.873375014999965,
+          2.775181828999848,
+          2.7767043780004315,
+          2.880071089000012,
+          2.795395098999961
+        ],
+        "cargo-100": [
+          2.787645918999715,
+          2.901475883999865,
+          2.7810226320002585,
+          2.7793231300001935,
+          2.768260240000018,
+          2.7712317900000016,
+          2.873537982000016
+        ],
+        "loaded-deep-strike": [
+          4.5062153769999895,
+          4.59454408900001,
+          4.6130648809999,
+          4.504544292999981,
+          4.602025632999812,
+          4.603118013999847,
+          4.548364633999881
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-setup-head.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  },
+  "shock_reconstruction": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-shock_reconstruction-base.json",
+      "canonical_sha256": "207b6c9449fd3af2f935446a24917128c1b2a2451bb31e66cdbd3012af362844",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "active_shock/restore": [
+          2.9586464369999703,
+          2.9689092860000983,
+          2.9603665100000853
+        ],
+        "active_shock/replay": [
+          0.5520764020000115,
+          0.5533505329999571,
+          0.5537854029998925
+        ],
+        "expired_shock/restore": [
+          3.596930463000035,
+          3.6891863490000105,
+          3.66364895300012
+        ],
+        "expired_shock/replay": [
+          1.06046675399989,
+          1.058368148999989,
+          1.0448761479999575
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-shock_reconstruction-base.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-shock_reconstruction-head.json",
+      "canonical_sha256": "f24f66ce8c52932cc0e4f575690750fc0f947fb859290688a270856fbf4c5c50",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "active_shock/restore": [
+          2.901418182000043,
+          3.330314585999986,
+          3.1349946929999533
+        ],
+        "active_shock/replay": [
+          0.5515954429999965,
+          0.5503880460000801,
+          0.5454379889999927
+        ],
+        "expired_shock/restore": [
+          3.5355845540000246,
+          3.6274644830000398,
+          3.6234094290000485
+        ],
+        "expired_shock/replay": [
+          1.0662309439999262,
+          1.0441537310000513,
+          1.0424781960000473
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-shock_reconstruction-head.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  },
+  "strength": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-strength-base.json",
+      "canonical_sha256": "4c66cc34f6b8eed5a9e27122ff9688d1999e4865dbca792c1c5eba2b55172a2a",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "shooting": [
+          1.8478638080000565,
+          1.713110707999931,
+          1.808405107999988,
+          1.7299214089998713,
+          1.8245426240000597
+        ],
+        "fight": [
+          1.2563873100000365,
+          1.2460677369999758,
+          1.2420011980000254,
+          1.2473733650001577,
+          1.2444385680000778
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-strength-base.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-strength-head.json",
+      "canonical_sha256": "201df35fa50c8e707b8c0a71590c5e2ca540e4c2f31dcc33528eb47fb2033a79",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "shooting": [
+          1.8466402949998155,
+          1.7240438549999908,
+          1.8164159259999906,
+          1.7484892019999734,
+          1.7969412349998493
+        ],
+        "fight": [
+          1.2220926859999963,
+          1.2297887480001464,
+          1.241419692999898,
+          1.2267420360001324,
+          1.2252094860000398
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-strength-head.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  },
+  "visibility": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+    "producing_head": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+    "base": {
+      "path": "data/source_audits/qualification40_v1/raw-visibility-base.json",
+      "canonical_sha256": "820ee33e4966094296e3eb20eb99d99d9448d0a21d0da0d689d7370e42a14087",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "dense-outside": [
+          0.14946482499999547,
+          0.09617895999986104,
+          0.09623335499986752,
+          0.09609646400008387,
+          0.0973301869998977,
+          0.09601115700002083,
+          0.09661588000017218
+        ],
+        "dense-inside": [
+          0.3313121690000571,
+          0.09551075900003525,
+          0.095642984000051,
+          0.09565935299997363,
+          0.09602704500002801,
+          0.09604035600000316,
+          0.09711161699988224
+        ],
+        "attached-outside": [
+          0.2656842010001128,
+          0.18995257599999604,
+          0.1923763780000627,
+          0.19585363200008032,
+          0.19656957899996996,
+          0.19243865400017057,
+          0.1920827219998955
+        ],
+        "light-outside": [
+          0.07178863100011768,
+          0.06239667299996654,
+          0.0625911659999474,
+          0.0624484019999727,
+          0.06234079500018197,
+          0.0625991360000171,
+          0.06253491699999358
+        ],
+        "not-hidden": [
+          0.059810131999938676,
+          0.05996022399995127,
+          0.06255784600011793,
+          0.059733504999940124,
+          0.05963931800010869,
+          0.05977491299995563,
+          0.05985999700010325
+        ],
+        "fully-visible": [
+          0.025872394000089116,
+          0.023318566999932955,
+          0.02350213900012932,
+          0.023480049999989205,
+          0.023303427999962878,
+          0.023394906000021365,
+          0.02332624699988628
+        ],
+        "associated-policy-only-woods": [
+          0.14461304499991456,
+          0.09972810900012519,
+          0.1000144449999425,
+          0.10332652700003564,
+          0.10809955100012303,
+          0.10783843400008664,
+          0.10779669500016098
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-visibility-base.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/qualification40_v1/raw-visibility-head.json",
+      "canonical_sha256": "d6d27180c47b2f5c9290458a932d40284de2ad99515127ba2b5ea56a13f00538",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+      "samples": {
+        "dense-outside": [
+          0.1513721680000799,
+          0.09743228199999976,
+          0.10090907600010723,
+          0.09820570599981693,
+          0.09684484000013072,
+          0.09684366700003011,
+          0.0968719790000705
+        ],
+        "dense-inside": [
+          0.29612603400005355,
+          0.09645523500012132,
+          0.09660716000007596,
+          0.09662864799997806,
+          0.09606008500009011,
+          0.09619991700014907,
+          0.09596922899982019
+        ],
+        "attached-outside": [
+          0.26565752800001974,
+          0.191405831000111,
+          0.1932728260001113,
+          0.19328958500000226,
+          0.1908456460000707,
+          0.1908874239998113,
+          0.19101556800001163
+        ],
+        "light-outside": [
+          0.07335882000006677,
+          0.06859490400006507,
+          0.06560447899983046,
+          0.06557988999998088,
+          0.0656898539998565,
+          0.06545509699981267,
+          0.06559089899997161
+        ],
+        "not-hidden": [
+          0.06291564999992261,
+          0.06119265899997117,
+          0.061128470000085144,
+          0.06394651300001897,
+          0.061474445999920135,
+          0.061950574000093184,
+          0.06174667300001602
+        ],
+        "fully-visible": [
+          0.02745075299981181,
+          0.02418071800002508,
+          0.024130019999802244,
+          0.024157900000091104,
+          0.024572489999854952,
+          0.0242497959998218,
+          0.023991187000092395
+        ],
+        "associated-policy-only-woods": [
+          0.1491929540000001,
+          0.09996158899980401,
+          0.10039708899989819,
+          0.10115606299996216,
+          0.10270987500007323,
+          0.10012449999999262,
+          0.10019730799990612
+        ]
+      },
+      "completed": true,
+      "receipt_paths": [
+        "data/source_audits/qualification40_v1/receipt-visibility-head.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359387648,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "symbolic_metadata_requalification": {
+      "producing_commit": "3b2c5ab8e00ef96e0ebf03d4c4d8e51f75ce895b",
+      "producing_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+      "reason": "Two accidental retired-token matches inside truncated operation digest keys; full SHA256 identifiers use the existing legitimate cryptographic-identity recognition. Scanner unchanged; no source identity is obscured.",
+      "allowed_inputs": [
+        "tools/performance_qualification_successor.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "tests/code_quality/test_qualification40_successor.py"
+      ],
+      "constraints": "Exact two symbolic key expansions only; all mapped values and all numeric budgets remain exact. Admission function and two quality guard owners only; every timed runtime/driver/fixture/contract/dependency byte and every raw measurement remains unchanged."
+    }
+  }
+}

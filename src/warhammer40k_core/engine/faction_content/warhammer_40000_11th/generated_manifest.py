@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import keyword
+from collections.abc import Mapping
+from dataclasses import dataclass
+from types import MappingProxyType
 
 from warhammer40k_core.engine.faction_content.manifest import (
     RuntimeContentManifestRow,
@@ -54,14 +57,61 @@ _CURRENT_FACTION_MODULE_PATHS = {
 }
 
 
+@dataclass(frozen=True, slots=True)
+class _ExecutionRecordIndex:
+    by_owner: Mapping[
+        tuple[str, str | None],
+        tuple[faction_execution_2026_27.Phase17FExecutionRecord, ...],
+    ]
+    by_rule: Mapping[
+        tuple[str, str | None, str | None, str],
+        tuple[faction_execution_2026_27.Phase17FExecutionRecord, ...],
+    ]
+    by_execution_id: Mapping[str, tuple[faction_execution_2026_27.Phase17FExecutionRecord, ...]]
+
+
+def _execution_record_index(
+    records: tuple[faction_execution_2026_27.Phase17FExecutionRecord, ...],
+) -> _ExecutionRecordIndex:
+    owners: dict[
+        tuple[str, str | None], list[faction_execution_2026_27.Phase17FExecutionRecord]
+    ] = {}
+    rules: dict[
+        tuple[str, str | None, str | None, str],
+        list[faction_execution_2026_27.Phase17FExecutionRecord],
+    ] = {}
+    execution_ids: dict[str, list[faction_execution_2026_27.Phase17FExecutionRecord]] = {}
+    for record in records:
+        owners.setdefault((record.faction_id, record.detachment_id), []).append(record)
+        rules.setdefault(
+            (record.faction_id, record.detachment_id, record.rule_id, record.coverage_kind.value),
+            [],
+        ).append(record)
+        execution_ids.setdefault(record.execution_id, []).append(record)
+    return _ExecutionRecordIndex(
+        by_owner=MappingProxyType({key: tuple(values) for key, values in owners.items()}),
+        by_rule=MappingProxyType({key: tuple(values) for key, values in rules.items()}),
+        by_execution_id=MappingProxyType(
+            {key: tuple(values) for key, values in execution_ids.items()}
+        ),
+    )
+
+
 def generated_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:
+    execution_index = _execution_record_index(_EXECUTION_RECORDS)
     return (
-        *tuple(_faction_row(row) for row in faction_detachments_2026_27.faction_rows()),
-        *tuple(_detachment_row(row) for row in faction_detachments_2026_27.detachment_rows()),
         *tuple(
-            _enhancement_row(row)
+            _faction_row(execution_index, row) for row in faction_detachments_2026_27.faction_rows()
+        ),
+        *tuple(
+            _detachment_row(execution_index, row)
+            for row in faction_detachments_2026_27.detachment_rows()
+        ),
+        *tuple(
+            _enhancement_row(execution_index, row)
             for row in faction_subrules_2026_27.enhancement_rows()
             if _executable_execution_ids_for_rule(
+                execution_index,
                 faction_id=row.faction_id,
                 detachment_id=row.detachment_id,
                 rule_id=row.enhancement_id,
@@ -69,35 +119,41 @@ def generated_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:
             )
         ),
         *tuple(
-            _stratagem_row(row)
+            _stratagem_row(execution_index, row)
             for row in faction_subrules_2026_27.stratagem_rows()
             if _executable_execution_ids_for_rule(
+                execution_index,
                 faction_id=row.faction_id,
                 detachment_id=row.detachment_id,
                 rule_id=row.stratagem_id,
                 coverage_kind="detachment_stratagem",
             )
         ),
-        *_pilot_runtime_content_rows(),
+        *_pilot_runtime_content_rows(
+            execution_index,
+        ),
     )
 
 
 def _faction_row(
+    execution_index: _ExecutionRecordIndex,
     row: faction_detachments_2026_27.SourceFactionRow,
 ) -> RuntimeContentManifestRow:
     execution_record_ids = _execution_ids_for(
+        execution_index,
         faction_id=row.faction_id,
         detachment_id=None,
     )
     return _row(
+        execution_index,
         content_id=row.faction_id,
         family=RuntimeContentModuleFamily.FACTION,
-        source_ids=_source_ids_for(faction_id=row.faction_id, detachment_id=None),
+        source_ids=_source_ids_for(execution_index, faction_id=row.faction_id, detachment_id=None),
         owner_faction_id=row.faction_id,
         owner_detachment_id=None,
         execution_record_ids=execution_record_ids,
         module_path=_current_faction_module_path(row.faction_id),
-        semantic_status=_semantic_status_for_execution_ids(execution_record_ids),
+        semantic_status=_semantic_status_for_execution_ids(execution_index, execution_record_ids),
     )
 
 
@@ -111,18 +167,22 @@ def _current_faction_module_path(faction_id: str) -> str:
 
 
 def _detachment_row(
+    execution_index: _ExecutionRecordIndex,
     row: faction_detachments_2026_27.SourceDetachmentRow,
 ) -> RuntimeContentManifestRow:
     faction_module = _module_name_for_id(row.faction_id)
     detachment_module = _module_name_for_id(row.detachment_id)
     execution_record_ids = _execution_ids_for(
+        execution_index,
         faction_id=row.faction_id,
         detachment_id=row.detachment_id,
     )
     return _row(
+        execution_index,
         content_id=row.detachment_id,
         family=RuntimeContentModuleFamily.DETACHMENT,
         source_ids=_source_ids_for(
+            execution_index,
             faction_id=row.faction_id,
             detachment_id=row.detachment_id,
         ),
@@ -130,25 +190,29 @@ def _detachment_row(
         owner_detachment_id=row.detachment_id,
         execution_record_ids=execution_record_ids,
         module_path=(f"{_BASE}.{faction_module}.detachments.{detachment_module}.manifest"),
-        semantic_status=_semantic_status_for_execution_ids(execution_record_ids),
+        semantic_status=_semantic_status_for_execution_ids(execution_index, execution_record_ids),
     )
 
 
 def _enhancement_row(
+    execution_index: _ExecutionRecordIndex,
     row: faction_subrules_2026_27.SourceEnhancementRow,
 ) -> RuntimeContentManifestRow:
     faction_module = _module_name_for_id(row.faction_id)
     detachment_module = _module_name_for_id(row.detachment_id)
     execution_record_ids = _executable_execution_ids_for_rule(
+        execution_index,
         faction_id=row.faction_id,
         detachment_id=row.detachment_id,
         rule_id=row.enhancement_id,
         coverage_kind="detachment_enhancement",
     )
     return _row(
+        execution_index,
         content_id=row.enhancement_id,
         family=RuntimeContentModuleFamily.ENHANCEMENT,
         source_ids=_source_ids_for_rule(
+            execution_index,
             faction_id=row.faction_id,
             detachment_id=row.detachment_id,
             rule_id=row.enhancement_id,
@@ -158,25 +222,29 @@ def _enhancement_row(
         owner_detachment_id=row.detachment_id,
         execution_record_ids=execution_record_ids,
         module_path=(f"{_BASE}.{faction_module}.detachments.{detachment_module}.manifest"),
-        semantic_status=_semantic_status_for_execution_ids(execution_record_ids),
+        semantic_status=_semantic_status_for_execution_ids(execution_index, execution_record_ids),
     )
 
 
 def _stratagem_row(
+    execution_index: _ExecutionRecordIndex,
     row: faction_subrules_2026_27.SourceStratagemRow,
 ) -> RuntimeContentManifestRow:
     faction_module = _module_name_for_id(row.faction_id)
     detachment_module = _module_name_for_id(row.detachment_id)
     execution_record_ids = _executable_execution_ids_for_rule(
+        execution_index,
         faction_id=row.faction_id,
         detachment_id=row.detachment_id,
         rule_id=row.stratagem_id,
         coverage_kind="detachment_stratagem",
     )
     return _row(
+        execution_index,
         content_id=row.stratagem_id,
         family=RuntimeContentModuleFamily.STRATAGEM,
         source_ids=_source_ids_for_rule(
+            execution_index,
             faction_id=row.faction_id,
             detachment_id=row.detachment_id,
             rule_id=row.stratagem_id,
@@ -186,16 +254,20 @@ def _stratagem_row(
         owner_detachment_id=row.detachment_id,
         execution_record_ids=execution_record_ids,
         module_path=(f"{_BASE}.{faction_module}.detachments.{detachment_module}.manifest"),
-        semantic_status=_semantic_status_for_execution_ids(execution_record_ids),
+        semantic_status=_semantic_status_for_execution_ids(execution_index, execution_record_ids),
     )
 
 
-def _pilot_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:
+def _pilot_runtime_content_rows(
+    execution_index: _ExecutionRecordIndex,
+) -> tuple[RuntimeContentManifestRow, ...]:
     return (
         _row(
+            execution_index,
             content_id="plague-marines",
             family=RuntimeContentModuleFamily.DATASHEET,
             source_ids=_source_ids_for(
+                execution_index,
                 faction_id="death-guard",
                 detachment_id=None,
             ),
@@ -205,9 +277,11 @@ def _pilot_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:
             module_path=f"{_BASE}.death_guard.units.plague_marines",
         ),
         _row(
+            execution_index,
             content_id="typhus",
             family=RuntimeContentModuleFamily.DATASHEET,
             source_ids=_source_ids_for(
+                execution_index,
                 faction_id="death-guard",
                 detachment_id=None,
             ),
@@ -217,9 +291,11 @@ def _pilot_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:
             module_path=f"{_BASE}.death_guard.units.typhus",
         ),
         _row(
+            execution_index,
             content_id="plague-weapons",
             family=RuntimeContentModuleFamily.WARGEAR,
             source_ids=_source_ids_for(
+                execution_index,
                 faction_id="death-guard",
                 detachment_id=None,
             ),
@@ -230,9 +306,11 @@ def _pilot_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:
             dependency_ids=("plague-weapons:standard",),
         ),
         _row(
+            execution_index,
             content_id="plague-weapons:standard",
             family=RuntimeContentModuleFamily.WEAPON_PROFILE,
             source_ids=_source_ids_for(
+                execution_index,
                 faction_id="death-guard",
                 detachment_id=None,
             ),
@@ -245,6 +323,7 @@ def _pilot_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:
 
 
 def _row(
+    execution_index: _ExecutionRecordIndex,
     *,
     content_id: str,
     family: RuntimeContentModuleFamily,
@@ -269,7 +348,7 @@ def _row(
         support_status=RuntimeContentSupportStatus.SUPPORTED,
         dependency_ids=dependency_ids,
         semantic_status=(
-            _semantic_status_for_execution_ids(execution_record_ids)
+            _semantic_status_for_execution_ids(execution_index, execution_record_ids)
             if semantic_status is None
             else semantic_status
         ),
@@ -277,13 +356,16 @@ def _row(
 
 
 def _semantic_status_for_execution_ids(
+    execution_index: _ExecutionRecordIndex,
     execution_record_ids: tuple[str, ...],
 ) -> RuntimeContentSemanticStatus:
     if not execution_record_ids:
         return RuntimeContentSemanticStatus.PLACEHOLDER
     execution_record_id_set = frozenset(execution_record_ids)
     records = tuple(
-        record for record in _EXECUTION_RECORDS if record.execution_id in execution_record_id_set
+        record
+        for execution_id in execution_record_id_set
+        for record in execution_index.by_execution_id.get(execution_id, ())
     )
     if len(records) != len(execution_record_ids):
         raise GameLifecycleError(
@@ -304,6 +386,7 @@ def _semantic_status_for_execution_ids(
 
 
 def _execution_ids_for(
+    execution_index: _ExecutionRecordIndex,
     *,
     faction_id: str,
     detachment_id: str | None,
@@ -311,7 +394,7 @@ def _execution_ids_for(
     return tuple(
         sorted(
             record.execution_id
-            for record in _EXECUTION_RECORDS
+            for record in execution_index.by_owner.get((faction_id, detachment_id), ())
             if record.faction_id == faction_id and record.detachment_id == detachment_id
         )
     )
@@ -324,6 +407,7 @@ def _execution_ids_matching(token: str) -> tuple[str, ...]:
 
 
 def _executable_execution_ids_for_rule(
+    execution_index: _ExecutionRecordIndex,
     *,
     faction_id: str,
     detachment_id: str | None,
@@ -337,7 +421,9 @@ def _executable_execution_ids_for_rule(
     return tuple(
         sorted(
             record.execution_id
-            for record in _EXECUTION_RECORDS
+            for record in execution_index.by_rule.get(
+                (faction_id, detachment_id, rule_id, coverage_kind), ()
+            )
             if record.faction_id == faction_id
             and record.detachment_id == detachment_id
             and record.rule_id == rule_id
@@ -348,13 +434,14 @@ def _executable_execution_ids_for_rule(
 
 
 def _source_ids_for(
+    execution_index: _ExecutionRecordIndex,
     *,
     faction_id: str,
     detachment_id: str | None,
 ) -> tuple[str, ...]:
     source_ids = {
         source_id
-        for record in _EXECUTION_RECORDS
+        for record in execution_index.by_owner.get((faction_id, detachment_id), ())
         if record.faction_id == faction_id and record.detachment_id == detachment_id
         for source_id in record.source_ids
     }
@@ -362,6 +449,7 @@ def _source_ids_for(
 
 
 def _source_ids_for_rule(
+    execution_index: _ExecutionRecordIndex,
     *,
     faction_id: str,
     detachment_id: str | None,
@@ -370,7 +458,9 @@ def _source_ids_for_rule(
 ) -> tuple[str, ...]:
     source_ids = {
         source_id
-        for record in _EXECUTION_RECORDS
+        for record in execution_index.by_rule.get(
+            (faction_id, detachment_id, rule_id, coverage_kind), ()
+        )
         if record.faction_id == faction_id
         and record.detachment_id == detachment_id
         and record.rule_id == rule_id

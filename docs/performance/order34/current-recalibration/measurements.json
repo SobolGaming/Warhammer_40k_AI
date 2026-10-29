@@ -1,0 +1,137 @@
+{
+  "base_commit": "923e24c9d6cea9668bec488e79b717173851c91b",
+  "workload_id": "order34-live-unrestricted-v1",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "cpu_count": 64,
+  "timing_mode": "uninstrumented; seven serial samples; setup excluded; no coverage",
+  "timing_samples": [
+    {
+      "case": "unrestricted",
+      "setup_seconds": 10.177812846000023,
+      "slice_seconds": 0.29403137399998514,
+      "inventory_size": 32,
+      "work_counts": {},
+      "setup_geometry_work_counts": {},
+      "cold_geometry_work_counts": {},
+      "decision_count": 6,
+      "reached_charge": true,
+      "final_phase": "fight"
+    },
+    {
+      "case": "unrestricted",
+      "setup_seconds": 4.441736340999995,
+      "slice_seconds": 0.2570365640000034,
+      "inventory_size": 32,
+      "work_counts": {},
+      "setup_geometry_work_counts": {},
+      "cold_geometry_work_counts": {},
+      "decision_count": 6,
+      "reached_charge": true,
+      "final_phase": "fight"
+    },
+    {
+      "case": "unrestricted",
+      "setup_seconds": 4.497886548000025,
+      "slice_seconds": 0.25751949999997237,
+      "inventory_size": 32,
+      "work_counts": {},
+      "setup_geometry_work_counts": {},
+      "cold_geometry_work_counts": {},
+      "decision_count": 6,
+      "reached_charge": true,
+      "final_phase": "fight"
+    },
+    {
+      "case": "unrestricted",
+      "setup_seconds": 4.472720769000006,
+      "slice_seconds": 0.25897921800000745,
+      "inventory_size": 32,
+      "work_counts": {},
+      "setup_geometry_work_counts": {},
+      "cold_geometry_work_counts": {},
+      "decision_count": 6,
+      "reached_charge": true,
+      "final_phase": "fight"
+    },
+    {
+      "case": "unrestricted",
+      "setup_seconds": 4.468880916000018,
+      "slice_seconds": 0.25404821999998717,
+      "inventory_size": 32,
+      "work_counts": {},
+      "setup_geometry_work_counts": {},
+      "cold_geometry_work_counts": {},
+      "decision_count": 6,
+      "reached_charge": true,
+      "final_phase": "fight"
+    },
+    {
+      "case": "unrestricted",
+      "setup_seconds": 4.497741845000007,
+      "slice_seconds": 0.25454625799997643,
+      "inventory_size": 32,
+      "work_counts": {},
+      "setup_geometry_work_counts": {},
+      "cold_geometry_work_counts": {},
+      "decision_count": 6,
+      "reached_charge": true,
+      "final_phase": "fight"
+    },
+    {
+      "case": "unrestricted",
+      "setup_seconds": 4.474051492000001,
+      "slice_seconds": 0.2584885100000065,
+      "inventory_size": 32,
+      "work_counts": {},
+      "setup_geometry_work_counts": {},
+      "cold_geometry_work_counts": {},
+      "decision_count": 6,
+      "reached_charge": true,
+      "final_phase": "fight"
+    }
+  ],
+  "mean_seconds": 0.26209280628570547,
+  "median_seconds": 0.25751949999997237,
+  "maximum_seconds": 0.29403137399998514,
+  "work_mode": "canonical cProfile live interval; setup excluded from lookup count",
+  "profile_sample": {
+    "case": "unrestricted",
+    "setup_seconds": 9.107747185999983,
+    "slice_seconds": 0.7425692660000038,
+    "inventory_size": 32,
+    "work_counts": {
+      "expire_persisting_effects_at_boundary": 3,
+      "rules_unit_identity_ids": 10,
+      "resolve_visibility_pair_uncached": 12,
+      "persisting_effects_for_lineage": 173,
+      "invalid_shooting_unit_selection_status": 1,
+      "_legal_shooting_unit_ids": 3,
+      "resolve_line_of_sight": 27,
+      "resolve_visibility_pair": 12,
+      "rules_unit_view_by_id": 246,
+      "applies_to_unit": 7142
+    },
+    "setup_geometry_work_counts": {
+      "resolve_visibility_pair_uncached": 2,
+      "resolve_visibility_pair": 2
+    },
+    "cold_geometry_work_counts": {
+      "resolve_visibility_pair": 14,
+      "resolve_visibility_pair_uncached": 14
+    },
+    "decision_count": 6,
+    "reached_charge": true,
+    "final_phase": "fight"
+  },
+  "input_hashes": {
+    "scripts/measure_action_restriction_live.py": "fe88e5059e9c52f576f373c4db5d3f4295154d9ab0792cbbbc24f4c106fd5845",
+    "scripts/measure_action_restrictions.py": "537cd664ed3386e977d6b33ae9810e4861440018928426b246ca017a89fbab80",
+    "tests/indirect_shooting_helpers.py": "dbca147e17f121e989e9e558326aec85e7e550a3822a80efe8919dcf1c6bbf1b",
+    "tests/retained_attack_helpers.py": "067022adcbd00614efaf29b6daea330837c53e3d1e9d36267ef10c33cd5c50d2",
+    "uv.lock": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "src/warhammer40k_core/_engine_build_manifest.json": "f6a3ae8474577236b9a4ca29786d0b7b19801f737c5e882f5c5180372039d8c5"
+  },
+  "full_game_certified": false
+}

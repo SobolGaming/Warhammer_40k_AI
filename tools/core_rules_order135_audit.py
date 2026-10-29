@@ -87,6 +87,47 @@ def _d04_assertion_exception(root: Path, changed_links: list[dict[str, Any]]) ->
     return len(selected)
 
 
+def integration_emergency_assertion_exception(
+    root: Path, changed_links: list[dict[str, Any]]
+) -> int:
+    """Retain the original obligation while authenticating its current diagnostic scalar."""
+    filename = "tests/unit/test_order60_emergency_disembark.py"
+    name = "test_emergency_disembark_places_every_survivor_on_the_closest_ring"
+    archive = root / (
+        "data/source_audits/integration_2026_10_19/order97/" + filename + ".before.py.txt"
+    )
+    raw = archive.read_bytes()
+    if _sha(raw) != "c69fe087121a994906469306df957c6846b193e590a2aed51faafb12d13b7548":
+        raise CurrentAuditError("Emergency original assertion archive drifted.")
+    before = next(
+        n for n in ast.parse(raw).body if isinstance(n, ast.FunctionDef) and n.name == name
+    )
+    after = next(
+        n
+        for n in ast.parse((root / filename).read_bytes()).body
+        if isinstance(n, ast.FunctionDef) and n.name == name
+    )
+    values = [
+        n for n in ast.walk(before) if isinstance(n, ast.Constant) and n.value == "end_of_turn"
+    ]
+    if len(values) != 1:
+        raise CurrentAuditError("Emergency original lifetime assertion drifted.")
+    values[0].value = "until_cleared"
+    if ast.dump(before) != ast.dump(after):
+        raise CurrentAuditError("Emergency assertion maintenance changed another obligation.")
+    selected = [
+        row
+        for row in changed_links
+        if row["requirement_id"] == "18.05-battle-shock"
+        and row["original"]["nodeid"] == filename + "::" + name
+        and row["original"]["assertion"]
+        == "assert result.disembarked_unit_state.battle_shocked_until == 'end_of_turn'"
+    ]
+    if len(selected) != 1:
+        raise CurrentAuditError("Emergency selected assertion exception is not uniquely used.")
+    return len(selected)
+
+
 def _sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
@@ -354,13 +395,13 @@ def build(root: Path = ROOT) -> dict[str, Any]:
     ):
         raise CurrentAuditError("Complete changed/added source reconciliation differs from inputs.")
     live = LiveSymbols(root)
-    rows = []
+    rows: list[dict[str, Any]] = []
     categories = {
         "00": _read(root, Path("data/source_audits/order97/categories/00.json")),
         **selected["categories"],
     }
-    changed_links = []
-    no_original = []
+    changed_links: list[dict[str, Any]] = []
+    no_original: list[str] = []
     for category, source_rows in categories.items():
         for source_row in source_rows:
             rid = source_row["row_id"]
@@ -368,8 +409,8 @@ def build(root: Path = ROOT) -> dict[str, Any]:
                 raise CurrentAuditError("Requirement has no complete selected source: " + rid)
             for requirement in source_row["requirements"]:
                 qid = requirement["requirement_id"]
-                nodes = []
-                evidence = []
+                nodes: list[str] = []
+                evidence: list[dict[str, Any]] = []
                 for original in requirement["evidence"]:
                     if rid == "rule:18:18.07:1" and original["nodeid"] in {
                         "tests/unit/test_phase10q_transports.py::"
@@ -414,7 +455,7 @@ def build(root: Path = ROOT) -> dict[str, Any]:
                     no_original.append(qid)
                     if qid not in bindings["requirement_bindings"]:
                         raise CurrentAuditError("Unlinked clause has no current successor: " + qid)
-                successor = bindings["requirement_bindings"].get(qid)
+                successor: dict[str, Any] | None = bindings["requirement_bindings"].get(qid)
                 if successor:
                     nodes.extend(successor["current_test_nodes"])
                 supersession = bindings["source_supersessions"].get(rid)
@@ -447,9 +488,14 @@ def build(root: Path = ROOT) -> dict[str, Any]:
                     }
                 )
     d04_exceptions = _d04_assertion_exception(root, changed_links)
-    if len(rows) != 1078 or len(no_original) != 34 or len(changed_links) - d04_exceptions != 14:
+    emergency_exceptions = integration_emergency_assertion_exception(root, changed_links)
+    if (
+        len(rows) != 1078
+        or len(no_original) != 34
+        or len(changed_links) - d04_exceptions - emergency_exceptions != 14
+    ):
         raise CurrentAuditError("Complete original obligation/link inventory drifted.")
-    additions = []
+    additions: list[dict[str, Any]] = []
     for faq_id, binding in bindings["current_new_faqs"].items():
         source = current_sources["faq:" + faq_id]
         nodes = [node for filename in binding["test_files"] for node in live.file_tests(filename)]
@@ -539,6 +585,12 @@ def build(root: Path = ROOT) -> dict[str, Any]:
         "retained_baseline_source_report": (
             root / AUDIT / "current-source-qualifications.md"
         ).read_text(encoding="utf-8"),
+        "integration_emergency_assertion_maintenance": {
+            "count": emergency_exceptions,
+            "historical_obligation_retained": True,
+            "current_lifetime": "until_cleared",
+            "runtime_pass_claimed": False,
+        },
         "runtime_pass_claimed": False,
         "qualification": (
             "All25 categories plus universal00; complete source observations, exact live owners "

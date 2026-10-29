@@ -5770,7 +5770,7 @@
         "required_neighbors_large_unit": null,
         "required_neighbors_small_unit": 1
       },
-      "descriptor_hash": "4628f51dc7a64ed686669da01ae0633c1ad3a598c4ddc8dc4cb2059e6ef5c9ce",
+      "descriptor_hash": "fac267ba1d5dab070a4ffc1f0e7f515e96a9ca5fa4bcb1e694b7777e1041427d",
       "descriptor_version": "core-v2-setup-prebattle-ui-smoke",
       "engagement_policy": {
         "horizontal_inches": 2.0,
@@ -5946,7 +5946,13 @@
             "no_overhang_required": true,
             "terrain_feature_kind": "armoured_containers",
             "through_terrain_allowed_keywords": [],
-            "upper_floor_allowed_keywords": []
+            "upper_floor_allowed_keywords": [
+              "BEAST",
+              "FLY",
+              "INFANTRY",
+              "MONSTER",
+              "SWARM"
+            ]
           },
           {
             "can_move_over": true,
@@ -5957,7 +5963,13 @@
             "no_overhang_required": false,
             "terrain_feature_kind": "barricade_and_fuel_pipes",
             "through_terrain_allowed_keywords": [],
-            "upper_floor_allowed_keywords": []
+            "upper_floor_allowed_keywords": [
+              "BEAST",
+              "FLY",
+              "INFANTRY",
+              "MONSTER",
+              "SWARM"
+            ]
           },
           {
             "can_move_over": true,
@@ -5968,7 +5980,13 @@
             "no_overhang_required": false,
             "terrain_feature_kind": "battlefield_debris_and_statuary",
             "through_terrain_allowed_keywords": [],
-            "upper_floor_allowed_keywords": []
+            "upper_floor_allowed_keywords": [
+              "BEAST",
+              "FLY",
+              "INFANTRY",
+              "MONSTER",
+              "SWARM"
+            ]
           },
           {
             "can_move_over": true,
@@ -5979,7 +5997,13 @@
             "no_overhang_required": false,
             "terrain_feature_kind": "crater_and_rubble",
             "through_terrain_allowed_keywords": [],
-            "upper_floor_allowed_keywords": []
+            "upper_floor_allowed_keywords": [
+              "BEAST",
+              "FLY",
+              "INFANTRY",
+              "MONSTER",
+              "SWARM"
+            ]
           },
           {
             "can_move_over": true,
@@ -5990,7 +6014,13 @@
             "no_overhang_required": false,
             "terrain_feature_kind": "debris_and_statuary",
             "through_terrain_allowed_keywords": [],
-            "upper_floor_allowed_keywords": []
+            "upper_floor_allowed_keywords": [
+              "BEAST",
+              "FLY",
+              "INFANTRY",
+              "MONSTER",
+              "SWARM"
+            ]
           },
           {
             "can_move_over": true,
@@ -6001,7 +6031,13 @@
             "no_overhang_required": true,
             "terrain_feature_kind": "hills",
             "through_terrain_allowed_keywords": [],
-            "upper_floor_allowed_keywords": []
+            "upper_floor_allowed_keywords": [
+              "BEAST",
+              "FLY",
+              "INFANTRY",
+              "MONSTER",
+              "SWARM"
+            ]
           },
           {
             "can_move_over": true,
@@ -6012,7 +6048,13 @@
             "no_overhang_required": true,
             "terrain_feature_kind": "hills_and_sealed_buildings",
             "through_terrain_allowed_keywords": [],
-            "upper_floor_allowed_keywords": []
+            "upper_floor_allowed_keywords": [
+              "BEAST",
+              "FLY",
+              "INFANTRY",
+              "MONSTER",
+              "SWARM"
+            ]
           },
           {
             "can_move_over": true,
@@ -6023,7 +6065,13 @@
             "no_overhang_required": true,
             "terrain_feature_kind": "industrial_structures",
             "through_terrain_allowed_keywords": [],
-            "upper_floor_allowed_keywords": []
+            "upper_floor_allowed_keywords": [
+              "BEAST",
+              "FLY",
+              "INFANTRY",
+              "MONSTER",
+              "SWARM"
+            ]
           },
           {
             "can_move_over": true,
@@ -6046,7 +6094,8 @@
               "FLY",
               "IMPERIUM_PRIMARCH",
               "INFANTRY",
-              "MONSTER"
+              "MONSTER",
+              "SWARM"
             ]
           },
           {
@@ -6058,7 +6107,13 @@
             "no_overhang_required": true,
             "terrain_feature_kind": "sealed_buildings",
             "through_terrain_allowed_keywords": [],
-            "upper_floor_allowed_keywords": []
+            "upper_floor_allowed_keywords": [
+              "BEAST",
+              "FLY",
+              "INFANTRY",
+              "MONSTER",
+              "SWARM"
+            ]
           },
           {
             "can_move_over": true,
@@ -6069,7 +6124,13 @@
             "no_overhang_required": false,
             "terrain_feature_kind": "woods",
             "through_terrain_allowed_keywords": [],
-            "upper_floor_allowed_keywords": []
+            "upper_floor_allowed_keywords": [
+              "BEAST",
+              "FLY",
+              "INFANTRY",
+              "MONSTER",
+              "SWARM"
+            ]
           }
         ],
         "fly_traversal_mode": "air_path",

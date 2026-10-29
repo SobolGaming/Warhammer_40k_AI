@@ -25,8 +25,8 @@ def test_dice_result_source_artifacts_and_dispatch_remain_authoritative() -> Non
     import json
 
     package, audit = build_payloads()
-    assert json.loads(ARTIFACT_PATH.read_text()) == package
-    assert json.loads(AUDIT_PATH.read_text()) == audit
+    assert json.loads(ARTIFACT_PATH.read_text(encoding="utf-8")) == package
+    assert json.loads(AUDIT_PATH.read_text(encoding="utf-8")) == audit
     assert hashlib.sha256(ARTIFACT_PATH.read_bytes()).hexdigest() == EXPECTED_ARTIFACT_SHA256
     assert source_package().evidence_required_source_ids == (
         "gw-11e-core-dice-results:default-critical-hit",

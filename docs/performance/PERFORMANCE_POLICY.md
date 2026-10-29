@@ -5,6 +5,27 @@ Policy ID: `rules-engine-performance-v3`, owner-approved tiered workflow,
 historical head report whenever the global runtime ID or a shared fixture hash
 changes. It does not turn any previously failed measurement into a pass.
 
+## PR591 prototype comparison exception
+
+For the finite Core + Faction cutover against exact base
+5f509724da25a2f6ded0c2739a8e7c84bdf59c91, the owner explicitly approved
+comparison_disposition: deferred and the 260 exact comparison/preservation quality
+cases recorded in data/source_audits/ci64_provenance_v1/test-cutover.json.
+Fresh comparative reports and their historical qualification are not merge
+prerequisites for this cutover. Existing reports remain historical; deferred or
+unrun checks are not passes. This exception does not certify a speedup.
+Actual-base assessment, every changed-owner mapping, live current source/index
+and dependency identity, real serial smoke and independently fresh postflight,
+static checks, all 4,886 selected gameplay cases, full-package branch coverage
+at 50%, and absolute timing gates remain required. Restore coverage to 85% as
+documented in the cutover record. Other bases and ordinary assessments retain
+the existing comparison policy.
+
+The separately approved final complete covered run for this cutover is the
+required GitHub CI run, rather than a duplicate local full run. Focused local
+regressions and static checks remain required; the full selected gameplay suite
+and unchanged 50% full-package branch-coverage gate must pass in CI.
+
 ## Required evidence tiers
 
 Every PR, including documentation and development-tool changes, must provide
@@ -317,3 +338,10 @@ record full-game certification and its missing prerequisites as outstanding.
 Order 32 preimplementation evidence and remaining acceptance obligations are in
 `ORDER_32_VISIBILITY_REVIEW.md` and `order32/`. A diagnostic baseline or prototype
 is not a passing delivery gate.
+
+On 29 October 2026, the owner separately approved deferring the exact 103
+historical-preservation controls in addition to the prior 157 comparison controls.
+The 260-case list remains finite and code-pinned. These include adversarial checks
+of retained historical helpers; they are not passing results. Keep helper code,
+active production and preflight/postflight validators, 1,848 active quality checks
+and all 4,886 selected gameplay cases. No additional omission is authorized.

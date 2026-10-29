@@ -397,7 +397,9 @@ class DisembarkedUnitState:
             can_move_further=False,
             can_choose_remain_stationary=False,
             can_declare_charge=False,
-            battle_shocked_until="end_of_turn",
+            battle_shocked_until=(
+                "until_cleared" if mode is DisembarkModeKind.EMERGENCY_DISEMBARK else "end_of_turn"
+            ),
             source_rule_id=(
                 EMERGENCY_DISEMBARK_RULE_ID
                 if mode is DisembarkModeKind.EMERGENCY_DISEMBARK

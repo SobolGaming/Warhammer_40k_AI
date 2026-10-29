@@ -1,0 +1,184 @@
+{
+  "workload_id": "v963-shock-reconstruction-v1",
+  "revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+  "runtime_src": "/tmp/task57-correctness/repo/reports/performance-attempts/ci60/arms/base/src",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+  "python": "3.14.5",
+  "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+  "cpu_allocation": 64,
+  "memory_bytes": 67359399936,
+  "host_role": "provisional",
+  "concurrency": 1,
+  "coverage": false,
+  "profiler": false,
+  "sample_protocol": "Repeated independent reconstructions in one process from each fixed prepared checkpoint; warm fixture/runtime imports, no discarded samples or cold-start claim",
+  "scenario": "Unchanged Order 62 fixture, enemy_x=18, four units, sixteen models, empty terrain; each runtime creates its own legal Shock and normal turn-completion history",
+  "decision_policy": "Canonical passenger and fixed unengaged Shock poses; remaining units remain stationary; decline optional actions and complete phases until player-b",
+  "seeds": {},
+  "timing_boundary": "restore: LocalGameSession.from_persistence_payload only; replay: ReplayRunner.run only; fixture, facade setup, turn completion, JSON roundtrip, artifact capture, input copies and correctness assertions excluded",
+  "hashes": {
+    "uv.lock": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "scripts/measure_shock_reconstruction.py": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5",
+    "scripts/measure_order63.py": "2636f89e426567541a98ff9eda159081896e084f8c5e4ec2270848d29f2e0865",
+    "tests/order62_shock_helpers.py": "138d59187f94fd8bffabd22095e736649cb7c6efd083ffd421b548dbc7794aae",
+    "tests/disembark_eligibility_helpers.py": "ac98d190d196f7bbfa30b91167715767cec8d856655fa268104b3aa1590a7ba6",
+    "tests/psychic_modifier_helpers.py": "d387946cc6731484807c410f8e452dd4cb23e1f24ffaa98b89a95ecd4e4a3f93"
+  },
+  "rows": [
+    {
+      "checkpoint": "active_shock",
+      "operation": "restore",
+      "preparation_seconds": 11.888928684000007,
+      "unit_count": 4,
+      "model_count": 16,
+      "terrain_features": 0,
+      "active_player_id": "player-a",
+      "active_disembark_records": 1,
+      "event_records": 42,
+      "decision_records": 3,
+      "samples": [
+        {
+          "seconds": 2.9299130289999766,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        },
+        {
+          "seconds": 2.9792485499999657,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        },
+        {
+          "seconds": 2.947795467999981,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        }
+      ],
+      "mean_seconds": 2.952319015666641,
+      "median_seconds": 2.947795467999981,
+      "p95_seconds": 2.9792485499999657,
+      "maximum_seconds": 2.9792485499999657,
+      "operations_per_second": 0.3387167832112471,
+      "completion_rate": 1
+    },
+    {
+      "checkpoint": "active_shock",
+      "operation": "replay",
+      "preparation_seconds": 11.888928684000007,
+      "unit_count": 4,
+      "model_count": 16,
+      "terrain_features": 0,
+      "active_player_id": "player-a",
+      "active_disembark_records": 1,
+      "event_records": 42,
+      "decision_records": 3,
+      "samples": [
+        {
+          "seconds": 0.5565709669999706,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        },
+        {
+          "seconds": 0.5547361580000825,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        },
+        {
+          "seconds": 0.5548333819999698,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        }
+      ],
+      "mean_seconds": 0.5553801690000076,
+      "median_seconds": 0.5548333819999698,
+      "p95_seconds": 0.5565709669999706,
+      "maximum_seconds": 0.5565709669999706,
+      "operations_per_second": 1.800568431891536,
+      "completion_rate": 1
+    },
+    {
+      "checkpoint": "expired_shock",
+      "operation": "restore",
+      "preparation_seconds": 1.122866985000087,
+      "unit_count": 4,
+      "model_count": 16,
+      "terrain_features": 0,
+      "active_player_id": "player-b",
+      "active_disembark_records": 0,
+      "event_records": 131,
+      "decision_records": 10,
+      "samples": [
+        {
+          "seconds": 3.5374272349999956,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        },
+        {
+          "seconds": 3.629691858000001,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        },
+        {
+          "seconds": 3.640684632999978,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        }
+      ],
+      "mean_seconds": 3.6026012419999915,
+      "median_seconds": 3.629691858000001,
+      "p95_seconds": 3.640684632999978,
+      "maximum_seconds": 3.640684632999978,
+      "operations_per_second": 0.2775772095844968,
+      "completion_rate": 1
+    },
+    {
+      "checkpoint": "expired_shock",
+      "operation": "replay",
+      "preparation_seconds": 1.122866985000087,
+      "unit_count": 4,
+      "model_count": 16,
+      "terrain_features": 0,
+      "active_player_id": "player-b",
+      "active_disembark_records": 0,
+      "event_records": 131,
+      "decision_records": 10,
+      "samples": [
+        {
+          "seconds": 1.041142169000068,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        },
+        {
+          "seconds": 1.038047133999953,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        },
+        {
+          "seconds": 1.0322912860000315,
+          "complete": true,
+          "exact_result": true,
+          "input_unchanged": true
+        }
+      ],
+      "mean_seconds": 1.0371601963333508,
+      "median_seconds": 1.038047133999953,
+      "p95_seconds": 1.041142169000068,
+      "maximum_seconds": 1.041142169000068,
+      "operations_per_second": 0.9641712085898375,
+      "completion_rate": 1
+    }
+  ],
+  "full_game_certified": false,
+  "qualification": "Matched component costs; source-correctness differences are not judged against the historical runtime; no full-game or historical-failure certification"
+}

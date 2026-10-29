@@ -1,0 +1,1757 @@
+{
+  "schema": "section23-source-behavior-inventory-v1",
+  "source_authority": "Authenticated retained adopted capture; no fresh official App/version or native Aircraft provider claim.",
+  "capture_path": "data/source_audits/v963_shock/captures/core-page.js",
+  "capture_sha256": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026",
+  "category_hierarchy": {
+    "number": "23",
+    "title": "Aircraft",
+    "subsections": [
+      {
+        "ref": "23.01",
+        "title": "Aircraft Deployment",
+        "text": [
+          "\u2022 In the Declare Battle Formations step, all \u0003AIRCRAFT\u0004 units must be placed in \u0005strategic reserves\u0006 (20.01)."
+        ]
+      },
+      {
+        "ref": "23.02",
+        "title": "Aircraft Movement",
+        "text": [
+          "\u2022 \u0003AIRCRAFT\u0004 units are only eligible to make an \u0005ingress move\u0006 (20.04); they are \u0001not\u0002 eligible to make any other type of move.",
+          "\u2022 At the end of your opponent\u2019s turn, all \u0003AIRCRAFT\u0004 units in your army that are on the battlefield must be placed in \u0005strategic reserves\u0006.",
+          "\u2022 Each time a unit makes any type of move, its models can be moved through \u0003AIRCRAFT\u0004 models.",
+          "\u2022 Each time a unit makes a \u0005pile-in\u0006, \u0005consolidation\u0006 or \u0005surge move\u0006, unless that unit can \u0003FLY\u0004, while making that move, ignore \u0003AIRCRAFT\u0004 units for the purposes of selecting enemy units and determining the closest enemy unit.",
+          "\u2022 Being \u0005engaged\u0006 solely with one or more \u0003AIRCRAFT\u0004 units does not prevent a unit from being eligible to make a \u0005normal\u0006 or \u0005advance move\u0006."
+        ]
+      },
+      {
+        "ref": "23.03",
+        "title": "Shooting With Or At Aircraft",
+        "text": [
+          "\u2022 The \u0005Plunging Fire\u0006 rule (22.05) has no effect on attacks made by, or targeting, \u0003AIRCRAFT\u0004 units."
+        ]
+      },
+      {
+        "ref": "23.04",
+        "title": "Aircraft Charging And Fighting",
+        "text": [
+          "\u2022 \u0003AIRCRAFT\u0004 units are \u0001not\u0002 \u0005eligible to declare a charge\u0006, and can only make melee attacks that target \u0003FLYING\u0004 units.",
+          "\u2022 Only \u0003FLYING\u0004 units can select \u0003AIRCRAFT\u0004 units as a \u0005charge target\u0006, and only \u0003FLYING\u0004 models can make melee attacks that target \u0003AIRCRAFT\u0004 units."
+        ]
+      }
+    ]
+  },
+  "sources": [
+    {
+      "row_id": "rule:23:23.01:1",
+      "category": "23",
+      "locator": "23.01",
+      "title": "Aircraft Deployment",
+      "occurrence": 1,
+      "source_sha256": "d2cf32c4c72af2cb017fb16097bed2b8e0fc13d50ac19920f275c5551ffe07cd",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "8267cc8d61bb616cba65c28e909cbf1ff747ec3e71d7d317de4b0035fc5b5b7d"
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "S23-001",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Every selected AIRCRAFT rules unit enters mandatory Strategic Reserves during Declare Battle Formations; non-Aircraft are not included.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_deployment_return.py::test_all_aircraft_are_mandatory_strategic_reserves_once_with_owner_secret",
+              "function_ast_sha256": "3439091e71ff8b6ad51a1c2c07f0c377d3de407713008694ca14c1fedfeeeec2",
+              "assertions": [
+                "assert {r.unit_instance_id for r in rows} == set(aircraft_ids)",
+                "assert all((r.reserve_origin is ReserveOrigin.AIRCRAFT_MANDATORY_RESERVE for r in rows))",
+                "assert all((r.reserve_kind is ReserveKind.STRATEGIC_RESERVES and r.is_unarrived for r in rows))",
+                "assert apply_mandatory_aircraft_reserve_declarations(state=state, config=config, decisions=decisions) == ()",
+                "assert len([e for e in events['events'] if e['event_type'] == 'aircraft_reserve_declared']) == expected"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase16c_reserve_declarations.py::test_order66_mandatory_aircraft_reserves_use_attached_identity",
+              "function_ast_sha256": "0876b3ceccdae247dca4fd56ac67d8109cfb769bf1c76a644e18ce60a1d39eba",
+              "assertions": [
+                "assert state is not None",
+                "assert reserve is not None",
+                "assert reserve.points_contribution == 100",
+                "assert reserve.source_rule_ids == ('gw-11e-core-aircraft:deployment',)",
+                "assert state.reserve_state_for_unit('army-alpha:leader') is reserve",
+                "assert reserve.unit_instance_id == 'attached-unit:army-alpha:bodyguard'",
+                "assert len(state.reserve_states) == 1",
+                "assert len(state.unarrived_reserve_model_ids()) == 6"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-002",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Mandatory deployment is idempotent and has owner-secret records before Battle Formations reveal.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_deployment_return.py::test_all_aircraft_are_mandatory_strategic_reserves_once_with_owner_secret",
+              "function_ast_sha256": "3439091e71ff8b6ad51a1c2c07f0c377d3de407713008694ca14c1fedfeeeec2",
+              "assertions": [
+                "assert {r.unit_instance_id for r in rows} == set(aircraft_ids)",
+                "assert all((r.reserve_origin is ReserveOrigin.AIRCRAFT_MANDATORY_RESERVE for r in rows))",
+                "assert all((r.reserve_kind is ReserveKind.STRATEGIC_RESERVES and r.is_unarrived for r in rows))",
+                "assert apply_mandatory_aircraft_reserve_declarations(state=state, config=config, decisions=decisions) == ()",
+                "assert len([e for e in events['events'] if e['event_type'] == 'aircraft_reserve_declared']) == expected"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        }
+      ],
+      "colocated_faq_clarifications": [
+        {
+          "faq_number": 41,
+          "id": "adf7c2cd-b765-4e84-abb7-f0ed45d52841",
+          "clarification": "The points restriction is a pre-battle declaration boundary; mandatory deployment and battle re-entry keep distinct owners.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_deployment_return.py::test_all_aircraft_are_mandatory_strategic_reserves_once_with_owner_secret",
+              "function_ast_sha256": "3439091e71ff8b6ad51a1c2c07f0c377d3de407713008694ca14c1fedfeeeec2",
+              "assertions": [
+                "assert {r.unit_instance_id for r in rows} == set(aircraft_ids)",
+                "assert all((r.reserve_origin is ReserveOrigin.AIRCRAFT_MANDATORY_RESERVE for r in rows))",
+                "assert all((r.reserve_kind is ReserveKind.STRATEGIC_RESERVES and r.is_unarrived for r in rows))",
+                "assert apply_mandatory_aircraft_reserve_declarations(state=state, config=config, decisions=decisions) == ()",
+                "assert len([e for e in events['events'] if e['event_type'] == 'aircraft_reserve_declared']) == expected"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_deployment_return.py::test_turn_end_returns_only_opponents_present_aircraft_once",
+              "function_ast_sha256": "96c9b8b178ceef094cb0b7c966acfdf8ffd21fd1a75732d77009fb8d847a951f",
+              "assertions": [
+                "assert binding.candidate_handler is not None",
+                "assert len(candidates) == (turn_owner == 'opponent')",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.is_unit_placed(enemy.unit_instance_id)",
+                "assert state.battlefield_state.is_unit_placed('section02:ground')",
+                "assert len([e for e in decisions.event_log.records if e.event_type == AIRCRAFT_RETURN_EVENT]) == (fleet if turn_owner == 'opponent' else 0)",
+                "assert not binding.candidate_handler(context)",
+                "assert not binding.candidate_handler(phase_end)",
+                "assert state.battlefield_state.is_unit_placed(identity) is (turn_owner == 'owner')",
+                "assert reserve is not None",
+                "assert reserve.is_unarrived",
+                "assert reserve.reserve_kind is ReserveKind.STRATEGIC_RESERVES",
+                "assert reserve.entered_reserves_battle_round == state.battle_round",
+                "assert reserve is None"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:23:23.02:1",
+      "category": "23",
+      "locator": "23.02",
+      "title": "Aircraft Movement",
+      "occurrence": 1,
+      "source_sha256": "871d583dca30a8a2468f7e5e04d1f8682eae35b4c01cea5c01d28053cfa6fbe8",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "4ca73be6088ee4c33e5a5045470de6b522fa5ece679ba79fc60fd6ce7c5bf0e1"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "847e75331bd7ca93660868d0673da7655294423dd7e1dcca847111d11ad44b0c"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "419105fac3376e7dc6b6147263c8b99316d24f919ea641e52720905b09504878"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "fe01f4ccf4e0686134f5f80eb3a28d4ce035253bf6ff77d154402ce7500b294f"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "382f3c8c6764f963fc0e5e9e93075417201cd32e619b882c490f1f376ec9e761"
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "S23-003",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Aircraft has no ordinary movement actions and only Ingress permission; direct Normal/Advance/Charge and physical state mutation reject other moves.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_movement.py::test_native_aircraft_identity_has_ingress_only_policy",
+              "function_ast_sha256": "c395566478c6058d747f3c3eda5ad4fdeb8874a9e1cd15c16862f0a6595888c8",
+              "assertions": [
+                "assert 'AIRCRAFT' in aircraft.keywords",
+                "assert policy.uses_aircraft_rules",
+                "assert not policy.can_declare_charge",
+                "assert AircraftMovementPolicy.from_payload(policy.to_payload()) == policy",
+                "assert policy.effective_keywords == aircraft.keywords",
+                "assert context.evaluate().available_actions == ()"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_movement.py::test_aircraft_rejects_other_movement_before_state_mutation",
+              "function_ast_sha256": "f07fbf3978d990ab00f9a211646059bcea2b1be428019fbf8fbca721394e666e",
+              "assertions": [
+                "assert state.to_payload() == before",
+                "assert not result.is_valid"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='aircraft_ingress_only'):\n    resolve_charge_move(scenario=world, ruleset_descriptor=state.runtime_ruleset_descriptor(), unit_placement=world.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id), path_witness=witness, selected_target_unit_instance_ids=(target.unit_instance_id,), maximum_distance_inches=12)",
+                "with pytest.raises(GameLifecycleError, match='aircraft_ingress_only'):\n    state.replace_battlefield_state(world.battlefield_state.with_unit_placement(moved))"
+              ],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_other_moves.py::test_actual_advance_owner_rejects_aircraft_with_faithful_roll_input",
+              "function_ast_sha256": "2ce6dad5c0770559ad11df1806205d3317674f8e7418c6e0e96cdb6b00fa1975",
+              "assertions": [
+                "assert not result.is_valid",
+                "assert state.to_payload() == before"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-004",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Pile In and Consolidation retain the shared Ingress-only physical restriction.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_other_moves.py::test_aircraft_cannot_pile_in_or_consolidate_at_shared_physical_owner",
+              "function_ast_sha256": "feb5cc2012b238fb5034868f7d60b12d6ef0ee8e6699f638c6eb69b3041804be",
+              "assertions": [
+                "assert results",
+                "assert not results[0].is_valid",
+                "assert results[0].violations[0].violation_code == 'aircraft_ingress_only'",
+                "assert state.to_payload() == before"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-005",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "A native body with explicit Core AIRCRAFT can submit actual Ingress placement; malformed input is atomic and a legal retry records Ingress while retaining AIRCRAFT.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_facade.py::test_public_native_aircraft_ingress_preserves_keyword_and_actual_placement",
+              "function_ast_sha256": "a08723a587c1f456ae0968640a6ae14a518fd7706e2283a3ee3280d26080f5ab",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert s.state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == records",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert s.state.battlefield_state is not None",
+                "assert placed.model_placements[0].pose == Pose.at(2, 15)",
+                "assert s.state.phase_movement_history[-1].is_ingress",
+                "assert 'AIRCRAFT' in rules_unit_view_by_id(state=s.state, unit_instance_id=unit.unit_instance_id).keywords",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)['events']"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase10r_aircraft.py::test_order66_returned_aircraft_uses_facade_ingress_and_retains_keyword",
+              "function_ast_sha256": "bf6445b4e25b38ce57c3fc0fb4dc7ff0ddf247bffcc8394185689fe7cf1cfc67",
+              "assertions": [
+                "assert state is not None",
+                "assert state.battlefield_state is not None",
+                "assert request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE",
+                "assert {o.option_id for o in request.options} == {'ingress', 'remain_stationary'}",
+                "assert isinstance(request.payload, dict)",
+                "assert outcome.status_kind is not LifecycleStatusKind.INVALID, outcome.payload",
+                "assert state.battlefield_state.is_unit_placed(before.unit_instance_id)",
+                "assert reserve is not None",
+                "assert not reserve.is_unarrived",
+                "assert state.phase_movement_history[-1].is_ingress",
+                "assert 'AIRCRAFT' in rules_unit_view_by_id(state=state, unit_instance_id=before.unit_instance_id).keywords",
+                "assert GameLifecycle.from_payload(copy.deepcopy(saved)).to_payload() == saved",
+                "assert len(returns) == 2",
+                "assert returns[0].event_id != returns[1].event_id",
+                "assert GameLifecycle.from_payload(copy.deepcopy(saved)).to_payload() == saved"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-006",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "At opponent turn end every friendly on-battlefield Aircraft departs once into Strategic Reserves; own-turn and phase-end do not trigger it; ordinary friend/enemy models remain.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_deployment_return.py::test_turn_end_returns_only_opponents_present_aircraft_once",
+              "function_ast_sha256": "96c9b8b178ceef094cb0b7c966acfdf8ffd21fd1a75732d77009fb8d847a951f",
+              "assertions": [
+                "assert binding.candidate_handler is not None",
+                "assert len(candidates) == (turn_owner == 'opponent')",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.is_unit_placed(enemy.unit_instance_id)",
+                "assert state.battlefield_state.is_unit_placed('section02:ground')",
+                "assert len([e for e in decisions.event_log.records if e.event_type == AIRCRAFT_RETURN_EVENT]) == (fleet if turn_owner == 'opponent' else 0)",
+                "assert not binding.candidate_handler(context)",
+                "assert not binding.candidate_handler(phase_end)",
+                "assert state.battlefield_state.is_unit_placed(identity) is (turn_owner == 'owner')",
+                "assert reserve is not None",
+                "assert reserve.is_unarrived",
+                "assert reserve.reserve_kind is ReserveKind.STRATEGIC_RESERVES",
+                "assert reserve.entered_reserves_battle_round == state.battle_round",
+                "assert reserve is None"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-007",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "Supported canonical Core departure has exact persistence, both viewer projections/events and exact replay. This is not native provider or legal-roster admission.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_facade.py::test_supported_core_aircraft_departure_restores_and_replays_exactly",
+              "function_ast_sha256": "47b9b45454c6bc5ecf08930c083fe2f3dd26d1d341449673e727af137b7916ac",
+              "assertions": [
+                "assert status.status_kind is not LifecycleStatusKind.INVALID",
+                "assert state is not None",
+                "assert len(state.reserve_states) == 2",
+                "assert all((r.is_unarrived for r in state.reserve_states))",
+                "assert clone.lifecycle.to_payload() == final",
+                "assert replay.reproduced_exactly, replay",
+                "assert clone.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)",
+                "assert clone.events_since(EventStreamCursor(), viewer_player_id=viewer) == session.events_since(EventStreamCursor(), viewer_player_id=viewer)"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-008",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "Embarked cargo and attached rules-unit identities use shared reserve owners.",
+          "semantic_assertions": [
+            {
+              "node": "tests/unit/test_phase10r_aircraft.py::test_order66_return_preserves_embarked_transport_cargo_and_restore",
+              "function_ast_sha256": "d8589de12e6d8734f827f1888d3d3087184436d53e52677e4100c7d0e8d6a77c",
+              "assertions": [
+                "assert state is not None",
+                "assert reserve is not None",
+                "assert reserve.embarked_unit_instance_ids == ('army-alpha:passenger',)",
+                "assert cargo is not None",
+                "assert cargo.embarked_unit_instance_ids == reserve.embarked_unit_instance_ids",
+                "assert state.battlefield_state is not None",
+                "assert not state.battlefield_state.is_unit_placed('army-alpha:passenger')",
+                "assert GameLifecycle.from_payload(copy.deepcopy(saved)).to_payload() == saved"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase16c_reserve_declarations.py::test_order66_mandatory_aircraft_reserves_use_attached_identity",
+              "function_ast_sha256": "0876b3ceccdae247dca4fd56ac67d8109cfb769bf1c76a644e18ce60a1d39eba",
+              "assertions": [
+                "assert state is not None",
+                "assert reserve is not None",
+                "assert reserve.points_contribution == 100",
+                "assert reserve.source_rule_ids == ('gw-11e-core-aircraft:deployment',)",
+                "assert state.reserve_state_for_unit('army-alpha:leader') is reserve",
+                "assert reserve.unit_instance_id == 'attached-unit:army-alpha:bodyguard'",
+                "assert len(state.reserve_states) == 1",
+                "assert len(state.unarrived_reserve_model_ids()) == 6"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-009",
+          "source_blocks": [
+            3
+          ],
+          "acceptance": "Every continuous movement mode can transit friendly or enemy Aircraft, while endpoint model overlap remains illegal.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_transit.py::test_native_models_transit_aircraft_but_cannot_end_overlapping_it",
+              "function_ast_sha256": "2935de6a5455ff23a11194a9bec15cc58a7de49fb89cfd38f2bea9de27f245fa",
+              "assertions": [
+                "assert result.is_valid is legal",
+                "assert 'end_on_model_overlap' in {v.violation_code for v in result.violations}"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-010",
+          "source_blocks": [
+            4
+          ],
+          "acceptance": "Non-FLY units ignore Aircraft for Pile In, Consolidation and closest Surge enemies; FLY units include them without a Take to the Skies declaration.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_combat.py::test_charge_pile_in_and_surge_use_fly_without_skies_choice",
+              "function_ast_sha256": "88eebdcb799cbcbc6c388c81fc0d062a3ee67869995dbec62839d6435c0c1df0",
+              "assertions": [
+                "assert candidate.is_legal is flying",
+                "assert ground.unit_instance_id in pile_targets",
+                "assert (aircraft.unit_instance_id in pile_targets) is flying",
+                "assert targets == ((aircraft.unit_instance_id,) if flying else (ground.unit_instance_id,))"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_combat.py::test_consolidation_ignores_aircraft_when_unit_cannot_fly",
+              "function_ast_sha256": "dd190c684693328aac0feae2d38f34a5e30932cec61596fd42b3ee7206bc9782",
+              "assertions": [
+                "assert modes == ((ConsolidationModeKind.ONGOING,) if flying else ())"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_combat.py::test_native_flying_datasheet_has_aircraft_charge_permission_without_taking_to_skies",
+              "function_ast_sha256": "ed4ec11daecb5c9ceaa31fb46e125e31e3c124cddce02dc46e69acd1ae7817ce",
+              "assertions": [
+                "assert 'FLY' in own.keywords",
+                "assert all(('FLY' in m.keywords for m in own.own_models))",
+                "assert charge_target_candidates(state=state, unit_instance_id=own.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor())[0].is_legal",
+                "assert aircraft_melee_target_ids(scenario=scenario(state), unit_instance_id=own.unit_instance_id, model_instance_id=model.model_instance_id, target_ids=(target.unit_instance_id,)) == (target.unit_instance_id,)"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-011",
+          "source_blocks": [
+            5
+          ],
+          "acceptance": "Aircraft-only engagement permits Normal and Advance; ordinary enemy engagement still excludes them at public Movement selection.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_movement.py::test_public_movement_choices_distinguish_aircraft_only_engagement",
+              "function_ast_sha256": "c2c1d50ef73086af1077e292b721e2ef5eac4197b24dea3ac1de1ace20580e39",
+              "assertions": [
+                "assert next_request is not None",
+                "assert state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == controller",
+                "assert 'normal_move' not in options",
+                "assert 'advance' not in options",
+                "assert any((o.startswith('fall_back:') for o in options))",
+                "assert {'normal_move', 'advance', 'remain_stationary'} == options"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(DecisionError, match='finite action space'):\n    session.submit_option(request_id=request.request_id, result_id='s23:invalid', option_id='invented')"
+              ],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        }
+      ],
+      "colocated_faq_clarifications": [
+        {
+          "faq_number": 5,
+          "id": "e5941469-5653-49b2-919e-9c9246e811d4",
+          "clarification": "Transit does not create lasting engagement; endpoint engagement and overlap remain independently constrained.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_transit.py::test_native_models_transit_aircraft_but_cannot_end_overlapping_it",
+              "function_ast_sha256": "2935de6a5455ff23a11194a9bec15cc58a7de49fb89cfd38f2bea9de27f245fa",
+              "assertions": [
+                "assert result.is_valid is legal",
+                "assert 'end_on_model_overlap' in {v.violation_code for v in result.violations}"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_movement.py::test_public_movement_choices_distinguish_aircraft_only_engagement",
+              "function_ast_sha256": "c2c1d50ef73086af1077e292b721e2ef5eac4197b24dea3ac1de1ace20580e39",
+              "assertions": [
+                "assert next_request is not None",
+                "assert state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == controller",
+                "assert 'normal_move' not in options",
+                "assert 'advance' not in options",
+                "assert any((o.startswith('fall_back:') for o in options))",
+                "assert {'normal_move', 'advance', 'remain_stationary'} == options"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(DecisionError, match='finite action space'):\n    session.submit_option(request_id=request.request_id, result_id='s23:invalid', option_id='invented')"
+              ],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 40,
+          "id": "9e243f82-42e9-4f0d-9e4b-3f5b74cd68bc",
+          "clarification": "Opponent-turn Aircraft departure enters reserves during battle; the pre-battle reserve points cap is not a renewed turn-end cap.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_deployment_return.py::test_turn_end_returns_only_opponents_present_aircraft_once",
+              "function_ast_sha256": "96c9b8b178ceef094cb0b7c966acfdf8ffd21fd1a75732d77009fb8d847a951f",
+              "assertions": [
+                "assert binding.candidate_handler is not None",
+                "assert len(candidates) == (turn_owner == 'opponent')",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.is_unit_placed(enemy.unit_instance_id)",
+                "assert state.battlefield_state.is_unit_placed('section02:ground')",
+                "assert len([e for e in decisions.event_log.records if e.event_type == AIRCRAFT_RETURN_EVENT]) == (fleet if turn_owner == 'opponent' else 0)",
+                "assert not binding.candidate_handler(context)",
+                "assert not binding.candidate_handler(phase_end)",
+                "assert state.battlefield_state.is_unit_placed(identity) is (turn_owner == 'owner')",
+                "assert reserve is not None",
+                "assert reserve.is_unarrived",
+                "assert reserve.reserve_kind is ReserveKind.STRATEGIC_RESERVES",
+                "assert reserve.entered_reserves_battle_round == state.battle_round",
+                "assert reserve is None"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 52,
+          "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+          "clarification": "Embarked cargo remains off battlefield on Aircraft departure and does not gain carrier ownership.",
+          "semantic_assertions": [
+            {
+              "node": "tests/unit/test_phase10r_aircraft.py::test_order66_return_preserves_embarked_transport_cargo_and_restore",
+              "function_ast_sha256": "d8589de12e6d8734f827f1888d3d3087184436d53e52677e4100c7d0e8d6a77c",
+              "assertions": [
+                "assert state is not None",
+                "assert reserve is not None",
+                "assert reserve.embarked_unit_instance_ids == ('army-alpha:passenger',)",
+                "assert cargo is not None",
+                "assert cargo.embarked_unit_instance_ids == reserve.embarked_unit_instance_ids",
+                "assert state.battlefield_state is not None",
+                "assert not state.battlefield_state.is_unit_placed('army-alpha:passenger')",
+                "assert GameLifecycle.from_payload(copy.deepcopy(saved)).to_payload() == saved"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_admission": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:23:23.03:1",
+      "category": "23",
+      "locator": "23.03",
+      "title": "Shooting With Or At Aircraft",
+      "occurrence": 1,
+      "source_sha256": "532c3f77b78d3f7dd5ff1048a6e1fccddda6bd3d61a68add9f5d27da25f32cd1",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "6718f56a142b000b410682dbb24db20e93b67edbcb7f34ddc9abab47e8cfa70f"
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "S23-012",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "AIRCRAFT attacking or target rules unit suppresses Plunging Fire in both Towering and supported-floor branches; ordinary control improves BS3 to BS2 and fixed2 hits; Aircraft remains BS3 and misses.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_shooting.py::test_aircraft_exclusion_reaches_actual_hit_for_both_plunging_branches",
+              "function_ast_sha256": "15e4c6ea9cdd86ce0227999896075d6e300ad159a5c9fb60ba717de3bf6e2ff7",
+              "assertions": [
+                "assert state.battlefield_state is not None",
+                "assert profile.skill is not None",
+                "assert profile.skill.final == 3",
+                "assert candidate.is_legal",
+                "assert (PLUNGING_FIRE_RULE_ID in candidate.targeting_rule_ids) is (aircraft_side == 'neither')",
+                "assert len(hits) == 1",
+                "assert isinstance(step, dict)",
+                "assert isinstance(step['payload'], dict)",
+                "assert step['payload']['target_number'] == (2 if aircraft_side == 'neither' else 3)",
+                "assert step['payload']['successful'] is (aircraft_side == 'neither')"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-013",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Aircraft remains a legal ordinary ranged attacker/target at the public declaration and actual attack completion boundary, with invalid-input isolation and viewer event projections.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_facade.py::test_public_native_shooting_accepts_aircraft_without_plunging_effect",
+              "function_ast_sha256": "f78dd1ea39d395ac3a8bdb08b1a4f50d5bd4d0c2619e1412cab8839149a5d4b1",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == records",
+                "assert rows",
+                "assert isinstance(completed.payload, dict)",
+                "assert isinstance(identity, str)",
+                "assert sequence.is_complete",
+                "assert sequence.attack_pools",
+                "assert all((PLUNGING_FIRE_RULE_ID not in p.targeting_rule_ids for p in sequence.attack_pools))",
+                "assert json.loads(json.dumps(view)) == view",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)['events']"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        }
+      ],
+      "colocated_faq_clarifications": []
+    },
+    {
+      "row_id": "rule:23:23.04:1",
+      "category": "23",
+      "locator": "23.04",
+      "title": "Aircraft Charging And Fighting",
+      "occurrence": 1,
+      "source_sha256": "685cabdebd8b5a0ff6b08121d8f4995f1422126dbb0459e61b3737e187071fbf",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "148b20b33ca92c1227707aac533dc1b9ddb8a022f8735f95f9474dacb243a1df"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "a9d5bec50f39e447f40a230830ec844ec46aa65d944f3840a940ccb4913d640e"
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "S23-014",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Aircraft cannot declare a charge; public selection excludes it, preserves invalid-input state and permits an ordinary native spare to declare and roll.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_movement.py::test_native_aircraft_identity_has_ingress_only_policy",
+              "function_ast_sha256": "c395566478c6058d747f3c3eda5ad4fdeb8874a9e1cd15c16862f0a6595888c8",
+              "assertions": [
+                "assert 'AIRCRAFT' in aircraft.keywords",
+                "assert policy.uses_aircraft_rules",
+                "assert not policy.can_declare_charge",
+                "assert AircraftMovementPolicy.from_payload(policy.to_payload()) == policy",
+                "assert policy.effective_keywords == aircraft.keywords",
+                "assert context.evaluate().available_actions == ()"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_movement.py::test_aircraft_rejects_other_movement_before_state_mutation",
+              "function_ast_sha256": "f07fbf3978d990ab00f9a211646059bcea2b1be428019fbf8fbca721394e666e",
+              "assertions": [
+                "assert state.to_payload() == before",
+                "assert not result.is_valid"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='aircraft_ingress_only'):\n    resolve_charge_move(scenario=world, ruleset_descriptor=state.runtime_ruleset_descriptor(), unit_placement=world.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id), path_witness=witness, selected_target_unit_instance_ids=(target.unit_instance_id,), maximum_distance_inches=12)",
+                "with pytest.raises(GameLifecycleError, match='aircraft_ingress_only'):\n    state.replace_battlefield_state(world.battlefield_state.with_unit_placement(moved))"
+              ],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_facade.py::test_public_charge_excludes_aircraft_and_rejects_invented_selection_atomically",
+              "function_ast_sha256": "a2f2b6180264a8fd09ca8d6c9bff7a1adc0987a69659dc13c8a44a696fe13367",
+              "assertions": [
+                "assert own.unit_instance_id not in {o.option_id for o in request.options}",
+                "assert 'section02:spare' in {o.option_id for o in request.options}",
+                "assert state.to_payload() == before",
+                "assert session.lifecycle.decision_controller.to_payload() == records",
+                "assert not any((e.event_type == 'charge_roll_started' for e in session.lifecycle.decision_controller.event_log.records))",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID",
+                "assert any((e.event_type == 'charge_roll_started' for e in session.lifecycle.decision_controller.event_log.records))"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='parameterized request'):\n    session.submit_parameterized_payload(request_id=request.request_id, result_id='s23:wrong-kind', payload={})"
+              ],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-015",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Aircraft melee can target only FLY units; non-FLY targets remain excluded.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_combat.py::test_aircraft_melee_can_target_only_flying_units",
+              "function_ast_sha256": "4b94954abce2e60c40ac47da8c072a52d55c007f5b8c00373bfc8d6d2faa906f",
+              "assertions": [
+                "assert (target.unit_instance_id in targets) is flying"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-016",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "Only FLY units can select Aircraft as charge target, independent of skies choice; native Swooping Hawks supply real datasheet FLY.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_combat.py::test_charge_pile_in_and_surge_use_fly_without_skies_choice",
+              "function_ast_sha256": "88eebdcb799cbcbc6c388c81fc0d062a3ee67869995dbec62839d6435c0c1df0",
+              "assertions": [
+                "assert candidate.is_legal is flying",
+                "assert ground.unit_instance_id in pile_targets",
+                "assert (aircraft.unit_instance_id in pile_targets) is flying",
+                "assert targets == ((aircraft.unit_instance_id,) if flying else (ground.unit_instance_id,))"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_combat.py::test_mixed_unit_can_charge_but_only_individually_flying_model_can_attack_aircraft",
+              "function_ast_sha256": "5c51f59d7f785f594cd7ea11e7cfa46686790fa124b46caea65d06e4da482c36",
+              "assertions": [
+                "assert 'FLY' in mover.keywords",
+                "assert candidates[0].is_legal",
+                "assert bool(targets) is (index == flying_index)"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_combat.py::test_native_flying_datasheet_has_aircraft_charge_permission_without_taking_to_skies",
+              "function_ast_sha256": "ed4ec11daecb5c9ceaa31fb46e125e31e3c124cddce02dc46e69acd1ae7817ce",
+              "assertions": [
+                "assert 'FLY' in own.keywords",
+                "assert all(('FLY' in m.keywords for m in own.own_models))",
+                "assert charge_target_candidates(state=state, unit_instance_id=own.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor())[0].is_legal",
+                "assert aircraft_melee_target_ids(scenario=scenario(state), unit_instance_id=own.unit_instance_id, model_instance_id=model.model_instance_id, target_ids=(target.unit_instance_id,)) == (target.unit_instance_id,)"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-017",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "Only individually FLY models can attack Aircraft: a peer FLY model grants unit charge permission without giving every model melee permission.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_combat.py::test_mixed_unit_can_charge_but_only_individually_flying_model_can_attack_aircraft",
+              "function_ast_sha256": "5c51f59d7f785f594cd7ea11e7cfa46686790fa124b46caea65d06e4da482c36",
+              "assertions": [
+                "assert 'FLY' in mover.keywords",
+                "assert candidates[0].is_legal",
+                "assert bool(targets) is (index == flying_index)"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "clause_id": "S23-018",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "Public Fight consumes a no-legal-target selection with no attacks; FLY attacks proceed through declaration and real completed attack resolution.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_facade.py::test_public_fight_weapon_choices_keep_aircraft_target_fly_requirement",
+              "function_ast_sha256": "fd87ce321bbd59b8cfe98670acd8cb6467eebec659a2c52c301125a2d84a740a",
+              "assertions": [
+                "assert request.decision_type == 'submit_melee_declaration'",
+                "assert rows",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID",
+                "assert any((e.event_type == 'attack_sequence_completed' for e in session.lifecycle.decision_controller.event_log.records))",
+                "assert request.decision_type == 'select_fight_activation'",
+                "assert all((not isinstance(o.payload, dict) or o.payload.get('unit_instance_id') != own.unit_instance_id for o in request.options))",
+                "assert not any((e.event_type in {'melee_declaration_accepted', 'attack_sequence_step', 'attack_sequence_completed'} for e in session.lifecycle.decision_controller.event_log.records))",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)['events']",
+                "assert isinstance(targets, list)",
+                "assert target.unit_instance_id in targets"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        }
+      ],
+      "colocated_faq_clarifications": [
+        {
+          "faq_number": 2,
+          "id": "9bfa47ed-be8d-4e11-80de-f3832d507ca1",
+          "clarification": "An ineligible model does not make attacks; an empty selected Fight still resolves its type.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_facade.py::test_public_fight_weapon_choices_keep_aircraft_target_fly_requirement",
+              "function_ast_sha256": "fd87ce321bbd59b8cfe98670acd8cb6467eebec659a2c52c301125a2d84a740a",
+              "assertions": [
+                "assert request.decision_type == 'submit_melee_declaration'",
+                "assert rows",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID",
+                "assert any((e.event_type == 'attack_sequence_completed' for e in session.lifecycle.decision_controller.event_log.records))",
+                "assert request.decision_type == 'select_fight_activation'",
+                "assert all((not isinstance(o.payload, dict) or o.payload.get('unit_instance_id') != own.unit_instance_id for o in request.options))",
+                "assert not any((e.event_type in {'melee_declaration_accepted', 'attack_sequence_step', 'attack_sequence_completed'} for e in session.lifecycle.decision_controller.event_log.records))",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)['events']",
+                "assert isinstance(targets, list)",
+                "assert target.unit_instance_id in targets"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 35,
+          "id": "6575ee89-b92a-456d-8e59-4ee513df8f4e",
+          "clarification": "AIRCRAFT and FLY are exact canonical keywords; embedded display-name words do not grant them.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_faq_6575_embedded_word_does_not_match",
+              "function_ast_sha256": "f810d21fc98729a3591fd23dd53b3b10ae6649e09985ecbc65a16ea29483f890",
+              "assertions": [
+                "assert unit_has_required_keywords(unit_keywords=unit.keywords, faction_keywords=unit.faction_keywords, required_keywords=(\"EMPEROR'S CHILDREN\",))",
+                "assert not unit_has_required_keywords(unit_keywords=unit.keywords, faction_keywords=unit.faction_keywords, required_keywords=('CHILDREN',))"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 49,
+          "id": "2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+          "clarification": "Retained destroyed models remain physically present until their own cleanup; this is distinct from living models, ability ownership and selected catalog content.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section12/test_retained_presence.py::test_retained_enemy_still_engages_both_sides_and_constrains_fight_movement_until_cleanup",
+              "function_ast_sha256": "464518705abbfa5105d2d322a14b3bdcbfff61fcfe28e34e236bca0df09ad30a",
+              "assertions": [
+                "assert not unit_is_currently_engaged(state=s, unit_instance_id=source)",
+                "assert unit_is_currently_engaged(state=s, unit_instance_id=source)",
+                "assert unit_is_currently_engaged(state=s, unit_instance_id=target.unit_instance_id)",
+                "assert current_physically_engaged_enemy_rules_unit_ids(state=s, unit_instance_id=source) == (target.unit_instance_id,)",
+                "assert current_physically_engaged_enemy_rules_unit_ids(state=s, unit_instance_id=target.unit_instance_id) == (source,)",
+                "assert s.fight_phase_state is not None",
+                "assert FightEligibilityKind.CURRENTLY_ENGAGED in reasons",
+                "assert model_is_present_on_battlefield(state=s, model_instance_id=target.own_model_ids()[0])",
+                "assert [m.value for m in modes] == ['ongoing']",
+                "assert begin_retained_destruction_cleanup(state=s, decisions=decisions, reason='phase_end') is None",
+                "assert not current_physically_engaged_enemy_rules_unit_ids(state=s, unit_instance_id=source)",
+                "assert not model_is_present_on_battlefield(state=s, model_instance_id=target.own_model_ids()[0])"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution",
+              "function_ast_sha256": "ac8b1edd74909c6ef13157300290fa664a0d967667190f44e278a7c6f671061b",
+              "assertions": [
+                "assert target.required_wargear_ids == ()",
+                "assert 'CHARACTER' in view.keywords",
+                "assert 'CHARACTER' not in bodyguard.own_models[0].keywords",
+                "assert 'CHARACTER' in leader.own_models[0].keywords",
+                "assert set(view.keywords) == set(bodyguard.keywords) | set(leader.keywords)",
+                "assert 'CHARACTER' not in after.keywords",
+                "assert 'LORD EXULTANT' not in after.keywords",
+                "assert \"EMPEROR'S CHILDREN\" in after.faction_keywords",
+                "assert 'CHARACTER' in retained.keywords",
+                "assert 'CHARACTER' not in after.keywords"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 51,
+          "id": "60232b79-7a10-44a0-ac68-e27312c7ba60",
+          "clarification": "Unit keyword unions use remaining physical members; actual casualty removes contribution, while explicit retained presence keeps it.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution",
+              "function_ast_sha256": "ac8b1edd74909c6ef13157300290fa664a0d967667190f44e278a7c6f671061b",
+              "assertions": [
+                "assert target.required_wargear_ids == ()",
+                "assert 'CHARACTER' in view.keywords",
+                "assert 'CHARACTER' not in bodyguard.own_models[0].keywords",
+                "assert 'CHARACTER' in leader.own_models[0].keywords",
+                "assert set(view.keywords) == set(bodyguard.keywords) | set(leader.keywords)",
+                "assert 'CHARACTER' not in after.keywords",
+                "assert 'LORD EXULTANT' not in after.keywords",
+                "assert \"EMPEROR'S CHILDREN\" in after.faction_keywords",
+                "assert 'CHARACTER' in retained.keywords",
+                "assert 'CHARACTER' not in after.keywords"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_combat.py::test_mixed_unit_can_charge_but_only_individually_flying_model_can_attack_aircraft",
+              "function_ast_sha256": "5c51f59d7f785f594cd7ea11e7cfa46686790fa124b46caea65d06e4da482c36",
+              "assertions": [
+                "assert 'FLY' in mover.keywords",
+                "assert candidates[0].is_legal",
+                "assert bool(targets) is (index == flying_index)"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 57,
+          "id": "ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+          "clarification": "FLY identity supplies Aircraft combat eligibility; Take to the Skies is an optional movement choice and does not create that keyword.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_combat.py::test_native_flying_datasheet_has_aircraft_charge_permission_without_taking_to_skies",
+              "function_ast_sha256": "ed4ec11daecb5c9ceaa31fb46e125e31e3c124cddce02dc46e69acd1ae7817ce",
+              "assertions": [
+                "assert 'FLY' in own.keywords",
+                "assert all(('FLY' in m.keywords for m in own.own_models))",
+                "assert charge_target_candidates(state=state, unit_instance_id=own.unit_instance_id, ruleset_descriptor=state.runtime_ruleset_descriptor())[0].is_legal",
+                "assert aircraft_melee_target_ids(scenario=scenario(state), unit_instance_id=own.unit_instance_id, model_instance_id=model.model_instance_id, target_ids=(target.unit_instance_id,)) == (target.unit_instance_id,)"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section23/test_combat.py::test_charge_pile_in_and_surge_use_fly_without_skies_choice",
+              "function_ast_sha256": "88eebdcb799cbcbc6c388c81fc0d062a3ee67869995dbec62839d6435c0c1df0",
+              "assertions": [
+                "assert candidate.is_legal is flying",
+                "assert ground.unit_instance_id in pile_targets",
+                "assert (aircraft.unit_instance_id in pile_targets) is flying",
+                "assert targets == ((aircraft.unit_instance_id,) if flying else (ground.unit_instance_id,))"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            }
+          ]
+        },
+        {
+          "faq_number": 64,
+          "id": "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+          "clarification": "Unit-wide attached keywords and model-specific physical permissions stay separate; no native Aircraft attachment provider is claimed.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section23/test_combat.py::test_mixed_unit_can_charge_but_only_individually_flying_model_can_attack_aircraft",
+              "function_ast_sha256": "5c51f59d7f785f594cd7ea11e7cfa46686790fa124b46caea65d06e4da482c36",
+              "assertions": [
+                "assert 'FLY' in mover.keywords",
+                "assert candidates[0].is_legal",
+                "assert bool(targets) is (index == flying_index)"
+              ],
+              "expected_exceptions": [],
+              "role": "owned_native_core_checkpoint",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/unit/test_phase16c_reserve_declarations.py::test_order66_mandatory_aircraft_reserves_use_attached_identity",
+              "function_ast_sha256": "0876b3ceccdae247dca4fd56ac67d8109cfb769bf1c76a644e18ce60a1d39eba",
+              "assertions": [
+                "assert state is not None",
+                "assert reserve is not None",
+                "assert reserve.points_contribution == 100",
+                "assert reserve.source_rule_ids == ('gw-11e-core-aircraft:deployment',)",
+                "assert state.reserve_state_for_unit('army-alpha:leader') is reserve",
+                "assert reserve.unit_instance_id == 'attached-unit:army-alpha:bodyguard'",
+                "assert len(state.reserve_states) == 1",
+                "assert len(state.unarrived_reserve_model_ids()) == 6"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_admission": false
+            },
+            {
+              "node": "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution",
+              "function_ast_sha256": "ac8b1edd74909c6ef13157300290fa664a0d967667190f44e278a7c6f671061b",
+              "assertions": [
+                "assert target.required_wargear_ids == ()",
+                "assert 'CHARACTER' in view.keywords",
+                "assert 'CHARACTER' not in bodyguard.own_models[0].keywords",
+                "assert 'CHARACTER' in leader.own_models[0].keywords",
+                "assert set(view.keywords) == set(bodyguard.keywords) | set(leader.keywords)",
+                "assert 'CHARACTER' not in after.keywords",
+                "assert 'LORD EXULTANT' not in after.keywords",
+                "assert \"EMPEROR'S CHILDREN\" in after.faction_keywords",
+                "assert 'CHARACTER' in retained.keywords",
+                "assert 'CHARACTER' not in after.keywords"
+              ],
+              "expected_exceptions": [],
+              "role": "bounded_existing_dependency",
+              "native_provider_admission": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "source_rows": 4,
+  "literal_blocks": 9,
+  "semantic_obligations": 18,
+  "table_count": 0,
+  "diagram_count": 0,
+  "nested_subsection_count": 0,
+  "textual_examples": 0,
+  "visual_qualification": "Retained literal capture contains no Section23 diagrams; no fresh visual App verification.",
+  "all_current_faqs_screened": 64,
+  "faq_screen": [
+    {
+      "number": 1,
+      "id": "c2df3e97-f21e-4fc9-943e-37072c08c10e",
+      "source_sha256": "5dde776b1cf69f6b47b71219938b51665eb2d8a42e8392befa07e5afdea855e2",
+      "question": "Aerialists ability allows you to get into a transport even though they disembarked a transport this turn?",
+      "answer": "Yes, as the unit embarking is not making a normal, advance or fall-back move as part of this embarkation.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Transport re-embarkation ability; no Aircraft-specific exception to embark legality."
+    },
+    {
+      "number": 2,
+      "id": "9bfa47ed-be8d-4e11-80de-f3832d507ca1",
+      "source_sha256": "8d4f6b7b01b92637f2848b261fe07f970ef819f1ee867b889e885d1bdcbb1ada",
+      "question": "Can I select a unit to shoot or fight if it doesn't have melee or ranged weapons?",
+      "answer": "Yes, it just makes no attacks and then the fight type or shoot type is resolved.",
+      "disposition": "locally_relevant_or_bounded_dependency",
+      "colocated_at": "23.04",
+      "rationale": "An ineligible model does not make attacks; an empty selected Fight still resolves its type."
+    },
+    {
+      "number": 3,
+      "id": "7f767dd0-3996-417e-bba2-b7a5828b2430",
+      "source_sha256": "4cfeea846d7a2e135d7eb728147265987cc1adf54ca93657427474d44fe9ce56",
+      "question": "Can a model be within range of a weapon if it is not visible",
+      "answer": "Yes",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Weapon range versus visibility belongs to target query geometry; Aircraft adds no exception."
+    },
+    {
+      "number": 4,
+      "id": "904b8b36-09f0-4449-a9c3-45892664ef60",
+      "source_sha256": "4d6f85a577496676241ac385c0cb4fa2e672c8c679d56ff363d7344279670845",
+      "question": "Do models destroyed when a unit is out of coherency count for mission objectives?",
+      "answer": "Yes.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Coherency casualties and mission scoring remain inherited mission contracts."
+    },
+    {
+      "number": 5,
+      "id": "e5941469-5653-49b2-919e-9c9246e811d4",
+      "source_sha256": "819dd65da567f7dae1c13e61e2e2a43c02b1188d605f1458b3c5778eefe50b36",
+      "question": "Does my model or unit become engaged while moving through a enemy units engagement range during a move?",
+      "answer": "No",
+      "disposition": "locally_relevant_or_bounded_dependency",
+      "colocated_at": "23.02",
+      "rationale": "Transit does not create lasting engagement; endpoint engagement and overlap remain independently constrained."
+    },
+    {
+      "number": 6,
+      "id": "5928ab6e-7113-42c8-9085-4291faddae09",
+      "source_sha256": "3baf6215041a9e32c26f4544ae11dc0907a480bc3e2b1f3b30f0dfd8a8f53efe",
+      "question": "How many mortals do you take from Hazardous tests for a combined vehicle/monster and Infantry unit",
+      "answer": "The roll would be all at once and it would be 1 MW per fail",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Hazardous mixed-body wound count belongs to Section06."
+    },
+    {
+      "number": 7,
+      "id": "6b074ac1-8a03-43ac-8669-3bac17d372ab",
+      "source_sha256": "ce792ca90e1fcdfb597549aaba5c9c7fa227850068b1581a6b00492e993aafb7",
+      "question": "I failed hazard rolls from [Hazardous] weapons, do those mortal wounds have to be allocated to the models with the [Hazardous] weapons?",
+      "answer": "No, you allocate the mortal wounds to the unit as per Mortal Wounds(06.02). (This represents Bob the guardsmen picking up his fallen squad mates plasma gun or that the twisting power of James the Chaos Sorcerer pulling his followers into the warp.)",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Hazardous allocation belongs to Section06."
+    },
+    {
+      "number": 8,
+      "id": "e58d31bc-b6eb-4db1-b319-dc27dd60154f",
+      "source_sha256": "6cb474a554ba766f84b3bf678656f25876bec6fb41905666e7e3a0697b89e3fb",
+      "question": "I have a rule that triggers when a mortal wound is allocated to a model, when does this happen?",
+      "answer": "When you select a model in the Select Model step of Mortal Wounds (06.02).",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Mortal wound allocation trigger belongs to Section06."
+    },
+    {
+      "number": 9,
+      "id": "814f382c-d6b7-4a30-a78b-1247b57ac133",
+      "source_sha256": "0c6ab46362def6aac110116ddd1f38ac0efee475fdefeeeac74b6291198e1f87",
+      "question": "I have a unit being attacked with weapons that will modify some of their save rolls to be worse then 6 should I make those save rolls?",
+      "answer": "Yes, because other models in your unit may have Sv's that are better those models you've mentioned, this means that enough save rolls could be allocated to the those models that the rest of the results are not greater then the Sv's of the other models in your unit.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Mandatory Save rolls belong to Section05."
+    },
+    {
+      "number": 10,
+      "id": "acdcfb0c-5b84-4b41-b271-751c4204bf56",
+      "source_sha256": "e8193326f2f9d7e3fb0a5d65ea64a96b7d6d2d5a3051487cc84a7c94bbef51d1",
+      "question": "If I have a rule that says my unit can move up to 6\" when it makes a pile-in move or consolidation move, does this also mean it changes the maximum distance of those moves to 6\"?",
+      "answer": "Yes",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Pile In/Consolidation distance permission cannot override Aircraft Ingress-only restriction."
+    },
+    {
+      "number": 11,
+      "id": "9657bb5d-72da-4d42-9927-731c9fc0e315",
+      "source_sha256": "cade2b4fcf8c180e7fccd7db3cda6b1d9af1dcf01e2d728abbb3011d7bc286f2",
+      "question": "If a rule allows my unit to pile-in or consolidate an extra distance in the Fight phase, when can I use that rule?",
+      "answer": "For pile-in moves, during the Pile-in step(12.02), and for consolidation moves, during the Consolidate step(12.07) of the Fight phase.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Fight-step distance permission cannot grant Aircraft a prohibited move."
+    },
+    {
+      "number": 12,
+      "id": "55ea7d23-2f9e-45bf-bf6c-d98bf682549f",
+      "source_sha256": "5b0a2ff2b97ec653c19ef9a0b2b903cefe44903aae6ce26174360afd342a5b16",
+      "question": "If a rule modifies how far a unit or model can move during a pile-in move or consolidation move does it also change the distance of the target units?",
+      "answer": "No",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Target range does not change with extra Fight movement; no new Aircraft exception."
+    },
+    {
+      "number": 13,
+      "id": "4978f15f-2b4a-4805-aacd-db9b5cad71bd",
+      "source_sha256": "418d349eaf7304a61d3dd28047950280deee139fe1a1f4a68b3c71f5414183a3",
+      "question": "If a rule says a unit auto passes Desperate Escape tests does that mean it would auto pass the hazard rolls from a desperate escape move?",
+      "answer": "Yes",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Desperate Escape auto-pass semantics are bounded movement dependencies."
+    },
+    {
+      "number": 14,
+      "id": "fae8a959-9cbe-46e3-a721-029b23b24e24",
+      "source_sha256": "203efbd7887644a4d4a986b7b38ecf618e7a775677f1b61a1726ae0954da4f17",
+      "question": "If a rule says a unit can embark into a Transport in a turn that unit disembarked, does this ignore the core rules restriction on embarking in a turn that unit made a set up move (see 18.02)?",
+      "answer": "Yes",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Transport setup re-embarkation exception adds no Aircraft clause."
+    },
+    {
+      "number": 15,
+      "id": "81bf7082-3ef5-47b9-bfc4-f2021fff1d4f",
+      "source_sha256": "63e2958a2a4ffb22895f940904bf6956f11e89ba2717bab129d341a8b6f60e6c",
+      "question": "If a rule says my unit must make a hazard roll does every model in the unit make a hazard roll?",
+      "answer": "No, the unit would make 1 single hazard roll.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Unit Hazard roll cardinality is Section06."
+    },
+    {
+      "number": 16,
+      "id": "bbe268a2-b1fd-43ab-8b24-fd4363730c3f",
+      "source_sha256": "1912cbae65dddd8e8799e7e7a82a5ec5984533152aae9239745831f9dfed89ae",
+      "question": "If a unit becomes battle-shocked after starting an action does it stop performing that action?",
+      "answer": "Yes",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Battle-shock interrupts Actions in Section16."
+    },
+    {
+      "number": 17,
+      "id": "4c654d00-318d-4665-9e46-26cfab179a29",
+      "source_sha256": "fef99387330cc3df5d34f0f94c59f49ddd403bffc2bb46936e4b80d8214f46bb",
+      "question": "If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action?",
+      "answer": "Yes",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Battle-shocked Action permission belongs to Section16."
+    },
+    {
+      "number": 18,
+      "id": "b49d0004-1dd8-4746-a971-0b6656719dd3",
+      "source_sha256": "1eb39b2856a8e102482e905b7bc7fb8392e71ad6d043627414f7a7c4a69fcc21",
+      "question": "If a unit makes any disembark move in a turn (i.e. Disembark move, Emergency Disembark move etc.) has it disembarked that turn?",
+      "answer": "Yes.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Disembark history belongs to Section18."
+    },
+    {
+      "number": 19,
+      "id": "a89dddb3-7930-4704-9f7a-0a7664da4d84",
+      "source_sha256": "5ec36166d98fd4e9d6031f8f85a631801253c6a65f26008c6e58d8cec6e72b1c",
+      "question": "If my unit has taken control of an objective at the end of my movement phase and that unit has as an ability that secures an objective they control, can they secure that objective?",
+      "answer": "Yes",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Secure Objective timing belongs to mission/Section14."
+    },
+    {
+      "number": 20,
+      "id": "ab92e97b-be2b-4125-9ded-fcfa6abe092e",
+      "source_sha256": "6c0d66fac9785c64b585ccf535fece6c50738787459f61ccff18d7b4d54f22fc",
+      "question": "If my unit has the Deadly Demise ability and has an ability that allows it to Fight on Death, how do I resolve this?",
+      "answer": "Fight on Death rules are resolved before Deadly Demise abilities, meaning that your unit's Deadly Demise will resolve after your unit has fought/at the end of the phase and the relevant models have been removed from the battlefield.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Adopted DD/FoD after-removal interaction remains verbatim in SECTION05_DEADLY_DEMISE_DECISION.md; this work changes no casualty owner."
+    },
+    {
+      "number": 21,
+      "id": "ee9a398d-3acb-4440-b63a-68bed3e6e217",
+      "source_sha256": "a46aec7c497acd207755a6a220760722b4b41ab05aa0b4936cd98911abbdb641",
+      "question": "If my unit has weapons that are identical in characteristics, but some of those weapons have [PRECISION] and those weapons targeted a unit without the character keyword, do I roll all of those weapons together?",
+      "answer": "Yes, the [PRECISION] ability is not an applicable ability for those attacks as there is no CHARACTER in the target unit for the ability to trigger its rule.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Precision grouping is an attack-pool dependency with no Aircraft exception."
+    },
+    {
+      "number": 22,
+      "id": "bb42e060-31e1-46bc-ba52-85cd5ea8c6cf",
+      "source_sha256": "2c17122ffb565c8449dcae5b2f4ca29654cb327c39f61e112cadfb49b73f0993",
+      "question": "If the [ANTI] ability on my unit is ANTI-non-Monster/Vehicle does it mean the [ANTI] rule triggers when targeting units that do not have the Monster or Vehicle keyword?",
+      "answer": "Yes, ANTI-non-(any keyword) will trigger on any unit that does not have the specified keyword.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Anti keyword negation is Section24; no Section24 work is performed."
+    },
+    {
+      "number": 23,
+      "id": "66be2ad9-24af-4edf-890a-c0e55004bf76",
+      "source_sha256": "9377700d849a18e73f6f58830a215dfe1b122e65b7e115d5ceecd9ca34a46feb",
+      "question": "My rule says that \"this units ranged attacks have +1 A\", do each of my attacks get an extra attack dice?",
+      "answer": "No, it increases the A characteristics of the unit's ranged weapons by 1.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Attack count modifiers belong to Section02/04."
+    },
+    {
+      "number": 24,
+      "id": "c7a83b0a-e8c3-44b5-a3ca-bb3dfba98c2d",
+      "source_sha256": "e1ebb8a68e7f4c31e1672e4801af152cb6355b84d975b7329c57de930f5a61c1",
+      "question": "The Munitorium Field Manual shows my unit can attach to different units then are on it's datasheet, which do I use?",
+      "answer": "Use the Munitorium Field Manual.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Official attachment admission precedence is Section19 and remains qualified."
+    },
+    {
+      "number": 25,
+      "id": "3103e536-8fb8-4fa3-800c-c0d159115bba",
+      "source_sha256": "5b6592050979bbcee593897a953177ea6ff01143998be6aaa82d94cec6e0e28f",
+      "question": "What does the X\" in Lone Operative X\" mean?",
+      "answer": "The X is a placeholder for a number of inches that the ability might appear in a rule with, like Lone Operative 15\" where the X has been replaced with 15\"",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Lone Operative numeric placeholder belongs to Section24; no Section24 work."
+    },
+    {
+      "number": 26,
+      "id": "ba488672-92ec-443d-9087-85a999342589",
+      "source_sha256": "0f27aa55b21c0ddb344b8c753eda2ed864b0618ef79c02ce24ac11d7a0cc9213",
+      "question": "When a move says that a model or unit must move in a way if it is able, can that requirement force the unit to end their move not in coherency?",
+      "answer": "No, when a model or unit is making a move it must follow requirements while ending that move in coherency",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Movement must still end coherent; Aircraft transit permission does not waive this existing geometry rule."
+    },
+    {
+      "number": 27,
+      "id": "fdefb262-1eb9-43fd-a2c8-70cf3bd2a621",
+      "source_sha256": "08639241469c28315db54217af96362204e61b52d0bd272d16a40bab54e25fe8",
+      "question": "When a rule instructs you to perform a charge outside of the charge phase, do I resolve step 2 and 3 of the Charge step(11.02)?",
+      "answer": "Yes",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Out-of-phase charge follows ordinary charge steps; Aircraft charge prohibition is unchanged."
+    },
+    {
+      "number": 28,
+      "id": "a7ba0395-6635-45cd-aeec-1cc3c0607a0b",
+      "source_sha256": "4eff6df1baf7b221cf03ed213f78a6cd38284f178f611bd883e448388f12eb9d",
+      "question": "When checking coherency for my unit can my unit be in multiple groups?",
+      "answer": "No, it must be in a single contiguous group as per Units and Models (01.02) and What is Coherency in the core rules.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Contiguous coherency remains a movement prerequisite."
+    },
+    {
+      "number": 29,
+      "id": "06c896b8-bf06-40bd-a892-b56cb3cde9d3",
+      "source_sha256": "e8c435f8a7716a35d41f4a7522b6d87d156c108f9ba88195bdab4b27d00897c1",
+      "question": "When declaring the allocation order of groups in my unit I have more than one non-CHARACTER groups that contain a model with a missing wound, how must I select the order?",
+      "answer": "Those groups can be selected in an order of your choosing but must be in an order that makes them come before any non-CHARACTER groups that do not contain a model with a missing wound.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Allocation group order is Section05."
+    },
+    {
+      "number": 30,
+      "id": "5553f538-6182-4e72-905a-67855489bb1d",
+      "source_sha256": "5c88c04e13b99a324290f8726e470f1e4fb93152c890c597b9b16906cdd4e3e4",
+      "question": "When selecting a target unit can the enemy model that is visible to my model and the enemy model that is in range of my model's weapon be different enemy models in the same unit?",
+      "answer": "Yes",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Separate visible/in-range models remain supported shooting query behavior; Aircraft changes only Plunging Fire here."
+    },
+    {
+      "number": 31,
+      "id": "019feac1-cd25-4644-b855-2ce3fa048fee",
+      "source_sha256": "0726dff38f240002912d8730e11af4be7e4f1c14c17d67b797855e597dd88a42",
+      "question": "Can an attached unit be given an Upgrade?",
+      "answer": "Yes.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Upgrade attachment belongs to mustering/Section19."
+    },
+    {
+      "number": 32,
+      "id": "38785a5c-16ba-41c5-b936-723a385f57aa",
+      "source_sha256": "7ee44f5393615f9102f2df97ea71badbd468f7b02b9f968aa1ec0c30da3ce524",
+      "question": "Can a unit have both an Upgrade and an enhancement?",
+      "answer": "No, units are prevented from having two enhancements, and Upgrades are enhancements.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Enhancement count belongs to mustering/Section19."
+    },
+    {
+      "number": 33,
+      "id": "3de45ba4-435e-4f58-a50c-fbda3f71bdc5",
+      "source_sha256": "00e5a5e21fcdab4cfe98c30af6341386425851e952d8b85aa2febc27b4d2104e",
+      "question": "Are Upgrades enhancements?",
+      "answer": "Yes, Upgrades are a type of enhancement (but not all enhancements are Upgrades).",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Upgrade taxonomy belongs to mustering/Section19."
+    },
+    {
+      "number": 34,
+      "id": "603e9b2f-cc24-498c-ac2e-08ad3068f257",
+      "source_sha256": "f12df889b0db17cfacf6358aea3dcd1a3d2725660c8a159eabad35f6f6c9fef3",
+      "question": "Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area?",
+      "answer": "Yes",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Terrain-area membership uses physical geometry; no Aircraft-specific exception."
+    },
+    {
+      "number": 35,
+      "id": "6575ee89-b92a-456d-8e59-4ee513df8f4e",
+      "source_sha256": "4246aa2cdf23333e8213aeef87c4224f0f2ff31b5f8c80229f9c9f3b7c648fa4",
+      "question": "Do rules that affect a keyword include multi-word keywords that contain that keyword? For example, would rules that affect Commissar units affect a unit that has the Commissar Graves keyword?",
+      "answer": "No.",
+      "disposition": "locally_relevant_or_bounded_dependency",
+      "colocated_at": "23.04",
+      "rationale": "AIRCRAFT and FLY are exact canonical keywords; embedded display-name words do not grant them."
+    },
+    {
+      "number": 36,
+      "id": "7a982686-03ff-4565-8d5a-2549e5650268",
+      "source_sha256": "83a20d1e25f2befd445e81a037eddc1fbae6799e634efe2a95b7b1724d5de541",
+      "question": "After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available?",
+      "answer": "Yes.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "CP increase acceptance is Section15."
+    },
+    {
+      "number": 37,
+      "id": "88fc6c54-a3a6-4757-947b-b2dab8b7f3bf",
+      "source_sha256": "f76c805bcfca3c48fd1702c593c0b7ae45b19cb075e805878fa90d19c9fbf2c3",
+      "question": "In what step during the attack sequence do I roll for Feel No Pain?",
+      "answer": "In the Resolve Damage step of the Inflict Damage step (05.04).",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Feel No Pain timing is Section05."
+    },
+    {
+      "number": 38,
+      "id": "9aea2cef-c9db-4a30-bbfb-6b07c1f148a2",
+      "source_sha256": "d4d4f6a90669f72253ba254163280068e061623dfd51e1989df9d53a3797f45d",
+      "question": "Can an Epic Hero unit form an attached unit with a unit that has an enhancement?",
+      "answer": "Yes.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Epic Hero enhancement attachment is Section19."
+    },
+    {
+      "number": 39,
+      "id": "9b1c81f5-2ea0-40eb-9015-6a005367cd75",
+      "source_sha256": "f3c9e8b3182c4e2071fac4e28a5f24038296b51c1e9815e075078612dfa184ee",
+      "question": "While making a move type other than a normal/advance move, can my MONSTER/VEHICLE unit move through friendly units?",
+      "answer": "Yes.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Ordinary Monster/Vehicle friendly transit rules remain distinct from explicit any-model Aircraft transit."
+    },
+    {
+      "number": 40,
+      "id": "9e243f82-42e9-4f0d-9e4b-3f5b74cd68bc",
+      "source_sha256": "4a48d283634e5425caf54f2f8426b8c64351a15d8772e58a6c3ee0cff47b7031",
+      "question": "If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)?",
+      "answer": "Yes. That restriction is applicable before the battle, in the Declare Battle Formations step.",
+      "disposition": "locally_relevant_or_bounded_dependency",
+      "colocated_at": "23.02",
+      "rationale": "Opponent-turn Aircraft departure enters reserves during battle; the pre-battle reserve points cap is not a renewed turn-end cap."
+    },
+    {
+      "number": 41,
+      "id": "adf7c2cd-b765-4e84-abb7-f0ed45d52841",
+      "source_sha256": "fcbf7560ed5887e51b590721ed9949d9d631d5f5c22e4bd49886aba684e0dbfa",
+      "question": "Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round?",
+      "answer": "Yes.",
+      "disposition": "locally_relevant_or_bounded_dependency",
+      "colocated_at": "23.01",
+      "rationale": "The points restriction is a pre-battle declaration boundary; mandatory deployment and battle re-entry keep distinct owners."
+    },
+    {
+      "number": 42,
+      "id": "beaeca32-9701-45f7-9461-879d8ae3d78f",
+      "source_sha256": "e5ea7a06664adae76ec6f30368df75c64a03655b158375bbea49637e51d3c53a",
+      "question": "After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens?",
+      "answer": "No CP are spent and that stratagem's effects are not resolved (but that stratagem still counts as having been used this phase).",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Unaffordable increased Stratagem cost is Section15."
+    },
+    {
+      "number": 43,
+      "id": "c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e",
+      "source_sha256": "b071da95e8e4f7b784d6b56260bc20d1f99d1dee892c93e49694be55146a9f6e",
+      "question": "Is being within range of a terrain objective the same as being within range of an objective marker?",
+      "answer": "Yes.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Event Companion Terrain Objectives remain primary inherited objective authority."
+    },
+    {
+      "number": 44,
+      "id": "e01c8a02-7a36-4d3b-b168-976b11bd47e8",
+      "source_sha256": "8c5268b2b6d5a355b36634065359e05eec587d8ad7541cfbe7a7ed5144c48031",
+      "question": "When my unit shoots at another unit, how does it work if some models in the target unit are fully visible to some models in my unit, while others are within a terrain area/not fully visible?",
+      "answer": "For each attacking model in your unit, determine whether the target unit has the benefit of cover, as described in Terrain and Visibility. In this scenario, the target unit will likely have the benefit of cover against some of the attacking models, but not all. This means that, in an example unit where all attacking models are using the same weapon, when you get to the Resolve Attacks step of the Attack Sequence, you will collect dice for attacks made by models against which the target unit has the benefit of cover separately from the dice for attacks made by models against which the target unit does not have the benefit of cover.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Cover is per attacker and remains independent from Aircraft Plunging Fire suppression."
+    },
+    {
+      "number": 45,
+      "id": "e43402db-7c49-4cd6-acf7-fa6cac83acb0",
+      "source_sha256": "82f9c28b646f5734f69e5e94c22a2a9a1df8761eaf463c1510f301294963c5f0",
+      "question": "If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier?",
+      "answer": "No, a stratagem that costs 1CP and is making use of an optional +1CP section has an original cost of 2CP.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Optional Stratagem CP cost is Section15."
+    },
+    {
+      "number": 46,
+      "id": "e846db5e-3138-4ac6-b7ee-ca2ff7fe303e",
+      "source_sha256": "5fc6e6bf0de94e1cd61c8e9c98f520b0c863d4b728c5e4c19654f1b8c4a61368",
+      "question": "Does vertical movement in a unit that has taken to the skies count towards the distance a model has used for the purposes of [Heavy]?",
+      "answer": "No.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Heavy horizontal distance accounting remains Section21/24; Aircraft cannot take an ordinary move merely by FLY status."
+    },
+    {
+      "number": 47,
+      "id": "fc49644c-cc46-47a0-892b-284a4c4ec018",
+      "source_sha256": "6c644170715564c73a7148e873c64fb055afa4031065a1027f319016ba4b6bee",
+      "question": "Can I group or allocate a wound to a destroyed model?",
+      "answer": "No.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Destroyed models cannot receive new wounds; retained physical presence does not mean living allocation eligibility."
+    },
+    {
+      "number": 48,
+      "id": "04f15433-3ee1-4c6d-8546-29e4247dee5b",
+      "source_sha256": "13028847f833da09851ea0172c574d87efff63f06d924d31f67bf2fb42574b60",
+      "question": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?",
+      "answer": "After.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Zero-damage timing is Section05."
+    },
+    {
+      "number": 49,
+      "id": "2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+      "source_sha256": "47c3d8041c00d1755fd01c8fc8149fccadfbd89cb238fa5d8184cadaeaaea455",
+      "question": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?",
+      "answer": "Models awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models: They can be measured to by friendly/enemy abilities. They can be considered visible to friendly/enemy models where relevant. They can use their datasheet abilities. They can be targeted by stratagems. Enemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight).",
+      "disposition": "locally_relevant_or_bounded_dependency",
+      "colocated_at": "23.04",
+      "rationale": "Retained destroyed models remain physically present until their own cleanup; this is distinct from living models, ability ownership and selected catalog content."
+    },
+    {
+      "number": 50,
+      "id": "421a6f30-63e2-4e1f-b352-99b643637c53",
+      "source_sha256": "c5ad1503a94c734aa9f1d0dadca11d1daa19dc63928131659eb8214c5f4c7724",
+      "question": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+      "answer": "No, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Battle-shocked Stratagem target restriction is Section15."
+    },
+    {
+      "number": 51,
+      "id": "60232b79-7a10-44a0-ac68-e27312c7ba60",
+      "source_sha256": "a4fb6955c73cae19a4d09415f8b77188b6fd8542fbb0448084db0db2c56c392f",
+      "question": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+      "answer": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit.",
+      "disposition": "locally_relevant_or_bounded_dependency",
+      "colocated_at": "23.04",
+      "rationale": "Unit keyword unions use remaining physical members; actual casualty removes contribution, while explicit retained presence keeps it."
+    },
+    {
+      "number": 52,
+      "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+      "source_sha256": "736b6d704a27951f968fbcc84f7b0eca6840b08a451d353390367442244b1766",
+      "question": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+      "answer": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead).",
+      "disposition": "locally_relevant_or_bounded_dependency",
+      "colocated_at": "23.02",
+      "rationale": "Embarked cargo remains off battlefield on Aircraft departure and does not gain carrier ownership."
+    },
+    {
+      "number": 53,
+      "id": "7f238e23-cd3f-40ad-aa91-c75274cc655e",
+      "source_sha256": "cf0fd95bcbcfb3ff78f04318e141c735309cc69f5f3815ab946d5a4245563333",
+      "question": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?",
+      "answer": "Line of sight is drawn from any part of the observing model to any part of the model being observed.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Full model visibility geometry remains inherited; no Aircraft-specific observer exception."
+    },
+    {
+      "number": 54,
+      "id": "80182be3-1a44-464b-9ef6-cd9212429603",
+      "source_sha256": "5d5056a4966de981a21706e962e5c9ea70f05377ff20fd4962f7cc7a01d5290b",
+      "question": "If both players have units with the Scouts ability, do they alternate resolving scout moves?",
+      "answer": "Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Alternating pre-battle Scouts is Section19/24; Aircraft movement restriction still applies."
+    },
+    {
+      "number": 55,
+      "id": "aab10e23-6433-42ca-86e7-ddc829f16c47",
+      "source_sha256": "b26dfcd0cc3f76a41e680b3bedaf3ba6a299fa135400cea6cbd42e493ea2e057",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting?",
+      "answer": "Unless otherwise stated, no: when snap shooting, each attack only hits on a roll of 6.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Snap shooting hit threshold belongs to Section04/24."
+    },
+    {
+      "number": 56,
+      "id": "b7d3d760-a167-44b2-9c91-32ce86684225",
+      "source_sha256": "9bfda5c1d2a514b705e9feeec17efef3325815360389fe267537521350a557ac",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit?",
+      "answer": "Yes, except when snap shooting: when snap shooting, each attack only hits on a roll of 6.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Critical versus required hit roll belongs to Section04/24."
+    },
+    {
+      "number": 57,
+      "id": "ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+      "source_sha256": "2202a3d04b20b42997b9a0e9a19177697bf42ee7b2b1923c4674b43faa676e9b",
+      "question": "When do the effects of a FLYING unit taking to the skies apply?",
+      "answer": "When that unit is selected to make a normal/advance/fall-back/charge move. Note that for an advance/charge move, this means you must declare that a unit will take to the skies before rolling for that advance/charge move.",
+      "disposition": "locally_relevant_or_bounded_dependency",
+      "colocated_at": "23.04",
+      "rationale": "FLY identity supplies Aircraft combat eligibility; Take to the Skies is an optional movement choice and does not create that keyword."
+    },
+    {
+      "number": 58,
+      "id": "dc9911da-e156-4b48-bf9b-18f9d96d037e",
+      "source_sha256": "f084d1e31353f70020957e67d0ad8821f406be29c8251048d27bf81e6664f4b3",
+      "question": "If a rule refers to an 'objective marker', does this mean an 'objective'?",
+      "answer": "Yes (excluding rules in the Core Rules)'.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Objective marker non-Core terminology remains inherited Section14 qualification."
+    },
+    {
+      "number": 59,
+      "id": "fb3b2776-c954-471b-b448-b70caa91929d",
+      "source_sha256": "18f33a49e6d2f3f401aefb615c84a2d4d373c9b382b5bb38252504d517bc8662",
+      "question": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?",
+      "answer": "A charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03). Example: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\". Example: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\".",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Modified charge distance changes target range; FLY Aircraft target permission is an additional conjunction."
+    },
+    {
+      "number": 60,
+      "id": "db020803-7564-45c9-a6d4-e4cdf463da32",
+      "source_sha256": "8352b49b9fbfaceb630ac21dc45eac4d9fdf112bd15de3e50ec2f0fbd30ca36e",
+      "question": "Can a unit be controlling more than one objective at once?",
+      "answer": "Yes.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Multiple objective control belongs to Section14."
+    },
+    {
+      "number": 61,
+      "id": "8c51d370-70b2-46c7-abaa-228b55c830c3",
+      "source_sha256": "cda9f83e49d0006eef29aeb0e17f388472db9fa391be2ea4a96e6ce4850e80a6",
+      "question": "When determining control over an objective, can the same model's OC count towards more than one objective that model is within range of?",
+      "answer": "Yes.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Model OC may count to multiple objectives in Section14."
+    },
+    {
+      "number": 62,
+      "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+      "source_sha256": "f1569a6a16420f52ff3a4cc89c61762db7467cba6bdc320c8a4e3fa8ceec239f",
+      "question": "If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle?",
+      "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "End-turn effects remain in force through end-turn hooks; this work adds no effect expiration change."
+    },
+    {
+      "number": 63,
+      "id": "9638115f-b94b-4d05-ba62-df9fba2805ac",
+      "source_sha256": "1c43f713b930f8f51c7d429991f40174c22eb30bbf4bd56773993b4a8e319cd8",
+      "question": "When a model overhangs the edge of the battlefield, how does that affect its visibility?",
+      "answer": "That model's controlling player can draw line of sight from any part of that model that is not overhanging the edge of the battlefield. Their opponent can draw line of sight to any part of that model.",
+      "disposition": "other_section_no_new_section23_obligation",
+      "colocated_at": null,
+      "rationale": "Asymmetric overhang visibility remains a bounded geometry dependency with no Aircraft exception."
+    },
+    {
+      "number": 64,
+      "id": "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+      "source_sha256": "cbf7e42f41f0d4cce05a0f084c6982e8899da06ac0a71c7339ad6845ef0acc47",
+      "question": "When does a model's or unit's ability in an attached unit apply to all models in that unit?",
+      "answer": "A rule that applies to 'this/that unit' or 'models in this/that unit' applies to all models in an attached unit. Rules that just apply to one model in an attached unit (for example, a rule that grants a model Feel No Pain or Lone Operative) only apply to that model, not to all models in the attached unit.",
+      "disposition": "locally_relevant_or_bounded_dependency",
+      "colocated_at": "23.04",
+      "rationale": "Unit-wide attached keywords and model-specific physical permissions stay separate; no native Aircraft attachment provider is claimed."
+    }
+  ],
+  "metadata_gameplay_credit": false,
+  "qualification": "Supported real native bodies/equipment and native Swooping Hawks FLY; AIRCRAFT input is explicitly constructed Core keyword scope. No admitted native Aircraft geometry/provider/legal roster/setup/full-game certificate. Native current facade execution and separately supported canonical Core persistence/replay have distinct evidence."
+}

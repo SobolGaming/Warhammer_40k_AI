@@ -88,14 +88,23 @@ def validate_triggered_movement_source_witness(
     witness: PathWitness,
     source_model_placements: tuple[ModelPlacement, ...],
 ) -> None:
+    if not triggered_movement_witness_matches_source(
+        witness=witness, source_model_placements=source_model_placements
+    ):
+        raise GameLifecycleError(
+            "Triggered movement witness must match selected unit living models."
+        )
+
+
+def triggered_movement_witness_matches_source(
+    *, witness: PathWitness, source_model_placements: tuple[ModelPlacement, ...]
+) -> bool:
+    """Share the exact placed living inventory before commit and in the resolver."""
     if type(witness) is not PathWitness:
         raise GameLifecycleError("Triggered movement requires a PathWitness.")
     placements = _require_non_empty_model_placements(source_model_placements)
     expected_model_ids = tuple(sorted(placement.model_instance_id for placement in placements))
-    if tuple(sorted(witness.model_ids())) != expected_model_ids:
-        raise GameLifecycleError(
-            "Triggered movement witness must match selected unit living models."
-        )
+    return tuple(sorted(witness.model_ids())) == expected_model_ids
 
 
 def merge_triggered_movement_source_endpoints(
@@ -271,5 +280,6 @@ __all__ = (
     "retained_triggered_movement_blocker_ids",
     "triggered_movement_source_model_placements",
     "triggered_movement_unit_has_placed_living_source",
+    "triggered_movement_witness_matches_source",
     "validate_triggered_movement_source_witness",
 )

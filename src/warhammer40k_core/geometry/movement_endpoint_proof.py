@@ -209,8 +209,10 @@ def _goal_region(
             pose.position.z,
         )
     return both(
-        z.le(rational(goal.z_inches) + vertical + _SLACK),
-        (z + height).ge(rational(goal.z_inches) - vertical - _SLACK),
+        both() if goal.ignore_polygon_height else z.le(rational(goal.z_inches) + vertical + _SLACK),
+        both()
+        if goal.ignore_polygon_height
+        else (z + height).ge(rational(goal.z_inches) - vertical - _SLACK),
         either(
             *(
                 both(

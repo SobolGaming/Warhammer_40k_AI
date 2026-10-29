@@ -5,10 +5,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, replace
 
-from warhammer40k_core.core.objectives import (
-    DEFAULT_OBJECTIVE_CONTROL_VERTICAL_INCHES,
-    ObjectiveMarker,
-)
+from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -74,17 +71,18 @@ class ObjectiveModelDistance:
     horizontal_distance_inches: float
     vertical_gap_inches: float
     within_control_range: bool
+    closest_distance_inches: float
 
     def __post_init__(self) -> None:
-        for value in (self.horizontal_distance_inches, self.vertical_gap_inches):
+        for value in (
+            self.horizontal_distance_inches,
+            self.vertical_gap_inches,
+            self.closest_distance_inches,
+        ):
             if validate_finite_number("objective distance", value) < 0:
                 raise GameLifecycleError("Objective distances must be non-negative.")
         if type(self.within_control_range) is not bool:
             raise GameLifecycleError("Objective control range must be a bool.")
-
-    @property
-    def closest_distance_inches(self) -> float:
-        return math.hypot(self.horizontal_distance_inches, self.vertical_gap_inches)
 
 
 @dataclass(frozen=True, slots=True)
@@ -143,21 +141,40 @@ def measure_model_to_objective(
         )
         horizontal = context.horizontal_distance_inches()
         vertical = context.vertical_gap_inches()
-        horizontal_limit = marker.control_horizontal_inches
-        vertical_limit = marker.control_vertical_inches
+        closest = context.closest_distance_inches()
+        # Body measurements require one physical point for both marker axes.
+        # Ordinary base prisms already supply one pair of axis measurements.
+        within_range = (
+            context.within_axis_limits(
+                marker.control_horizontal_inches, marker.control_vertical_inches
+            )
+            if model.measures_every_part
+            else horizontal <= marker.control_horizontal_inches
+            and vertical <= marker.control_vertical_inches
+        )
     else:
-        horizontal = min(
-            shapely_backend.base_footprint_distance_to_polygon(model.base, model.pose, polygon)
+        separations = tuple(
+            (
+                shapely_backend.base_footprint_distance_to_polygon(
+                    subject.base, subject.pose, polygon
+                ),
+                max(bottom, -top, 0.0),
+            )
+            for subject in model.rules_distance_subjects()
+            for bottom, top in (subject.volume.vertical_interval(subject.pose),)
             for polygon in objective.footprint_polygons
         )
-        bottom, top = model.volume.vertical_interval(model.pose)
-        vertical = max(bottom, -top, 0.0)
-        horizontal_limit = 0.0
-        vertical_limit = DEFAULT_OBJECTIVE_CONTROL_VERTICAL_INCHES
+        horizontal = min(h for h, _ in separations)
+        vertical = min(v for _, v in separations)
+        # A scalar distance needs one physical pair, unlike axis diagnostics.
+        closest = min(math.hypot(h, v) for h, v in separations)
+        # Core14.02/FAQ34 terrain occupancy is unchanged by marker correlation.
+        within_range = horizontal <= 0.0
     return ObjectiveModelDistance(
         horizontal_distance_inches=horizontal,
         vertical_gap_inches=vertical,
-        within_control_range=horizontal <= horizontal_limit and vertical <= vertical_limit,
+        closest_distance_inches=closest,
+        within_control_range=within_range,
     )
 
 

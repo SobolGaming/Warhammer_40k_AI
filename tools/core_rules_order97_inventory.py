@@ -15,6 +15,10 @@ from pathlib import Path
 from typing import Any, cast
 
 from tests.category_migration_preservation import MIGRATED_PATHS, verify_migrated_test
+from tests.support.faction_layout_preservation import (
+    ORIGINALS as FACTION_LAYOUT_ORIGINALS,
+)
+from tests.support.faction_layout_preservation import verify_layout_original
 
 from tools.core_rules_40k_app_audit import roadmap_rows
 from tools.core_rules_order84_capture import fingerprint, source_inventory
@@ -32,11 +36,17 @@ class InventoryError(ValueError):
 
 
 def _path(reference: str, root: Path) -> Path:
+    from tools.performance_ci69_members import retired_test_source
+
+    retired = retired_test_source(root, reference)
     if reference in MIGRATED_PATHS:
         _, migration = verify_migrated_test(root, reference)
         path = root / migration["archive"]
+    elif reference in FACTION_LAYOUT_ORIGINALS:
+        _, relocation = verify_layout_original(root, reference)
+        path = root / relocation["archive"]
     else:
-        path = root / reference
+        path = retired[0] if retired is not None else root / reference
     if Path(reference).is_absolute() or not path.resolve().is_relative_to(root.resolve()):
         raise InventoryError(f"Evidence path escapes the repository: {reference}.")
     if not path.is_file():
@@ -156,6 +166,8 @@ def _symbol(
 
 def helper_source_paths(inventory: Inventory, *, root: Path = ROOT) -> set[str]:
     """Retain the shared fixture code that gives assertion ASTs their meaning."""
+    from tools.performance_ci69_members import retired_test_source
+
     pending = {a.nodeid.split("::", 1)[0] for a in inventory.assertions}
     pending.update(
         item.path
@@ -185,7 +197,7 @@ def helper_source_paths(inventory: Inventory, *, root: Path = ROOT) -> set[str]:
             if not node.module.startswith("tests."):
                 continue
             path = node.module.replace(".", "/") + ".py"
-            if not (root / path).is_file():
+            if not (root / path).is_file() and retired_test_source(root, path) is None:
                 path = node.module.replace(".", "/") + "/__init__.py"
             _path(path, root)
             helpers.add(path)
@@ -218,8 +230,23 @@ def validate_inventory(inventory: Inventory, *, root: Path = ROOT) -> None:
     if _unique(inventory.categories, "category") != {f"{i:02d}" for i in range(1, 26)}:
         raise InventoryError("All 25 categories are required.")
     _unique([item.path for item in inventory.files], "evidence file")
+    from tools import performance_ci60_qualification as ci60
+
     for item in inventory.files:
-        if hashlib.sha256(_path(item.path, root).read_bytes()).hexdigest() != item.sha256:
+        raw = _path(item.path, root).read_bytes()
+        if (
+            item.path
+            in {
+                "tests/setup_completion_helpers.py",
+                "tests/unit/test_phase12b_stratagem_framework.py",
+            }
+            and (root / ci60.NAMESPACE).is_dir()
+        ):
+            try:
+                raw = ci60.historical_test_preimage(root, item.path, raw)
+            except ValueError as exc:
+                raise InventoryError(f"Pinned evidence file drifted: {item.path}. {exc}") from exc
+        if hashlib.sha256(raw).hexdigest() != item.sha256:
             raise InventoryError(f"Pinned evidence file drifted: {item.path}.")
     pinned_paths = {item.path for item in inventory.files}
     if not helper_source_paths(inventory, root=root) <= pinned_paths:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import hashlib
-from typing import TypedDict, cast
+from typing import NotRequired, TypedDict, cast
 
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.battlefield_projection import (
@@ -27,6 +27,7 @@ from warhammer40k_core.adapters.redaction import (
     HIDDEN_REQUEST_ID,
     battle_formation_declarations_are_unresolved,
     decision_request_hidden_from_context,
+    public_army_roster_payload,
     public_decision_request_payload,
     public_primary_rules_unit_turn_start_snapshots,
     public_victory_point_ledger_payload,
@@ -306,6 +307,7 @@ class ModelDisplayPayload(TypedDict):
 
 
 class GameViewPayload(TypedDict):
+    public_army_rosters: NotRequired[list[dict[str, JsonValue]]]
     projection_schema: str
     projection_state_hash: str
     rules_catalog: RulesCatalogReferencePayload
@@ -571,6 +573,14 @@ def project_game_view(
         omniscient=context.policy.omniscient,
     )
     payload: GameViewPayload = {
+        "public_army_rosters": [
+            public_army_roster_payload(request=request, state=state, viewer=context)
+            for request in lifecycle.config.army_muster_requests
+            if any(
+                army.army_id == request.army_id and army.player_id == request.player_id
+                for army in state.army_definitions
+            )
+        ],
         "projection_schema": PROJECTION_SCHEMA_VERSION,
         "projection_state_hash": "",
         "rules_catalog": rules_catalog,

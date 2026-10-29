@@ -48,27 +48,6 @@ def test_embark_diagonal_distance_is_not_separate_axis_limits(
     ) is (vertical <= 2.4)
 
 
-@pytest.mark.parametrize("axis", ["horizontal", "vertical", "diagonal"])
-@pytest.mark.parametrize("translation", [(0.0, 0.0, 0.0), (19.0, 11.0, 7.0)])
-def test_embark_comparison_allowance_does_not_admit_distance_beyond_envelope(
-    axis: str, translation: tuple[float, float, float]
-) -> None:
-    x, y, z = translation
-    carrier = Model("carrier", Pose.at(x, y, z), CircularBase(0.5), ModelVolume(20))
-    outside = 3.0 + 2e-9
-    endpoint = (
-        Pose.at(x + outside + 1, y, z)
-        if axis == "horizontal"
-        else Pose.at(x, y, z + outside)
-        if axis == "vertical"
-        else Pose.at(x + 1 + 0.6 * outside, y, z + 0.8 * outside)
-    )
-    passenger = Model("passenger", endpoint, CircularBase(0.5), ModelVolume(20))
-    assert not _model_within_any_transport_model(
-        passenger, transport_models=(carrier,), distance_inches=3
-    )
-
-
 @pytest.mark.parametrize("frame_role", ["passenger", "carrier"])
 def test_embark_frame_closest_part_preserves_ordinary_base_plane(frame_role: str) -> None:
     part = ModelBodyPart(

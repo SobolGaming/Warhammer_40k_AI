@@ -1,0 +1,203 @@
+{
+  "status": "RESOLVED_FOR_RULE_CONTRACT_COVERAGE; native datasheet integration limitations retained",
+  "groups": {
+    "absent_m": {
+      "candidate_rows": 52,
+      "candidate_datasheet_ids": [
+        "000000087",
+        "000000097",
+        "000000098",
+        "000000099",
+        "000000122",
+        "000000243",
+        "000000458",
+        "000000459",
+        "000000498",
+        "000000562",
+        "000000567",
+        "000000603",
+        "000000606",
+        "000000747",
+        "000000755",
+        "000000758",
+        "000000762",
+        "000000785",
+        "000000786",
+        "000000914",
+        "000000917",
+        "000000918",
+        "000000919",
+        "000000920",
+        "000000921",
+        "000000922",
+        "000000923",
+        "000001470",
+        "000001545",
+        "000001576",
+        "000001587",
+        "000001588",
+        "000002068",
+        "000002267",
+        "000002361",
+        "000002362",
+        "000002459",
+        "000002462",
+        "000002499",
+        "000002619",
+        "000002739",
+        "000002807",
+        "000002808",
+        "000002809",
+        "000002810",
+        "000002811",
+        "000003955",
+        "000003956",
+        "000003957",
+        "000003958",
+        "000003959",
+        "000004031"
+      ],
+      "with_provider_height_ids": []
+    },
+    "absent_oc": {
+      "candidate_rows": 3,
+      "candidate_datasheet_ids": [
+        "000000603",
+        "000000606",
+        "000004092"
+      ],
+      "with_provider_height_ids": []
+    },
+    "absent_s": {
+      "candidate_rows": 48,
+      "candidate_datasheet_ids": [
+        "000000087",
+        "000000122",
+        "000000436",
+        "000000458",
+        "000000487",
+        "000000488",
+        "000000741",
+        "000000922",
+        "000000923",
+        "000001470",
+        "000001545",
+        "000001588",
+        "000002068",
+        "000002459",
+        "000002619",
+        "000002809",
+        "000002810",
+        "000003651",
+        "000003652",
+        "000003653",
+        "000003654",
+        "000003938",
+        "000003939",
+        "000003940",
+        "000003941",
+        "000003942",
+        "000003944",
+        "000003950",
+        "000003955",
+        "000003976",
+        "000003977",
+        "000003993"
+      ],
+      "with_provider_height_ids": []
+    },
+    "random_model": {
+      "candidate_rows": 0,
+      "candidate_datasheet_ids": [],
+      "with_provider_height_ids": []
+    },
+    "other_random_weapon": {
+      "candidate_rows": 3,
+      "candidate_datasheet_ids": [
+        "000000037",
+        "000000039",
+        "000001388"
+      ],
+      "with_provider_height_ids": []
+    },
+    "unqualified_grant": {
+      "selected_native_control": "Maulerfiend Siege Crawler; M/Advance/Charge only",
+      "status": "Constructed unqualified contract covers the production permission evaluator; no native unqualified grant is claimed."
+    }
+  },
+  "obligations": {
+    "02.02-obligation-01": {
+      "group": "absent_m",
+      "native_integration_limitation": "Actual absent-M movement consumer requires a real admitted model; all52 raw candidate rows lack a selected-provider height override.",
+      "disposition": "Covered by explicitly constructed Core contract; see coverage.json."
+    },
+    "02.02-obligation-02": {
+      "group": "absent_m",
+      "native_integration_limitation": "Actual absent-M setup requires a real admitted model; same52 candidate rows lack a selected-provider height override.",
+      "disposition": "Covered by explicitly constructed Core contract; see coverage.json."
+    },
+    "02.02-obligation-07": {
+      "group": "absent_oc",
+      "native_integration_limitation": "All3 raw absent-OC candidate rows lack a selected-provider height override; no real instantiated objective-control case available.",
+      "disposition": "Covered by explicitly constructed Core contract; see coverage.json."
+    },
+    "02.04.01-obligation-01": {
+      "group": "absent_s",
+      "native_integration_limitation": "All48 raw absent-S candidate rows lack selected-provider height overrides. Some rows may be placeholder/non-current weapons; no admitted equipped real weapon established.",
+      "disposition": "Covered by explicitly constructed Core contract; see coverage.json."
+    },
+    "02.02.03-obligation-01": {
+      "group": "random_model",
+      "native_integration_limitation": "No random model-characteristic row among1817 retained raw model rows; cannot create native random-M selection timing case without altering real stats.",
+      "disposition": "Covered by explicitly constructed Core contract; see coverage.json."
+    },
+    "02.02.03-obligation-02": {
+      "group": "random_model",
+      "native_integration_limitation": "No retained raw random-M profile to supply a real unit movement value; no fabricated stat substitution made.",
+      "disposition": "Covered by explicitly constructed Core contract; see coverage.json."
+    },
+    "02.02.03-obligation-08": {
+      "group": "other_random_weapon",
+      "native_integration_limitation": "All3 raw other-random weapon candidates (Zzap gun S) lack selected-provider height overrides; no random model profiles. Per-model/weapon other-random use remains unexecuted.",
+      "disposition": "Covered by explicitly constructed Core contract; see coverage.json."
+    },
+    "02.02.02-obligation-01": {
+      "group": "unqualified_grant",
+      "native_integration_limitation": "No native unqualified modifier-ignore grant established in the selected real definitions. Siege Crawler is qualified to M/Advance/Charge. An invented unqualified datasheet ability was not substituted; this remains a test-design/source prerequisite, not a proven engine defect.",
+      "disposition": "Covered by explicitly constructed Core contract; see coverage.json."
+    }
+  },
+  "probe_results": [
+    {
+      "id": "000002359",
+      "label": "Lokhust Destroyers; native nested conditions",
+      "loadable": false,
+      "error": "Representative model height override is required."
+    },
+    {
+      "id": "000000087",
+      "label": "Drop Pod; absentM/absentS",
+      "loadable": false,
+      "error": "Representative model height override is required."
+    },
+    {
+      "id": "000004092",
+      "label": "Heldrake; absentOC",
+      "loadable": false,
+      "error": "Representative model height override is required."
+    },
+    {
+      "id": "000001588",
+      "label": "Skull Altar; absentS",
+      "loadable": false,
+      "error": "Representative model height override is required."
+    },
+    {
+      "raw_model_rows": 1817,
+      "random_model_profiles": []
+    }
+  ],
+  "raw_inventory_receipt": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-8\\conditional-prerequisite-inventory.json",
+  "raw_inventory_sha256": "22bff1920ce79ab636c2298e3baf8f9564f949898dd5fcdd05ae82a009713490",
+  "qualification": "Parent authorized explicitly labelled constructed Core contract inputs where real source/provider coverage is unavailable. No provider/geometry support or real source stats changed. Candidate inventory is not an adoption decision. Missing height overrides remain legitimate provider rejections, not crashes."
+}

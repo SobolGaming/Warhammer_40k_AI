@@ -1,0 +1,84 @@
+{
+  "governing_commit": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "reconstructed_tree": "1fa709a167abb369932e651f89babbd0034941c5",
+  "baseline_entries": 6442,
+  "merge_seal_sha256": "98d78c6a40f75677268d7d8f97328bb72c6429cbf95bc2f5cc3d6777b0b241fe",
+  "selected_payloads": [
+    {
+      "name": "USER_AUTHORIZATION.json",
+      "sha256": "e3f8c5c013595a8455c007ada8bf33778eab06eb56a678f3ce4cfc4bfa6f1475",
+      "bytes": 512,
+      "seal_matches": true
+    },
+    {
+      "name": "MERGE_RESULT.json",
+      "sha256": "c7807e148ed71c0ea941d0a368639d08921cb15f2b191128a3fb430ad2d23b49",
+      "bytes": 284,
+      "seal_matches": true
+    },
+    {
+      "name": "VERIFIED_MERGE.json",
+      "sha256": "5b1fb9a972fadca1613d1e93a889367e7183a3ee9733fe60e06ddd01e50b6770",
+      "bytes": 915,
+      "seal_matches": true
+    },
+    {
+      "name": "PR_AFTER_MERGE.json",
+      "sha256": "316693f639a4d0f7afa86c4b42ccc7b30747e502a960b08e8c2a36f440e6bc8e",
+      "bytes": 23157,
+      "seal_matches": true
+    },
+    {
+      "name": "merged-parentage.stdout",
+      "sha256": "d707d0c8ae427c5c151f0a3f260b6a851d9f6a6ed78411b2072b0846a69aac25",
+      "bytes": 82,
+      "seal_matches": true
+    },
+    {
+      "name": "fetched-main-sha.stdout",
+      "sha256": "ef7f75380de5743f5620393622638c0c74f292dfe50c06626f4f51745cce036b",
+      "bytes": 41,
+      "seal_matches": true
+    },
+    {
+      "name": "fetched-main-tree.stdout",
+      "sha256": "60a57502ab6e49753979d52c240a3ee30859b3e0530aaec645a8f8c02bc329b0",
+      "bytes": 41,
+      "seal_matches": true
+    },
+    {
+      "name": "reviewed-canonical-tree.stdout",
+      "sha256": "f31db4dbad303d8f852aa1a44d7f872028eb225e4fa4d911ef5c63b6df4ffc28",
+      "bytes": 809099,
+      "seal_matches": true
+    },
+    {
+      "name": "merged-canonical-tree.stdout",
+      "sha256": "f31db4dbad303d8f852aa1a44d7f872028eb225e4fa4d911ef5c63b6df4ffc28",
+      "bytes": 809099,
+      "seal_matches": true
+    },
+    {
+      "name": "CANONICAL_BLOBS.json",
+      "sha256": "234b23117e90635e84b9aee89726d36c5ae86a47fc3b801e7a7b43c92d18b52d",
+      "bytes": 1305138,
+      "seal_matches": true
+    }
+  ],
+  "current_source_sha256": "4892160053d56dcde98c6b780497c0b1b956168af8d009fe22fd6dbd709989b9",
+  "files": 7039,
+  "task15_source_manifest_equal": true,
+  "retained_local_qualification_provenance": {
+    "local_disposable_commit": "65673dead8d763287c6e5f74467f338d2b357f0d",
+    "tree": "ceb6ba551e7baabb4080fbfcf77f416a3059041e",
+    "actual_local_parent": "dbfe7772e2a58509fdc2072785d102a51687bce3",
+    "parent_qualification_artifact": "3a4dbf885ed23a29f75d024c9c30c9f774316205",
+    "accepted_historical_git_base": null,
+    "source_sha256": "4892160053d56dcde98c6b780497c0b1b956168af8d009fe22fd6dbd709989b9",
+    "selection_sha256": "dfb863b8f12ef287b105aa8d920b6381c988881adb7cddfb08c1f683cd20552b",
+    "patch_sha256": "b4d77d19e6b5fcc24ef8c957368b6c1e5d8967a05a7a69d9937dfa924160403d",
+    "publication": false,
+    "local_settings_only_in_command_arguments": true
+  },
+  "qualification": "Retained sealed exports and candidate overlays authenticated freshly. No fresh Git/history/live filesystem modes, ignored/untracked input discovery, runtime execution, original nonmutation scan or model/effort attestation claimed."
+}

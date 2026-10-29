@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from pathlib import Path
 from typing import cast
 
 import pytest
@@ -379,8 +380,13 @@ def test_phase17k_collar_of_khorne_catalog_ir_records_bearer_psychic_fnp_source(
     )
 
 
-def test_world_eaters_maulerfiend_exact_rule_ir_resolves_scent_and_savage_exaltation() -> None:
-    package = _ability_support_catalog_package(datasheet_ids=("000002639", "000004091"))
+def test_world_eaters_maulerfiend_exact_rule_ir_resolves_scent_and_savage_exaltation(
+    selected_army_source_index: Path | None,
+) -> None:
+    package = _ability_support_catalog_package(
+        datasheet_ids=("000002639", "000004091"),
+        source_index_dir=selected_army_source_index,
+    )
     factory = UnitFactory(
         catalog=package.army_catalog,
         model_geometries=package.model_geometries,

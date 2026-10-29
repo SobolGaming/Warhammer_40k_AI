@@ -1,0 +1,12 @@
+{
+  "loader": "Existing selected-army source index, authenticated separately; selected native definitions built once per process.",
+  "native_datasheets": [
+    "000004080",
+    "000004078",
+    "000000592",
+    "000000968"
+  ],
+  "state": "Fresh unit graphs via selected UnitFactory + deep copy, real battlefield/health/controller owners. No mustering or prior phases.",
+  "mission": "Existing Section07 immutable source-complete fixture reused once for facade completion only.",
+  "permissions": "No expected sequencing or passed-state policy is supplied to a rule consumer. Explicit duplicate source permission is a labeled collector contract."
+}

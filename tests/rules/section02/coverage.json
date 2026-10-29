@@ -1,0 +1,3242 @@
+{
+  "schema": 1,
+  "milestone_status": "COMPLETE_BOUNDED_SECTION02_CORPUS",
+  "counts": {
+    "subsections": 7,
+    "subsubsections": 12,
+    "rule_rows": 19,
+    "rule_obligations": 97,
+    "local_faq_rows": 3,
+    "local_faq_obligations": 3
+  },
+  "authority": {
+    "adopted_full_capture": "data/source_audits/order135/retained-current-sources.json",
+    "adopted_observed_at": "2026-10-01T12:04:31.127429+00:00",
+    "adopted_bindings": "data/source_audits/order135/current-bindings.json",
+    "newer_full_body_observed_at": "2026-10-15T15:36:12.248781+00:00",
+    "newer_body_version": null,
+    "newer_changelog_version": 981,
+    "newer_body_file": "C:/Users/nostr/Documents/Codex/2026-10-15/task-2/audit-v981/sources/live-core-rows.json",
+    "newer_body_sha256": "61c8b96565754220a7be60b350bb0f554cbee7356f072966c6a174a2131e2e64",
+    "comparison": "All19Section02 rule row fingerprints unchanged. Body timestamp is not changelog version. No v981 adoption or source-authority change made."
+  },
+  "status_meanings": {
+    "behavior": "New assertion exercises the named production semantic owner, at the layer explicitly described; not fullgame certification.",
+    "partial_behavior": "Some behavior asserted; listed portions still missing.",
+    "definition_only": "Real instantiated definition checked; not a live rule consumer.",
+    "mapped_only": "Source and owner accounted for; no new execution. Predecessor references are not a current pass claim.",
+    "blocked_prerequisite": "Operative requirement accounted for but native real-profile/source prerequisite prevents the new execution. No pass, skip, or engine-correctness claim."
+  },
+  "sources": [
+    {
+      "source_id": "rule:02:02.01:1",
+      "section": "02.01",
+      "title": "Datasheet Name",
+      "source_sha256": "33d1866d144a897dc0d4a854fac875815a4d36028e765095ab70b75de9d1624f",
+      "block_sha256": {
+        "1": "cbf94e0f9a5d38fb5a5bdefc544e7bd67f5022f0a135390dd60caf679f961e08"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "metadata",
+          "reason": "Rendering metadata; does not add a gameplay rule."
+        }
+      ],
+      "requirements": []
+    },
+    {
+      "source_id": "rule:02:02.01.01:1",
+      "section": "02.01.01",
+      "title": "Datasheet Name and Keywords",
+      "source_sha256": "85e5ef1733b9cca9f2578256913dd334f10f03f4bd96a59a0583f1bf04aa288b",
+      "block_sha256": {
+        "1": "91101d9c198534f36db22c5582fcedcbb99cbf30387ccb4356cc5c4654cdf6c1"
+      },
+      "context": [],
+      "requirements": [
+        {
+          "id": "02.01.01-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "clause": "A datasheet's name contributes an additional canonical unit keyword.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:UnitInstance.keywords"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.01.01-obligation-01",
+          "predecessor_nodes": [],
+          "current_successor_nodes": [
+            "tests/unit/test_order123_datasheet_identity.py::test_name_is_normalized_once_without_rewriting_retained_catalog_keywords",
+            "tests/unit/test_order123_datasheet_identity.py::test_scoped_and_materialization_assignments_add_only_datasheet_identity",
+            "tests/unit/test_order123_datasheet_identity.py::test_live_model_scope_keeps_identity_after_specialist_casualty",
+            "tests/unit/test_order123_datasheet_identity.py::test_identity_keeps_native_keyword_punctuation_and_deduplicates",
+            "tests/unit/test_order123_datasheet_identity.py::test_official_admitted_catalog_already_has_names_and_preserves_reconciliation",
+            "tests/unit/test_order123_datasheet_identity.py::test_catalog_name_transport_and_enhancement_gates_share_identity",
+            "tests/unit/test_order123_datasheet_identity.py::test_materialized_model_keeps_datasheet_identity_despite_distinct_model_label",
+            "tests/unit/test_order123_datasheet_identity.py::test_loaded_lifecycle_identity_pending_continuation_fork_viewers_and_exact_replay",
+            "tests/unit/test_order123_datasheet_identity.py::test_contextful_generic_gates_preserve_both_native_sides",
+            "tests/unit/test_order123_datasheet_identity.py::test_name_role_and_independent_grant_keep_conventional_keyword_compatibility",
+            "tests/unit/test_order123_datasheet_identity.py::test_near_names_coexist_in_one_attached_inventory_without_aliasing_each_other",
+            "tests/unit/test_order123_datasheet_identity.py::test_explicit_native_selector_declarations_disambiguate_eager_validation_only",
+            "tests/unit/test_order123_datasheet_identity.py::test_model_name_payload_metadata_is_strictly_paired",
+            "tests/unit/test_order123_datasheet_identity.py::test_weapon_positive_negative_and_anti_selectors_keep_native_spelling",
+            "tests/unit/test_order123_datasheet_identity.py::test_current_runtime_restore_authenticates_name_classification",
+            "tests/unit/test_order123_datasheet_identity.py::test_native_selector_metadata_preserves_eager_domain_container_errors",
+            "tests/unit/test_order123_datasheet_identity.py::test_declared_native_weapon_selectors_preserve_names_at_grammar_boundaries",
+            "tests/unit/test_order123_datasheet_identity.py::test_selected_mustering_name_grant_keeps_its_independent_ordinary_role",
+            "tests/unit/test_order123_datasheet_identity.py::test_mustering_name_role_is_limited_to_the_selected_model_profile"
+          ],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_01_identity.py::test_02_01_01_datasheet_identity_is_an_exact_additional_keyword"
+          ],
+          "assertion": "Four actual unit names match exact keyword selectors; partial name tokens do not.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/unit_keyword_queries.py:unit_has_keyword; engine/unit_factory.py:UnitInstance.keywords"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.02:1",
+      "section": "02.02",
+      "title": "Profiles",
+      "source_sha256": "63d7331e78c7d66b7f451704da49555f992ed4128eea23eabb6941d199709588",
+      "block_sha256": {
+        "1": "f914bf47a22eb251158564e246b33a9cce9ac0d2a8c9c53b5c220f3e248f1ed2",
+        "2": "b1f2f844b4cb7c3e67c6756b2026df35937d0588d41ba75456cb65f69b475313",
+        "3": "50fd6ebc100a7d6c4b1bd408a08e541a07f404288dd237be69d25df034e562d9",
+        "4": "686f321decc81baccbb4a6212854e5563b52f1c1ce8f4c749c2a877d2db48d48",
+        "5": "3d2712873295af82af21a160b1d563813cc7df19798a2e64083d1b6a42a4f2b5",
+        "6": "d576ea4fddaec77271e71d73b961f9dd8142e9eea8cfd8246ef82c7ce131246c",
+        "7": "b384a7d6965b13c2ab266d2c6d24771a14d0812a1bc7f57336aa8083cdf504a3",
+        "8": "c4762ddec801ac0c25d8ccad25caf7fbaa2c5655b00ae00117b8a6ed9620f349"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            1,
+            3
+          ],
+          "classification": "context",
+          "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "02.02-obligation-01",
+          "source_blocks": [
+            2
+          ],
+          "clause": "An absent M characteristic forbids movement.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/movement_resolvers.py:resolve_advance_move"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02-obligation-01",
+          "predecessor_nodes": [],
+          "current_successor_nodes": [
+            "tests/unit/test_order115_absent_movement.py::test_absent_movement_cannot_advance_or_use_a_normal_move_bonus",
+            "tests/unit/test_order115_absent_movement.py::test_fixed_distance_reaction_preserves_per_model_absence",
+            "tests/unit/test_order115_absent_movement.py::test_facade_advance_retry_completion_restore_fork_and_replay",
+            "tests/unit/test_order115_absent_movement.py::test_shared_permission_serializes_and_proves_fixed_pose_reachability",
+            "tests/unit/test_order115_absent_movement.py::test_attached_movement_keeps_dash_bodyguard_fixed_and_numeric_leader_mobile",
+            "tests/unit/test_order115_absent_movement.py::test_dash_reactive_hold_is_an_engine_created_restorable_completion",
+            "tests/unit/test_order115_absent_movement.py::test_dash_fighter_completes_lethal_attacks_and_post_destruction_continuation",
+            "tests/unit/test_order115_absent_movement.py::test_fixed_oval_surge_certifies_maximum_approach_and_restores"
+          ],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_constructed_contracts.py::test_02_02_absent_m_requires_fixed_pose_through_movement_consumers"
+          ],
+          "assertion": "Constructed absent M rejects translation, rotation and leave-and-return paths through actual normal, advance and fixed-distance movement consumers, with unchanged input state and model_pose_fixed violations. Hold succeeds; numeric M=0 with the same positive allowance permits these paths. 24 independent cases; no native absent-M datasheet certification.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/phases/movement_resolvers.py:resolve_normal_move",
+            "engine/phases/movement_resolvers.py:resolve_advance_move",
+            "engine/triggered_movement_resolution.py:resolve_triggered_movement"
+          ],
+          "evidence_kind": "constructed_rule_contract",
+          "native_integration_limitation": "prerequisites.json#absent_m"
+        },
+        {
+          "id": "02.02-obligation-02",
+          "source_blocks": [
+            2
+          ],
+          "clause": "An absent M characteristic still permits setup.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02-obligation-02",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_absent_movement_characteristic_still_allows_physical_setup"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_constructed_contracts.py::test_02_02_absent_move_still_accepts_actual_reserve_setup"
+          ],
+          "assertion": "Actual reserve-arrival setup validator accepts complete coherent placements for the explicitly constructed absent-M contract and emits the setup transition; input state and absent characteristic are preserved.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/reserves.py:resolve_reserve_arrival"
+          ],
+          "evidence_kind": "constructed_rule_contract",
+          "native_integration_limitation": "prerequisites.json#absent_m"
+        },
+        {
+          "id": "02.02-obligation-03",
+          "source_blocks": [
+            4
+          ],
+          "clause": "The Sv characteristic is an armor-save threshold.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02-obligation-03",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_roll_checks_one_invulnerable_then_armour"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_profiles.py::test_02_02_armor_threshold_is_inclusive"
+          ],
+          "assertion": "Real Sv3 resolves rolls2/3/4 as fail/pass/pass.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/saves.py:resolve_saving_throw"
+          ]
+        },
+        {
+          "id": "02.02-obligation-04",
+          "source_blocks": [
+            5
+          ],
+          "clause": "The optional InSv characteristic is an invulnerable-save threshold.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02-obligation-04",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_roll_checks_one_invulnerable_then_armour"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_profiles.py::test_02_02_save_profiles_produce_real_save_options",
+            "tests/rules/section02/test_02_02_profiles.py::test_02_02_invulnerable_threshold_is_used_when_armour_is_worse"
+          ],
+          "assertion": "Real Dire Avenger InSv5 succeeds at5/6 and fails at1/4 with AP-3 armour worse.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/saves.py:save_options_for_model",
+            "engine/saves.py:resolve_saving_throw"
+          ]
+        },
+        {
+          "id": "02.02-obligation-05",
+          "source_blocks": [
+            6
+          ],
+          "clause": "Reaching zero wounds destroys a model.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02-obligation-05",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_model_health_definition_matches_full_wounds_and_zero_health_casualties"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_04_healing.py::test_02_02_wound_threshold_and_excess_damage"
+          ],
+          "assertion": "Real2W models survive1, die at2/3 damage, lose excess, leave other models untouched.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/damage_allocation.py:apply_damage_to_model"
+          ]
+        },
+        {
+          "id": "02.02-obligation-06",
+          "source_blocks": [
+            7
+          ],
+          "clause": "Ld is the threshold for leadership rolls.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02-obligation-06",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_leadership_battle_shock_uses_two_d6_and_inclusive_threshold"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_profiles.py::test_02_02_leadership_threshold_consumes_real_profile"
+          ],
+          "assertion": "Actual Ld6 consumer fails5 and passes6/7.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/battle_shock.py:BattleShockResult.from_roll_state"
+          ]
+        },
+        {
+          "id": "02.02-obligation-07",
+          "source_blocks": [
+            8
+          ],
+          "clause": "An absent OC characteristic prevents objective control.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:ModelInstance"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02-obligation-07",
+          "predecessor_nodes": [
+            "tests/unit/test_order79_control_first.py::test_control_precedes_aircraft_departure_and_exactly_replays"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_constructed_contracts.py::test_02_02_absent_oc_contributes_no_control_value"
+          ],
+          "assertion": "Constructed absent OC remains absent and contributes zero; actual Infractor OC2 is positive control. No geometry needed.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/objective_control.py:model_objective_control_characteristic"
+          ],
+          "evidence_kind": "constructed_rule_contract",
+          "native_integration_limitation": "prerequisites.json#absent_oc"
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.02.01:1",
+      "section": "02.02.01",
+      "title": "Modifiers",
+      "source_sha256": "b41c116532995553e3e5b5df1a3c970caf452a388f8ab49511fcf64fa0849d17",
+      "block_sha256": {
+        "1": "73d07244a9921cef5ec32b24bd0d06b9841e067fc633f0dfb935c806a5fbf518",
+        "2": "eef5d1a6ccdd34741afd8e0382e017e25ed9307a8f4122ed7f454876c48871f2",
+        "3": "4bc64d0b6f3c0a5fe1c66e26717a85d312e1ce8836fc527cfa06714662c6214b",
+        "4": "5ecd4d1a94f400a406758239fa5cb93714d7c1f472ba841cea7a03d78ece2e15",
+        "5": "487ebcf532b82bda9c3c0c858daa8c14cb6d4de39068bb2808c28720999411cb",
+        "6": "285ee710c301855a73285042fbfd60d8c3441545522b98ad46cc6c63da42b8ac",
+        "7": "d3a318f205b53396e3e7db6118033576c6ff0107582f3fd9e53be70572d7913a",
+        "8": "dde7ca1fe7dc93f1faf5828f9dd6d7759f2d90767f674a98275fb308f4021936",
+        "9": "85e145c1b06d4b3a75c6c0ac6702c31d1208b5747abd9ae39ba9ebacf9478a7b",
+        "10": "6fba0a49f190c1054133cb82ee1c3b4ef969c8fbd5e3c7b2231e051beb84e7b4",
+        "11": "3f62be86a67a88ef35e07ee652f347713e6c938bc0935dd84cf2e65bee7b988d",
+        "12": "05bdbd29aee70702f05418398f17684ab05095255f00e9c33d9b0542827a1a25",
+        "13": "a42c3c78abcdf3ece8c55d4d676adae68021843df8456acabd97cc1bda638137",
+        "14": "79648d8a1be6cd790ea3bdfc4fa24f8b9472f74549a96625524388f6825f549c",
+        "15": "4cfe596f6c95fb29acc58ac223566c95d3421e403f866f7b82666ba6e7695567",
+        "16": "07877a85427c11fddc5d21d171577d9f0a224ce208ae5b8600571f9458a8a9d9",
+        "17": "a898a09a268b467dc00539788193ae5d7bbacdd594383eaf8aa836ec1c4a95ae",
+        "18": "35a113ae16837e00e1a5573354f5a05b403e0ea0788a842577bb3140aadb4920",
+        "19": "384aac8874f23e926d7e3b2c4faa609748d2a25c78a5d98d231829ac903a8171",
+        "20": "ed150a2fc7bc89df59104edbe2d0630a36e07dbc17633ecdd77cd873129c6fe2",
+        "21": "2a4cc1e6c36cc1244b59e8a97a5bee3b44115667f4d0957f657dc3078232aece",
+        "22": "b2d81e3379d39efd0609a3746a3ca8762968b0d1fc928a45c1bf819f0b8afa42",
+        "23": "339140446ba6dc07650ec21c1d7b6b409a419a8289bfe82b926f66e578f82815",
+        "24": "78f8be2e66144f967aec043e32d3b0abc413805dbac0b14eab5d07b2e5fbdac0",
+        "25": "ae5ba720b29c5b53def68c30a803c9723ed1a2a6495332ebbc3201b7335c3c5c",
+        "26": "a55ce2690f18aedff26308e586e9906ea1ce5a252db015f7c6af908d835a6523",
+        "27": "fd3f9fc693a03c57652f9b5b4ae2bed568c83b48b59d0444798974524a5c4eaf",
+        "28": "a98c16cd1c453eb4da9c49aec904005adef41c18a1b1e83207b9f211d7e9c0b6",
+        "29": "18ba544b0a9a7c8f800b180711c564fc3ecaf9aba140fd4322fddb603b13250f",
+        "30": "1de5bea8e62b1c708222e0cc628a1b1df609e36ff16365844eaca749734b1391",
+        "31": "9473a7ef889c53dd02d0c3245029babb4a8d28eff33eb73efa90fd13b94b2b22",
+        "32": "6fac94c284137628eeab74c6f777e5e91ebba86fe70893fbf9a04088581d01c1",
+        "33": "af45f7ba5a78d94edf234c244f85d131a198b7d99e6d53553caf4653b63c4137",
+        "34": "97c0e9893b66aa8186e7069ed3e32d9619cc57a0dc40b7df74f36ee41cd2390d",
+        "35": "c023ee9e6197021babdc60abe79b70bf92088f48bd4647867086fd790533a145",
+        "36": "6169184e2cb47485ec7d3b00d44e9d8dd9c98ee40f1073135769b368a04497f4",
+        "37": "9d81190662e2f02abef2d0690a13b65b6b90bf8bb628ebf86992aa6df40356ca",
+        "38": "49acb0cff2df82a00667524c4ef24841f94d35ebe7cce8f14949d73174411bb2",
+        "39": "8e187a3ba6e370dc7bd10869e843770c7a176591cee3bb3f967dfe15e94349b1",
+        "40": "63055a4072a2adbf23ab0738195a66e5bf0eceb5f808ee219a5788a4302b2a1b",
+        "41": "8441cc02c68a1b1bebe60d1414a4c29432d33a0ee4ef13ce38d6f344300c0fd5",
+        "42": "76c8396e2d3c98baa2c6b50f6ab67410e0fcf3c41482742da892b3d4aeebea2a",
+        "43": "795c5779f2352c2767b96d005946fd3cfee624a4cd08bd51963079ffeea27a50",
+        "44": "851d7c2fc5fd3c717a41c5ef08ed35f03c96b1df691b01f898db83c0289975d3",
+        "45": "e5e30a43eabf473891a87d13b76b44fd2849a5f9ee732d2d60a02abc100e2a29",
+        "46": "e1c41fdbd8208991a4c4924547b39e8a579d771663146ed78cc045bb404fd133",
+        "47": "c999619aeaa62133273e5864fed9632a51bd7117a99d5766ee5a8358bd4a0839",
+        "48": "b4ace15533e0901f11cf7f695ab91d93bb3c59ee699d3c9f5ee017dfa0d4543f",
+        "49": "82b898c5d8d705ea999b1d86a5f3e3b7b291cc2b030e33a85b2292e848df7539",
+        "50": "c1fc5980afb1cd0c1d246ab75fd8e7f34fd1c6147624264fb1db96f9252ee3f5",
+        "51": "cb839d51a90c375640c83b9ebcf2061783f2e380ae8478c952de6209d46d0723",
+        "52": "dd3fe15a91c3a76ccfc89020b60e367252b20de03818970da23bc4fcc8d2b3e8",
+        "53": "b55009f9317d22edb8bb1b89b614a09085c214bb2c80c430938e1fc807dd2246",
+        "54": "69fa52af82436add8b12515e59db12e5a1422cc966e79a8a9c888cf44444484b",
+        "55": "011293f1226ecddc85cf3dbfb9f0f5c04b998fdea2bced53fdaa75858ea0d5ce"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            1,
+            2,
+            3,
+            8,
+            10,
+            18,
+            19,
+            22,
+            36,
+            42,
+            43,
+            52,
+            53
+          ],
+          "classification": "context",
+          "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+        },
+        {
+          "source_blocks": [
+            5,
+            7
+          ],
+          "classification": "example",
+          "reason": "Illustration of the separately inventoried operative rule."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "02.02.01-obligation-01",
+          "source_blocks": [
+            4
+          ],
+          "clause": "A positive characteristic modifier improves the characteristic according to its direction.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_direction_matches_characteristic_meaning"
+          ],
+          "assertion": "Production direction function maps improve/worsen to signed deltas for nine characteristics; bounds tested separately.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "rules/rule_characteristic_parser.py:_directional_characteristic_delta"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-02",
+          "source_blocks": [
+            6
+          ],
+          "clause": "A negative characteristic modifier worsens the characteristic according to its direction.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-02",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_direction_matches_characteristic_meaning"
+          ],
+          "assertion": "Production direction function maps improve/worsen to signed deltas for nine characteristics; bounds tested separately.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "rules/rule_characteristic_parser.py:_directional_characteristic_delta"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-03",
+          "source_blocks": [
+            9
+          ],
+          "clause": "Applicable modifiers accumulate.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-03",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_accumulates_in_source_order_and_rounds_only_at_end"
+          ],
+          "assertion": "Exact Fraction steps SET/MUL/ADD/DIV/SUB yield4.5 then ceil5 regardless input order.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:ModifierStack.arithmetic_steps/resolve"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-04",
+          "source_blocks": [
+            11
+          ],
+          "clause": "Value replacements occur before arithmetic modifiers.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-04",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_accumulates_in_source_order_and_rounds_only_at_end"
+          ],
+          "assertion": "Exact Fraction steps SET/MUL/ADD/DIV/SUB yield4.5 then ceil5 regardless input order.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:ModifierStack.arithmetic_steps/resolve"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-05",
+          "source_blocks": [
+            12
+          ],
+          "clause": "Replacement of a characteristic with zero, absent, or asterisk is terminal for subsequent modifiers.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-05",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order26_symbolic_replacements_are_terminal_and_serializable",
+            "tests/unit/test_attributes_modifiers.py::test_order26_zero_replacement_is_terminal_even_for_damage"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_terminal_replacement_blocks_later_arithmetic"
+          ],
+          "assertion": "SET0/dash/star are terminal and exclude bonus operation.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-06",
+          "source_blocks": [
+            13
+          ],
+          "clause": "Multiplication follows replacement and precedes addition.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-06",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_accumulates_in_source_order_and_rounds_only_at_end"
+          ],
+          "assertion": "Exact Fraction steps SET/MUL/ADD/DIV/SUB yield4.5 then ceil5 regardless input order.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:ModifierStack.arithmetic_steps/resolve"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-07",
+          "source_blocks": [
+            14
+          ],
+          "clause": "Addition follows multiplication and precedes division.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-07",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_accumulates_in_source_order_and_rounds_only_at_end"
+          ],
+          "assertion": "Exact Fraction steps SET/MUL/ADD/DIV/SUB yield4.5 then ceil5 regardless input order.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:ModifierStack.arithmetic_steps/resolve"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-08",
+          "source_blocks": [
+            15
+          ],
+          "clause": "Division follows addition and precedes subtraction.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-08",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_accumulates_in_source_order_and_rounds_only_at_end"
+          ],
+          "assertion": "Exact Fraction steps SET/MUL/ADD/DIV/SUB yield4.5 then ceil5 regardless input order.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:ModifierStack.arithmetic_steps/resolve"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-09",
+          "source_blocks": [
+            16
+          ],
+          "clause": "Subtraction occurs after division.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-09",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_accumulates_in_source_order_and_rounds_only_at_end"
+          ],
+          "assertion": "Exact Fraction steps SET/MUL/ADD/DIV/SUB yield4.5 then ceil5 regardless input order.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:ModifierStack.arithmetic_steps/resolve"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-10",
+          "source_blocks": [
+            17
+          ],
+          "clause": "Fractional final results round upward only after all arithmetic.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-10",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order26_complete_algebra_is_exact_and_independent_of_input_order"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_accumulates_in_source_order_and_rounds_only_at_end"
+          ],
+          "assertion": "Exact Fraction steps SET/MUL/ADD/DIV/SUB yield4.5 then ceil5 regardless input order.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:ModifierStack.arithmetic_steps/resolve"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-11",
+          "source_blocks": [
+            20
+          ],
+          "clause": "Absent, asterisk, and N/A characteristics cannot receive arithmetic modifiers.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-11",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order26_symbolic_replacements_are_terminal_and_serializable"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_absent_real_invulnerable_save_cannot_be_modified",
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_non_numeric_source_tokens_cannot_enter_arithmetic"
+          ],
+          "assertion": "Core dash, asterisk and N/A tokens are rejected at the numeric arithmetic boundary for addition/multiplication. Existing typed absent InSv and terminal-star tests remain. This does not claim native N/A source import support.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value",
+            "core/modifiers.py:ModifierStack"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-12",
+          "source_blocks": [
+            21
+          ],
+          "clause": "A model-level WS modifier affects every equipped weapon's WS.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-12",
+          "predecessor_nodes": [
+            "tests/unit/test_aeldari_war_walkers_wraithlord_datasheets.py::test_wraithlord_psychic_guidance_modifies_live_weapon_skills_and_leadership"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_weapon_scope.py::test_02_02_01_model_skill_operation_reaches_every_matching_equipped_profile"
+          ],
+          "assertion": "Same model-level Core operation dispatched over actual Maulerfiend/Ranger equipment; every matching WS/BS profile changes, opposite skill stays unchanged, source values preserved and2+ bound applies. Dispatcher contract, not a native ability grant.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/rule_ir_weapon_modifiers.py:rule_ir_modified_weapon_profile"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-13",
+          "source_blocks": [
+            21
+          ],
+          "clause": "A model-level BS modifier affects every equipped weapon's BS.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-13",
+          "predecessor_nodes": [
+            "tests/unit/test_aeldari_war_walkers_wraithlord_datasheets.py::test_wraithlord_psychic_guidance_modifies_live_weapon_skills_and_leadership"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_weapon_scope.py::test_02_02_01_model_skill_operation_reaches_every_matching_equipped_profile"
+          ],
+          "assertion": "Same model-level Core operation dispatched over actual Maulerfiend/Ranger equipment; every matching WS/BS profile changes, opposite skill stays unchanged, source values preserved and2+ bound applies. Dispatcher contract, not a native ability grant.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/rule_ir_weapon_modifiers.py:rule_ir_modified_weapon_profile"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-14",
+          "source_blocks": [
+            23
+          ],
+          "clause": "Modified numeric M is at least one inch.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-14",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-15",
+          "source_blocks": [
+            24
+          ],
+          "clause": "Modified numeric T is at least one.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-15",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-16",
+          "source_blocks": [
+            25
+          ],
+          "clause": "Modified Sv cannot improve beyond two-plus.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-16",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-17",
+          "source_blocks": [
+            26
+          ],
+          "clause": "Modified InSv cannot improve beyond two-plus.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-17",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_invulnerable_save_modifier_cannot_improve_past_two_plus"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-18",
+          "source_blocks": [
+            27
+          ],
+          "clause": "Modified Ld lies between five-plus and eight-plus.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-18",
+          "predecessor_nodes": [
+            "tests/integration/test_core_modifier_boundaries.py::test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls",
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers",
+            "tests/unit/test_phase10j1_numeric_rules.py::test_leadership_and_skill_bounds_follow_complete_modifier_order"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-19",
+          "source_blocks": [
+            28
+          ],
+          "clause": "Modified OC cannot be negative.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-19",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-20",
+          "source_blocks": [
+            29
+          ],
+          "clause": "Modified ranged-weapon Range is at least one inch.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-20",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-21",
+          "source_blocks": [
+            30
+          ],
+          "clause": "Modified A is at least one.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-21",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-22",
+          "source_blocks": [
+            31
+          ],
+          "clause": "Modified WS lies between two-plus and six-plus.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-22",
+          "predecessor_nodes": [
+            "tests/integration/test_core_modifier_boundaries.py::test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls",
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-23",
+          "source_blocks": [
+            32
+          ],
+          "clause": "Modified BS lies between two-plus and six-plus.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-23",
+          "predecessor_nodes": [
+            "tests/integration/test_core_modifier_boundaries.py::test_order99_leadership_and_weapon_skill_bounds_reach_live_rolls",
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-24",
+          "source_blocks": [
+            33
+          ],
+          "clause": "Modified numeric S is at least one.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-24",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-25",
+          "source_blocks": [
+            34
+          ],
+          "clause": "Modified AP cannot worsen beyond zero.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-25",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-26",
+          "source_blocks": [
+            35
+          ],
+          "clause": "Modified numeric D is at least one unless a terminal replacement applies.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-26",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_characteristic_boundaries"
+          ],
+          "assertion": "Real source values plus explicit Core modifiers exercise below/at/above every numeric characteristic bound.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_characteristic_value"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-27",
+          "source_blocks": [
+            37
+          ],
+          "clause": "Improving WS, BS, Sv, or Ld decreases the threshold number.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-27",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_direction_matches_characteristic_meaning"
+          ],
+          "assertion": "Production direction function maps improve/worsen to signed deltas for nine characteristics; bounds tested separately.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "rules/rule_characteristic_parser.py:_directional_characteristic_delta"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-28",
+          "source_blocks": [
+            38
+          ],
+          "clause": "Worsening WS, BS, Sv, or Ld increases the threshold number.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-28",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_direction_matches_characteristic_meaning"
+          ],
+          "assertion": "Production direction function maps improve/worsen to signed deltas for nine characteristics; bounds tested separately.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "rules/rule_characteristic_parser.py:_directional_characteristic_delta"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-29",
+          "source_blocks": [
+            39
+          ],
+          "clause": "Improving AP decreases its numeric value.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-29",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_direction_matches_characteristic_meaning"
+          ],
+          "assertion": "Production direction function maps improve/worsen to signed deltas for nine characteristics; bounds tested separately.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "rules/rule_characteristic_parser.py:_directional_characteristic_delta"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-30",
+          "source_blocks": [
+            40
+          ],
+          "clause": "Worsening AP increases its numeric value, capped at zero.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-30",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_threshold_and_ap_improvement_decreases_the_numeric_characteristic",
+            "tests/unit/test_phase10j1_numeric_rules.py::test_characteristic_cap_floor_is_enforced_after_modifiers"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_direction_matches_characteristic_meaning"
+          ],
+          "assertion": "Production direction function maps improve/worsen to signed deltas for nine characteristics; bounds tested separately.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "rules/rule_characteristic_parser.py:_directional_characteristic_delta"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-31",
+          "source_blocks": [
+            41
+          ],
+          "clause": "Improving an ordinary numeric characteristic adds the stated amount.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-31",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_ordinary_characteristic_improvement_increases_the_numeric_characteristic"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_direction_matches_characteristic_meaning"
+          ],
+          "assertion": "Production direction function maps improve/worsen to signed deltas for nine characteristics; bounds tested separately.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "rules/rule_characteristic_parser.py:_directional_characteristic_delta"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-32",
+          "source_blocks": [
+            41
+          ],
+          "clause": "Worsening an ordinary numeric characteristic subtracts the stated amount.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-32",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_ordinary_characteristic_improvement_increases_the_numeric_characteristic"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_direction_matches_characteristic_meaning"
+          ],
+          "assertion": "Production direction function maps improve/worsen to signed deltas for nine characteristics; bounds tested separately.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "rules/rule_characteristic_parser.py:_directional_characteristic_delta"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-33",
+          "source_blocks": [
+            44
+          ],
+          "clause": "Roll modifiers apply after rerolls.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-33",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j_dice_semantics.py::test_modifiers_apply_after_rerolls_and_preserve_unmodified_value"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_04_weapons.py::test_02_02_01_reroll_replaces_the_unmodified_result_before_ap"
+          ],
+          "assertion": "Save originally2 rerolled4; unmodified4, AP-1 final3; original immutable2.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/dice.py:DiceRollState.with_reroll; engine/saves.py:resolve_saving_throw"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-34",
+          "source_blocks": [
+            45
+          ],
+          "clause": "An unmodified dice result is the post-reroll result before modifiers.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-34",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j_dice_semantics.py::test_modifiers_apply_after_rerolls_and_preserve_unmodified_value"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_04_weapons.py::test_02_02_01_reroll_replaces_the_unmodified_result_before_ap"
+          ],
+          "assertion": "Save originally2 rerolled4; unmodified4, AP-1 final3; original immutable2.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/dice.py:DiceRollState.with_reroll; engine/saves.py:resolve_saving_throw"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-35",
+          "source_blocks": [
+            46
+          ],
+          "clause": "Modified dice may exceed the die's physical maximum.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-35",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j_dice_semantics.py::test_order27_modified_dice_limits"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_roll_limits_follow_cumulative_modifiers"
+          ],
+          "assertion": "Cumulative roll resolver checks physical-maximum overflow, minimum1, hit/wound modifier cap±1 and charge12.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_roll_modifiers"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-36",
+          "source_blocks": [
+            47
+          ],
+          "clause": "Modified rolls cannot be below one.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-36",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j_dice_semantics.py::test_order27_modified_dice_limits"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_roll_limits_follow_cumulative_modifiers"
+          ],
+          "assertion": "Cumulative roll resolver checks physical-maximum overflow, minimum1, hit/wound modifier cap±1 and charge12.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_roll_modifiers"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-37",
+          "source_blocks": [
+            48,
+            49
+          ],
+          "clause": "Combined hit and wound roll penalties are capped at minus one.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-37",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j_dice_semantics.py::test_order27_modified_dice_limits"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_roll_limits_follow_cumulative_modifiers"
+          ],
+          "assertion": "Cumulative roll resolver checks physical-maximum overflow, minimum1, hit/wound modifier cap±1 and charge12.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_roll_modifiers"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-38",
+          "source_blocks": [
+            48,
+            50
+          ],
+          "clause": "Combined hit and wound roll bonuses are capped at plus one.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-38",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j_dice_semantics.py::test_order27_modified_dice_limits"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_roll_limits_follow_cumulative_modifiers"
+          ],
+          "assertion": "Cumulative roll resolver checks physical-maximum overflow, minimum1, hit/wound modifier cap±1 and charge12.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_roll_modifiers"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-39",
+          "source_blocks": [
+            51
+          ],
+          "clause": "Modified charge-roll results are capped at twelve.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-39",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j_dice_semantics.py::test_order27_modified_dice_limits"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_roll_limits_follow_cumulative_modifiers"
+          ],
+          "assertion": "Cumulative roll resolver checks physical-maximum overflow, minimum1, hit/wound modifier cap±1 and charge12.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_roll_modifiers"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-40",
+          "source_blocks": [
+            54
+          ],
+          "clause": "Modified detection range lies between nine and thirty inches.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-40",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order29_detection_range_is_terminally_bounded"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_detection_and_lone_operative_range_bounds"
+          ],
+          "assertion": "Shared targeting-range owner clamps8/9/10/29/30/31 to9..30.",
+          "remaining": "Owner-level boundary contract; no targeting declaration integration is claimed.",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_targeting_range"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-41",
+          "source_blocks": [
+            54
+          ],
+          "clause": "Modified Lone Operative range lies between nine and thirty inches.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/lone_operative.py:lone_operative_target_allowed",
+            "src/warhammer40k_core/core/modifiers.py:resolve_targeting_range"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-41",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_lone_operative_actual_target_consumer_clamps_range"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_detection_and_lone_operative_range_bounds"
+          ],
+          "assertion": "Shared targeting-range owner clamps8/9/10/29/30/31 to9..30.",
+          "remaining": "Owner-level boundary contract; no targeting declaration integration is claimed.",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_targeting_range"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-42",
+          "source_blocks": [
+            55
+          ],
+          "clause": "Stratagem CP cost may increase by at most one.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-42",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order37_stratagem_cost_uses_exact_operation_order_and_terminal_bounds"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_cp_cost_bounds_use_each_stratagem_base"
+          ],
+          "assertion": "CP costs0/1/2 with negative, neutral, positive and excess changes clamp0..base+1.",
+          "remaining": "Core cost arithmetic only; optional base-cost FAQ owned in15.",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_stratagem_cost"
+          ]
+        },
+        {
+          "id": "02.02.01-obligation-43",
+          "source_blocks": [
+            55
+          ],
+          "clause": "Modified Stratagem CP cost cannot be negative.",
+          "engine_owners": [
+            "src/warhammer40k_core/core/modifiers.py:ModifierStack",
+            "src/warhammer40k_core/core/attributes.py:CharacteristicBoundPolicy",
+            "src/warhammer40k_core/rules/rule_characteristic_parser.py:parse_characteristic_effects"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.01-obligation-43",
+          "predecessor_nodes": [
+            "tests/unit/test_attributes_modifiers.py::test_order37_stratagem_cost_uses_exact_operation_order_and_terminal_bounds"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_cp_cost_bounds_use_each_stratagem_base"
+          ],
+          "assertion": "CP costs0/1/2 with negative, neutral, positive and excess changes clamp0..base+1.",
+          "remaining": "Core cost arithmetic only; optional base-cost FAQ owned in15.",
+          "asserted_production_owner": [
+            "core/modifiers.py:resolve_stratagem_cost"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.02.02:1",
+      "section": "02.02.02",
+      "title": "Ignore Modifiers",
+      "source_sha256": "602082d0589ef3774fe46bcdd208ad25fb2f4a379b631515b24cc27d21c94d36",
+      "block_sha256": {
+        "1": "324a0b493c81e218d992030d1862aa4907c4d8717db9451fd64c95e366f8d705",
+        "2": "5d088391903bb02f60eab32827565e84b3ae9557fbf22c7195eccabdd6dc29a7",
+        "3": "101459c3fc24187ad95044579ccbfdb9158dd50a1d8c56a0958a0e5d7df7a89b",
+        "4": "edd96140a825034040b26916fa74bd5e7492b90658132cfea18d5d801104b114",
+        "5": "edb55b8e9e120fabb3a9e2981b38af133d587307da97e0c20df31d67616343ef"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "context",
+          "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+        },
+        {
+          "source_blocks": [
+            4,
+            5
+          ],
+          "classification": "example",
+          "reason": "Illustration of the separately inventoried operative rule."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "02.02.02-obligation-01",
+          "source_blocks": [
+            2
+          ],
+          "clause": "An unqualified ignore-modifiers rule covers rolls, unit profile characteristics, and weapon characteristics.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.02-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_catalog_rule_runtime_consumers.py::test_modifier_ignore_subject_unrestricted_permission_covers_typed_kinds"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_constructed_contracts.py::test_02_02_02_unqualified_contract_covers_rolls_models_and_weapons"
+          ],
+          "assertion": "Explicit constructed unqualified Core IR contract reaches production permission consumer; exact 24 roll/model/weapon kinds asserted. Not a claimed native grant. Native qualified Maulerfiend contrast remains beside owning section.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/catalog_modifier_ignore.py:catalog_modifier_ignore_permissions_for_unit"
+          ],
+          "evidence_kind": "constructed_rule_contract",
+          "native_integration_limitation": "prerequisites.json#unqualified_grant"
+        },
+        {
+          "id": "02.02.02-obligation-02",
+          "source_blocks": [
+            3
+          ],
+          "clause": "The player may select any subset of eligible modifiers to ignore, including retaining beneficial modifiers.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.02-obligation-02",
+          "predecessor_nodes": [
+            "tests/unit/test_order93_modifier_ignore.py::test_fixed_profile_keeps_opposing_source_operations_and_original_value",
+            "tests/unit/test_order93_modifier_ignore.py::test_general_hit_modifier_choice_uses_session_and_replays"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_02_ignore_modifiers.py::test_02_02_02_every_subset_preserves_the_real_source_value",
+            "tests/rules/section02/test_02_02_02_native_permission.py::test_02_02_02_native_permission_allows_each_recorded_subset"
+          ],
+          "assertion": "Actual Siege Crawler permission offers and records all four bonus/penalty subsets to owning player with battlefield presence; scope excludes hit rolls. Existing profile subset arithmetic remains.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/profile_modifier_trace.py:CharacteristicModifierTrace.resolve",
+            "engine/modifier_evaluation.py:select_modifiers"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.02.03:1",
+      "section": "02.02.03",
+      "title": "Random Characteristics",
+      "source_sha256": "5e03456e767c79c7a9e156ca6f841fd27cd9fc9f66d692f9efdf54e5799cf607",
+      "block_sha256": {
+        "1": "39dfb2d3a140818f5f469e525285cb0a54c90a2ad03a4b3300848c910dfd2369",
+        "2": "f060ed8aa7bbc4bd3f7d94c63fdd1c7325ae9e2ab3cf7fa91a8c379b645a49ad",
+        "3": "f95b044ea6c4f58ddfd33f094e15a738c5074ff8963991e78d569daff89ce1cf",
+        "4": "26f7058844a74bac1e25f80f8b3fa4178e1e942c403c150e5065e789fe45c0e8",
+        "5": "704211bea06b5ff066a3a371185333d29ae09abe4aa8571fc134d73dce5a2120",
+        "6": "37c9c4dc85b53bfe560a0860ea57e7c5107546e7ce981736a89201e2f2f4d542"
+      },
+      "context": [],
+      "requirements": [
+        {
+          "id": "02.02.03-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "clause": "Random M is rolled when the rules unit is selected to move.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+            "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.03-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_order87_random_profiles.py::test_random_movement_is_rolled_at_facade_selection_once_for_the_unit"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_constructed_contracts.py::test_02_02_03_random_move_is_resolved_at_selection_and_used_for_budget"
+          ],
+          "assertion": "Constructed random-M Core contract starts unresolved/no rolls; selecting the rules unit emits exactly one unit_when_selected_to_move roll; repeated same use emits none.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/phases/movement_action_decisions.py:_request_movement_action"
+          ],
+          "evidence_kind": "constructed_rule_contract",
+          "native_integration_limitation": "prerequisites.json#random_model"
+        },
+        {
+          "id": "02.02.03-obligation-02",
+          "source_blocks": [
+            1
+          ],
+          "clause": "The random M roll supplies the unit's movement value.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+            "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.03-obligation-02",
+          "predecessor_nodes": [
+            "tests/unit/test_order87_random_profiles.py::test_random_movement_is_rolled_at_facade_selection_once_for_the_unit"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_constructed_contracts.py::test_02_02_03_random_move_is_resolved_at_selection_and_used_for_budget"
+          ],
+          "assertion": "All models in the explicit random-M contract receive the single selected-unit roll as their production movement budget.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/phases/movement_validation.py:_model_movement_budget_inches"
+          ],
+          "evidence_kind": "constructed_rule_contract",
+          "native_integration_limitation": "prerequisites.json#random_model"
+        },
+        {
+          "id": "02.02.03-obligation-03",
+          "source_blocks": [
+            2
+          ],
+          "clause": "Random A is rolled when attacks are generated in Resolve Attacks.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+            "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.03-obligation-03",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_attacks_resolve_when_declaration_is_accepted"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_03_attack_generation.py::test_02_02_03_generate_each_equipped_weapon_before_pooling"
+          ],
+          "assertion": "Actual melee inventory excludes pistols and includes each equipped bearer. Preview consumes no dice. Generator rolls native Chaos Spawn D6+2 separately per physical weapon; grouping preserves budgets/contributions without reroll. Fixed Infractor A4 produces four attacks per weapon. No lifecycle timing beyond preview/generation/gather boundary is claimed.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/fight_weapon_selection.py:melee_attack_sequence_from_proposal"
+          ]
+        },
+        {
+          "id": "02.02.03-obligation-04",
+          "source_blocks": [
+            2
+          ],
+          "clause": "Each physical weapon rolls random A separately before identical attacks are pooled.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+            "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.03-obligation-04",
+          "predecessor_nodes": [
+            "tests/unit/test_order92_random_melee.py::test_all_weapons_commit_before_dice_and_each_budget_is_conserved",
+            "tests/unit/test_phase10j_dice_semantics.py::test_random_attacks_and_damage_characteristics_roll_at_required_use_timing"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_03_attack_generation.py::test_02_02_03_generate_each_equipped_weapon_before_pooling"
+          ],
+          "assertion": "Actual melee inventory excludes pistols and includes each equipped bearer. Preview consumes no dice. Generator rolls native Chaos Spawn D6+2 separately per physical weapon; grouping preserves budgets/contributions without reroll. Fixed Infractor A4 produces four attacks per weapon. No lifecycle timing beyond preview/generation/gather boundary is claimed.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/fight_weapon_selection.py:melee_attack_sequence_from_proposal"
+          ]
+        },
+        {
+          "id": "02.02.03-obligation-05",
+          "source_blocks": [
+            3
+          ],
+          "clause": "Random D is rolled separately for each damaging attack after allocation to a model.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+            "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.03-obligation-05",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_damage_rolls_after_failed_save"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_03_damage_timing.py::test_02_02_03_random_damage_waits_for_each_model_allocation"
+          ],
+          "assertion": "Bounded real six-fist attack sequence: no damage roll for pending model allocation; unique per-attack damage scopes, intrinsic+1 retained, requested damage and actual wound loss checked, completion recorded. Minimal cross-section attack/allocation control only.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/attack_sequence_grouped_allocation.py:_resolve_grouped_damage_from"
+          ]
+        },
+        {
+          "id": "02.02.03-obligation-06",
+          "source_blocks": [
+            4
+          ],
+          "clause": "A random-D determination is a damage roll.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+            "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.03-obligation-06",
+          "predecessor_nodes": [
+            "tests/unit/test_phase10j_dice_semantics.py::test_random_attacks_and_damage_characteristics_roll_at_required_use_timing"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_03_damage_timing.py::test_02_02_03_random_damage_waits_for_each_model_allocation"
+          ],
+          "assertion": "Bounded real six-fist attack sequence: no damage roll for pending model allocation; unique per-attack damage scopes, intrinsic+1 retained, requested damage and actual wound loss checked, completion recorded. Minimal cross-section attack/allocation control only.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/attack_sequence_grouped_allocation.py:_resolve_grouped_damage_from"
+          ]
+        },
+        {
+          "id": "02.02.03-obligation-07",
+          "source_blocks": [
+            5
+          ],
+          "clause": "A dice expression's intrinsic operator and constant belong to the base D characteristic, not its modifier inventory.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+            "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.03-obligation-07",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_multiple_dice_sum_all_faces_and_the_intrinsic_constant"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_03_random_characteristics.py::test_02_02_03_intrinsic_damage_constant_is_not_an_ignorable_modifier"
+          ],
+          "assertion": "Real Maulerfiend D6+1 at die1/3/6 retains intrinsic+1 when separately sourced penalty ignored.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/count_profiles.py:DamageProfile.resolve_value"
+          ]
+        },
+        {
+          "id": "02.02.03-obligation-08",
+          "source_blocks": [
+            6
+          ],
+          "clause": "Other random characteristics are determined per model or weapon on each required use.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry",
+            "src/warhammer40k_core/engine/decision.py:DiceRollManager"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.03-obligation-08",
+          "predecessor_nodes": [
+            "tests/unit/test_order87_random_profiles.py::test_random_characteristics_are_evaluated_at_shooting_uses"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_constructed_contracts.py::test_02_02_03_other_random_model_values_are_per_model_and_use",
+            "tests/rules/section02/test_02_02_constructed_contracts.py::test_02_02_03_other_random_weapon_values_are_per_weapon_and_use"
+          ],
+          "assertion": "Constructed random T and S evaluate separately per model/physical weapon on each of two required uses; distinct event scopes, per_model/per_weapon timing, and repeat-use idempotence asserted.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/random_profile_evaluation.py:evaluate_unit_profile_characteristics",
+            "engine/random_weapon_profiles.py:evaluate_attack_weapon_profile"
+          ],
+          "evidence_kind": "constructed_rule_contract",
+          "native_integration_limitation": "prerequisites.json#other_random_weapon"
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.02.04:1",
+      "section": "02.02.04",
+      "title": "Healing Or Regaining Lost Wounds",
+      "source_sha256": "895eda0b8b573435e6765051b85b6a99e10344e7312cde45de5822b87ad5a375",
+      "block_sha256": {
+        "1": "1091149edd693c5b3de60beda7973ef3af899d6cb0015a53eb67c3e70acfdb18",
+        "2": "9f97cc6c833251d13ba2e050dae9437d5cadc15430aa8b056350b1a6564cda9e",
+        "3": "e7c893ddecffc296c6693575d9026f89d3a1bef3b717bfc7d3e947a2a074f040",
+        "4": "781fa7c82c5bb515e31fef8f23bd5a6edbff487a5468b0f0b9d56173472c77cc",
+        "5": "ddc473a6c37069d3964e055c186e1efeb457364721f4495a67057a6515766811"
+      },
+      "context": [],
+      "requirements": [
+        {
+          "id": "02.02.04-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "clause": "Unit healing processes no more than its specified regained wound count.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+            "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.04-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_phase14h_healing.py::test_healing_iterates_wound_revival_revived_wound_and_no_effect"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_04_healing.py::test_02_02_04_healing_restores_one_wound_without_exceeding_starting_wounds"
+          ],
+          "assertion": "Real wounded2W model heals exactly1 with amount1 or3; complete without exceeding2.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/healing.py:resolve_healing_until_blocked"
+          ]
+        },
+        {
+          "id": "02.02.04-obligation-02",
+          "source_blocks": [
+            2
+          ],
+          "clause": "Unit healing selects a currently wounded model and restores one wound before reviving casualties.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+            "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.04-obligation-02",
+          "predecessor_nodes": [
+            "tests/unit/test_order89_healing.py::test_any_unit_offers_wounded_model_choice_to_source_actor"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_04_healing.py::test_02_02_04_healing_restores_one_wound_without_exceeding_starting_wounds",
+            "tests/rules/section02/test_02_02_04_revival.py::test_02_02_04_wounded_member_precedes_one_wound_revival"
+          ],
+          "assertion": "Real wounded Infractor healed first; excess healing selects eligible destroyed model in reserves, revives at one wound then heals further. Separate destroyed CHARACTER negative case. Off-battlefield reserve return path, not physical revival placement certification.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/healing.py:resolve_healing_until_blocked"
+          ]
+        },
+        {
+          "id": "02.02.04-obligation-03",
+          "source_blocks": [
+            3
+          ],
+          "clause": "When no living member is wounded, unit healing revives an eligible destroyed non-CHARACTER at one wound.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+            "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.04-obligation-03",
+          "predecessor_nodes": [
+            "tests/unit/test_order89_healing.py::test_character_exclusion_is_only_for_ordinary_unit_healing",
+            "tests/unit/test_order89_healing.py::test_mixed_attached_revival_candidates_and_accepted_placement_replay"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_04_revival.py::test_02_02_04_wounded_member_precedes_one_wound_revival"
+          ],
+          "assertion": "Real wounded Infractor healed first; excess healing selects eligible destroyed model in reserves, revives at one wound then heals further. Separate destroyed CHARACTER negative case. Off-battlefield reserve return path, not physical revival placement certification.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/healing.py:resolve_healing_until_blocked"
+          ]
+        },
+        {
+          "id": "02.02.04-obligation-04",
+          "source_blocks": [
+            4
+          ],
+          "clause": "Healing cannot exceed a model starting wounds.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+            "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.04-obligation-04",
+          "predecessor_nodes": [
+            "tests/unit/test_order89_healing.py::test_model_healing_discards_excess_without_healing_another_model_or_reviving"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_04_healing.py::test_02_02_04_healing_restores_one_wound_without_exceeding_starting_wounds"
+          ],
+          "assertion": "Real wounded2W model heals exactly1 with amount1 or3; complete without exceeding2.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/healing.py:resolve_healing_until_blocked"
+          ]
+        },
+        {
+          "id": "02.02.04-obligation-05",
+          "source_blocks": [
+            5
+          ],
+          "clause": "Model-scoped healing affects only the specified model.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+            "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.04-obligation-05",
+          "predecessor_nodes": [
+            "tests/unit/test_order89_healing.py::test_model_healing_discards_excess_without_healing_another_model_or_reviving"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_04_healing.py::test_02_02_04_model_scope_discards_excess_and_does_not_revive"
+          ],
+          "assertion": "Only specified model heals; other wounded and destroyed members stay1/0; excess discarded.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/healing.py:resolve_healing_until_blocked"
+          ]
+        },
+        {
+          "id": "02.02.04-obligation-06",
+          "source_blocks": [
+            5
+          ],
+          "clause": "Excess model healing is discarded.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+            "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.04-obligation-06",
+          "predecessor_nodes": [
+            "tests/unit/test_order89_healing.py::test_model_healing_discards_excess_without_healing_another_model_or_reviving"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_04_healing.py::test_02_02_04_model_scope_discards_excess_and_does_not_revive"
+          ],
+          "assertion": "Only specified model heals; other wounded and destroyed members stay1/0; excess discarded.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/healing.py:resolve_healing_until_blocked"
+          ]
+        },
+        {
+          "id": "02.02.04-obligation-07",
+          "source_blocks": [
+            5
+          ],
+          "clause": "Model-scoped healing does not revive a destroyed unit member.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked",
+            "src/warhammer40k_core/engine/healing_revival.py:apply_healing_revival_placement_decision"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.04-obligation-07",
+          "predecessor_nodes": [
+            "tests/unit/test_order89_healing.py::test_model_healing_discards_excess_without_healing_another_model_or_reviving"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_04_healing.py::test_02_02_04_model_scope_discards_excess_and_does_not_revive"
+          ],
+          "assertion": "Only specified model heals; other wounded and destroyed members stay1/0; excess discarded.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/healing.py:resolve_healing_until_blocked"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.02.05:1",
+      "section": "02.02.05",
+      "title": "Full Wounds Remaining",
+      "source_sha256": "cf9a93342a79234ef326bd64bc5e5aa5a973498de1112cd836f498cafc8bdcca",
+      "block_sha256": {
+        "1": "d53e36d20eb720f73e40b8b507458a5f5e4eb33e80c9a0742296fd8dc8e783e1"
+      },
+      "context": [],
+      "requirements": [
+        {
+          "id": "02.02.05-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "clause": "Full wounds means remaining wounds equal the model's W characteristic.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:ModelInstance",
+            "src/warhammer40k_core/engine/healing.py:resolve_healing_until_blocked"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.02.05-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_model_health_definition_matches_full_wounds_and_zero_health_casualties",
+            "tests/unit/test_phase14h_healing.py::test_healing_iterates_wound_revival_revived_wound_and_no_effect"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_04_healing.py::test_02_02_04_healing_restores_one_wound_without_exceeding_starting_wounds"
+          ],
+          "assertion": "Healing stopping condition leaves current_wounds==initial_wounds==actualW2.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/healing.py:resolve_healing_until_blocked"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.02.06:1",
+      "section": "02.02.06",
+      "title": "Characteristic Modifiers & Modified Characteristics",
+      "source_sha256": "3ea6df4cbd39a2d2b261789a723e75a3fa57744aaecace472da0fd0a1597ab82",
+      "block_sha256": {
+        "1": "131d180a12b598027a142e899ce3047f5ef0224088f0d79fb08779e0a68cbaa4"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "cross_reference",
+          "reason": "Explicit referral to the operative clause in another source row."
+        }
+      ],
+      "requirements": []
+    },
+    {
+      "source_id": "rule:02:02.03:1",
+      "section": "02.03",
+      "title": "Abilities",
+      "source_sha256": "7a1e292c57bcbecb3625d1aca60ff42c7e5b67f238fc94ad15cb46c9553c0b51",
+      "block_sha256": {
+        "1": "c8698093b360bb405ba877f46b7497b04b733e59ded9b398014fc50d39732afe"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "metadata",
+          "reason": "Rendering metadata; does not add a gameplay rule."
+        }
+      ],
+      "requirements": []
+    },
+    {
+      "source_id": "rule:02:02.03.01:1",
+      "section": "02.03.01",
+      "title": "Rules With Multiple Conditions And Effects",
+      "source_sha256": "30091dfbc59e53fb250c880610847a3a3f1da9c223f748761381b9d81fa37018",
+      "block_sha256": {
+        "1": "0d4cfbf9a14acd1bb4a9ec392b6c5fec2a882f7fb4db1e92a7679dfbd2de40e2",
+        "2": "569c63949f16b3e20827fce0872330b8c837173507fb7b522d19e5071fe5b045",
+        "3": "7084be1c86186a31d610dd746e0b13d5a2f003fb8608857b6e46035176529c0b",
+        "4": "e9962f0a28c46dde3c9318d377374cdfdb9807ef0117f330b950fb71291fbaf3",
+        "5": "f8b652e3e643f6b464db2d6a04ab36b60cc2eed67a72846e22e41280c39d50bb"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "classification": "example",
+          "reason": "Illustration of the separately inventoried operative rule."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "02.03.01-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "clause": "A stronger nested-condition effect requires both its parent condition and its more-specific condition.",
+          "engine_owners": [
+            "src/warhammer40k_core/rules/rule_parser.py:parse_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.03.01-obligation-01",
+          "predecessor_nodes": [],
+          "current_successor_nodes": [
+            "tests/unit/test_order124_nested_conditions.py::test_selected_source_compiles_with_parent_and_stronger_branch",
+            "tests/unit/test_order124_nested_conditions.py::test_real_nested_upgrade_survives_pending_and_completed_continuations",
+            "tests/unit/test_order124_nested_conditions.py::test_incomplete_structured_nested_sources_gain_no_runtime_hook",
+            "tests/unit/test_order124_nested_conditions.py::test_real_boundary_control_negatives_keep_only_the_basic_permission",
+            "tests/unit/test_order124_nested_conditions.py::test_unrelated_attack_contexts_cannot_gain_the_nested_source",
+            "tests/unit/test_order124_nested_conditions.py::test_nested_source_requires_complete_actual_attack_context",
+            "tests/unit/test_order124_nested_conditions.py::test_shared_target_legality_and_closest_ties_preserve_eligible_targets",
+            "tests/unit/test_order124_nested_conditions.py::test_real_weaker_branch_and_outer_source_negatives",
+            "tests/unit/test_order124_nested_conditions.py::test_real_advanced_assault_preserves_nested_permission_and_continuations"
+          ],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_03_01_nested.py::test_02_03_01_improvement_requires_both_real_predicates"
+          ],
+          "assertion": "Four-case authenticated Core-example contract with real units, marker geometry and measured ownership: parent false grants nothing regardless of child; parent true grants ones-only or full reroll according to child. Explicit Core example input, no native Infractor ability or source admission claimed.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/catalog_nested_attack_reroll_runtime.py:nested_attack_reroll_handler"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.04:1",
+      "section": "02.04",
+      "title": "Weapons",
+      "source_sha256": "5badd3493560d2eb0ac2eca62ac8797a3371356e32973084c8c01762b0ce3a55",
+      "block_sha256": {
+        "1": "c9a13011fcc95b9a8dd88d290effcdc361e7a8fb7080e3e878289ba482b6b030",
+        "2": "cbba7abdea0b1f6930f004f155a80f2adf743c5b11ab3b2908612362d3a8e915",
+        "3": "53fff1c0e277d62f6d5bc610961f21568b1782530fc88399ab5107979bb12559",
+        "4": "3ba737a9dab244a79b9e0c37d11e78ca4cad68cce5b00233d2702f95b83119a2",
+        "5": "0b1a76f7fe031410471b373ef89b4b6c7ffd89cc345d1c81dc757ab8b715d313",
+        "6": "90c7aaac104c354952a56698958c31b46f7cf5323478dd1bb1081a9bcbbf556c",
+        "7": "f73519b8ccb9c60f482dc149fff38e6bde6d4144cbac958d1a578168c70461f4",
+        "8": "a05f19156abff560d1cda7790998aaeba6a706417f1dc1007cff9c684bde0733"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "context",
+          "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "02.04-obligation-01",
+          "source_blocks": [
+            2
+          ],
+          "clause": "Ranged weapon Range bounds target distance.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.04-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_shooting_target_candidate_cache_uses_full_weapon_profile_identity"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_04_live_consumers.py::test_02_04_actual_pistol_range_bounds_targets"
+          ],
+          "assertion": "Actual32mm bases and12-inch pistol at edge distances11.99/12/12.01; exact boundary inclusive.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/shooting_targets.py:shooting_target_candidate_for_model"
+          ]
+        },
+        {
+          "id": "02.04-obligation-02",
+          "source_blocks": [
+            2
+          ],
+          "clause": "Melee Range designates a melee weapon.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.04-obligation-02",
+          "predecessor_nodes": [
+            "tests/unit/test_wargear_weapon_profiles.py::test_range_attack_and_damage_profiles_consume_parsed_values"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_03_attack_generation.py::test_02_02_03_generate_each_equipped_weapon_before_pooling"
+          ],
+          "assertion": "Actual melee inventory excludes pistols and includes each equipped bearer. Preview consumes no dice. Generator rolls native Chaos Spawn D6+2 separately per physical weapon; grouping preserves budgets/contributions without reroll. Fixed Infractor A4 produces four attacks per weapon. No lifecycle timing beyond preview/generation/gather boundary is claimed.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/fight_weapon_selection.py:melee_attack_sequence_from_proposal"
+          ]
+        },
+        {
+          "id": "02.04-obligation-03",
+          "source_blocks": [
+            3
+          ],
+          "clause": "The A characteristic determines attack-dice count.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.04-obligation-03",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_attacks_resolve_when_declaration_is_accepted"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_03_attack_generation.py::test_02_02_03_generate_each_equipped_weapon_before_pooling"
+          ],
+          "assertion": "Actual melee inventory excludes pistols and includes each equipped bearer. Preview consumes no dice. Generator rolls native Chaos Spawn D6+2 separately per physical weapon; grouping preserves budgets/contributions without reroll. Fixed Infractor A4 produces four attacks per weapon. No lifecycle timing beyond preview/generation/gather boundary is claimed.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/fight_weapon_selection.py:melee_attack_sequence_from_proposal"
+          ]
+        },
+        {
+          "id": "02.04-obligation-04",
+          "source_blocks": [
+            4
+          ],
+          "clause": "BS supplies the ranged hit threshold.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.04-obligation-04",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_hit_roll_bonus_cap_applies_after_ballistic_skill_modifier"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_04_live_consumers.py::test_02_04_bs_and_ws_are_live_hit_thresholds"
+          ],
+          "assertion": "Real pistol BS3 and sabre WS3 consume actual roll states at1/2/3/4/6; expected threshold and success asserted.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/attack_sequence_hit_wound.py:_roll_hit"
+          ]
+        },
+        {
+          "id": "02.04-obligation-05",
+          "source_blocks": [
+            5
+          ],
+          "clause": "WS supplies the melee hit threshold.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.04-obligation-05",
+          "predecessor_nodes": [
+            "tests/unit/test_phase15d_fight_resolution.py::test_hit_roll_bonus_cap_applies_after_weapon_skill_modifier"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_04_live_consumers.py::test_02_04_bs_and_ws_are_live_hit_thresholds"
+          ],
+          "assertion": "Real pistol BS3 and sabre WS3 consume actual roll states at1/2/3/4/6; expected threshold and success asserted.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/attack_sequence_hit_wound.py:_roll_hit"
+          ]
+        },
+        {
+          "id": "02.04-obligation-06",
+          "source_blocks": [
+            6
+          ],
+          "clause": "S determines the wound threshold relative to target T.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.04-obligation-06",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_wound_roll_table_uses_integer_safe_boundaries"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_04_weapons.py::test_02_04_strength_compares_real_weapon_and_target_profiles",
+            "tests/rules/section02/test_02_04_live_consumers.py::test_02_04_strength_is_consumed_by_wound_rolls"
+          ],
+          "assertion": "Actual S4 versus T4 consumes wound rolls at1/3/4/6; existing real S/T ratio matrix retained.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/attack_sequence_state.py:wound_roll_target_number",
+            "engine/attack_sequence_hit_wound.py:_roll_wound"
+          ]
+        },
+        {
+          "id": "02.04-obligation-07",
+          "source_blocks": [
+            7
+          ],
+          "clause": "AP modifies armor saving rolls.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.04-obligation-07",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_phase14e_save_roll_checks_one_invulnerable_then_armour"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_04_weapons.py::test_02_04_ap_changes_the_real_armour_save_result"
+          ],
+          "assertion": "Actual catapult AP-1 changes realSv3 boundary to roll4.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/saves.py:save_options_for_model/resolve_saving_throw"
+          ]
+        },
+        {
+          "id": "02.04-obligation-08",
+          "source_blocks": [
+            8
+          ],
+          "clause": "D determines wounds inflicted by an attack.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/weapon_declaration.py:ShootingDeclarationProposal"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.04-obligation-08",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_phase13c_random_damage_rolls_after_failed_save"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_03_damage_timing.py::test_02_02_03_random_damage_waits_for_each_model_allocation"
+          ],
+          "assertion": "Bounded real six-fist attack sequence: no damage roll for pending model allocation; unique per-attack damage scopes, intrinsic+1 retained, requested damage and actual wound loss checked, completion recorded. Minimal cross-section attack/allocation control only.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/attack_sequence_grouped_allocation.py:_resolve_grouped_damage_from"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.04.01:1",
+      "section": "02.04.01",
+      "title": "Weapons With No Strength",
+      "source_sha256": "e266bdad60564967e9ac444d60ee6fe4045c54b892f44cf9ef359ed0f5e38834",
+      "block_sha256": {
+        "1": "13a157af75b900b0b90c29f80a20e4424c8728680cd82138e5f3111194049a45"
+      },
+      "context": [],
+      "requirements": [
+        {
+          "id": "02.04.01-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "clause": "A weapon lacking S uses one for an interaction with its Strength.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.04.01-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_order88_absent_strength.py::test_strength_interactions_through_attack_hosts_restore_and_replay"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_04_01_constructed_contract.py::test_02_04_01_absent_strength_is_one_only_for_interaction"
+          ],
+          "assertion": "Constructed absent-S weapon reports interaction Strength1 while its stored absent value stays absent/zero. Real bolt-pistol S4 control and immutable source unchanged.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/weapon_profiles.py:WeaponProfile.strength_for_interaction"
+          ],
+          "evidence_kind": "constructed_rule_contract",
+          "native_integration_limitation": "prerequisites.json#absent_s"
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.05:1",
+      "section": "02.05",
+      "title": "Keywords",
+      "source_sha256": "45a41112b5203de776d4ab2cf808ee516af2bcefd3f377ad56f020bf09010eee",
+      "block_sha256": {
+        "1": "d7599dc1570b67d3911fb3bf516761ee99f94ac7826f2334ec71a3a298bda046"
+      },
+      "context": [],
+      "requirements": [
+        {
+          "id": "02.05-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "clause": "Faction and other keywords have the same rules-matching semantics outside army construction.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_phase17d_rule_execution.py::test_phase17d_aura_keyword_gates_match_target_faction_keywords"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keywords.py::test_02_05_faction_and_other_keywords_share_exact_conjunctive_matching"
+          ],
+          "assertion": "Actual faction AELDARI, ordinary ASURYANI/INFANTRY and full datasheet name share matcher; wrong/partial tokens fail.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/rule_target_resolution.py:unit_has_required_keywords"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.05.01:1",
+      "section": "02.05.01",
+      "title": "Using Keywords & Mixed Keywords in Units",
+      "source_sha256": "48df8363e95ed138f1cf0af5f99b0cf159fc9a66d8141bae3c5e87ac2ad899ef",
+      "block_sha256": {
+        "1": "fbd269ac5e31c1a60ffb508a720bdc2a0fe34d93cb776f6eba9a6ef91d61aa6e",
+        "2": "cd5a551d353de0b4c29ed46c31929eef51de2cf3b4bac652e856404e39ccc6f2",
+        "3": "3d0d53efedbd7defb3ad7ba0797343e9b68e697ccca7a7c464175a48e80f2033",
+        "4": "083913006c59b36c093ac2dcbdeaba990045375651a813fa6a431058777bfb60",
+        "5": "7ab0b77ab1dc7ce10b8b9fd6aaa72b25ae76a0e651bc41d56e4bb447800aecb7",
+        "6": "e82cfed961d633cc06623e03c8a830dfc14d67f19d28c9885cf19a920e0fcca0",
+        "7": "1443e3ef5f01968e29f55ef61df03f71e45b7347511db6e6bd8be5926e75ba67",
+        "8": "3b890049f17247a3e8788fe4ad12362692c5bc85f021ecec9afdb8688e7f2262",
+        "9": "42a72bf3c5ca60d0ebaa0ab0eb0527ebe0384687b8f190f15a0ecf196780c2b5",
+        "10": "94f8ace125b168d39248817067356869ef2eba3eaaa108a27a5421c332c5a0df",
+        "11": "b9a8f1937d717a0e7e7d6b1e185d5efb0f64aa5918396d6fcf574956c4d8bc31"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "context",
+          "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "02.05.01-obligation-01",
+          "source_blocks": [
+            2
+          ],
+          "clause": "A rules unit possesses the union of its members' keywords.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_phase15d_fight_resolution.py::test_phase15d_attached_melee_cleave_uses_rules_unit_count_and_keywords"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution"
+          ],
+          "assertion": "Actual eligible Lord Exultant/Infractors formation unions live member keywords; bodyguard models do not acquire CHARACTER.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/rules_units.py:RulesUnitView.keywords"
+          ]
+        },
+        {
+          "id": "02.05.01-obligation-02",
+          "source_blocks": [
+            2
+          ],
+          "clause": "A model possesses only its own keywords.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-02",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_keywords"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution"
+          ],
+          "assertion": "Actual eligible Lord Exultant/Infractors formation unions live member keywords; bodyguard models do not acquire CHARACTER.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/rules_units.py:RulesUnitView.keywords"
+          ]
+        },
+        {
+          "id": "02.05.01-obligation-03",
+          "source_blocks": [
+            3
+          ],
+          "clause": "A keyword-qualified unit rule matches if any member has the keyword.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-03",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_mixed_unit_keyword_does_not_promote_member_keywords"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution",
+            "tests/rules/section02/test_02_05_keyword_consumers.py::test_02_05_01_unit_effect_uses_any_member_keyword"
+          ],
+          "assertion": "Legally attach Lord Exultant and Infractors; unit-effect gate accepts CHARACTER/CHARACTERS/INFANTRY, rejects VEHICLE.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/rules_units.py:RulesUnitView.keywords",
+            "engine/generic_rule_ability_effects.py:_required_keywords_apply"
+          ]
+        },
+        {
+          "id": "02.05.01-obligation-04",
+          "source_blocks": [
+            4
+          ],
+          "clause": "A keyword-qualified model rule matches only that model's own keywords.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-04",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_mixed_unit_keyword_does_not_promote_member_keywords"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution",
+            "tests/rules/section02/test_02_05_keyword_consumers.py::test_02_05_01_model_effect_does_not_inherit_unit_union"
+          ],
+          "assertion": "Real mixed-unit model-effect scope selects leader only for CHARACTER(S), all for INFANTRY, none for VEHICLE.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/rules_units.py:RulesUnitView.keywords",
+            "engine/catalog_model_scope.py:scoped_roll_model_ids_for_effect"
+          ]
+        },
+        {
+          "id": "02.05.01-obligation-05",
+          "source_blocks": [
+            5
+          ],
+          "clause": "A non-keyword rule matches only if the specified model or unit lacks that keyword.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-05",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase14i_non_keyword_gated_weapon_abilities_match_missing_target_keywords"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keyword_consumers.py::test_02_05_01_non_keyword_inverts_the_selected_scope_only"
+          ],
+          "assertion": "Core non-keyword selector over real unit/model inventories: CHARACTER differs between attached unit and bodyguard model; INFANTRY/VEHICLE controls.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/weapon_abilities.py:_target_keyword_gate_matches_descriptor"
+          ]
+        },
+        {
+          "id": "02.05.01-obligation-06",
+          "source_blocks": [
+            6
+          ],
+          "clause": "A mixed-keyword unit is affected by unit rules matching any member keyword.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-06",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_mixed_unit_keyword_does_not_promote_member_keywords"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution",
+            "tests/rules/section02/test_02_05_keyword_consumers.py::test_02_05_01_unit_effect_uses_any_member_keyword"
+          ],
+          "assertion": "Legally attach Lord Exultant and Infractors; unit-effect gate accepts CHARACTER/CHARACTERS/INFANTRY, rejects VEHICLE.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/rules_units.py:RulesUnitView.keywords",
+            "engine/generic_rule_ability_effects.py:_required_keywords_apply"
+          ]
+        },
+        {
+          "id": "02.05.01-obligation-07",
+          "source_blocks": [
+            6
+          ],
+          "clause": "Attacks target a rules unit, not a keyword-selected member.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-07",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_declarations.py::test_phase14h_mustered_attached_unit_targets_and_allocates_as_rules_unit"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keyword_consumers.py::test_02_05_01_keyword_target_is_whole_attached_unit"
+          ],
+          "assertion": "CHARACTER selector matches real attachment; shooting candidate retains attached-unit identity and visible bodyguard+leader models, not just matching leader.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/shooting_targets.py:shooting_target_candidate_for_model"
+          ]
+        },
+        {
+          "id": "02.05.01-obligation-08",
+          "source_blocks": [
+            7
+          ],
+          "clause": "Model-keyword effects do not spill over to other models in a mixed unit.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-08",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13b_shooting_phase_declarations.py::test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_keywords"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution",
+            "tests/rules/section02/test_02_05_keyword_consumers.py::test_02_05_01_model_effect_does_not_inherit_unit_union"
+          ],
+          "assertion": "Real mixed-unit model-effect scope selects leader only for CHARACTER(S), all for INFANTRY, none for VEHICLE.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/rules_units.py:RulesUnitView.keywords",
+            "engine/catalog_model_scope.py:scoped_roll_model_ids_for_effect"
+          ]
+        },
+        {
+          "id": "02.05.01-obligation-09",
+          "source_blocks": [
+            8
+          ],
+          "clause": "Comma, slash, and or keyword alternatives mean any listed keyword.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-09",
+          "predecessor_nodes": [
+            "tests/unit/test_phase13d_weapon_ability_helpers.py::test_phase13d_anti_keyword_supports_slash_keywords_and_non_matching_targets"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keyword_consumers.py::test_02_05_01_alternative_keywords_reach_target_gate"
+          ],
+          "assertion": "Comma/or parser and slash descriptor alternatives reach real mixed-unit target gate; any matching alternative succeeds, no-match alternatives fail.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/weapon_abilities.py:_target_keyword_gate_matches_descriptor"
+          ]
+        },
+        {
+          "id": "02.05.01-obligation-10",
+          "source_blocks": [
+            9
+          ],
+          "clause": "Adjacent required keywords form a conjunction.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/rules_units.py:RulesUnitView",
+            "src/warhammer40k_core/engine/rule_execution.py:execute_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-10",
+          "predecessor_nodes": [
+            "tests/unit/test_phase17d_rule_execution.py::test_phase17d_aura_keyword_gates_match_target_faction_keywords"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keywords.py::test_02_05_faction_and_other_keywords_share_exact_conjunctive_matching"
+          ],
+          "assertion": "AELDARI+INFANTRY succeeds, AELDARI+VEHICLE fails with actual unit keywords.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/rule_target_resolution.py:unit_has_required_keywords"
+          ]
+        },
+        {
+          "id": "02.05.01-obligation-11",
+          "source_blocks": [
+            10
+          ],
+          "clause": "Legacy unspecified model/unit keyword subjects refer to units.",
+          "engine_owners": [
+            "src/warhammer40k_core/rules/rule_parser.py:parse_rule_ir"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-11",
+          "predecessor_nodes": [],
+          "current_successor_nodes": [
+            "tests/unit/test_order125_implicit_subjects.py::test_selected_default_subject_preserves_keyword_and_source_range",
+            "tests/unit/test_order125_implicit_subjects.py::test_complete_default_unit_rule_has_a_shared_executable_consumer",
+            "tests/unit/test_order125_implicit_subjects.py::test_catalog_loaded_selection_survives_full_lifecycle_continuations",
+            "tests/unit/test_order125_implicit_subjects.py::test_shared_selection_enforces_real_keyword_owner_range_and_source_boundaries",
+            "tests/unit/test_order125_implicit_subjects.py::test_implicit_subject_does_not_invent_keywords_aliases_or_discard_language",
+            "tests/unit/test_order125_implicit_subjects.py::test_explicit_noun_and_source_spans_remain_intact",
+            "tests/unit/test_order125_implicit_subjects.py::test_implicit_adjacent_keywords_keep_the_existing_conjunction",
+            "tests/unit/test_order125_implicit_subjects.py::test_ordinary_trigger_does_not_admit_unestablished_weapon_context",
+            "tests/unit/test_order125_implicit_subjects.py::test_subject_matcher_preserves_literal_declared_keyword_parts",
+            "tests/unit/test_order125_implicit_subjects.py::test_subject_matcher_keeps_explicit_overlap_and_literal_order",
+            "tests/unit/test_order125_implicit_subjects.py::test_explicit_model_subject_keeps_typed_evidence_and_no_unit_consumer",
+            "tests/unit/test_order125_implicit_subjects.py::test_explicit_model_catalog_subject_never_offers_a_unit_selection_in_native_play"
+          ],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keyword_consumers.py::test_02_05_01_implicit_subject_reaches_unit_keyword_consumer"
+          ],
+          "assertion": "Implicit CHARACTER and explicit CHARACTER unit compile to FRIENDLY_UNIT; resulting keyword gate accepts actual attachment. Core grammar input, not a native ability grant.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "rules/rule_compiler.py:compile_rule_source_text"
+          ]
+        },
+        {
+          "id": "02.05.01-obligation-12",
+          "source_blocks": [
+            11
+          ],
+          "clause": "Singular and plural spellings identify the same canonical keyword.",
+          "engine_owners": [
+            "src/warhammer40k_core/rules/rule_keyword_sequences.py:keyword_sequence_tokens",
+            "src/warhammer40k_core/engine/rule_target_resolution.py:unit_has_required_keywords"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.05.01-obligation-12",
+          "predecessor_nodes": [],
+          "current_successor_nodes": [
+            "tests/unit/test_order133_keyword_numbers.py::test_source_number_spellings_preserve_declared_runtime_token",
+            "tests/unit/test_order133_keyword_numbers.py::test_plural_adjacent_sequence_consumes_literal_alias_before_next_keyword",
+            "tests/unit/test_order133_keyword_numbers.py::test_unknown_and_invariant_tokens_are_not_stemmed",
+            "tests/unit/test_order133_keyword_numbers.py::test_catalog_loaded_selection_survives_full_lifecycle_continuations",
+            "tests/unit/test_order133_keyword_materialization.py::test_plural_raw_catalog_keeps_model_ownership_and_rederives_on_load",
+            "tests/unit/test_order133_keyword_materialization.py::test_plural_beast_uses_native_geometry_on_muster_and_materialization",
+            "tests/unit/test_order133_keyword_materialization.py::test_runtime_grants_and_mustering_preserve_raw_provenance",
+            "tests/unit/test_order133_keyword_materialization.py::test_distinct_owner_labels_do_not_acquire_inferred_number_aliases"
+          ],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_declared_keyword_numbers_preserve_multiword_identity",
+            "tests/rules/section02/test_02_05_keyword_consumers.py::test_02_05_01_unit_effect_uses_any_member_keyword"
+          ],
+          "assertion": "Legally attach Lord Exultant and Infractors; unit-effect gate accepts CHARACTER/CHARACTERS/INFANTRY, rejects VEHICLE.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "rules/rule_keyword_sequences.py:keyword_sequence_tokens",
+            "engine/generic_rule_ability_effects.py:_required_keywords_apply"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.06:1",
+      "section": "02.06",
+      "title": "Unit Composition And Other Rules",
+      "source_sha256": "1b7ee603cb303a2f776333407ae58786b042090eb7709cdfde2827cbb8df0a3e",
+      "block_sha256": {
+        "1": "7d58a8f64915e512c5de306c092108b270f709f53ed291d3c56a2312f1c80d50"
+      },
+      "context": [],
+      "requirements": [
+        {
+          "id": "02.06-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "clause": "Unit composition constrains the number and type of member models.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:UnitFactory.instantiate_unit"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.06-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_phase9c_mustering.py::test_model_profile_counts_must_match_datasheet_composition"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_06_equipment.py::test_02_06_invalid_composition_is_rejected",
+            "tests/rules/section02/test_02_06_equipment.py::test_02_06_composition_bounds_apply_to_each_model_type"
+          ],
+          "assertion": "Actual Infractor regular4/9 endpoints accepted; champion missing/doubled rejected; existing regular3/10 failures retained.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/unit_factory.py:UnitFactory.instantiate_unit"
+          ]
+        },
+        {
+          "id": "02.06-obligation-02",
+          "source_blocks": [
+            1
+          ],
+          "clause": "Each model receives the applicable listed default wargear.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:UnitFactory.instantiate_unit"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.06-obligation-02",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_default_wargear_is_equipped_separately_by_every_selected_model"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_06_equipment.py::test_02_06_defaults_belong_to_the_correct_real_model_type",
+            "tests/rules/section02/test_02_02_03_attack_generation.py::test_02_02_03_generate_each_equipped_weapon_before_pooling"
+          ],
+          "assertion": "Actual melee inventory excludes pistols and includes each equipped bearer. Preview consumes no dice. Generator rolls native Chaos Spawn D6+2 separately per physical weapon; grouping preserves budgets/contributions without reroll. Fixed Infractor A4 produces four attacks per weapon. No lifecycle timing beyond preview/generation/gather boundary is claimed.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/unit_factory.py:UnitFactory.instantiate_unit",
+            "engine/fight_weapon_selection.py:melee_attack_sequence_from_proposal"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.06.01:1",
+      "section": "02.06.01",
+      "title": "Bearer",
+      "source_sha256": "a9f1cde7a2b15e4f39376d0d0544ca913fe728fcad76a672e5a1daf6d0709298",
+      "block_sha256": {
+        "1": "a2f6c55dc0f38a5097de15a9092d6a7e41429542423771708657cb69d162cccc"
+      },
+      "context": [],
+      "requirements": [
+        {
+          "id": "02.06.01-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "clause": "The bearer is the particular model equipped with the weapon, enhancement, or wargear.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/enhancement_bearers.py:enhancement_bearer_model"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.06.01-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_unit_splitting.py::test_order68_explicit_nonfirst_bearer_retains_identity_after_split_and_restore"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_06_equipment.py::test_02_06_01_and_02_07_replacement_affects_only_its_bearer",
+            "tests/rules/section02/test_02_06_equipment.py::test_02_06_01_enhancement_bearer_remains_the_selected_character"
+          ],
+          "assertion": "Retained Tactical Perfection assignment resolves exact Lord Exultant model, never bodyguard; physical weapon replacement controls retained. Enhancement effect itself is outside this identity clause.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/unit_factory.py:UnitFactory.instantiate_unit",
+            "engine/enhancement_bearers.py:enhancement_bearer_model"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.06.02:1",
+      "section": "02.06.02",
+      "title": "Unit's Equipment",
+      "source_sha256": "3b994c3db193d160db14c2afff63a2307d2c54ccbafb4dc610ce1df14a760c5f",
+      "block_sha256": {
+        "1": "150de9f0fdfb6f6dc09136405eee64819ce869f609519fbe3ca7f811fefa66d7"
+      },
+      "context": [],
+      "requirements": [
+        {
+          "id": "02.06.02-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "clause": "A unit's equipment is the collection of wargear equipped by all member models.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:UnitFactory.instantiate_unit"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.06.02-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_default_wargear_is_equipped_separately_by_every_selected_model"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_06_equipment.py::test_02_06_defaults_belong_to_the_correct_real_model_type",
+            "tests/rules/section02/test_02_02_03_attack_generation.py::test_02_02_03_generate_each_equipped_weapon_before_pooling"
+          ],
+          "assertion": "Actual melee inventory excludes pistols and includes each equipped bearer. Preview consumes no dice. Generator rolls native Chaos Spawn D6+2 separately per physical weapon; grouping preserves budgets/contributions without reroll. Fixed Infractor A4 produces four attacks per weapon. No lifecycle timing beyond preview/generation/gather boundary is claimed.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/unit_factory.py:UnitFactory.instantiate_unit",
+            "engine/fight_weapon_selection.py:melee_attack_sequence_from_proposal"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:02:02.07:1",
+      "section": "02.07",
+      "title": "Wargear options",
+      "source_sha256": "5d7437fa9c3d494ed89ec36967a0576886bcc6dc6d7e9a99efd4e08201cd58ee",
+      "block_sha256": {
+        "1": "7343cf9cfc73a1f70878e406ee69edb660fadc12f187272370d9b67db505c788"
+      },
+      "context": [],
+      "requirements": [
+        {
+          "id": "02.07-obligation-01",
+          "source_blocks": [
+            1
+          ],
+          "clause": "Army construction may change model equipment only through the datasheet's allowed wargear options.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#02.07-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_phase9c_mustering.py::test_selected_wargear_must_be_legal_for_datasheet_option"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_06_equipment.py::test_02_06_01_and_02_07_replacement_affects_only_its_bearer"
+          ],
+          "assertion": "Legal plasma substitution changes correct bearer; adjacent negative test rejects wrong model and foreign wargear.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/unit_factory.py:UnitFactory.instantiate_unit"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "faq:66be2ad9-24af-4edf-890a-c0e55004bf76",
+      "section": "02.02.01",
+      "title": "FAQ 23",
+      "source_sha256": "9377700d849a18e73f6f58830a215dfe1b122e65b7e115d5ceecd9ca34a46feb",
+      "block_sha256": {
+        "1": "bd6b20a5b1e85cb9c9edf281ed4c711c4872c46e6a6a42fcd705fea4c3989179",
+        "2": "7ed095cb58fbe538fa899a404b5c7026e0b9a7ae2cc2d4830380e6bf04b352a3"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "context",
+          "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "faq-66be2ad9-24af-4edf-890a-c0e55004bf76-obligation-01",
+          "source_blocks": [
+            2
+          ],
+          "clause": "A unit ranged-attacks A bonus modifies each ranged weapon's A characteristic, not each generated attack die.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/runtime_modifiers.py:RuntimeModifierRegistry"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#faq-66be2ad9-24af-4edf-890a-c0e55004bf76-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_unit_ranged_attacks_bonus_changes_weapon_count_once"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_02_01_modifiers.py::test_02_02_01_faq_66be_bonus_applies_once_per_weapon",
+            "tests/rules/section02/test_02_02_01_weapon_scope.py::test_02_02_01_faq_bonus_generates_one_extra_attack_per_ranged_weapon"
+          ],
+          "assertion": "Core FAQ +1A input modifies each of real Ranger rifle/pistol profiles, generates source A+1 each, leaves melee unchanged and consumes no random dice.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "core/count_profiles.py:AttackProfile.with_modifier",
+            "engine/rule_ir_weapon_modifiers.py:rule_ir_modified_weapon_profile"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "faq:6575ee89-b92a-456d-8e59-4ee513df8f4e",
+      "section": "02.05.01",
+      "title": "FAQ 35",
+      "source_sha256": "4246aa2cdf23333e8213aeef87c4224f0f2ff31b5f8c80229f9c9f3b7c648fa4",
+      "block_sha256": {
+        "1": "153ee2d9c416b43e7b662d62d2b7bf88d6df151c83d65c3540c6f933627613ef",
+        "2": "a06fcf42f6466d9178edfccb0cb3bc4bb0d40c78258d071f83567fb8f6952083"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "context",
+          "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "faq-6575ee89-b92a-456d-8e59-4ee513df8f4e-obligation-01",
+          "source_blocks": [
+            2
+          ],
+          "clause": "Keyword matching is exact and does not match a word embedded within a different multiword keyword.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#faq-6575ee89-b92a-456d-8e59-4ee513df8f4e-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_order97_foundation_evidence.py::test_exact_keyword_matching_does_not_promote_embedded_words"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_faq_6575_embedded_word_does_not_match"
+          ],
+          "assertion": "EMPEROR'S CHILDREN matches actual faction; CHILDREN fails.",
+          "remaining": "",
+          "asserted_production_owner": [
+            "engine/rule_target_resolution.py:unit_has_required_keywords"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "faq:60232b79-7a10-44a0-ac68-e27312c7ba60",
+      "section": "02.05.01",
+      "title": "FAQ 51",
+      "source_sha256": "a4fb6955c73cae19a4d09415f8b77188b6fd8542fbb0448084db0db2c56c392f",
+      "block_sha256": {
+        "1": "cba0e6720c8bf7fdf2688115d9082a8c9560174f4dfbe845b53102e10062692e",
+        "2": "bb19e36f668275ba2b6a291f637cb88d3c067f4cd8b51bb37b854e1077a521c8"
+      },
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "context",
+          "reason": "Explanatory introduction or section heading; operative obligations are inventoried separately."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "faq-60232b79-7a10-44a0-ac68-e27312c7ba60-obligation-01",
+          "source_blocks": [
+            2
+          ],
+          "clause": "A removed destroyed model no longer contributes keywords to its prior rules unit.",
+          "engine_owners": [
+            "src/warhammer40k_core/engine/unit_factory.py:UnitInstance"
+          ],
+          "predecessor_reference": "data/source_audits/order97/categories/02.json#faq-60232b79-7a10-44a0-ac68-e27312c7ba60-obligation-01",
+          "predecessor_nodes": [
+            "tests/unit/test_model_keyword_authority.py::test_keyword_casualty_facade_restore_replay_and_both_viewers",
+            "tests/unit/test_phase13b_shooting_phase_declarations.py::test_order71_candidate_cache_rechecks_attached_vehicle_keyword_after_casualty"
+          ],
+          "current_successor_nodes": [],
+          "status": "behavior",
+          "tests": [
+            "tests/rules/section02/test_02_05_keywords.py::test_02_05_01_real_attachment_keeps_model_keywords_and_removes_casualty_contribution"
+          ],
+          "assertion": "Dead leader stops contributing CHARACTER; explicitly retained presence preserves contribution until removal.",
+          "remaining": "Casualty state supplied directly; destruction lifecycle remains Section05 owner.",
+          "asserted_production_owner": [
+            "engine/rules_units.py:RulesUnitView.keywords"
+          ]
+        }
+      ]
+    }
+  ],
+  "cross_section_links": [
+    {
+      "source_id": "faq:3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+      "owner": "19",
+      "links_from": [
+        "02.03",
+        "02.05.01"
+      ],
+      "status": "retained-clarification",
+      "behavior": "Attached-unit ability scope; existing owner evidence not rerun.",
+      "owning_rewrite_location": "tests/rules/section19/test_19_attached_ability_scope.py",
+      "owning_rewrite_status": "planned, not created or executed in this milestone",
+      "predecessor_reference": "tests/unit/test_unit_abilities.py::test_attached_conferring_bearer_survives_as_ability_source_until_attacks_finish"
+    },
+    {
+      "source_id": "faq:e43402db-7c49-4cd6-acf7-fa6cac83acb0",
+      "owner": "15",
+      "links_from": [
+        "02.02.01"
+      ],
+      "status": "retained-clarification",
+      "behavior": "Optional extra CP forms base cost; no duplicate execution here.",
+      "source_sha256": "82f9c28b646f5734f69e5e94c22a2a9a1df8761eaf463c1510f301294963c5f0",
+      "owning_rewrite_location": "tests/rules/section15/test_15_stratagem_cost.py",
+      "owning_rewrite_status": "planned, not created or executed in this milestone",
+      "predecessor_reference": "tests/rules/faq/unit/test_phase12c_core_stratagems.py::test_order37_cost_ceiling_uses_the_selected_stratagem_section"
+    },
+    {
+      "source_id": "faq:2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+      "owner": "05",
+      "links_from": [
+        "02.05.01"
+      ],
+      "status": "retained-clarification",
+      "behavior": "Fight-on-death retained presence; local60232 FAQ checks resulting keyword view, not repeated destruction execution.",
+      "source_sha256": "47c3d8041c00d1755fd01c8fc8149fccadfbd89cb238fa5d8184cadaeaaea455",
+      "owning_rewrite_location": "tests/rules/section05/test_05_retained_presence.py",
+      "owning_rewrite_status": "planned, not created or executed in this milestone",
+      "predecessor_reference": "tests/rules/rules05/unit/test_phase13b_shooting_declarations_part2.py::test_phase13e_fight_on_death_model_retains_presence_and_component_keywords"
+    },
+    {
+      "source_id": "faq:2a65a983-98ca-4f81-9668-ab87faad1443",
+      "source_sha256": "f91abe0e716e55b95fa6b1e363036199c711bbf146888e652bf4bece345ce976",
+      "owner": "18",
+      "links_from": [
+        "02.06.01",
+        "02.06.02"
+      ],
+      "status": "unadopted-v981",
+      "distinct_obligation": "V981-Q03",
+      "behavior": "Borrowed profiles are validated against catalog and attack identity belongs to carrier. Existing helper-level Leader ownership test supports non-leakage for Lethal Hits only. Named Upgrade/Enhancement and complete native attack controls remain unproved. This FAQ does not resolve S24 out-of-phase availability.",
+      "evidence": "audit-v981 T07: helper-level Leader Lethal Hits non-leakage; not rerun here. Named Enhancement/Upgrade and native attack remain unproved.",
+      "owning_rewrite_location": "tests/rules/section18/test_18_firing_deck.py",
+      "owning_rewrite_status": "planned, not created or executed in this milestone",
+      "predecessor_reference": null
+    },
+    {
+      "source_id": "faq:46de5d13-e6bb-4085-9948-38ce97880570",
+      "source_sha256": "4749d4b86d84f6febc090db44758d952b15068ce0dbe1e6010655e68a2dabb49",
+      "owner": "18",
+      "links_from": [
+        "02.06.01",
+        "02.06.02"
+      ],
+      "status": "unadopted-v981",
+      "distinct_obligation": "V981-Q03",
+      "behavior": "Borrowed profiles are validated against catalog and attack identity belongs to carrier. Existing helper-level Leader ownership test supports non-leakage for Lethal Hits only. Named Upgrade/Enhancement and complete native attack controls remain unproved. This FAQ does not resolve S24 out-of-phase availability.",
+      "evidence": "audit-v981 T07: helper-level Leader Lethal Hits non-leakage; not rerun here. Named Enhancement/Upgrade and native attack remain unproved.",
+      "owning_rewrite_location": "tests/rules/section18/test_18_firing_deck.py",
+      "owning_rewrite_status": "planned, not created or executed in this milestone",
+      "predecessor_reference": null
+    },
+    {
+      "source_id": "faq:b9fb8097-e9f4-4bab-b2bf-ec525c8e6db7",
+      "source_sha256": "ede077205e90741754f7f536c4c222e40f8fe8b26c2f15a167fa0fe34132ce96",
+      "owner": "18",
+      "links_from": [
+        "02.06.01",
+        "02.06.02"
+      ],
+      "status": "unadopted-v981",
+      "distinct_obligation": "V981-Q03",
+      "behavior": "Borrowed profiles are validated against catalog and attack identity belongs to carrier. Existing helper-level Leader ownership test supports non-leakage for Lethal Hits only. Named Upgrade/Enhancement and complete native attack controls remain unproved. This FAQ does not resolve S24 out-of-phase availability.",
+      "evidence": "audit-v981 T07: helper-level Leader Lethal Hits non-leakage; not rerun here. Named Enhancement/Upgrade and native attack remain unproved.",
+      "owning_rewrite_location": "tests/rules/section18/test_18_firing_deck.py",
+      "owning_rewrite_status": "planned, not created or executed in this milestone",
+      "predecessor_reference": null
+    }
+  ],
+  "retirement": "No predecessor removed or disabled. Equivalence and coverage review remains required before retirement.",
+  "coverage_summary": {
+    "behavior": 100,
+    "constructed_contract_obligations": 8,
+    "unimplemented": 0,
+    "confirmed_incorrect_rule_outcomes": 0
+  },
+  "engine_findings": {
+    "confirmed_incorrect_rule_outcomes": 0,
+    "execution_crash_repairs": 0,
+    "register": "future-fixes.json"
+  },
+  "qualification": "All 100 adopted obligations have bounded production-boundary assertions. Eight use explicitly constructed Core contracts; native integration limitations are retained in prerequisites.json. This is not full-game, Linux CI, source adoption, or predecessor-retirement certification."
+}

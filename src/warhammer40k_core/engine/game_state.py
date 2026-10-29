@@ -993,13 +993,9 @@ class OneShotWeaponUseRecord:
         )
 
     @property
-    def weapon_key(self) -> tuple[str, str, str, str]:
-        return (
-            self.model_instance_id,
-            self.wargear_id,
-            self.weapon_profile_id,
-            self.weapon_instance_id,
-        )
+    def weapon_key(self) -> tuple[str, str, str]:
+        """One battle entitlement per physical copy, across all of its profiles."""
+        return (self.model_instance_id, self.wargear_id, self.weapon_instance_id)
 
     def to_payload(self) -> OneShotWeaponUseRecordPayload:
         return {
@@ -1826,10 +1822,10 @@ class GameState:
         weapon_profile_id: str,
     ) -> bool:
         model_id = _validate_identifier("model_instance_id", model_instance_id)
+        _validate_identifier("weapon_profile_id", weapon_profile_id)
         key = (
             model_id,
             _validate_identifier("wargear_id", wargear_id),
-            _validate_identifier("weapon_profile_id", weapon_profile_id),
             _validate_identifier("weapon_instance_id", weapon_instance_id),
         )
         return key not in {record.weapon_key for record in self.one_shot_weapon_use_records}
@@ -1842,10 +1838,10 @@ class GameState:
         wargear_id: str,
         weapon_profile_id: str,
     ) -> OneShotWeaponUseRecord | None:
+        _validate_identifier("weapon_profile_id", weapon_profile_id)
         key = (
             _validate_identifier("model_instance_id", model_instance_id),
             _validate_identifier("wargear_id", wargear_id),
-            _validate_identifier("weapon_profile_id", weapon_profile_id),
             _validate_identifier("weapon_instance_id", weapon_instance_id),
         )
         for record in self.one_shot_weapon_use_records:
@@ -5470,7 +5466,14 @@ class GameState:
             player_id=player_id,
         )
 
-    def resolve_end_turn_cleanup_boundary(self, *, completed_phase: BattlePhase) -> None:
+    def resolve_end_turn_cleanup_boundary(
+        self, *, completed_phase: BattlePhase, decisions: DecisionController | None = None
+    ) -> _phase.LifecycleStatus | None:
+        if completed_phase is not self.current_battle_phase:
+            raise GameLifecycleError("Coherency cleanup phase drift.")
+        from warhammer40k_core.engine.coherency_cleanup_decisions import (
+            request_coherency_cleanup,
+        )
         from warhammer40k_core.engine.mission_cleanup_boundary import (
             resolve_mission_cleanup_boundary,
         )
@@ -5478,10 +5481,22 @@ class GameState:
             record_primary_unit_destructions_for_end_turn_cleanup,
         )
 
+        if any(
+            row.completes_boundary
+            and row.battle_round == self.battle_round
+            and row.active_player_id == self.active_player_id
+            and row.phase == completed_phase.value
+            for row in self.end_turn_cleanup_states
+        ):
+            return None
+        pending = request_coherency_cleanup(state=self, decisions=decisions)
+        if pending is not None:
+            return pending
         cleanup = resolve_mission_cleanup_boundary(state=self, completed_phase=completed_phase)
         record_primary_unit_destructions_for_end_turn_cleanup(state=self, cleanup=cleanup)
         self.end_turn_cleanup_states.append(cleanup)
         self.end_turn_cleanup_states.sort(key=lambda row: row.cleanup_id)
+        return None
 
     def _resolve_unarrived_reserve_destruction_boundary(self, *, end_of_battle: bool) -> None:
         from warhammer40k_core.engine.reserve_lifetime_boundary import resolve_boundary
@@ -5829,7 +5844,7 @@ def _validate_one_shot_weapon_use_records(
         for model in unit.own_models
     }
     records: list[OneShotWeaponUseRecord] = []
-    seen: set[tuple[str, str, str, str]] = set()
+    seen: set[tuple[str, str, str]] = set()
     for value in cast(list[object], values):
         if type(value) is not OneShotWeaponUseRecord:
             raise GameLifecycleError(

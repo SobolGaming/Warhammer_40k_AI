@@ -1,0 +1,75 @@
+{
+  "schema": "section10-future-fixes-v1",
+  "policy": "Retain enabled source-correct failures. No semantic repair, skip, xfail, guard weakening or compatibility shim.",
+  "findings": [
+    {
+      "id": "SF10-001",
+      "title": "Native inclusive engagement edge changes under coordinate translation",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "source": [
+        "rule:10:10.04:1 block2",
+        "rule:10:10.06:1 block3",
+        "rule:03:03.04:1"
+      ],
+      "expected": "A native Lord Exultant pair positioned with a mathematical base gap of exactly2 inches is engaged. Close-quarters is available and Normal is unavailable; translating the same separation must not change that answer.",
+      "actual": "At origin10 the native radius/pose arithmetic yields a floating gap just above2 and exposes Normal. The translated origin2 case, nearby +/-0.001 cases and independent vertical limits are controls.",
+      "tests": [
+        "tests/rules/section10/test_boundaries.py::test_native_engagement_boundary_changes_normal_and_close_quarters_choices[10-False-0]"
+      ],
+      "owners": [
+        "geometry/base.py",
+        "geometry/volume.py:Model.is_within_engagement_range",
+        "engine/unit_proximity.py",
+        "engine/phases/shooting_eligibility.py:_legal_shooting_types_for_rules_unit"
+      ],
+      "qualification": "Shared numerical geometry boundary exposed through native public Shooting choices, not a new incorrect shooting-type Boolean policy. Intended equality uses native radii and full legal in-bounds poses; measured float and pose values are printed in raw receipts. No general tolerance policy or broader geometry repair is proposed by this corpus task.",
+      "repair_performed": true,
+      "pre_repair_observation": {
+        "id": "SF10-001",
+        "title": "Native inclusive engagement edge changes under coordinate translation",
+        "status": "OPEN_ENABLED_NUMERICAL_BOUNDARY_FAILURE_NO_REPAIR",
+        "source": [
+          "rule:10:10.04:1 block2",
+          "rule:10:10.06:1 block3",
+          "rule:03:03.04:1"
+        ],
+        "expected": "A native Lord Exultant pair positioned with a mathematical base gap of exactly2 inches is engaged. Close-quarters is available and Normal is unavailable; translating the same separation must not change that answer.",
+        "actual": "At origin10 the native radius/pose arithmetic yields a floating gap just above2 and exposes Normal. The translated origin2 case, nearby +/-0.001 cases and independent vertical limits are controls.",
+        "tests": [
+          "tests/rules/section10/test_boundaries.py::test_native_engagement_boundary_changes_normal_and_close_quarters_choices[10-False-0]"
+        ],
+        "owners": [
+          "geometry/base.py",
+          "geometry/volume.py:Model.is_within_engagement_range",
+          "engine/unit_proximity.py",
+          "engine/phases/shooting_eligibility.py:_legal_shooting_types_for_rules_unit"
+        ],
+        "qualification": "Shared numerical geometry boundary exposed through native public Shooting choices, not a new incorrect shooting-type Boolean policy. Intended equality uses native radii and full legal in-bounds poses; measured float and pose values are printed in raw receipts. No general tolerance policy or broader geometry repair is proposed by this corpus task.",
+        "repair_performed": false
+      },
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": "SF10-001",
+        "independent_review_revision": {
+          "finding": "R1",
+          "prior_verdict": "SCOPED_NOT_CLEAN",
+          "prior_source_map": "cd334b13a3a8102dddbfc0f79de8e38d4999f38df3f376f7971f5aca2db26534",
+          "revision": "task11/revision-2",
+          "status": "REPAIRED_AWAITING_RENEWED_REVIEW",
+          "comparison": "exact authoritative binary input ratios; no exterior tolerance",
+          "fixture_correction": "nearest legal native placement; original assertions/parameters preserved"
+        }
+      }
+    }
+  ],
+  "prior_findings": "Stealth, retained CHARACTER/Epic Challenge, adopted Deadly Demise/Fight on Death removal order, qualified Command-end sequencing, Section09 Ordered Retreat transit, whole-model hazard removal and partial Defiler auto-pass remain deferred and unchanged. Prior combined01-08:1226/1216pass/10fail; separate09:105/100pass/5fail. No combined01-09 credit.",
+  "development_qualifications": [
+    "Initial pilots had incomplete mission/history or terrain fixtures, missing runtime phase bindings and incorrect test assumptions about automatic attack completion. They are preserved diagnostics, not additional engine findings.",
+    "No production repair was required. The final mission membership snapshot is minimal continuation identity, not prior-phase execution."
+  ],
+  "current_checkpoint_note": "User-approved focused repair checkpoint supersedes this file's historical no-repair milestone policy only for marked findings; original observations and source qualifications remain retained. Independent review pending."
+}

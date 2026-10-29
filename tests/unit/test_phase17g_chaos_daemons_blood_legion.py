@@ -30,6 +30,7 @@ from tests.phase15c_fight_order_helpers import (
     fight_lifecycle,
     submit_minimal_melee_declaration,
 )
+from tests.setup_completion_helpers import place_attached_components_coherently_for_fixture
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -3328,6 +3329,7 @@ def _battle_ready_state(
         armies=tuple(state.army_definitions),
     )
     state.record_battlefield_state(scenario.battlefield_state)
+    place_attached_components_coherently_for_fixture(state)
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-a"))
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-b"))
     while state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:

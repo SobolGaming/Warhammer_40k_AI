@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import math
+import os
+import stat
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+from itertools import product
 from pathlib import Path, PurePosixPath
 from statistics import median
 from typing import TypedDict, cast
@@ -13,7 +17,7 @@ from typing import TypedDict, cast
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 TESTS_ROOT = REPOSITORY_ROOT / "tests"
 EXCLUDED_TEST_DIRECTORIES = {"benchmarks", "code_quality"}
-SHARD_STRATEGY = "largest-processing-time-by-median-file-duration"
+SHARD_STRATEGY = "largest-processing-time-by-derived-selector-weight"
 
 
 class ProfileEvidence(TypedDict):
@@ -64,19 +68,575 @@ def main() -> int:
     if args.profile_source is None or len(args.profile_source) != len(args.junit):
         parser.error("one --profile-source is required per --junit")
     durations, profiles = _profile_medians(tuple(args.junit), tuple(args.profile_source))
-    durations = _rounded_durations(durations)
+    durations = _rounded_durations(_partitioned_durations(durations))
     shards = _balanced_shards(durations=durations, shard_count=args.shard_count)
     _write_manifests(output_dir=output_dir, shards=shards, durations=durations, profiles=profiles)
     return 0
 
 
-def _behavioral_test_files() -> tuple[str, ...]:
-    paths = (
-        path
-        for path in TESTS_ROOT.rglob("test_*.py")
-        if not EXCLUDED_TEST_DIRECTORIES.intersection(path.relative_to(TESTS_ROOT).parts)
+CUTOVER_PATH = "data/source_audits/ci64_provenance_v1/test-cutover.json"
+CUTOVER_BASE = "5734eace50abe8fe99bbe46282652e4ab3c021b4"
+CUTOVER_TREE = "29eb413bb3c6c698c7f12a74e96b373e1084fd46"
+CUTOVER_LEDGER_SHA256 = "207e59b1e4f56c209ca35f1839823a3dfa94e0ad71e231334549b3ce74945217"
+RETIRED_TEST_COUNT = 92
+RETIRED_TEST_PATHS_SHA256 = "a60c2ab82c17e8703ae1faec743b8b1ff463094252e4249876cb7cca14800bf0"
+RETIRED_TEST_ROWS_SHA256 = "30ce81d57e4fe404dfac0de28662f1ae428d716a29ef095d711f520a4315ad46"
+ACTIVE_TEST_ROOTS = ("tests/rules", "tests/factions", "tests/infrastructure", "tests/performance")
+RETAINED_ACTIVE_FILES = (
+    "tests/unit/test_dice.py",
+    "tests/unit/test_phase10i_terrain_movement.py",
+)
+
+
+@dataclass(frozen=True, slots=True)
+class BehavioralSelection:
+    active_files: tuple[str, ...]
+    inactive_files: tuple[str, ...]
+    quality_files: tuple[str, ...]
+    benchmark_files: tuple[str, ...]
+    manifest_sha256: str
+
+    def check_explicit(self, root: Path, arguments: tuple[str, ...]) -> None:
+        """Reject explicit quarantined files; pytest otherwise bypasses ignore lists."""
+        for argument in arguments:
+            name = argument.split("::", 1)[0]
+            path = Path(name)
+            if ".." in path.parts:
+                raise SystemExit("Test selector must not contain parent aliases: " + name)
+            candidate = path if path.is_absolute() else root / path
+            _selection_no_links(root, candidate)
+            if candidate.is_dir():
+                if candidate != root and not candidate.is_relative_to(root / "tests"):
+                    raise SystemExit("Test selector escaped tests: " + name)
+                continue
+            relative = candidate.relative_to(root).as_posix()
+            if relative in self.inactive_files:
+                raise SystemExit("Explicit inactive legacy test is quarantined: " + relative)
+            if relative not in (*self.active_files, *self.quality_files, *self.benchmark_files):
+                raise SystemExit("Explicit test is outside the declared cutover: " + relative)
+
+
+def _selection_no_links(root: Path, path: Path) -> None:
+    if not path.is_relative_to(root):
+        raise SystemExit("Test selection escaped repository: " + str(path))
+    for member in (path, *path.parents):
+        if member == root:
+            break
+        if member.is_symlink():
+            raise SystemExit("Test selection contains a symlink alias: " + str(member))
+
+
+def _selection_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    value: dict[str, object] = {}
+    for key, item in pairs:
+        if key in value:
+            raise SystemExit("Duplicate cutover field: " + key)
+        value[key] = item
+    return value
+
+
+def _selection_members(
+    value: object, root: Path, *, current: dict[str, dict[str, object]] | None = None
+) -> dict[str, dict[str, object]]:
+    if not isinstance(value, dict) or not value:
+        raise SystemExit("Cutover members must be a nonempty object.")
+    result: dict[str, dict[str, object]] = {}
+    for name, item in value.items():
+        if (
+            not isinstance(name, str)
+            or name != PurePosixPath(name).as_posix()
+            or PurePosixPath(name).is_absolute()
+            or ".." in PurePosixPath(name).parts
+            or "\\" in name
+            or ":" in name
+            or not name.startswith("tests/")
+            or not PurePosixPath(name).name.startswith("test_")
+            or not name.endswith(".py")
+            or not isinstance(item, dict)
+            or item.keys() != {"mode", "blob_sha1", "sha256", "bytes"}
+            or item["mode"] not in {"100644", "100755"}
+            or type(item["bytes"]) is not int
+            or item["bytes"] < 0
+        ):
+            raise SystemExit("Malformed cutover member: " + str(name))
+        for key, size in (("sha256", 64), ("blob_sha1", 40)):
+            token = item[key]
+            if (
+                not isinstance(token, str)
+                or len(token) != size
+                or set(token) - set("0123456789abcdef")
+            ):
+                raise SystemExit("Malformed cutover digest: " + name)
+        path = root / name
+        _selection_no_links(root, path)
+        if not path.is_file():
+            raise SystemExit("Missing declared cutover member: " + name)
+        observed = item if current is None else current.get(name, item)
+        raw = path.read_bytes()
+        blob = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw, usedforsecurity=False)
+        if (
+            len(raw) != observed["bytes"]
+            or hashlib.sha256(raw).hexdigest() != observed["sha256"]
+            or blob.hexdigest() != observed["blob_sha1"]
+        ):
+            raise SystemExit("Cutover member bytes changed: " + name)
+        if os.name != "nt" and bool(path.stat().st_mode & 0o100) != (observed["mode"] == "100755"):
+            raise SystemExit("Cutover member mode changed: " + name)
+        result[name] = item
+    if len({name.casefold() for name in result}) != len(result):
+        raise SystemExit("Case aliases in cutover membership.")
+    return result
+
+
+def _selection_retirements(root: Path, value: object, native: object) -> frozenset[str]:
+    """Fresh exact tombstones and owned native text archives; no virtual live bytes."""
+    if not isinstance(value, list) or not isinstance(native, dict):
+        raise SystemExit("Retirement data must be an exact list over the native ledger.")
+    paths: list[str] = []
+    rows: dict[str, object] = {}
+    for row in value:
+        if (
+            not isinstance(row, dict)
+            or row.keys() != {"path", "archive", "native"}
+            or not isinstance(row["path"], str)
+            or not isinstance(row["archive"], str)
+        ):
+            raise SystemExit("Malformed finite retirement row.")
+        name = row["path"]
+        if name in rows or name not in native or row["native"] != native[name]:
+            raise SystemExit("Retirement native membership or identity changed.")
+        archive = "data/source_audits/ci64_provenance_v1/retired-tests/" + name + ".txt"
+        if row["archive"] != archive:
+            raise SystemExit("Retirement archive path is not the exact owned location.")
+        paths.append(name)
+        rows[name] = row["native"]
+    if (
+        paths != sorted(paths)
+        or len(paths) != RETIRED_TEST_COUNT
+        or hashlib.sha256(json.dumps(paths, separators=(",", ":")).encode()).hexdigest()
+        != RETIRED_TEST_PATHS_SHA256
+        or hashlib.sha256(
+            json.dumps(rows, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        != RETIRED_TEST_ROWS_SHA256
+    ):
+        raise SystemExit("Approved finite retirement set changed.")
+    for row in value:
+        name = row["path"]
+        path = root / name
+        _selection_no_links(root, path)
+        if path.exists() or path.is_symlink():
+            raise SystemExit("Retired test path reappeared: " + name)
+        archive = root / row["archive"]
+        _selection_no_links(root, archive)
+        try:
+            resolved_before = archive.resolve(strict=True)
+            before = archive.lstat()
+        except FileNotFoundError as error:
+            raise SystemExit("Retirement archive is missing before acquisition.") from error
+        if resolved_before != archive:
+            raise SystemExit("Retirement archive has a physical path alias.")
+        if (
+            not stat.S_ISREG(before.st_mode)
+            or before.st_nlink != 1
+            or (os.name != "nt" and before.st_mode & 0o111)
+        ):
+            raise SystemExit("Retirement archive must be an owned regular non-executable file.")
+        fields = (
+            "st_dev",
+            "st_ino",
+            "st_mode",
+            "st_nlink",
+            "st_size",
+            "st_mtime_ns",
+            "st_ctime_ns",
+        )
+        before_identity = tuple(getattr(before, name) for name in fields)
+        try:
+            stream = archive.open("rb")
+        except FileNotFoundError as error:
+            raise SystemExit("Retirement archive disappeared before open.") from error
+        with stream:
+            opened = os.fstat(stream.fileno())
+            opened_identity = tuple(getattr(opened, name) for name in fields)
+            # Windows lstat/fstat ctime meanings can differ: compare it only within
+            # the same API. All remaining ownership/identity fields must agree.
+            if opened_identity[:-1] != before_identity[:-1]:
+                raise SystemExit("Retirement archive handle identity differs from its path.")
+            raw = stream.read()
+            finished = os.fstat(stream.fileno())
+            if tuple(getattr(finished, name) for name in fields) != opened_identity:
+                raise SystemExit("Retirement archive changed while its handle was open.")
+        _selection_no_links(root, archive)
+        try:
+            resolved_after = archive.resolve(strict=True)
+            after = archive.lstat()
+        except FileNotFoundError as error:
+            raise SystemExit("Retirement archive disappeared during acquisition.") from error
+        if resolved_after != archive:
+            raise SystemExit("Retirement archive physical path changed during acquisition.")
+        if tuple(getattr(after, name) for name in fields) != before_identity:
+            raise SystemExit("Retirement archive path identity changed during acquisition.")
+        expected = row["native"]
+        blob = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw, usedforsecurity=False)
+        if (
+            len(raw) != expected["bytes"]
+            or hashlib.sha256(raw).hexdigest() != expected["sha256"]
+            or blob.hexdigest() != expected["blob_sha1"]
+        ):
+            raise SystemExit("Retirement archive differs from authentic native bytes: " + name)
+    return frozenset(paths)
+
+
+def deferred_comparison_cases(value: object) -> tuple[str, ...]:
+    """The owner's finite PR591 comparison exception, not behavioral deselection."""
+    if not isinstance(value, dict):
+        raise SystemExit("Invalid comparison deferral record.")
+    nodes = value["deferred_quality_cases"]
+    if (
+        value["comparison_disposition"] != "deferred"
+        or not isinstance(nodes, list)
+        or len(nodes) != 260
+        or not all(isinstance(node, str) for node in nodes)
+        or nodes != sorted(set(nodes))
+        or hashlib.sha256(
+            json.dumps(nodes, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+        ).hexdigest()
+        != "e419ac241cf7908e138b1bd78289a523416bddd51cb65a5356c60e6763d167c7"
+    ):
+        raise SystemExit("Comparison deferral differs from the approved 260 quality cases.")
+    ledger = {
+        name: value[name]
+        for name in (
+            "source_base",
+            "active_roots",
+            "native_active_files",
+            "retained_active_files",
+            "inactive_legacy_files",
+            "benchmark_files",
+        )
+    }
+    if (
+        hashlib.sha256(
+            json.dumps(ledger, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        != CUTOVER_LEDGER_SHA256
+    ):
+        raise SystemExit("Comparison deferral changed the native behavioral ledger.")
+    coverage = value["coverage"]
+    if (
+        coverage["metric"] != "coverage.py total with branch=true"
+        or coverage["source"] != ["warhammer40k_core"]
+        or type(coverage["current_floor"]) is not int
+        or coverage["current_floor"] != 50
+    ):
+        raise SystemExit("Comparison deferral changed full-package branch coverage.")
+    return tuple(nodes)
+
+
+def behavioral_selection(root: Path) -> BehavioralSelection:
+    """Fresh finite cutover admission shared by pytest and shard discovery."""
+    root = root.resolve(strict=True)
+    path = root / CUTOVER_PATH
+    _selection_no_links(root, path)
+    raw = path.read_bytes()
+    value = json.loads(raw, object_pairs_hook=_selection_object)
+    fields = {
+        "schema",
+        "source_base",
+        "active_roots",
+        "active_files",
+        "retained_active_files",
+        "inactive_legacy_files",
+        "inactive_updates",
+        "native_active_files",
+        "benchmark_files",
+        "retirements",
+        "coverage",
+        "comparison_disposition",
+        "deferred_quality_cases",
+    }
+    if (
+        not isinstance(value, dict)
+        or value.keys() != fields
+        or value["schema"] != "finite-test-cutover-v1"
+    ):
+        raise SystemExit("Invalid finite test cutover schema.")
+    deferred_comparison_cases(value)
+    if value["source_base"] != {"commit": CUTOVER_BASE, "tree": CUTOVER_TREE}:
+        raise SystemExit("Test cutover source authority changed.")
+    if value["active_roots"] != list(ACTIVE_TEST_ROOTS):
+        raise SystemExit("Test cutover roots or approved retirement set changed.")
+    expected_coverage = {
+        "metric": "coverage.py total with branch=true",
+        "source": ["warhammer40k_core"],
+        "current_floor": 50,
+        "restoration_floor": 85,
+        "restoration_condition": (
+            "post-merge rebuild until complete selected behavioral coverage meets85; then restore85"
+        ),
+    }
+    if (
+        value["coverage"] != expected_coverage
+        or type(value["coverage"]["current_floor"]) is not int
+        or type(value["coverage"]["restoration_floor"]) is not int
+    ):
+        raise SystemExit("Test cutover coverage authority changed.")
+    ledger_fields = (
+        "source_base",
+        "active_roots",
+        "native_active_files",
+        "retained_active_files",
+        "inactive_legacy_files",
+        "benchmark_files",
     )
-    return tuple(sorted(path.relative_to(REPOSITORY_ROOT).as_posix() for path in paths))
+    ledger = {name: value[name] for name in ledger_fields}
+    if (
+        hashlib.sha256(
+            json.dumps(ledger, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        != CUTOVER_LEDGER_SHA256
+    ):
+        raise SystemExit("Native behavioral classification ledger changed.")
+    if not isinstance(value["native_active_files"], dict):
+        raise SystemExit("Native active file ledger must be an object.")
+    active = _selection_members(value["active_files"], root)
+    if not value["native_active_files"].keys() <= active.keys():
+        raise SystemExit("A native active Core/regression file was omitted.")
+    retained = _selection_members(value["retained_active_files"], root)
+    updates = value["inactive_updates"]
+    allowed_updates = {
+        "tests/unit/test_phase15c_fight_order.py": "add-pending-decision-requests-v1",
+        "tests/unit/test_phase13b_shooting_declarations.py": "add-pending-decision-requests-v1",
+        "tests/integration/test_embarked_ability_authority.py": "type-only-battle-phase-cast-v1",
+    }
+    if not isinstance(updates, dict) or set(updates) - allowed_updates.keys():
+        raise SystemExit("Inactive update membership changed.")
+    current: dict[str, dict[str, object]] = {}
+    for name, update in updates.items():
+        if (
+            not isinstance(update, dict)
+            or update.keys() != {"before", "after", "recipe"}
+            or update["recipe"] != allowed_updates[name]
+            or not isinstance(value["inactive_legacy_files"], dict)
+            or update["before"] != value["inactive_legacy_files"].get(name)
+        ):
+            raise SystemExit("Inactive update native preimage/recipe changed.")
+        current.update(_selection_members({name: update["after"]}, root))
+    retired = _selection_retirements(root, value["retirements"], value["inactive_legacy_files"])
+    if current.keys() & retired:
+        raise SystemExit("A retired test cannot also carry a live inactive update.")
+    present_inactive = {
+        name: row for name, row in value["inactive_legacy_files"].items() if name not in retired
+    }
+    inactive = _selection_members(present_inactive, root, current=current)
+    inactive.update({name: value["inactive_legacy_files"][name] for name in retired})
+    benchmarks = _selection_members(value["benchmark_files"], root)
+    if tuple(sorted(retained)) != RETAINED_ACTIVE_FILES or any(
+        active.get(n) != row for n, row in retained.items()
+    ):
+        raise SystemExit("Retained active regression files changed.")
+    if set(active) & set(inactive) or (set(active) | set(inactive)) & set(benchmarks):
+        raise SystemExit("Cutover status memberships overlap.")
+    if any(
+        not any(name.startswith(prefix + "/") for prefix in ACTIVE_TEST_ROOTS)
+        and name not in retained
+        for name in active
+    ):
+        raise SystemExit("Active file is outside approved roots and retained files.")
+    if any(
+        not name.startswith(("tests/unit/", "tests/integration/", "tests/replay/"))
+        for name in inactive
+    ):
+        raise SystemExit("Inactive file is outside the finite legacy roots.")
+    if any(not name.startswith("tests/benchmarks/") for name in benchmarks):
+        raise SystemExit("Measurement file is outside benchmark root.")
+    found: set[str] = set()
+    tests_root = root / "tests"
+    _selection_no_links(root, tests_root)
+    for directory, directories, filenames in os.walk(tests_root, followlinks=False):
+        base = Path(directory)
+        for entry in directories:
+            _selection_no_links(root, base / entry)
+        for filename in filenames:
+            if filename.endswith("_test.py") and not filename.startswith("test_"):
+                raise SystemExit("Undeclared alternate pytest naming: " + str(base / filename))
+            if filename.startswith("test_") and filename.endswith(".py"):
+                member = base / filename
+                _selection_no_links(root, member)
+                found.add(member.relative_to(root).as_posix())
+    quality = {name for name in found if name.startswith("tests/code_quality/")}
+    declared = set(active) | (set(inactive) - retired) | set(benchmarks) | quality
+    if found != declared:
+        raise SystemExit("Cutover test membership changed: " + repr(sorted(found ^ declared)))
+    if len({name.casefold() for name in found}) != len(found):
+        raise SystemExit("Case aliases in physical test membership.")
+    for name in ACTIVE_TEST_ROOTS:
+        if not (root / name).is_dir():
+            raise SystemExit("Missing active test root: " + name)
+    for name in retired:
+        path = root / name
+        _selection_no_links(root, path)
+        if path.exists() or path.is_symlink():
+            raise SystemExit("Retired test path reappeared before admission closed: " + name)
+    return BehavioralSelection(
+        tuple(sorted(active)),
+        tuple(sorted(inactive)),
+        tuple(sorted(quality)),
+        tuple(sorted(benchmarks)),
+        hashlib.sha256(raw).hexdigest(),
+    )
+
+
+def _behavioral_test_files() -> tuple[str, ...]:
+    return behavioral_selection(REPOSITORY_ROOT).active_files
+
+
+CASE_PARTITION_PATH = "ci/test_shards/case-partitions.json"
+CASE_PARTITION_FILE = "tests/rules/rules04/unit/test_s25_permission_relevance.py"
+CASE_PARTITION_SHA256 = "be09d3680ac4ac47c248a1962b24846a3791824821c14a5a4080f5cab8b73c07"
+
+
+def _literal_partition_nodes(root: Path) -> tuple[str, ...]:
+    path = root / CASE_PARTITION_FILE
+    _selection_no_links(root, path)
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != CASE_PARTITION_SHA256:
+        raise SystemExit("Finite case partition source changed; regeneration/review required.")
+    module = ast.parse(raw.decode(), filename=CASE_PARTITION_FILE)
+    functions = [
+        node
+        for node in module.body
+        if isinstance(node, ast.FunctionDef) and node.name.startswith("test_")
+    ]
+    if (
+        len(functions) != 1
+        or functions[0].name != "test_normal_native_relevant_operations_and_owned_selected_sources"
+    ):
+        raise SystemExit("Finite case partition test function changed.")
+    function = functions[0]
+    if len(function.decorator_list) != 2:
+        raise SystemExit("Finite case partition decorators changed.")
+    axes: list[tuple[str, ...]] = []
+    for decorator, name, count in zip(
+        reversed(function.decorator_list), ("mode", "player"), (10, 2), strict=True
+    ):
+        if (
+            not isinstance(decorator, ast.Call)
+            or ast.unparse(decorator.func) != "pytest.mark.parametrize"
+            or len(decorator.args) != 2
+            or decorator.keywords
+            or not isinstance(decorator.args[0], ast.Constant)
+            or decorator.args[0].value != name
+            or not isinstance(decorator.args[1], ast.List)
+        ):
+            raise SystemExit("Only the reviewed literal parameter axes are admitted.")
+        values: list[str] = []
+        for value in decorator.args[1].elts:
+            if not isinstance(value, ast.Constant) or not isinstance(value.value, str):
+                raise SystemExit("Partition parameters must be literal strings.")
+            values.append(value.value)
+        if len(values) != count or len(set(values)) != count:
+            raise SystemExit("Partition parameter count or uniqueness changed.")
+        axes.append(tuple(values))
+    nodes = tuple(
+        CASE_PARTITION_FILE + "::" + function.name + "[" + "-".join(row) + "]"
+        for row in product(*axes)
+    )
+    if len(nodes) != 20 or len(set(nodes)) != 20:
+        raise SystemExit("Finite partition must contain exactly twenty unique nodes.")
+    return nodes
+
+
+def worksteal_relevance_order(nodeids: tuple[str, ...], *, workers: int) -> tuple[int, ...]:
+    """Start the finite expensive S25 cases on distinct existing worker chunks.
+
+    Worksteal initially sends floor(remaining / remaining workers) consecutive
+    items. Adjacent expensive cases otherwise become an unstealable serial tail.
+    Keep both relative orders and leave every other collection untouched.
+    """
+    original = tuple(range(len(nodeids)))
+    heavy = tuple(
+        index for index, node in enumerate(nodeids) if node.startswith(CASE_PARTITION_FILE + "::")
+    )
+    if workers != 4 or not 1 <= len(heavy) <= workers or len(nodeids) < 2 * workers:
+        return original
+    declared = frozenset(_literal_partition_nodes(REPOSITORY_ROOT))
+    if any(nodeids[index] not in declared for index in heavy):
+        raise SystemExit("Worksteal relevance ordering requires declared finite cases.")
+    ordinary = iter(index for index in original if index not in heavy)
+    ordered: list[int] = []
+    for worker in range(workers):
+        count = (len(nodeids) - len(ordered)) // (workers - worker)
+        first = (heavy[worker],) if worker < len(heavy) else ()
+        ordered.extend(first)
+        ordered.extend(next(ordinary) for _ in range(count - len(first)))
+    return tuple(ordered)
+
+
+def _case_partition(root: Path, files: frozenset[str]) -> dict[str, float]:
+    if CASE_PARTITION_FILE not in files:
+        return {}
+    path = root / CASE_PARTITION_PATH
+    _selection_no_links(root, path)
+    value = json.loads(path.read_bytes(), object_pairs_hook=_selection_object)
+    fields = {"schema", "source_file", "source_sha256", "nodes", "weights", "evidence"}
+    if (
+        not isinstance(value, dict)
+        or value.keys() != fields
+        or value["schema"] != "finite-behavior-node-partition-v1"
+        or value["source_file"] != CASE_PARTITION_FILE
+        or value["source_sha256"] != CASE_PARTITION_SHA256
+    ):
+        raise SystemExit("Finite node partition schema or source identity changed.")
+    nodes = _literal_partition_nodes(root)
+    if (
+        value["nodes"] != list(nodes)
+        or not isinstance(value["weights"], dict)
+        or value["weights"].keys() != set(nodes)
+    ):
+        raise SystemExit("Finite node partition is not the complete exact literal inventory.")
+    result: dict[str, float] = {}
+    for node in nodes:
+        weight = value["weights"][node]
+        if (
+            isinstance(weight, bool)
+            or not isinstance(weight, int | float)
+            or not math.isfinite(weight)
+            or weight <= 0
+        ):
+            raise SystemExit("Finite partition weights must be positive finite scheduling values.")
+        result[node] = float(weight)
+    evidence = value["evidence"]
+    if (
+        not isinstance(evidence, dict)
+        or evidence.get("purpose")
+        != "Derived scheduling weights only; not current performance or full-suite qualification"
+    ):
+        raise SystemExit("Finite partition must retain its scheduling-only evidence label.")
+    return result
+
+
+def _behavioral_shard_selectors() -> tuple[str, ...]:
+    files = frozenset(_behavioral_test_files())
+    partition = _case_partition(REPOSITORY_ROOT, files)
+    return (
+        tuple(sorted((files - {CASE_PARTITION_FILE}) | partition.keys()))
+        if partition
+        else tuple(sorted(files))
+    )
+
+
+def _partitioned_durations(durations: dict[str, float]) -> dict[str, float]:
+    """Preserve file totals; node ratios are derived scheduling weights, not case profiles."""
+    partition = _case_partition(REPOSITORY_ROOT, frozenset(durations))
+    if not partition:
+        return dict(durations)
+    result = dict(durations)
+    total = result.pop(CASE_PARTITION_FILE)
+    denominator = sum(partition.values())
+    result.update({node: total * weight / denominator for node, weight in partition.items()})
+    return result
 
 
 def _profile_medians(
@@ -231,7 +791,7 @@ def _write_manifests(
 
 
 def _check_manifests(*, output_dir: Path, shard_count: int) -> None:
-    expected = set(_behavioral_test_files())
+    expected = set(_behavioral_shard_selectors())
     manifest_names = {path.name for path in output_dir.glob("shard-*.txt")}
     if manifest_names != {f"shard-{index}.txt" for index in range(1, shard_count + 1)}:
         raise SystemExit("Shard manifest count does not match --shard-count.")

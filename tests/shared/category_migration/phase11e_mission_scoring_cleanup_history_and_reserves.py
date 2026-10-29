@@ -453,6 +453,7 @@ def _authentic_attached_unit_lifecycle_payload() -> GameLifecyclePayload:
     lifecycle.state = _battle_state_from_config(
         config,
         decisions=lifecycle.decision_controller,
+        coherent_attached_units=True,
     )
     state = lifecycle.state
     assert state is not None

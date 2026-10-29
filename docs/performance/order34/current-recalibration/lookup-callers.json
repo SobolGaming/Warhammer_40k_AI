@@ -1,0 +1,434 @@
+[
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/damage_allocation_targets.py",
+      28,
+      "damage_allocation_target_state"
+    ],
+    "primitive_calls": 3,
+    "total_calls": 3
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/runtime_characteristic_context.py",
+      27,
+      "__post_init__"
+    ],
+    "primitive_calls": 5,
+    "total_calls": 5
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/terrain_hidden.py",
+      26,
+      "terrain_hidden_model_ids"
+    ],
+    "primitive_calls": 5,
+    "total_calls": 5
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/stealth.py",
+      70,
+      "stealth_source_inventory"
+    ],
+    "primitive_calls": 2,
+    "total_calls": 2
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/random_profile_evaluation.py",
+      47,
+      "evaluate_unit_profile_characteristics"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/dice_result_overrides.py",
+      182,
+      "request_dice_result_override_if_available"
+    ],
+    "primitive_calls": 4,
+    "total_calls": 4
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/attack_modifier_evaluation.py",
+      57,
+      "select_hit_modifiers"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/attack_modifier_evaluation.py",
+      126,
+      "select_wound_modifiers"
+    ],
+    "primitive_calls": 2,
+    "total_calls": 2
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py",
+      93,
+      "_roll_hit_step"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
+      70,
+      "_roll_hit"
+    ],
+    "primitive_calls": 3,
+    "total_calls": 3
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py",
+      316,
+      "_roll_hit_and_wound"
+    ],
+    "primitive_calls": 2,
+    "total_calls": 2
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/lethal_hits.py",
+      357,
+      "_eligible"
+    ],
+    "primitive_calls": 6,
+    "total_calls": 6
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/charge_eligibility.py",
+      55,
+      "charge_unit_ineligibility_reason"
+    ],
+    "primitive_calls": 4,
+    "total_calls": 4
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/activity_restrictions.py",
+      122,
+      "record_completed_shooting_restriction"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/charge_targets.py",
+      58,
+      "charge_target_candidates"
+    ],
+    "primitive_calls": 3,
+    "total_calls": 3
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/charge_targets.py",
+      26,
+      "charge_target_restriction"
+    ],
+    "primitive_calls": 12,
+    "total_calls": 12
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/attached_unit_reconciliation.py",
+      85,
+      "reconcile_after_attack_sequence"
+    ],
+    "primitive_calls": 2,
+    "total_calls": 2
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/attached_unit_reconciliation.py",
+      18,
+      "validate_attached_rules_unit_identity_after_destruction"
+    ],
+    "primitive_calls": 2,
+    "total_calls": 2
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/shooting_validation.py",
+      376,
+      "_shooting_unit_options"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/shooting_validation.py",
+      298,
+      "_enemy_placed_unit_ids"
+    ],
+    "primitive_calls": 12,
+    "total_calls": 12
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/shooting_target_replacement.py",
+      133,
+      "_candidate_pool"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/shooting_handler.py",
+      587,
+      "invalid_shooting_type_selection_status"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/shooting_requests.py",
+      53,
+      "_request_shooting_type_selection"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/shooting_decisions.py",
+      73,
+      "_apply_shooting_type_selection_decision"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/shooting_requests.py",
+      143,
+      "_request_shooting_declaration"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/shooting_declaration_validation.py",
+      62,
+      "_validate_declaration_submission"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/shooting_declaration_validation.py",
+      269,
+      "_attack_pools_or_validation"
+    ],
+    "primitive_calls": 6,
+    "total_calls": 6
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/shooting_eligibility.py",
+      71,
+      "_legal_shooting_unit_ids"
+    ],
+    "primitive_calls": 3,
+    "total_calls": 3
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/shooting_eligibility.py",
+      209,
+      "_hidden_target_model_ids"
+    ],
+    "primitive_calls": 5,
+    "total_calls": 5
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/stratagems_targeting.py",
+      116,
+      "_target_binding_error"
+    ],
+    "primitive_calls": 2,
+    "total_calls": 2
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/generic_rule_attack_hooks.py",
+      488,
+      "_matching_generic_attack_effects"
+    ],
+    "primitive_calls": 78,
+    "total_calls": 78
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/movement_locks.py",
+      16,
+      "movement_lock_reason"
+    ],
+    "primitive_calls": 11,
+    "total_calls": 11
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/fight_rules_unit_movement.py",
+      1378,
+      "_canonical_rules_unit"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/fight_movement_mode_authority.py",
+      136,
+      "_canonical_rules_unit"
+    ],
+    "primitive_calls": 3,
+    "total_calls": 3
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/fight_rules_unit_melee.py",
+      483,
+      "_canonical_target_unit_id"
+    ],
+    "primitive_calls": 2,
+    "total_calls": 2
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/attack_weapon_inventory.py",
+      30,
+      "<genexpr>"
+    ],
+    "primitive_calls": 10,
+    "total_calls": 10
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/stratagems_targeting.py",
+      460,
+      "_target_unit_has_keyword"
+    ],
+    "primitive_calls": 2,
+    "total_calls": 2
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/stratagems_geometry.py",
+      633,
+      "_unit_is_within_enemy_engagement_range"
+    ],
+    "primitive_calls": 2,
+    "total_calls": 2
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/shooting_firing_deck.py",
+      68,
+      "_firing_deck_phase_available"
+    ],
+    "primitive_calls": 9,
+    "total_calls": 9
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/mission_action_eligibility.py",
+      148,
+      "rules_unit_started_mission_action_this_turn"
+    ],
+    "primitive_calls": 6,
+    "total_calls": 6
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/mission_action_eligibility.py",
+      162,
+      "mission_action_prevents_rules_unit_from_shooting_this_phase"
+    ],
+    "primitive_calls": 11,
+    "total_calls": 11
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/charge.py",
+      1357,
+      "_unit_by_id"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/phases/charge.py",
+      1277,
+      "_charge_actor_can_declare_charge"
+    ],
+    "primitive_calls": 4,
+    "total_calls": 4
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/attack_sequence_selection.py",
+      179,
+      "target_has_character_for_attack_group"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
+      278,
+      "_critical_wound_threshold"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/rules_unit_effects.py",
+      48,
+      "rules_unit_effect_applications"
+    ],
+    "primitive_calls": 7,
+    "total_calls": 7
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/rules_units.py",
+      650,
+      "rules_unit_owner_player_id"
+    ],
+    "primitive_calls": 1,
+    "total_calls": 1
+  },
+  {
+    "caller": [
+      "/tmp/task27-order34-recalibration/src/warhammer40k_core/engine/damage_allocation_targets.py",
+      108,
+      "allocatable_rules_unit"
+    ],
+    "primitive_calls": 2,
+    "total_calls": 2
+  }
+]

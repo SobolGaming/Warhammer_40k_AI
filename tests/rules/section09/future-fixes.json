@@ -1,0 +1,165 @@
+{
+  "schema": "section09-future-fixes-v1",
+  "policy": "Record incorrect rules behavior with enabled source-correct failures. No new semantic fixes in this corpus task.",
+  "findings": [
+    {
+      "id": "SF09-001",
+      "source": [
+        "rule:09:09.02.02:1:block3",
+        "rule:09:09.07:1:block8"
+      ],
+      "expected": "Only Desperate Escape supplies enemy-model transit; Ordered Retreat without another permission rejects a crossing witness.",
+      "actual": "Ordered Retreat witness crossing both enemy Spawn bases is valid and requests legacy overflight tests.",
+      "tests": [
+        "tests/rules/section09/test_fall_back.py::test_only_desperate_escape_can_cross_enemy_models_but_both_must_end_unengaged[ordered_retreat]"
+      ],
+      "owners": [
+        "engine/phases/movement_resolvers.py",
+        "engine/movement_legality.py",
+        "engine/phases/movement_geometry.py"
+      ],
+      "qualification": "Actual native geometry evaluator; no external grant or transit policy injected.",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "repair_performed": true,
+      "pre_repair_observation": {
+        "id": "SF09-001",
+        "source": [
+          "rule:09:09.02.02:1:block3",
+          "rule:09:09.07:1:block8"
+        ],
+        "expected": "Only Desperate Escape supplies enemy-model transit; Ordered Retreat without another permission rejects a crossing witness.",
+        "actual": "Ordered Retreat witness crossing both enemy Spawn bases is valid and requests legacy overflight tests.",
+        "tests": [
+          "tests/rules/section09/test_fall_back.py::test_only_desperate_escape_can_cross_enemy_models_but_both_must_end_unengaged[ordered_retreat]"
+        ],
+        "owners": [
+          "engine/phases/movement_resolvers.py",
+          "engine/movement_legality.py",
+          "engine/phases/movement_geometry.py"
+        ],
+        "qualification": "Actual native geometry evaluator; no external grant or transit policy injected.",
+        "status": "OPEN_ENABLED_SOURCE_CORRECT_FAILING_TESTS_NO_REPAIR",
+        "repair_performed": false
+      },
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": null
+      }
+    },
+    {
+      "id": "SF09-002",
+      "source": [
+        "rule:09:09.07:1:block6",
+        "rule:09:09.07.01:1:block1",
+        "rule:06:06.03:1",
+        "rule:06:06.02:1"
+      ],
+      "expected": "Each failed hazard deals 1 mortal wound for these native BEAST models, allocated by the mortal-wound owner; a full-health four-wound Spawn survives one failure.",
+      "actual": "Native facade rolls one failed hazard and offers a whole-model removal choice; submitting it physically removes a full-health Spawn.",
+      "tests": [
+        "tests/rules/section09/test_fall_back.py::test_failed_escape_hazards_inflict_mortals_instead_of_removing_native_multiwound_models[False]",
+        "tests/rules/section09/test_fall_back.py::test_failed_escape_hazards_inflict_mortals_instead_of_removing_native_multiwound_models[True]"
+      ],
+      "owners": [
+        "engine/phases/movement_options_dice.py",
+        "engine/phases/movement_fall_back_embark.py",
+        "engine/phases/movement_state.py"
+      ],
+      "qualification": "Minimal native Movement facade at the already-engaged boundary, both shock states; fixed natural game identity, no dice override. Earlier all-failure forced pilot reached a downstream removed-unit reaction crash; preserved in dev-targeted2, not separately certified as an admitted correct-hazard crash.",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "repair_performed": true,
+      "pre_repair_observation": {
+        "id": "SF09-002",
+        "source": [
+          "rule:09:09.07:1:block6",
+          "rule:09:09.07.01:1:block1",
+          "rule:06:06.03:1",
+          "rule:06:06.02:1"
+        ],
+        "expected": "Each failed hazard deals 1 mortal wound for these native BEAST models, allocated by the mortal-wound owner; a full-health four-wound Spawn survives one failure.",
+        "actual": "Native facade rolls one failed hazard and offers a whole-model removal choice; submitting it physically removes a full-health Spawn.",
+        "tests": [
+          "tests/rules/section09/test_fall_back.py::test_failed_escape_hazards_inflict_mortals_instead_of_removing_native_multiwound_models[False]",
+          "tests/rules/section09/test_fall_back.py::test_failed_escape_hazards_inflict_mortals_instead_of_removing_native_multiwound_models[True]"
+        ],
+        "owners": [
+          "engine/phases/movement_options_dice.py",
+          "engine/phases/movement_fall_back_embark.py",
+          "engine/phases/movement_state.py"
+        ],
+        "qualification": "Minimal native Movement facade at the already-engaged boundary, both shock states; fixed natural game identity, no dice override. Earlier all-failure forced pilot reached a downstream removed-unit reaction crash; preserved in dev-targeted2, not separately certified as an admitted correct-hazard crash.",
+        "status": "OPEN_ENABLED_SOURCE_CORRECT_FAILING_TESTS_NO_REPAIR",
+        "repair_performed": false
+      },
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": null
+      }
+    },
+    {
+      "id": "SF09-003",
+      "source": [
+        "faq:4978f15f-2b4a-4805-aacd-db9b5cad71bd",
+        "rule:09:09.07.01:1:block1"
+      ],
+      "expected": "Native Scuttling Walker automatically passes the hazards referenced by Desperate Escape tests, including when Desperate Escape is selected or required by shock.",
+      "actual": "Native Defiler ability suppresses crossed-model overflight requirements, but leaves selected-mode and battle-shocked requirements pending. Ordered Retreat positive control passes.",
+      "tests": [
+        "tests/rules/section09/test_fall_back.py::test_faq13_native_auto_pass_permission_covers_desperate_mode_hazards[desperate_escape-False]",
+        "tests/rules/section09/test_fall_back.py::test_faq13_native_auto_pass_permission_covers_desperate_mode_hazards[desperate_escape-True]"
+      ],
+      "owners": [
+        "engine/phases/movement_geometry.py",
+        "engine/phases/movement_resolvers.py",
+        "engine/movement_legality.py"
+      ],
+      "qualification": "Real supported Defiler definition, its native compiled ability/catalog index and a legal witnessed crossing; no fabricated auto-pass permission.",
+      "status": "REPAIRED_AWAITING_INDEPENDENT_REVIEW",
+      "repair_performed": true,
+      "pre_repair_observation": {
+        "id": "SF09-003",
+        "source": [
+          "faq:4978f15f-2b4a-4805-aacd-db9b5cad71bd",
+          "rule:09:09.07.01:1:block1"
+        ],
+        "expected": "Native Scuttling Walker automatically passes the hazards referenced by Desperate Escape tests, including when Desperate Escape is selected or required by shock.",
+        "actual": "Native Defiler ability suppresses crossed-model overflight requirements, but leaves selected-mode and battle-shocked requirements pending. Ordered Retreat positive control passes.",
+        "tests": [
+          "tests/rules/section09/test_fall_back.py::test_faq13_native_auto_pass_permission_covers_desperate_mode_hazards[desperate_escape-False]",
+          "tests/rules/section09/test_fall_back.py::test_faq13_native_auto_pass_permission_covers_desperate_mode_hazards[desperate_escape-True]"
+        ],
+        "owners": [
+          "engine/phases/movement_geometry.py",
+          "engine/phases/movement_resolvers.py",
+          "engine/movement_legality.py"
+        ],
+        "qualification": "Real supported Defiler definition, its native compiled ability/catalog index and a legal witnessed crossing; no fabricated auto-pass permission.",
+        "status": "OPEN_ENABLED_SOURCE_CORRECT_FAILING_TESTS_NO_REPAIR",
+        "repair_performed": false
+      },
+      "repair_checkpoint": {
+        "id": "task11-focused-approved-defects",
+        "report": "docs/FOCUSED_DEFECT_CHECKPOINT.md",
+        "evidence": "task11/package/completion-proof.json",
+        "prior_evidence_preserved": true,
+        "source_expectation_weakened": false,
+        "numerical_family_counted_once_as": null
+      }
+    }
+  ],
+  "prior_findings": "Stealth, retained CHARACTER/Epic Challenge, adopted Deadly Demise/Fight on Death removal ordering, qualified SF08 Command-end policy probes all remain deferred and unchanged. Native SF08 mission scoring path previously waited and awarded4VP; no new proven native early-score claim.",
+  "discarded_development_inferences": [
+    "Separate dice_rolled receipts do not prove non-simultaneous hazard consequences; final assertion checks absence of interleaved consequences/decisions.",
+    "Roll modifier total has the adopted minimum1; the first face1-minus1 pilot expectation was corrected.",
+    "A forced test and a voluntary post-move rule may both produce tests; no unsupported once-only suppression assertion retained."
+  ],
+  "current_checkpoint_note": "User-approved focused repair checkpoint supersedes this file's historical no-repair milestone policy only for marked findings; original observations and source qualifications remain retained. Independent review pending."
+}

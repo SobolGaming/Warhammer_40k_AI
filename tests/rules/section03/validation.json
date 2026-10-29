@@ -1,0 +1,51 @@
+{
+  "scope": "Adopted Section03 corpus complete; engine compliance not achieved while SF03-001 remains.",
+  "source_rows": 17,
+  "rule_rows": 13,
+  "faq_rows": 4,
+  "obligations": 62,
+  "passing_assertion_mapped_obligations": 61,
+  "visible_semantic_failure_mapped_obligations": 1,
+  "unimplemented_adopted_obligations": 0,
+  "unadopted_rows": 0,
+  "tests": {
+    "total": 116,
+    "passed": 114,
+    "failed": 2,
+    "skip": 0,
+    "xfail": 0,
+    "inventory_checks": 3,
+    "isolation_checks": 1,
+    "behavioral_cases": 112
+  },
+  "stable_junit": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-10\\section03-stable.xml",
+  "performance": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-10\\section03-complete-performance.json",
+  "quality": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-10\\quality-complete-receipt.json",
+  "direct_dependencies": {
+    "command": [
+      "C:\\Users\\nostr\\Documents\\Codex\\2026-10-15\\task\\behavior-rebuild\\.venv\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "tests/rules/section02/test_02_02_04_healing.py",
+      "tests/rules/section01/test_01_07_actions.py",
+      "tests/unit/test_phase10k_movement_distance.py",
+      "--selected-army-source-index",
+      "C:/Users/nostr/Documents/Codex/2026-10-16/task-7/integration-source-index-v2",
+      "--no-cov",
+      "-q",
+      "-o",
+      "cache_dir=C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-10\\pytest-cache",
+      "--junitxml",
+      "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-10\\dependencies.xml"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 13.378402000002097,
+    "log": "C:\\Users\\nostr\\Documents\\Codex\\2026-10-16\\task-10\\dependencies-final.txt"
+  },
+  "source_capture_qualification": "Unversioned Core body. Changelog 981 is contextual, not a claimed body version. All 17 adopted row fingerprints match retained current; no fresh network claim.",
+  "remaining_gates": [
+    "Future semantic fix SF03-001; preserve SF01-001",
+    "Linux/broader integration and independent predecessor-equivalence review before retiring old tests"
+  ],
+  "next": "Fresh Section04 only, followed by05 and06. Section00 deferred."
+}

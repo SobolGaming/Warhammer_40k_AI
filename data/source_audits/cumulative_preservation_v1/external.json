@@ -1,0 +1,23 @@
+{
+  "conformance/typescript/README.md": "c67e3544aedd397d1abfd02df6c416fc71137e4d6e12bc0bccd094964ced76c5",
+  "conformance/typescript/package-lock.json": "96a6a1493e0be69c2e0bea5dc3e2646d5c9d441a3c770d7c49a5e503fa2dc385",
+  "conformance/typescript/package.json": "31b16c5863d771d9729279127d4f360d8ad473f47e91ee85db98012010697fd6",
+  "conformance/typescript/scripts/check-generated.mjs": "81650bdbd263eb544d53a6ab6107e4335e728481f608f37594edc118e5c42859",
+  "conformance/typescript/scripts/generate-models.mjs": "c6e20ef5bbde409fcffa0dbcb09eaa3e558c882d541b15bf6599504d2294067f",
+  "conformance/typescript/src/battlefield-conformance.test.ts": "16258554e24b286bbedfc0028f920e5ea50ab048968342987958ed20763fd3b3",
+  "conformance/typescript/src/canonical-json.test.ts": "2c177d475f1e6939d8448ed1c011c229e0a6dc96806793c9ca295c79095b3c35",
+  "conformance/typescript/src/canonical-json.ts": "4f651e3d6c8b178a8b54b280bd3fd7dbdbfa0af5b9b1e20d6e630390a6f867b2",
+  "conformance/typescript/src/client.ts": "cd82ec6da5bb45f9cf879ceb345bfbb4e031471e71af1f0a97728c286565da38",
+  "conformance/typescript/src/contract.ts": "a867549b21c3f1d695c0c9b8c56bc633c56fcf5f86a3ba1e4909a740c3c7092f",
+  "conformance/typescript/src/generated/openapi.operations.ts": "4bc8daf0751af037728ead9b7b22c6f0a91c9a959be4e1065501dd5889eecc80",
+  "conformance/typescript/src/generated/openapi.ts": "ac57458fdb9437a38311b5b8838b2726914ffddff575a3c3f2749bca2462de13",
+  "conformance/typescript/src/interaction-conformance.test.ts": "7fd1167a5d086e655ada427e1a86ec1550012f989e6fd366f47cb26cf272beea",
+  "conformance/typescript/src/interaction.ts": "e099b7f3aeeb10a303400e1c82bcb98390b796f154fa09c85346b7873a1cbf2e",
+  "conformance/typescript/src/main.ts": "65e31571f7ff658eff5d4af088d2ad7396f5c07ca0fbd1e3f84557d38726bf3f",
+  "conformance/typescript/src/proposal-schema.test.ts": "9b405f01667d83d048d3c1e057b863b097eb89c558f222e004873af795dba56e",
+  "conformance/typescript/src/scenario.ts": "c037e1d580d24d80fb428bd70ad2f38b7966ec376d19fbf8f7295d10f6abfb03",
+  "conformance/typescript/src/type-fixtures/overlay-identity.type-test.ts": "05194f5523487c28e53112ab516a6e534862d309e16ecd1c2fc76cd6b8dfb0f2",
+  "conformance/typescript/src/type-fixtures/session-command-envelope.type-test.ts": "1ee39e3bbee9f029e6dde656d72b7e8831a8c5f2115bc1cae353301de18b044d",
+  "conformance/typescript/tsconfig.json": "cde3893dbecb2f70175ee0a1eac68b752f070b087692c7155c0b2875c3254a3d",
+  "docs/DECISION_SUBMISSION_CATALOG.md": "3cb434fad44fc1ef72a16e3e893688363eb2db2589d4d19c9d95ab27deb15e8f"
+}

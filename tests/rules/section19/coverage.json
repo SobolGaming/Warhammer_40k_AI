@@ -1,0 +1,2171 @@
+{
+  "schema": "section19-source-behavior-inventory-v1",
+  "source_authority": "Accepted retained adopted capture authenticated against literal JS; no fresh external/App-version claim.",
+  "category_hierarchy": {
+    "number": "19",
+    "title": "Attached Units",
+    "subsections": [
+      {
+        "ref": "19.01",
+        "title": "Forming Attached Units",
+        "text": [
+          "Some units have the \u0005Leader\u0006 or \u0005Support\u0006 ability listed on their datasheet (24.22 & 24.34). Such units are known as \u0005leader\u0006 units and \u0005support\u0006 units respectively. Both of these abilities allow such units to lead other friendly units (known as \u0005bodyguard\u0006 units) to form \u0005attached\u0006 units. An attached unit is a single unit for all rules purposes. \u0005Leader\u0006 and \u0005support\u0006 units can only lead specific \u0005bodyguard\u0006 units, as listed in the Warhammer 40,000 app"
+        ],
+        "accordions": [
+          {
+            "ref": "19.01.01",
+            "title": "Attached Units After Their Bodyguard Unit is Destroyed",
+            "text": [
+              "Some units have rules stating that when the \u0005bodyguard\u0006 unit in an \u0005attached\u0006 unit is \u0005destroyed\u0006, \u0005leader/support\u0006 units that were attached to them become separate units with their original \u0005starting strengths\u0006.",
+              "When the \u0005bodyguard\u0006 unit in an \u0005attached\u0006 unit affected by such a rule is \u0005destroyed\u0006, all of those \u0005leader/support\u0006 units remain a single unit for all rules purposes."
+            ]
+          }
+        ]
+      },
+      {
+        "ref": "19.02",
+        "title": "Attacking Attached Units",
+        "text": [
+          "Each time an attack targets an \u0005attached\u0006 unit, if that unit contains one or more \u0005bodyguard\u0006 models, use the highest \u0005T\u0006 characteristic of the \u0005bodyguard\u0006 models in that unit while resolving that attack, even if a \u0005leader\u0006/\u0005support\u0006 unit in that \u0005attached\u0006 unit has a different \u0005T\u0006 characteristic. If that unit only contains \u0005leader\u0006/\u0005support\u0006 models, use the highest \u0005T\u0006 characteristic of those models while resolving that attack instead.",
+          "Rules that are triggered when a unit is \u0005destroyed\u0006 are only triggered when the last model that started the battle in an \u0005attached\u0006 unit is \u0005destroyed\u0006."
+        ]
+      },
+      {
+        "ref": "19.03",
+        "title": "Keywords In Attached Units",
+        "text": [
+          "An \u0005attached\u0006 unit has all of the keywords of all of its component units. As such, an \u0005attached\u0006 unit is affected by any rule that applies to units with any of those keywords. Note that models in an \u0005attached\u0006 unit do not gain the keywords of other models in that unit that they do not already have. Remember that attacks target units, not models.",
+          "\u0005Example\u0006: \u0007An \u0005attached\u0006 unit contains a \u0005leader\u0006 model with the \u0003PSYKER\u0004 keyword. While that model is part of that unit, that unit has the \u0003PSYKER\u0004 keyword, even if the \u0005bodyguard\u0006 models do not have that keyword. If that unit is attacked by a weapon with the \u0003[ANTI\u2011PSYKER 4+]\u0004 ability, any unmodified \u0005wound roll\u0006 of 4+ made against that unit is a \u0005critical wound\u0006, even if the attack itself is not allocated to that \u0005leader\u0006 model.\b"
+        ]
+      },
+      {
+        "ref": "19.04",
+        "title": "Abilities In Attached Units",
+        "text": [
+          "Abilities/rules that affect a single specified model (e.g. from an \u0005enhancement\u0006 or an item of wargear) only ever apply to that model, even while part of an \u0005attached\u0006 unit.",
+          "Otherwise, abilities/rules that affect a unit (or models in it) apply to every model in an \u0005attached\u0006 unit, until the source of that ability/rule is \u0005destroyed\u0006, as shown below.",
+          "*\u0007This means \u0005leader/support\u0006 units continue to benefit from their own 'while this model is \u0005leading\u0006 a unit' abilities even after their \u0005bodyguard\u0006 unit is \u0005destroyed\u0006, provided they started the battle in an \u0005attached\u0006 unit.\b",
+          "In all of the above cases, if that last model was \u0005destroyed\u0006 as the result of an attack, the ability it was conferring upon the \u0005attached\u0006 unit applies until the attacking unit has resolved all of its attacks."
+        ],
+        "tables": [
+          {
+            "rows": [
+              [
+                "SOURCE OF ABILITY/RULE",
+                "APPLIES TO THE ATTACHED UNIT UNTIL"
+              ],
+              [
+                "\u0005Leader/support unit\u0006",
+                "The last model in that \u0005leader/support\u0006 unit is \u0005destroyed\u0006.*"
+              ],
+              [
+                "\u0005Bodyguard unit\u0006(e.g. from a datasheet ability)",
+                "The last model in that \u0005bodyguard\u0006 unit is \u0005destroyed\u0006"
+              ],
+              [
+                "\u0005A specific model\u0006(e.g. the bearer of an \u0005enhancement\u0006 or an item of wargear)",
+                "That model is \u0005destroyed\u0006"
+              ]
+            ]
+          }
+        ],
+        "accordions": [
+          {
+            "ref": "19.04.01",
+            "title": "Only In Death Does Duty End",
+            "text": [
+              "\u0005Leader\u0006 and \u0005support\u0006 units often have abilities that make the models they are leading more powerful. In the same way, some \u0005bodyguard\u0006 units\u2019 abilities can enhance the power of those leading them. Abilities in Attached Units (19.04) means that once the models conferring such effects are \u0005destroyed\u0006, that \u0005attached\u0006 unit does not continue to benefit from them. Should those models later be \u0005revived\u0006, however, those abilities will once more apply to their \u0005attached\u0006 unit."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "source_rows": 6,
+  "literal_blocks": 13,
+  "text_blocks": 12,
+  "table_count": 1,
+  "table_cells": 8,
+  "table_semantic_rows": 3,
+  "diagram_count": 0,
+  "semantic_obligations": 21,
+  "sources": [
+    {
+      "row_id": "rule:19:19.01:1",
+      "category": "19",
+      "locator": "19.01",
+      "title": "Forming Attached Units",
+      "occurrence": 1,
+      "source_sha256": "802e3f266d2c2a82cca88c48da75f65485d365347ae5bbd97fd6c9efd4553747",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "09ca4e5872f05afd971761dcd8b6ce4cbb83129dc6d58814f5b8b070cadcd196",
+          "value": "Some units have the \u0005Leader\u0006 or \u0005Support\u0006 ability listed on their datasheet (24.22 & 24.34). Such units are known as \u0005leader\u0006 units and \u0005support\u0006 units respectively. Both of these abilities allow such units to lead other friendly units (known as \u0005bodyguard\u0006 units) to form \u0005attached\u0006 units. An attached unit is a single unit for all rules purposes. \u0005Leader\u0006 and \u0005support\u0006 units can only lead specific \u0005bodyguard\u0006 units, as listed in the Warhammer 40,000 app"
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "19.01:leader-support-and-bodyguard-roles",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Leader/Support attachment forms a single friendly rules unit; explicit structured role and allowed target are required.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_formation.py::test_native_leader_can_attach_only_to_its_structured_friendly_bodyguard",
+              "function_ast_sha256": "aa9cc7318b62302f3ab45110a7f32f54b9c3085e2bb04237c38d55f9e9af369d",
+              "assertions": [
+                "assert len(formations) == 1",
+                "assert f.bodyguard_unit_instance_id == s.body.unit_instance_id",
+                "assert f.leader_unit_instance_ids == (s.leader.unit_instance_id,)",
+                "assert f.attachment_source_ids == eligibility.source_ids",
+                "assert own is not None",
+                "assert len(views) == 1",
+                "assert len(views[0].alive_models()) == 6",
+                "assert tuple((u.to_payload() for u in units)) == before"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='not allowed'):\n    resolve_attached_unit_formations(request=request, units=units, datasheets_by_selection_id=sheets)"
+              ]
+            },
+            {
+              "node": "tests/rules/section19/test_formation.py::test_formation_rejects_nonfriendly_or_unpermitted_components_without_mutating_units",
+              "function_ast_sha256": "20ff0836246c43cda4e31ed17bfe7c94c6b4e1909d98962997b4e00023479342",
+              "assertions": [
+                "assert tuple((u.to_payload() for u in units)) == before"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='not mustered|no attachment eligibility|exceeds one'):\n    resolve_attached_unit_formations(request=req, units=units, datasheets_by_selection_id=sheets)"
+              ]
+            },
+            {
+              "node": "tests/rules/section19/test_identity.py::test_component_aliases_keep_one_unit_and_original_strength_after_bodyguard_loss",
+              "function_ast_sha256": "50c1d63039ddedf0d5c8b351313adc38fcbffbc48ff5a1b761fa666fe84de1bf",
+              "assertions": [
+                "assert len([v for v in rules_unit_views_for_state(state=s.state) if v.owner_player_id == 'owner']) == 1",
+                "assert s.state.starting_strength_record_for_unit(s.view.unit_instance_id) == original",
+                "assert original.starting_model_count == 6 + int(support)",
+                "assert s.state.starting_attached_unit_records == [frozen]",
+                "assert restored.to_payload() == s.state.to_payload()",
+                "assert rules_unit_view_by_id(state=restored, unit_instance_id=s.leader.unit_instance_id).unit_instance_id == s.view.unit_instance_id",
+                "assert view.unit_instance_id == frozen.attached_unit_instance_id",
+                "assert len(view.alive_models()) == expected",
+                "assert view.attached_unit == s.formation"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "19.01:specific-bodyguards-only",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Attachment eligibility is source structured, with MFM precedence; unsupported/enemy/multiple-Leader declarations fail atomically.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_formation.py::test_native_leader_can_attach_only_to_its_structured_friendly_bodyguard",
+              "function_ast_sha256": "aa9cc7318b62302f3ab45110a7f32f54b9c3085e2bb04237c38d55f9e9af369d",
+              "assertions": [
+                "assert len(formations) == 1",
+                "assert f.bodyguard_unit_instance_id == s.body.unit_instance_id",
+                "assert f.leader_unit_instance_ids == (s.leader.unit_instance_id,)",
+                "assert f.attachment_source_ids == eligibility.source_ids",
+                "assert own is not None",
+                "assert len(views) == 1",
+                "assert len(views[0].alive_models()) == 6",
+                "assert tuple((u.to_payload() for u in units)) == before"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='not allowed'):\n    resolve_attached_unit_formations(request=request, units=units, datasheets_by_selection_id=sheets)"
+              ]
+            },
+            {
+              "node": "tests/rules/section19/test_formation.py::test_formation_rejects_nonfriendly_or_unpermitted_components_without_mutating_units",
+              "function_ast_sha256": "20ff0836246c43cda4e31ed17bfe7c94c6b4e1909d98962997b4e00023479342",
+              "assertions": [
+                "assert tuple((u.to_payload() for u in units)) == before"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(ArmyMusteringError, match='not mustered|no attachment eligibility|exceeds one'):\n    resolve_attached_unit_formations(request=req, units=units, datasheets_by_selection_id=sheets)"
+              ]
+            },
+            {
+              "node": "tests/unit/test_army_points_mfm.py::test_catalog_with_mfm_attachment_allowances_replaces_leader_and_support_targets",
+              "function_ast_sha256": "e6f6dc1cf4b4d11e5cd5194d44f3392632f36bc3aa986c379a24efd8ead01315",
+              "assertions": [
+                "assert len(leader_eligibilities) == 1",
+                "assert tuple((target.bodyguard_datasheet_id for target in leader_eligibilities[0].targets)) == ('bodyguard-b',)",
+                "assert leader_eligibilities[0].targets[0].source_ids == ('test-mfm:faction:test-faction:unit:leader:leader',)",
+                "assert len(support_eligibilities) == 1",
+                "assert tuple((target.bodyguard_datasheet_id for target in support_eligibilities[0].targets)) == ('bodyguard-b',)",
+                "assert support_eligibilities[0].targets[0].source_ids == ('test-mfm:faction:test-faction:unit:support:support',)",
+                "assert overlay.datasheet_by_id('foreign-unit') == catalog.datasheet_by_id('foreign-unit')"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "19.01:single-unit-all-rules",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Physical components alias one rules identity, one public shooting activation and one frozen starting strength.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_identity.py::test_component_aliases_keep_one_unit_and_original_strength_after_bodyguard_loss",
+              "function_ast_sha256": "50c1d63039ddedf0d5c8b351313adc38fcbffbc48ff5a1b761fa666fe84de1bf",
+              "assertions": [
+                "assert len([v for v in rules_unit_views_for_state(state=s.state) if v.owner_player_id == 'owner']) == 1",
+                "assert s.state.starting_strength_record_for_unit(s.view.unit_instance_id) == original",
+                "assert original.starting_model_count == 6 + int(support)",
+                "assert s.state.starting_attached_unit_records == [frozen]",
+                "assert restored.to_payload() == s.state.to_payload()",
+                "assert rules_unit_view_by_id(state=restored, unit_instance_id=s.leader.unit_instance_id).unit_instance_id == s.view.unit_instance_id",
+                "assert view.unit_instance_id == frozen.attached_unit_instance_id",
+                "assert len(view.alive_models()) == expected",
+                "assert view.attached_unit == s.formation"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_facade.py::test_native_attached_public_shooting_has_one_activation_and_physical_weapon_owners",
+              "function_ast_sha256": "a629817d56959f94eaa3627a9e436d05e418c5d9c057edbe64069252f4920e4e",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert req.decision_type == 'select_shooting_unit'",
+                "assert s.view.unit_instance_id in options",
+                "assert not options.intersection(s.view.component_unit_instance_ids)",
+                "assert req.decision_type == 'submit_shooting_declaration'",
+                "assert rows",
+                "assert available_model_ids == living",
+                "assert all((has_lethal(s, mid) for mid in living))",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
+                "assert s.state.shooting_phase_state is not None",
+                "assert s.state.shooting_phase_state.selected_unit_ids == (s.view.unit_instance_id,)",
+                "assert any((e.event_type == 'shooting_declaration_accepted' for e in controller.event_log.records))",
+                "assert '0x' not in json.dumps(controller.to_payload())",
+                "assert isinstance(model_id, str)",
+                "assert isinstance(model_id, str)",
+                "assert json.loads(json.dumps(view)) == view",
+                "assert json.loads(json.dumps(delta)) == delta"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:19:19.01.01:1",
+      "category": "19",
+      "locator": "19.01.01",
+      "title": "Attached Units After Their Bodyguard Unit is Destroyed",
+      "occurrence": 1,
+      "source_sha256": "ad4624252fd488916c2853c49d311b6f2f14e48468fdabd4fdfbf0a8cb3a14fc",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "8f89f4d5b1c0fbccf0f2aba1b6f21d09a116da6a261eef875a3acb6433cf4a6a",
+          "value": "Some units have rules stating that when the \u0005bodyguard\u0006 unit in an \u0005attached\u0006 unit is \u0005destroyed\u0006, \u0005leader/support\u0006 units that were attached to them become separate units with their original \u0005starting strengths\u0006."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "c234c1cd2aa5c8a080d24a2f9c54498b2b9a17866dad37cb914483055a18d72e",
+          "value": "When the \u0005bodyguard\u0006 unit in an \u0005attached\u0006 unit affected by such a rule is \u0005destroyed\u0006, all of those \u0005leader/support\u0006 units remain a single unit for all rules purposes."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "19.01.01:older-split-wording-retained",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Retain conflicting datasheet Leader split wording as provenance; current nested Core clarification overrides it.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_identity.py::test_component_aliases_keep_one_unit_and_original_strength_after_bodyguard_loss",
+              "function_ast_sha256": "50c1d63039ddedf0d5c8b351313adc38fcbffbc48ff5a1b761fa666fe84de1bf",
+              "assertions": [
+                "assert len([v for v in rules_unit_views_for_state(state=s.state) if v.owner_player_id == 'owner']) == 1",
+                "assert s.state.starting_strength_record_for_unit(s.view.unit_instance_id) == original",
+                "assert original.starting_model_count == 6 + int(support)",
+                "assert s.state.starting_attached_unit_records == [frozen]",
+                "assert restored.to_payload() == s.state.to_payload()",
+                "assert rules_unit_view_by_id(state=restored, unit_instance_id=s.leader.unit_instance_id).unit_instance_id == s.view.unit_instance_id",
+                "assert view.unit_instance_id == frozen.attached_unit_instance_id",
+                "assert len(view.alive_models()) == expected",
+                "assert view.attached_unit == s.formation"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "19.01.01:bodyguard-loss-does-not-split",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "After bodyguard death every remaining leader/support remains in one attached unit with frozen original strength.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_identity.py::test_component_aliases_keep_one_unit_and_original_strength_after_bodyguard_loss",
+              "function_ast_sha256": "50c1d63039ddedf0d5c8b351313adc38fcbffbc48ff5a1b761fa666fe84de1bf",
+              "assertions": [
+                "assert len([v for v in rules_unit_views_for_state(state=s.state) if v.owner_player_id == 'owner']) == 1",
+                "assert s.state.starting_strength_record_for_unit(s.view.unit_instance_id) == original",
+                "assert original.starting_model_count == 6 + int(support)",
+                "assert s.state.starting_attached_unit_records == [frozen]",
+                "assert restored.to_payload() == s.state.to_payload()",
+                "assert rules_unit_view_by_id(state=restored, unit_instance_id=s.leader.unit_instance_id).unit_instance_id == s.view.unit_instance_id",
+                "assert view.unit_instance_id == frozen.attached_unit_instance_id",
+                "assert len(view.alive_models()) == expected",
+                "assert view.attached_unit == s.formation"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_abilities.py::test_native_leading_ability_applies_to_every_living_component_after_bodyguard_loss",
+              "function_ast_sha256": "49a4c4675db827d50d9e7671266d5dd5e24ee477f0607a88296b721300addb24",
+              "assertions": [
+                "assert living",
+                "assert all((has_lethal(s, m.model_instance_id) for m in living))",
+                "assert not section19_definitions.weapon('000004078:bolt-pistol').abilities"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_destruction.py::test_destroyed_trigger_waits_for_last_starting_attached_model_in_any_component_order",
+              "function_ast_sha256": "704a339331a19165050e23a6a7629fa47c0919fc7fbe6a47dd5e64922a65581d",
+              "assertions": [
+                "assert len(components) == 3",
+                "assert s.state.starting_attached_unit_records == [starting]",
+                "assert s.view.alive_models() == ()",
+                "assert len(completed) == int(i == len(model_order))",
+                "assert completed[0][1]['target_unit_instance_id'] == starting.attached_unit_instance_id",
+                "assert completed[0][1]['model_instance_id'] == mid",
+                "assert s.view.attached_unit == s.formation"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:19:19.02:1",
+      "category": "19",
+      "locator": "19.02",
+      "title": "Attacking Attached Units",
+      "occurrence": 1,
+      "source_sha256": "9187d4155ba345315eb9a210c012206e46779f86f39e54bc52c8ccd0553a16f7",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "a9c7291e39fe570eb9f511b8f6fcb0ad49912b01d6c183bd4783f55ce203dc68",
+          "value": "Each time an attack targets an \u0005attached\u0006 unit, if that unit contains one or more \u0005bodyguard\u0006 models, use the highest \u0005T\u0006 characteristic of the \u0005bodyguard\u0006 models in that unit while resolving that attack, even if a \u0005leader\u0006/\u0005support\u0006 unit in that \u0005attached\u0006 unit has a different \u0005T\u0006 characteristic. If that unit only contains \u0005leader\u0006/\u0005support\u0006 models, use the highest \u0005T\u0006 characteristic of those models while resolving that attack instead."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "a96999938b450a1e156619a5dd05f3d2067d116bb072e2d9ec949dbe61a1d18c",
+          "value": "Rules that are triggered when a unit is \u0005destroyed\u0006 are only triggered when the last model that started the battle in an \u0005attached\u0006 unit is \u0005destroyed\u0006."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "19.02:highest-current-bodyguard-toughness",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Each attack uses highest living bodyguard T regardless of higher/lower Leader/Support T.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_toughness.py::test_attack_toughness_selects_highest_living_models_of_the_required_component",
+              "function_ast_sha256": "5bcde96441e0623097e790ece5692acbbbc5215d289fe482928f1e8f1c309902",
+              "assertions": [
+                "assert _target_unit_toughness(state=s.state, target_unit_instance_id=selected) == expected",
+                "assert len(s.view.alive_models()) == body_alive + leader_alive + support_alive"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "19.02:highest-surviving-leader-support-toughness",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "With no living bodyguards use highest living Leader/Support T, preserving all aliases.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_toughness.py::test_attack_toughness_selects_highest_living_models_of_the_required_component",
+              "function_ast_sha256": "5bcde96441e0623097e790ece5692acbbbc5215d289fe482928f1e8f1c309902",
+              "assertions": [
+                "assert _target_unit_toughness(state=s.state, target_unit_instance_id=selected) == expected",
+                "assert len(s.view.alive_models()) == body_alive + leader_alive + support_alive"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "19.02:last-frozen-starting-model-completes-unit",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "Destruction rules complete once only when the last starting attached model dies, in every component order.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_destruction.py::test_destroyed_trigger_waits_for_last_starting_attached_model_in_any_component_order",
+              "function_ast_sha256": "704a339331a19165050e23a6a7629fa47c0919fc7fbe6a47dd5e64922a65581d",
+              "assertions": [
+                "assert len(components) == 3",
+                "assert s.state.starting_attached_unit_records == [starting]",
+                "assert s.view.alive_models() == ()",
+                "assert len(completed) == int(i == len(model_order))",
+                "assert completed[0][1]['target_unit_instance_id'] == starting.attached_unit_instance_id",
+                "assert completed[0][1]['model_instance_id'] == mid",
+                "assert s.view.attached_unit == s.formation"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:19:19.03:1",
+      "category": "19",
+      "locator": "19.03",
+      "title": "Keywords In Attached Units",
+      "occurrence": 1,
+      "source_sha256": "c201e92790ee6f6c67d64b1cce8559d1e07f62641c68d0df15d7aaefd6e51b79",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "d89c3900547a3439bda1d6489ccde0e1edd1b1f71ad68e2987114d2273be2c0a",
+          "value": "An \u0005attached\u0006 unit has all of the keywords of all of its component units. As such, an \u0005attached\u0006 unit is affected by any rule that applies to units with any of those keywords. Note that models in an \u0005attached\u0006 unit do not gain the keywords of other models in that unit that they do not already have. Remember that attacks target units, not models."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "823e912116393198218d43b87719d10998f350a8af2cb7478acb34ed82870c41",
+          "value": "\u0005Example\u0006: \u0007An \u0005attached\u0006 unit contains a \u0005leader\u0006 model with the \u0003PSYKER\u0004 keyword. While that model is part of that unit, that unit has the \u0003PSYKER\u0004 keyword, even if the \u0005bodyguard\u0006 models do not have that keyword. If that unit is attacked by a weapon with the \u0003[ANTI\u2011PSYKER 4+]\u0004 ability, any unmodified \u0005wound roll\u0006 of 4+ made against that unit is a \u0005critical wound\u0006, even if the attack itself is not allocated to that \u0005leader\u0006 model.\b"
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "19.03:unit-keyword-union",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Attached unit has live component keyword union and rules matching that union affect it. Loaded selected-content admission remains separate from living eligibility.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_keywords.py::test_keyword_union_anti_psyker_does_not_transfer_physical_model_keywords",
+              "function_ast_sha256": "82b9bb155519941424c5148b65e28fc9325e60f885c5a806e241f55873b96a93",
+              "assertions": [
+                "assert 'PSYKER' in source.own_models[0].keywords",
+                "assert all(('PSYKER' not in m.keywords for m in s.body.own_models))",
+                "assert ('PSYKER' in s.view.keywords) is alive",
+                "assert all(('PSYKER' not in m.keywords for m in s.body.own_models))",
+                "assert anti_keyword_critical_threshold(profile=anti, target_keywords=s.view.keywords) == (4 if alive else None)",
+                "assert anti_keyword_critical_threshold(profile=anti, target_keywords=('PSYKER ELITE',)) is None"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_catalog_membership.py::test_actual_casualties_preserve_selected_content_but_remove_live_keywords",
+              "function_ast_sha256": "be3e974988378162d8a63f709f45729ff4c3d49dc62e15ac22fe61c63b0a198e",
+              "assertions": [
+                "assert army is not None",
+                "assert 'gw-11e-core-abilities:datasheet:core-leader' not in initial_ids",
+                "assert 'gw-11e-core-abilities:keyword:keyword-infantry' in initial_ids",
+                "assert current_army is not None",
+                "assert tuple((r.record_id for r in rebuilt.all_records())) == initial_ids",
+                "assert absent.all_records() == ()",
+                "assert 'CHARACTER' not in s.view.keywords",
+                "assert s.view.keywords == ()",
+                "assert s.view.alive_models() == ()",
+                "assert movement_capability_flags_from_index(index=rebuilt, keywords=s.view.keywords) == ()"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "19.03:no-model-keyword-transfer",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Physical models retain their own keywords rather than receiving unit union.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_keywords.py::test_keyword_union_anti_psyker_does_not_transfer_physical_model_keywords",
+              "function_ast_sha256": "82b9bb155519941424c5148b65e28fc9325e60f885c5a806e241f55873b96a93",
+              "assertions": [
+                "assert 'PSYKER' in source.own_models[0].keywords",
+                "assert all(('PSYKER' not in m.keywords for m in s.body.own_models))",
+                "assert ('PSYKER' in s.view.keywords) is alive",
+                "assert all(('PSYKER' not in m.keywords for m in s.body.own_models))",
+                "assert anti_keyword_critical_threshold(profile=anti, target_keywords=s.view.keywords) == (4 if alive else None)",
+                "assert anti_keyword_critical_threshold(profile=anti, target_keywords=('PSYKER ELITE',)) is None"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "19.03:anti-psyker-example",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "Anti-Psyker4+ sees unit PSYKER without allocating to the psyker; after source death the keyword ceases.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_keywords.py::test_keyword_union_anti_psyker_does_not_transfer_physical_model_keywords",
+              "function_ast_sha256": "82b9bb155519941424c5148b65e28fc9325e60f885c5a806e241f55873b96a93",
+              "assertions": [
+                "assert 'PSYKER' in source.own_models[0].keywords",
+                "assert all(('PSYKER' not in m.keywords for m in s.body.own_models))",
+                "assert ('PSYKER' in s.view.keywords) is alive",
+                "assert all(('PSYKER' not in m.keywords for m in s.body.own_models))",
+                "assert anti_keyword_critical_threshold(profile=anti, target_keywords=s.view.keywords) == (4 if alive else None)",
+                "assert anti_keyword_critical_threshold(profile=anti, target_keywords=('PSYKER ELITE',)) is None"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:19:19.04:1",
+      "category": "19",
+      "locator": "19.04",
+      "title": "Abilities In Attached Units",
+      "occurrence": 1,
+      "source_sha256": "6ceb69296e3832bc6f1de9f5818faed68a805fce2fc3ff7e2c37811b25c9c7c5",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "2814b92cac76a5cf0c40983752ce0bde9b868f75ffbc3958db2172963bf3befc",
+          "value": "Abilities/rules that affect a single specified model (e.g. from an \u0005enhancement\u0006 or an item of wargear) only ever apply to that model, even while part of an \u0005attached\u0006 unit."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "1060776957ac8b23903130143d43eb216069f8be9565977bd7791b313a56deb4",
+          "value": "Otherwise, abilities/rules that affect a unit (or models in it) apply to every model in an \u0005attached\u0006 unit, until the source of that ability/rule is \u0005destroyed\u0006, as shown below."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "aa757690716dc562ae869c5afc9a959df207de0b5a4476b4f3488b325a28c4b9",
+          "value": "*\u0007This means \u0005leader/support\u0006 units continue to benefit from their own 'while this model is \u0005leading\u0006 a unit' abilities even after their \u0005bodyguard\u0006 unit is \u0005destroyed\u0006, provided they started the battle in an \u0005attached\u0006 unit.\b"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "5a7d81af083e1852af871a96c8dc33143df2ab372f33cd1c5bb91e8f1a973197",
+          "value": "In all of the above cases, if that last model was \u0005destroyed\u0006 as the result of an attack, the ability it was conferring upon the \u0005attached\u0006 unit applies until the attacking unit has resolved all of its attacks."
+        },
+        {
+          "ordinal": 5,
+          "kind": "table",
+          "sha256": "fd13b9f900c0492db98883a461a2703ceb249cbb925c05e9c3df96d268ce2a1e",
+          "value": {
+            "rows": [
+              [
+                "SOURCE OF ABILITY/RULE",
+                "APPLIES TO THE ATTACHED UNIT UNTIL"
+              ],
+              [
+                "\u0005Leader/support unit\u0006",
+                "The last model in that \u0005leader/support\u0006 unit is \u0005destroyed\u0006.*"
+              ],
+              [
+                "\u0005Bodyguard unit\u0006(e.g. from a datasheet ability)",
+                "The last model in that \u0005bodyguard\u0006 unit is \u0005destroyed\u0006"
+              ],
+              [
+                "\u0005A specific model\u0006(e.g. the bearer of an \u0005enhancement\u0006 or an item of wargear)",
+                "That model is \u0005destroyed\u0006"
+              ]
+            ]
+          }
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "19.04:model-only-ability-scope",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Specified-model abilities affect that model only, including actual Lone Operative recipient/target consumers and selected Epic model.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_model_scope.py::test_native_model_lone_operative_keeps_exact_recipients_and_targeting_scope",
+              "function_ast_sha256": "b9f6e0e12cc518ff54ea22666e47b7d189e5f25fce20f34f04564c578ab266b1",
+              "assertions": [
+                "assert s.support is not None",
+                "assert s.state.battlefield_state is not None",
+                "assert descriptor.rule_ir_payload is not None",
+                "assert len(grants) == 1",
+                "assert (granted, bool(restrictions)) == (s.support.own_model_ids(), not other_alive)",
+                "assert granted == s.support.own_model_ids()",
+                "assert bool(restrictions) is (not other_alive)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_model_scope.py::test_mixed_native_and_conditional_owners_cover_all_models_and_keep_highest_range",
+              "function_ast_sha256": "bf0d6fcaafb178218a32aee74d412a3e4f31bef700a7874ba8f29d38aa111cf6",
+              "assertions": [
+                "assert s.support is not None",
+                "assert s.state.battlefield_state is not None",
+                "assert bool(restrictions) is (enemy_x == 40)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_scope_controls.py::test_conditional_unit_and_model_recipients_keep_positive_scope_and_source_lifetime",
+              "function_ast_sha256": "4494212ae3e6b0d8427d023e523c7c584d8403d26f2bb43edb34cb6fc42d4056",
+              "assertions": [
+                "assert native.rule_ir_payload is not None",
+                "assert s.support is not None",
+                "assert s.state.battlefield_state is not None",
+                "assert len(grants) == 1",
+                "assert grants[0].model_ids(ModelAbilityGrantContext(s.state, s.view)) == (expected if source_available else ())",
+                "assert bool(restrictions) is (whole_unit and source_available)",
+                "assert clause.target is not None"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/unit/test_d12_epic_challenge.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
+              "function_ast_sha256": "d4642e4ffdc3f254937f7f65de8185aa7ac5b4739572501546f8fa5ceea04f5f",
+              "assertions": [
+                "assert state is not None",
+                "assert session.to_persistence_payload() == fork.to_persistence_payload() == saved",
+                "assert state is not None",
+                "assert state.command_point_total(player) == 1",
+                "assert len(state.stratagem_use_records) == 1",
+                "assert effect.target_unit_instance_ids == (unit.unit_instance_id,)",
+                "assert effect.expiration == EffectExpiration.end_phase(battle_round=1, phase=BattlePhase.FIGHT, player_id=player)",
+                "assert request.decision_type == 'submit_melee_declaration'",
+                "assert model.model_instance_id in seen",
+                "assert state is not None",
+                "assert state.fight_phase_state is not None",
+                "assert sequence is not None",
+                "assert pools",
+                "assert effect.effect_id not in {current.effect_id for current in state.persisting_effects}",
+                "assert isinstance(owner, str)",
+                "assert any(('bodyguard' in owner for owner in seen))",
+                "assert any(('support' in owner for owner in seen))",
+                "assert any(('leader' in owner for owner in seen))",
+                "assert (WeaponKeyword.PRECISION in pool.weapon_profile.keywords) is (pool.attacker_model_instance_id == model.model_instance_id)",
+                "assert state is not None",
+                "assert weapon['engaged_target_unit_instance_ids'] == []",
+                "assert owner != model.model_instance_id",
+                "assert ('Precision' in cast(list[str], profile['keywords'])) is (owner == model.model_instance_id)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death",
+              "function_ast_sha256": "cb9989cc8aff6ccc10d1b98106935b3533a3d1c95f406d4f2473252f8c0e9b97",
+              "assertions": [
+                "assert s.support is not None",
+                "assert before_ids == s.support.own_model_ids()",
+                "assert bool(before_restrictions) is (not other_alive and enemy_x == 40)",
+                "assert ids == ((model_id,) if retained else ())",
+                "assert (model_id in presence.active_model_ids) is retained",
+                "assert (model_id in presence.battlefield_model_ids) is retained",
+                "assert (model_id in s.view.retained_model_ids) is retained",
+                "assert bool(restrictions) is (retained and (not other_alive) and (enemy_x == 40))",
+                "assert s.view.living_components == ()",
+                "assert len(s.view.rules_present_components) == (1 if retained else 0)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_retained_scope.py::test_retained_recipient_still_requires_duplicate_instance_selection",
+              "function_ast_sha256": "0e4d9296d4fa97de36a5a0faf63dd47397f10e099f7d13ea5c5072c34d9d1538",
+              "assertions": [
+                "assert model_id in s.view.retained_model_ids"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(GameLifecycleError, match='controlling-player selection'):\n    _scope(s)",
+                "with pytest.raises(GameLifecycleError, match='controlling-player selection'):\n    _scope(s)"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "19.04:unit-models-scope-includes-every-component",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "This/that unit and models in it include every attached component.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_abilities.py::test_native_leading_ability_applies_to_every_living_component_after_bodyguard_loss",
+              "function_ast_sha256": "49a4c4675db827d50d9e7671266d5dd5e24ee477f0607a88296b721300addb24",
+              "assertions": [
+                "assert living",
+                "assert all((has_lethal(s, m.model_instance_id) for m in living))",
+                "assert not section19_definitions.weapon('000004078:bolt-pistol').abilities"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_table.py::test_each_table_source_applies_until_last_source_model_then_returns_on_real_revival",
+              "function_ast_sha256": "f8fbaeefe73bfa0389d9aae42b9175705ac9fdb4263fd8b5fcceb1d4579d0738",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert all((not has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert not set(source.own_model_ids()) & set(ability_presence(state=s.state, rules_unit=s.view).active_model_ids)",
+                "assert req is not None",
+                "assert req is None",
+                "assert effect.is_complete()",
+                "assert effect.resolved_steps[0].step_kind is HealingStepKind.REVIVE_MODEL_IN_RESERVES",
+                "assert effect.resolved_steps[0].model_instance_id == source.own_model_ids()[0]",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert s.view.attached_unit == s.formation",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_scope_controls.py::test_conditional_unit_and_model_recipients_keep_positive_scope_and_source_lifetime",
+              "function_ast_sha256": "4494212ae3e6b0d8427d023e523c7c584d8403d26f2bb43edb34cb6fc42d4056",
+              "assertions": [
+                "assert native.rule_ir_payload is not None",
+                "assert s.support is not None",
+                "assert s.state.battlefield_state is not None",
+                "assert len(grants) == 1",
+                "assert grants[0].model_ids(ModelAbilityGrantContext(s.state, s.view)) == (expected if source_available else ())",
+                "assert bool(restrictions) is (whole_unit and source_available)",
+                "assert clause.target is not None"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "19.04:source-is-last-component-model",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "Unit-scoped grants last through last source-component model; equipment-specific grants track the bearer.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_table.py::test_each_table_source_applies_until_last_source_model_then_returns_on_real_revival",
+              "function_ast_sha256": "f8fbaeefe73bfa0389d9aae42b9175705ac9fdb4263fd8b5fcceb1d4579d0738",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert all((not has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert not set(source.own_model_ids()) & set(ability_presence(state=s.state, rules_unit=s.view).active_model_ids)",
+                "assert req is not None",
+                "assert req is None",
+                "assert effect.is_complete()",
+                "assert effect.resolved_steps[0].step_kind is HealingStepKind.REVIVE_MODEL_IN_RESERVES",
+                "assert effect.resolved_steps[0].model_instance_id == source.own_model_ids()[0]",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert s.view.attached_unit == s.formation",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_abilities.py::test_native_grant_stops_when_source_is_destroyed_outside_attack",
+              "function_ast_sha256": "0c0e22a377a4ba6feaa24c34cf0eab06db8cf9bbee897fcb94737da5417a6687",
+              "assertions": [
+                "assert has_lethal(s, s.body.own_model_ids()[0])",
+                "assert all((not has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "19.04:leading-after-bodyguard-destruction",
+          "source_blocks": [
+            3
+          ],
+          "acceptance": "Native leading benefits persist for leader/support after bodyguard destruction.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_abilities.py::test_native_leading_ability_applies_to_every_living_component_after_bodyguard_loss",
+              "function_ast_sha256": "49a4c4675db827d50d9e7671266d5dd5e24ee477f0607a88296b721300addb24",
+              "assertions": [
+                "assert living",
+                "assert all((has_lethal(s, m.model_instance_id) for m in living))",
+                "assert not section19_definitions.weapon('000004078:bolt-pistol').abilities"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_identity.py::test_component_aliases_keep_one_unit_and_original_strength_after_bodyguard_loss",
+              "function_ast_sha256": "50c1d63039ddedf0d5c8b351313adc38fcbffbc48ff5a1b761fa666fe84de1bf",
+              "assertions": [
+                "assert len([v for v in rules_unit_views_for_state(state=s.state) if v.owner_player_id == 'owner']) == 1",
+                "assert s.state.starting_strength_record_for_unit(s.view.unit_instance_id) == original",
+                "assert original.starting_model_count == 6 + int(support)",
+                "assert s.state.starting_attached_unit_records == [frozen]",
+                "assert restored.to_payload() == s.state.to_payload()",
+                "assert rules_unit_view_by_id(state=restored, unit_instance_id=s.leader.unit_instance_id).unit_instance_id == s.view.unit_instance_id",
+                "assert view.unit_instance_id == frozen.attached_unit_instance_id",
+                "assert len(view.alive_models()) == expected",
+                "assert view.attached_unit == s.formation"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "19.04:attack-caused-source-retention",
+          "source_blocks": [
+            4
+          ],
+          "acceptance": "A source destroyed by attacks keeps its ability until the attacking unit finishes all attacks, then expires; no physical presence invented.",
+          "semantic_assertions": [
+            {
+              "node": "tests/unit/test_unit_abilities.py::test_attached_source_lifetime_facade_restore_replay",
+              "function_ast_sha256": "f1b94e6efe0f653c6c1257033260ddb953e6cd72d2b86af81c1f47e39e9b2649",
+              "assertions": [
+                "assert source_grant_active(session)",
+                "assert state is not None",
+                "assert state.battlefield_state is not None",
+                "assert not model_by_id(state=state, model_instance_id=model_id).is_alive",
+                "assert state.battlefield_state.model_placement_or_none(model_id) is None",
+                "assert retained_destructions(state=state) == ()",
+                "assert source_grant_active(session)",
+                "assert model_id in presence.active_model_ids",
+                "assert model_id not in presence.battlefield_model_ids",
+                "assert restored.to_persistence_payload() == saved",
+                "assert source_grant_active(restored)",
+                "assert restored.to_persistence_payload() == saved",
+                "assert ReplayRunner.from_payload(session.replay_artifact(artifact_id='order118:mid')).run().status is ReplayRunStatus.REPRODUCED",
+                "assert restored.to_persistence_payload() == session.to_persistence_payload()",
+                "assert fork.to_persistence_payload() == saved",
+                "assert source_grant_active(fork)",
+                "assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)",
+                "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == delta",
+                "assert 'attack_ability_source_retained' not in str(delta)",
+                "assert attack_completed(current)",
+                "assert not source_grant_active(current)",
+                "assert ReplayRunner.from_payload(current.replay_artifact(artifact_id='order118:done')).run().status is ReplayRunStatus.REPRODUCED",
+                "assert LocalGameSession.from_persistence_payload(complete).to_persistence_payload() == complete"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(DecisionError, match='finite action space'):\n    restored.submit_option(request_id=request.request_id, result_id='order118:malformed', option_id='order118:nonexistent-option')"
+              ]
+            },
+            {
+              "node": "tests/unit/test_unit_abilities.py::test_equipped_attached_source_lifetime_uses_shared_catalog_consumer",
+              "function_ast_sha256": "e9cc5d855bf626beadece3b1d87eadf109949cc5a7dfe71883b519e88573571b",
+              "assertions": [
+                "assert source_grant_active(session)",
+                "assert source_grant_active(session)"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        },
+        {
+          "clause_id": "19.04:literal-table-leader-support",
+          "source_blocks": [
+            5
+          ],
+          "acceptance": "Leader/Support row: source persists until its last model is destroyed, with attack exception.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_table.py::test_each_table_source_applies_until_last_source_model_then_returns_on_real_revival",
+              "function_ast_sha256": "f8fbaeefe73bfa0389d9aae42b9175705ac9fdb4263fd8b5fcceb1d4579d0738",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert all((not has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert not set(source.own_model_ids()) & set(ability_presence(state=s.state, rules_unit=s.view).active_model_ids)",
+                "assert req is not None",
+                "assert req is None",
+                "assert effect.is_complete()",
+                "assert effect.resolved_steps[0].step_kind is HealingStepKind.REVIVE_MODEL_IN_RESERVES",
+                "assert effect.resolved_steps[0].model_instance_id == source.own_model_ids()[0]",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert s.view.attached_unit == s.formation",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/unit/test_unit_abilities.py::test_attached_source_lifetime_facade_restore_replay",
+              "function_ast_sha256": "f1b94e6efe0f653c6c1257033260ddb953e6cd72d2b86af81c1f47e39e9b2649",
+              "assertions": [
+                "assert source_grant_active(session)",
+                "assert state is not None",
+                "assert state.battlefield_state is not None",
+                "assert not model_by_id(state=state, model_instance_id=model_id).is_alive",
+                "assert state.battlefield_state.model_placement_or_none(model_id) is None",
+                "assert retained_destructions(state=state) == ()",
+                "assert source_grant_active(session)",
+                "assert model_id in presence.active_model_ids",
+                "assert model_id not in presence.battlefield_model_ids",
+                "assert restored.to_persistence_payload() == saved",
+                "assert source_grant_active(restored)",
+                "assert restored.to_persistence_payload() == saved",
+                "assert ReplayRunner.from_payload(session.replay_artifact(artifact_id='order118:mid')).run().status is ReplayRunStatus.REPRODUCED",
+                "assert restored.to_persistence_payload() == session.to_persistence_payload()",
+                "assert fork.to_persistence_payload() == saved",
+                "assert source_grant_active(fork)",
+                "assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)",
+                "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == delta",
+                "assert 'attack_ability_source_retained' not in str(delta)",
+                "assert attack_completed(current)",
+                "assert not source_grant_active(current)",
+                "assert ReplayRunner.from_payload(current.replay_artifact(artifact_id='order118:done')).run().status is ReplayRunStatus.REPRODUCED",
+                "assert LocalGameSession.from_persistence_payload(complete).to_persistence_payload() == complete"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(DecisionError, match='finite action space'):\n    restored.submit_option(request_id=request.request_id, result_id='order118:malformed', option_id='order118:nonexistent-option')"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "19.04:literal-table-bodyguard",
+          "source_blocks": [
+            5
+          ],
+          "acceptance": "Bodyguard row: until last bodyguard source model is destroyed, with attack exception.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_table.py::test_each_table_source_applies_until_last_source_model_then_returns_on_real_revival",
+              "function_ast_sha256": "f8fbaeefe73bfa0389d9aae42b9175705ac9fdb4263fd8b5fcceb1d4579d0738",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert all((not has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert not set(source.own_model_ids()) & set(ability_presence(state=s.state, rules_unit=s.view).active_model_ids)",
+                "assert req is not None",
+                "assert req is None",
+                "assert effect.is_complete()",
+                "assert effect.resolved_steps[0].step_kind is HealingStepKind.REVIVE_MODEL_IN_RESERVES",
+                "assert effect.resolved_steps[0].model_instance_id == source.own_model_ids()[0]",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert s.view.attached_unit == s.formation",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/unit/test_unit_abilities.py::test_attached_source_lifetime_facade_restore_replay",
+              "function_ast_sha256": "f1b94e6efe0f653c6c1257033260ddb953e6cd72d2b86af81c1f47e39e9b2649",
+              "assertions": [
+                "assert source_grant_active(session)",
+                "assert state is not None",
+                "assert state.battlefield_state is not None",
+                "assert not model_by_id(state=state, model_instance_id=model_id).is_alive",
+                "assert state.battlefield_state.model_placement_or_none(model_id) is None",
+                "assert retained_destructions(state=state) == ()",
+                "assert source_grant_active(session)",
+                "assert model_id in presence.active_model_ids",
+                "assert model_id not in presence.battlefield_model_ids",
+                "assert restored.to_persistence_payload() == saved",
+                "assert source_grant_active(restored)",
+                "assert restored.to_persistence_payload() == saved",
+                "assert ReplayRunner.from_payload(session.replay_artifact(artifact_id='order118:mid')).run().status is ReplayRunStatus.REPRODUCED",
+                "assert restored.to_persistence_payload() == session.to_persistence_payload()",
+                "assert fork.to_persistence_payload() == saved",
+                "assert source_grant_active(fork)",
+                "assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)",
+                "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == delta",
+                "assert 'attack_ability_source_retained' not in str(delta)",
+                "assert attack_completed(current)",
+                "assert not source_grant_active(current)",
+                "assert ReplayRunner.from_payload(current.replay_artifact(artifact_id='order118:done')).run().status is ReplayRunStatus.REPRODUCED",
+                "assert LocalGameSession.from_persistence_payload(complete).to_persistence_payload() == complete"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(DecisionError, match='finite action space'):\n    restored.submit_option(request_id=request.request_id, result_id='order118:malformed', option_id='order118:nonexistent-option')"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "19.04:literal-table-specific-bearer",
+          "source_blocks": [
+            5
+          ],
+          "acceptance": "Specific bearer row: until that exact bearer is destroyed, with attack exception.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_table.py::test_each_table_source_applies_until_last_source_model_then_returns_on_real_revival",
+              "function_ast_sha256": "f8fbaeefe73bfa0389d9aae42b9175705ac9fdb4263fd8b5fcceb1d4579d0738",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert all((not has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert not set(source.own_model_ids()) & set(ability_presence(state=s.state, rules_unit=s.view).active_model_ids)",
+                "assert req is not None",
+                "assert req is None",
+                "assert effect.is_complete()",
+                "assert effect.resolved_steps[0].step_kind is HealingStepKind.REVIVE_MODEL_IN_RESERVES",
+                "assert effect.resolved_steps[0].model_instance_id == source.own_model_ids()[0]",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert s.view.attached_unit == s.formation",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/unit/test_unit_abilities.py::test_equipped_attached_source_lifetime_uses_shared_catalog_consumer",
+              "function_ast_sha256": "e9cc5d855bf626beadece3b1d87eadf109949cc5a7dfe71883b519e88573571b",
+              "assertions": [
+                "assert source_grant_active(session)",
+                "assert source_grant_active(session)"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/unit/test_d12_epic_challenge.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
+              "function_ast_sha256": "d4642e4ffdc3f254937f7f65de8185aa7ac5b4739572501546f8fa5ceea04f5f",
+              "assertions": [
+                "assert state is not None",
+                "assert session.to_persistence_payload() == fork.to_persistence_payload() == saved",
+                "assert state is not None",
+                "assert state.command_point_total(player) == 1",
+                "assert len(state.stratagem_use_records) == 1",
+                "assert effect.target_unit_instance_ids == (unit.unit_instance_id,)",
+                "assert effect.expiration == EffectExpiration.end_phase(battle_round=1, phase=BattlePhase.FIGHT, player_id=player)",
+                "assert request.decision_type == 'submit_melee_declaration'",
+                "assert model.model_instance_id in seen",
+                "assert state is not None",
+                "assert state.fight_phase_state is not None",
+                "assert sequence is not None",
+                "assert pools",
+                "assert effect.effect_id not in {current.effect_id for current in state.persisting_effects}",
+                "assert isinstance(owner, str)",
+                "assert any(('bodyguard' in owner for owner in seen))",
+                "assert any(('support' in owner for owner in seen))",
+                "assert any(('leader' in owner for owner in seen))",
+                "assert (WeaponKeyword.PRECISION in pool.weapon_profile.keywords) is (pool.attacker_model_instance_id == model.model_instance_id)",
+                "assert state is not None",
+                "assert weapon['engaged_target_unit_instance_ids'] == []",
+                "assert owner != model.model_instance_id",
+                "assert ('Precision' in cast(list[str], profile['keywords'])) is (owner == model.model_instance_id)"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_id": "rule:19:19.04.01:1",
+      "category": "19",
+      "locator": "19.04.01",
+      "title": "Only In Death Does Duty End",
+      "occurrence": 1,
+      "source_sha256": "6888909f867aec30dd0987156457812702c4f8f746a43095051dabdb7dde2ae5",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "dc7676a881ea19fedc78931e98de59cad2e589f6eecbe2f7209394629778377b",
+          "value": "\u0005Leader\u0006 and \u0005support\u0006 units often have abilities that make the models they are leading more powerful. In the same way, some \u0005bodyguard\u0006 units\u2019 abilities can enhance the power of those leading them. Abilities in Attached Units (19.04) means that once the models conferring such effects are \u0005destroyed\u0006, that \u0005attached\u0006 unit does not continue to benefit from them. Should those models later be \u0005revived\u0006, however, those abilities will once more apply to their \u0005attached\u0006 unit."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "19.04.01:source-death-stops-grant",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Conferring dead models stop providing benefits after applicable attack lifetime.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_abilities.py::test_native_grant_stops_when_source_is_destroyed_outside_attack",
+              "function_ast_sha256": "0c0e22a377a4ba6feaa24c34cf0eab06db8cf9bbee897fcb94737da5417a6687",
+              "assertions": [
+                "assert has_lethal(s, s.body.own_model_ids()[0])",
+                "assert all((not has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/rules/section19/test_table.py::test_each_table_source_applies_until_last_source_model_then_returns_on_real_revival",
+              "function_ast_sha256": "f8fbaeefe73bfa0389d9aae42b9175705ac9fdb4263fd8b5fcceb1d4579d0738",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert all((not has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert not set(source.own_model_ids()) & set(ability_presence(state=s.state, rules_unit=s.view).active_model_ids)",
+                "assert req is not None",
+                "assert req is None",
+                "assert effect.is_complete()",
+                "assert effect.resolved_steps[0].step_kind is HealingStepKind.REVIVE_MODEL_IN_RESERVES",
+                "assert effect.resolved_steps[0].model_instance_id == source.own_model_ids()[0]",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert s.view.attached_unit == s.formation",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))"
+              ],
+              "expected_exceptions": []
+            },
+            {
+              "node": "tests/unit/test_unit_abilities.py::test_attached_source_lifetime_facade_restore_replay",
+              "function_ast_sha256": "f1b94e6efe0f653c6c1257033260ddb953e6cd72d2b86af81c1f47e39e9b2649",
+              "assertions": [
+                "assert source_grant_active(session)",
+                "assert state is not None",
+                "assert state.battlefield_state is not None",
+                "assert not model_by_id(state=state, model_instance_id=model_id).is_alive",
+                "assert state.battlefield_state.model_placement_or_none(model_id) is None",
+                "assert retained_destructions(state=state) == ()",
+                "assert source_grant_active(session)",
+                "assert model_id in presence.active_model_ids",
+                "assert model_id not in presence.battlefield_model_ids",
+                "assert restored.to_persistence_payload() == saved",
+                "assert source_grant_active(restored)",
+                "assert restored.to_persistence_payload() == saved",
+                "assert ReplayRunner.from_payload(session.replay_artifact(artifact_id='order118:mid')).run().status is ReplayRunStatus.REPRODUCED",
+                "assert restored.to_persistence_payload() == session.to_persistence_payload()",
+                "assert fork.to_persistence_payload() == saved",
+                "assert source_grant_active(fork)",
+                "assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)",
+                "assert restored.events_since(EventStreamCursor(), viewer_player_id=viewer) == delta",
+                "assert 'attack_ability_source_retained' not in str(delta)",
+                "assert attack_completed(current)",
+                "assert not source_grant_active(current)",
+                "assert ReplayRunner.from_payload(current.replay_artifact(artifact_id='order118:done')).run().status is ReplayRunStatus.REPRODUCED",
+                "assert LocalGameSession.from_persistence_payload(complete).to_persistence_payload() == complete"
+              ],
+              "expected_exceptions": [
+                "with pytest.raises(DecisionError, match='finite action space'):\n    restored.submit_option(request_id=request.request_id, result_id='order118:malformed', option_id='order118:nonexistent-option')"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "19.04.01:actual-revival-restores-grant",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "A revived source resumes ability on its original attached unit through shared healing authority.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section19/test_table.py::test_each_table_source_applies_until_last_source_model_then_returns_on_real_revival",
+              "function_ast_sha256": "f8fbaeefe73bfa0389d9aae42b9175705ac9fdb4263fd8b5fcceb1d4579d0738",
+              "assertions": [
+                "assert s.state.battlefield_state is not None",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert all((not has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert not set(source.own_model_ids()) & set(ability_presence(state=s.state, rules_unit=s.view).active_model_ids)",
+                "assert req is not None",
+                "assert req is None",
+                "assert effect.is_complete()",
+                "assert effect.resolved_steps[0].step_kind is HealingStepKind.REVIVE_MODEL_IN_RESERVES",
+                "assert effect.resolved_steps[0].model_instance_id == source.own_model_ids()[0]",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+                "assert s.view.attached_unit == s.formation",
+                "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))"
+              ],
+              "expected_exceptions": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "all_current_faqs_screened": 64,
+  "faq_screen": [
+    {
+      "ordinal": 1,
+      "id": "c2df3e97-f21e-4fc9-943e-37072c08c10e",
+      "question": "Aerialists ability allows you to get into a transport even though they disembarked a transport this turn?",
+      "answer": "Yes, as the unit embarking is not making a normal, advance or fall-back move as part of this embarkation.",
+      "source_sha256": "5dde776b1cf69f6b47b71219938b51665eb2d8a42e8392befa07e5afdea855e2",
+      "disposition": "bounded_owning_section",
+      "reason": "Transport embark occasion belongs to Section18; attachment does not grant a new embark occasion."
+    },
+    {
+      "ordinal": 2,
+      "id": "9bfa47ed-be8d-4e11-80de-f3832d507ca1",
+      "question": "Can I select a unit to shoot or fight if it doesn't have melee or ranged weapons?",
+      "answer": "Yes, it just makes no attacks and then the fight type or shoot type is resolved.",
+      "source_sha256": "8d4f6b7b01b92637f2848b261fe07f970ef819f1ee867b889e885d1bdcbb1ada",
+      "disposition": "bounded_owning_section",
+      "reason": "Weaponless activation is owned by Sections10/12; public attached activation is tested without inventing attacks."
+    },
+    {
+      "ordinal": 3,
+      "id": "7f767dd0-3996-417e-bba2-b7a5828b2430",
+      "question": "Can a model be within range of a weapon if it is not visible",
+      "answer": "Yes",
+      "source_sha256": "4cfeea846d7a2e135d7eb728147265987cc1adf54ca93657427474d44fe9ce56",
+      "disposition": "bounded_owning_section",
+      "reason": "Visibility/range independence is Section04; no attached-only exception."
+    },
+    {
+      "ordinal": 4,
+      "id": "904b8b36-09f0-4449-a9c3-45892664ef60",
+      "question": "Do models destroyed when a unit is out of coherency count for mission objectives?",
+      "answer": "Yes.",
+      "source_sha256": "4d6f85a577496676241ac385c0cb4fa2e672c8c679d56ff363d7344279670845",
+      "disposition": "bounded_owning_section",
+      "reason": "Mission credit for coherency casualties is Section01/mission scope; frozen attached destruction boundary is local."
+    },
+    {
+      "ordinal": 5,
+      "id": "e5941469-5653-49b2-919e-9c9246e811d4",
+      "question": "Does my model or unit become engaged while moving through a enemy units engagement range during a move?",
+      "answer": "No",
+      "source_sha256": "819dd65da567f7dae1c13e61e2e2a43c02b1188d605f1458b3c5778eefe50b36",
+      "disposition": "bounded_owning_section",
+      "reason": "Engaged while moving is Section03; no attachment-specific exception."
+    },
+    {
+      "ordinal": 6,
+      "id": "5928ab6e-7113-42c8-9085-4291faddae09",
+      "question": "How many mortals do you take from Hazardous tests for a combined vehicle/monster and Infantry unit",
+      "answer": "The roll would be all at once and it would be 1 MW per fail",
+      "source_sha256": "3baf6215041a9e32c26f4544ae11dc0907a480bc3e2b1f3b30f0dfd8a8f53efe",
+      "disposition": "bounded_owning_section",
+      "reason": "Mixed-unit Hazard amount is Section06; components do not change the owning hazard rule."
+    },
+    {
+      "ordinal": 7,
+      "id": "6b074ac1-8a03-43ac-8669-3bac17d372ab",
+      "question": "I failed hazard rolls from [Hazardous] weapons, do those mortal wounds have to be allocated to the models with the [Hazardous] weapons?",
+      "answer": "No, you allocate the mortal wounds to the unit as per Mortal Wounds(06.02). (This represents Bob the guardsmen picking up his fallen squad mates plasma gun or that the twisting power of James the Chaos Sorcerer pulling his followers into the warp.)",
+      "source_sha256": "ce792ca90e1fcdfb597549aaba5c9c7fa227850068b1581a6b00492e993aafb7",
+      "disposition": "bounded_owning_section",
+      "reason": "Mortal allocation/weapon ownership is Section06; attachment introduces no Hazardous bearer lock."
+    },
+    {
+      "ordinal": 8,
+      "id": "e58d31bc-b6eb-4db1-b319-dc27dd60154f",
+      "question": "I have a rule that triggers when a mortal wound is allocated to a model, when does this happen?",
+      "answer": "When you select a model in the Select Model step of Mortal Wounds (06.02).",
+      "source_sha256": "6cb474a554ba766f84b3bf678656f25876bec6fb41905666e7e3a0697b89e3fb",
+      "disposition": "bounded_owning_section",
+      "reason": "Mortal Select Model timing is Section06; no new Section19 timing rule."
+    },
+    {
+      "ordinal": 9,
+      "id": "814f382c-d6b7-4a30-a78b-1247b57ac133",
+      "question": "I have a unit being attacked with weapons that will modify some of their save rolls to be worse then 6 should I make those save rolls?",
+      "answer": "Yes, because other models in your unit may have Sv's that are better those models you've mentioned, this means that enough save rolls could be allocated to the those models that the rest of the results are not greater then the Sv's of the other models in your unit.",
+      "source_sha256": "0c6ab46362def6aac110116ddd1f38ac0efee475fdefeeeac74b6291198e1f87",
+      "disposition": "bounded_owning_section",
+      "reason": "Heterogeneous Save allocation is shared Section05; highest-T distinction is locally asserted."
+    },
+    {
+      "ordinal": 10,
+      "id": "acdcfb0c-5b84-4b41-b271-751c4204bf56",
+      "question": "If I have a rule that says my unit can move up to 6\" when it makes a pile-in move or consolidation move, does this also mean it changes the maximum distance of those moves to 6\"?",
+      "answer": "Yes",
+      "source_sha256": "e8193326f2f9d7e3fb0a5d65ea64a96b7d6d2d5a3051487cc84a7c94bbef51d1",
+      "disposition": "bounded_owning_section",
+      "reason": "Pile-in/consolidation maximum is Section12, not changed by attachment."
+    },
+    {
+      "ordinal": 11,
+      "id": "9657bb5d-72da-4d42-9927-731c9fc0e315",
+      "question": "If a rule allows my unit to pile-in or consolidate an extra distance in the Fight phase, when can I use that rule?",
+      "answer": "For pile-in moves, during the Pile-in step(12.02), and for consolidation moves, during the Consolidate step(12.07) of the Fight phase.",
+      "source_sha256": "cade2b4fcf8c180e7fccd7db3cda6b1d9af1dcf01e2d728abbb3011d7bc286f2",
+      "disposition": "bounded_owning_section",
+      "reason": "Fight step-specific movement grant remains Section12."
+    },
+    {
+      "ordinal": 12,
+      "id": "55ea7d23-2f9e-45bf-bf6c-d98bf682549f",
+      "question": "If a rule modifies how far a unit or model can move during a pile-in move or consolidation move does it also change the distance of the target units?",
+      "answer": "No",
+      "source_sha256": "5b0a2ff2b97ec653c19ef9a0b2b903cefe44903aae6ce26174360afd342a5b16",
+      "disposition": "bounded_owning_section",
+      "reason": "Target distances for movement grants remain Section12."
+    },
+    {
+      "ordinal": 13,
+      "id": "4978f15f-2b4a-4805-aacd-db9b5cad71bd",
+      "question": "If a rule says a unit auto passes Desperate Escape tests does that mean it would auto pass the hazard rolls from a desperate escape move?",
+      "answer": "Yes",
+      "source_sha256": "418d349eaf7304a61d3dd28047950280deee139fe1a1f4a68b3c71f5414183a3",
+      "disposition": "bounded_owning_section",
+      "reason": "Desperate Escape Hazard equivalence remains Section03."
+    },
+    {
+      "ordinal": 14,
+      "id": "fae8a959-9cbe-46e3-a721-029b23b24e24",
+      "question": "If a rule says a unit can embark into a Transport in a turn that unit disembarked, does this ignore the core rules restriction on embarking in a turn that unit made a set up move (see 18.02)?",
+      "answer": "Yes",
+      "source_sha256": "203efbd7887644a4d4a986b7b38ecf618e7a775677f1b61a1726ae0954da4f17",
+      "disposition": "bounded_owning_section",
+      "reason": "Embark exception remains Section18."
+    },
+    {
+      "ordinal": 15,
+      "id": "81bf7082-3ef5-47b9-bfc4-f2021fff1d4f",
+      "question": "If a rule says my unit must make a hazard roll does every model in the unit make a hazard roll?",
+      "answer": "No, the unit would make 1 single hazard roll.",
+      "source_sha256": "63e2958a2a4ffb22895f940904bf6956f11e89ba2717bab129d341a8b6f60e6c",
+      "disposition": "bounded_owning_section",
+      "reason": "One unit hazard versus explicit each-model roll remains Section06/18."
+    },
+    {
+      "ordinal": 16,
+      "id": "bbe268a2-b1fd-43ab-8b24-fd4363730c3f",
+      "question": "If a unit becomes battle-shocked after starting an action does it stop performing that action?",
+      "answer": "Yes",
+      "source_sha256": "1912cbae65dddd8e8799e7e7a82a5ec5984533152aae9239745831f9dfed89ae",
+      "disposition": "bounded_owning_section",
+      "reason": "Battle-shock Action interruption remains Section16."
+    },
+    {
+      "ordinal": 17,
+      "id": "4c654d00-318d-4665-9e46-26cfab179a29",
+      "question": "If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action?",
+      "answer": "Yes",
+      "source_sha256": "fef99387330cc3df5d34f0f94c59f49ddd403bffc2bb46936e4b80d8214f46bb",
+      "disposition": "bounded_owning_section",
+      "reason": "Battle-shocked Action permission remains Section16."
+    },
+    {
+      "ordinal": 18,
+      "id": "b49d0004-1dd8-4746-a971-0b6656719dd3",
+      "question": "If a unit makes any disembark move in a turn (i.e. Disembark move, Emergency Disembark move etc.) has it disembarked that turn?",
+      "answer": "Yes.",
+      "source_sha256": "1eb39b2856a8e102482e905b7bc7fb8392e71ad6d043627414f7a7c4a69fcc21",
+      "disposition": "bounded_owning_section",
+      "reason": "Every disembark counts as setup remains Section18."
+    },
+    {
+      "ordinal": 19,
+      "id": "a89dddb3-7930-4704-9f7a-0a7664da4d84",
+      "question": "If my unit has taken control of an objective at the end of my movement phase and that unit has as an ability that secures an objective they control, can they secure that objective?",
+      "answer": "Yes",
+      "source_sha256": "5ec36166d98fd4e9d6031f8f85a631801253c6a65f26008c6e58d8cec6e72b1c",
+      "disposition": "bounded_owning_section",
+      "reason": "Objective securing timing remains Section17."
+    },
+    {
+      "ordinal": 20,
+      "id": "ab92e97b-be2b-4125-9ded-fcfa6abe092e",
+      "question": "If my unit has the Deadly Demise ability and has an ability that allows it to Fight on Death, how do I resolve this?",
+      "answer": "Fight on Death rules are resolved before Deadly Demise abilities, meaning that your unit's Deadly Demise will resolve after your unit has fought/at the end of the phase and the relevant models have been removed from the battlefield.",
+      "source_sha256": "6c0d66fac9785c64b585ccf535fece6c50738787459f61ccff18d7b4d54f22fc",
+      "disposition": "bounded_owning_section",
+      "reason": "Current adopted DD/FoD decision preserved unchanged; attachment creates no new removal ordering."
+    },
+    {
+      "ordinal": 21,
+      "id": "ee9a398d-3acb-4440-b63a-68bed3e6e217",
+      "question": "If my unit has weapons that are identical in characteristics, but some of those weapons have [PRECISION] and those weapons targeted a unit without the character keyword, do I roll all of those weapons together?",
+      "answer": "Yes, the [PRECISION] ability is not an applicable ability for those attacks as there is no CHARACTER in the target unit for the ability to trigger its rule.",
+      "source_sha256": "a46aec7c497acd207755a6a220760722b4b41ab05aa0b4936cd98911abbdb641",
+      "disposition": "bounded_owning_section",
+      "reason": "Precision applicability remains Section05; actual attached model Precision dependency executes."
+    },
+    {
+      "ordinal": 22,
+      "id": "bb42e060-31e1-46bc-ba52-85cd5ea8c6cf",
+      "question": "If the [ANTI] ability on my unit is ANTI-non-Monster/Vehicle does it mean the [ANTI] rule triggers when targeting units that do not have the Monster or Vehicle keyword?",
+      "answer": "Yes, ANTI-non-(any keyword) will trigger on any unit that does not have the specified keyword.",
+      "source_sha256": "2c17122ffb565c8449dcae5b2f4ca29654cb327c39f61e112cadfb49b73f0993",
+      "disposition": "bounded_owning_section",
+      "reason": "Anti negative keyword semantics belong to weapon ability authority; local exact Anti-Psyker example binds live union."
+    },
+    {
+      "ordinal": 23,
+      "id": "66be2ad9-24af-4edf-890a-c0e55004bf76",
+      "question": "My rule says that \"this units ranged attacks have +1 A\", do each of my attacks get an extra attack dice?",
+      "answer": "No, it increases the A characteristics of the unit's ranged weapons by 1.",
+      "source_sha256": "9377700d849a18e73f6f58830a215dfe1b122e65b7e115d5ceecd9ca34a46feb",
+      "disposition": "bounded_owning_section",
+      "reason": "Weapon A modifier remains Section02."
+    },
+    {
+      "ordinal": 24,
+      "id": "c7a83b0a-e8c3-44b5-a3ca-bb3dfba98c2d",
+      "question": "The Munitorium Field Manual shows my unit can attach to different units then are on it's datasheet, which do I use?",
+      "answer": "Use the Munitorium Field Manual.",
+      "source_sha256": "e1ebb8a68e7f4c31e1672e4801af152cb6355b84d975b7329c57de930f5a61c1",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct attachment source-precedence rule: execute actual MFM replacement owner for both Leader and Support."
+    },
+    {
+      "ordinal": 25,
+      "id": "3103e536-8fb8-4fa3-800c-c0d159115bba",
+      "question": "What does the X\" in Lone Operative X\" mean?",
+      "answer": "The X is a placeholder for a number of inches that the ability might appear in a rule with, like Lone Operative 15\" where the X has been replaced with 15\"",
+      "source_sha256": "5b6592050979bbcee593897a953177ea6ff01143998be6aaa82d94cec6e0e28f",
+      "disposition": "bounded_owning_section",
+      "reason": "Lone Operative numeric placeholder is Section24; bounded consumer uses native12 and explicit native15 controls."
+    },
+    {
+      "ordinal": 26,
+      "id": "ba488672-92ec-443d-9087-85a999342589",
+      "question": "When a move says that a model or unit must move in a way if it is able, can that requirement force the unit to end their move not in coherency?",
+      "answer": "No, when a model or unit is making a move it must follow requirements while ending that move in coherency",
+      "source_sha256": "0f27aa55b21c0ddb344b8c753eda2ed864b0618ef79c02ce24ac11d7a0cc9213",
+      "disposition": "bounded_owning_section",
+      "reason": "Movement coherency remains Section03; no weakening for attached groups."
+    },
+    {
+      "ordinal": 27,
+      "id": "fdefb262-1eb9-43fd-a2c8-70cf3bd2a621",
+      "question": "When a rule instructs you to perform a charge outside of the charge phase, do I resolve step 2 and 3 of the Charge step(11.02)?",
+      "answer": "Yes",
+      "source_sha256": "08639241469c28315db54217af96362204e61b52d0bd272d16a40bab54e25fe8",
+      "disposition": "bounded_owning_section",
+      "reason": "Out-of-phase charge sequencing remains Section11."
+    },
+    {
+      "ordinal": 28,
+      "id": "a7ba0395-6635-45cd-aeec-1cc3c0607a0b",
+      "question": "When checking coherency for my unit can my unit be in multiple groups?",
+      "answer": "No, it must be in a single contiguous group as per Units and Models (01.02) and What is Coherency in the core rules.",
+      "source_sha256": "4eff6df1baf7b221cf03ed213f78a6cd38284f178f611bd883e448388f12eb9d",
+      "disposition": "bounded_owning_section",
+      "reason": "One connected group coherency remains Section01/03; no split on bodyguard death."
+    },
+    {
+      "ordinal": 29,
+      "id": "06c896b8-bf06-40bd-a892-b56cb3cde9d3",
+      "question": "When declaring the allocation order of groups in my unit I have more than one non-CHARACTER groups that contain a model with a missing wound, how must I select the order?",
+      "answer": "Those groups can be selected in an order of your choosing but must be in an order that makes them come before any non-CHARACTER groups that do not contain a model with a missing wound.",
+      "source_sha256": "e8c435f8a7716a35d41f4a7522b6d87d156c108f9ba88195bdab4b27d00897c1",
+      "disposition": "bounded_owning_section",
+      "reason": "Wounded allocation-group priority remains Section05; no Section19 exception."
+    },
+    {
+      "ordinal": 30,
+      "id": "5553f538-6182-4e72-905a-67855489bb1d",
+      "question": "When selecting a target unit can the enemy model that is visible to my model and the enemy model that is in range of my model's weapon be different enemy models in the same unit?",
+      "answer": "Yes",
+      "source_sha256": "5c88c04e13b99a324290f8726e470f1e4fb93152c890c597b9b16906cdd4e3e4",
+      "disposition": "bounded_owning_section",
+      "reason": "Different visible/range models remain Section04; attacks target canonical units."
+    },
+    {
+      "ordinal": 31,
+      "id": "019feac1-cd25-4644-b855-2ce3fa048fee",
+      "question": "Can an attached unit be given an Upgrade?",
+      "answer": "Yes.",
+      "source_sha256": "0726dff38f240002912d8730e11af4be7e4f1c14c17d67b797855e597dd88a42",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct: actual attached unit accepts one Upgrade in executed roster validator."
+    },
+    {
+      "ordinal": 32,
+      "id": "38785a5c-16ba-41c5-b936-723a385f57aa",
+      "question": "Can a unit have both an Upgrade and an enhancement?",
+      "answer": "No, units are prevented from having two enhancements, and Upgrades are enhancements.",
+      "source_sha256": "7ee44f5393615f9102f2df97ea71badbd468f7b02b9f968aa1ec0c30da3ce524",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct: shared attached squad enhancement cap forbids Upgrade plus leader Enhancement."
+    },
+    {
+      "ordinal": 33,
+      "id": "3de45ba4-435e-4f58-a50c-fbda3f71bdc5",
+      "question": "Are Upgrades enhancements?",
+      "answer": "Yes, Upgrades are a type of enhancement (but not all enhancements are Upgrades).",
+      "source_sha256": "00e5a5e21fcdab4cfe98c30af6341386425851e952d8b85aa2febc27b4d2104e",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct: Upgrade is Enhancement; shared validation executes the same cap."
+    },
+    {
+      "ordinal": 34,
+      "id": "603e9b2f-cc24-498c-ac2e-08ad3068f257",
+      "question": "Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area?",
+      "answer": "Yes",
+      "source_sha256": "f12df889b0db17cfacf6358aea3dcd1a3d2725660c8a159eabad35f6f6c9fef3",
+      "disposition": "bounded_owning_section",
+      "reason": "Terrain area vertical membership remains Section14."
+    },
+    {
+      "ordinal": 35,
+      "id": "6575ee89-b92a-456d-8e59-4ee513df8f4e",
+      "question": "Do rules that affect a keyword include multi-word keywords that contain that keyword? For example, would rules that affect Commissar units affect a unit that has the Commissar Graves keyword?",
+      "answer": "No.",
+      "source_sha256": "4246aa2cdf23333e8213aeef87c4224f0f2ff31b5f8c80229f9c9f3b7c648fa4",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct exact keyword matching; no partial multiword Anti match."
+    },
+    {
+      "ordinal": 36,
+      "id": "7a982686-03ff-4565-8d5a-2549e5650268",
+      "question": "After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available?",
+      "answer": "Yes.",
+      "source_sha256": "83a20d1e25f2befd445e81a037eddc1fbae6799e634efe2a95b7b1724d5de541",
+      "disposition": "bounded_owning_section",
+      "reason": "Increased CP cost payment remains Section15."
+    },
+    {
+      "ordinal": 37,
+      "id": "88fc6c54-a3a6-4757-947b-b2dab8b7f3bf",
+      "question": "In what step during the attack sequence do I roll for Feel No Pain?",
+      "answer": "In the Resolve Damage step of the Inflict Damage step (05.04).",
+      "source_sha256": "f76c805bcfca3c48fd1702c593c0b7ae45b19cb075e805878fa90d19c9fbf2c3",
+      "disposition": "bounded_owning_section",
+      "reason": "Feel No Pain damage timing remains Section05; no attachment-specific timing."
+    },
+    {
+      "ordinal": 38,
+      "id": "9aea2cef-c9db-4a30-bbfb-6b07c1f148a2",
+      "question": "Can an Epic Hero unit form an attached unit with a unit that has an enhancement?",
+      "answer": "Yes.",
+      "source_sha256": "d4d4f6a90669f72253ba254163280068e061623dfd51e1989df9d53a3797f45d",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct: Epic Hero may attach to bodyguard with Upgrade; executed canonical roster control."
+    },
+    {
+      "ordinal": 39,
+      "id": "9b1c81f5-2ea0-40eb-9015-6a005367cd75",
+      "question": "While making a move type other than a normal/advance move, can my MONSTER/VEHICLE unit move through friendly units?",
+      "answer": "Yes.",
+      "source_sha256": "f3c9e8b3182c4e2071fac4e28a5f24038296b51c1e9815e075078612dfa184ee",
+      "disposition": "bounded_owning_section",
+      "reason": "Friendly movement traversal remains Section03."
+    },
+    {
+      "ordinal": 40,
+      "id": "9e243f82-42e9-4f0d-9e4b-3f5b74cd68bc",
+      "question": "If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)?",
+      "answer": "Yes. That restriction is applicable before the battle, in the Declare Battle Formations step.",
+      "source_sha256": "4a48d283634e5425caf54f2f8426b8c64351a15d8772e58a6c3ee0cff47b7031",
+      "disposition": "bounded_owning_section",
+      "reason": "Reserves points cap belongs to Section20, explicitly not started."
+    },
+    {
+      "ordinal": 41,
+      "id": "adf7c2cd-b765-4e84-abb7-f0ed45d52841",
+      "question": "Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round?",
+      "answer": "Yes.",
+      "source_sha256": "fcbf7560ed5887e51b590721ed9949d9d631d5f5c22e4bd49886aba684e0dbfa",
+      "disposition": "bounded_owning_section",
+      "reason": "Reserves prebattle cap belongs to Section20, explicitly not started."
+    },
+    {
+      "ordinal": 42,
+      "id": "beaeca32-9701-45f7-9461-879d8ae3d78f",
+      "question": "After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens?",
+      "answer": "No CP are spent and that stratagem's effects are not resolved (but that stratagem still counts as having been used this phase).",
+      "source_sha256": "e5ea7a06664adae76ec6f30368df75c64a03655b158375bbea49637e51d3c53a",
+      "disposition": "bounded_owning_section",
+      "reason": "Insufficient increased CP remains Section15."
+    },
+    {
+      "ordinal": 43,
+      "id": "c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e",
+      "question": "Is being within range of a terrain objective the same as being within range of an objective marker?",
+      "answer": "Yes.",
+      "source_sha256": "b071da95e8e4f7b784d6b56260bc20d1f99d1dee892c93e49694be55146a9f6e",
+      "disposition": "bounded_owning_section",
+      "reason": "Terrain Objective/marker equivalence remains primary adopted Companion convention."
+    },
+    {
+      "ordinal": 44,
+      "id": "e01c8a02-7a36-4d3b-b168-976b11bd47e8",
+      "question": "When my unit shoots at another unit, how does it work if some models in the target unit are fully visible to some models in my unit, while others are within a terrain area/not fully visible?",
+      "answer": "For each attacking model in your unit, determine whether the target unit has the benefit of cover, as described in Terrain and Visibility. In this scenario, the target unit will likely have the benefit of cover against some of the attacking models, but not all. This means that, in an example unit where all attacking models are using the same weapon, when you get to the Resolve Attacks step of the Attack Sequence, you will collect dice for attacks made by models against which the target unit has the benefit of cover separately from the dice for attacks made by models against which the target unit does not have the benefit of cover.",
+      "source_sha256": "8c5268b2b6d5a355b36634065359e05eec587d8ad7541cfbe7a7ed5144c48031",
+      "disposition": "bounded_owning_section",
+      "reason": "Cover is per attacking model in Section14; native geometry ownership is retained."
+    },
+    {
+      "ordinal": 45,
+      "id": "e43402db-7c49-4cd6-acf7-fa6cac83acb0",
+      "question": "If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier?",
+      "answer": "No, a stratagem that costs 1CP and is making use of an optional +1CP section has an original cost of 2CP.",
+      "source_sha256": "82f9c28b646f5734f69e5e94c22a2a9a1df8761eaf463c1510f301294963c5f0",
+      "disposition": "bounded_owning_section",
+      "reason": "Optional Stratagem base cost remains Section15."
+    },
+    {
+      "ordinal": 46,
+      "id": "e846db5e-3138-4ac6-b7ee-ca2ff7fe303e",
+      "question": "Does vertical movement in a unit that has taken to the skies count towards the distance a model has used for the purposes of [Heavy]?",
+      "answer": "No.",
+      "source_sha256": "5fc6e6bf0de94e1cd61c8e9c98f520b0c863d4b728c5e4c19654f1b8c4a61368",
+      "disposition": "bounded_owning_section",
+      "reason": "Flying vertical Heavy distance remains Section03/24."
+    },
+    {
+      "ordinal": 47,
+      "id": "fc49644c-cc46-47a0-892b-284a4c4ec018",
+      "question": "Can I group or allocate a wound to a destroyed model?",
+      "answer": "No.",
+      "source_sha256": "6c644170715564c73a7148e873c64fb055afa4031065a1027f319016ba4b6bee",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct living-model membership: dead models cannot supply attack toughness/allocation; casualty producer and presence consumers are local."
+    },
+    {
+      "ordinal": 48,
+      "id": "04f15433-3ee1-4c6d-8546-29e4247dee5b",
+      "question": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?",
+      "answer": "After.",
+      "source_sha256": "13028847f833da09851ea0172c574d87efff63f06d924d31f67bf2fb42574b60",
+      "disposition": "bounded_owning_section",
+      "reason": "Post-save Damage-to-zero remains Section05."
+    },
+    {
+      "ordinal": 49,
+      "id": "2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+      "question": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?",
+      "answer": "Models awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models: They can be measured to by friendly/enemy abilities. They can be considered visible to friendly/enemy models where relevant. They can use their datasheet abilities. They can be targeted by stratagems. Enemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight).",
+      "source_sha256": "47c3d8041c00d1755fd01c8fc8149fccadfbd89cb238fa5d8184cadaeaaea455",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct required Core boundary: explicit physical FoD retention keeps recipient/selection/shooting authority; ordinary casualties remain absent. Native Support/FoD provider admission is unproven."
+    },
+    {
+      "ordinal": 50,
+      "id": "421a6f30-63e2-4e1f-b352-99b643637c53",
+      "question": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+      "answer": "No, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+      "source_sha256": "c5ad1503a94c734aa9f1d0dadca11d1daa19dc63928131659eb8214c5f4c7724",
+      "disposition": "bounded_owning_section",
+      "reason": "Friendly battle-shocked Stratagem denial remains Section01/15."
+    },
+    {
+      "ordinal": 51,
+      "id": "60232b79-7a10-44a0-ac68-e27312c7ba60",
+      "question": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+      "answer": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit.",
+      "source_sha256": "a4fb6955c73cae19a4d09415f8b77188b6fd8542fbb0448084db0db2c56c392f",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct: dead keyword source ceases unit contribution; native Psyker and Anti example asserted."
+    },
+    {
+      "ordinal": 52,
+      "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+      "question": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+      "answer": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead).",
+      "source_sha256": "736b6d704a27951f968fbcc84f7b0eca6840b08a451d353390367442244b1766",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct inherited boundary: embarked abilities and borrowed weapons preserve physical ownership; execute shared Firing Deck consumer."
+    },
+    {
+      "ordinal": 53,
+      "id": "7f238e23-cd3f-40ad-aa91-c75274cc655e",
+      "question": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?",
+      "answer": "Line of sight is drawn from any part of the observing model to any part of the model being observed.",
+      "source_sha256": "cf0fd95bcbcfb3ff78f04318e141c735309cc69f5f3815ab946d5a4245563333",
+      "disposition": "bounded_owning_section",
+      "reason": "Physical line of sight remains Section14."
+    },
+    {
+      "ordinal": 54,
+      "id": "80182be3-1a44-464b-9ef6-cd9212429603",
+      "question": "If both players have units with the Scouts ability, do they alternate resolving scout moves?",
+      "answer": "Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn.",
+      "source_sha256": "5d5056a4966de981a21706e962e5c9ea70f05377ff20fd4962f7cc7a01d5290b",
+      "disposition": "bounded_owning_section",
+      "reason": "Scouts alternation remains Section03/prebattle."
+    },
+    {
+      "ordinal": 55,
+      "id": "aab10e23-6433-42ca-86e7-ddc829f16c47",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting?",
+      "answer": "Unless otherwise stated, no: when snap shooting, each attack only hits on a roll of 6.",
+      "source_sha256": "b26dfcd0cc3f76a41e680b3bedaf3ba6a299fa135400cea6cbd42e493ea2e057",
+      "disposition": "bounded_owning_section",
+      "reason": "Snap shooting threshold remains Section05/10."
+    },
+    {
+      "ordinal": 56,
+      "id": "b7d3d760-a167-44b2-9c91-32ce86684225",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit?",
+      "answer": "Yes, except when snap shooting: when snap shooting, each attack only hits on a roll of 6.",
+      "source_sha256": "9bfda5c1d2a514b705e9feeec17efef3325815360389fe267537521350a557ac",
+      "disposition": "bounded_owning_section",
+      "reason": "Critical hit thresholds remain Section05."
+    },
+    {
+      "ordinal": 57,
+      "id": "ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+      "question": "When do the effects of a FLYING unit taking to the skies apply?",
+      "answer": "When that unit is selected to make a normal/advance/fall-back/charge move. Note that for an advance/charge move, this means you must declare that a unit will take to the skies before rolling for that advance/charge move.",
+      "source_sha256": "2202a3d04b20b42997b9a0e9a19177697bf42ee7b2b1923c4674b43faa676e9b",
+      "disposition": "bounded_owning_section",
+      "reason": "Take to Skies declaration remains Section03."
+    },
+    {
+      "ordinal": 58,
+      "id": "dc9911da-e156-4b48-bf9b-18f9d96d037e",
+      "question": "If a rule refers to an 'objective marker', does this mean an 'objective'?",
+      "answer": "Yes (excluding rules in the Core Rules)'.",
+      "source_sha256": "f084d1e31353f70020957e67d0ad8821f406be29c8251048d27bf81e6664f4b3",
+      "disposition": "bounded_owning_section",
+      "reason": "Non-Core objective terminology and current Companion policy remain unchanged."
+    },
+    {
+      "ordinal": 59,
+      "id": "fb3b2776-c954-471b-b448-b70caa91929d",
+      "question": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?",
+      "answer": "A charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03). Example: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\". Example: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\".",
+      "source_sha256": "18f33a49e6d2f3f401aefb615c84a2d4d373c9b382b5bb38252504d517bc8662",
+      "disposition": "bounded_owning_section",
+      "reason": "Charge maximum and target reselection remain Section11."
+    },
+    {
+      "ordinal": 60,
+      "id": "db020803-7564-45c9-a6d4-e4cdf463da32",
+      "question": "Can a unit be controlling more than one objective at once?",
+      "answer": "Yes.",
+      "source_sha256": "8352b49b9fbfaceb630ac21dc45eac4d9fdf112bd15de3e50ec2f0fbd30ca36e",
+      "disposition": "bounded_owning_section",
+      "reason": "Multiple-objective control remains Section17."
+    },
+    {
+      "ordinal": 61,
+      "id": "8c51d370-70b2-46c7-abaa-228b55c830c3",
+      "question": "When determining control over an objective, can the same model's OC count towards more than one objective that model is within range of?",
+      "answer": "Yes.",
+      "source_sha256": "cda9f83e49d0006eef29aeb0e17f388472db9fa391be2ea4a96e6ce4850e80a6",
+      "disposition": "bounded_owning_section",
+      "reason": "OC may count for multiple in-range objectives remains Section17."
+    },
+    {
+      "ordinal": 62,
+      "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+      "question": "If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle?",
+      "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn.",
+      "source_sha256": "f1569a6a16420f52ff3a4cc89c61762db7467cba6bdc320c8a4e3fa8ceec239f",
+      "disposition": "bounded_owning_section",
+      "reason": "End-window effect lifetime remains shared expiry; attack lifetime has its own sequence completion owner."
+    },
+    {
+      "ordinal": 63,
+      "id": "9638115f-b94b-4d05-ba62-df9fba2805ac",
+      "question": "When a model overhangs the edge of the battlefield, how does that affect its visibility?",
+      "answer": "That model's controlling player can draw line of sight from any part of that model that is not overhanging the edge of the battlefield. Their opponent can draw line of sight to any part of that model.",
+      "source_sha256": "1c43f713b930f8f51c7d429991f40174c22eb30bbf4bd56773993b4a8e319cd8",
+      "disposition": "bounded_owning_section",
+      "reason": "Overhanging visibility remains Section14."
+    },
+    {
+      "ordinal": 64,
+      "id": "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+      "question": "When does a model's or unit's ability in an attached unit apply to all models in that unit?",
+      "answer": "A rule that applies to 'this/that unit' or 'models in this/that unit' applies to all models in an attached unit. Rules that just apply to one model in an attached unit (for example, a rule that grants a model Feel No Pain or Lone Operative) only apply to that model, not to all models in the attached unit.",
+      "source_sha256": "cbf7e42f41f0d4cce05a0f084c6982e8899da06ac0a71c7339ad6845ef0acc47",
+      "disposition": "local_or_executed_dependency",
+      "reason": "Direct: every unit-wide grant includes group models while specified-model grants stay local; actual recipient, targeting and model-only Epic controls execute."
+    }
+  ],
+  "locally_owned_faqs": [
+    {
+      "ordinal": 24,
+      "id": "c7a83b0a-e8c3-44b5-a3ca-bb3dfba98c2d",
+      "question": "The Munitorium Field Manual shows my unit can attach to different units then are on it's datasheet, which do I use?",
+      "answer": "Use the Munitorium Field Manual.",
+      "semantic_assertions": [
+        {
+          "node": "tests/unit/test_army_points_mfm.py::test_catalog_with_mfm_attachment_allowances_replaces_leader_and_support_targets",
+          "function_ast_sha256": "e6f6dc1cf4b4d11e5cd5194d44f3392632f36bc3aa986c379a24efd8ead01315",
+          "assertions": [
+            "assert len(leader_eligibilities) == 1",
+            "assert tuple((target.bodyguard_datasheet_id for target in leader_eligibilities[0].targets)) == ('bodyguard-b',)",
+            "assert leader_eligibilities[0].targets[0].source_ids == ('test-mfm:faction:test-faction:unit:leader:leader',)",
+            "assert len(support_eligibilities) == 1",
+            "assert tuple((target.bodyguard_datasheet_id for target in support_eligibilities[0].targets)) == ('bodyguard-b',)",
+            "assert support_eligibilities[0].targets[0].source_ids == ('test-mfm:faction:test-faction:unit:support:support',)",
+            "assert overlay.datasheet_by_id('foreign-unit') == catalog.datasheet_by_id('foreign-unit')"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 31,
+      "id": "019feac1-cd25-4644-b855-2ce3fa048fee",
+      "question": "Can an attached unit be given an Upgrade?",
+      "answer": "Yes.",
+      "semantic_assertions": [
+        {
+          "node": "tests/unit/test_phase9c_mustering.py::test_phase16d_attached_unit_can_receive_one_upgrade_enhancement",
+          "function_ast_sha256": "7615eba401accc347670688a2161983c01c06c9998ff31e4d946a756ca1373bf",
+          "assertions": [
+            "assert report.is_legal",
+            "assert army.enhancement_assignments == request.enhancement_assignments",
+            "assert len(army.attached_units) == 1"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 32,
+      "id": "38785a5c-16ba-41c5-b936-723a385f57aa",
+      "question": "Can a unit have both an Upgrade and an enhancement?",
+      "answer": "No, units are prevented from having two enhancements, and Upgrades are enhancements.",
+      "semantic_assertions": [
+        {
+          "node": "tests/unit/test_phase9c_mustering.py::test_phase16d_upgrade_and_leader_enhancement_cannot_stack_on_attached_squad",
+          "function_ast_sha256": "d428f744078447b299b5b2cbb25658e82e20e1a128c9ecafb66dc71493e8e0c2",
+          "assertions": [
+            "assert 'attached_squad_enhancement_limit_exceeded' in codes"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 33,
+      "id": "3de45ba4-435e-4f58-a50c-fbda3f71bdc5",
+      "question": "Are Upgrades enhancements?",
+      "answer": "Yes, Upgrades are a type of enhancement (but not all enhancements are Upgrades).",
+      "semantic_assertions": [
+        {
+          "node": "tests/unit/test_phase9c_mustering.py::test_phase16d_attached_unit_can_receive_one_upgrade_enhancement",
+          "function_ast_sha256": "7615eba401accc347670688a2161983c01c06c9998ff31e4d946a756ca1373bf",
+          "assertions": [
+            "assert report.is_legal",
+            "assert army.enhancement_assignments == request.enhancement_assignments",
+            "assert len(army.attached_units) == 1"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/unit/test_phase9c_mustering.py::test_phase16d_upgrade_and_leader_enhancement_cannot_stack_on_attached_squad",
+          "function_ast_sha256": "d428f744078447b299b5b2cbb25658e82e20e1a128c9ecafb66dc71493e8e0c2",
+          "assertions": [
+            "assert 'attached_squad_enhancement_limit_exceeded' in codes"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 35,
+      "id": "6575ee89-b92a-456d-8e59-4ee513df8f4e",
+      "question": "Do rules that affect a keyword include multi-word keywords that contain that keyword? For example, would rules that affect Commissar units affect a unit that has the Commissar Graves keyword?",
+      "answer": "No.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section19/test_keywords.py::test_keyword_union_anti_psyker_does_not_transfer_physical_model_keywords",
+          "function_ast_sha256": "82b9bb155519941424c5148b65e28fc9325e60f885c5a806e241f55873b96a93",
+          "assertions": [
+            "assert 'PSYKER' in source.own_models[0].keywords",
+            "assert all(('PSYKER' not in m.keywords for m in s.body.own_models))",
+            "assert ('PSYKER' in s.view.keywords) is alive",
+            "assert all(('PSYKER' not in m.keywords for m in s.body.own_models))",
+            "assert anti_keyword_critical_threshold(profile=anti, target_keywords=s.view.keywords) == (4 if alive else None)",
+            "assert anti_keyword_critical_threshold(profile=anti, target_keywords=('PSYKER ELITE',)) is None"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 38,
+      "id": "9aea2cef-c9db-4a30-bbfb-6b07c1f148a2",
+      "question": "Can an Epic Hero unit form an attached unit with a unit that has an enhancement?",
+      "answer": "Yes.",
+      "semantic_assertions": [
+        {
+          "node": "tests/unit/test_phase9c_mustering.py::test_phase16d_epic_hero_can_attach_to_unit_with_upgrade_enhancement",
+          "function_ast_sha256": "a510c62d136937f5493096676881486d1a521c119b8de10bb52ce9acc9772b1c",
+          "assertions": [
+            "assert report.is_legal",
+            "assert 'EPIC HERO' in leader.keywords",
+            "assert army.attached_units[0].leader_unit_instance_ids == (leader.unit_instance_id,)"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 47,
+      "id": "fc49644c-cc46-47a0-892b-284a4c4ec018",
+      "question": "Can I group or allocate a wound to a destroyed model?",
+      "answer": "No.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section19/test_toughness.py::test_attack_toughness_selects_highest_living_models_of_the_required_component",
+          "function_ast_sha256": "5bcde96441e0623097e790ece5692acbbbc5215d289fe482928f1e8f1c309902",
+          "assertions": [
+            "assert _target_unit_toughness(state=s.state, target_unit_instance_id=selected) == expected",
+            "assert len(s.view.alive_models()) == body_alive + leader_alive + support_alive"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section19/test_destruction.py::test_destroyed_trigger_waits_for_last_starting_attached_model_in_any_component_order",
+          "function_ast_sha256": "704a339331a19165050e23a6a7629fa47c0919fc7fbe6a47dd5e64922a65581d",
+          "assertions": [
+            "assert len(components) == 3",
+            "assert s.state.starting_attached_unit_records == [starting]",
+            "assert s.view.alive_models() == ()",
+            "assert len(completed) == int(i == len(model_order))",
+            "assert completed[0][1]['target_unit_instance_id'] == starting.attached_unit_instance_id",
+            "assert completed[0][1]['model_instance_id'] == mid",
+            "assert s.view.attached_unit == s.formation"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section05/test_groups.py::test_wounded_model_precedes_unwounded_and_dead_models_are_not_allocatable",
+          "function_ast_sha256": "bdd5c4fa72c24a907e8167a45cc39c201455c0a808ef8dcb274b3a087b28658c",
+          "assertions": [
+            "assert damage.wounds_lost == 1",
+            "assert _legal_model_ids_for_allocation_group_damage(state=state, allocation_group=group) == (second,)",
+            "assert not model_by_id(state=state, model_instance_id=second).is_alive",
+            "assert second not in updated.alive_model_ids",
+            "assert second not in {m for g in allocation_groups_for_context(state=state, allocation_context=updated) for m in g.model_ids}",
+            "assert first in _legal_model_ids_for_allocation_group_damage(state=state, allocation_group=group)"
+          ],
+          "expected_exceptions": [
+            "with pytest.raises(GameLifecycleError, match='destroyed model'):\n    apply_damage_to_model(state=state, target_unit_instance_id=target.unit_instance_id, model_instance_id=second, damage=1, damage_kind=DamageKind.NORMAL)"
+          ]
+        }
+      ]
+    },
+    {
+      "ordinal": 51,
+      "id": "60232b79-7a10-44a0-ac68-e27312c7ba60",
+      "question": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+      "answer": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section19/test_keywords.py::test_keyword_union_anti_psyker_does_not_transfer_physical_model_keywords",
+          "function_ast_sha256": "82b9bb155519941424c5148b65e28fc9325e60f885c5a806e241f55873b96a93",
+          "assertions": [
+            "assert 'PSYKER' in source.own_models[0].keywords",
+            "assert all(('PSYKER' not in m.keywords for m in s.body.own_models))",
+            "assert ('PSYKER' in s.view.keywords) is alive",
+            "assert all(('PSYKER' not in m.keywords for m in s.body.own_models))",
+            "assert anti_keyword_critical_threshold(profile=anti, target_keywords=s.view.keywords) == (4 if alive else None)",
+            "assert anti_keyword_critical_threshold(profile=anti, target_keywords=('PSYKER ELITE',)) is None"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section19/test_catalog_membership.py::test_actual_casualties_preserve_selected_content_but_remove_live_keywords",
+          "function_ast_sha256": "be3e974988378162d8a63f709f45729ff4c3d49dc62e15ac22fe61c63b0a198e",
+          "assertions": [
+            "assert army is not None",
+            "assert 'gw-11e-core-abilities:datasheet:core-leader' not in initial_ids",
+            "assert 'gw-11e-core-abilities:keyword:keyword-infantry' in initial_ids",
+            "assert current_army is not None",
+            "assert tuple((r.record_id for r in rebuilt.all_records())) == initial_ids",
+            "assert absent.all_records() == ()",
+            "assert 'CHARACTER' not in s.view.keywords",
+            "assert s.view.keywords == ()",
+            "assert s.view.alive_models() == ()",
+            "assert movement_capability_flags_from_index(index=rebuilt, keywords=s.view.keywords) == ()"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 52,
+      "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+      "question": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+      "answer": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead).",
+      "semantic_assertions": [
+        {
+          "node": "tests/integration/test_embarked_ability_authority.py::test_firing_deck_preserves_attached_ability_ownership",
+          "function_ast_sha256": "77fdaaef02cc591d2f1e7abca5d7b6da12e373f7eaf5966f2ed5a7dfe7dfe3aa",
+          "assertions": [
+            "assert weapon['model_instance_id'] == transport.own_models[0].model_instance_id",
+            "assert runtime.weapon_profile_modifier(context) == weapon['weapon_profile']",
+            "assert 'firing_deck_source_model_instance_id' in weapon",
+            "assert WeaponKeyword.LETHAL_HITS in own_profile.keywords"
+          ],
+          "expected_exceptions": []
+        }
+      ]
+    },
+    {
+      "ordinal": 64,
+      "id": "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+      "question": "When does a model's or unit's ability in an attached unit apply to all models in that unit?",
+      "answer": "A rule that applies to 'this/that unit' or 'models in this/that unit' applies to all models in an attached unit. Rules that just apply to one model in an attached unit (for example, a rule that grants a model Feel No Pain or Lone Operative) only apply to that model, not to all models in the attached unit.",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section19/test_model_scope.py::test_native_model_lone_operative_keeps_exact_recipients_and_targeting_scope",
+          "function_ast_sha256": "b9f6e0e12cc518ff54ea22666e47b7d189e5f25fce20f34f04564c578ab266b1",
+          "assertions": [
+            "assert s.support is not None",
+            "assert s.state.battlefield_state is not None",
+            "assert descriptor.rule_ir_payload is not None",
+            "assert len(grants) == 1",
+            "assert (granted, bool(restrictions)) == (s.support.own_model_ids(), not other_alive)",
+            "assert granted == s.support.own_model_ids()",
+            "assert bool(restrictions) is (not other_alive)"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section19/test_model_scope.py::test_mixed_native_and_conditional_owners_cover_all_models_and_keep_highest_range",
+          "function_ast_sha256": "bf0d6fcaafb178218a32aee74d412a3e4f31bef700a7874ba8f29d38aa111cf6",
+          "assertions": [
+            "assert s.support is not None",
+            "assert s.state.battlefield_state is not None",
+            "assert bool(restrictions) is (enemy_x == 40)"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section19/test_abilities.py::test_native_leading_ability_applies_to_every_living_component_after_bodyguard_loss",
+          "function_ast_sha256": "49a4c4675db827d50d9e7671266d5dd5e24ee477f0607a88296b721300addb24",
+          "assertions": [
+            "assert living",
+            "assert all((has_lethal(s, m.model_instance_id) for m in living))",
+            "assert not section19_definitions.weapon('000004078:bolt-pistol').abilities"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section19/test_table.py::test_each_table_source_applies_until_last_source_model_then_returns_on_real_revival",
+          "function_ast_sha256": "f8fbaeefe73bfa0389d9aae42b9175705ac9fdb4263fd8b5fcceb1d4579d0738",
+          "assertions": [
+            "assert s.state.battlefield_state is not None",
+            "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+            "assert all((not has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+            "assert not set(source.own_model_ids()) & set(ability_presence(state=s.state, rules_unit=s.view).active_model_ids)",
+            "assert req is not None",
+            "assert req is None",
+            "assert effect.is_complete()",
+            "assert effect.resolved_steps[0].step_kind is HealingStepKind.REVIVE_MODEL_IN_RESERVES",
+            "assert effect.resolved_steps[0].model_instance_id == source.own_model_ids()[0]",
+            "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))",
+            "assert s.view.attached_unit == s.formation",
+            "assert all((has_lethal(s, m.model_instance_id) for m in s.view.alive_models()))"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section19/test_scope_controls.py::test_conditional_unit_and_model_recipients_keep_positive_scope_and_source_lifetime",
+          "function_ast_sha256": "4494212ae3e6b0d8427d023e523c7c584d8403d26f2bb43edb34cb6fc42d4056",
+          "assertions": [
+            "assert native.rule_ir_payload is not None",
+            "assert s.support is not None",
+            "assert s.state.battlefield_state is not None",
+            "assert len(grants) == 1",
+            "assert grants[0].model_ids(ModelAbilityGrantContext(s.state, s.view)) == (expected if source_available else ())",
+            "assert bool(restrictions) is (whole_unit and source_available)",
+            "assert clause.target is not None"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/unit/test_d12_epic_challenge.py::test_d12_epic_model_owned_melee_restore_replay_and_expiry",
+          "function_ast_sha256": "d4642e4ffdc3f254937f7f65de8185aa7ac5b4739572501546f8fa5ceea04f5f",
+          "assertions": [
+            "assert state is not None",
+            "assert session.to_persistence_payload() == fork.to_persistence_payload() == saved",
+            "assert state is not None",
+            "assert state.command_point_total(player) == 1",
+            "assert len(state.stratagem_use_records) == 1",
+            "assert effect.target_unit_instance_ids == (unit.unit_instance_id,)",
+            "assert effect.expiration == EffectExpiration.end_phase(battle_round=1, phase=BattlePhase.FIGHT, player_id=player)",
+            "assert request.decision_type == 'submit_melee_declaration'",
+            "assert model.model_instance_id in seen",
+            "assert state is not None",
+            "assert state.fight_phase_state is not None",
+            "assert sequence is not None",
+            "assert pools",
+            "assert effect.effect_id not in {current.effect_id for current in state.persisting_effects}",
+            "assert isinstance(owner, str)",
+            "assert any(('bodyguard' in owner for owner in seen))",
+            "assert any(('support' in owner for owner in seen))",
+            "assert any(('leader' in owner for owner in seen))",
+            "assert (WeaponKeyword.PRECISION in pool.weapon_profile.keywords) is (pool.attacker_model_instance_id == model.model_instance_id)",
+            "assert state is not None",
+            "assert weapon['engaged_target_unit_instance_ids'] == []",
+            "assert owner != model.model_instance_id",
+            "assert ('Precision' in cast(list[str], profile['keywords'])) is (owner == model.model_instance_id)"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death",
+          "function_ast_sha256": "cb9989cc8aff6ccc10d1b98106935b3533a3d1c95f406d4f2473252f8c0e9b97",
+          "assertions": [
+            "assert s.support is not None",
+            "assert before_ids == s.support.own_model_ids()",
+            "assert bool(before_restrictions) is (not other_alive and enemy_x == 40)",
+            "assert ids == ((model_id,) if retained else ())",
+            "assert (model_id in presence.active_model_ids) is retained",
+            "assert (model_id in presence.battlefield_model_ids) is retained",
+            "assert (model_id in s.view.retained_model_ids) is retained",
+            "assert bool(restrictions) is (retained and (not other_alive) and (enemy_x == 40))",
+            "assert s.view.living_components == ()",
+            "assert len(s.view.rules_present_components) == (1 if retained else 0)"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section19/test_retained_scope.py::test_retained_recipient_still_requires_duplicate_instance_selection",
+          "function_ast_sha256": "0e4d9296d4fa97de36a5a0faf63dd47397f10e099f7d13ea5c5072c34d9d1538",
+          "assertions": [
+            "assert model_id in s.view.retained_model_ids"
+          ],
+          "expected_exceptions": [
+            "with pytest.raises(GameLifecycleError, match='controlling-player selection'):\n    _scope(s)",
+            "with pytest.raises(GameLifecycleError, match='controlling-player selection'):\n    _scope(s)"
+          ]
+        }
+      ]
+    },
+    {
+      "ordinal": 49,
+      "id": "2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+      "question": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?",
+      "answer": "Models awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models: They can be measured to by friendly/enemy abilities. They can be considered visible to friendly/enemy models where relevant. They can use their datasheet abilities. They can be targeted by stratagems. Enemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight).",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death",
+          "function_ast_sha256": "cb9989cc8aff6ccc10d1b98106935b3533a3d1c95f406d4f2473252f8c0e9b97",
+          "assertions": [
+            "assert s.support is not None",
+            "assert before_ids == s.support.own_model_ids()",
+            "assert bool(before_restrictions) is (not other_alive and enemy_x == 40)",
+            "assert ids == ((model_id,) if retained else ())",
+            "assert (model_id in presence.active_model_ids) is retained",
+            "assert (model_id in presence.battlefield_model_ids) is retained",
+            "assert (model_id in s.view.retained_model_ids) is retained",
+            "assert bool(restrictions) is (retained and (not other_alive) and (enemy_x == 40))",
+            "assert s.view.living_components == ()",
+            "assert len(s.view.rules_present_components) == (1 if retained else 0)"
+          ],
+          "expected_exceptions": []
+        },
+        {
+          "node": "tests/rules/section19/test_retained_scope.py::test_retained_recipient_still_requires_duplicate_instance_selection",
+          "function_ast_sha256": "0e4d9296d4fa97de36a5a0faf63dd47397f10e099f7d13ea5c5072c34d9d1538",
+          "assertions": [
+            "assert model_id in s.view.retained_model_ids"
+          ],
+          "expected_exceptions": [
+            "with pytest.raises(GameLifecycleError, match='controlling-player selection'):\n    _scope(s)",
+            "with pytest.raises(GameLifecycleError, match='controlling-player selection'):\n    _scope(s)"
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata_is_not_semantic_coverage": true,
+  "unresolved_source_interpretations": []
+}

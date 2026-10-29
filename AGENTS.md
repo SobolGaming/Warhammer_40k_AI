@@ -375,7 +375,34 @@ Allowed process:
 
 Legacy code containing broad exceptions, fallback behavior, ambiguous model access, or runtime string parsing must be rewritten.
 
+## PR591 prototype comparison exception
+
+For the finite Core + Faction cutover against exact base
+5f509724da25a2f6ded0c2739a8e7c84bdf59c91, the owner explicitly approved
+comparison_disposition: deferred and the 260 exact comparison/preservation quality
+cases recorded in data/source_audits/ci64_provenance_v1/test-cutover.json.
+Fresh comparative reports and their historical qualification are not merge
+prerequisites for this cutover. Existing reports remain historical; deferred or
+unrun checks are not passes. This exception does not certify a speedup.
+Actual-base assessment, every changed-owner mapping, live current source/index
+and dependency identity, real serial smoke and independently fresh postflight,
+static checks, all 4,886 selected gameplay cases, full-package branch coverage
+at 50%, and absolute timing gates remain required. Restore coverage to 85% as
+documented in the cutover record. Other bases and ordinary assessments retain
+the existing comparison policy.
+
+For this same PR591 cutover, the owner separately approved using the final
+required GitHub CI complete covered run instead of duplicating that full run
+locally. The complete 4,886-case selection and 50% full-package branch-coverage
+gate remain mandatory in CI. Run focused local regressions and static checks;
+collection or a partial local run is not complete covered qualification. The
+canonical complete covered command below remains the required CI workload.
+
 ## Required commands before PR
+
+The temporary owner-approved coverage floor is 50%; post-merge coverage work must restore
+85%. Keep full-package branch coverage and all other required gates. See
+docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md.
 
 Run:
 
@@ -383,8 +410,8 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
-uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=50
+uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
 uv run pre-commit run --all-files
@@ -418,3 +445,10 @@ Stop before coding if the change would:
 - weaken a CORE V2 invariant.
 
 Agents should prefer review, tests, audit scripts, small typed modules, and migration plans over large production-code changes.
+
+On 29 October 2026, the owner separately approved deferring the exact 103
+historical-preservation controls in addition to the prior 157 comparison controls.
+The 260-case list remains finite and code-pinned. These include adversarial checks
+of retained historical helpers; they are not passing results. Keep helper code,
+active production and preflight/postflight validators, 1,848 active quality checks
+and all 4,886 selected gameplay cases. No additional omission is authorized.

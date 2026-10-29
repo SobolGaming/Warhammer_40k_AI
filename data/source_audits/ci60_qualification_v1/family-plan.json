@@ -1,0 +1,165 @@
+{
+  "schema": "ci60-finite-family-plan-v1",
+  "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "prior_source": "d7b7650fa1c76ee5830a9ffc78522eba3a6a3209",
+  "implementation_start": "9fb03ba622df1b7524acb72e5990fc500bc50696",
+  "families": {
+    "dice": {
+      "disposition": "fresh",
+      "comparison": "docs/performance/current/ci60-dice.json",
+      "driver": "scripts/benchmark_order96_rerolls.py",
+      "cases": [
+        "shooting/false",
+        "shooting/true",
+        "fight/false",
+        "fight/true"
+      ],
+      "samples_per_case": 5,
+      "reason": "LocalGameSession attack completion includes shared casualty/retained-cause consumers; fork/restore is separately timed and its exact semantic assertion reaches changed restoration. Preserve 12 wounds/choices, legal rerolls, physical dice and all five samples."
+    },
+    "dice_sustained": {
+      "disposition": "fresh",
+      "comparison": "docs/performance/current/ci60-dice_sustained.json",
+      "driver": "scripts/benchmark_order96_rerolls.py",
+      "cases": [
+        "shooting/false",
+        "shooting/true",
+        "fight/false",
+        "fight/true"
+      ],
+      "samples_per_case": 5,
+      "reason": "Sustained attack completion shares the changed causal consumers; setup constructs the current runtime bundle. Separate fork/restore proof and fixed order103 fixture suffix remain mandatory. Preserve critical-hit/D3 work assertions and all five samples."
+    },
+    "external_contract_source_reuse": {
+      "disposition": "fresh",
+      "comparison": "docs/performance/current/ci60-external_contract_source_reuse.json",
+      "driver": "tests/code_quality/test_phase18m_conformance_boundary.py",
+      "cases": [
+        "orphan-write-independent-check"
+      ],
+      "samples_per_case": 3,
+      "reason": "The fixture copies all contracts plus schemas/runtime/generator/tools. Current runtime identity changes eight generated outputs. Rebuild and independently verify all three complete generated trees on each arm with new truthful runtime and input-role identities."
+    },
+    "fight": {
+      "disposition": "fresh",
+      "comparison": "docs/performance/current/ci60-fight.json",
+      "driver": "scripts/measure_order72.py",
+      "cases": [
+        "complete-fight-phase"
+      ],
+      "samples_per_case": 3,
+      "reason": "Each of three samples times a real pytest process, facade fixture, complete Fight, restoration and replay. The changed runtime index is called during lifecycle setup/restoration; changed retained destruction owners lie on this shared consumer path."
+    },
+    "movement": {
+      "disposition": "fresh",
+      "comparison": "docs/performance/current/ci60-movement.json",
+      "driver": "scripts/measure_order80.py",
+      "cases": [
+        "finite",
+        "parameterized"
+      ],
+      "samples_per_case": 3,
+      "reason": "Accepted reactive movement, turn transition, persistence export and restore are timed. Current GameLifecycle reconstruction reaches the changed runtime index and restoration validation. Preserve finite and parameterized cases even if transport compatibility blocks an arm."
+    },
+    "objective_control": {
+      "disposition": "retained",
+      "comparison": "docs/performance/current/qualification40-objective_control.json",
+      "driver": "scripts/measure_order86.py",
+      "cases": [
+        "0.01",
+        "0.01968503937007874",
+        "0.02",
+        "4.0"
+      ],
+      "samples_per_case": 10,
+      "reason": "battle_state constructs GameState.from_config, canonical armies, deterministic placement and SetupCompletionGate without GameLifecycle/runtime bundle. The called ensure_army_mustered_events_for_fixture owner is unchanged; the new sibling placement helper is not called. Timed quarter-witness geometry has no changed causal/index consumer. Preserve original samples/runtime and all four gap work counts; bind complete roles and unchanged call owners."
+    },
+    "reconstruction": {
+      "disposition": "fresh",
+      "comparison": "docs/performance/current/ci60-reconstruction.json",
+      "driver": "scripts/measure_ingress_reconstruction.py",
+      "cases": [
+        "ingress/restore",
+        "ingress/fork",
+        "rapid_disembark/restore",
+        "rapid_disembark/fork",
+        "later_decision/restore",
+        "later_decision/fork"
+      ],
+      "samples_per_case": 7,
+      "reason": "Every timed restore/fork reconstructs GameLifecycle with the changed generated manifest index and causal authority validators. Preserve all ingress, rapid_disembark and later_decision restore/fork cases and seven samples each."
+    },
+    "roster": {
+      "disposition": "retained",
+      "comparison": "docs/performance/current/qualification40-roster.json",
+      "driver": "scripts/measure_order68.py",
+      "cases": [
+        "2",
+        "4",
+        "20"
+      ],
+      "samples_per_case": 7,
+      "reason": "The complete workload constructs ArmyCatalog.phase9a_canonical_content_pack and immutable roster requests, then times 100 validate_roster_legality calls. It constructs no GameLifecycle/runtime-content bundle and calls no changed destruction owner. Preserve all original samples, runtime, fixture and host identities; current applicability requires exact unchanged call owners and complete changed-input roles."
+    },
+    "setup": {
+      "disposition": "fresh",
+      "comparison": "docs/performance/current/ci60-setup.json",
+      "driver": "scripts/measure_order101.py",
+      "cases": [
+        "cargo-5",
+        "cargo-100",
+        "loaded-deep-strike"
+      ],
+      "samples_per_case": 7,
+      "reason": "Timed finite submissions, rejected complete placements, restore, both viewer/event consumers and exact replay reach the changed lifecycle reconstruction and cause authority. Preserve all three cargo/loaded Deep Strike cases and seven samples."
+    },
+    "shock_reconstruction": {
+      "disposition": "fresh",
+      "comparison": "docs/performance/current/ci60-shock_reconstruction.json",
+      "driver": "scripts/measure_shock_reconstruction.py",
+      "cases": [
+        "active_shock/restore",
+        "active_shock/replay",
+        "expired_shock/restore",
+        "expired_shock/replay"
+      ],
+      "samples_per_case": 3,
+      "reason": "Active/expired Shock restore and exact replay invoke current runtime construction and causal validation. Preserve four cases and three samples each; no change to rule assertions."
+    },
+    "strength": {
+      "disposition": "fresh",
+      "comparison": "docs/performance/current/ci60-strength.json",
+      "driver": "scripts/benchmark_order88_strength.py",
+      "cases": [
+        "shooting",
+        "fight"
+      ],
+      "samples_per_case": 5,
+      "reason": "Canonical strength_session constructs a lifecycle/runtime bundle; timed complete_attack uses shared attack/casualty owners. The driver delta since the producer is only reordered imports, not a changed numeric S1 workload. Preserve both phases and five samples."
+    },
+    "visibility": {
+      "disposition": "fresh",
+      "comparison": "docs/performance/current/ci60-visibility.json",
+      "driver": "scripts/measure_order78.py",
+      "cases": [
+        "dense-outside",
+        "dense-inside",
+        "attached-outside",
+        "light-outside",
+        "not-hidden",
+        "fully-visible",
+        "associated-policy-only-woods"
+      ],
+      "samples_per_case": 7,
+      "reason": "Each canonical scene explicitly calls GameLifecycle.start, which constructs the changed runtime bundle during excluded setup. Timed paired target-candidate/shared LOS queries preserve geometry caches, legal results and seven cases; do not infer reuse from the excluded setup timer."
+    }
+  },
+  "total_cases": 41,
+  "total_samples_per_arm": 247,
+  "limits": {
+    "complete_performance_seconds": 180,
+    "whole_workload_seconds": 600,
+    "warning_seconds": 500,
+    "coverage_percent": 85
+  }
+}

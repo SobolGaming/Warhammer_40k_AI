@@ -5,8 +5,10 @@ import hashlib
 import json
 from pathlib import Path
 
-from tests.category_migration_preservation import read_historical_test_bytes
-from tests.d09_test_preservation_helpers import preserved_d09_predecessor_test_bytes
+from tools.cumulative_preservation import d07_predecessors
+
+from tests.d07_geometry_containment import verify_d07_geometry_containment
+from tests.support.section13_preservation import pre_section13_descriptor_bytes
 
 ROOT = Path(__file__).resolve().parents[2]
 ARCHIVE = ROOT / "data/source_audits/d07"
@@ -63,9 +65,9 @@ def test_d07_complete_sources_archives_and_original_tests_remain_pinned() -> Non
     assert hashlib.sha256(original_raw).hexdigest() == provenance["original_tests_sha256"]
     originals = json.loads(original_raw)
     assert approved.keys() <= originals.keys()
+    predecessors = d07_predecessors(ROOT)
     for path, digest in originals.items():
-        raw = read_historical_test_bytes(ROOT, path).replace(b"\r\n", b"\n")
-        raw = preserved_d09_predecessor_test_bytes(path, raw)
+        raw = predecessors[path]
         current = hashlib.sha256(raw).hexdigest()
         if path in approved:
             pin = approved[path]
@@ -143,7 +145,7 @@ def test_d07_all_movement_consumers_bind_physical_model_and_history() -> None:
 def test_d07_ruins_changes_only_the_monster_endpoint_token() -> None:
     path = "src/warhammer40k_core/core/ruleset_descriptor.py"
     old = ast.parse((ARCHIVE / "baseline" / (path + ".txt")).read_text(encoding="utf-8"))
-    new = ast.parse((ROOT / path).read_text(encoding="utf-8"))
+    new = ast.parse(pre_section13_descriptor_bytes(ROOT))
     owners = [
         node
         for node in new.body
@@ -168,12 +170,7 @@ def test_d07_ruins_changes_only_the_monster_endpoint_token() -> None:
 
 
 def test_d07_native_geometry_rejection_owner_is_unchanged() -> None:
-    path = "src/warhammer40k_core/engine/phases/movement_resolution_flow.py"
-    old = (ARCHIVE / "baseline" / (path + ".txt")).read_text(encoding="utf-8")
-    current = (ROOT / path).read_text(encoding="utf-8")
-    assert ast.dump(ast.parse(current), include_attributes=False) == ast.dump(
-        ast.parse(old), include_attributes=False
-    )
+    verify_d07_geometry_containment(ROOT)
 
 
 def test_d07_upper_floor_owners_do_not_re_normalize_catalog_keyword_identity() -> None:

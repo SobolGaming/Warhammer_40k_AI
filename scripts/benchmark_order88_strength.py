@@ -7,7 +7,6 @@ import hashlib
 import json
 import platform
 import statistics
-import subprocess
 from pathlib import Path
 from time import perf_counter
 
@@ -15,6 +14,7 @@ from tests.absent_strength_helpers import strength_session
 from tests.lethal_hits_helpers import attack_steps, complete_attack
 from tests.psychic_modifier_helpers import pending_request
 
+from scripts.measure_order65 import _host_inventory
 from warhammer40k_core.build_identity import verified_engine_build_identity
 from warhammer40k_core.engine.phase import BattlePhase
 
@@ -46,15 +46,14 @@ def measure() -> dict[str, object]:
                 "slices_per_second": 1 / statistics.mean(samples),
             }
         )
+    cpu, memory = _host_inventory()
     return {
         "workload": "order88-numeric-strength-attacks-v1",
         "runtime_build_id": verified_engine_build_identity().build_id,
         "platform": platform.platform(),
         "python": platform.python_version(),
-        "cpu": subprocess.check_output(
-            ["sysctl", "-n", "machdep.cpu.brand_string"], text=True
-        ).strip(),
-        "memory_bytes": int(subprocess.check_output(["sysctl", "-n", "hw.memsize"], text=True)),
+        "cpu": cpu,
+        "memory_bytes": memory,
         "hardware_status": "provisional",
         "concurrency": 1,
         "coverage": False,

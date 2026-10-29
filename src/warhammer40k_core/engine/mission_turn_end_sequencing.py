@@ -8,6 +8,7 @@ from warhammer40k_core.engine.boundary_sequencing import boundary_context
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.mission_action_options import mission_action_for_state
 from warhammer40k_core.engine.mission_action_policies import mission_action_policy_for_id
 from warhammer40k_core.engine.mission_decisions import request_tactical_secondary_score
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
@@ -42,6 +43,10 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
     SecondaryMissionCardStatus,
+)
+from warhammer40k_core.engine.secondary_mission_action_resolution import (
+    pending_secondary_mission_actions_at_turn_end,
+    resolve_secondary_mission_action_at_turn_end,
 )
 from warhammer40k_core.engine.secondary_scoring_boundary import (
     score_or_record_secondary_card,
@@ -159,6 +164,27 @@ def mission_turn_end_candidates(
         raise GameLifecycleError("Mission timing requires MissionSetup.")
     policies = mission_scoring_policies_from_setup(state.mission_setup)
     candidates: list[TimingRuleCandidate] = []
+    for action in pending_secondary_mission_actions_at_turn_end(state):
+        source = mission_action_for_state(state=state, mission_action_id=action.mission_action_id)
+        candidates.append(
+            TimingRuleCandidate(
+                participant=SequencingParticipant(
+                    participant_id=f"secondary-action:{action.action_id}",
+                    player_id=action.player_id,
+                    source_rule_id=source.source_id,
+                    requirement=SequencingRequirement.MANDATORY,
+                    origin=SequencingRuleOrigin.MISSION,
+                    payload={"action_id": action.action_id},
+                ),
+                activate=partial(
+                    resolve_secondary_mission_action_at_turn_end,
+                    state=state,
+                    decisions=decisions,
+                    action_id=action.action_id,
+                    turn_end_record=record,
+                ),
+            )
+        )
     pending_action_ids = {
         action.action_id for action in pending_primary_mission_actions_at_turn_end(state)
     }

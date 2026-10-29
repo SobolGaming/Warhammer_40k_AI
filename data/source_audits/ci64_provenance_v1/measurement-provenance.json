@@ -1,0 +1,71 @@
+{
+  "external_contract_source_reuse": {
+    "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+    "head_input_digest": "3bb4f2a53600be7e7f121b342b1fba673a92595f542c9a625a233a032b78e312",
+    "producing_head": "824778b0ae34ab4082937c3f7cea2f2834ebde11",
+    "base": {
+      "path": "data/source_audits/ci64_provenance_v1/measurements/source-base.json",
+      "sha256": "64cc15e73c06a1f758053b368b6822d76fc9a0d4d39416b9a8be7636d5604115",
+      "canonical_sha256": "650cbd914223fd3f4b473ced63e30429454bdcaa7867ccdd6f1bbe5cf6be97f5",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+      "samples": {
+        "orphan-write-independent-check": [
+          154.109,
+          155.84,
+          153.21
+        ]
+      },
+      "completed": true,
+      "native_attempt_names": [
+        "305-ci71-source-base-0",
+        "307-ci71-source-base-1",
+        "309-ci71-source-base-2"
+      ],
+      "receipt_paths": [
+        "data/source_audits/ci64_provenance_v1/receipts/source-base-0.json",
+        "data/source_audits/ci64_provenance_v1/receipts/source-base-1.json",
+        "data/source_audits/ci64_provenance_v1/receipts/source-base-2.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359404032,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    },
+    "head": {
+      "path": "data/source_audits/ci64_provenance_v1/measurements/source-head.json",
+      "sha256": "80413932dbcb721df05a400e243cbc16946634da80d0d8e5655cbe92189631d8",
+      "canonical_sha256": "8329c8d0d270b8f0457c9dad0b6e5eeeea6b15b54f0f99f128979b960829b499",
+      "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5f86d2a2a3daca0224ee696144bc6d5806f94de7bfebacc628b78950eba6fe6",
+      "samples": {
+        "orphan-write-independent-check": [
+          141.77,
+          139.879,
+          139.512
+        ]
+      },
+      "completed": true,
+      "native_attempt_names": [
+        "306-ci71-source-head-0",
+        "308-ci71-source-head-1",
+        "310-ci71-source-head-2"
+      ],
+      "receipt_paths": [
+        "data/source_audits/ci64_provenance_v1/receipts/source-head-0.json",
+        "data/source_audits/ci64_provenance_v1/receipts/source-head-1.json",
+        "data/source_audits/ci64_provenance_v1/receipts/source-head-2.json"
+      ],
+      "host": {
+        "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+        "memory_bytes": 67359404032,
+        "logical_cpus": 64,
+        "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+        "python": "3.14.5",
+        "role": "provisional"
+      }
+    }
+  }
+}

@@ -505,6 +505,7 @@ def _apply_attack_sequence_decision(
         shooting_state.with_attack_sequence_update(
             attack_sequence=attack_sequence,
             allocated_model_ids_this_phase=allocated_model_ids,
+            pending_decision_requests=decisions.queue.pending_requests,
         )
     )
     return status
@@ -540,6 +541,7 @@ def _apply_attack_sequence_selection_decision(
                 decisions=decisions,
             ),
             allocated_model_ids_this_phase=shooting_state.allocated_model_ids_this_phase,
+            pending_decision_requests=decisions.queue.pending_requests,
         )
     )
 

@@ -4256,6 +4256,7 @@ def test_pending_destroyed_transport_retains_physical_model_but_restores_living_
         shooting_state.with_attack_sequence_update(
             attack_sequence=remaining_sequence,
             allocated_model_ids_this_phase=allocated_ids,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
     )
 

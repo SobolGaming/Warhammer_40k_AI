@@ -27,6 +27,9 @@ from warhammer40k_core.engine.command_phase_start_hooks import CommandPhaseStart
 from warhammer40k_core.engine.core_stratagem_mortal_wound_continuation import (
     core_stratagem_mortal_wound_bindings,
 )
+from warhammer40k_core.engine.desperate_escape_mortal_wounds import (
+    desperate_escape_mortal_wound_binding,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookBinding,
 )
@@ -60,6 +63,7 @@ def mortal_wound_feel_no_pain(
 ) -> tuple[MortalWoundFeelNoPainContinuationHookBinding, ...]:
     return (
         *core_stratagem_mortal_wound_bindings(),
+        desperate_escape_mortal_wound_binding(),
         *catalog_poisoned_mortal_wound_feel_no_pain_bindings(
             ability_indexes_by_player_id=ability_indexes_by_player_id,
         ),

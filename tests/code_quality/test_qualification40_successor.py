@@ -1,0 +1,542 @@
+"""New qualification may add exact obligations, never repin its prior stages."""
+
+from __future__ import annotations
+
+import ast
+import json
+import os
+import shutil
+import subprocess
+from collections.abc import Callable, Iterator, Mapping
+from pathlib import Path
+from types import MappingProxyType
+from typing import Any, Protocol, cast
+
+import pytest
+from tools import cumulative_preservation as prior
+from tools import performance_policy as policy
+from tools import performance_preflight_successor as preflight
+from tools import performance_qualification_successor as stage
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def _copy_ignore(directory: str, names: list[str]) -> set[str]:
+    ignored = set(
+        shutil.ignore_patterns(
+            ".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "reports"
+        )(directory, names)
+    )
+    if Path(directory) == ROOT and ".venv" in names:
+        if any(
+            name in os.environ
+            for name in (
+                "GIT_DIR",
+                "GIT_WORK_TREE",
+                "GIT_COMMON_DIR",
+                "GIT_INDEX_FILE",
+                "GIT_OBJECT_DIRECTORY",
+                "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+                "GIT_NAMESPACE",
+                "GIT_CONFIG",
+                "GIT_CONFIG_COUNT",
+                "GIT_CONFIG_PARAMETERS",
+                "GIT_CONFIG_GLOBAL",
+                "GIT_CONFIG_SYSTEM",
+                "GIT_REPLACE_REF_BASE",
+            )
+        ):
+            raise ValueError("Root environment ownership refuses redirected Git roles.")
+        environment = ROOT / ".venv"
+        first = environment.lstat()
+        if (
+            environment.is_symlink()
+            or environment.is_junction()
+            or environment.resolve(strict=True) != environment
+        ):
+            raise ValueError("Root environment must not be an alias.")
+        command = [
+            "git",
+            "--literal-pathspecs",
+            "--work-tree=" + str(ROOT),
+            "ls-files",
+            "--with-tree=HEAD",
+            "--error-unmatch",
+            "-z",
+            "--",
+            ".venv",
+        ]
+        result = subprocess.run(command, cwd=ROOT, stdout=subprocess.DEVNULL, timeout=30)
+        if result.returncode == 0:
+            raise ValueError("Tracked root environment must not be omitted.")
+        if result.returncode != 1:
+            raise subprocess.CalledProcessError(result.returncode, command)
+        second = environment.lstat()
+        if (
+            (first.st_dev, first.st_ino, first.st_mode)
+            != (second.st_dev, second.st_ino, second.st_mode)
+            or environment.is_symlink()
+            or environment.is_junction()
+            or environment.resolve(strict=True) != environment
+        ):
+            raise ValueError("Root environment identity changed during ownership admission.")
+        if environment.is_dir():
+            ignored.add(".venv")
+    return ignored
+
+
+class _QualificationMechanisms(Protocol):
+    def _member(self, root: Path, name: str, freeze: str) -> bytes: ...
+
+    def _read(self, root: Path, name: str) -> bytes: ...
+
+    def member(self) -> Callable[[Path, str, str], bytes]:
+        return self._member
+
+    def read(self) -> Callable[[Path, str], bytes]:
+        return self._read
+
+
+# Capture real functions through a typed view before the test replaces them.
+_stage = cast(_QualificationMechanisms, stage)
+
+
+@pytest.fixture(scope="module")
+def successor_copy(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    root = tmp_path_factory.mktemp("qualification40")
+    shutil.copytree(
+        ROOT,
+        root,
+        dirs_exist_ok=True,
+        ignore=_copy_ignore,
+    )
+    git_dir = (
+        subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=ROOT)
+        .decode()
+        .strip()
+    )
+    (root / ".git").write_text("gitdir: " + git_dir + "\n")
+    assert len(prior.verify_live(root)) == 64
+    return root
+
+
+@pytest.fixture(scope="module")
+def qualification_native_operands(
+    successor_copy: Path,
+) -> Iterator[tuple[Mapping[str, tuple[bytes, bytes]], bytes]]:
+    """Authenticate a finite historical comparator view, never a live admission result."""
+    from tools import performance_ci60_qualification as ci60
+
+    from tests.d07_geometry_containment import read_owned_geometry_member
+
+    ci60.fresh_admission(successor_copy)
+    expected = stage.prior_operation_map_bytes(successor_copy)
+    original_read = _QualificationMechanisms.read(_stage)
+    names = (stage.SELF, policy.MAP, stage.NAMESPACE + "/added-operations.json")
+    views = MappingProxyType(
+        {
+            name: (
+                read_owned_geometry_member(successor_copy, name),
+                original_read(successor_copy, name),
+            )
+            for name in names
+        }
+    )
+    yield views, expected
+    ci60.fresh_admission(successor_copy)
+
+
+def test_qualification_preserves_every_old_family_operation_and_assertion_stage() -> None:
+    old = stage.accepted_operation_map(ROOT)
+    current: dict[str, Any] = policy.read_object(ROOT / policy.MAP)
+    family = current["families"]["external_contract_source_reuse"]
+    assert family["input_binding"]["schema"] == "tool-input-roles-v3"
+    family["input_binding"] = old["families"]["external_contract_source_reuse"]["input_binding"]
+    assert {k: v for k, v in current.items() if k != "operations"} == {
+        k: v for k, v in old.items() if k != "operations"
+    }
+    assert all(current["operations"][k] == value for k, value in old["operations"].items())
+    assert all(
+        current["operations"][k]["mandatory"] and current["operations"][k]["sensitive"]
+        for k in old["operations"]
+        if k.startswith("cumulative-exact-")
+    )
+    assert len(prior.verify_live(ROOT)) == 64
+    assert prior.SOURCE_COMMIT == "036a1aa2b066fe37b0a9be37d4d9f45436a24e32"
+    assert stage.ACCEPTED == "ee3ecc1de30a799811f6cbdf04a05d56e02f6ae5"
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "tests/support/section08_native_mission.py",
+        "tests/support/section08_native_mission_source.py",
+        "data/source_audits/section08_native_mission_2026_10_22/observation.json",
+        "data/source_audits/qualification40_v1/accepted-source.json",
+        "data/source_audits/qualification40_v1/control-transitions.json",
+        "tools/performance_qualification_successor.py",
+        "docs/performance/change-assessment.json",
+    ],
+)
+def test_qualification_rejects_live_fixture_source_evidence_or_control_drift(
+    successor_copy: Path, path: str
+) -> None:
+    file = successor_copy / path
+    raw = file.read_bytes()
+    try:
+        file.write_bytes(raw + b"\nchanged\n")
+        with pytest.raises((ValueError, json.JSONDecodeError)):
+            prior.verify_live(successor_copy)
+    finally:
+        file.write_bytes(raw)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["drop_old", "relax_sensitive", "relax_budget", "drop_new", "wildcard", "repin_additions"],
+)
+def test_qualification_map_mutation_cannot_inherit_historical_credit(
+    successor_copy: Path,
+    mutation: str,
+    qualification_native_operands: tuple[Mapping[str, tuple[bytes, bytes]], bytes],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+
+    from tests.d07_geometry_containment import read_owned_geometry_member
+
+    views, expected_prior = qualification_native_operands
+
+    def native_comparator_read(root: Path, name: str) -> bytes:
+        assert root == successor_copy
+        assert name in views
+        actual = read_owned_geometry_member(root, name)
+        current, native = views[name]
+        return native if actual == current else actual
+
+    with monkeypatch.context() as positive:
+        positive.setattr(stage, "_read", native_comparator_read)
+        assert stage.prior_operation_map_bytes(successor_copy) == expected_prior
+    file = successor_copy / policy.MAP
+    raw = file.read_bytes()
+    addition_path = successor_copy / stage.NAMESPACE / "added-operations.json"
+    before = addition_path.read_bytes()
+    value = json.loads(raw)
+    old = stage.accepted_operation_map(ROOT)
+    new_key = next(k for k in value["operations"] if k not in old["operations"])
+    if mutation == "drop_old":
+        value["operations"].pop(next(iter(old["operations"])))
+    elif mutation == "relax_sensitive":
+        value["operations"]["cumulative-exact-001"]["sensitive"] = False
+    elif mutation == "relax_budget":
+        value["families"]["reconstruction"]["samples_per_case"] = 1
+    elif mutation == "drop_new":
+        value["operations"].pop(new_key)
+    else:
+        value["operations"][new_key]["paths"] = ["src/*"]
+    try:
+        file.write_text(json.dumps(value))
+        if mutation == "repin_additions":
+            additions = json.loads(before)
+            additions[new_key] = value["operations"][new_key]
+            addition_path.write_text(json.dumps(additions))
+        with pytest.raises(ValueError, match="CI64 Preflight source changed"):
+            ci60.fresh_admission(successor_copy)
+        with monkeypatch.context() as historical:
+            historical.setattr(stage, "_read", native_comparator_read)
+            with pytest.raises(ValueError, match="Qualification"):
+                stage.prior_operation_map_bytes(successor_copy)
+    finally:
+        file.write_bytes(raw)
+        addition_path.write_bytes(before)
+
+
+def test_qualification_producing_inputs_allows_only_anchor_literal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools import performance_ci60_qualification as ci60
+
+    actual = policy.runtime_inputs(ROOT)
+    historical = ci60.historical_inputs(ROOT)
+    assert policy.canonical_digest(historical) == stage.PRODUCING_INPUT_DIGEST
+    historical = ci60.historical_inputs(ROOT, original_controls=True)
+
+    def historical_collector(root: Path) -> dict[str, str]:
+        assert root == ROOT
+        return dict(historical)
+
+    def historical_projection(root: Path, inputs: dict[str, str]) -> dict[str, str]:
+        assert root == ROOT
+        return dict(inputs)
+
+    with monkeypatch.context() as historical_context:
+        historical_context.setattr(policy, "runtime_inputs", historical_collector)
+        historical_context.setattr(preflight, "measurement_inputs", historical_projection)
+        current = policy.runtime_inputs(ROOT)
+        producing = stage.producing_inputs(ROOT, current)
+        from tools.performance_preflight_successor import measurement_inputs
+
+        current = measurement_inputs(ROOT, current)
+        assert {k for k in current if current[k] != producing[k]} == {
+            stage.SELF,
+            policy.MAP,
+            "tests/code_quality/test_qualification40_successor.py",
+        }
+        assert current.keys() == producing.keys()
+        wrong = policy.runtime_inputs(ROOT)
+        wrong.pop(stage.SELF)
+        with pytest.raises(ValueError, match="collector omitted"):
+            stage.producing_inputs(ROOT, wrong)
+
+    with pytest.raises(ValueError, match="cannot change workload inputs"):
+        stage.producing_inputs(ROOT, actual)
+    producing = ci60.producing_inputs(ROOT, actual)
+    assert producing.keys() == actual.keys()
+    assert all(producing[name] == pin for name, pin in actual.items() if name != ci60.SELF)
+    wrong = dict(actual)
+    wrong["src/warhammer40k_core/engine/retained_demise_removal.py"] = "f" * 64
+    with pytest.raises(ValueError, match="actual current collector"):
+        ci60.producing_inputs(ROOT, wrong)
+
+    proof = ci60.admitted(ROOT)
+    producing_path = ci60.NAMESPACE + "/producing-inputs.json"
+    forged = json.loads(proof[producing_path])
+    forged[ci60.SELF] = "f" * 64
+    proof[producing_path] = json.dumps(forged).encode()
+
+    def forged_producing_control(root: Path) -> dict[str, bytes]:
+        assert root == ROOT
+        return proof
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "admitted", forged_producing_control)
+        with pytest.raises(ValueError, match="exact unactivated frozen source"):
+            ci60.producing_inputs(ROOT, actual)
+
+    ledger_name = "src/warhammer40k_core/engine/retained_demise_removal.py"
+    proof = ci60.admitted(ROOT)
+    owners = policy.owner_hashes(ledger_name, proof[ledger_name])
+    ledger = ci60.historical_ledger_owners(ROOT, ledger_name, owners)
+    assert ledger["@module"] == "482b60427ede07c2ef519a7633aa53e463c05dc353290f26e34cfe62594ced83"
+    assert {k: v for k, v in ledger.items() if k != "@module"} == {
+        k: v for k, v in owners.items() if k != "@module"
+    }
+    with pytest.raises(ValueError, match="current retained-demise owner source"):
+        ci60.historical_ledger_owners(ROOT, ledger_name, owners | {"@module": "f" * 64})
+    import_line = (
+        b"    from warhammer40k_core.engine.retained_destruction_state "
+        b"import RetainedModelDestruction\n"
+    )
+    for replacement, message in (
+        (import_line * 2, "current retained-demise owner source"),
+        (import_line.rstrip(b"\n") + b"  # altered\n", "sole reviewed type-only import"),
+    ):
+        changed_proof = proof | {
+            ledger_name: proof[ledger_name]
+            .replace(b"\r\n", b"\n")
+            .replace(import_line, replacement, 1)
+        }
+
+        def changed_ledger_source(
+            root: Path, value: dict[str, bytes] = changed_proof
+        ) -> dict[str, bytes]:
+            assert root == ROOT
+            return value
+
+        with monkeypatch.context() as changed:
+            changed.setattr(ci60, "admitted", changed_ledger_source)
+            with pytest.raises(ValueError, match=message):
+                ci60.historical_ledger_owners(ROOT, ledger_name, owners)
+    native_history = ci60.history
+
+    def wrong_native_owner(root: Path, *args: str) -> bytes:
+        if args == ("show", ci60.BASE + ":" + ledger_name):
+            return proof[ledger_name]
+        return native_history(root, *args)
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "history", wrong_native_owner)
+        with pytest.raises(ValueError, match="original retained-demise ledger owner"):
+            ci60.historical_ledger_owners(ROOT, ledger_name, owners)
+    assert ci60.historical_ledger_owners(ROOT, ledger_name, owners) == ledger
+
+    test_proof = ci60.admitted(ROOT)
+    for name, pin in ci60.HISTORICAL_TEST_PINS.items():
+        current_test = test_proof[name]
+        assert policy.digest(ci60.historical_test_preimage(ROOT, name, current_test)) == pin
+        with pytest.raises(ValueError, match="unrelated current bytes"):
+            ci60.historical_test_preimage(ROOT, name, current_test + b"\n")
+    test_name = "tests/integration/test_fight_on_death_presence.py"
+    original_test = ci60.historical_test_preimage(ROOT, test_name, test_proof[test_name])
+
+    def wrong_test_native(root: Path, *args: str) -> bytes:
+        if args == ("show", ci60.BASE + ":" + test_name):
+            return original_test + b"\n"
+        return native_history(root, *args)
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "history", wrong_test_native)
+        with pytest.raises(ValueError, match="native preimage changed"):
+            ci60.historical_test_preimage(ROOT, test_name, test_proof[test_name])
+    tree = ast.parse(original_test)
+    assertion = next(node for node in ast.walk(tree) if isinstance(node, ast.Assert))
+    assertion.test = ast.Constant(value=False)
+    dropped = ast.unparse(tree).encode()
+    changed_test_proof = test_proof | {test_name: dropped}
+
+    def dropped_test_source(root: Path) -> dict[str, bytes]:
+        assert root == ROOT
+        return changed_test_proof
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "admitted", dropped_test_source)
+        with pytest.raises(ValueError, match="lost an original assertion"):
+            ci60.historical_test_preimage(ROOT, test_name, dropped)
+    assert ci60.historical_test_preimage(ROOT, test_name, test_proof[test_name]) == original_test
+
+    inventory_name = ci60.CURRENT_INVENTORY
+    inventory_raw = test_proof[inventory_name]
+    original_inventory = ci60.preceding_control(ROOT, inventory_name, inventory_raw)
+    assert policy.digest(original_inventory) == ci60.CURRENT_INVENTORY_BEFORE
+    with pytest.raises(ValueError, match="caller supplied unrelated bytes"):
+        ci60.preceding_control(ROOT, inventory_name, inventory_raw + b"\n")
+    wrong_inventory = json.loads(inventory_raw)
+    wrong_inventory["acceptance"] += " unreviewed"
+    wrong_inventory_raw = json.dumps(wrong_inventory).encode()
+
+    def forged_inventory_source(root: Path) -> dict[str, bytes]:
+        assert root == ROOT
+        return test_proof | {inventory_name: wrong_inventory_raw}
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "admitted", forged_inventory_source)
+        with pytest.raises(ValueError, match="outside fourteen source fields"):
+            ci60.preceding_control(ROOT, inventory_name, wrong_inventory_raw)
+
+    def wrong_inventory_native(root: Path, *args: str) -> bytes:
+        if args == ("show", ci60.BASE + ":" + inventory_name):
+            return inventory_raw
+        return native_history(root, *args)
+
+    with monkeypatch.context() as changed:
+        changed.setattr(ci60, "history", wrong_inventory_native)
+        with pytest.raises(ValueError, match="native preimage changed"):
+            ci60.preceding_control(ROOT, inventory_name, inventory_raw)
+    assert ci60.preceding_control(ROOT, inventory_name, inventory_raw) == original_inventory
+
+
+@pytest.mark.parametrize("mutation", ["owner", "path", "profile", "prior_operation"])
+def test_qualification_map_identifier_requalification_rejects_semantic_drift(
+    mutation: str,
+) -> None:
+    before = subprocess.check_output(
+        ["git", "show", stage.PRODUCING_COMMIT + ":" + policy.MAP], cwd=ROOT
+    )
+    current = preflight.preceding_control(ROOT, policy.MAP, (ROOT / policy.MAP).read_bytes())
+    stage.assert_symbolic_operation_map(before, current)
+    value: dict[str, Any] = json.loads(current)
+    key = next(k for k in value["operations"] if len(k) == len("qualification40-exact-") + 64)
+    if mutation == "owner":
+        value["operations"][key]["owners"].append("unreviewed_owner")
+    elif mutation == "path":
+        value["operations"][key]["paths"] = ["unreviewed/path.py"]
+    elif mutation == "profile":
+        value["families"]["reconstruction"]["samples_per_case"] = 1
+    else:
+        value["operations"].pop(next(iter(stage.accepted_operation_map(ROOT)["operations"])))
+    raw = json.dumps(value).encode()
+    with pytest.raises(ValueError, match="symbolic"):
+        stage.assert_symbolic_operation_map(before, raw)
+
+
+def test_qualification_map_current_collector_rejects_forged_hash(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    raw = (ROOT / policy.MAP).read_bytes() + b"\n"
+    member, read = _QualificationMechanisms.member(_stage), _QualificationMechanisms.read(_stage)
+
+    def repinned_member(root: Path, name: str, freeze: str) -> bytes:
+        return raw if name == policy.MAP else member(root, name, freeze)
+
+    def repinned_read(root: Path, name: str) -> bytes:
+        return raw if name == policy.MAP else read(root, name)
+
+    monkeypatch.setattr(stage, "_member", repinned_member)
+    monkeypatch.setattr(stage, "_read", repinned_read)
+    current = policy.runtime_inputs(ROOT) | {policy.MAP: policy.digest(raw)}
+    with pytest.raises(ValueError, match="actual input collector omitted current control bytes"):
+        stage.producing_inputs(ROOT, current)
+
+
+def test_root_environment_copy_filter_preserves_owned_and_nested_sources(tmp_path: Path) -> None:
+    source, copied = tmp_path / "source", tmp_path / "copied"
+    environment = source / ".venv" / "environment.py"
+    nested = source / "data" / ".venv" / "owned.py"
+    ordinary = source / "src" / "owned.py"
+    for path, raw in (
+        (environment, b"ENV = 1\n"),
+        (nested, b"NESTED = 1\n"),
+        (ordinary, b"OWNED = 1\n"),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+    subprocess.run(["git", "init", "-q"], cwd=source, check=True)
+    subprocess.run(
+        ["git", "add", "-f", "data/.venv/owned.py", "src/owned.py"], cwd=source, check=True
+    )
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=quality-control",
+            "-c",
+            "user.email=quality-control@example.invalid",
+            "commit",
+            "-qm",
+            "owned nested fixture",
+        ],
+        cwd=source,
+        check=True,
+    )
+    with pytest.MonkeyPatch.context() as private:
+        private.setitem(globals(), "ROOT", source)
+        shutil.copytree(source, copied, ignore=_copy_ignore)
+        assert not (copied / ".venv").exists()
+        assert (copied / "data/.venv/owned.py").read_bytes() == nested.read_bytes()
+        assert (copied / "src/owned.py").read_bytes() == ordinary.read_bytes()
+        subprocess.run(["git", "add", "-f", ".venv/environment.py"], cwd=source, check=True)
+        with pytest.raises(ValueError, match="Tracked root environment"):
+            _copy_ignore(str(source), [".venv"])
+        subprocess.run(
+            [
+                "git",
+                "-c",
+                "user.name=quality-control",
+                "-c",
+                "user.email=quality-control@example.invalid",
+                "commit",
+                "-qm",
+                "owned root fixture",
+            ],
+            cwd=source,
+            check=True,
+        )
+        subprocess.run(["git", "rm", "--cached", "-qr", ".venv"], cwd=source, check=True)
+        with pytest.raises(ValueError, match="Tracked root environment"):
+            _copy_ignore(str(source), [".venv"])
+        with pytest.MonkeyPatch.context() as redirected:
+            redirected.setenv("GIT_INDEX_FILE", str(tmp_path / "unrelated-index"))
+            with pytest.raises(ValueError, match="redirected Git roles"):
+                _copy_ignore(str(source), [".venv"])
+    alias_root = tmp_path / "alias-source"
+    alias_root.mkdir()
+    (alias_root / ".venv").symlink_to(environment.parent, target_is_directory=True)
+    subprocess.run(["git", "init", "-q"], cwd=alias_root, check=True)
+    subprocess.run(["git", "add", "-f", ".venv"], cwd=alias_root, check=True)
+    assert subprocess.check_output(
+        ["git", "ls-files", "--stage", "--", ".venv"], cwd=alias_root
+    ).startswith(b"120000")
+    with pytest.MonkeyPatch.context() as private:
+        private.setitem(globals(), "ROOT", alias_root)
+        with pytest.raises(ValueError, match="must not be an alias"):
+            _copy_ignore(str(alias_root), [".venv"])

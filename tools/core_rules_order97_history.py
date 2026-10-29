@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 from pathlib import Path
@@ -114,6 +115,203 @@ ORDER135_D07_MAPPING = "data/source_audits/order135/d07-historical-inputs.json"
 ORDER135_D07_MAPPING_SHA256 = "347097fb7a159d7e640014e00e309621c56b013a74028df2cdf02b2068469c7e"
 
 
+INTEGRATION_INVENTORY_PREIMAGES: dict[str, tuple[str, str, str]] = {
+    "tests/unit/test_order60_emergency_disembark.py": (
+        "data/source_audits/integration_2026_10_19/order97/tests/unit/test_order60_emergency_disembark.py.before.py.txt",
+        "c69fe087121a994906469306df957c6846b193e590a2aed51faafb12d13b7548",
+        "9fbf5fdc576a4fed4bbe5d36de1309b4ecae9fb30498cff1cd81a5b7cc968449",
+    ),
+    "tests/unit/test_phase11b_objective_control.py": (
+        "data/source_audits/integration_2026_10_19/order97/tests/unit/test_phase11b_objective_control.py.before.py.txt",
+        "021ae6324df6db332fe417a141ce21c90836d2c618ed72b4a738a8c2d3c1b568",
+        "cef54e6222976e0336827a41dbf9b91b75a6e33ebbcb5902aa92741099c53c28",
+    ),
+}
+
+
+REVIEWED_INVENTORY_FIXTURES: dict[str, tuple[str, str, str, str]] = {
+    "tests/conftest.py": (
+        "data/source_audits/integration_2026_10_19/order97-fixtures/tests/conftest.py.before.py.txt",
+        "db7fe5a9246d0aa44cc115b59840781806bdd5228b115bbd9dce8309d28292b7",
+        "data/source_audits/integration_2026_10_19/order97-fixtures/tests/conftest.py.reviewed.py.txt",
+        "3785219e822d61ca902a568cb792f0a227685bc27c2d6509cec89ef4cf64180b",
+    ),
+    "tests/indirect_shooting_helpers.py": (
+        "data/source_audits/integration_2026_10_19/order97-fixtures/tests/indirect_shooting_helpers.py.before.py.txt",
+        "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9",
+        "data/source_audits/integration_2026_10_19/order97-fixtures/tests/indirect_shooting_helpers.py.reviewed.py.txt",
+        "dbca147e17f121e989e9e558326aec85e7e550a3822a80efe8919dcf1c6bbf1b",
+    ),
+    "tests/psychic_modifier_helpers.py": (
+        "data/source_audits/integration_2026_10_19/order97-fixtures/tests/psychic_modifier_helpers.py.before.py.txt",
+        "250e1f8a846662a937b7c0b7e3862788e6591e88a2e2b520332cc1526ec7da54",
+        "data/source_audits/integration_2026_10_19/order97-fixtures/tests/psychic_modifier_helpers.py.reviewed.py.txt",
+        "d387946cc6731484807c410f8e452dd4cb23e1f24ffaa98b89a95ecd4e4a3f93",
+    ),
+    "tests/support/ability_presence_fixtures.py": (
+        "data/source_audits/integration_2026_10_19/order97-fixtures/tests/support/ability_presence_fixtures.py.before.py.txt",
+        "d7d01d57258bab1c80c4c8c9d8030534c6a9cf2b440ccb25c9756b9690adf902",
+        "data/source_audits/integration_2026_10_19/order97-fixtures/tests/support/ability_presence_fixtures.py.reviewed.py.txt",
+        "7cabadf4c1e596682b4809628e42e7b7f40a714a3e79f4cb70da83f168971f4f",
+    ),
+    "tests/unit/test_phase12a_timing_reactions_effects.py": (
+        "data/source_audits/integration_2026_10_19/order97-fixtures/tests/unit/test_phase12a_timing_reactions_effects.py.before.py.txt",
+        "06cd0c34b4495f6a17077aa58c7440bb0e35d5319386f802b0a54d294a66184d",
+        "data/source_audits/integration_2026_10_19/order97-fixtures/tests/unit/test_phase12a_timing_reactions_effects.py.reviewed.py.txt",
+        "8a0291e4732431622461e0dbfba79d3d748a0e57a9d9db3d7109e634aeccfc1a",
+    ),
+}
+
+
+def assert_reviewed_inventory_fixture_ast(accepted: bytes, current: bytes) -> None:
+    if ast.dump(ast.parse(accepted)) != ast.dump(ast.parse(current)):
+        raise ValueError("Reviewed inventory fixture AST drifted.")
+
+
+def reviewed_inventory_fixture_history(reference: str, *, root: Path) -> Path | None:
+    if reference not in REVIEWED_INVENTORY_FIXTURES:
+        return None
+    archive, old_hash, accepted_archive, accepted_hash = REVIEWED_INVENTORY_FIXTURES[reference]
+    path = root / archive
+    reviewed = root / accepted_archive
+    if not path.resolve().is_relative_to(root.resolve()) or not reviewed.resolve().is_relative_to(
+        root.resolve()
+    ):
+        raise ValueError("Reviewed inventory fixture history escaped the repository.")
+    before = path.read_bytes()
+    accepted = reviewed.read_bytes()
+    from tools.performance_ci69_members import retired_test_source
+
+    retired = retired_test_source(root, reference)
+    current = retired[1] if retired is not None else (root / reference).read_bytes()
+    if (
+        hashlib.sha256(before).hexdigest() != old_hash
+        or hashlib.sha256(accepted).hexdigest() != accepted_hash
+        or hashlib.sha256(current).hexdigest() != accepted_hash
+    ):
+        raise ValueError("Exact reviewed inventory fixture bytes drifted.")
+    assert_reviewed_inventory_fixture_ast(accepted, current)
+    return path
+
+
+def integration_inventory_history(reference: str, *, root: Path) -> Path | None:
+    if reference not in INTEGRATION_INVENTORY_PREIMAGES:
+        return reviewed_inventory_fixture_history(reference, root=root)
+    archive, before_sha256, current_sha256 = INTEGRATION_INVENTORY_PREIMAGES[reference]
+    path = root / archive
+    if not path.resolve().is_relative_to(root.resolve()):
+        raise ValueError("Integration inventory history escaped the repository.")
+    before = path.read_bytes()
+    from tools.performance_ci69_members import retired_test_source
+
+    retired = retired_test_source(root, reference)
+    current = retired[1] if retired is not None else (root / reference).read_bytes()
+    if (
+        hashlib.sha256(before).hexdigest() != before_sha256
+        or hashlib.sha256(current).hexdigest() != current_sha256
+    ):
+        raise ValueError("Exact integration inventory input bytes drifted.")
+    assert_integration_inventory_ast(reference, before, current)
+    return path
+
+
+def assert_integration_inventory_ast(reference: str, before: bytes, current: bytes) -> None:
+    """Authenticate current source changes before exposing reviewed history."""
+    expected, actual = ast.parse(before), ast.parse(current)
+
+    def function(name: str) -> ast.FunctionDef:
+        values = [n for n in expected.body if isinstance(n, ast.FunctionDef) and n.name == name]
+        if len(values) != 1:
+            raise ValueError("Integration inventory function membership drifted.")
+        return values[0]
+
+    if reference == "tests/unit/test_order60_emergency_disembark.py":
+        owner = function("test_emergency_disembark_places_every_survivor_on_the_closest_ring")
+        values = [
+            n for n in ast.walk(owner) if isinstance(n, ast.Constant) and n.value == "end_of_turn"
+        ]
+        if len(values) != 1:
+            raise ValueError("Original Emergency Battle-shock expectation drifted.")
+        values[0].value = "until_cleared"
+    elif reference == "tests/unit/test_phase11b_objective_control.py":
+        owner = function("test_objective_control_records_update_at_phase_and_turn_end")
+        calls = [
+            n
+            for n in ast.walk(owner)
+            if isinstance(n, ast.Call)
+            and isinstance(n.func, ast.Name)
+            and n.func.id == "_battle_state_with_center_objective_positions"
+        ]
+        if len(calls) != 1 or len(calls[0].keywords) != 1:
+            raise ValueError("Objective physical fixture preimage drifted.")
+        keyword = calls[0].keywords[0]
+        if keyword.arg != "player_a_offsets" or ast.dump(keyword.value) != ast.dump(
+            ast.parse("((2.0, 0.0),)", mode="eval").body
+        ):
+            raise ValueError("Objective physical fixture position drifted.")
+        keyword.value = ast.parse(
+            "((2.0, 0.0), (3.4, 0.0), (4.8, 0.0), (2.0, 1.4), (3.4, 1.4))",
+            mode="eval",
+        ).body
+        owner = function("test_p14_objective_query_uses_closest_vertical_part")
+        arguments = [n for n in owner.args.args if n.arg == "expected"]
+        if len(arguments) != 1:
+            raise ValueError("Objective marker parameter preimage drifted.")
+        arguments[0].arg = "marker_expected"
+        values = [
+            n
+            for d in owner.decorator_list
+            for n in ast.walk(d)
+            if isinstance(n, ast.Constant) and n.value == "expected"
+        ]
+        if len(values) != 1:
+            raise ValueError("Objective marker decorator preimage drifted.")
+        values[0].value = "marker_expected"
+        loops = [n for n in owner.body if isinstance(n, ast.For)]
+        if len(loops) != 1 or not isinstance(loops[0].iter, ast.Tuple):
+            raise ValueError("Objective kind fixture preimage drifted.")
+        loop = loops[0]
+        sequence = loop.iter
+        if not isinstance(sequence, ast.Tuple):
+            raise ValueError("Objective kind tuple drifted.")
+        if len(sequence.elts) != 2 or not isinstance(loop.target, ast.Name):
+            raise ValueError("Objective kind membership drifted.")
+        marker, terrain = sequence.elts
+        loop.target = ast.Tuple(
+            elts=[
+                ast.Name(id="objective", ctx=ast.Store()),
+                ast.Name(id="expected", ctx=ast.Store()),
+            ],
+            ctx=ast.Store(),
+        )
+        loop.iter = ast.Tuple(
+            elts=[
+                ast.Tuple(
+                    elts=[marker, ast.Name(id="marker_expected", ctx=ast.Load())], ctx=ast.Load()
+                ),
+                ast.Tuple(elts=[terrain, ast.Constant(value=True)], ctx=ast.Load()),
+            ],
+            ctx=ast.Load(),
+        )
+        owner = function(
+            "test_p14_objective_query_rejects_missing_shape_and_drifted_marker_identity"
+        )
+        calls = [
+            n
+            for n in ast.walk(owner)
+            if isinstance(n, ast.Call)
+            and isinstance(n.func, ast.Name)
+            and n.func.id == "ObjectiveModelDistance"
+        ]
+        if len(calls) != 1 or any(k.arg == "closest_distance_inches" for k in calls[0].keywords):
+            raise ValueError("Objective invalid-distance fixture preimage drifted.")
+        calls[0].keywords.append(ast.keyword(arg="closest_distance_inches", value=ast.Constant(0)))
+    else:
+        raise ValueError("Unknown integration inventory predecessor.")
+    if ast.dump(expected) != ast.dump(actual):
+        raise ValueError("Integration inventory whole-module AST drifted.")
+
+
 def historical_evidence_path(reference: str, *, root: Path) -> Path | None:
     """Resolve only the reviewed mapping; missing or corrupt history never falls back."""
     for mapping_name, expected_sha256 in (
@@ -161,4 +359,4 @@ def historical_evidence_path(reference: str, *, root: Path) -> Path | None:
             ):
                 raise ValueError("Order 97 immutable historical input drifted.")
             return path
-    return None
+    return integration_inventory_history(reference, root=root)

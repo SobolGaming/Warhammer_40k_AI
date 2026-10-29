@@ -1,0 +1,171 @@
+{
+  "schema": "section08-native-mission-source-v1",
+  "scope": "reviewed-component-fixture-observation; existing RuleIR semantics only; no full-catalog or runtime source-package admission",
+  "provider_name": "40k.app",
+  "provider_owned_by_games_workshop": false,
+  "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+  "edition": "warhammer_40000_11th",
+  "locale": "en",
+  "app_version": "995",
+  "observed_at": "2026-10-22T03:07:23+00:00",
+  "url": "https://www.40k.app/factions/emperors-children/units/tormentors",
+  "owning_faction_id": "emperors-children",
+  "datasheet_id": "000004079",
+  "ability_id": "000004079:objective-defiled",
+  "captured_text": "40K.APP\nFACTIONS\nEMPEROR’S CHILDREN\nTormentors\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nObsessionist 32mm\n7\"\n5\n3+\n2\n6+\n2\nTormentor 32mm\n7\"\n5\n3+\n2\n6+\n2\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nBolt pistol\nPISTOL\nPRECISION\n12\"\n1\n3+\n5\n-1\n1\n➤ Plasma pistol (standard)\nPISTOL\nPRECISION\n12\"\n1\n3+\n7\n-2\n1\n➤ Plasma pistol (supercharge)\nHAZARDOUS\nPISTOL\nPRECISION\n12\"\n1\n3+\n8\n-3\n2\nBoltgun\nPRECISION\n24\"\n2\n3+\n5\n-1\n1\nMeltagun\nMELTA 2\nPRECISION\n12\"\n1\n3+\n9\n-4\nD6\n➤ Plasma gun (standard)\nPRECISION\nRAPID FIRE 1\n24\"\n1\n3+\n7\n-2\n1\n➤ Plasma gun (supercharge)\nHAZARDOUS\nPRECISION\nRAPID FIRE 1\n24\"\n1\n3+\n8\n-3\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nPower sword\n4\n3+\n5\n-2\n1\nRapture lash\n6\n3+\n4\n-1\n1\nClose Combat Weapon\n3\n3+\n5\n0\n1\nKEYWORDS\nBATTLELINE\nCHAOS\nGRENADES\nINFANTRY\nSLAANESH\nTORMENTORS\nCOSTS\n5 models\n85 pts\n10 models\n170 pts\nUNIT COMPOSITION\n1 Obsessionist\n4‑9 Tormentors\n\nThe Obsessionist is equipped with: bolt pistol; power sword. Every Tormentor is equipped with: boltgun; close combat weapon.\n\nLed by\nLORD EXULTANT\nSORCERER\nWARGEAR OPTIONS\nThe Obsessionist’s bolt pistol can be replaced with 1 plasma pistol.\nThe Obsessionist’s power sword can be replaced with 1 rapture lash.\nFor every 5 models in this unit, 1 Tormentor’s boltgun can be replaced with 1 meltagun.\nFor every 5 models in this unit, 1 Tormentor’s boltgun can be replaced with 1 plasma gun.\n1 Tormentor can be equipped with 1 icon of excess.\nWARGEAR\nIcon of Excess\n\nAt the end of your Shooting phase or the Fight phase, if the bearer’s unit destroyed one or more enemy units that phase, the bearer’s unit takes a Leadership test. If that test is passed, you gain 1CP.\n\nCORE ABILITIES\nINFILTRATORS\nFACTION ABILITIES\nTHRILL SEEKERS\nUNIT ABILITIES\nObjective Defiled\n\nAt the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent’s Level of Control over that objective marker is greater than yours at the end of a phase.",
+  "captured_text_sha256": "e8a5202891411bb26c63fbdf99e517986f390dc0ab42f8950b8dd8342dec1c54",
+  "operative_start_heading": "Tormentors",
+  "operative_text": "Tormentors\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nObsessionist 32mm\n7\"\n5\n3+\n2\n6+\n2\nTormentor 32mm\n7\"\n5\n3+\n2\n6+\n2\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nBolt pistol\nPISTOL\nPRECISION\n12\"\n1\n3+\n5\n-1\n1\n➤ Plasma pistol (standard)\nPISTOL\nPRECISION\n12\"\n1\n3+\n7\n-2\n1\n➤ Plasma pistol (supercharge)\nHAZARDOUS\nPISTOL\nPRECISION\n12\"\n1\n3+\n8\n-3\n2\nBoltgun\nPRECISION\n24\"\n2\n3+\n5\n-1\n1\nMeltagun\nMELTA 2\nPRECISION\n12\"\n1\n3+\n9\n-4\nD6\n➤ Plasma gun (standard)\nPRECISION\nRAPID FIRE 1\n24\"\n1\n3+\n7\n-2\n1\n➤ Plasma gun (supercharge)\nHAZARDOUS\nPRECISION\nRAPID FIRE 1\n24\"\n1\n3+\n8\n-3\n2\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nPower sword\n4\n3+\n5\n-2\n1\nRapture lash\n6\n3+\n4\n-1\n1\nClose Combat Weapon\n3\n3+\n5\n0\n1\nKEYWORDS\nBATTLELINE\nCHAOS\nGRENADES\nINFANTRY\nSLAANESH\nTORMENTORS\nCOSTS\n5 models\n85 pts\n10 models\n170 pts\nUNIT COMPOSITION\n1 Obsessionist\n4‑9 Tormentors\n\nThe Obsessionist is equipped with: bolt pistol; power sword. Every Tormentor is equipped with: boltgun; close combat weapon.\n\nLed by\nLORD EXULTANT\nSORCERER\nWARGEAR OPTIONS\nThe Obsessionist’s bolt pistol can be replaced with 1 plasma pistol.\nThe Obsessionist’s power sword can be replaced with 1 rapture lash.\nFor every 5 models in this unit, 1 Tormentor’s boltgun can be replaced with 1 meltagun.\nFor every 5 models in this unit, 1 Tormentor’s boltgun can be replaced with 1 plasma gun.\n1 Tormentor can be equipped with 1 icon of excess.\nWARGEAR\nIcon of Excess\n\nAt the end of your Shooting phase or the Fight phase, if the bearer’s unit destroyed one or more enemy units that phase, the bearer’s unit takes a Leadership test. If that test is passed, you gain 1CP.\n\nCORE ABILITIES\nINFILTRATORS\nFACTION ABILITIES\nTHRILL SEEKERS\nUNIT ABILITIES\nObjective Defiled\n\nAt the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent’s Level of Control over that objective marker is greater than yours at the end of a phase.",
+  "ability_heading": "Objective Defiled",
+  "ability_text": "At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent’s Level of Control over that objective marker is greater than yours at the end of a phase.",
+  "ability_text_sha256": "0f0cca0ae3c12e1647d3a224991a7c20607f000737e0901c0653bf0c91a2f8af",
+  "version_evidence": {
+    "url": "https://www.40k.app/factions/updates",
+    "statement": "VERSION 995\nReleased 2026-10-16.\n1 faction changed.",
+    "meaning": "current App-data snapshot; not last changed version"
+  },
+  "identity_crosswalk": {
+    "page_source_id": "faction-app:emperors-children:datasheet:tormentors",
+    "runtime_rule_id": "phase17n:emperors-children:battleline:datasheet:000004079:3",
+    "runtime_source_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08:datasheet:000004079:3",
+    "rule_ir_hash": "0cf6502fe3a7e3b845b0090879ff32232c9000e0bf9b158e23b9f28c745e3f15",
+    "normalized_text_sha256": "39388fff1412b450acbc8496290358669a2198a41ca9cf399f48a9a1a0b39def",
+    "admitted_package_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08",
+    "admitted_package_hash": "076824923ec39f2ce539c6e2dbd1c763143797c688fb36abebfd4104d8f38059"
+  },
+  "historical_lineage": {
+    "bridge_ability": {
+      "ability_id": "000004079:objective-defiled",
+      "name": "Objective Defiled",
+      "source_id": "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets_abilities:000004079:3",
+      "support": "generic_rule_ir",
+      "source_kind": "datasheet",
+      "effect_description": "At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent's Level of Control over that objective marker is greater than yours at the end of a phase.",
+      "source_wargear_id": null,
+      "rule_ir_payload": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:emperors-children:battleline:datasheet:000004079:3:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "source_unit"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "source_unit_within_controlled_objective"
+                  }
+                ],
+                "source_span": {
+                  "end": 97,
+                  "start": 34,
+                  "text": "if this unit is within range of an objective marker you control"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "set_contextual_status",
+                "parameters": [
+                  {
+                    "key": "objective_scope",
+                    "value": "controlled_objective_within_source_unit_range"
+                  },
+                  {
+                    "key": "retention_end_condition",
+                    "value": "opponent_level_of_control_greater_than_source_player"
+                  },
+                  {
+                    "key": "status",
+                    "value": "sticky_objective_control"
+                  }
+                ],
+                "source_span": {
+                  "end": 147,
+                  "start": 99,
+                  "text": "that objective marker remains under your control"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 258,
+              "start": 0,
+              "text": "At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent's Level of Control over that objective marker is greater than yours at the end of a phase."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 46,
+                "start": 37,
+                "text": "this unit"
+              }
+            },
+            "template_id": "phase17n:command-end-sticky-objective-control",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "end"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "command"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                }
+              ],
+              "source_span": {
+                "end": 32,
+                "start": 0,
+                "text": "At the end of your Command phase"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "0cf6502fe3a7e3b845b0090879ff32232c9000e0bf9b158e23b9f28c745e3f15",
+        "normalized_text": "At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent's Level of Control over that objective marker is greater than yours at the end of a phase.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:emperors-children:battleline:datasheet:000004079:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08:datasheet:000004079:3"
+      },
+      "rule_ir_diagnostics": [],
+      "timing_tags": [],
+      "parameter_tokens": []
+    },
+    "bridge_ability_sha256": "ea77045ee0940a8d12e330080f69790c64839932109a190b19195426f3320cce",
+    "datasheet_source_ids": [
+      "data-package:core-v2:wahapedia-10e-bridge:phase17k-generated:Datasheets:000004079",
+      "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets:000004079",
+      "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000004079:Battleline:global:false:14721",
+      "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000004079:Chaos:global:false:14718",
+      "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000004079:Emperor's Children:global:true:14717",
+      "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000004079:Grenades:global:false:14723",
+      "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000004079:Infantry:global:false:14722",
+      "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000004079:Slaanesh:global:false:14719",
+      "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords:000004079:Tormentors:global:false:14720"
+    ],
+    "source_snapshot_path": "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_abilities.json",
+    "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01",
+    "official_pdf_filename": "eng_22-07_warhammer_40,000_faction_pack_emperor_s_children-srspmclqtm-i8ey7hgk2s.pdf",
+    "official_pdf_sha256": "1808fabb911f7a3e917ae5f2f12a6a7436ed97e1e5382238566dfd5e4540aa3c",
+    "official_pdf_relationship": "historical primary and weapon update; not current ability transcription"
+  },
+  "operative_text_sha256": "750eaac283e3df55cda8b12867c481cf94248b8b82bff9886dbf87dfc824990d",
+  "observation_sha256": "959259a6d4b3da3045356eb7543e9974ed0fafea95586e95805d753879213799"
+}

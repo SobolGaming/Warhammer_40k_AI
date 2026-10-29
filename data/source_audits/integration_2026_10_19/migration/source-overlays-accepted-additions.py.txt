@@ -1,0 +1,139 @@
+import os
+from dataclasses import replace
+from tests.support.selected_source_index_fixtures import POSITIVE_SLOTS, SMALL_DATASHEET_ID, RealSourceIndex, SmallSourceIndex, selected_units
+from tests.support.selected_source_index_fixtures import real_selected_source_index as real_selected_source_index
+from tests.support.selected_source_index_fixtures import small_selected_source_index as small_selected_source_index
+from tools.generate_ability_support_matrix import _ability_support_catalog_package
+from warhammer40k_core.engine.unit_factory import UnitFactoryError
+from warhammer40k_core.rules.selected_source_index import SourceIndexError, build_selected_source_index
+from warhammer40k_core.rules.wahapedia_bridge_rows import bridge_rows_by_table, selected_or_full_bridge_rows
+
+def test_selected_source_index_round_trip_and_duplicate_order(small_selected_source_index: SmallSourceIndex) -> None:
+    case = small_selected_source_index
+    expected = bridge_rows_by_table(case.artifacts(), error_type=ValueError)
+    assert dict(case.load().tables) == expected
+    assert case.load((SMALL_DATASHEET_ID, SMALL_DATASHEET_ID)) == case.load()
+    assert case.load((f' {SMALL_DATASHEET_ID} ',)) == case.load()
+    with pytest.raises(ValueError, match='does not match selected datasheets'):
+        selected_or_full_bridge_rows(case.load(), datasheet_ids=('another',), error_type=ValueError)
+
+@pytest.mark.parametrize('ids', [(), ('',), ('  ',), ('unknown',)])
+def test_selected_source_index_rejects_invalid_ids(small_selected_source_index: SmallSourceIndex, ids: tuple[str, ...]) -> None:
+    with pytest.raises(SourceIndexError):
+        small_selected_source_index.load(ids)
+
+@pytest.mark.parametrize('filename', ['manifest.json', 'rows.jsonl'])
+def test_selected_source_index_rejects_missing_files(small_selected_source_index: SmallSourceIndex, filename: str) -> None:
+    (small_selected_source_index.directory / filename).unlink()
+    with pytest.raises(FileNotFoundError):
+        small_selected_source_index.load()
+
+@pytest.mark.parametrize('filename', ['manifest.json', 'rows.jsonl'])
+def test_selected_source_index_rejects_corruption(small_selected_source_index: SmallSourceIndex, filename: str) -> None:
+    path = small_selected_source_index.directory / filename
+    if filename == 'rows.jsonl':
+        data = path.read_bytes()
+        path.write_bytes(b'!' + data[1:])
+    else:
+        payload = cast(dict[str, object], json.loads(path.read_bytes()))
+        payload['version'] = 'corrupt-without-updating-hash'
+        path.write_text(json.dumps(payload), encoding='utf8')
+    with pytest.raises(SourceIndexError, match='hash mismatch'):
+        small_selected_source_index.load()
+
+@pytest.mark.parametrize('field', ['version', 'python'])
+def test_selected_source_index_rejects_builder_version(small_selected_source_index: SmallSourceIndex, field: str) -> None:
+    path = small_selected_source_index.directory / 'manifest.json'
+    payload = cast(dict[str, object], json.loads(path.read_bytes()))
+    payload[field] = 'earlier-builder'
+    payload['index_hash'] = ''
+    payload['index_hash'] = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+    path.write_text(json.dumps(payload), encoding='utf8')
+    with pytest.raises(SourceIndexError, match='builder version changed'):
+        small_selected_source_index.load()
+
+def test_selected_source_index_explicit_regeneration_preserves_new_source(small_selected_source_index: SmallSourceIndex, tmp_path: Path) -> None:
+    case = small_selected_source_index
+    changed: list[WahapediaJsonArtifact] = []
+    for artifact in case.artifacts():
+        if artifact.source_table == 'Datasheets_models':
+            row = artifact.rows[0]
+            row = replace(row, fields=tuple(((key, '8' if key == 'M' else value) for key, value in row.fields)))
+            artifact = replace(artifact, rows=(row,))
+        changed.append(artifact)
+    before = case.source.stat()
+    case.source.write_text(json.dumps([artifact.to_payload() for artifact in changed]), encoding='utf8')
+    assert case.source.stat().st_size == before.st_size
+    os.utime(case.source, ns=(before.st_atime_ns, before.st_mtime_ns))
+    with pytest.raises(SourceIndexError, match='inputs changed'):
+        case.load()
+    with pytest.raises(FileExistsError):
+        case.build(case.directory)
+    regenerated = replace(case, directory=tmp_path / 'regenerated')
+    regenerated.build(regenerated.directory)
+    rows = dict(regenerated.load().tables)['Datasheets_models']
+    assert rows[0].runtime_fields_payload()['M'] == '8'
+    with pytest.raises(SourceIndexError, match='inputs changed'):
+        case.load()
+    case.source.unlink()
+    with pytest.raises(FileNotFoundError):
+        regenerated.load()
+
+def test_selected_source_index_does_not_publish_changed_build(small_selected_source_index: SmallSourceIndex, tmp_path: Path) -> None:
+    case = small_selected_source_index
+    directory = tmp_path / 'interrupted'
+
+    def changed_sources() -> tuple[WahapediaJsonArtifact, ...]:
+        artifacts = case.artifacts()
+        case.source.write_bytes(case.source.read_bytes() + b' ')
+        return artifacts
+    with pytest.raises(SourceIndexError, match='changed during index construction'):
+        build_selected_source_index(directory, input_files=(case.source,), load_sources=changed_sources)
+    assert not (directory / 'manifest.json').exists()
+
+def test_selected_source_index_retains_historical_children_without_admission(small_selected_source_index: SmallSourceIndex, tmp_path: Path) -> None:
+    case = small_selected_source_index
+    artifacts = tuple((replace(artifact, rows=()) if artifact.source_table == 'Datasheets' else artifact for artifact in case.artifacts()))
+    case.source.write_text(json.dumps([artifact.to_payload() for artifact in artifacts]), encoding='utf8')
+    historical = replace(case, directory=tmp_path / 'historical')
+    historical.build(historical.directory)
+    with pytest.raises(SourceIndexError, match='no active source record'):
+        historical.load()
+
+def test_selected_source_index_matches_two_armies_and_mixed_dependencies(real_selected_source_index: RealSourceIndex) -> None:
+    case = real_selected_source_index
+    indexed = case.load()
+    assert indexed.to_payload() == case.reference.to_payload()
+    assert indexed.package_hash() == case.reference.package_hash()
+    actual = selected_units(indexed)
+    expected = selected_units(case.reference)
+    assert len(actual) == 28
+    assert sum((len(unit.own_models) for unit in actual)) == 105
+    assert [unit.to_payload() for unit in actual] == [unit.to_payload() for unit in expected]
+    assert len({id(unit) for unit in actual}) == 28
+    assert len({id(model) for unit in actual for model in unit.own_models}) == 105
+    reverse = tuple(reversed(POSITIVE_SLOTS))
+    assert [unit.to_payload() for unit in selected_units(indexed, reverse)] == [unit.to_payload() for unit in selected_units(case.reference, reverse)]
+    for package in (case.reference, indexed):
+        with pytest.raises(UnitFactoryError, match='UnitMusterSelection is invalid') as rejected:
+            selected_units(package, ('000004081',))
+        assert str(rejected.value.__cause__) == 'Scaled wargear options in one group must share limit metadata.'
+    for directory in (None, case.directory):
+        with pytest.raises(ValueError, match='must not contain duplicates'):
+            _ability_support_catalog_package(datasheet_ids=('000004080', '000004080'), source_index_dir=directory)
+    with pytest.raises(SourceIndexError, match='absent from the source index'):
+        case.load(('unknown',))
+
+def test_selected_source_index_catalog_and_unit_mutations_do_not_poison_reload(real_selected_source_index: RealSourceIndex) -> None:
+    case = real_selected_source_index
+    first = case.load()
+    second = case.load()
+    first_units = selected_units(first)
+    second_units = selected_units(second)
+    expected = [unit.to_payload() for unit in second_units]
+    ability = next((item for item in first_units[0].datasheet_abilities if item.rule_ir_payload))
+    assert ability.rule_ir_payload is not None
+    ability.rule_ir_payload['index_isolation_probe'] = True
+    assert [unit.to_payload() for unit in second_units] == expected
+    assert second.to_payload() == case.reference.to_payload()
+    assert case.load().to_payload() == case.reference.to_payload()

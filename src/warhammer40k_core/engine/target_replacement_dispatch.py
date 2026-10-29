@@ -111,7 +111,7 @@ def decision_dispatch_handlers(host: GameLifecycle) -> tuple[DecisionDispatchHan
         if melee:
             replace_active_melee_sequence(state, updated)
         else:
-            replace_active_shooting_sequence(state, updated)
+            replace_active_shooting_sequence(state, updated, decisions=host.decision_controller)
         host.decision_controller.event_log.append(
             "target_replacement_resolved",
             {

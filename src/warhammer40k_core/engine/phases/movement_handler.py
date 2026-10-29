@@ -177,6 +177,22 @@ class MovementPhaseHandler:
         _ensure_transport_cargo_phase_states(state)
         active_selection = movement_state.active_selection
         if active_selection is not None:
+            from warhammer40k_core.engine.desperate_escape_mortal_wounds import (
+                pending_escape_movement,
+            )
+            from warhammer40k_core.engine.phases.movement_escape_mortals import (
+                resume_escape_movement,
+            )
+
+            if pending_escape_movement(state=state, decisions=decisions) is not None:
+                hazard_status = resume_escape_movement(
+                    state=state, decisions=decisions, handler=self, reaction_queue=reaction_queue
+                )
+                if hazard_status is not None:
+                    return hazard_status
+                return self.begin_phase(
+                    state=state, decisions=decisions, reaction_queue=reaction_queue
+                )
             if movement_state.pending_desperate_escape_battle_shock_continuation is not None:
                 continuation_status = _resume_desperate_escape_battle_shock_continuation(
                     state=state,

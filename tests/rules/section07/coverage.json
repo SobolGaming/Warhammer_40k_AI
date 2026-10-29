@@ -1,0 +1,1576 @@
+{
+  "schema": "section07-clause-corpus-v1",
+  "source_authority": "Game Datamissions maintained mirror, non-affiliated; existing accepted hostname; live-body actual timestamp, not asserted App-data963",
+  "observed_at": "2026-10-01T12:04:31.127429+00:00",
+  "source_qualification": "Retained timestamped maintained-mirror body; no independent Games Workshop publication or App export certification; no new provider observation.",
+  "sources": [
+    {
+      "source_id": "rule:07:07.00:1",
+      "locator": "07.00",
+      "title": "The Battle Round",
+      "source_sha256": "8ad976fa01d35ef824590e77ebb33494db837dea7463cba9457020346c70b742",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "1abfe44b40f699b0b2358995113aa4ef44d708bbcb847521ed4156bb5cf78739",
+          "value": "Games of Warhammer 40,000 are played in a series of battle rounds. This section describes the structure of the battle round, defining the order in which players take turns to move their units and make attacks with them."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "4ae40e27f478fdbb0de88bfe348aedaf08f57776a3a41102861610949d1aeb2a",
+          "value": "Each battle round is resolved by following these steps:"
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "aeb008b8136716899b4b034ac0b049a7d19c9ae61c8c760426d9b82f427ed029",
+          "value": "1. START OF BATTLE ROUND"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "8e338f6354abe1a50d2946d202591bed962e71c4568cf7c78dc946b525aacafd",
+          "value": "2. PLAYER TURNS"
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "8824aef0ccd0a13312fcea57da231c3ca03e0f20ed4c3577ff95fedde046190e",
+          "value": "3. END OF BATTLE ROUND"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "07.00-stage-3",
+          "summary": "Start-of-round rules precede player turns.",
+          "source_blocks": [
+            3
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py:apply_blessings_selection_result"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_round_effect.py::test_constructed_round_permission_resolves_real_effect_before_command_once"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_round_effect.py::test_constructed_round_permission_resolves_real_effect_before_command_once",
+              "function_ast_sha256": "3d0a04769802489730d5f5be9aa4238d9646c33a4a887f5771decaf5d76af0b7",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION",
+                "assert request is not None",
+                "assert request.actor_id == 'owner'",
+                "assert state.current_battle_phase is BattlePhase.COMMAND",
+                "assert not any((e.event_type == 'battle_phase_completed' for e in decisions.event_log.records))",
+                "assert not army_rule.active_blessings_for_player(state, player_id='owner')",
+                "assert army_rule.BlessingOfKhorne.UNBRIDLED_BLOODLUST in army_rule.active_blessings_for_player(state, player_id='owner')",
+                "assert state.persisting_effects",
+                "assert registry.next_request_for(BattleRoundStartRequestContext(state, decisions)) is None"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.00-stage-4",
+          "summary": "Player turns occur between round boundaries.",
+          "source_blocks": [
+            4
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_progression.py::test_first_turn_ends_before_opponent_and_never_ends_round"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_progression.py::test_first_turn_ends_before_opponent_and_never_ends_round",
+              "function_ast_sha256": "759049a194be28bd40aa72c103341fc85c811a6ace37c5a764389b58ec2f2c52",
+              "assertions": [
+                "assert state.battle_round == 5",
+                "assert state.active_player_id == state.turn_order[1]",
+                "assert state.current_battle_phase is BattlePhase.COMMAND",
+                "assert state.stage is GameLifecycleStage.BATTLE"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.00-stage-5",
+          "summary": "End-of-round rules follow both player turns.",
+          "source_blocks": [
+            5
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_progression.py::test_second_turn_starts_same_first_player_or_ends_at_mission_limit"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_progression.py::test_second_turn_starts_same_first_player_or_ends_at_mission_limit",
+              "function_ast_sha256": "e4574b91ded5fede71d97342e7be38bb81c6c9321e3730b9a92096a09bbb5a54",
+              "assertions": [
+                "assert state.turn_order[0] == first",
+                "assert state.stage is GameLifecycleStage.COMPLETE",
+                "assert state.battle_round == 5",
+                "assert state.active_player_id is None",
+                "assert state.current_battle_phase is None",
+                "assert state.stage is GameLifecycleStage.BATTLE",
+                "assert (state.battle_round, state.active_player_id) == (battle_round + 1, first)",
+                "assert state.current_battle_phase is BattlePhase.COMMAND"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1,
+            2
+          ],
+          "classification": "context",
+          "reason": "Introduction to the ordered battle-round sequence below."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:07:07.01:1",
+      "locator": "07.01",
+      "title": "Start Of Battle Round",
+      "source_sha256": "4d7677ac52782efcb7f9a8dbee9b599e2fb404e2ef50a187f4db11a9e3ad5a65",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "101f6fc159a84630fe117b3fa6915f46b935d02513efa64ed91b8e02a63afd2d",
+          "value": "At the start of the battle round, players resolve rules that are triggered at the start of the battle round, before progressing to player turns."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "07.01-start",
+          "summary": "Resolve start-of-battle-round rules before player turns.",
+          "source_blocks": [
+            1
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [
+            "The lower-level lifecycle consumer supplies the non-empty rule effect; the facade round-order assertion supplies the shared adapter progression."
+          ],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            },
+            {
+              "nodeid": "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py::test_lifecycle_requests_world_eaters_blessings_and_records_effect",
+              "role": "semantic",
+              "assertion": "assert army_rule.active_blessings_for_player(lifecycle.state, player_id='player-a') == (army_rule.BlessingOfKhorne.UNBRIDLED_BLOODLUST,)",
+              "proves": "A real loaded round-start Blessing is selected and becomes an active persisting effect."
+            },
+            {
+              "nodeid": "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py::test_lifecycle_requests_world_eaters_blessings_and_records_effect",
+              "role": "semantic",
+              "assertion": "assert army_rule.active_blessings_for_player(lifecycle.state, player_id='player-a') == (army_rule.BlessingOfKhorne.UNBRIDLED_BLOODLUST,)",
+              "proves": "A loaded source-owned battle-round-start choice records the selected Blessing as active."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py:apply_blessings_selection_result"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_round_effect.py::test_constructed_round_permission_resolves_real_effect_before_command_once",
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_round_effect.py::test_constructed_round_permission_resolves_real_effect_before_command_once",
+              "function_ast_sha256": "3d0a04769802489730d5f5be9aa4238d9646c33a4a887f5771decaf5d76af0b7",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION",
+                "assert request is not None",
+                "assert request.actor_id == 'owner'",
+                "assert state.current_battle_phase is BattlePhase.COMMAND",
+                "assert not any((e.event_type == 'battle_phase_completed' for e in decisions.event_log.records))",
+                "assert not army_rule.active_blessings_for_player(state, player_id='owner')",
+                "assert army_rule.BlessingOfKhorne.UNBRIDLED_BLOODLUST in army_rule.active_blessings_for_player(state, player_id='owner')",
+                "assert state.persisting_effects",
+                "assert registry.next_request_for(BattleRoundStartRequestContext(state, decisions)) is None"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:07:07.02:1",
+      "locator": "07.02",
+      "title": "Player Turns",
+      "source_sha256": "435a6f4774c0faf300c63cff50537d4b95b2bd91a46b337d88681b84a47d8373",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "8d6f2dbed419a90642969e90ba642727afd61ba4be5273131f81f0333aac78b4",
+          "value": "Both players now take one turn each. The same player always takes the first turn in each battle round – the mission you are playing will tell you which player this is. Once that player’s turn has ended, their opponent takes their turn."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "2b32aef811a0fd32d682dd7046e8b8c7e1f1d9addcf4e76092ca0a96e92b359f",
+          "value": "Each turn consists of seven parts: first the Start of Turn step, then a series of five phases resolved in the order shown below, then the End of Turn step."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "1f4f1335fdebfbcab8176eb725a852ba831044e1b47d01d2ed60d774606504c9",
+          "value": "\u00051. Start of Turn Step:\u0006 Rules that are triggered at the start of a turn are resolved now."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "a0feb126b5a69e40c1c4a09204ac901408e14d287c6dac8b35e0a5e7649f6269",
+          "value": "\u00052. Command Phase:\u0006 You marshal strategic resources and check your units’ morale."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "a383fb596de454a3714d01583e45e4fbc1f0523f1ff0aeb36cb5c5dcca64cb48",
+          "value": "\u00053. Movement Phase:\u0006 Your units move across the battlefield and strategic reserves arrive."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "9479dd7293914e477a9e738421e4ad24a56bb3c1f51cb2045b2a88234269830d",
+          "value": "\u00054. Shooting Phase:\u0006 Your units make attacks with their ranged weapons."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "db5be223ccb1a4374cf1b8ebdbeea594c92f095f44bcdcd0508f2d4447aaeb51",
+          "value": "\u00055. Charge Phase:\u0006 Your units make charge moves to engage the enemy."
+        },
+        {
+          "ordinal": 8,
+          "kind": "text",
+          "sha256": "890c708b160594e02c1cf794c19ddef39e6549b38e2ea3f8b96df4c75df9505e",
+          "value": "\u00056. Fight Phase:\u0006 Both player's units make attacks with their melee weapons."
+        },
+        {
+          "ordinal": 9,
+          "kind": "text",
+          "sha256": "0a61f951d4fc36c8c8cb06bd0b967c7272ad6265dd500e14a7c1b978e06f227c",
+          "value": "\u00057. End of Turn Step:\u0006 Rules that are triggered at the end of a turn are resolved now, in the following order:"
+        },
+        {
+          "ordinal": 10,
+          "kind": "text",
+          "sha256": "8192505a8a35b5296399d421d8fc339625e4693dcafd16fc1e5436e3c758f4c2",
+          "value": "\u00051.\u0006 First resolve rules triggered at this point other than mission rules."
+        },
+        {
+          "ordinal": 11,
+          "kind": "text",
+          "sha256": "f4594fd5d0448872d7e569660bce28026da22d86bcd052c916db63692fa2d973",
+          "value": "\u00052.\u0006 Both players then consult their mission; if one or both players have achieved any aspects of their mission that are triggered at this point, resolve them now."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "07.02-fixed-first",
+          "summary": "The same mission-selected player takes the first turn in each round.",
+          "source_blocks": [
+            1
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_progression.py::test_second_turn_starts_same_first_player_or_ends_at_mission_limit"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_progression.py::test_second_turn_starts_same_first_player_or_ends_at_mission_limit",
+              "function_ast_sha256": "e4574b91ded5fede71d97342e7be38bb81c6c9321e3730b9a92096a09bbb5a54",
+              "assertions": [
+                "assert state.turn_order[0] == first",
+                "assert state.stage is GameLifecycleStage.COMPLETE",
+                "assert state.battle_round == 5",
+                "assert state.active_player_id is None",
+                "assert state.current_battle_phase is None",
+                "assert state.stage is GameLifecycleStage.BATTLE",
+                "assert (state.battle_round, state.active_player_id) == (battle_round + 1, first)",
+                "assert state.current_battle_phase is BattlePhase.COMMAND"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02-opponent-next",
+          "summary": "The opposing player takes one turn after the first player finishes.",
+          "source_blocks": [
+            1
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_progression.py::test_first_turn_ends_before_opponent_and_never_ends_round"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_progression.py::test_first_turn_ends_before_opponent_and_never_ends_round",
+              "function_ast_sha256": "759049a194be28bd40aa72c103341fc85c811a6ace37c5a764389b58ec2f2c52",
+              "assertions": [
+                "assert state.battle_round == 5",
+                "assert state.active_player_id == state.turn_order[1]",
+                "assert state.current_battle_phase is BattlePhase.COMMAND",
+                "assert state.stage is GameLifecycleStage.BATTLE"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02-seven-parts",
+          "summary": "Each turn proceeds through start, five phases, and end in source order.",
+          "source_blocks": [
+            2
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn",
+              "function_ast_sha256": "3b641f3d8e8cc931a80798928c121000a6779d245c59915f772de79b531021eb",
+              "assertions": [
+                "assert completed is phase",
+                "assert state.current_battle_phase is PHASES[PHASES.index(phase) + 1]",
+                "assert (state.battle_round, state.active_player_id) == (1, active)",
+                "assert state.stage is GameLifecycleStage.BATTLE"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02-part-3",
+          "summary": "Resolve start-of-turn rules in the prescribed part of every turn.",
+          "source_blocks": [
+            3
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02-part-4",
+          "summary": "Resolve Command phase in the prescribed part of every turn.",
+          "source_blocks": [
+            4
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn",
+              "function_ast_sha256": "3b641f3d8e8cc931a80798928c121000a6779d245c59915f772de79b531021eb",
+              "assertions": [
+                "assert completed is phase",
+                "assert state.current_battle_phase is PHASES[PHASES.index(phase) + 1]",
+                "assert (state.battle_round, state.active_player_id) == (1, active)",
+                "assert state.stage is GameLifecycleStage.BATTLE"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02-part-5",
+          "summary": "Resolve Movement phase in the prescribed part of every turn.",
+          "source_blocks": [
+            5
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn",
+              "function_ast_sha256": "3b641f3d8e8cc931a80798928c121000a6779d245c59915f772de79b531021eb",
+              "assertions": [
+                "assert completed is phase",
+                "assert state.current_battle_phase is PHASES[PHASES.index(phase) + 1]",
+                "assert (state.battle_round, state.active_player_id) == (1, active)",
+                "assert state.stage is GameLifecycleStage.BATTLE"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02-part-6",
+          "summary": "Resolve Shooting phase in the prescribed part of every turn.",
+          "source_blocks": [
+            6
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn",
+              "function_ast_sha256": "3b641f3d8e8cc931a80798928c121000a6779d245c59915f772de79b531021eb",
+              "assertions": [
+                "assert completed is phase",
+                "assert state.current_battle_phase is PHASES[PHASES.index(phase) + 1]",
+                "assert (state.battle_round, state.active_player_id) == (1, active)",
+                "assert state.stage is GameLifecycleStage.BATTLE"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02-part-7",
+          "summary": "Resolve Charge phase in the prescribed part of every turn.",
+          "source_blocks": [
+            7
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn",
+              "function_ast_sha256": "3b641f3d8e8cc931a80798928c121000a6779d245c59915f772de79b531021eb",
+              "assertions": [
+                "assert completed is phase",
+                "assert state.current_battle_phase is PHASES[PHASES.index(phase) + 1]",
+                "assert (state.battle_round, state.active_player_id) == (1, active)",
+                "assert state.stage is GameLifecycleStage.BATTLE"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02-part-8",
+          "summary": "Resolve Fight phase in the prescribed part of every turn.",
+          "source_blocks": [
+            8
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_progression.py::test_five_phases_advance_in_source_order_without_changing_turn",
+              "function_ast_sha256": "3b641f3d8e8cc931a80798928c121000a6779d245c59915f772de79b531021eb",
+              "assertions": [
+                "assert completed is phase",
+                "assert state.current_battle_phase is PHASES[PHASES.index(phase) + 1]",
+                "assert (state.battle_round, state.active_player_id) == (1, active)",
+                "assert state.stage is GameLifecycleStage.BATTLE"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02-part-9",
+          "summary": "Resolve end-of-turn rules in the prescribed part of every turn.",
+          "source_blocks": [
+            9
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request",
+            "src/warhammer40k_core/engine/sequencing.py:eligible_sequencing_participants"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+              "function_ast_sha256": "49a8175258782957ae4c36ad762c7ae5677fee2febca083d92df07dea0ed6897",
+              "assertions": [
+                "assert observed == [f'player:{active}', f'player:{other}', f'mission:{active}', f'mission:{other}']",
+                "assert context.sequence_exception_source_id is not None",
+                "assert len(request.options) == 1",
+                "with pytest.raises(DecisionError, match='actor'):\n    apply_select_next_sequencing_participant_from_request(request=request, result=replace(result, actor_id='intruder'))"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02-nonmission-first",
+          "summary": "Resolve non-mission end-of-turn rules before mission rules.",
+          "source_blocks": [
+            10
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert payload['resolution_order'] == ['non_mission_rules', 'mission_rules']",
+              "proves": "Turn and round boundary events specify non-mission-before-mission ordering."
+            },
+            {
+              "nodeid": "tests/unit/test_order36_sequencing.py::test_mission_turn_end_offers_owner_order_between_primary_and_fixed_secondary",
+              "role": "facade",
+              "assertion": "assert kinds[0] is (VictoryPointSourceKind.PRIMARY if first_family == 'primary-scoring' else VictoryPointSourceKind.FIXED_SECONDARY)",
+              "proves": "A non-empty mission boundary executes the chosen scoring family first."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request",
+            "src/warhammer40k_core/engine/sequencing.py:eligible_sequencing_participants"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+              "function_ast_sha256": "49a8175258782957ae4c36ad762c7ae5677fee2febca083d92df07dea0ed6897",
+              "assertions": [
+                "assert observed == [f'player:{active}', f'player:{other}', f'mission:{active}', f'mission:{other}']",
+                "assert context.sequence_exception_source_id is not None",
+                "assert len(request.options) == 1",
+                "with pytest.raises(DecisionError, match='actor'):\n    apply_select_next_sequencing_participant_from_request(request=request, result=replace(result, actor_id='intruder'))"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02-mission-after",
+          "summary": "Resolve achieved end-of-turn mission conditions for both players after non-mission rules.",
+          "source_blocks": [
+            11
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order36_sequencing.py::test_opposing_primary_missions_keep_distinct_commits_at_one_boundary",
+              "role": "semantic",
+              "assertion": "assert {row.scoring_player_id for row in state.primary_scoring_boundary_lifecycles} == {'player-a', 'player-b'}",
+              "proves": "Both players own separate primary scoring commits at one boundary."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/mission_turn_end_sequencing.py:request_mission_turn_end_rules",
+            "src/warhammer40k_core/engine/primary_scoring_boundary.py:score_primary_player_boundary",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request",
+            "src/warhammer40k_core/engine/sequencing.py:eligible_sequencing_participants"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_mission_boundary.py::test_actual_eligible_mission_commits_and_achieved_condition_at_turn_end",
+            "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_mission_boundary.py::test_actual_eligible_mission_commits_and_achieved_condition_at_turn_end",
+              "function_ast_sha256": "6ffb02dfe418ffbf3337346492258360589d5b4f739618f4dcc54e1db89cff0c",
+              "assertions": [
+                "assert candidates",
+                "assert all((c.participant.origin is SequencingRuleOrigin.MISSION for c in candidates))",
+                "assert any((c.participant.player_id == active for c in candidates))",
+                "assert request_mission_turn_end_rules(state=state, decisions=decisions, runtime_modifier_registry=registry) is None",
+                "assert any((evidence.scoring_player_id == active and evidence.objective_control_record_id == record.record_id for evidence in state.primary_scoring_state_evidence_records))",
+                "assert request_mission_turn_end_rules(state=state, decisions=decisions, runtime_modifier_registry=registry) is None",
+                "assert (state.to_payload(), decisions.to_payload()) == before",
+                "assert state.victory_point_ledger_for_player(active).victory_points > 0"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+              "function_ast_sha256": "49a8175258782957ae4c36ad762c7ae5677fee2febca083d92df07dea0ed6897",
+              "assertions": [
+                "assert observed == [f'player:{active}', f'player:{other}', f'mission:{active}', f'mission:{other}']",
+                "assert context.sequence_exception_source_id is not None",
+                "assert len(request.options) == 1",
+                "with pytest.raises(DecisionError, match='actor'):\n    apply_select_next_sequencing_participant_from_request(request=request, result=replace(result, actor_id='intruder'))"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": []
+    },
+    {
+      "source_id": "rule:07:07.02.01:1",
+      "locator": "07.02.01",
+      "title": "Out Of Phase Rules",
+      "source_sha256": "2b318b19b598565a5bb81efbb665e8410d6b9568a6660fbfda35647bfaf2f4ff",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "82ab4e73684a9ab36136e252ee7181a16993d6eca7825132897e60d81d38c0a4",
+          "value": "Some rules allow a model or unit to make a move, shoot, declare a charge or fight outside of the normal turn sequence."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "cf64b71ca5c65e5b6e1270c7ef5c5c14389afc3bd67880f16d5a396f0cbcb394",
+          "value": "When using these out-of-phase rules, you cannot use any other ‘phase-locked’ rules; that is, any other rule that explicitly states the phase in which that rule applies."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "88b739404a54944aebc1c81f40c0e3d4cbfbf405a1603d33f4c1017217b25f34",
+          "value": "\u0005Example\u0006: \u0007In your opponent’s Movement phase, you target a friendly unit with the Fire Overwatch \u0005stratagem\u0006. That unit has an ability which is used ‘In your Shooting phase, after this unit has shot’. Because Fire Overwatch is phase-locked to your opponent's Shooting phase, that ability is not triggered.\b"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "07.02.01-phase-lock",
+          "summary": "An out-of-phase action does not activate other phase-locked rules.",
+          "source_blocks": [
+            2
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+              "role": "semantic",
+              "assertion": "assert pool_payload['hit_roll_modifier'] == 0",
+              "proves": "An out-of-phase shooting declaration receives no Heavy phase-locked bonus."
+            },
+            {
+              "nodeid": "tests/unit/test_phase13b_shooting_declarations.py::test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting",
+              "role": "semantic",
+              "assertion": "assert HEAVY_RULE_ID not in targeting_rule_ids",
+              "proves": "The accepted out-of-phase attack omits the phase-locked Heavy source."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py:_apply_phase13d_weapon_modifiers"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_out_of_phase.py::test_actual_weapon_modifier_consumer_suppresses_phase_locked_heavy"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_out_of_phase.py::test_actual_weapon_modifier_consumer_suppresses_phase_locked_heavy",
+              "function_ast_sha256": "3f85858f05754f1d3910e6621421c474cb7a4ec666654973c939defd76c026b7",
+              "assertions": [
+                "assert WeaponKeyword.HEAVY in profile.keywords",
+                "assert modifier == expected",
+                "assert (HEAVY_RULE_ID in rule_ids) is bool(expected)",
+                "assert attacks == 1"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "context",
+          "reason": "Introduces permissions that are supplied by the individual out-of-phase rules."
+        },
+        {
+          "source_blocks": [
+            3
+          ],
+          "classification": "example",
+          "reason": "Overwatch example illustrates the phase-lock rule."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:07:07.02.02:1",
+      "locator": "07.02.02",
+      "title": "Battle Round/Turn/Phase Definitions",
+      "source_sha256": "66dc38c7d0f3afaab673a5ac9f6ccc6665bb56d3a89a7ae6b851c5d80020771c",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "13f0acc7b0cc71c8441f704ee41ea5503fa67642f1e8f6ba596f031281f8291e",
+          "value": "• \u0005Start of Battle Round/Turn/Phase:\u0006 If a rule is triggered at the start of the battle round/turn/phase, it is triggered at the start of every battle round/turn/phase."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "2a516107898d98ad69c98f5e85611b3a22a3a66b897ba9aceb4fb65a5fb5fe55",
+          "value": "• \u0005The Turn/the Phase:\u0006 If a rule is triggered during \u0001the\u0002 turn/phase instead of during \u0001your\u0002 turn/phase or \u0001your opponent’s\u0002 turn/phase, it is triggered in both players’ turn/phase."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "aabb7bae78e7ed224abae6038448e6aab79d015038e4853f78b100cc03aab9df",
+          "value": "\u0005Example\u0006: \u0007If a rule states ‘At the end of the Movement phase, this model \u0005heals\u0006 1 wound’, that rule triggers at the end of your Movement phase and at the end of your opponent’s Movement phase.\b"
+        }
+      ],
+      "requirements": [
+        {
+          "id": "07.02.02-every-boundary",
+          "summary": "Unqualified start-of-round, turn, and phase triggers recur at every corresponding boundary.",
+          "source_blocks": [
+            1
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_timing_evidence.py::test_loaded_unqualified_fight_trigger_repeats_on_both_players_turns",
+              "role": "facade",
+              "assertion": "assert [(row['battle_round'], row['active_player_id']) for row in resolved] == [(1, 'player-a'), (1, 'player-b'), (2, 'player-a'), (2, 'player-b')]",
+              "proves": "The source-loaded unqualified Fight-start rule creates a real selected-target Damage effect on both players turns in two rounds; exact restore, viewer and replay checks accompany the four occurrences."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/catalog_selected_target_effects.py:CatalogSelectedTargetEffectRuntime",
+            "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py:apply_blessings_selection_result",
+            "src/warhammer40k_core/engine/fight_phase_start_hooks.py:FightPhaseStartHookRegistry"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+            "tests/rules/section07/test_trigger_effects.py::test_unqualified_phase_trigger_applies_real_effect_at_each_boundary",
+            "tests/rules/section07/test_round_effect.py::test_constructed_round_permission_resolves_real_effect_before_command_once"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_trigger_effects.py::test_unqualified_phase_trigger_applies_real_effect_at_each_boundary",
+              "function_ast_sha256": "b3dffce65f880f4169b43cb2b8210ae5d54eb3a5f1579944b4e4ba2ebaf4311a",
+              "assertions": [
+                "assert observed == ['owner', 'opponent', 'owner', 'opponent']",
+                "assert len(state.persisting_effects) == 4",
+                "assert len({effect.effect_id for effect in state.persisting_effects}) == 4",
+                "assert isinstance(request, DecisionRequest)",
+                "assert request.actor_id == 'owner'",
+                "assert not state.persisting_effects or all((effect.source_rule_id == SOURCE for effect in state.persisting_effects))",
+                "with pytest.raises(DecisionError, match='actor'):\n    decisions.submit_result(replace(result, actor_id='opponent'))",
+                "assert (decisions.to_payload(), state.to_payload()) == before",
+                "assert registry.apply_result(FightPhaseStartResultContext(state, decisions, request, result, ability_indexes_by_player_id=runtime.ability_indexes_by_player_id)) is True",
+                "assert effect.source_rule_id == SOURCE",
+                "assert effect.expiration.player_id == active",
+                "assert effect.expiration.phase is BattlePhase.FIGHT",
+                "assert effect.effect_payload is not None",
+                "assert registry.next_request_for(context) is None"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_round_effect.py::test_constructed_round_permission_resolves_real_effect_before_command_once",
+              "function_ast_sha256": "3d0a04769802489730d5f5be9aa4238d9646c33a4a887f5771decaf5d76af0b7",
+              "assertions": [
+                "assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION",
+                "assert request is not None",
+                "assert request.actor_id == 'owner'",
+                "assert state.current_battle_phase is BattlePhase.COMMAND",
+                "assert not any((e.event_type == 'battle_phase_completed' for e in decisions.event_log.records))",
+                "assert not army_rule.active_blessings_for_player(state, player_id='owner')",
+                "assert army_rule.BlessingOfKhorne.UNBRIDLED_BLOODLUST in army_rule.active_blessings_for_player(state, player_id='owner')",
+                "assert state.persisting_effects",
+                "assert registry.next_request_for(BattleRoundStartRequestContext(state, decisions)) is None"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.02.02-both-players",
+          "summary": "An unqualified turn or phase rule applies in both players' corresponding turns or phases.",
+          "source_blocks": [
+            2
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_timing_evidence.py::test_loaded_unqualified_fight_trigger_repeats_on_both_players_turns",
+              "role": "facade",
+              "assertion": "assert [(row['battle_round'], row['active_player_id']) for row in resolved] == [(1, 'player-a'), (1, 'player-b'), (2, 'player-a'), (2, 'player-b')]",
+              "proves": "The source-loaded unqualified Fight-start rule creates a real selected-target Damage effect on both players turns in two rounds; exact restore, viewer and replay checks accompany the four occurrences."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/catalog_selected_target_effects.py:CatalogSelectedTargetEffectRuntime",
+            "src/warhammer40k_core/engine/fight_phase_start_hooks.py:FightPhaseStartHookRegistry"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_trigger_effects.py::test_unqualified_phase_trigger_applies_real_effect_at_each_boundary",
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_trigger_effects.py::test_unqualified_phase_trigger_applies_real_effect_at_each_boundary",
+              "function_ast_sha256": "b3dffce65f880f4169b43cb2b8210ae5d54eb3a5f1579944b4e4ba2ebaf4311a",
+              "assertions": [
+                "assert observed == ['owner', 'opponent', 'owner', 'opponent']",
+                "assert len(state.persisting_effects) == 4",
+                "assert len({effect.effect_id for effect in state.persisting_effects}) == 4",
+                "assert isinstance(request, DecisionRequest)",
+                "assert request.actor_id == 'owner'",
+                "assert not state.persisting_effects or all((effect.source_rule_id == SOURCE for effect in state.persisting_effects))",
+                "with pytest.raises(DecisionError, match='actor'):\n    decisions.submit_result(replace(result, actor_id='opponent'))",
+                "assert (decisions.to_payload(), state.to_payload()) == before",
+                "assert registry.apply_result(FightPhaseStartResultContext(state, decisions, request, result, ability_indexes_by_player_id=runtime.ability_indexes_by_player_id)) is True",
+                "assert effect.source_rule_id == SOURCE",
+                "assert effect.expiration.player_id == active",
+                "assert effect.expiration.phase is BattlePhase.FIGHT",
+                "assert effect.effect_payload is not None",
+                "assert registry.next_request_for(context) is None"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            3
+          ],
+          "classification": "example",
+          "reason": "Healing example illustrates unqualified timing."
+        }
+      ]
+    },
+    {
+      "source_id": "rule:07:07.03:1",
+      "locator": "07.03",
+      "title": "End Of Battle Round",
+      "source_sha256": "967800af2fa743e873e4d8763d1088fb64e08d3325d97449293ea41c8130a38f",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "85718d9b783f7a10a06d8dfb0cd6d758bb2fd18f42060fce1a871b52f767ce3b",
+          "value": "Rules that are triggered at the end of the battle round are resolved now, in the following order:"
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "974a0d0f294db4a1e7755efe41188e70a6d1f2d43fb45042346df7d78f0d9325",
+          "value": "1. First resolve rules triggered at this point other than mission rules."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "f93d6792a05a60b4c2ed22760430f573d7a379c3deec039e316b304e80c82767",
+          "value": "2. Both players then consult their mission; if one or both players have achieved any aspects of their mission that are triggered at this point, resolve them now."
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "de7fb049aaabfe0075d911d6c2db33d366a92e396e47695033e7682bb2cf6842",
+          "value": "The battle round then ends and, unless the battle ends, the next battle round starts. The mission you are playing will tell you how many battle rounds to resolve before the battle ends."
+        }
+      ],
+      "requirements": [
+        {
+          "id": "07.03-nonmission-first",
+          "summary": "Resolve non-mission end-of-battle-round rules before mission rules.",
+          "source_blocks": [
+            2
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert payload['resolution_order'] == ['non_mission_rules', 'mission_rules']",
+              "proves": "Round-end events declare the non-mission-before-mission order."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request",
+            "src/warhammer40k_core/engine/sequencing.py:eligible_sequencing_participants"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+              "function_ast_sha256": "49a8175258782957ae4c36ad762c7ae5677fee2febca083d92df07dea0ed6897",
+              "assertions": [
+                "assert observed == [f'player:{active}', f'player:{other}', f'mission:{active}', f'mission:{other}']",
+                "assert context.sequence_exception_source_id is not None",
+                "assert len(request.options) == 1",
+                "with pytest.raises(DecisionError, match='actor'):\n    apply_select_next_sequencing_participant_from_request(request=request, result=replace(result, actor_id='intruder'))"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.03-mission-after",
+          "summary": "Resolve achieved end-of-round mission conditions after non-mission rules.",
+          "source_blocks": [
+            3
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [
+            "The sequencing assertion covers participant priority; this clause does not certify individual mission scoring formulas."
+          ],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order36_sequencing.py::test_unowned_mission_priority_preserves_source_exceptions",
+              "role": "semantic",
+              "assertion": "assert {option.option_id for option in request.options} == ({'next:mission-0', 'next:mission-1'} if mission_first else {'next:opponent-rule'})",
+              "proves": "At end-of-round/turn boundaries, only the non-mission participant is selectable while mandatory mission participants remain; changing the source exception is rejected."
+            },
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert payload['resolution_order'] == ['non_mission_rules', 'mission_rules']",
+              "proves": "Both players complete two real rounds; turn/round-end boundaries retain non-mission-before-mission resolution and the full run restores and replays."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/sequencing.py:apply_select_next_sequencing_participant_from_request",
+            "src/warhammer40k_core/engine/sequencing.py:eligible_sequencing_participants"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_mission_order.py::test_nonmission_rules_finish_before_both_players_mission_rules",
+              "function_ast_sha256": "49a8175258782957ae4c36ad762c7ae5677fee2febca083d92df07dea0ed6897",
+              "assertions": [
+                "assert observed == [f'player:{active}', f'player:{other}', f'mission:{active}', f'mission:{other}']",
+                "assert context.sequence_exception_source_id is not None",
+                "assert len(request.options) == 1",
+                "with pytest.raises(DecisionError, match='actor'):\n    apply_select_next_sequencing_participant_from_request(request=request, result=replace(result, actor_id='intruder'))"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.03-next-round",
+          "summary": "After a completed round, start the next unless the mission-defined final round ended.",
+          "source_blocks": [
+            4
+          ],
+          "status": "semantic assertions implemented; execution in separate validation receipt",
+          "retained_prior_qualifications": [],
+          "prior_evidence": [
+            {
+              "nodeid": "tests/unit/test_order97_facade_evidence.py::test_category07_facade_round_turn_phase_order_and_restore",
+              "role": "facade",
+              "assertion": "assert windows == expected",
+              "proves": "Facade submissions produce the complete ordered timing-window list across both players and two rounds."
+            },
+            {
+              "nodeid": "tests/unit/test_phase11e_mission_scoring_cleanup.py::test_game_ends_after_configured_battle_rounds_with_draw_result",
+              "role": "semantic",
+              "assertion": "assert state.stage is GameLifecycleStage.COMPLETE",
+              "proves": "The configured mission round count ends the game."
+            }
+          ],
+          "engine_owners": [
+            "src/warhammer40k_core/adapters/local_session.py:LocalGameSession.submit_option",
+            "src/warhammer40k_core/engine/battle_round_flow.py:BattleRoundFlow.advance",
+            "src/warhammer40k_core/engine/game_state.py:GameState.advance_to_next_battle_phase"
+          ],
+          "asserting_tests": [
+            "tests/rules/section07/test_progression.py::test_second_turn_starts_same_first_player_or_ends_at_mission_limit",
+            "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence"
+          ],
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section07/test_progression.py::test_second_turn_starts_same_first_player_or_ends_at_mission_limit",
+              "function_ast_sha256": "e4574b91ded5fede71d97342e7be38bb81c6c9321e3730b9a92096a09bbb5a54",
+              "assertions": [
+                "assert state.turn_order[0] == first",
+                "assert state.stage is GameLifecycleStage.COMPLETE",
+                "assert state.battle_round == 5",
+                "assert state.active_player_id is None",
+                "assert state.current_battle_phase is None",
+                "assert state.stage is GameLifecycleStage.BATTLE",
+                "assert (state.battle_round, state.active_player_id) == (battle_round + 1, first)",
+                "assert state.current_battle_phase is BattlePhase.COMMAND"
+              ]
+            },
+            {
+              "node": "tests/rules/section07/test_facade.py::test_public_two_round_order_fixed_first_player_and_boundary_recurrence",
+              "function_ast_sha256": "e9f5284325fb58bc672fe97eae5440473bdc0ecf6e284b06b3f4962e233abb5f",
+              "assertions": [
+                "assert (state.battle_round, state.active_player_id) == (3, first)",
+                "assert [row['completed_phase'] for row in completed] == [phase for _turn in range(4) for phase in ('command', 'movement', 'shooting', 'charge', 'fight')] + ['command']",
+                "assert observed == expected",
+                "assert request is not None, status",
+                "assert status.status_kind not in {LifecycleStatusKind.INVALID, LifecycleStatusKind.UNSUPPORTED}",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert options, request",
+                "assert row['resolution_order'] == ['non_mission_rules', 'mission_rules']"
+              ]
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "source_blocks": [
+            1
+          ],
+          "classification": "context",
+          "reason": "Introduces the end-of-round ordered resolution below."
+        }
+      ]
+    }
+  ],
+  "unadopted_gaps": [],
+  "authenticated_inputs": {
+    "AGENTS.md": "ba2b751ed0d689cd0807309143cd23ebe926c7f8ed10f5ddbd9e85e43901cbba",
+    "README.md": "dc56745fbffccc97c257292ed367c5d2f3110b33d4926065df271fa583ad7897",
+    "pyproject.toml": "f11ef7317eb37d7ebb7eaba3766cafbeb9a422a123c9e77fdc208f960d675627",
+    "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
+    "data/source_audits/order97/categories/07.json": "52a349cc268a3c3e9cb0348ac9bb101a2c9a4d83ccde60f99a3d2ad071adc80d",
+    "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+    "data/source_audits/order135/current-bindings.json": "844e02f68e5aea952d4578e333ec6c73a2f029cfe2bbd8be1db0d58c22c8f239",
+    "data/source_audits/v963_shock/captures/core-page.js": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026"
+  },
+  "faq_ownership": {
+    "locally_owned": [],
+    "reviewed_current_faq_count": 64,
+    "cross_references": [
+      {
+        "faq": 11,
+        "id": "9657bb5d-72da-4d42-9927-731c9fc0e315",
+        "owner": "12",
+        "reason": "Additional Fight movement distance remains limited to the matching Fight steps; no duplicate ownership in07."
+      },
+      {
+        "faq": 27,
+        "id": "fdefb262-1eb9-43fd-a2c8-70cf3bd2a621",
+        "owner": "11",
+        "reason": "Out-of-phase charge still resolves Charge steps2 and3;07 owns suppression of other phase-locked rules."
+      },
+      {
+        "faq": 62,
+        "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+        "owner": "01",
+        "reason": "Effect remains active through its named end boundary; Section01 owns expiry assertions,07 owns timing sequence."
+      }
+    ]
+  },
+  "qualifications": [
+    "Retained maintained mirror is unversioned; no new live-site or official App export authentication.",
+    "The retained Overwatch example mentions inconsistent Movement/Shooting phases. Preserve text verbatim; the operative phase-lock prohibition is tested independently.",
+    "Round effect uses an explicit World Eaters source-permission contract on a supported native EC body. The selected loader correctly rejected the WE datasheet without representative height; no geometry guard was changed. This is not native WE admission proof.",
+    "Nonempty unqualified Fight effects use compiled constructed text because native selected sheets lack this exact boundary. Qualified variants are outside this selected-target consumer support contract and are not claimed implemented by that owner.",
+    "The phase-permission Heavy test begins at a typed out-of-phase outcome; it does not certify granting ability activation.",
+    "Mission participant priority is exercised at the shared production sequencing owner. It does not certify all mission formulas or invent an end-of-round mission provider.",
+    "Two-round adapter progression covers normal empty phase completion and viewer event deltas, not full-game startup, mustering, replay or universal fixture order independence."
+  ],
+  "historical_authenticated_inputs": {
+    "AGENTS.md": "76801ae91602ab66a164e7d4500294977bd92725ca78026472ddfcd23f20e309",
+    "README.md": "ad52bc7e7e40aa9a7e2296f20c8726fcf63a5b92bd087100e09238572901a583",
+    "pyproject.toml": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192"
+  },
+  "authenticated_inputs_maintenance": "Three current governance/configuration inputs are refreshed to the exact reviewed coverage-50/behavioral-cutover source. Their former native5734 hashes remain historical_authenticated_inputs. Literal capture/source authorities and all gameplay bindings are unchanged; this update claims no qualification pass."
+}

@@ -75,6 +75,8 @@ class MovementCapabilitySetPayload(TypedDict):
     can_move_through_friendly_models: bool
     can_move_through_enemy_models: bool
     can_move_through_terrain: bool
+    horizontal_terrain_feature_transit: bool
+    can_transit_all_terrain: bool
     can_transit_enemy_engagement_range: bool
     ignores_vertical_distance: bool
     blocks_friendly_vehicle_monster_pass_through: bool
@@ -158,6 +160,7 @@ class MovementCapabilitySet:
     can_move_through_friendly_models: bool
     can_move_through_enemy_models: bool
     can_move_through_terrain: bool
+    can_transit_all_terrain: bool
     can_transit_enemy_engagement_range: bool
     ignores_vertical_distance: bool
     blocks_friendly_vehicle_monster_pass_through: bool
@@ -167,6 +170,7 @@ class MovementCapabilitySet:
     friendly_model_transit_blocker_keywords: tuple[str, ...] = ()
     enemy_model_transit_blocker_keywords: tuple[str, ...] = ()
     desperate_escape_tests_auto_passed: bool = False
+    horizontal_terrain_feature_transit: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -197,6 +201,8 @@ class MovementCapabilitySet:
             ("can_move_through_friendly_models", self.can_move_through_friendly_models),
             ("can_move_through_enemy_models", self.can_move_through_enemy_models),
             ("can_move_through_terrain", self.can_move_through_terrain),
+            ("horizontal_terrain_feature_transit", self.horizontal_terrain_feature_transit),
+            ("can_transit_all_terrain", self.can_transit_all_terrain),
             (
                 "can_transit_enemy_engagement_range",
                 self.can_transit_enemy_engagement_range,
@@ -351,8 +357,14 @@ class MovementCapabilitySet:
         is_titanic = "is_titanic" in flags
         is_infantry = "is_infantry" in flags
         is_beast = "is_beast" in flags
-        is_vehicle = "is_vehicle" in flags
-        is_monster = "is_monster" in flags
+        # Core 17.01 grants transit to physical models, not their keyword union.
+        model_keywords = (
+            unit.own_model_by_id(model_instance_id).keywords
+            if unit is not None and model_instance_id is not None
+            else normalized_keywords
+        )
+        is_vehicle = "is_vehicle" in flags and "VEHICLE" in model_keywords
+        is_monster = "is_monster" in flags and "MONSTER" in model_keywords
         can_traverse_ruins_walls = (
             "can_traverse_ruins_walls" in flags
             or _keywords_allow_ruins_wall_traversal(
@@ -424,10 +436,15 @@ class MovementCapabilitySet:
             can_move_through_friendly_models=can_move_through_friendly_models,
             can_move_through_enemy_models=can_move_through_enemy_models,
             can_move_through_terrain=can_move_through_terrain,
+            horizontal_terrain_feature_transit=(
+                terrain_transit_permission or _catalog_terrain_transit_allowed(catalog_permissions)
+            ),
+            can_transit_all_terrain=flying and descriptor.fly_policy.may_move_through_terrain,
             can_transit_enemy_engagement_range=can_transit_enemy_engagement_range,
             ignores_vertical_distance=ignores_vertical_distance,
             blocks_friendly_vehicle_monster_pass_through=(
                 "blocks_friendly_vehicle_monster_pass_through" in flags
+                and (is_vehicle or is_monster)
             ),
             can_move_over_friendly_vehicle_monster_models=(
                 bool(move_abilities)
@@ -483,6 +500,8 @@ class MovementCapabilitySet:
             "can_move_through_friendly_models": self.can_move_through_friendly_models,
             "can_move_through_enemy_models": self.can_move_through_enemy_models,
             "can_move_through_terrain": self.can_move_through_terrain,
+            "horizontal_terrain_feature_transit": self.horizontal_terrain_feature_transit,
+            "can_transit_all_terrain": self.can_transit_all_terrain,
             "can_transit_enemy_engagement_range": self.can_transit_enemy_engagement_range,
             "ignores_vertical_distance": self.ignores_vertical_distance,
             "blocks_friendly_vehicle_monster_pass_through": (
@@ -524,6 +543,8 @@ class MovementCapabilitySet:
             can_move_through_friendly_models=raw_payload["can_move_through_friendly_models"],
             can_move_through_enemy_models=raw_payload["can_move_through_enemy_models"],
             can_move_through_terrain=raw_payload["can_move_through_terrain"],
+            horizontal_terrain_feature_transit=raw_payload["horizontal_terrain_feature_transit"],
+            can_transit_all_terrain=raw_payload["can_transit_all_terrain"],
             can_transit_enemy_engagement_range=raw_payload["can_transit_enemy_engagement_range"],
             ignores_vertical_distance=raw_payload["ignores_vertical_distance"],
             blocks_friendly_vehicle_monster_pass_through=raw_payload[
@@ -843,13 +864,9 @@ class MovementLegalityContext:
             self.capabilities.is_vehicle or self.capabilities.is_monster
         ) and self.movement_mode in _VEHICLE_MONSTER_ENEMY_TRANSIT_MOVEMENT_MODES
         may_transit_enemy_models = (
-            (
-                (self.capabilities.can_move_through_enemy_models and fly_transit_applies)
-                or self.capabilities.can_move_through_enemy_models
-            )
-            or self.movement_mode is MovementMode.FALL_BACK
-            or vehicle_monster_enemy_transit_applies
-        )
+            (self.capabilities.can_move_through_enemy_models and fly_transit_applies)
+            or self.capabilities.can_move_through_enemy_models
+        ) or vehicle_monster_enemy_transit_applies
         may_transit_enemy_engagement = (
             self.engagement_policy.may_transit_enemy_engagement
             or fly_transit_applies
@@ -913,6 +930,8 @@ class MovementLegalityContext:
             contact_footprint_available=contact_footprint_available,
             can_traverse_ruins_walls=self.capabilities.can_traverse_ruins_walls,
             can_move_through_terrain=self.capabilities.can_move_through_terrain,
+            horizontal_terrain_feature_transit=self.capabilities.horizontal_terrain_feature_transit,
+            can_transit_all_terrain=self.capabilities.can_transit_all_terrain,
             terrain_as_if_absent_height_inches=(
                 self.capabilities.terrain_as_if_absent_height_inches
             ),

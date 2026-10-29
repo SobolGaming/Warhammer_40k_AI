@@ -50,8 +50,15 @@ class MovementGoal:
     z_inches: float = 0.0
     range_inches: float | None = None
     spatial_region_range_inches: float | None = None
+    ignore_polygon_height: bool = False
 
     def __post_init__(self) -> None:
+        if type(self.ignore_polygon_height) is not bool:
+            raise GeometryError("Movement goal ignore_polygon_height must be a bool.")
+        if self.ignore_polygon_height and (
+            not self.polygons or self.spatial_region_range_inches is not None
+        ):
+            raise GeometryError("Height-free movement goals require polygon membership.")
         if sum((bool(self.models), bool(self.polygons), self.disk is not None)) != 1:
             raise GeometryError("Movement goal requires exactly one kind of target geometry.")
         for value in (self.horizontal_inches, self.vertical_inches):
@@ -112,7 +119,7 @@ class MovementGoal:
                 <= self.spatial_region_range_inches
                 for polygon in self.polygons
             )
-        return gap <= self.vertical_inches and any(
+        return (self.ignore_polygon_height or gap <= self.vertical_inches) and any(
             shapely_backend.base_footprint_distance_to_polygon(model.base, model.pose, polygon)
             <= self.horizontal_inches
             for polygon in self.polygons
@@ -203,7 +210,7 @@ class MovementGoal:
                 - self.horizontal_inches,
             ),
             0.0
-            if ignores_vertical_distance
+            if ignores_vertical_distance or self.ignore_polygon_height
             else max(
                 0.0,
                 bottom - self.z_inches - self.vertical_inches,
@@ -346,7 +353,7 @@ def _anchored_region_bound(
             - goal.horizontal_inches,
         ),
         0.0
-        if ignores_vertical_distance
+        if ignores_vertical_distance or goal.ignore_polygon_height
         else max(
             0.0,
             part.bottom - goal.z_inches - goal.vertical_inches,

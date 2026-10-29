@@ -86,6 +86,22 @@ def pre_validate_attack_sequence_decision(
             message=str(exc),
             payload={"invalid_reason": "attack_hit_authority_drift", "field": "hit_roll"},
         )
+    if _mw_model.is_mortal_wound_resolution_request(request):
+        try:
+            progress = _mw_model.mortal_wound_resolution_progress(request)
+        except GameLifecycleError as exc:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message=str(exc),
+                payload={"invalid_reason": "mortal_wound_boundary_drift"},
+            )
+        evidence = progress.destruction_evidence
+        if evidence is not None and state.current_battle_phase is not evidence.parent_battle_phase:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Mortal wound continuation parent phase drifted.",
+                payload={"invalid_reason": "mortal_wound_boundary_drift"},
+            )
     if request.decision_type == SELECT_LETHAL_HIT_WOUND_DECISION_TYPE:
         return invalid_lethal_hit_wound_status(
             state=state, decisions=decisions, request=request, result=result

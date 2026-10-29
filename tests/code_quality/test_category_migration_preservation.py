@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tools import performance_ci60_qualification as ci60
 from tools.core_rules_order95_audit import (
     RETIRED_REFERENCE_SUCCESSORS,
     AuditError,
@@ -28,10 +29,22 @@ def _manifest() -> migration.MigrationManifest:
 @pytest.fixture
 def preserved_root(tmp_path: Path) -> Path:
     record = _manifest()["originals"][ORIGINAL]
-    for name in [migration.MANIFEST, record["archive"], *record["successors"]]:
+    for name in [
+        migration.MANIFEST,
+        record["archive"],
+        *record["successors"],
+        *(pin[0] for pin in migration.INTEGRATION_PREIMAGES.values()),
+        migration.INTEGRATION_OVERLAY_ADDITIONS[0],
+    ]:
         destination = tmp_path / name
         destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes((ROOT / name).read_bytes())
+        current = (ROOT / name).read_bytes()
+        if name in {
+            "tests/shared/category_migration/phase11e_mission_scoring_cleanup_configuration.py",
+            "tests/shared/category_migration/phase11e_mission_scoring_cleanup_history_and_reserves.py",
+        }:
+            current = ci60.historical_test_preimage(ROOT, name, current)
+        destination.write_bytes(current)
     return tmp_path
 
 
@@ -325,3 +338,118 @@ def test_edition_maintenance_rejects_an_assertion_change_even_with_recomputed_li
         ValueError, match="Original edition assertions or unrelated semantics changed"
     ):
         migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+
+
+@pytest.mark.parametrize("path", tuple(migration.INTEGRATION_PREIMAGES))
+def test_integration_whole_module_ast_rejects_assertion_drift_without_hash_gate(path: str) -> None:
+    archive, _before_hash, _current_hash = migration.INTEGRATION_PREIMAGES[path]
+    before = (ROOT / archive).read_bytes()
+    current = (ROOT / path).read_bytes()
+    migration.assert_integration_migration_ast(path, before, current)
+    tree = ast.parse(current)
+    assertion = next(n for n in ast.walk(tree) if isinstance(n, ast.Assert))
+    assertion.test = ast.Constant(value=False)
+    with pytest.raises(ValueError, match=r"Integration.*(AST|initialization)"):
+        migration.assert_integration_migration_ast(path, before, ast.unparse(tree).encode())
+
+
+def test_integration_exact_preimage_byte_drift_is_rejected(preserved_root: Path) -> None:
+    archive = migration.INTEGRATION_PREIMAGES[ORIGINAL][0]
+    target = preserved_root / archive
+    target.write_bytes(target.read_bytes() + b"\n")
+    with pytest.raises(ValueError, match="predecessor bytes drifted"):
+        migration.verify_migrated_test(preserved_root, ORIGINAL)
+
+
+@pytest.mark.parametrize(
+    "reference",
+    [
+        "tests/unit/test_order60_emergency_disembark.py",
+        "tests/unit/test_phase11b_objective_control.py",
+    ],
+)
+def test_inventory_predecessor_AST_rejects_unrelated_assertion_drift(reference: str) -> None:
+    from tools.core_rules_order97_history import (
+        INTEGRATION_INVENTORY_PREIMAGES,
+        assert_integration_inventory_ast,
+    )
+
+    archive = INTEGRATION_INVENTORY_PREIMAGES[reference][0]
+    before = (ROOT / archive).read_bytes()
+    current = (ROOT / reference).read_bytes()
+    assert_integration_inventory_ast(reference, before, current)
+    tree = ast.parse(current)
+    assertion = next(n for n in ast.walk(tree) if isinstance(n, ast.Assert))
+    assertion.test = ast.Constant(value=False)
+    with pytest.raises(ValueError, match="whole-module AST drifted"):
+        assert_integration_inventory_ast(reference, before, ast.unparse(tree).encode())
+
+
+@pytest.mark.parametrize(
+    "reference",
+    [
+        "tests/unit/test_order60_emergency_disembark.py",
+        "tests/unit/test_phase11b_objective_control.py",
+    ],
+)
+def test_inventory_predecessor_exact_archive_bytes_reject_drift(
+    reference: str,
+    tmp_path: Path,
+) -> None:
+    from tools.core_rules_order97_history import (
+        INTEGRATION_INVENTORY_PREIMAGES,
+    )
+
+    archive = INTEGRATION_INVENTORY_PREIMAGES[reference][0]
+    for name in [reference, archive]:
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / name).read_bytes())
+    # Exercise the exact integration view without unrelated historical mappings.
+    from tools.core_rules_order97_history import integration_inventory_history
+
+    assert integration_inventory_history(reference, root=tmp_path) == tmp_path / archive
+    target = tmp_path / archive
+    target.write_bytes(target.read_bytes() + b"\n")
+    with pytest.raises(ValueError, match="input bytes drifted"):
+        integration_inventory_history(reference, root=tmp_path)
+
+
+@pytest.mark.parametrize(
+    "reference",
+    [
+        "tests/conftest.py",
+        "tests/indirect_shooting_helpers.py",
+        "tests/psychic_modifier_helpers.py",
+        "tests/support/ability_presence_fixtures.py",
+        "tests/unit/test_phase12a_timing_reactions_effects.py",
+    ],
+)
+def test_reviewed_inventory_fixture_whole_AST_rejects_unlisted_initializers(reference: str) -> None:
+    from tools.core_rules_order97_history import (
+        REVIEWED_INVENTORY_FIXTURES,
+        assert_reviewed_inventory_fixture_ast,
+    )
+
+    accepted_path = REVIEWED_INVENTORY_FIXTURES[reference][2]
+    accepted = (ROOT / accepted_path).read_bytes()
+    current = (ROOT / reference).read_bytes()
+    assert_reviewed_inventory_fixture_ast(accepted, current)
+    tree = ast.parse(current)
+    tree.body.extend(ast.parse("unlisted_inventory_fixture_initializer = True").body)
+    with pytest.raises(ValueError, match="fixture AST drifted"):
+        assert_reviewed_inventory_fixture_ast(accepted, ast.unparse(tree).encode())
+
+
+@pytest.mark.parametrize("path", sorted(ci60.HISTORICAL_TEST_PINS))
+def test_ci60_historical_test_view_requires_current_bytes_and_original_native_pin(
+    path: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    current = (ROOT / path).read_bytes()
+    before = ci60.historical_test_preimage(ROOT, path, current)
+    assert hashlib.sha256(before).hexdigest() == ci60.HISTORICAL_TEST_PINS[path]
+    with pytest.raises(ValueError, match="unrelated current bytes"):
+        ci60.historical_test_preimage(ROOT, path, current + b"\n")
+    monkeypatch.setitem(ci60.HISTORICAL_TEST_PINS, path, "0" * 64)
+    with pytest.raises(ValueError, match="native preimage changed"):
+        ci60.historical_test_preimage(ROOT, path, current)

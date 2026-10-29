@@ -1,6 +1,7 @@
 # ruff: noqa: E501,F401,F403,F405,I001
 # pyright: reportUnusedImport=false
 from __future__ import annotations
+from warhammer40k_core.engine.damage_allocation import MortalWoundApplication
 
 from typing import TYPE_CHECKING
 
@@ -935,6 +936,7 @@ class FallBackActionResult:
         *,
         before: UnitPlacement | RulesUnitPlacement,
         destroyed_model_ids: tuple[str, ...],
+        mortal_wound_application: MortalWoundApplication | None = None,
     ) -> BattlefieldTransitionBatch:
         if not self.is_valid:
             raise GameLifecycleError("Invalid Fall Back cannot emit transition records.")
@@ -944,28 +946,36 @@ class FallBackActionResult:
                 "resolved."
             )
         destroyed_ids = _validate_identifier_tuple("destroyed_model_ids", destroyed_model_ids)
-        failed_model_ids = tuple(
-            roll.requirement.model_instance_id for roll in self.failed_desperate_escape_rolls
-        )
-        if len(destroyed_ids) != len(failed_model_ids):
-            raise GameLifecycleError(
-                "Fall Back must select one model for every failed Desperate Escape roll."
+        casualty_ids = (
+            ()
+            if mortal_wound_application is None
+            else tuple(
+                damage.model_instance_id
+                for damage in mortal_wound_application.applications
+                if damage.destroyed
             )
-        eligible_model_ids = {
-            placement.model_instance_id for placement in self.attempted_placement.model_placements
-        }
-        for destroyed_id in destroyed_ids:
-            if destroyed_id not in eligible_model_ids:
-                raise GameLifecycleError(
-                    "Fall Back destroyed_model_ids must be eligible falling-back models."
-                )
-        return _rules_unit_movement_transition_batch(
+        )
+        if (self.failed_desperate_escape_rolls and mortal_wound_application is None) or tuple(
+            sorted(destroyed_ids)
+        ) != tuple(sorted(casualty_ids)):
+            raise GameLifecycleError(
+                "Fall Back casualties require the completed hazard mortal-wound application."
+            )
+        if (
+            mortal_wound_application is not None
+            and mortal_wound_application.target_unit_instance_id != self.unit_instance_id
+        ):
+            raise GameLifecycleError("Fall Back casualty packet unit drift.")
+        batch = _rules_unit_movement_transition_batch(
             before=before,
             after=self.attempted_placement,
             witness=self.witness,
             displacement_kind=ModelDisplacementKind.FALL_BACK,
             destroyed_model_ids=destroyed_ids,
         )
+        # Shared mortal-wound authority already records casualty removal before
+        # movement. This batch describes only surviving model displacement.
+        return replace(batch, removals=())
 
     def surviving_attempted_placement(
         self,

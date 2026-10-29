@@ -32,6 +32,7 @@ PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH = "return_on_death_placement_requ
 PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE = "turn_end_faction_rule_required"
 PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE = "primary_mission_turn_end_choice_required"
 PRIMARY_SCORING_PENDING_WINDOW_MISSION_TURN_END = "mission_turn_end_rule_required"
+PRIMARY_SCORING_PENDING_WINDOW_COHERENCY_CASUALTY = "coherency_casualty_required"
 LEGAL_PRIMARY_SCORING_PENDING_WINDOWS = frozenset(
     {
         PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED,
@@ -39,9 +40,11 @@ LEGAL_PRIMARY_SCORING_PENDING_WINDOWS = frozenset(
         PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE,
         PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
         PRIMARY_SCORING_PENDING_WINDOW_MISSION_TURN_END,
+        PRIMARY_SCORING_PENDING_WINDOW_COHERENCY_CASUALTY,
     }
 )
 _PENDING_WINDOW_PROVENANCE_EVENT_TYPES = {
+    PRIMARY_SCORING_PENDING_WINDOW_COHERENCY_CASUALTY: "decision_requested",
     PRIMARY_SCORING_PENDING_WINDOW_MISSION_TURN_END: "decision_requested",
     PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED: "decision_requested",
     PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH: "return_on_death_set_back_up_requested",
@@ -740,6 +743,9 @@ def _pending_window_decision_types(pending_window: str) -> frozenset[str]:
     from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
         SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
     )
+    from warhammer40k_core.engine.coherency_cleanup_decisions import (
+        SELECT_COHERENCY_CASUALTY_DECISION_TYPE,
+    )
     from warhammer40k_core.engine.damage_allocation import (
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     )
@@ -760,6 +766,9 @@ def _pending_window_decision_types(pending_window: str) -> frozenset[str]:
     )
 
     families = {
+        PRIMARY_SCORING_PENDING_WINDOW_COHERENCY_CASUALTY: frozenset(
+            {SELECT_COHERENCY_CASUALTY_DECISION_TYPE}
+        ),
         PRIMARY_SCORING_PENDING_WINDOW_MISSION_TURN_END: frozenset(
             {
                 SEQUENCING_DECISION_TYPE,
@@ -779,7 +788,7 @@ def _pending_window_decision_types(pending_window: str) -> frozenset[str]:
             {SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE}
         ),
         PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE: frozenset(
-            {SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE}
+            {SEQUENCING_DECISION_TYPE, SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE}
         ),
         PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE: frozenset(
             {SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE}
@@ -958,6 +967,7 @@ _identifier = IdentifierValidator(GameLifecycleError)
 __all__ = (
     "LEGAL_PRIMARY_SCORING_PENDING_WINDOWS",
     "PRIMARY_SCORING_BOUNDARY_LIFECYCLE_SCHEMA",
+    "PRIMARY_SCORING_PENDING_WINDOW_COHERENCY_CASUALTY",
     "PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED",
     "PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE",
     "PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH",

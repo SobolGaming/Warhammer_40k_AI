@@ -46,9 +46,7 @@ def charge_target_restriction(
     restrictions = registry.restrictions_for(
         ChargeTargetRestrictionContext(
             state=state,
-            player_id=rules_unit_view_by_id(
-                state=state, unit_instance_id=charging_unit_instance_id
-            ).owner_player_id,
+            player_id=mover.owner_player_id,
             battle_round=state.battle_round,
             charging_unit_instance_id=charging_unit_instance_id,
             target_unit_instance_id=target_unit_instance_id,

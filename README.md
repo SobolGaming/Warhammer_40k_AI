@@ -393,7 +393,7 @@ Start here:
 uv python install 3.14.5
 uv lock
 uv sync
-uv run pytest tests/unit/test_polygon_geometry.py -q --no-cov
+uv run pytest tests/unit/test_phase10i_terrain_movement.py -q --no-cov
 ```
 
 ## Test commands
@@ -404,8 +404,8 @@ workers or collect coverage unless requested.
 Fast local feedback names the affected test files explicitly, for example:
 
 ```bash
-uv run pytest tests/unit/test_polygon_geometry.py -q --no-cov
-uv run pytest tests/unit/test_phase13b_shooting_declarations.py -k hazardous -q --no-cov
+uv run pytest tests/unit/test_phase10i_terrain_movement.py -q --no-cov
+uv run pytest tests/rules/section04/test_completion_boundaries.py -k attack_mortal_choices -q --no-cov
 ```
 
 Architecture and source-shape audits run independently without behavioral coverage:
@@ -422,7 +422,7 @@ Focused subsets and `--lf` are for iteration, never replacements for this final 
 PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
   uv run pytest tests --ignore=tests/code_quality \
   -n auto --dist=worksteal \
-  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
+  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=50
 ```
 
 The `PATH` prefix exposes the Node.js runtime bundled with Codex desktop to the executable
@@ -430,14 +430,23 @@ viewer-renderer regressions. It is safe when that directory is absent: an indepe
 `node` later on the existing `PATH` remains available. Keep this prefix on full-suite runs so those
 tests do not fail only because the desktop shell omitted the bundled runtime.
 
-CI shards this same behavioral suite, combines branch coverage, and applies the single 85%
+CI shards this same behavioral suite, combines branch coverage, and applies the temporary 50%
 gate after every shard succeeds. Full type checking and architecture checks also remain required
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
 
+The owner temporarily lowered the coverage floor from 85% to 50% on 28 October 2026.
+Post-merge coverage work must restore the 85% requirement. The full
+warhammer40k_core package and branch metric remain unchanged, with no added coverage
+omissions or exclusions. This policy change does not claim either threshold has passed;
+all required tests and other gates must still succeed. See the
+[active review policy](docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
+
 The twelve behavioral manifests in `ci/test_shards/` use deterministic
-largest-processing-time balancing of median per-file durations from complete
-successful Linux CI runs. Verify that every behavioral file appears exactly once:
+largest-processing-time balancing. One heavy, source-bound module is partitioned
+into its twenty exact collected cases; every other file remains intact. The
+required quality guard checks that partition against real pytest collection.
+Verify that every selected file or declared case appears exactly once:
 
 ```bash
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
@@ -456,12 +465,19 @@ uv run --no-sync python scripts/build_test_shards.py \
   --shard-count 12
 ```
 
+The initial replacement cutover uses explicitly derived scheduling seeds from
+the retained passing cases of hosted run 40639444907 and bounded local regression
+results. Those seeds are not a complete successful current-run profile; an empty
+`profiles` list records that limitation. Replace them with the first complete
+successful selected-suite profile. Seed totals are scheduling weights, not
+measured job wall times or proof that the ten-minute target passes.
+
 A single complete local JUnit XML is also accepted; label its host accurately and
 do not mix local and hosted-runner timings in one representative CI profile.
 Every supplied run must cover the current behavioral file inventory. Missing files,
 duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts
-are rejected. New test files require a fresh complete profile; timings are never
-filled with zero. `durations.json` preserves report SHA-256 hashes and run descriptions.
+are rejected. Outside the explicit initial migration seed above, new test files
+require a fresh complete profile; timings are never filled with zero. `durations.json` preserves report SHA-256 hashes and run descriptions.
 Historical profiles measure their recorded case inventory; changed cases within an
 existing file require refreshed successful CI reports to reflect their new cost.
 
@@ -480,7 +496,7 @@ workers share read-only source/AST data within each process; mutable test fixtur
 and generated temporary output remain independently validated.
 
 Twelve standard runners increase behavioral parallel capacity without changing test
-selection or the 85% combined branch-coverage gate. Compare several successful CI
+selection or the combined branch-coverage measurement. Compare several successful CI
 runs before claiming a wall-time reduction: added capacity can increase total runner
 minutes, and cold caches or queued jobs can offset the idealized speedup. Keep main
 and merge-candidate verification; no previously tested tree is reused as authority.
@@ -1081,7 +1097,7 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=50
 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports

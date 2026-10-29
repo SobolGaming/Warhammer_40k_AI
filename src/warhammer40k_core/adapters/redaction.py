@@ -9,7 +9,7 @@ from warhammer40k_core.adapters.capability_manifest import project_capability_ma
 from warhammer40k_core.adapters.external_contract import ERROR_ENVELOPE_SCHEMA_VERSION
 from warhammer40k_core.adapters.support_profile import SupportProfilePayload
 from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
-from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import (
     EventRecordPayload,
@@ -68,6 +68,48 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 HIDDEN_DECISION_TYPE = "hidden_decision"
 HIDDEN_REQUEST_ID = "hidden-request"
 HIDDEN_RESULT_ID = "hidden-result"
+
+
+def public_army_roster_payload(
+    *,
+    request: ArmyMusterRequest,
+    state: GameState,
+    viewer: ViewerContext,
+) -> dict[str, JsonValue]:
+    """Publish recorded roster selections, never unresolved formation choices.
+
+    Profile-local model indices are the same stable physical bearer identities
+    used by mustering. Public unit/model displays supply their instance joins.
+    Config selections survive casualties and runtime split/formation changes.
+    """
+    recorded = cast(dict[str, JsonValue], request.to_payload())
+    public_fields = (
+        "army_id",
+        "player_id",
+        "catalog_id",
+        "source_package_id",
+        "ruleset_id",
+        "battle_size",
+        "detachment_selection",
+        "force_disposition_id",
+        "unit_selections",
+        "unit_points",
+        "enhancement_point_values",
+        "points_source_package_id",
+        "enhancement_assignments",
+        "warlord_selection",
+    )
+    payload = {key: validate_json_value(recorded[key]) for key in public_fields}
+    formation_visible = (
+        viewer.policy.omniscient
+        or viewer.owns_player(request.player_id)
+        or not battle_formation_declarations_are_unresolved(state)
+    )
+    for key in ("attachment_declarations", "dedicated_transport_manifests"):
+        payload[key] = validate_json_value(recorded[key]) if formation_visible else None
+    return payload
+
+
 _TACTICAL_SECONDARY_SCORE_DECLINED_EVENT_TYPE = "tactical_secondary_mission_score_declined"
 _INTERNAL_SECONDARY_AUTHORITY_COMMITMENT_KEYS = frozenset(
     {
@@ -539,6 +581,7 @@ def _event_record_hidden_from_context(
         "timing_batch_transition",
         "rule_trigger_observed",
         "attack_sequence_completion_state_recorded",
+        "attack_sequence_model_completion_state_recorded",
         "move_rule_candidates_observed",
         "rule_trigger_released",
         "rule_trigger_completed",

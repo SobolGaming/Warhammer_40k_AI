@@ -1,0 +1,241 @@
+Bounded current preservation and applicability bridge — design only
+
+Status and authority
+
+This is a reviewable design under the already approved test rebuild, documented
+bug fixes, PR587 baseline and complete qualification. It grants no new behavior,
+approval or gate credit. No source, test, reader or proof implementation is made.
+No test or engine run, Git mutation, installation or publication occurred.
+
+The prior assessment's request to authorize internal bridge design was too broad.
+Designing and reviewing this mechanism is authorized engineering work. Its later
+implementation and activation require a reviewed, complete exact scope, not a
+redundant human approval of JSON bookkeeping. Ask the user only if engineering
+adjudication exposes a genuinely new rule convention, unsupported preservation
+exception or material scope expansion. None is established by this design.
+Runtime optimization remains outside this phase and separately pending.
+
+Identity model
+
+The governing semantic base is commit
+5f509724da25a2f6ded0c2739a8e7c84bdf59c91 with tree
+1fa709a167abb369932e651f89babbd0034941c5, authenticated through protected PR587
+merge records and a reconstructed 6,442-entry canonical path/mode/type/blob tree.
+The assessed current artifact is local qualification commit
+65673dead8d763287c6e5f74467f338d2b357f0d, tree
+ceb6ba551e7baabb4080fbfcf77f416a3059041e, raw source-manifest identity
+4892160053d56dcde98c6b780497c0b1b956168af8d009fe22fd6dbd709989b9.
+Its actual local parent remains dbfe7772e2a58509fdc2072785d102a51687bce3;
+qualification ancestor 3a4dbf885ed23a29f75d024c9c30c9f774316205 stays recorded.
+
+Keep two identities explicit: the accepted historical content base and the actual
+local execution commit. A protected squash can authenticate reviewed content without
+making internal worker commits ancestors. Do not create a merge, graft, replace,
+fake parent or synthetic accepted history to make an ancestry assertion pass.
+Never rewrite 241f413... measured or 4a8fb3c... implementation identities.
+
+Proposed evidence records
+
+Use a separately versioned current bridge namespace; leave every historic archive,
+approval, pin, source-commit binding and measurement immutable. The design proposes:
+
+1. A baseline-content identity record: exact PR587 commit/tree, all canonical
+   members and modes, protected merge/approval payload references and their seals.
+   It claims retained authenticated content, not a fresh remote state or Git read.
+2. A current-source record: exact complete raw file inventory, current commit/tree,
+   its real local parent, producing runtime, lock, generator and environment pins.
+   Future validation must independently compare the actual disposable checkout and
+   committed raw blobs. Do not infer these facts from a successful status command.
+3. A complete change ledger: all 810 PR587 differences, with exact before/after
+   identities, owner changes, source obligation, approved exception rationale,
+   preservation route, affected operations/consumers and remaining controls.
+4. A per-file preservation recipe registry: exact old and current member hashes,
+   literal definition maps and only bounded approved transformations. It has no
+   blanket test-only exemption, ignored path family or arbitrary expected-value map.
+5. A current applicability record: every policy/tool/external input and exact
+   operation route, review identity and validation evidence. Historical performance
+   reports remain scoped to their original measurement cohort and producing source.
+
+Those records describe actual source, not acceptance booleans supplied by a report.
+The existing legacy adapter must keep its old exact cohort and ancestry behavior.
+The current cumulative route must be selected explicitly by version and exact
+identity. A legacy failure, missing Git access or absent receipt must not silently
+fall back to the new route. No path is accepted merely because an archive exists.
+
+Protected-squash content route
+
+Authenticate PR587's protected squash, approved reviewed content and canonical
+merged tree from the sealed payloads. Reconstruct the tree independently, preserving
+mode, type, path and blob identity. Bind each consumed baseline preimage to its exact
+canonical blob. Bind the current snapshot to its genuine local qualification history
+and raw inventory; any later implementation has a new real commit and source seal.
+
+The new route can establish a content-based cumulative comparison; it must not
+report the baseline as a local ancestor or pretend a worker measurement is current.
+Existing Git-ancestry APIs cannot be monkeypatched to return success. The proposed
+current record/reader interface must explicitly distinguish accepted content base
+from execution revision, with reject tests for every identity substitution. If a
+consumer requires actual reachable Git ancestry rather than this declared content
+route, leave that consumer unsatisfied until a legitimate permitted lineage exists.
+
+Live-successor validation must precede predecessor exposure
+
+For each historical test request, the proposed reader must execute this order:
+
+1. Authenticate registry version, complete membership and exact recipe bytes.
+2. Validate owned regular paths; reject aliases, symlinks, traversal, duplicates,
+   missing/extra successors and wrong current byte identities.
+3. Validate every live definition and helper/fixture/import initializer used by
+   that recipe, including transitive shared modules. Verify actual collector/definition
+   destinations; an unexecuted archive is not a live replacement.
+4. Compare original function/decorator/parameter/assertion ASTs with multiplicity
+   and expected statement order. For fixture or source-correct assertion changes,
+   allow only named exact transformations bound to the accepted source and specific
+   original owner. All other old statements, definitions and initializers stay exact.
+5. Require the recipe's positive and sensitivity controls and exact-head review.
+   Source documentation alone supplies no run credit. Unresolved recipes fail closed.
+6. Only then return the authenticated predecessor bytes for historical readers.
+   Live audits continue to use real live nodes and must never parse an old substitute
+   as if it certified the current consumer.
+
+Preserve the existing accepted faction-layout/current static-inventory mechanisms.
+Their archive-to-live proofs are useful substeps, but cannot by themselves bridge
+six changed faction archives backwards to PR587. Keep their exact special fixture
+and append-only-prefix controls rather than replacing them with broader exceptions.
+
+D07, D09 and geometry recipe boundaries
+
+All 33 ordinary D07 expected preimages equal the corresponding genuine baseline
+blobs. Use the prior per-file ledger and exact diffs as recipe inputs. Separate
+additive guards, literal UTF-8 reads, exact relocation, fixture changes and explicitly
+source-correct expected-value exceptions. Do not replace original-tests.json or its
+historic approvals with today's hashes. Retain D04's exact ten-die assertion and
+all existing strict descriptor/fixture identity exceptions unchanged.
+
+For D09, validate the authentic original-before -> accepted D09-after stage, then
+the accepted-after -> current stage. The facade historical input is its verified
+category predecessor, not the live collector wrapper. Shooting declarations has
+seven bounded later owner changes; preserve Heavy's separate source rules and all
+short/long/vertical/return-path/no-Advance-permission controls. Do not make the
+old helper's assertion-equality rule accept later changes by repinning its after hash.
+
+For movement_resolution_flow.py, preserve all module statements and every function
+outside the two named changed functions exactly. One recipe permits exactly the
+three inserted completed-packet retry statements in the proposal function. The
+other permits exactly one failed-roll branch delegation to shared mortal allocation.
+Require both transitive owners and causal source/packet controls. A hash of the
+whole new module is insufficient; a blanket exemption for both functions is also
+insufficient. All existing endpoint, terrain, witness, model, keyword, coherency and
+legal retry controls remain. No extra rolls, repeated damage/removal, duplicate
+completion, wrong actor/selection/mode or newly untested retry model is permitted.
+
+Aeldari adjudication and correction
+
+The earlier wording suggesting a D6+1-to-Normal-Move numerical replacement was
+incorrect. Retained source row 000009894:AE is byte-bound to authenticated PR587
+and already says both maneuvers permit a Normal move up to D6+1 inches. Current
+consumer source asserts movement_kind triggered, movement_mode normal and the
+actual native roll current_total plus exactly one. It also asserts shorter movement
+away, the original trigger/hit distinctions, declined unchanged state, invalid retry,
+one spend and restore/replay. No current runtime pass is claimed in this phase.
+
+The bounded repair fixes classification and actual turn-occurrence spend identity;
+it preserves the distance rule. Its classification prevents ordinary Normal movement
+from inheriting Surge's closest-target, maximum-approach and eligibility constraints.
+Shooting-end grants retain default Surge for unrelated sources and reject mixed
+movement kinds. The immutable source mirror retains its original edition/provider
+IDs; this does not invent a new 11th-edition source identity or resolve the separate
+retired-bridge identity failure by renaming provenance.
+
+The two removed shallow grant tests need an explicit recipe mapping every original
+source ID, target, hook, max-bonus and maneuver assertion to current native/helper
+assertions plus preserved grant structure. This is a source-correct classification
+fix within existing approval, not a new user choice about distance. Preserve turn,
+phase, round and token-limit controls, absence of unrelated Surge changes, typed
+serialization, missing-field rejection, pending restore and exact replay.
+
+Exact owner dispositions and literal operations
+
+UNMAPPED-153-OWNER-DISPOSITIONS.json contains one row for each of the 153 owners
+on 52 paths. Counts: 2 narrow validator-equivalence rows, 44 documented approved
+fix rows, 97 rows needing behavioral guards or equivalence evidence, and 10
+unresolved rows. A documented-fix classification means the delta has the stated
+approved source rationale; it is not an assertion that all its runtime branches pass.
+The two scalar-validator rows preserve validation outputs after an exact closed
+binding expansion; allocation/work equality is explicitly not claimed.
+
+PROPOSED-52-LITERAL-OPERATIONS.json proposes one operation per affected file, with
+its exact unmapped owner list and before/after hashes. There are no wildcard paths
+or owners and no multi-file cross-product widening. Every new operation is mandatory
+and sensitive. Union it with already applicable operations; do not replace or drop
+existing family comparisons, semantic/work/cache checks or budgets. Each family
+assignment is a conservative proposal, requiring consumer review before activation.
+Only an existing or independently reviewed exact source-bound policy exception can
+alter a comparison requirement; calling a change rule semantics alone cannot.
+
+The other 139 changed owners already have operation matches, but those matches are
+not new semantic acceptance. Their current source and mandatory controls still need
+the complete current assessment. This phase does not convert earlier path-level
+documentation links into whole-file approval.
+
+Full input universe and remaining evidence
+
+The literal input routing includes the complete 723-path union: 694 differing policy
+inputs within 4,836 total, and 723 differing tool inputs within 5,061 total. Include
+all three changed external reads with unchanged membership; contract version,
+generated OpenAPI types and decision catalogue are actual inputs. Preserve all
+frozen archives and control pins. The 93 positional operation-map differences are
+three exact old path entries replaced by seven current entries, not 93 independent
+semantic changes. Preserve budgets/families and prove the literal layout destinations.
+
+The complete PR587 delta has 193 changed, 607 added and 10 absent paths. All 810
+remain explicit even when outside policy/tool selection. Blob-matched predecessor
+payloads were located for 189 of the 203 non-added paths in the two permitted sealed
+archives. Fourteen remain unavailable in these inspected members: durations.json,
+shards 2 through 12, operation-map.json and _engine_build_manifest.json. Their exact
+paths and expected Git blob IDs are in FULL-810-DELTA-AND-PREIMAGE-LEDGER.json.
+This is not a claim that the payloads are absent from every retained artifact.
+Seek a permitted sealed export or an independently reconstructed payload matching
+the exact canonical blob. Do not use denied Git, raw objects or alternate access.
+
+The finite unresolved owner ledger contains:
+- Three terrain classifier/descriptor owners requiring exact source and branch scope.
+- One shared physical Vehicle/Monster blocker owner requiring mixed/attached semantics.
+- Two catalog mortal-prevention recipient owners requiring exact recipient authority.
+- One runtime module-import owner requiring reconciliation with selected admission.
+- One mixed primary pending-window owner: the coherency addition is documented, but
+  the separate faction-window sequencing expansion is not justified by that alone.
+- Two Command sequencing exception owners requiring the supported source/consumer
+  boundary; the qualified SF08 observation cannot become a universal ordering waiver.
+
+These are engineering evidence blockers, not pending human permission. There was no
+new access denial. Existing artifacts permit this design, but do not yet establish
+all predecessor and source/consumer evidence needed for activation.
+
+Implementation and independent-review acceptance
+
+Before implementation activation, recover or exactly reconstruct the fourteen
+predecessors, resolve all ten owner questions and satisfy the 97 explicit guard
+obligations, using existing adequate controls where possible. Complete the remaining
+source/fixture/control assessment for the full delta. A reviewer must derive their
+own verdict from exact source and causal consumers, not author disposition labels.
+
+Implement only the reviewed current record/reader mechanism in an isolated checkout.
+Preserve every historic payload, old reader route, source behavior, test obligation,
+actual local parent and immutable environment. Pin a new genuine implementation
+commit and exact raw source; never call the old candidate unchanged after edits.
+
+Then perform the required fresh full quality, targeted positive/negative sensitivity,
+type/lint/generated/contract and exact twelve-shard checks. Reassess behavioral
+evidence reuse from actual inputs/imports; no automatic reuse for a changed reader.
+Any production change invalidates applicable aggregates, coverage, runtime identity,
+client and performance evidence. Do not run the unqualified full 3,621 subset or
+present its 57.847 percent coverage as meeting the unchanged 85 percent gate.
+
+An authentic serial current smoke may run only after real content-base/execution-
+head/assessment bindings are valid. Preserve the smoke's limits, the 240 work budget
+and every existing timing/coverage gate. Each test command remains capped at 600
+seconds with a 500-second warning; a multi-command process is capped at 590 seconds.
+No installs, forbidden access, publication, original Git writes or runtime optimization.
+Complete local/hosted CI and a fresh literal-parent audit remain unmet later gates;
+this static design cannot earn them. Stop for independent review before implementation.

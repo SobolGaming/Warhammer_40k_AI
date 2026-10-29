@@ -664,6 +664,7 @@ def validate_model_destruction_cause_restore(
         state=state,
         event_records=event_records,
         decision_records=decision_records,
+        pending_decision_requests=pending_decision_requests,
     )
     retained = validate_model_destruction_cause_producer_restore(
         state=state,

@@ -1,0 +1,150 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "objective_control",
+  "workload_id": "order86-five-model-quarter-witness-v1",
+  "base_revision": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+  "head_input_digest": "af2ce46c1732bbebbb3cc2a7a0ce85de6fafef66cc5b7747ff558d45a775b46d",
+  "budget_profile": "current-change-relative-v1",
+  "historical_failures": [
+    "Earlier accepted-source preflight failed before workloads because its assessment named another base/runtime. It remains retained as a failed attempt.",
+    "Fresh actual-PR587/current-runtime measurements use the complete original sample counts and hard cases. Source and runtime identities, full raw outputs and whole-process receipts are retained.",
+    "Some unchanged raw drivers retain descriptive notes about their original historical baseline. Those notes do not identify the current measured arms or transfer any historical correctness conclusion; exact current revision/runtime fields and arm inventories govern.",
+    "Provisional admission failures were corrected before any measurement. Sole final freeze-literal activation is separately admitted; final live smoke must bind the actual final execution head. No full-game or full-CI qualification is claimed.",
+    "After measurement, two truncated operation digests caused false retired-edition scanner matches. Only those symbolic keys expand to full SHA256; scanner and all operation values/budgets remain unchanged. Exact metadata admission and its negative controls requalify the original producing input cohort; raw measurements and their producing input digest are not repinned."
+  ],
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:65fc8414407ae5d6a8ea779c8e737a22733459094db679a160c60f6e2129f96a",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359387648,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "11a2d11655fd368f60a13d24715e7cf141ecb40fea8bc1bc7f1054f1b1361bc7",
+    "fixture_sha256": "2b6864b6e1065a0b7b9e27e32ed61b84859962f853507fc41b30b92bd15650a2",
+    "samples": {
+      "0.01": [
+        5.5583299999852894e-05,
+        5.362766999951418e-05,
+        5.427105000080701e-05,
+        5.4702929999166374e-05,
+        5.459594000058132e-05,
+        5.3283590000319235e-05,
+        5.428565000102026e-05,
+        5.349719000150799e-05,
+        5.452942999909283e-05,
+        5.465663999984827e-05
+      ],
+      "0.01968503937007874": [
+        5.5137809999905586e-05,
+        5.6138170000394895e-05,
+        5.4439939999610944e-05,
+        5.65632400002869e-05,
+        5.598928000154046e-05,
+        5.503351000015755e-05,
+        5.456534000131796e-05,
+        5.566368000017974e-05,
+        5.532131000109075e-05,
+        5.579828999998426e-05
+      ],
+      "0.02": [
+        0.00023073388999819144,
+        0.00022740324000096733,
+        0.00022356100000024527,
+        0.00022132671000008486,
+        0.0002197382800000014,
+        0.00022162108999964402,
+        0.00022279913999909696,
+        0.0002218339899991406,
+        0.00022233108000136782,
+        0.0002195559899996624
+      ],
+      "4.0": [
+        0.00022450515999935305,
+        0.00022166749000007257,
+        0.00021997477000013533,
+        0.000218879819999529,
+        0.00022084433000145508,
+        0.00022116801000038322,
+        0.00022050145000093835,
+        0.00022049325999887515,
+        0.00021960608999961552,
+        0.00022007256000051713
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0443ce4bc405aad1737ec9a396948775010df933bd75144f6ab9ff54152118ba",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359387648,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+    "workload_sha256": "11a2d11655fd368f60a13d24715e7cf141ecb40fea8bc1bc7f1054f1b1361bc7",
+    "fixture_sha256": "2b6864b6e1065a0b7b9e27e32ed61b84859962f853507fc41b30b92bd15650a2",
+    "samples": {
+      "0.01": [
+        5.333799999789335e-05,
+        5.094490000146834e-05,
+        5.203694999863728e-05,
+        5.1990450001540014e-05,
+        5.192544999999882e-05,
+        5.1445680001052096e-05,
+        5.1893659999677766e-05,
+        5.1215290000072855e-05,
+        5.242403000011109e-05,
+        5.1509669999632026e-05
+      ],
+      "0.01968503937007874": [
+        5.265782999913426e-05,
+        5.232183999851259e-05,
+        5.2218749999610736e-05,
+        5.143797999835442e-05,
+        5.217705000177375e-05,
+        5.11793900000157e-05,
+        5.261591999897064e-05,
+        5.216195000002699e-05,
+        5.1422869998987155e-05,
+        5.140318000030675e-05
+      ],
+      "0.02": [
+        0.00022035547000086807,
+        0.0002123336099998596,
+        0.0002144569200004298,
+        0.00021240581000029124,
+        0.000212233820000165,
+        0.00021387074000131178,
+        0.0002137718499989205,
+        0.00021265429999857587,
+        0.00021472000999892772,
+        0.0002161635499987824
+      ],
+      "4.0": [
+        0.0002158751599995412,
+        0.00021033640000041486,
+        0.00021139185999800248,
+        0.00021211714000173742,
+        0.00021191762999933417,
+        0.00021338216999993164,
+        0.00021746198000073492,
+        0.00021361436000006507,
+        0.00021535276999884445,
+        0.00021297989000004235
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  }
+}

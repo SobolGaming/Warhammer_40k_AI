@@ -12,11 +12,9 @@ from warhammer40k_core.engine.damage_allocation import (
     DamageApplication,
     DestructionReactionSource,
     FeelNoPainResolution,
-    remove_destroyed_model_from_battlefield,
 )
 from warhammer40k_core.engine.destruction_provenance import (
     DestructionProvenance,
-    ModelDestructionAttribution,
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
@@ -229,7 +227,6 @@ def resolve_pending_attack_destruction_until_blocked(
     from warhammer40k_core.engine.attack_sequence_destroyed_transport import (
         _begin_destroyed_transport_disembark_if_needed,
     )
-    from warhammer40k_core.engine.attack_sequence_hit_wound import _emit_damage_event
 
     retention_status = offer_fight_on_death_retention(
         manager=manager,
@@ -258,7 +255,9 @@ def resolve_pending_attack_destruction_until_blocked(
         destruction_waits_for_retained_casualty,
     )
 
-    if destruction_waits_for_retained_casualty(
+    if (
+        retained is None or retained.stage is not RetainedDestructionStage.REMOVED
+    ) and destruction_waits_for_retained_casualty(
         state=state, model_instance_id=pending.damage_application.model_instance_id
     ):
         return attack_sequence.without_current_pending_attack_destruction(), None
@@ -295,31 +294,17 @@ def resolve_pending_attack_destruction_until_blocked(
     if mandatory_status is not None:
         return updated_sequence, mandatory_status
 
-    _validate_retained_model_placement(state=state, pending=pending)
-    remove_destroyed_model_from_battlefield(
-        state=state,
-        model_instance_id=pending.damage_application.model_instance_id,
-    )
-    destroyed_emission = _emit_damage_event(
+    from warhammer40k_core.engine.retained_demise_removal import finalize_attack_casualty
+
+    destroyed_emission = finalize_attack_casualty(
         state=state,
         decisions=decisions,
-        hooks=hooks,
         attack_sequence=updated_sequence,
         damage=pending.damage_application,
-        saving_throw=None,
         saving_throw_payload=pending.saving_throw_payload,
         feel_no_pain=pending.feel_no_pain,
-        destroyed_model_placement=pending.destroyed_model_placement,
-        destruction_attribution=ModelDestructionAttribution.for_attack(
-            destroying_player_id=updated_sequence.attacker_player_id,
-            attacking_unit_instance_id=updated_sequence.attacking_unit_instance_id,
-            attacking_model_instance_id=pending.attack_pool.attacker_model_instance_id,
-            weapon_profile=pending.attack_pool.weapon_profile,
-            attack_context_id=pending.attack_context["attack_context_id"],
-        ),
+        hooks=hooks,
     )
-    if destroyed_emission is None:
-        raise GameLifecycleError("Deferred attack destruction did not emit evidence.")
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,
         decisions=decisions,
@@ -338,22 +323,6 @@ def resolve_pending_attack_destruction_until_blocked(
     if reaction_status is not None:
         return updated_sequence, reaction_status
     return updated_sequence.without_current_pending_attack_destruction(), None
-
-
-def _validate_retained_model_placement(
-    *,
-    state: GameState,
-    pending: PendingAttackDestruction,
-) -> None:
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Deferred attack destruction requires battlefield state.")
-    recorded = ModelPlacement.from_payload(
-        cast(ModelPlacementPayload, pending.destroyed_model_placement)
-    )
-    current = battlefield.model_placement_or_none(pending.damage_application.model_instance_id)
-    if current != recorded:
-        raise GameLifecycleError("Deferred attack destruction placement drift.")
 
 
 __all__ = (

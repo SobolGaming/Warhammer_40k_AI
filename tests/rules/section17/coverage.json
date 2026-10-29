@@ -1,0 +1,1439 @@
+{
+  "schema": "section17-source-behavior-inventory-v1",
+  "source_authority": "Accepted adopted literal capture; no fresh external observation or Core version claim.",
+  "category_hierarchy": {
+    "number": "17",
+    "title": "Monsters And Vehicles",
+    "subsections": [
+      {
+        "ref": "17.01",
+        "title": "Moving Monsters And Vehicles",
+        "text": [
+          "Each time you make a \u0005normal\u0006 or \u0005advance move\u0006 with a unit, \u0003MONSTER/VEHICLE\u0004 models in that unit can be moved through friendly and enemy models (excluding other \u0003MONSTER/VEHICLE\u0004 models)."
+        ]
+      },
+      {
+        "ref": "17.02",
+        "title": "Frame",
+        "text": [
+          "Some models do not have a base; many of these are \u0003MONSTER/VEHICLE\u0004 models. Such models have the \u0003FRAME\u0004 keyword, as do some other large models. Whenever a rule refers to a model\u2019s position in relation to anything else on the battlefield (e.g. when measuring distances), if that model has the \u0003FRAME\u0004 keyword, unless otherwise stated, measure to and from the closest point on that model (so not necessarily from its base, if it has one).",
+          "When rotating a \u0003FRAME\u0004 model as part of a move, if that model does not have a base, turn it any amount around its central axis, while keeping it upright."
+        ]
+      },
+      {
+        "ref": "17.03",
+        "title": "Shooting At Engaged Monsters And Vehicles",
+        "text": [
+          "In your Shooting phase, enemy \u0003MONSTER/VEHICLE\u0004 units that are \u0005engaged\u0006 can be selected as targets of ranged attacks (excluding attacks made with \u0003[BLAST]\u0004 weapons).",
+          "Each time a model makes a ranged attack that targets such a unit, subtract 1 from the \u0005hit roll\u0006 (excluding attacks made with \u0003[CLOSE\u2011QUARTERS]\u0004 weapons by models in a unit \u0005engaged\u0006 with the target).",
+          "\u000eEngaged Monsters/Vehicles \u2013 Shooting",
+          "The \u0003Vehicle\u0004 can shoot at \u0003Infantry\u0004 unit \u0005\u0007A\b\u0006 using \u0005\u0007close-quarters shooting\b\u0006. While resolving those attacks, subtract 1 from \u0005\u0007hit rolls\b\u0006 (excluding attacks made with \u0003[Close\u2011quarters]\u0004 weapons).",
+          "\u0003Infantry\u0004 unit \u0005\u0007A\b\u0006 can shoot at the \u0003Vehicle\u0004 using \u0005\u0007normal shooting\b\u0006. While resolving those attacks, subtract 1 from \u0005\u0007hit rolls\b\u0006. As the \u0003Vehicle\u0004 is \u0005\u0007engaged\b\u0006, \u0003[Blast]\u0004 weapons cannot target it, but can target other \u0005\u0007unengaged\b\u0006 units.",
+          "The \u0003Vehicle\u0004 can shoot at \u0003Infantry\u0004 unit \u0005\u0007B\b\u0006 using \u0005\u0007close-quarters shooting\b\u0006. While resolving those attacks, subtract 1 from \u0005\u0007hit rolls\b\u0006. As the \u0003INFANTRY\u0004 unit is \u0005\u0007engaged\b\u0006, \u0003[Blast]\u0004 weapons cannot target it, but can target other \u0005\u0007unengaged\b\u0006 units.",
+          "\u0003Infantry\u0004 unit \u0005\u0007B\b\u0006 is \u0005\u0007engaged\b\u0006, but can shoot at the \u0003VEHICLE\u0004 using \u0005\u0007close-quarters shooting\b\u0006. While doing so, it can only make attacks with its \u0003[CLOSE-QUARTERS]\u0004 weapons and can only target the \u0003VEHICLE\u0004 it is \u0005\u0007engaged\b\u0006 with."
+        ],
+        "accordions": [
+          {
+            "ref": "17.03.01",
+            "title": "Shooting While Engaged With Monsters/Vehicles",
+            "text": [
+              "A unit that is \u0005engaged\u0006 with an enemy \u0003MONSTER/VEHICLE\u0004 unit is still \u0001not\u0002 \u0005eligible to shoot\u0006, and so cannot make ranged attacks against that \u0003MONSTER/VEHICLE\u0004 unit, unless that unit is \u0005eligible to shoot\u0006 while \u0005engaged\u0006 (e.g. because it is using \u0005close\u2011quarters shooting\u0006)."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "rule:17:17.01:1",
+      "locator": "17.01",
+      "title": "Moving Monsters And Vehicles",
+      "source_sha256": "be5007c7f2cfab5021ee7d68a8b0afb9a6aadf1c2be1728a62c32ab59a715afe",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "35c581d8099a72626ba1fa4c6888e963f60bace836d953cddedb846ac668e3fc",
+          "value": "Each time you make a \u0005normal\u0006 or \u0005advance move\u0006 with a unit, \u0003MONSTER/VEHICLE\u0004 models in that unit can be moved through friendly and enemy models (excluding other \u0003MONSTER/VEHICLE\u0004 models)."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "17.01:normal-and-advance-model-transit",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Normal and Advance allow each Monster/Vehicle physical model through friendly/enemy non-Monster/non-Vehicle models.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_movement.py::test_native_monster_and_vehicle_cross_models_through_public_witness",
+              "function_ast_sha256": "8ee5ea00872e7dedd77da9073f712c376e97b031c7148f15d253dffb58928cc6",
+              "assertions": [
+                "assert not unit_within_enemy_engagement_range(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements[0].pose == end",
+                "assert len(events(session, 'movement_activation_completed')) == 1",
+                "assert state.movement_phase_state is not None",
+                "assert unit.unit_instance_id in state.movement_phase_state.moved_unit_ids",
+                "assert not unit_within_enemy_engagement_range(state=state, unit_instance_id=unit.unit_instance_id)",
+                "assert session.view(viewer_player_id=viewer)"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.01:excluded-models-and-move-scope",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Other Monster/Vehicle models remain excluded; ordinary models and non-Normal/Advance enemy transit are not granted this permission.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_movement.py::test_source_move_scope_and_faq39_keep_vehicle_blockers_and_enemy_restrictions",
+              "function_ast_sha256": "f6f1ae809d46a89a9b2fe402d418c13108721cc34f3b08a91dcf374f5d01168f",
+              "assertions": [
+                "assert result.is_valid is expected, result.violations",
+                "assert PathValidationContext.from_payload(path.to_payload()).validate() == result",
+                "assert not overlap.validate().is_valid",
+                "assert result.violations"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_blocker_ownership.py::test_off_path_sibling_keyword_cannot_forbid_ordinary_model_transit",
+              "function_ast_sha256": "48e210960a9a1e29efff6e31523666feb4d41e281faa27bb96040d8e89f316c2",
+              "assertions": [
+                "assert 'MONSTER' not in blocker.own_models[1].keywords",
+                "assert 'VEHICLE' not in blocker.own_models[1].keywords",
+                "assert moving.range_to(offpath) > state.runtime_ruleset_descriptor().engagement_policy.horizontal_inches",
+                "assert not unit_within_enemy_engagement_range(state=state, unit_instance_id=mover.unit_instance_id)",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_by_id(mover.unit_instance_id).model_placements[0].pose == end",
+                "assert len(events(session, 'movement_activation_completed')) == 1",
+                "assert state.movement_phase_state is not None",
+                "assert mover.unit_instance_id in state.movement_phase_state.moved_unit_ids",
+                "assert session.view(viewer_player_id=viewer)"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_blocker_ownership.py::test_actual_crossed_monster_vehicle_rejects_and_allows_legal_retry",
+              "function_ast_sha256": "dad452f0134b6dd6fde1466a4cb1e2563280dcc12d45533050ed4ee2d1d407b7",
+              "assertions": [
+                "assert keyword in blocker.own_models[1].keywords",
+                "assert keyword not in blocker.own_models[0].keywords",
+                "assert result.status_kind is LifecycleStatusKind.INVALID",
+                "assert 'vehicle_monster_transit_forbidden' in str(result.to_payload())",
+                "assert state.battlefield_state == original",
+                "assert not events(session, 'movement_activation_completed')",
+                "assert legal.status_kind is not LifecycleStatusKind.INVALID, legal",
+                "assert len(events(session, 'movement_activation_completed')) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_blocker_ownership.py::test_actual_enemy_monster_vehicle_engagement_envelope_still_blocks_transit",
+              "function_ast_sha256": "8c717e9b307f5e1c9d4a6fdf942d68f0ec92b63367a07ecc4bc2367020d24a03",
+              "assertions": [
+                "assert result.status_kind is LifecycleStatusKind.INVALID",
+                "assert 'enemy_engagement_range_transit_forbidden' in str(result.to_payload())",
+                "assert state.battlefield_state == original",
+                "assert not events(session, 'movement_activation_completed')",
+                "assert legal.status_kind is not LifecycleStatusKind.INVALID, legal",
+                "assert len(events(session, 'movement_activation_completed')) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_blocker_ownership.py::test_all_collectors_use_actual_present_model_keywords",
+              "function_ast_sha256": "76c919f2f71a9443843e6aa1785da11fd480e89a1f350bef7edba173dc3d7661",
+              "assertions": [
+                "assert ids == expected",
+                "assert blocker.own_models[1].model_instance_id not in ids",
+                "assert mover.own_models[0].model_instance_id not in ids"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.01:physical-model-ownership",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Permission is model-scoped even in a mixed unit; native runtime retains Core keyword records.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_movement.py::test_physical_model_permission_does_not_promote_a_siblings_keyword",
+              "function_ast_sha256": "3538a897a9edca63c150ad0b98b0de55d15af49d52ad6355e0c0fbd135e01f13",
+              "assertions": [
+                "assert result.is_valid is both",
+                "assert any((v.violation_code == 'enemy_model_base_crossed' for r in result.path_validation_results for v in r.violations))"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_movement.py::test_normal_runtime_builder_preserves_core_model_keyword_capabilities",
+              "function_ast_sha256": "58e9f7c801e665af23aa7eaa0f5a380cd17786e8ab144c9ec175bdfb18eda564",
+              "assertions": [
+                "assert 'is_monster' in flags",
+                "assert 'blocks_friendly_vehicle_monster_pass_through' in flags",
+                "assert 'is_vehicle' not in flags"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_blocker_ownership.py::test_off_path_sibling_keyword_cannot_forbid_ordinary_model_transit",
+              "function_ast_sha256": "48e210960a9a1e29efff6e31523666feb4d41e281faa27bb96040d8e89f316c2",
+              "assertions": [
+                "assert 'MONSTER' not in blocker.own_models[1].keywords",
+                "assert 'VEHICLE' not in blocker.own_models[1].keywords",
+                "assert moving.range_to(offpath) > state.runtime_ruleset_descriptor().engagement_policy.horizontal_inches",
+                "assert not unit_within_enemy_engagement_range(state=state, unit_instance_id=mover.unit_instance_id)",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result",
+                "assert state.battlefield_state is not None",
+                "assert state.battlefield_state.unit_placement_by_id(mover.unit_instance_id).model_placements[0].pose == end",
+                "assert len(events(session, 'movement_activation_completed')) == 1",
+                "assert state.movement_phase_state is not None",
+                "assert mover.unit_instance_id in state.movement_phase_state.moved_unit_ids",
+                "assert session.view(viewer_player_id=viewer)"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_blocker_ownership.py::test_actual_crossed_monster_vehicle_rejects_and_allows_legal_retry",
+              "function_ast_sha256": "dad452f0134b6dd6fde1466a4cb1e2563280dcc12d45533050ed4ee2d1d407b7",
+              "assertions": [
+                "assert keyword in blocker.own_models[1].keywords",
+                "assert keyword not in blocker.own_models[0].keywords",
+                "assert result.status_kind is LifecycleStatusKind.INVALID",
+                "assert 'vehicle_monster_transit_forbidden' in str(result.to_payload())",
+                "assert state.battlefield_state == original",
+                "assert not events(session, 'movement_activation_completed')",
+                "assert legal.status_kind is not LifecycleStatusKind.INVALID, legal",
+                "assert len(events(session, 'movement_activation_completed')) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_blocker_ownership.py::test_actual_enemy_monster_vehicle_engagement_envelope_still_blocks_transit",
+              "function_ast_sha256": "8c717e9b307f5e1c9d4a6fdf942d68f0ec92b63367a07ecc4bc2367020d24a03",
+              "assertions": [
+                "assert result.status_kind is LifecycleStatusKind.INVALID",
+                "assert 'enemy_engagement_range_transit_forbidden' in str(result.to_payload())",
+                "assert state.battlefield_state == original",
+                "assert not events(session, 'movement_activation_completed')",
+                "assert legal.status_kind is not LifecycleStatusKind.INVALID, legal",
+                "assert len(events(session, 'movement_activation_completed')) == 1"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_blocker_ownership.py::test_all_collectors_use_actual_present_model_keywords",
+              "function_ast_sha256": "76c919f2f71a9443843e6aa1785da11fd480e89a1f350bef7edba173dc3d7661",
+              "assertions": [
+                "assert ids == expected",
+                "assert blocker.own_models[1].model_instance_id not in ids",
+                "assert mover.own_models[0].model_instance_id not in ids"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.01:endpoint-controls",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Moving through a model does not permit an overlapping endpoint; legal retry remains available.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_movement.py::test_transit_permission_never_allows_ending_on_another_model",
+              "function_ast_sha256": "0546aa303723a11aa7b257f02e94f0daffa80bc5e5c7ad013854ff48ea1a16a2",
+              "assertions": [
+                "assert result.status_kind is LifecycleStatusKind.INVALID",
+                "assert state.battlefield_state == original",
+                "assert 'end_on_model_overlap' in str(result.to_payload())",
+                "assert not events(session, 'movement_activation_completed')",
+                "assert legal.status_kind is not LifecycleStatusKind.INVALID, legal",
+                "assert len(events(session, 'movement_activation_completed')) == 1"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:17:17.02:1",
+      "locator": "17.02",
+      "title": "Frame",
+      "source_sha256": "2e122ac8b1faf0a5497786125ee088c85820bf2b70f53a89ee65b99d2c3a7d5a",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "2a4942ad85d5acd97f8d310a67c07c46ff56fe555773608d360a470922b69c0a",
+          "value": "Some models do not have a base; many of these are \u0003MONSTER/VEHICLE\u0004 models. Such models have the \u0003FRAME\u0004 keyword, as do some other large models. Whenever a rule refers to a model\u2019s position in relation to anything else on the battlefield (e.g. when measuring distances), if that model has the \u0003FRAME\u0004 keyword, unless otherwise stated, measure to and from the closest point on that model (so not necessarily from its base, if it has one)."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "2948b2b226b8ea545c37a665fcfbee6f37f7367638868323096b05f74718e1a8",
+          "value": "When rotating a \u0003FRAME\u0004 model as part of a move, if that model does not have a base, turn it any amount around its central axis, while keeping it upright."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "17.02:frame-from-and-to-closest-point",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "FRAME position/distance measurements include physical parts, including on based models; ordinary models keep their support-base rules distances.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_frame.py::test_keyword_controls_measurement_from_and_to_identical_physical_body",
+              "function_ast_sha256": "07401781c264c57ed06e1e6b1069e4b2464e197634130b6353a304f53437c359",
+              "assertions": [
+                "assert subject.measures_every_part is frame",
+                "assert (context.closest_distance_inches() <= 1) is frame",
+                "assert source.range_to(target) < 1 if frame else source.range_to(target) > 2",
+                "assert restored.to_payload() == context.to_payload()",
+                "assert (restored.closest_distance_inches() <= 1) is frame"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.02:whole-distance-context",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "All-part measurement retains every physical point in whole-distance contexts, not merely closest-point selection.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_frame.py::test_every_part_whole_distance_includes_a_remote_overhang",
+              "function_ast_sha256": "d98af35dc47be271ed33f6b335231ac40df320113782ed5daab94051c33281ab",
+              "assertions": [
+                "assert DistanceMeasurementContext.from_models(source, ordinary).target_wholly_within_distance(4)",
+                "assert not DistanceMeasurementContext.from_models(source, frame).target_wholly_within_distance(4)",
+                "assert DistanceMeasurementContext.from_models(source, frame).target_wholly_within_distance(6)"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.02:terrain-and-objective-position",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Physical overhang determines source terrain-area and Companion Terrain Objective membership.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_frame.py::test_faq34_frame_overhang_is_in_source_terrain_area_at_any_height",
+              "function_ast_sha256": "7ee07a2b8a534deaa7834e91fb37ba949c9c27d2e3419eb7c9a6ebc86bbf81bd",
+              "assertions": [
+                "assert model_intersects_terrain_area(frame, logical)",
+                "assert not model_intersects_terrain_area(replace(frame, measures_every_part=False), logical)"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_frame.py::test_frame_occupies_actual_companion_terrain_objective_using_body",
+              "function_ast_sha256": "1d9e7b15b2f6dc649846c1349f684a881b57e840b2ac2b156e0341a9827a9db2",
+              "assertions": [
+                "assert measured.horizontal_distance_inches == 0",
+                "assert measured.within_control_range",
+                "assert not measure_model_to_objective(model=replace(subject, measures_every_part=False), objective=objective).within_control_range"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.02:marker-same-point",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "The user-adopted marker limits require one physical point meeting horizontal and vertical limits.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_frame.py::test_marker_axes_cannot_be_borrowed_from_different_frame_points",
+              "function_ast_sha256": "37c5fe24c7dbaac70e0a3c1080a7307fd6c16cb6e13e6a248a3abe5ffa9e0407",
+              "assertions": [
+                "assert result.horizontal_distance_inches == 0",
+                "assert result.vertical_gap_inches == 0",
+                "assert not result.within_control_range",
+                "assert measure_model_to_objective(model=lowered, objective=objective).within_control_range"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.02:baseless-central-axis-rotation",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "Declared baseless hull rotates any yaw about its center while staying upright; native baseless provider admission is not claimed.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_frame.py::test_declared_baseless_hull_rotates_upright_about_its_center",
+              "function_ast_sha256": "c670535f1a9a0be0471af4fa8df0b7a498e39c0f1be5c7c5065ab0f277a128a3",
+              "assertions": [
+                "assert path.validate().is_valid",
+                "assert rotated.pose.position == hull.pose.position",
+                "assert rotated.pose.facing.degrees == degrees",
+                "assert rotated.volume == hull.volume"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:17:17.03:1",
+      "locator": "17.03",
+      "title": "Shooting At Engaged Monsters And Vehicles",
+      "source_sha256": "acfbfe49295f0d526aaa1a9c7823f1ddc95eac0cf212935a631bd576740d928f",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "0732e991b63a2316e9cd0c582af9f1a6dc202680e442df75b18f0fd34f5dc18e",
+          "value": "In your Shooting phase, enemy \u0003MONSTER/VEHICLE\u0004 units that are \u0005engaged\u0006 can be selected as targets of ranged attacks (excluding attacks made with \u0003[BLAST]\u0004 weapons)."
+        },
+        {
+          "ordinal": 2,
+          "kind": "text",
+          "sha256": "0b961cb851c41330c6241b465d1e867161d15aa0336ab318ae3b49a132634d60",
+          "value": "Each time a model makes a ranged attack that targets such a unit, subtract 1 from the \u0005hit roll\u0006 (excluding attacks made with \u0003[CLOSE\u2011QUARTERS]\u0004 weapons by models in a unit \u0005engaged\u0006 with the target)."
+        },
+        {
+          "ordinal": 3,
+          "kind": "text",
+          "sha256": "b258f0d6aa25ef1e50eb7ad4296057690e9e697e248965712ed4f791bf5844f0",
+          "value": "\u000eEngaged Monsters/Vehicles \u2013 Shooting"
+        },
+        {
+          "ordinal": 4,
+          "kind": "text",
+          "sha256": "4b5a5da269f1ac9a42df8aa31cfd8fd2111206cb723fd0235cc30526cc8290dd",
+          "value": "The \u0003Vehicle\u0004 can shoot at \u0003Infantry\u0004 unit \u0005\u0007A\b\u0006 using \u0005\u0007close-quarters shooting\b\u0006. While resolving those attacks, subtract 1 from \u0005\u0007hit rolls\b\u0006 (excluding attacks made with \u0003[Close\u2011quarters]\u0004 weapons)."
+        },
+        {
+          "ordinal": 5,
+          "kind": "text",
+          "sha256": "5f70b94e2fd4ca711196b1e0bfc7136a46205d16a96c918dc10b09cc7c2b9857",
+          "value": "\u0003Infantry\u0004 unit \u0005\u0007A\b\u0006 can shoot at the \u0003Vehicle\u0004 using \u0005\u0007normal shooting\b\u0006. While resolving those attacks, subtract 1 from \u0005\u0007hit rolls\b\u0006. As the \u0003Vehicle\u0004 is \u0005\u0007engaged\b\u0006, \u0003[Blast]\u0004 weapons cannot target it, but can target other \u0005\u0007unengaged\b\u0006 units."
+        },
+        {
+          "ordinal": 6,
+          "kind": "text",
+          "sha256": "75adb171de4252dbcfb9b27f1514f928c00b2898db638d26691c87fa27d6f916",
+          "value": "The \u0003Vehicle\u0004 can shoot at \u0003Infantry\u0004 unit \u0005\u0007B\b\u0006 using \u0005\u0007close-quarters shooting\b\u0006. While resolving those attacks, subtract 1 from \u0005\u0007hit rolls\b\u0006. As the \u0003INFANTRY\u0004 unit is \u0005\u0007engaged\b\u0006, \u0003[Blast]\u0004 weapons cannot target it, but can target other \u0005\u0007unengaged\b\u0006 units."
+        },
+        {
+          "ordinal": 7,
+          "kind": "text",
+          "sha256": "aab184191bd5f0cea7682ef79bc16d096e994feec1bd51f4c214c19d682074e2",
+          "value": "\u0003Infantry\u0004 unit \u0005\u0007B\b\u0006 is \u0005\u0007engaged\b\u0006, but can shoot at the \u0003VEHICLE\u0004 using \u0005\u0007close-quarters shooting\b\u0006. While doing so, it can only make attacks with its \u0003[CLOSE-QUARTERS]\u0004 weapons and can only target the \u0003VEHICLE\u0004 it is \u0005\u0007engaged\b\u0006 with."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "17.03:engaged-target-exception",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "In own Shooting, engaged enemy Monster/Vehicle units remain selectable; ordinary engaged enemy units do not gain that exception.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_unengaged_shooter_selects_only_engaged_monster_vehicle_without_blast",
+              "function_ast_sha256": "52c2c221a962abcf4eee2262076c880e01278d60e9a1bed95c1755eb055d0a99",
+              "assertions": [
+                "assert state.current_battle_phase is not None",
+                "assert state.current_battle_phase.value == 'shooting'",
+                "assert state.active_player_id == 'owner'",
+                "assert result.is_legal is expected, result",
+                "assert ShootingTargetCandidate.from_payload(json.loads(json.dumps(result.to_payload()))) == result",
+                "assert result.shooting_types == (ShootingType.NORMAL,)",
+                "assert result.hit_roll_modifier == (-1 if engaged else 0)",
+                "assert (ENGAGED_TARGET_SOURCE_ID in result.targeting_rule_ids) is engaged",
+                "assert result.line_of_sight_witness is not None",
+                "assert result.target_visible_model_ids",
+                "assert result.target_in_range_model_ids"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.03:blast-exclusion",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "BLAST cannot target the engaged Monster/Vehicle, including actual equipped native BLAST and atomic retry.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_equipped_native_blast_rejects_engaged_target_before_queue_pop_and_retries",
+              "function_ast_sha256": "998f342b289346f451a433653d496d5dbc73f0e153d5998112b3aab172870956",
+              "assertions": [
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert accepted.status_kind is not LifecycleStatusKind.INVALID, accepted",
+                "assert accepted_pools(session)[0]['hit_roll_modifier'] == -1"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.03:penalty-and-exemption",
+          "source_blocks": [
+            2
+          ],
+          "acceptance": "The target penalty is independent of the attacking Monster/Vehicle penalty. CLOSE-QUARTERS exemption requires engagement with that specific target.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_target_penalty_exemption_requires_own_engagement_and_close_quarters_weapon",
+              "function_ast_sha256": "2ce368a99ee297e308c9ed44d75a98afb248bcad90c0937fa5b8daf3482902ab",
+              "assertions": [
+                "assert result.is_legal, result",
+                "assert result.hit_roll_modifier == (0 if exempt else -2 if mutual else -1)",
+                "assert (ENGAGED_TARGET_SOURCE_ID in result.targeting_rule_ids) is (not exempt)",
+                "assert (CLOSE_QUARTERS_SHOOTING_SOURCE_ID in result.targeting_rule_ids) is (mutual and (not exempt))",
+                "assert result.shooting_types == ((ShootingType.CLOSE_QUARTERS,) if mutual else (ShootingType.NORMAL,))"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.03:diagram-caption",
+          "source_blocks": [
+            3
+          ],
+          "acceptance": "The diagram heading introduces the four concrete A/B relationships below; not a new independent permission.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_diagram_a_normal_shooting_penalty_reaches_real_attacks_and_both_viewers",
+              "function_ast_sha256": "beef0fe921b7c2e7193ebdace33a28c04c167f579b2fe235a6c8a4ced1e6fa6a",
+              "assertions": [
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert pool['shooting_type'] == 'normal'",
+                "assert pool['hit_roll_modifier'] == -1",
+                "assert isinstance(rule_ids, list)",
+                "assert ENGAGED_TARGET_SOURCE_ID in rule_ids",
+                "assert len([e for e in records if e.event_type == 'attack_sequence_completed']) == 1",
+                "assert state.shooting_phase_state is not None",
+                "assert attacker.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert session.view(viewer_player_id=viewer)"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_diagram_vehicle_can_shoot_a_or_b_with_target_specific_blast_restriction",
+              "function_ast_sha256": "74b7ddac604d0f14b2e21de0348192bc38aa9d5639735579d933d336f156f168",
+              "assertions": [
+                "assert (result.status_kind is LifecycleStatusKind.INVALID) is forbidden",
+                "assert pool['hit_roll_modifier'] == -1",
+                "assert isinstance(rule_ids, list)",
+                "assert CLOSE_QUARTERS_SHOOTING_SOURCE_ID in rule_ids",
+                "assert ENGAGED_TARGET_SOURCE_ID not in rule_ids",
+                "assert session.lifecycle.to_payload() == before",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.03:diagram-vehicle-to-a",
+          "source_blocks": [
+            4
+          ],
+          "acceptance": "Engaged Vehicle may shoot unengaged Infantry A using close-quarters shooting, with -1 except target-specific close-quarters exemption.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_diagram_vehicle_can_shoot_a_or_b_with_target_specific_blast_restriction",
+              "function_ast_sha256": "74b7ddac604d0f14b2e21de0348192bc38aa9d5639735579d933d336f156f168",
+              "assertions": [
+                "assert (result.status_kind is LifecycleStatusKind.INVALID) is forbidden",
+                "assert pool['hit_roll_modifier'] == -1",
+                "assert isinstance(rule_ids, list)",
+                "assert CLOSE_QUARTERS_SHOOTING_SOURCE_ID in rule_ids",
+                "assert ENGAGED_TARGET_SOURCE_ID not in rule_ids",
+                "assert session.lifecycle.to_payload() == before",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_diagram_vehicle_close_quarters_exemption_only_for_engaged_infantry",
+              "function_ast_sha256": "cc717f1be18a6229efe3f167f9bc57f8748108ef8a4b58a5ebdfacf988e992b3",
+              "assertions": [
+                "assert candidate.is_legal",
+                "assert candidate.hit_roll_modifier == (0 if target == 'enemy:target' else -1)"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.03:diagram-a-to-vehicle",
+          "source_blocks": [
+            5
+          ],
+          "acceptance": "Unengaged Infantry A uses normal shooting against engaged Vehicle with -1; BLAST exclusion targets engagement, not the firing mode.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_diagram_a_normal_shooting_penalty_reaches_real_attacks_and_both_viewers",
+              "function_ast_sha256": "beef0fe921b7c2e7193ebdace33a28c04c167f579b2fe235a6c8a4ced1e6fa6a",
+              "assertions": [
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert pool['shooting_type'] == 'normal'",
+                "assert pool['hit_roll_modifier'] == -1",
+                "assert isinstance(rule_ids, list)",
+                "assert ENGAGED_TARGET_SOURCE_ID in rule_ids",
+                "assert len([e for e in records if e.event_type == 'attack_sequence_completed']) == 1",
+                "assert state.shooting_phase_state is not None",
+                "assert attacker.unit_instance_id in state.shooting_phase_state.shot_unit_ids",
+                "assert session.events_since(EventStreamCursor(), viewer_player_id=viewer)",
+                "assert session.view(viewer_player_id=viewer)"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_unengaged_shooter_selects_only_engaged_monster_vehicle_without_blast",
+              "function_ast_sha256": "52c2c221a962abcf4eee2262076c880e01278d60e9a1bed95c1755eb055d0a99",
+              "assertions": [
+                "assert state.current_battle_phase is not None",
+                "assert state.current_battle_phase.value == 'shooting'",
+                "assert state.active_player_id == 'owner'",
+                "assert result.is_legal is expected, result",
+                "assert ShootingTargetCandidate.from_payload(json.loads(json.dumps(result.to_payload()))) == result",
+                "assert result.shooting_types == (ShootingType.NORMAL,)",
+                "assert result.hit_roll_modifier == (-1 if engaged else 0)",
+                "assert (ENGAGED_TARGET_SOURCE_ID in result.targeting_rule_ids) is engaged",
+                "assert result.line_of_sight_witness is not None",
+                "assert result.target_visible_model_ids",
+                "assert result.target_in_range_model_ids"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.03:diagram-vehicle-to-b",
+          "source_blocks": [
+            6
+          ],
+          "acceptance": "Vehicle may use close-quarters shooting against engaged Infantry B; ordinary weapons suffer -1; BLAST can instead target an unengaged enemy.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_diagram_vehicle_can_shoot_a_or_b_with_target_specific_blast_restriction",
+              "function_ast_sha256": "74b7ddac604d0f14b2e21de0348192bc38aa9d5639735579d933d336f156f168",
+              "assertions": [
+                "assert (result.status_kind is LifecycleStatusKind.INVALID) is forbidden",
+                "assert pool['hit_roll_modifier'] == -1",
+                "assert isinstance(rule_ids, list)",
+                "assert CLOSE_QUARTERS_SHOOTING_SOURCE_ID in rule_ids",
+                "assert ENGAGED_TARGET_SOURCE_ID not in rule_ids",
+                "assert session.lifecycle.to_payload() == before",
+                "assert result.status_kind is not LifecycleStatusKind.INVALID, result"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_diagram_vehicle_close_quarters_exemption_only_for_engaged_infantry",
+              "function_ast_sha256": "cc717f1be18a6229efe3f167f9bc57f8748108ef8a4b58a5ebdfacf988e992b3",
+              "assertions": [
+                "assert candidate.is_legal",
+                "assert candidate.hit_roll_modifier == (0 if target == 'enemy:target' else -1)"
+              ]
+            }
+          ]
+        },
+        {
+          "clause_id": "17.03:diagram-b-to-vehicle",
+          "source_blocks": [
+            7
+          ],
+          "acceptance": "Engaged ordinary Infantry B uses only CLOSE-QUARTERS weapons against its engaged Vehicle; its eligible mode is not normal shooting.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_diagram_b_engagement_does_not_grant_infantry_normal_shooting",
+              "function_ast_sha256": "4404710eceb892fa8fadedeb8c54835e78e5f53ad244efaacb10a80037a759f3",
+              "assertions": [
+                "assert {o.option_id for o in pending(session).options} == {'close_quarters'}",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert pool['shooting_type'] == 'close_quarters'",
+                "assert pool['hit_roll_modifier'] == (0 if attacker_sheet == LORD else -2)",
+                "assert isinstance(rule_ids, list)",
+                "assert (ENGAGED_TARGET_SOURCE_ID in rule_ids) is (attacker_sheet != LORD)"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "rule:17:17.03.01:1",
+      "locator": "17.03.01",
+      "title": "Shooting While Engaged With Monsters/Vehicles",
+      "source_sha256": "6b2f8e6fa592c947e1ab63a978975f7ae0e3a94dff9e7f6dc02748a114e635d0",
+      "blocks": [
+        {
+          "ordinal": 1,
+          "kind": "text",
+          "sha256": "c8d849d357000801e899577957f2e6acf7f85248b8505a685bc0e8e21cbfa59e",
+          "value": "A unit that is \u0005engaged\u0006 with an enemy \u0003MONSTER/VEHICLE\u0004 unit is still \u0001not\u0002 \u0005eligible to shoot\u0006, and so cannot make ranged attacks against that \u0003MONSTER/VEHICLE\u0004 unit, unless that unit is \u0005eligible to shoot\u0006 while \u0005engaged\u0006 (e.g. because it is using \u0005close\u2011quarters shooting\u0006)."
+        }
+      ],
+      "obligations": [
+        {
+          "clause_id": "17.03.01:eligibility-not-granted-by-target",
+          "source_blocks": [
+            1
+          ],
+          "acceptance": "Being engaged with a Monster/Vehicle does not itself make an ordinary unit eligible to shoot; valid close-quarters permission and selected mode remain required.",
+          "semantic_assertions": [
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_diagram_b_engagement_does_not_grant_infantry_normal_shooting",
+              "function_ast_sha256": "4404710eceb892fa8fadedeb8c54835e78e5f53ad244efaacb10a80037a759f3",
+              "assertions": [
+                "assert {o.option_id for o in pending(session).options} == {'close_quarters'}",
+                "assert invalid.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert status.status_kind is not LifecycleStatusKind.INVALID, status",
+                "assert pool['shooting_type'] == 'close_quarters'",
+                "assert pool['hit_roll_modifier'] == (0 if attacker_sheet == LORD else -2)",
+                "assert isinstance(rule_ids, list)",
+                "assert (ENGAGED_TARGET_SOURCE_ID in rule_ids) is (attacker_sheet != LORD)"
+              ]
+            },
+            {
+              "node": "tests/rules/section17/test_shooting.py::test_stale_engaged_target_keyword_loss_rejects_original_option_atomically",
+              "function_ast_sha256": "35581f1404dde6fde8841487de7351fde58b3a37ae5df6749aff6da2b7f2a1a4",
+              "assertions": [
+                "assert result.status_kind is LifecycleStatusKind.INVALID",
+                "assert session.lifecycle.to_payload() == before",
+                "assert pending(session).request_id == request.request_id"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "locally_owned_faqs": [
+    {
+      "ordinal": 5,
+      "id": "e5941469-5653-49b2-919e-9c9246e811d4",
+      "question": "Does my model or unit become engaged while moving through a enemy units engagement range during a move?",
+      "answer": "No",
+      "source_sha256": "819dd65da567f7dae1c13e61e2e2a43c02b1188d605f1458b3c5778eefe50b36",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section17/test_movement.py::test_native_monster_and_vehicle_cross_models_through_public_witness",
+          "function_ast_sha256": "8ee5ea00872e7dedd77da9073f712c376e97b031c7148f15d253dffb58928cc6",
+          "assertions": [
+            "assert not unit_within_enemy_engagement_range(state=state, unit_instance_id=unit.unit_instance_id)",
+            "assert result.status_kind is not LifecycleStatusKind.INVALID, result",
+            "assert state.battlefield_state is not None",
+            "assert state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements[0].pose == end",
+            "assert len(events(session, 'movement_activation_completed')) == 1",
+            "assert state.movement_phase_state is not None",
+            "assert unit.unit_instance_id in state.movement_phase_state.moved_unit_ids",
+            "assert not unit_within_enemy_engagement_range(state=state, unit_instance_id=unit.unit_instance_id)",
+            "assert session.view(viewer_player_id=viewer)"
+          ]
+        }
+      ]
+    },
+    {
+      "ordinal": 34,
+      "id": "603e9b2f-cc24-498c-ac2e-08ad3068f257",
+      "question": "Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area?",
+      "answer": "Yes",
+      "source_sha256": "f12df889b0db17cfacf6358aea3dcd1a3d2725660c8a159eabad35f6f6c9fef3",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section17/test_frame.py::test_faq34_frame_overhang_is_in_source_terrain_area_at_any_height",
+          "function_ast_sha256": "7ee07a2b8a534deaa7834e91fb37ba949c9c27d2e3419eb7c9a6ebc86bbf81bd",
+          "assertions": [
+            "assert model_intersects_terrain_area(frame, logical)",
+            "assert not model_intersects_terrain_area(replace(frame, measures_every_part=False), logical)"
+          ]
+        }
+      ]
+    },
+    {
+      "ordinal": 39,
+      "id": "9b1c81f5-2ea0-40eb-9015-6a005367cd75",
+      "question": "While making a move type other than a normal/advance move, can my MONSTER/VEHICLE unit move through friendly units?",
+      "answer": "Yes.",
+      "source_sha256": "f3c9e8b3182c4e2071fac4e28a5f24038296b51c1e9815e075078612dfa184ee",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section17/test_movement.py::test_source_move_scope_and_faq39_keep_vehicle_blockers_and_enemy_restrictions",
+          "function_ast_sha256": "f6f1ae809d46a89a9b2fe402d418c13108721cc34f3b08a91dcf374f5d01168f",
+          "assertions": [
+            "assert result.is_valid is expected, result.violations",
+            "assert PathValidationContext.from_payload(path.to_payload()).validate() == result",
+            "assert not overlap.validate().is_valid",
+            "assert result.violations"
+          ]
+        }
+      ]
+    },
+    {
+      "ordinal": 51,
+      "id": "60232b79-7a10-44a0-ac68-e27312c7ba60",
+      "question": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+      "answer": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit.",
+      "source_sha256": "a4fb6955c73cae19a4d09415f8b77188b6fd8542fbb0448084db0db2c56c392f",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section17/test_shooting.py::test_faq51_destroyed_model_does_not_supply_target_unit_monster_keyword",
+          "function_ast_sha256": "8cc4db32bf27fb0ba8ce84a247b2d710e62e3e64cc69d09811bf0c0423902318",
+          "assertions": [
+            "assert 'MONSTER' in view.keywords",
+            "assert 'MONSTER' not in living.keywords",
+            "assert living.alive_models() == (second,)"
+          ]
+        }
+      ]
+    },
+    {
+      "ordinal": 53,
+      "id": "7f238e23-cd3f-40ad-aa91-c75274cc655e",
+      "question": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?",
+      "answer": "Line of sight is drawn from any part of the observing model to any part of the model being observed.",
+      "source_sha256": "cf0fd95bcbcfb3ff78f04318e141c735309cc69f5f3815ab946d5a4245563333",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section17/test_frame.py::test_faq53_visibility_uses_body_even_when_rules_distances_use_base",
+          "function_ast_sha256": "de9f6d9480253114e2bac7e9dad2c039dff38793a1526432723e05f4925fba16",
+          "assertions": [
+            "assert seen",
+            "assert not hidden"
+          ]
+        }
+      ]
+    },
+    {
+      "ordinal": 63,
+      "id": "9638115f-b94b-4d05-ba62-df9fba2805ac",
+      "question": "When a model overhangs the edge of the battlefield, how does that affect its visibility?",
+      "answer": "That model's controlling player can draw line of sight from any part of that model that is not overhanging the edge of the battlefield. Their opponent can draw line of sight to any part of that model.",
+      "source_sha256": "1c43f713b930f8f51c7d429991f40174c22eb30bbf4bd56773993b4a8e319cd8",
+      "semantic_assertions": [
+        {
+          "node": "tests/rules/section17/test_frame.py::test_faq63_overhanging_origins_are_clipped_but_targets_remain_physical",
+          "function_ast_sha256": "9e7b7502f3b8573ffdeffe6d2f2b5938b6041dc84d72167aa046e653e70e79af",
+          "assertions": [
+            "assert decide_physical_any(domains(overhanging), domains(inside), (), bounds)",
+            "assert not decide_physical_any(domains(outside), domains(inside), (), bounds)",
+            "assert decide_physical_any(domains(inside), domains(outside), (), bounds)"
+          ]
+        }
+      ]
+    }
+  ],
+  "all_current_faqs_screened": 64,
+  "faq_screen": [
+    {
+      "ordinal": 1,
+      "id": "c2df3e97-f21e-4fc9-943e-37072c08c10e",
+      "source_sha256": "5dde776b1cf69f6b47b71219938b51665eb2d8a42e8392befa07e5afdea855e2",
+      "question": "Aerialists ability allows you to get into a transport even though they disembarked a transport this turn?",
+      "answer": "Yes, as the unit embarking is not making a normal, advance or fall-back move as part of this embarkation.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 2,
+      "id": "9bfa47ed-be8d-4e11-80de-f3832d507ca1",
+      "source_sha256": "8d4f6b7b01b92637f2848b261fe07f970ef819f1ee867b889e885d1bdcbb1ada",
+      "question": "Can I select a unit to shoot or fight if it doesn't have melee or ranged weapons?",
+      "answer": "Yes, it just makes no attacks and then the fight type or shoot type is resolved.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 3,
+      "id": "7f767dd0-3996-417e-bba2-b7a5828b2430",
+      "source_sha256": "4cfeea846d7a2e135d7eb728147265987cc1adf54ca93657427474d44fe9ce56",
+      "question": "Can a model be within range of a weapon if it is not visible",
+      "answer": "Yes",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 4,
+      "id": "904b8b36-09f0-4449-a9c3-45892664ef60",
+      "source_sha256": "4d6f85a577496676241ac385c0cb4fa2e672c8c679d56ff363d7344279670845",
+      "question": "Do models destroyed when a unit is out of coherency count for mission objectives?",
+      "answer": "Yes.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 5,
+      "id": "e5941469-5653-49b2-919e-9c9246e811d4",
+      "source_sha256": "819dd65da567f7dae1c13e61e2e2a43c02b1188d605f1458b3c5778eefe50b36",
+      "question": "Does my model or unit become engaged while moving through a enemy units engagement range during a move?",
+      "answer": "No",
+      "disposition": "locally_colocated",
+      "reason": "Local semantic assertions are bound below."
+    },
+    {
+      "ordinal": 6,
+      "id": "5928ab6e-7113-42c8-9085-4291faddae09",
+      "source_sha256": "3baf6215041a9e32c26f4544ae11dc0907a480bc3e2b1f3b30f0dfd8a8f53efe",
+      "question": "How many mortals do you take from Hazardous tests for a combined vehicle/monster and Infantry unit",
+      "answer": "The roll would be all at once and it would be 1 MW per fail",
+      "disposition": "bounded_cross_section",
+      "reason": "Hazardous mixed Monster/Vehicle wound counts belong to Section06; no hazard is invoked by 17.01 ordinary movement."
+    },
+    {
+      "ordinal": 7,
+      "id": "6b074ac1-8a03-43ac-8669-3bac17d372ab",
+      "source_sha256": "ce792ca90e1fcdfb597549aaba5c9c7fa227850068b1581a6b00492e993aafb7",
+      "question": "I failed hazard rolls from [Hazardous] weapons, do those mortal wounds have to be allocated to the models with the [Hazardous] weapons?",
+      "answer": "No, you allocate the mortal wounds to the unit as per Mortal Wounds(06.02). (This represents Bob the guardsmen picking up his fallen squad mates plasma gun or that the twisting power of James the Chaos Sorcerer pulling his followers into the warp.)",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 8,
+      "id": "e58d31bc-b6eb-4db1-b319-dc27dd60154f",
+      "source_sha256": "6cb474a554ba766f84b3bf678656f25876bec6fb41905666e7e3a0697b89e3fb",
+      "question": "I have a rule that triggers when a mortal wound is allocated to a model, when does this happen?",
+      "answer": "When you select a model in the Select Model step of Mortal Wounds (06.02).",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 9,
+      "id": "814f382c-d6b7-4a30-a78b-1247b57ac133",
+      "source_sha256": "0c6ab46362def6aac110116ddd1f38ac0efee475fdefeeeac74b6291198e1f87",
+      "question": "I have a unit being attacked with weapons that will modify some of their save rolls to be worse then 6 should I make those save rolls?",
+      "answer": "Yes, because other models in your unit may have Sv's that are better those models you've mentioned, this means that enough save rolls could be allocated to the those models that the rest of the results are not greater then the Sv's of the other models in your unit.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 10,
+      "id": "acdcfb0c-5b84-4b41-b271-751c4204bf56",
+      "source_sha256": "e8193326f2f9d7e3fb0a5d65ea64a96b7d6d2d5a3051487cc84a7c94bbef51d1",
+      "question": "If I have a rule that says my unit can move up to 6\" when it makes a pile-in move or consolidation move, does this also mean it changes the maximum distance of those moves to 6\"?",
+      "answer": "Yes",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 11,
+      "id": "9657bb5d-72da-4d42-9927-731c9fc0e315",
+      "source_sha256": "cade2b4fcf8c180e7fccd7db3cda6b1d9af1dcf01e2d728abbb3011d7bc286f2",
+      "question": "If a rule allows my unit to pile-in or consolidate an extra distance in the Fight phase, when can I use that rule?",
+      "answer": "For pile-in moves, during the Pile-in step(12.02), and for consolidation moves, during the Consolidate step(12.07) of the Fight phase.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 12,
+      "id": "55ea7d23-2f9e-45bf-bf6c-d98bf682549f",
+      "source_sha256": "5b0a2ff2b97ec653c19ef9a0b2b903cefe44903aae6ce26174360afd342a5b16",
+      "question": "If a rule modifies how far a unit or model can move during a pile-in move or consolidation move does it also change the distance of the target units?",
+      "answer": "No",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 13,
+      "id": "4978f15f-2b4a-4805-aacd-db9b5cad71bd",
+      "source_sha256": "418d349eaf7304a61d3dd28047950280deee139fe1a1f4a68b3c71f5414183a3",
+      "question": "If a rule says a unit auto passes Desperate Escape tests does that mean it would auto pass the hazard rolls from a desperate escape move?",
+      "answer": "Yes",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 14,
+      "id": "fae8a959-9cbe-46e3-a721-029b23b24e24",
+      "source_sha256": "203efbd7887644a4d4a986b7b38ecf618e7a775677f1b61a1726ae0954da4f17",
+      "question": "If a rule says a unit can embark into a Transport in a turn that unit disembarked, does this ignore the core rules restriction on embarking in a turn that unit made a set up move (see 18.02)?",
+      "answer": "Yes",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 15,
+      "id": "81bf7082-3ef5-47b9-bfc4-f2021fff1d4f",
+      "source_sha256": "63e2958a2a4ffb22895f940904bf6956f11e89ba2717bab129d341a8b6f60e6c",
+      "question": "If a rule says my unit must make a hazard roll does every model in the unit make a hazard roll?",
+      "answer": "No, the unit would make 1 single hazard roll.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 16,
+      "id": "bbe268a2-b1fd-43ab-8b24-fd4363730c3f",
+      "source_sha256": "1912cbae65dddd8e8799e7e7a82a5ec5984533152aae9239745831f9dfed89ae",
+      "question": "If a unit becomes battle-shocked after starting an action does it stop performing that action?",
+      "answer": "Yes",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 17,
+      "id": "4c654d00-318d-4665-9e46-26cfab179a29",
+      "source_sha256": "fef99387330cc3df5d34f0f94c59f49ddd403bffc2bb46936e4b80d8214f46bb",
+      "question": "If a unit has a rule that allows it to start an action when it is battle-shocked can it also continue doing that action if it becomes battle-shocked after starting an action?",
+      "answer": "Yes",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 18,
+      "id": "b49d0004-1dd8-4746-a971-0b6656719dd3",
+      "source_sha256": "1eb39b2856a8e102482e905b7bc7fb8392e71ad6d043627414f7a7c4a69fcc21",
+      "question": "If a unit makes any disembark move in a turn (i.e. Disembark move, Emergency Disembark move etc.) has it disembarked that turn?",
+      "answer": "Yes.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 19,
+      "id": "a89dddb3-7930-4704-9f7a-0a7664da4d84",
+      "source_sha256": "5ec36166d98fd4e9d6031f8f85a631801253c6a65f26008c6e58d8cec6e72b1c",
+      "question": "If my unit has taken control of an objective at the end of my movement phase and that unit has as an ability that secures an objective they control, can they secure that objective?",
+      "answer": "Yes",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 20,
+      "id": "ab92e97b-be2b-4125-9ded-fcfa6abe092e",
+      "source_sha256": "6c0d66fac9785c64b585ccf535fece6c50738787459f61ccff18d7b4d54f22fc",
+      "question": "If my unit has the Deadly Demise ability and has an ability that allows it to Fight on Death, how do I resolve this?",
+      "answer": "Fight on Death rules are resolved before Deadly Demise abilities, meaning that your unit's Deadly Demise will resolve after your unit has fought/at the end of the phase and the relevant models have been removed from the battlefield.",
+      "disposition": "bounded_cross_section",
+      "reason": "Fight on Death / Deadly Demise belongs to Section05 and its adopted ordering; no Section17 change."
+    },
+    {
+      "ordinal": 21,
+      "id": "ee9a398d-3acb-4440-b63a-68bed3e6e217",
+      "source_sha256": "a46aec7c497acd207755a6a220760722b4b41ab05aa0b4936cd98911abbdb641",
+      "question": "If my unit has weapons that are identical in characteristics, but some of those weapons have [PRECISION] and those weapons targeted a unit without the character keyword, do I roll all of those weapons together?",
+      "answer": "Yes, the [PRECISION] ability is not an applicable ability for those attacks as there is no CHARACTER in the target unit for the ability to trigger its rule.",
+      "disposition": "bounded_cross_section",
+      "reason": "Precision grouping belongs to Section04; neither engaged-target permission nor its penalties depend on Precision."
+    },
+    {
+      "ordinal": 22,
+      "id": "bb42e060-31e1-46bc-ba52-85cd5ea8c6cf",
+      "source_sha256": "2c17122ffb565c8449dcae5b2f4ca29654cb327c39f61e112cadfb49b73f0993",
+      "question": "If the [ANTI] ability on my unit is ANTI-non-Monster/Vehicle does it mean the [ANTI] rule triggers when targeting units that do not have the Monster or Vehicle keyword?",
+      "answer": "Yes, ANTI-non-(any keyword) will trigger on any unit that does not have the specified keyword.",
+      "disposition": "bounded_cross_section",
+      "reason": "ANTI-non-Monster/Vehicle belongs to the weapon-ability section, not the movement/target-selection exception."
+    },
+    {
+      "ordinal": 23,
+      "id": "66be2ad9-24af-4edf-890a-c0e55004bf76",
+      "source_sha256": "9377700d849a18e73f6f58830a215dfe1b122e65b7e115d5ceecd9ca34a46feb",
+      "question": "My rule says that \"this units ranged attacks have +1 A\", do each of my attacks get an extra attack dice?",
+      "answer": "No, it increases the A characteristics of the unit's ranged weapons by 1.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 24,
+      "id": "c7a83b0a-e8c3-44b5-a3ca-bb3dfba98c2d",
+      "source_sha256": "e1ebb8a68e7f4c31e1672e4801af152cb6355b84d975b7329c57de930f5a61c1",
+      "question": "The Munitorium Field Manual shows my unit can attach to different units then are on it's datasheet, which do I use?",
+      "answer": "Use the Munitorium Field Manual.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 25,
+      "id": "3103e536-8fb8-4fa3-800c-c0d159115bba",
+      "source_sha256": "5b6592050979bbcee593897a953177ea6ff01143998be6aaa82d94cec6e0e28f",
+      "question": "What does the X\" in Lone Operative X\" mean?",
+      "answer": "The X is a placeholder for a number of inches that the ability might appear in a rule with, like Lone Operative 15\" where the X has been replaced with 15\"",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 26,
+      "id": "ba488672-92ec-443d-9087-85a999342589",
+      "source_sha256": "0f27aa55b21c0ddb344b8c753eda2ed864b0618ef79c02ce24ac11d7a0cc9213",
+      "question": "When a move says that a model or unit must move in a way if it is able, can that requirement force the unit to end their move not in coherency?",
+      "answer": "No, when a model or unit is making a move it must follow requirements while ending that move in coherency",
+      "disposition": "bounded_cross_section",
+      "reason": "Coherency remains a required generic movement endpoint invariant; retained Section09 controls own the general requirement."
+    },
+    {
+      "ordinal": 27,
+      "id": "fdefb262-1eb9-43fd-a2c8-70cf3bd2a621",
+      "source_sha256": "08639241469c28315db54217af96362204e61b52d0bd272d16a40bab54e25fe8",
+      "question": "When a rule instructs you to perform a charge outside of the charge phase, do I resolve step 2 and 3 of the Charge step(11.02)?",
+      "answer": "Yes",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 28,
+      "id": "a7ba0395-6635-45cd-aeec-1cc3c0607a0b",
+      "source_sha256": "4eff6df1baf7b221cf03ed213f78a6cd38284f178f611bd883e448388f12eb9d",
+      "question": "When checking coherency for my unit can my unit be in multiple groups?",
+      "answer": "No, it must be in a single contiguous group as per Units and Models (01.02) and What is Coherency in the core rules.",
+      "disposition": "bounded_cross_section",
+      "reason": "Single contiguous coherency group belongs to Section01/09; no special Monster/Vehicle exception is invented."
+    },
+    {
+      "ordinal": 29,
+      "id": "06c896b8-bf06-40bd-a892-b56cb3cde9d3",
+      "source_sha256": "e8c435f8a7716a35d41f4a7522b6d87d156c108f9ba88195bdab4b27d00897c1",
+      "question": "When declaring the allocation order of groups in my unit I have more than one non-CHARACTER groups that contain a model with a missing wound, how must I select the order?",
+      "answer": "Those groups can be selected in an order of your choosing but must be in an order that makes them come before any non-CHARACTER groups that do not contain a model with a missing wound.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 30,
+      "id": "5553f538-6182-4e72-905a-67855489bb1d",
+      "source_sha256": "5c88c04e13b99a324290f8726e470f1e4fb93152c890c597b9b16906cdd4e3e4",
+      "question": "When selecting a target unit can the enemy model that is visible to my model and the enemy model that is in range of my model's weapon be different enemy models in the same unit?",
+      "answer": "Yes",
+      "disposition": "bounded_cross_section",
+      "reason": "Independent visible/in-range enemy-model witnesses belong to Section04; native Section17 candidates preserve both inventories."
+    },
+    {
+      "ordinal": 31,
+      "id": "019feac1-cd25-4644-b855-2ce3fa048fee",
+      "source_sha256": "0726dff38f240002912d8730e11af4be7e4f1c14c17d67b797855e597dd88a42",
+      "question": "Can an attached unit be given an Upgrade?",
+      "answer": "Yes.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 32,
+      "id": "38785a5c-16ba-41c5-b936-723a385f57aa",
+      "source_sha256": "7ee44f5393615f9102f2df97ea71badbd468f7b02b9f968aa1ec0c30da3ce524",
+      "question": "Can a unit have both an Upgrade and an enhancement?",
+      "answer": "No, units are prevented from having two enhancements, and Upgrades are enhancements.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 33,
+      "id": "3de45ba4-435e-4f58-a50c-fbda3f71bdc5",
+      "source_sha256": "00e5a5e21fcdab4cfe98c30af6341386425851e952d8b85aa2febc27b4d2104e",
+      "question": "Are Upgrades enhancements?",
+      "answer": "Yes, Upgrades are a type of enhancement (but not all enhancements are Upgrades).",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 34,
+      "id": "603e9b2f-cc24-498c-ac2e-08ad3068f257",
+      "source_sha256": "f12df889b0db17cfacf6358aea3dcd1a3d2725660c8a159eabad35f6f6c9fef3",
+      "question": "Are models that are within the boundary of a terrain area, but not on the ground floor of a terrain area (e.g. overhanging parts of FRAME VEHICLES or models on terrain features that are within that terrain area) within that terrain area?",
+      "answer": "Yes",
+      "disposition": "locally_colocated",
+      "reason": "Local semantic assertions are bound below."
+    },
+    {
+      "ordinal": 35,
+      "id": "6575ee89-b92a-456d-8e59-4ee513df8f4e",
+      "source_sha256": "4246aa2cdf23333e8213aeef87c4224f0f2ff31b5f8c80229f9c9f3b7c648fa4",
+      "question": "Do rules that affect a keyword include multi-word keywords that contain that keyword? For example, would rules that affect Commissar units affect a unit that has the Commissar Graves keyword?",
+      "answer": "No.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 36,
+      "id": "7a982686-03ff-4565-8d5a-2549e5650268",
+      "source_sha256": "83a20d1e25f2befd445e81a037eddc1fbae6799e634efe2a95b7b1724d5de541",
+      "question": "After using an ability that increases the CP cost of a stratagem, must my opponent continue to use the selected stratagem at the increased cost if they have the necessary CP available?",
+      "answer": "Yes.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 37,
+      "id": "88fc6c54-a3a6-4757-947b-b2dab8b7f3bf",
+      "source_sha256": "f76c805bcfca3c48fd1702c593c0b7ae45b19cb075e805878fa90d19c9fbf2c3",
+      "question": "In what step during the attack sequence do I roll for Feel No Pain?",
+      "answer": "In the Resolve Damage step of the Inflict Damage step (05.04).",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 38,
+      "id": "9aea2cef-c9db-4a30-bbfb-6b07c1f148a2",
+      "source_sha256": "d4d4f6a90669f72253ba254163280068e061623dfd51e1989df9d53a3797f45d",
+      "question": "Can an Epic Hero unit form an attached unit with a unit that has an enhancement?",
+      "answer": "Yes.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 39,
+      "id": "9b1c81f5-2ea0-40eb-9015-6a005367cd75",
+      "source_sha256": "f3c9e8b3182c4e2071fac4e28a5f24038296b51c1e9815e075078612dfa184ee",
+      "question": "While making a move type other than a normal/advance move, can my MONSTER/VEHICLE unit move through friendly units?",
+      "answer": "Yes.",
+      "disposition": "locally_colocated",
+      "reason": "Local semantic assertions are bound below."
+    },
+    {
+      "ordinal": 40,
+      "id": "9e243f82-42e9-4f0d-9e4b-3f5b74cd68bc",
+      "source_sha256": "4a48d283634e5425caf54f2f8426b8c64351a15d8772e58a6c3ee0cff47b7031",
+      "question": "If I place units in strategic reserves during the battle, can this exceed the 50% of my points limit for the battle restriction as mentioned in Placing Units in Strategic Reserves (20.01)?",
+      "answer": "Yes. That restriction is applicable before the battle, in the Declare Battle Formations step.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 41,
+      "id": "adf7c2cd-b765-4e84-abb7-f0ed45d52841",
+      "source_sha256": "fcbf7560ed5887e51b590721ed9949d9d631d5f5c22e4bd49886aba684e0dbfa",
+      "question": "Does the limit to the combined points value of my units in strategic reserves only apply until the start of the first battle round?",
+      "answer": "Yes.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 42,
+      "id": "beaeca32-9701-45f7-9461-879d8ae3d78f",
+      "source_sha256": "e5ea7a06664adae76ec6f30368df75c64a03655b158375bbea49637e51d3c53a",
+      "question": "After using an ability that increases the CP cost of a stratagem, if my opponent does not have the necessary CP available for the selected stratagem, what happens?",
+      "answer": "No CP are spent and that stratagem's effects are not resolved (but that stratagem still counts as having been used this phase).",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 43,
+      "id": "c8d8181c-0fd4-40d0-a9b9-6dcfadfc287e",
+      "source_sha256": "b071da95e8e4f7b784d6b56260bc20d1f99d1dee892c93e49694be55146a9f6e",
+      "question": "Is being within range of a terrain objective the same as being within range of an objective marker?",
+      "answer": "Yes.",
+      "disposition": "bounded_cross_section",
+      "reason": "Terrain Objective range equivalence is owned by Section14. Section17 uses actual source Terrain Objective polygons; the bounded native Section14 producer test is a dependency."
+    },
+    {
+      "ordinal": 44,
+      "id": "e01c8a02-7a36-4d3b-b168-976b11bd47e8",
+      "source_sha256": "8c5268b2b6d5a355b36634065359e05eec587d8ad7541cfbe7a7ed5144c48031",
+      "question": "When my unit shoots at another unit, how does it work if some models in the target unit are fully visible to some models in my unit, while others are within a terrain area/not fully visible?",
+      "answer": "For each attacking model in your unit, determine whether the target unit has the benefit of cover, as described in Terrain and Visibility. In this scenario, the target unit will likely have the benefit of cover against some of the attacking models, but not all. This means that, in an example unit where all attacking models are using the same weapon, when you get to the Resolve Attacks step of the Attack Sequence, you will collect dice for attacks made by models against which the target unit has the benefit of cover separately from the dice for attacks made by models against which the target unit does not have the benefit of cover.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 45,
+      "id": "e43402db-7c49-4cd6-acf7-fa6cac83acb0",
+      "source_sha256": "82f9c28b646f5734f69e5e94c22a2a9a1df8761eaf463c1510f301294963c5f0",
+      "question": "If a stratagem contains a section that carries an additional CP cost (such as the Into the Fray option of Heroic Intervention), is that additional cost considered to be a modifier?",
+      "answer": "No, a stratagem that costs 1CP and is making use of an optional +1CP section has an original cost of 2CP.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 46,
+      "id": "e846db5e-3138-4ac6-b7ee-ca2ff7fe303e",
+      "source_sha256": "5fc6e6bf0de94e1cd61c8e9c98f520b0c863d4b728c5e4c19654f1b8c4a61368",
+      "question": "Does vertical movement in a unit that has taken to the skies count towards the distance a model has used for the purposes of [Heavy]?",
+      "answer": "No.",
+      "disposition": "bounded_cross_section",
+      "reason": "Flying vertical distance and Heavy belong to Section10/19. Section17 scenes do not select Take to the Skies."
+    },
+    {
+      "ordinal": 47,
+      "id": "fc49644c-cc46-47a0-892b-284a4c4ec018",
+      "source_sha256": "6c644170715564c73a7148e873c64fb055afa4031065a1027f319016ba4b6bee",
+      "question": "Can I group or allocate a wound to a destroyed model?",
+      "answer": "No.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 48,
+      "id": "04f15433-3ee1-4c6d-8546-29e4247dee5b",
+      "source_sha256": "13028847f833da09851ea0172c574d87efff63f06d924d31f67bf2fb42574b60",
+      "question": "My unit has access to a rule that changes the Damage characteristic of an incoming attack to 0. When such an attack is allocated to a model in that unit, is the Damage changed before or after save rolls?",
+      "answer": "After.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 49,
+      "id": "2d91a89e-59f3-410f-84cb-16644d7ea4a4",
+      "source_sha256": "47c3d8041c00d1755fd01c8fc8149fccadfbd89cb238fa5d8184cadaeaaea455",
+      "question": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?",
+      "answer": "Models awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models: They can be measured to by friendly/enemy abilities. They can be considered visible to friendly/enemy models where relevant. They can use their datasheet abilities. They can be targeted by stratagems. Enemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight).",
+      "disposition": "bounded_cross_section",
+      "reason": "Retained Fight-on-Death model presence belongs to Section05. Section17 does not broaden retained-model admission."
+    },
+    {
+      "ordinal": 50,
+      "id": "421a6f30-63e2-4e1f-b352-99b643637c53",
+      "source_sha256": "c5ad1503a94c734aa9f1d0dadca11d1daa19dc63928131659eb8214c5f4c7724",
+      "question": "Can I use the Insane Bravery stratagem on a battle-shocked unit?",
+      "answer": "No, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 51,
+      "id": "60232b79-7a10-44a0-ac68-e27312c7ba60",
+      "source_sha256": "a4fb6955c73cae19a4d09415f8b77188b6fd8542fbb0448084db0db2c56c392f",
+      "question": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?",
+      "answer": "These statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit.",
+      "disposition": "locally_colocated",
+      "reason": "Local semantic assertions are bound below."
+    },
+    {
+      "ordinal": 52,
+      "id": "7ac6c358-0263-49ff-aee7-28b8fd4b5b8b",
+      "source_sha256": "736b6d704a27951f968fbcc84f7b0eca6840b08a451d353390367442244b1766",
+      "question": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?",
+      "answer": "Yes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail. Example: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead).",
+      "disposition": "bounded_cross_section",
+      "reason": "Embarked abilities/Not On Battlefield remain with Section01/18. No Section18 execution or transport grant is added."
+    },
+    {
+      "ordinal": 53,
+      "id": "7f238e23-cd3f-40ad-aa91-c75274cc655e",
+      "source_sha256": "cf0fd95bcbcfb3ff78f04318e141c735309cc69f5f3815ab946d5a4245563333",
+      "question": "When checking line of sight from one model to another, is this drawn between the bases of those models, or between any part of them?",
+      "answer": "Line of sight is drawn from any part of the observing model to any part of the model being observed.",
+      "disposition": "locally_colocated",
+      "reason": "Local semantic assertions are bound below."
+    },
+    {
+      "ordinal": 54,
+      "id": "80182be3-1a44-464b-9ef6-cd9212429603",
+      "source_sha256": "5d5056a4966de981a21706e962e5c9ea70f05377ff20fd4962f7cc7a01d5290b",
+      "question": "If both players have units with the Scouts ability, do they alternate resolving scout moves?",
+      "answer": "Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 55,
+      "id": "aab10e23-6433-42ca-86e7-ddc829f16c47",
+      "source_sha256": "b26dfcd0cc3f76a41e680b3bedaf3ba6a299fa135400cea6cbd42e493ea2e057",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+. Does this work when snap shooting?",
+      "answer": "Unless otherwise stated, no: when snap shooting, each attack only hits on a roll of 6.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 56,
+      "id": "b7d3d760-a167-44b2-9c91-32ce86684225",
+      "source_sha256": "9bfda5c1d2a514b705e9feeec17efef3325815360389fe267537521350a557ac",
+      "question": "My attack has a rule that means it results in a critical hit on a hit roll of 4+, and I would otherwise need a 5+ to hit. Does a 4+ hit?",
+      "answer": "Yes, except when snap shooting: when snap shooting, each attack only hits on a roll of 6.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 57,
+      "id": "ce5fd555-a0f1-4bc9-85d3-00443143e94a",
+      "source_sha256": "2202a3d04b20b42997b9a0e9a19177697bf42ee7b2b1923c4674b43faa676e9b",
+      "question": "When do the effects of a FLYING unit taking to the skies apply?",
+      "answer": "When that unit is selected to make a normal/advance/fall-back/charge move. Note that for an advance/charge move, this means you must declare that a unit will take to the skies before rolling for that advance/charge move.",
+      "disposition": "bounded_cross_section",
+      "reason": "Take to the Skies selection timing belongs to its movement-ability section. Core 17.01 cases use grounded non-FLY native units."
+    },
+    {
+      "ordinal": 58,
+      "id": "dc9911da-e156-4b48-bf9b-18f9d96d037e",
+      "source_sha256": "f084d1e31353f70020957e67d0ad8821f406be29c8251048d27bf81e6664f4b3",
+      "question": "If a rule refers to an 'objective marker', does this mean an 'objective'?",
+      "answer": "Yes (excluding rules in the Core Rules)'.",
+      "disposition": "bounded_cross_section",
+      "reason": "Non-Core objective-marker alias belongs to Section14; no new alias or mission rule parser is introduced."
+    },
+    {
+      "ordinal": 59,
+      "id": "fb3b2776-c954-471b-b448-b70caa91929d",
+      "source_sha256": "18f33a49e6d2f3f401aefb615c84a2d4d373c9b382b5bb38252504d517bc8662",
+      "question": "How do modifiers to the charge roll (or to the maximum distance of the charge move, such as Take to the Skies) affect the selection of charge targets?",
+      "answer": "A charging unit may only select charge targets that are within the maximum distance of their charge roll, including any modifiers. If such a modifier occurs after selecting a charge target and causes that charge target to no longer be within the maximum distance, the charging unit would then select new targets (Target No Longer Eligible Or Viable, 04.03.03). Example: A unit's charge roll is 7\", and that unit has a datasheet ability which adds 1 to charge rolls: that charge's maximum distance is 8\", so you can select charge targets within 8\". Example: A FLYING unit chooses to take to the skies and rolls a charge roll of 9\"; that charge's maximum distance is 7\" (9\" minus the 2\" from taking to the skies), so you can select charge targets within 7\".",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 60,
+      "id": "db020803-7564-45c9-a6d4-e4cdf463da32",
+      "source_sha256": "8352b49b9fbfaceb630ac21dc45eac4d9fdf112bd15de3e50ec2f0fbd30ca36e",
+      "question": "Can a unit be controlling more than one objective at once?",
+      "answer": "Yes.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 61,
+      "id": "8c51d370-70b2-46c7-abaa-228b55c830c3",
+      "source_sha256": "cda9f83e49d0006eef29aeb0e17f388472db9fa391be2ea4a96e6ce4850e80a6",
+      "question": "When determining control over an objective, can the same model's OC count towards more than one objective that model is within range of?",
+      "answer": "Yes.",
+      "disposition": "outside_section17",
+      "reason": "No clause changes the Section17 transit, FRAME-position or engaged-target permission boundary; retained owning-section coverage is not replaced."
+    },
+    {
+      "ordinal": 62,
+      "id": "f1507145-5606-474c-ba71-f5c92f2d6faf",
+      "source_sha256": "f1569a6a16420f52ff3a4cc89c61762db7467cba6bdc320c8a4e3fa8ceec239f",
+      "question": "If a rule's effect lasts until the end of a specific part of the battle (e.g. until the end of the phase, until the end of the turn), is that rule still in effect at the end of that part of the battle?",
+      "answer": "Yes. For example, if an ability gave a unit +1 OC until the end of the turn, at the end of the turn, that unit would still have +1 OC. That unit would not have +1 OC at the start of the next turn.",
+      "disposition": "bounded_cross_section",
+      "reason": "End-boundary effect lifetime belongs to Section02/14/16; no lasting rule effect is newly granted by these Section17 tests."
+    },
+    {
+      "ordinal": 63,
+      "id": "9638115f-b94b-4d05-ba62-df9fba2805ac",
+      "source_sha256": "1c43f713b930f8f51c7d429991f40174c22eb30bbf4bd56773993b4a8e319cd8",
+      "question": "When a model overhangs the edge of the battlefield, how does that affect its visibility?",
+      "answer": "That model's controlling player can draw line of sight from any part of that model that is not overhanging the edge of the battlefield. Their opponent can draw line of sight to any part of that model.",
+      "disposition": "locally_colocated",
+      "reason": "Local semantic assertions are bound below."
+    },
+    {
+      "ordinal": 64,
+      "id": "3da822cb-4a7c-44d2-8a9d-b867b4c4aed8",
+      "source_sha256": "cbf7e42f41f0d4cce05a0f084c6982e8899da06ac0a71c7339ad6845ef0acc47",
+      "question": "When does a model's or unit's ability in an attached unit apply to all models in that unit?",
+      "answer": "A rule that applies to 'this/that unit' or 'models in this/that unit' applies to all models in an attached unit. Rules that just apply to one model in an attached unit (for example, a rule that grants a model Feel No Pain or Lone Operative) only apply to that model, not to all models in the attached unit.",
+      "disposition": "bounded_cross_section",
+      "reason": "Attached-unit vs model ability ownership remains shared Section01 authority. Constructed mixed-model controls test the explicit model scope of 17.01 without claiming a native attachment provider."
+    }
+  ],
+  "bounded_cross_section_faqs": {
+    "6": "Hazardous mixed Monster/Vehicle wound counts belong to Section06; no hazard is invoked by 17.01 ordinary movement.",
+    "20": "Fight on Death / Deadly Demise belongs to Section05 and its adopted ordering; no Section17 change.",
+    "21": "Precision grouping belongs to Section04; neither engaged-target permission nor its penalties depend on Precision.",
+    "22": "ANTI-non-Monster/Vehicle belongs to the weapon-ability section, not the movement/target-selection exception.",
+    "26": "Coherency remains a required generic movement endpoint invariant; retained Section09 controls own the general requirement.",
+    "28": "Single contiguous coherency group belongs to Section01/09; no special Monster/Vehicle exception is invented.",
+    "30": "Independent visible/in-range enemy-model witnesses belong to Section04; native Section17 candidates preserve both inventories.",
+    "43": "Terrain Objective range equivalence is owned by Section14. Section17 uses actual source Terrain Objective polygons; the bounded native Section14 producer test is a dependency.",
+    "46": "Flying vertical distance and Heavy belong to Section10/19. Section17 scenes do not select Take to the Skies.",
+    "49": "Retained Fight-on-Death model presence belongs to Section05. Section17 does not broaden retained-model admission.",
+    "52": "Embarked abilities/Not On Battlefield remain with Section01/18. No Section18 execution or transport grant is added.",
+    "57": "Take to the Skies selection timing belongs to its movement-ability section. Core 17.01 cases use grounded non-FLY native units.",
+    "58": "Non-Core objective-marker alias belongs to Section14; no new alias or mission rule parser is introduced.",
+    "62": "End-boundary effect lifetime belongs to Section02/14/16; no lasting rule effect is newly granted by these Section17 tests.",
+    "64": "Attached-unit vs model ability ownership remains shared Section01 authority. Constructed mixed-model controls test the explicit model scope of 17.01 without claiming a native attachment provider."
+  },
+  "metadata_is_not_semantic_coverage": true,
+  "unresolved_source_interpretations": [],
+  "authenticated_inputs": {
+    "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+    "data/source_audits/v963_shock/captures/core-page.js": "8b7e7a4004f8a55b17305013f181bf25933dff763e6737af407da254c5656026"
+  },
+  "scenario_qualifications": [
+    "R003 mixed Spawn blocker keywords and retained presence are explicit physical Core contracts; native heterogeneous provider and Fight-on-Death admission are not claimed. All prior semantic bindings remain.",
+    "Five supported native selected definitions are session-shared and hash guarded; all mutable unit/state/decision graphs are fresh. Army/detachment metadata is a non-roster checkpoint, not faction admission.",
+    "Native Prince and Defiler execute Normal/Advance through finite selection and witnessed public proposals. Shooting uses native equipped weapons and engine finite/proposal/attack owners; no preceding phases/full replay are played to reach the boundary.",
+    "Companion Terrain Objectives are primary. Source mission geometry is retained for objective tests; explicitly empty custom geometry supplies only mandatory proposal identity in open movement/shooting kernels.",
+    "FRAME keyword/body/hull/rectangular visibility, added BLAST/CLOSE-QUARTERS and heterogeneous model keywords are declared Core contracts, not native providers or physical measurements. Native baseless/compound FRAME admission remains unproved.",
+    "The marker kernel follows the explicit same-physical-point horizontal+vertical convention. Scalar closest-distance diagnostics never supply a different-point admission.",
+    "FAQ53/63 use the exact existential physical-visibility consumer. They do not certify quantified full visibility/cover for the preserved pathological compound scene. No timeout is interpreted as a visibility answer.",
+    "Move-scope matrix isolates native physical transit without an M budget; native public cases separately enforce actual budgets, endpoint rejection, retry, events and viewers.",
+    "Deadly Demise interpretation and all inherited coherency, quality, missing historical Git object, native provider, geometry, solver and full-game performance qualifications remain unchanged. SF16-R004 remains queued coordinated-history hardening."
+  ]
+}

@@ -5,6 +5,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
+from warhammer40k_core.engine.model_attack_completion import (
+    MODEL_COMPLETION_STATE_EVENT,
+    model_completion_evidence,
+    resolved_model_ids,
+    validate_shot_unit_inventory,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
@@ -49,8 +55,30 @@ def record_attack_sequence_completed(
 def record_models_attacked(
     *, state: GameState, decisions: DecisionController, sequence: AttackSequence
 ) -> None:
-    if not sequence.is_complete or state.current_battle_phase is None:
+    if state.current_battle_phase is None:
         raise GameLifecycleError("Model attack history requires completed attacks in a phase.")
+    complete = resolved_model_ids(sequence, event_records=decisions.event_log.records)
+    empty_completion = sequence.is_complete and not sequence.attack_pools
+    if not complete and not empty_completion:
+        return
+    prior = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == MODELS_ATTACKED_EVENT_TYPE
+        and isinstance(event.payload, dict)
+        and event.payload.get("sequence_id") == sequence.sequence_id
+    )
+    prior_ids = frozenset(
+        model_id
+        for event in prior
+        if isinstance(event.payload, dict)
+        for model_id in _model_ids(event.payload.get("model_instance_ids"))
+    )
+    if not prior_ids <= complete:
+        raise GameLifecycleError("Model attack participation boundary drift.")
+    new_ids = complete - prior_ids
+    if not new_ids and (not empty_completion or prior):
+        return
     payload = validate_json_value(
         {
             "game_id": state.game_id,
@@ -60,22 +88,12 @@ def record_models_attacked(
             "sequence_id": sequence.sequence_id,
             "attack_phase": sequence.source_phase.value,
             "attacking_unit_instance_id": sequence.attacking_unit_instance_id,
-            "model_instance_ids": sorted(
-                {pool.attacker_model_instance_id for pool in sequence.attack_pools}
-            ),
+            "model_instance_ids": sorted(new_ids),
         }
     )
-    prior = [
-        event
-        for event in decisions.event_log.records
-        if event.event_type == MODELS_ATTACKED_EVENT_TYPE
-        and isinstance(event.payload, dict)
-        and event.payload.get("sequence_id") == sequence.sequence_id
-    ]
-    if prior:
-        if len(prior) != 1 or prior[0].payload != payload:
-            raise GameLifecycleError("Model attack participation boundary drift.")
-        return
+    decisions.event_log.append(
+        MODEL_COMPLETION_STATE_EVENT, validate_json_value(sequence.to_payload())
+    )
     decisions.event_log.append(MODELS_ATTACKED_EVENT_TYPE, payload)
 
 
@@ -139,9 +157,10 @@ def _validate_model_attack_history(
     # None deliberately validates the complete inventory, including orphan claims
     # with empty/foreign models; retained-model queries may select known subjects.
     declarations: dict[str, dict[str, JsonValue]] = {}
-    participations: set[str] = set()
+    declaration_events: dict[str, EventRecord] = {}
+    participations: dict[str, frozenset[str]] = {}
     completions: set[tuple[str, str]] = set()
-    for event in event_records:
+    for index, event in enumerate(event_records):
         if event.event_type in {
             "shooting_declaration_accepted",
             "out_of_phase_shooting_declaration_accepted",
@@ -155,6 +174,19 @@ def _validate_model_attack_history(
             if sequence_id in declarations:
                 raise GameLifecycleError("Model attack history has duplicate declarations.")
             declarations[sequence_id] = expected
+            declaration_events[sequence_id] = event
+        elif event.event_type == MODEL_COMPLETION_STATE_EVENT:
+            payload = _object(event.payload)
+            sequence_id = _identifier(payload.get("sequence_id"))
+            if sequence_id in declarations or model_instance_ids is None:
+                if sequence_id not in declarations:
+                    raise GameLifecycleError("Model attack history lacks its declaration.")
+                if index + 1 == len(event_records) or (
+                    event_records[index + 1].event_type != MODELS_ATTACKED_EVENT_TYPE
+                ):
+                    raise GameLifecycleError(
+                        "Model attack history is missing its completed attacks."
+                    )
         elif event.event_type == MODELS_ATTACKED_EVENT_TYPE:
             payload = _object(event.payload)
             sequence_id = _identifier(payload.get("sequence_id"))
@@ -164,15 +196,35 @@ def _validate_model_attack_history(
                 ).intersection(model_instance_ids):
                     raise GameLifecycleError("Model attack history lacks its declaration.")
                 continue
-            if sequence_id in participations or payload != declarations[sequence_id]:
+            previous = participations.get(sequence_id, frozenset())
+            expected_ids = model_completion_evidence(
+                event_records=event_records,
+                index=index,
+                declaration=declarations[sequence_id],
+                previously_completed=previous,
+                declaration_event=declaration_events[sequence_id],
+            )
+            expected = {
+                **declarations[sequence_id],
+                "model_instance_ids": validate_json_value(sorted(expected_ids)),
+            }
+            empty_completion = (
+                not declarations[sequence_id]["model_instance_ids"]
+                and sequence_id not in participations
+            )
+            if (not expected_ids and not empty_completion) or payload != expected:
                 raise GameLifecycleError("Model attack history differs from its declaration.")
-            participations.add(sequence_id)
+            participations[sequence_id] = previous | expected_ids
         elif event.event_type in {"attack_sequence_completed", "attack_sequence_attacks_resolved"}:
             payload = _object(event.payload)
             sequence_id = _identifier(payload.get("sequence_id"))
             if model_instance_ids is None and sequence_id not in declarations:
                 raise GameLifecycleError("Model attack history completion lacks its declaration.")
-            if sequence_id in declarations and sequence_id not in participations:
+            if sequence_id in declarations and (
+                sequence_id not in participations
+                or participations[sequence_id]
+                != _model_ids(declarations[sequence_id]["model_instance_ids"])
+            ):
                 raise GameLifecycleError("Model attack history is missing its completed attacks.")
             completion = (event.event_type, sequence_id)
             if sequence_id in declarations and completion in completions:
@@ -255,8 +307,6 @@ def validate_declared_model_attack_completions(
     Mid-executor checkpoints retain the accepted declaration prefix. An omitted
     declaration is not evidence of an authenticated executor starting boundary.
     """
-    validate_model_attack_history(event_records=event_records)
-
     from warhammer40k_core.engine.primary_mission_event_decision_authority import (
         validate_primary_mission_shooting_event_decision_authority,
     )
@@ -268,6 +318,7 @@ def validate_declared_model_attack_completions(
     validate_targetless_weapon_history(
         state=state, events=event_records, decisions=decision_records
     )
+    validate_model_attack_history(event_records=event_records)
 
     records = {record.result.result_id: record for record in decision_records}
     ranged_history = {record.result_id: record for record in state.ranged_attack_history_records}
@@ -333,6 +384,8 @@ def validate_declared_model_attack_completions(
             != expected["model_instance_ids"]
         ):
             raise GameLifecycleError("Model attack history declaration model authority drifted.")
+
+    validate_shot_unit_inventory(state=state, events=event_records)
 
 
 def _validate_melee_declaration_authority(

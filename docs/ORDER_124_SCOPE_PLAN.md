@@ -53,3 +53,27 @@ reorganization and Order125 remain outside this order.
 
 Publication, push, PR creation, merge and auto-merge are explicitly on hold.
 Local validation and review evidence do not authorize those actions.
+
+## Current-descriptor synthetic dice fixture
+
+The four `test_real_nested_upgrade_survives_pending_and_completed_continuations`
+parameters retain their original first natural Hit result of four, six original
+Hit rolls, and every source, persistence, fork, projection and replay assertion.
+The test now declares two local game IDs for that physical-dice premise; the
+shared helper default and other tests remain unchanged.
+
+The approved current mission/ruleset descriptor is
+`d23064a1928e5e6a82abe3be06eff6cd51427dc56102d2e08f82b1b6b8e85c76`.
+Its hash and derived LOS fingerprints participate in RNG history. Comparing the
+original prefix against main found these as the only pre-first-roll differences;
+the old game ID produced four on main and one on current source with identical
+pinned Python, dependency bytes and lockfile. Descriptor binding is preserved.
+
+A predeclared, bounded native-prefix calibration selected
+`order124-nested:current-rules-20261028:0:00` for the ordinary unit and
+`order124-nested:current-rules-20261028:1:02` for the attached unit. The first
+qualifying IDs were selected only by the original roll-four and improved-reroll
+premises, not full-test outcomes or timing. Four attempted prefixes are retained
+in the CI77 diagnostic evidence; original seeds and measurements remain historical.
+Full original parameterized-test qualification is required after this fixture
+change; a matching prefix alone is not a test or performance pass.
