@@ -570,7 +570,8 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
         (b"from warhammer40k_core.adapters.session_protocol import AuthoritativeSession\n", b""),
         (
             b"class _SessionInspectableServer(AdapterGameServer):\n"
-            b"    def authoritative_session_for_test(self, session_id: str) -> AuthoritativeSession:\n"
+            b"    def authoritative_session_for_test(self, session_id: str) "
+            b"-> AuthoritativeSession:\n"
             b"        return self._sessions[session_id]\n\n\n",
             b"",
         ),

@@ -238,7 +238,7 @@
     },
     "tools/performance_ci69_members.py": {
       "before_sha256": "d7c146dfa55bb42ade20ffa7cda0091d1f04f2dfc3a533e8750056050936f5a6",
-      "after_sha256": "ae5e922e01d9baeb4d62db776857c8a36baba32b8a000e361f55c3d26f280590",
+      "after_sha256": "ea89fd9659a1abcb27423c17a6598f2f438eb13ecf01b3ae197ff3666f518310",
       "owners": {
         "validate_cutover": {
           "before": "a25ef976fe99f7705b4e1f9eba529eb02f0d536393323a68e95d70c68a1c4bf6",
