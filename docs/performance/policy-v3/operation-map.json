@@ -30107,6 +30107,32 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "http-listener-startup": {
+      "paths": [
+        "src/warhammer40k_core/adapters/http_transport.py"
+      ],
+      "owners": [
+        "@module",
+        "create_http_server",
+        "_AdapterHTTPServer",
+        "_AdapterHTTPServer.server_bind"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "http-listener-regression": {
+      "paths": [
+        "tests/infrastructure/adapters/unit/test_session_commands.py"
+      ],
+      "owners": [
+        "@module",
+        "test_http_listener_excludes_competitors_and_preserves_authenticated_session"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

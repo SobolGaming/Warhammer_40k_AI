@@ -85,6 +85,19 @@ def test_phase18e_server_network_modules_do_not_bypass_session_facade() -> None:
             if isinstance(node, ast.Name) and node.id == "DiceRollManager":
                 violations.append(f"{path}: references DiceRollManager")
     assert not violations
+    # Every authenticated HTTP entry point delegates listener ownership to the factory.
+    for path in (
+        SRC / "adapters" / "server.py",
+        ROOT / "scripts" / "run_phase18m_reference_server.py",
+    ):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        calls = {
+            node.func.id
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+        }
+        assert "create_http_server" in calls
+        assert "ThreadingHTTPServer" not in calls
 
 
 def test_phase18e_server_does_not_serialize_internal_exception_text() -> None:

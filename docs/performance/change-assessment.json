@@ -1,30 +1,320 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "06cda7604619f8bd4dcc6af2e74478475623f5f3",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ce95991ea3858da5cbd281c3004cd0d0c66d0b2e7c21f6afcc0d8f07b6eff0f0",
-  "operation_map_sha256": "708b62b3af707d3e60d1d54c662e56c57c9151ce7f83bd277caef62700c0cd0d",
+  "base": "857bac876cf560180ad0001d0d5adf6c9aa637af",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc0bba78a4181738a977f408445d0020be007701c1ebc7e34413c9643af53465",
+  "operation_map_sha256": "d1de2c9a9a56284d600119635ed4b797c252326cb795cad5240a676243f4f384",
   "changes": {
-    "conformance/typescript/package-lock.json": {
-      "before_sha256": "96a6a1493e0be69c2e0bea5dc3e2646d5c9d441a3c770d7c49a5e503fa2dc385",
-      "after_sha256": "06410a30fe60acc37b61863cc7bac2c2df2170496361bdd28ae5dffcc1a49294",
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "bf3796e0a887f96b055ab0468c8c1e6757381ed0ae0752323a24795ef6967710",
+      "after_sha256": "31f40c1f802b4b13dd01a4b94d24b9bfe1b82ff296ceb6a6d500eaadd3d2d208",
       "owners": {
         "@document": {
-          "before": "96a6a1493e0be69c2e0bea5dc3e2646d5c9d441a3c770d7c49a5e503fa2dc385",
-          "after": "06410a30fe60acc37b61863cc7bac2c2df2170496361bdd28ae5dffcc1a49294"
+          "before": "bf3796e0a887f96b055ab0468c8c1e6757381ed0ae0752323a24795ef6967710",
+          "after": "31f40c1f802b4b13dd01a4b94d24b9bfe1b82ff296ceb6a6d500eaadd3d2d208"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "630ee0e07d59a74ee4bdfea5c7b31a1ebb585245b7dd9882689bbbc38edaf787",
+      "after_sha256": "ebba2fc79e025b6fbd99f49bbf43d5fcba1546f989b5ad26fc40bacc7fea6269",
+      "owners": {
+        "@document": {
+          "before": "630ee0e07d59a74ee4bdfea5c7b31a1ebb585245b7dd9882689bbbc38edaf787",
+          "after": "ebba2fc79e025b6fbd99f49bbf43d5fcba1546f989b5ad26fc40bacc7fea6269"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "affb04bee4a4dd69294f462f2bbb50efa57ee8af6cb1214b759a60538e2cbd65",
+      "after_sha256": "8093b3d3be1db847eca53155a5618a43e6747d4fb9acaeb05e5c284204061e91",
+      "owners": {
+        "@document": {
+          "before": "affb04bee4a4dd69294f462f2bbb50efa57ee8af6cb1214b759a60538e2cbd65",
+          "after": "8093b3d3be1db847eca53155a5618a43e6747d4fb9acaeb05e5c284204061e91"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "77dcaa38283dff107c67d13e272a6eb52a993fe6bc861bc53289320bbc7849a4",
+      "after_sha256": "ea50be8fc0f9317e51af45d4fcb81619e46ca3226979af41110a5abb5e26dcfc",
+      "owners": {
+        "@document": {
+          "before": "77dcaa38283dff107c67d13e272a6eb52a993fe6bc861bc53289320bbc7849a4",
+          "after": "ea50be8fc0f9317e51af45d4fcb81619e46ca3226979af41110a5abb5e26dcfc"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "bf356ced71f2123c48c6cb04cce4f641997579b76d9cbd901040ad472758c566",
+      "after_sha256": "8a7376cf9298f7f74ca8fce8010075674f86a289be242e9bbc4f6df7efaba3cf",
+      "owners": {
+        "@document": {
+          "before": "bf356ced71f2123c48c6cb04cce4f641997579b76d9cbd901040ad472758c566",
+          "after": "8a7376cf9298f7f74ca8fce8010075674f86a289be242e9bbc4f6df7efaba3cf"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "58cc00637fd792703265277af5228db5374291cf32f918003bc2cc1abcfa5b2a",
+      "after_sha256": "3febedf21567f8159707f918f3939382eb29f1517b6d0d1a761941652a340b06",
+      "owners": {
+        "@document": {
+          "before": "58cc00637fd792703265277af5228db5374291cf32f918003bc2cc1abcfa5b2a",
+          "after": "3febedf21567f8159707f918f3939382eb29f1517b6d0d1a761941652a340b06"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "1faf0601784447ea6216599f4fab9bb4fe1a73491ed4889cba97502a6ff04612",
+      "after_sha256": "68213f00b7690f9631864683325730715ad0f002a5ece13f65d92a9dbc7cec20",
+      "owners": {
+        "@document": {
+          "before": "1faf0601784447ea6216599f4fab9bb4fe1a73491ed4889cba97502a6ff04612",
+          "after": "68213f00b7690f9631864683325730715ad0f002a5ece13f65d92a9dbc7cec20"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "f8229cf1d9fa837612015956056ff37794063119a6899dfc868d7e74574a7187",
+      "after_sha256": "3aaa872fa04fadda95dca8473308cbed0b5c86cac987669536b4363505828bb0",
+      "owners": {
+        "@document": {
+          "before": "f8229cf1d9fa837612015956056ff37794063119a6899dfc868d7e74574a7187",
+          "after": "3aaa872fa04fadda95dca8473308cbed0b5c86cac987669536b4363505828bb0"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "before_sha256": "cb509024abdc79389044920ab2ffe1eaa704123f8dd953c65c1d8bc2dde83753",
+      "after_sha256": "7edcaf4787f0860d277ca0b714b9609a35162772bf0c3bed04583fc2d7e33345",
+      "owners": {
+        "@document": {
+          "before": "cb509024abdc79389044920ab2ffe1eaa704123f8dd953c65c1d8bc2dde83753",
+          "after": "7edcaf4787f0860d277ca0b714b9609a35162772bf0c3bed04583fc2d7e33345"
+        }
+      }
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "before_sha256": "4b73d7dbee58003a2146768eecc50373deb22a73822ae35fd66936639bc5dd79",
+      "after_sha256": "2536c4989558b7c2b9e0345fb26dc0991c7d80e4dcb58a0b9c3fb26e879706ab",
+      "owners": {
+        "@document": {
+          "before": "4b73d7dbee58003a2146768eecc50373deb22a73822ae35fd66936639bc5dd79",
+          "after": "2536c4989558b7c2b9e0345fb26dc0991c7d80e4dcb58a0b9c3fb26e879706ab"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "5769f8f4b23c5c7792261f44ce916625fbf97d4586d9a250d1e9bb994cfc9daf",
+      "after_sha256": "3b6b84fed812a7201f392ac84d0f96334cca5858f0e68283f62cf4f7941ee748",
+      "owners": {
+        "@document": {
+          "before": "5769f8f4b23c5c7792261f44ce916625fbf97d4586d9a250d1e9bb994cfc9daf",
+          "after": "3b6b84fed812a7201f392ac84d0f96334cca5858f0e68283f62cf4f7941ee748"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "56c02eb40afb910a0803a448ba1d8163393629cc93996f0d5c6873a2a47b23f9",
+      "after_sha256": "a6cd8ef487b6c9cb73ad34a7d794087948d98261bf4144a5394082239f90e8d9",
+      "owners": {
+        "@document": {
+          "before": "56c02eb40afb910a0803a448ba1d8163393629cc93996f0d5c6873a2a47b23f9",
+          "after": "a6cd8ef487b6c9cb73ad34a7d794087948d98261bf4144a5394082239f90e8d9"
+        }
+      }
+    },
+    "src/warhammer40k_core/adapters/http_transport.py": {
+      "before_sha256": "d27f64be925f156021965ce2b99d2f99fd70675bf7caf9ded4c522ae48dbcd80",
+      "after_sha256": "c55acedc575241e590baa70ec6e1a6b3d64559bc460e03d37e49319e2d141f80",
+      "owners": {
+        "@module": {
+          "before": "06983eea2de11554c5f22bcd996fac0c15dea507e8c6e404f0af0620333b4f37",
+          "after": "816bcaddaeeded2778b26be927e4894b138545235d4ca00e66d080cd30bd1821"
+        },
+        "_AdapterHTTPServer": {
+          "before": null,
+          "after": "576c507b9bf505a69900d64bd10754afc1f4956c0897b461b8507bddf0177df3"
+        },
+        "_AdapterHTTPServer.server_bind": {
+          "before": null,
+          "after": "14552912ca5a6366c6d46890ad035883a023884c5b2926d14a959bec3db87d08"
+        },
+        "create_http_server": {
+          "before": "a1d89f16e65b4ac60aa79103c4bd8fd40944ea1f5f5b07d010c4338511add1f0",
+          "after": "e9b593ecfb6dfc4f9c18f4df0198d3915eadb8cb90e9b44ab715f11c1589934b"
+        }
+      }
+    },
+    "tests/code_quality/test_phase18e_server_network_audit.py": {
+      "before_sha256": "9b3cc5c0a558d976db6ce522628558fced8e941177af6f27d36cff4b011a3a57",
+      "after_sha256": "2c4b2a776453b81963e97397f7a3c47c19d0453c9be2c52614aa2617466ddec4",
+      "owners": {
+        "test_phase18e_server_network_modules_do_not_bypass_session_facade": {
+          "before": "0f70993a433b695a3a7a5585b1fe8b4cf1b248af315b011e2cd0fceecc8ea4a8",
+          "after": "4bab6d0ffc938b11ff88a30d01ab72bbb8efea0bb587f08498135842b86ccf15"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/unit/test_session_commands.py": {
+      "before_sha256": "8346b27cd1e0b893b7332d8b22b0092d245f6817b52603ff321de88f920b18d5",
+      "after_sha256": "2bebfd82ddf1ff46aa72599bac6e99435b09aa2ca9819e4a2e8c4e1d9c8490f8",
+      "owners": {
+        "@module": {
+          "before": "2873bb0260f8ca68c2a844ecccad1050c88464185708d58a8511676f4be1fde0",
+          "after": "b583bcb14c622240c452d3edd520d4e6797d5991802a8addfb76da20ab06ca22"
+        },
+        "test_http_listener_excludes_competitors_and_preserves_authenticated_session": {
+          "before": null,
+          "after": "1a0e0e806a9860a1a40daf903fa880152da98480f5fe70ea01027ee2cad202c2"
         }
       }
     }
   },
   "rows": {
-    "conformance/typescript/package-lock.json": {
-      "category": "dependency_environment",
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
       "operations": [
-        "development-dependency"
+        "d07-generated-current-contract-inventory"
       ],
       "selected_families": [],
-      "rationale": "Dependabot PR595 changes only fast-uri 3.1.8 to 3.1.9 in the TypeScript conformance lock. fast-uri resolves JSON Schema identifiers for Ajv in this development-only HTTP conformance client. Validate the locked install, generated client, TypeScript types, all client unit tests, and the real two-server conformance scenario.",
-      "source_obligation": "Preserve all 4886 selected behavioral cases, 1848 active quality cases, and the exact 260 approved historical deferrals. Keep full-package branch coverage at 64%, behavior setup-and-test cutoff at 720 seconds, quality cutoff at 600 seconds, complete serial performance protocol at 180 seconds, and normal merge protections.",
-      "unchanged_work": "Python runtime dependencies, engine source, schemas, generated client source, test assertions, and shard inventories are identical to the exact main base. The npm lock changes only fast-uri version, official resolved tarball, and integrity; no engine algorithm, search, cache, replay implementation, or measured workload changes. The serial current-runtime smoke and complete exact-head CI remain required; no historical comparison or full-game performance result is claimed."
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds contracts/examples/persistence/session-persistence.json; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "d07-generated-current-contract-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds contracts/examples/sessions/session-command-outcome.json; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "d07-generated-current-contract-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds contracts/examples/sessions/session-command-started.json; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "d07-generated-current-contract-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds contracts/examples/sessions/session-metadata-created.json; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "d07-generated-current-contract-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds contracts/examples/support-profile-player-a-redacted.json; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "d07-generated-current-contract-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds contracts/examples/support-profile-player-b-redacted.json; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "d07-generated-current-contract-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds contracts/examples/support-profile.json; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "d07-generated-current-contract-inventory"
+      ],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds contracts/manifest.json; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+      ],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds data/source_audits/ci64_provenance_v1/test-cutover.json; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds docs/CORE_RULES_REMEDIATION_ROADMAP.md; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds docs/performance/policy-v3/operation-map.json; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds src/warhammer40k_core/_engine_build_manifest.json; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "src/warhammer40k_core/adapters/http_transport.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "http-listener-startup"
+      ],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds src/warhammer40k_core/adapters/http_transport.py; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "tests/code_quality/test_phase18e_server_network_audit.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds tests/code_quality/test_phase18e_server_network_audit.py; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
+    },
+    "tests/infrastructure/adapters/unit/test_session_commands.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "http-listener-regression"
+      ],
+      "selected_families": [],
+      "rationale": "Issue589 repairs Windows listener admission at startup: disable address reuse and apply exclusive address use before bind in the shared factory. The regression covers a second factory and a reuse-address socket with an established authenticated session and post-failure idempotent retry. This row binds tests/infrastructure/adapters/unit/test_session_commands.py; generated artifacts publish the resulting exact runtime ID, test-cutover changes only the current active test byte identity, and governance records the scoped invariant and owner map.",
+      "source_obligation": "Owner-approved issue589: occupied 127.0.0.1 listener addresses must reject competing listeners on Windows while the first authenticated session remains healthy; preserve existing POSIX restart behavior. Native Windows socket API requires SO_EXCLUSIVEADDRUSE before bind. Existing adapter payload contracts cover this transport-only correction.",
+      "unchanged_work": "Only listener construction performs the new socket option, once per Windows server startup. HTTP request routing, engine rules, decision submission, serialization/replay work, algorithms, caches, dependencies and measured smoke workloads are unchanged. No optimization or serious slowdown is demonstrated; the bounded-repair policy requires exact-base assessment, serial current-runtime smoke, live controls and complete hosted gates. No detailed-family or complete-game performance certification is claimed."
     }
   },
   "milestone": "ordinary",
