@@ -29,7 +29,7 @@
     "tests/factions/tau_empire/unit/test_tau_empire_army_rule.py": 17.626,
     "tests/factions/thousand_sons/unit/test_source_overlays.py": 0.085,
     "tests/factions/tyranids/unit/test_tyranids_army_rule.py": 118.552,
-    "tests/factions/world_eaters/unit/test_blessings_gameplay.py": 34.083,
+    "tests/factions/world_eaters/unit/test_blessings_gameplay.py": 41.796,
     "tests/factions/world_eaters/unit/test_icon_gameplay.py": 18.262,
     "tests/factions/world_eaters/unit/test_icon_of_khorne.py": 4.755,
     "tests/factions/world_eaters/unit/test_total_carnage_gameplay.py": 19.433,
@@ -46,7 +46,7 @@
     "tests/infrastructure/missions/unit/test_event_companion_part2.py": 119.646,
     "tests/infrastructure/missions/unit/test_game_end_scoring.py": 10.127,
     "tests/infrastructure/missions/unit/test_lifecycle.py": 1.966,
-    "tests/infrastructure/missions/unit/test_mission_pack.py": 8.14,
+    "tests/infrastructure/missions/unit/test_mission_pack.py": 9.517,
     "tests/infrastructure/missions/unit/test_primary_scoring_boundary_lifecycle.py": 86.67,
     "tests/infrastructure/missions/unit/test_primary_scoring_boundary_lifecycle_part2.py": 45.377,
     "tests/infrastructure/missions/unit/test_primary_scoring_boundary_lifecycle_part3.py": 41.568,
@@ -59,7 +59,7 @@
     "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py": 832.356,
     "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py": 794.422,
     "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_c.py": 895.132,
-    "tests/infrastructure/missions/unit/test_step6g_secondary_certification.py": 204.855,
+    "tests/infrastructure/missions/unit/test_step6g_secondary_certification.py": 220.285,
     "tests/infrastructure/missions/unit/test_step6g_secondary_certification_a_grievous_through_beacon.py": 259.453,
     "tests/infrastructure/missions/unit/test_step6g_secondary_certification_behind_through_cleanse.py": 278.807,
     "tests/infrastructure/missions/unit/test_step6g_secondary_certification_defend_through_forward.py": 199.878,
@@ -116,12 +116,12 @@
     "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-player-b]": 352.781,
     "tests/rules/rules07/unit/test_lifecycle.py": 4.697,
     "tests/rules/rules18/unit/test_tactical_setup_proof.py": 0.885,
-    "tests/rules/rules24/unit/test_facade_evidence.py": 597.537,
+    "tests/rules/rules24/unit/test_facade_evidence.py": 779.451,
     "tests/rules/rules24/unit/test_prebattle.py": 7.921,
     "tests/rules/rules24/unit/test_return_on_death.py": 4.629,
     "tests/rules/rules24/unit/test_shadow_form_lookup.py": 1.182,
     "tests/rules/rules24/unit/test_tracked_targets.py": 7.696,
-    "tests/rules/section00/test_conversion.py": 29.414,
+    "tests/rules/section00/test_conversion.py": 38.554,
     "tests/rules/section00/test_facade.py": 18.862,
     "tests/rules/section00/test_inventory.py": 0.542,
     "tests/rules/section01/test_01_02_attached.py": 8.56,
@@ -169,7 +169,7 @@
     "tests/rules/section02/test_02_03_01_nested.py": 3.105,
     "tests/rules/section02/test_02_04_01_constructed_contract.py": 1.865,
     "tests/rules/section02/test_02_04_live_consumers.py": 19.401,
-    "tests/rules/section02/test_02_04_weapons.py": 0.464,
+    "tests/rules/section02/test_02_04_weapons.py": 3.737,
     "tests/rules/section02/test_02_05_keyword_consumers.py": 0.914,
     "tests/rules/section02/test_02_05_keywords.py": 2.446,
     "tests/rules/section02/test_02_06_equipment.py": 0.256,
@@ -205,8 +205,8 @@
     "tests/rules/section04/test_resolution_order.py": 41.721,
     "tests/rules/section04/test_selection_contracts.py": 2.753,
     "tests/rules/section04/test_targets.py": 5.28,
-    "tests/rules/section04/test_visibility.py": 0.898,
-    "tests/rules/section05/test_allocation_choices.py": 4.418,
+    "tests/rules/section04/test_visibility.py": 1.74,
+    "tests/rules/section05/test_allocation_choices.py": 9.631,
     "tests/rules/section05/test_coverage_map.py": 0.302,
     "tests/rules/section05/test_critical_consumers.py": 13.435,
     "tests/rules/section05/test_damage_timing.py": 0.829,
@@ -221,8 +221,8 @@
     "tests/rules/section05/test_retained_stratagem.py": 8.351,
     "tests/rules/section05/test_retention.py": 1.926,
     "tests/rules/section05/test_rolls.py": 24.996,
-    "tests/rules/section05/test_rule_effect_retention.py": 36.106,
-    "tests/rules/section05/test_saves.py": 6.325,
+    "tests/rules/section05/test_rule_effect_retention.py": 84.751,
+    "tests/rules/section05/test_saves.py": 8.44,
     "tests/rules/section05/test_sequence.py": 0.409,
     "tests/rules/section05/test_toughness.py": 3.201,
     "tests/rules/section06/test_coverage_map.py": 0.156,
@@ -238,7 +238,7 @@
     "tests/rules/section07/test_mission_boundary.py": 31.785,
     "tests/rules/section07/test_mission_order.py": 0.118,
     "tests/rules/section07/test_out_of_phase.py": 3.681,
-    "tests/rules/section07/test_progression.py": 25.278,
+    "tests/rules/section07/test_progression.py": 35.376,
     "tests/rules/section07/test_round_effect.py": 3.878,
     "tests/rules/section07/test_trigger_effects.py": 4.602,
     "tests/rules/section08/test_battle_shock.py": 5.927,
@@ -263,7 +263,7 @@
     "tests/rules/section10/test_coverage_map.py": 1.019,
     "tests/rules/section10/test_indirect.py": 79.25,
     "tests/rules/section10/test_isolation.py": 27.886,
-    "tests/rules/section10/test_mixed_integration.py": 10.524,
+    "tests/rules/section10/test_mixed_integration.py": 24.362,
     "tests/rules/section10/test_phase_flow.py": 6.471,
     "tests/rules/section10/test_selection.py": 25.339,
     "tests/rules/section10/test_shooting_types.py": 59.307,
@@ -281,7 +281,7 @@
     "tests/rules/section12/test_continuations.py": 40.058,
     "tests/rules/section12/test_coverage_map.py": 2.882,
     "tests/rules/section12/test_distance.py": 46.453,
-    "tests/rules/section12/test_movement.py": 62.441,
+    "tests/rules/section12/test_movement.py": 113.822,
     "tests/rules/section12/test_ownership.py": 50.951,
     "tests/rules/section12/test_phase.py": 58.636,
     "tests/rules/section12/test_retained_interactions.py": 7.939,
@@ -298,7 +298,7 @@
     "tests/rules/section14/test_coverage_map.py": 0.716,
     "tests/rules/section14/test_faqs.py": 5.382,
     "tests/rules/section14/test_goals.py": 5.501,
-    "tests/rules/section14/test_marker_axes.py": 3.202,
+    "tests/rules/section14/test_marker_axes.py": 4.324,
     "tests/rules/section14/test_physical.py": 3.597,
     "tests/rules/section14/test_range.py": 8.564,
     "tests/rules/section14/test_scalar.py": 0.209,
@@ -343,10 +343,10 @@
     "tests/rules/section18/test_facade.py": 219.077,
     "tests/rules/section18/test_faqs.py": 2.297,
     "tests/rules/section18/test_formations.py": 13.214,
-    "tests/rules/section18/test_isolation.py": 3.128,
+    "tests/rules/section18/test_isolation.py": 3.792,
     "tests/rules/section19/test_abilities.py": 4.951,
     "tests/rules/section19/test_catalog_membership.py": 4.612,
-    "tests/rules/section19/test_coverage.py": 0.212,
+    "tests/rules/section19/test_coverage.py": 0.213,
     "tests/rules/section19/test_destruction.py": 4.423,
     "tests/rules/section19/test_facade.py": 15.81,
     "tests/rules/section19/test_formation.py": 4.581,
@@ -375,7 +375,7 @@
     "tests/rules/section21/test_witness_admission.py": 10.829,
     "tests/rules/section22/test_auras.py": 5.57,
     "tests/rules/section22/test_catalog.py": 2.11,
-    "tests/rules/section22/test_damage.py": 4.622,
+    "tests/rules/section22/test_damage.py": 6.011,
     "tests/rules/section22/test_facade.py": 55.96,
     "tests/rules/section22/test_inventory.py": 2.005,
     "tests/rules/section22/test_plunging.py": 4.839,
@@ -411,7 +411,7 @@
     "tests/rules/section25/test_native.py": 1.925,
     "tests/rules/section25/test_warlord_attachment.py": 0.81,
     "tests/unit/test_dice.py": 1.606,
-    "tests/unit/test_phase10i_terrain_movement.py": 2.058
+    "tests/unit/test_phase10i_terrain_movement.py": 2.522
   },
   "profiles": [
     {
@@ -456,66 +456,66 @@
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 1628.083,
+      "duration_seconds": 1657.662,
       "shard_id": 1,
-      "test_file_count": 34
-    },
-    {
-      "duration_seconds": 1628.098,
-      "shard_id": 2,
       "test_file_count": 33
     },
     {
-      "duration_seconds": 1628.114,
+      "duration_seconds": 1657.653,
+      "shard_id": 2,
+      "test_file_count": 34
+    },
+    {
+      "duration_seconds": 1657.646,
       "shard_id": 3,
       "test_file_count": 34
     },
     {
-      "duration_seconds": 1628.09,
+      "duration_seconds": 1657.649,
       "shard_id": 4,
-      "test_file_count": 33
+      "test_file_count": 34
     },
     {
-      "duration_seconds": 1628.103,
+      "duration_seconds": 1657.632,
       "shard_id": 5,
+      "test_file_count": 34
+    },
+    {
+      "duration_seconds": 1657.639,
+      "shard_id": 6,
       "test_file_count": 35
     },
     {
-      "duration_seconds": 1628.103,
-      "shard_id": 6,
-      "test_file_count": 34
-    },
-    {
-      "duration_seconds": 1628.097,
+      "duration_seconds": 1657.661,
       "shard_id": 7,
-      "test_file_count": 36
-    },
-    {
-      "duration_seconds": 1628.086,
-      "shard_id": 8,
       "test_file_count": 34
     },
     {
-      "duration_seconds": 1628.104,
+      "duration_seconds": 1657.653,
+      "shard_id": 8,
+      "test_file_count": 35
+    },
+    {
+      "duration_seconds": 1657.657,
       "shard_id": 9,
       "test_file_count": 35
     },
     {
-      "duration_seconds": 1628.124,
+      "duration_seconds": 1657.648,
       "shard_id": 10,
       "test_file_count": 35
     },
     {
-      "duration_seconds": 1628.091,
+      "duration_seconds": 1657.648,
       "shard_id": 11,
-      "test_file_count": 34
+      "test_file_count": 35
     },
     {
-      "duration_seconds": 1628.082,
+      "duration_seconds": 1657.646,
       "shard_id": 12,
-      "test_file_count": 35
+      "test_file_count": 34
     }
   ],
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 19537.175
+  "total_test_duration_seconds": 19891.794
 }
