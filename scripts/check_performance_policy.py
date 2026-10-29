@@ -26,13 +26,14 @@ from tools.performance_policy import (
     digest,
     git,
     object_value,
+    prototype_comparison_deferral,
     read_object,
     runtime_inputs,
     validate_assessment,
     validate_comparison,
     validate_full_game,
 )
-from tools.performance_preflight import invocation
+from tools.performance_preflight import ci60_repository_identity, invocation, source_hashes
 from tools.performance_tool_inputs import (
     SCHEMA as HISTORICAL_TOOL_SCHEMA,
 )
@@ -184,6 +185,64 @@ def _base_manifest(root: Path, base: str) -> bytes:
 
 @invocation
 def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[str, object]:
+    assessment = read_object(root / ASSESSMENT)
+    if assessment.get("comparison_disposition") == "deferred":
+        from scripts.quality_evidence import dependency_identity, source_identity
+
+        base = git(root, "rev-parse", "--verify", f"{base_ref}^{{commit}}").decode().strip()
+        if prototype_comparison_deferral(root, base=base) is None:
+            raise ValueError("Missing explicit finite prototype disposition.")
+        if any(
+            name in os.environ
+            for name in (
+                "GIT_DIR",
+                "GIT_WORK_TREE",
+                "GIT_COMMON_DIR",
+                "GIT_INDEX_FILE",
+                "GIT_OBJECT_DIRECTORY",
+                "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+                "GIT_NAMESPACE",
+            )
+        ):
+            raise ValueError("Inherited Git repository role override is unsupported.")
+        if (
+            root != root.resolve()
+            or Path(git(root, "rev-parse", "--show-toplevel").decode().strip()).resolve() != root
+        ):
+            raise ValueError("Prototype verification requires its canonical checkout root.")
+        transaction_identity = ci60_repository_identity(root)
+        repository = {
+            key: str((root / git(root, "rev-parse", flag).decode().strip()).resolve(strict=True))
+            for key, flag in (("git_dir", "--git-dir"), ("common_dir", "--git-common-dir"))
+        }
+        names = set(git(root, "ls-files", "-z").decode().split("\0")) - {""}
+        before = source_identity(root)
+        owned = canonical_digest(source_hashes(root, names))
+        dependencies = dependency_identity()
+        binding = _validate_current(root, base_ref, pr_head=pr_head)
+        after_names = set(git(root, "ls-files", "-z").decode().split("\0")) - {""}
+        after_repository = {
+            key: str((root / git(root, "rev-parse", flag).decode().strip()).resolve(strict=True))
+            for key, flag in (("git_dir", "--git-dir"), ("common_dir", "--git-common-dir"))
+        }
+        if (
+            transaction_identity != ci60_repository_identity(root)
+            or before != source_identity(root)
+            or names != after_names
+            or owned != canonical_digest(source_hashes(root, after_names))
+            or repository != after_repository
+            or dependencies != dependency_identity()
+        ):
+            raise ValueError("Current source/repository/dependencies changed during validation.")
+        return binding | {
+            "comparison_disposition": "deferred",
+            "historical_comparison_qualification": "deferred",
+            "repository_identity": repository,
+            "current_source_identity": before,
+            "stable_current_source_digest": owned,
+            "dependency_identity": dependencies,
+        }
+
     from tools.performance_history_snapshot import phase
 
     with phase(root, base_ref, pr_head) as snapshot:
@@ -201,6 +260,9 @@ def _validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict
     runtime_id = verified_engine_build_identity().build_id
     assessment = read_object(root / ASSESSMENT)
     operation_map = read_object(root / MAP)
+    deferred = assessment.get("comparison_disposition") == "deferred"
+    if deferred and prototype_comparison_deferral(root, base=base) is None:
+        raise ValueError("Missing finite prototype comparison disposition.")
     selected = validate_assessment(
         assessment, base=base, changes=changes, runtime_id=runtime_id, operation_map=operation_map
     )
@@ -213,7 +275,7 @@ def _validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict
         raise TypeError("Base runtime identity missing.")
     approved_failures: list[dict[str, object]] = []
     retained_applicability: dict[str, str] = {}
-    for family in sorted(selected):
+    for family in sorted(set() if deferred else selected):
         path = comparisons[family]
         if (
             not isinstance(path, str)

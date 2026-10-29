@@ -184,6 +184,7 @@ def _governance(path: str) -> bool:
         "scripts/quality_runner.py",
         "tools/quality_runtime_successor.py",
         "ci/quality_shards/all.txt",
+        "ci/quality_shards/prototype-comparison-deferred.args",
         "ci/quality_shards/baseline-ci53.txt",
         "ci/quality_shards/shard-1.txt",
         "ci/quality_shards/shard-1-modules.txt",
@@ -338,6 +339,80 @@ def d02_rule_semantics_smoke_operations(
     return operations
 
 
+def prototype_comparison_deferral(root: Path, *, base: str) -> dict[str, object] | None:
+    """Explicit finite prototype exception; never measurement certification."""
+    path = root / "data/source_audits/ci64_provenance_v1/test-cutover.json"
+    if not path.is_file():
+        return None
+    record = read_object(path)
+    if "comparison_disposition" not in record:
+        return None
+    _keys(
+        record,
+        {
+            "schema",
+            "source_base",
+            "active_roots",
+            "native_active_files",
+            "active_files",
+            "retained_active_files",
+            "inactive_legacy_files",
+            "inactive_updates",
+            "benchmark_files",
+            "retirements",
+            "coverage",
+            "comparison_disposition",
+            "deferred_quality_cases",
+        },
+    )
+    if (
+        base != "5f509724da25a2f6ded0c2739a8e7c84bdf59c91"
+        or record.get("schema") != "finite-test-cutover-v1"
+        or record["comparison_disposition"] != "deferred"
+    ):
+        raise ValueError("Prototype comparison deferral is outside its exact cutover/base.")
+    baseline = {
+        name: record[name]
+        for name in (
+            "source_base",
+            "active_roots",
+            "native_active_files",
+            "retained_active_files",
+            "inactive_legacy_files",
+            "benchmark_files",
+        )
+    }
+    if (
+        canonical_digest(baseline)
+        != "207e59b1e4f56c209ca35f1839823a3dfa94e0ad71e231334549b3ce74945217"
+    ):
+        raise ValueError("Prototype native selection baseline changed.")
+    cases = _strings(record.get("deferred_quality_cases"))
+    if (
+        cases != sorted(cases)
+        or len(cases) != 157
+        or canonical_digest(cases)
+        != "c10cb4d337c5876a562cb4afd5612e596498f90f68b720242b081d92cedd170e"
+    ):
+        raise ValueError("Prototype comparison-only quality deferrals changed.")
+    coverage = object_value(record["coverage"])
+    restoration = coverage.get("restoration_condition")
+    if (
+        coverage.keys()
+        != {"metric", "source", "current_floor", "restoration_floor", "restoration_condition"}
+        or coverage["metric"] != "coverage.py total with branch=true"
+        or coverage["source"] != ["warhammer40k_core"]
+        or type(coverage["current_floor"]) is not int
+        or coverage["current_floor"] != 50
+        or type(coverage["restoration_floor"]) is not int
+        or coverage["restoration_floor"] != 85
+        or not isinstance(restoration, str)
+        or len(restoration.strip()) < 30
+    ):
+        raise ValueError("Prototype full-package coverage/restoration policy changed.")
+    return record
+
+
 def validate_assessment(
     assessment: dict[str, object],
     *,
@@ -346,6 +421,7 @@ def validate_assessment(
     runtime_id: str,
     operation_map: dict[str, object],
 ) -> set[str]:
+    deferred = assessment.get("comparison_disposition") == "deferred"
     _keys(
         assessment,
         {
@@ -358,8 +434,15 @@ def validate_assessment(
             "milestone",
             "comparisons",
             "full_game",
-        },
+        }
+        | ({"comparison_disposition"} if deferred else set()),
     )
+    if deferred and (
+        base != "5f509724da25a2f6ded0c2739a8e7c84bdf59c91"
+        or assessment["milestone"] != "ordinary"
+        or assessment["full_game"] is not None
+    ):
+        raise ValueError("Prototype deferral requires its exact ordinary PR base.")
     if assessment["policy"] != POLICY or assessment["base"] != base:
         raise ValueError("Missing/stale policy assessment or exact base.")
     if assessment["runtime_build_id"] != runtime_id or assessment["changes"] != changes:
@@ -524,7 +607,7 @@ def validate_assessment(
             raise ValueError("Rules-complete profiling is missing.")
     elif assessment["full_game"] is not None:
         raise ValueError("Full-game certification must be explicitly assessed as a milestone.")
-    if object_value(assessment["comparisons"]).keys() != selected:
+    if object_value(assessment["comparisons"]).keys() != (set() if deferred else selected):
         raise ValueError("Missing or extraneous current detailed comparison evidence.")
     referenced = set(object_value(assessment["comparisons"]).values())
     if assessment["full_game"] is not None:

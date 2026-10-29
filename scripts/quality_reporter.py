@@ -32,6 +32,7 @@ class Reporter:
             require(os.environ["PYTEST_XDIST_WORKER_COUNT"] == "4", "Worker count drift")
         self.journal = Journal(self.directory, self.mode + "-" + self.worker, self.binding)
         self.bad = False
+        self.deferred: list[str] = []
         self.started: set[str] = set()
         self.config = config
 
@@ -73,12 +74,18 @@ def pytest_collection_finish(session: pytest.Session) -> None:
     if state.mode == "execute" and state.worker == "controller":
         return
     nodes = [item.nodeid for item in session.items]
-    state.journal.emit("collection", nodes=nodes)
     expected = (
-        state.admitted["inventory"]["all"]
+        state.admitted["inventory"]["full_all"]
         if state.mode == "collect"
         else state.admitted["inventory"]["shards"][state.shard]["nodes"]
     )
+    declared = (
+        []
+        if state.mode == "collect"
+        else state.admitted["inventory"]["shards"][state.shard]["deferred"]
+    )
+    require(state.deferred == declared, "Missing or changed declared comparison deselection")
+    state.journal.emit("collection", nodes=nodes, deferred=state.deferred)
     actual = sorted(nodes) if state.mode == "collect" else nodes
     require(
         len(nodes) == len(set(nodes)) and actual == expected,
@@ -87,7 +94,19 @@ def pytest_collection_finish(session: pytest.Session) -> None:
 
 
 def pytest_deselected(items: list[pytest.Item]) -> None:
-    reporter().problem("deselected", nodes=[item.nodeid for item in items])
+    state = reporter()
+    nodes = [item.nodeid for item in items]
+    expected = state.admitted["inventory"]["shards"][state.shard]["deferred"]
+    require(
+        state.mode == "execute"
+        and state.worker in WORKERS
+        and bool(expected)
+        and not state.deferred
+        and nodes == expected
+        and len(nodes) == len(set(nodes)),
+        "Unexpected quality deselection",
+    )
+    state.deferred = nodes
 
 
 def pytest_collectreport(report: pytest.CollectReport) -> None:

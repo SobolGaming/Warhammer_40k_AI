@@ -288,6 +288,52 @@ def _selection_retirements(root: Path, value: object, native: object) -> frozens
     return frozenset(paths)
 
 
+def deferred_comparison_cases(value: object) -> tuple[str, ...]:
+    """The owner's finite PR591 comparison exception, not behavioral deselection."""
+    if not isinstance(value, dict):
+        raise SystemExit("Invalid comparison deferral record.")
+    nodes = value["deferred_quality_cases"]
+    if (
+        value["comparison_disposition"] != "deferred"
+        or not isinstance(nodes, list)
+        or len(nodes) != 157
+        or not all(isinstance(node, str) for node in nodes)
+        or nodes != sorted(set(nodes))
+        or hashlib.sha256(
+            json.dumps(nodes, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+        ).hexdigest()
+        != "c10cb4d337c5876a562cb4afd5612e596498f90f68b720242b081d92cedd170e"
+    ):
+        raise SystemExit("Comparison deferral differs from the approved 157 quality cases.")
+    ledger = {
+        name: value[name]
+        for name in (
+            "source_base",
+            "active_roots",
+            "native_active_files",
+            "retained_active_files",
+            "inactive_legacy_files",
+            "benchmark_files",
+        )
+    }
+    if (
+        hashlib.sha256(
+            json.dumps(ledger, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        != CUTOVER_LEDGER_SHA256
+    ):
+        raise SystemExit("Comparison deferral changed the native behavioral ledger.")
+    coverage = value["coverage"]
+    if (
+        coverage["metric"] != "coverage.py total with branch=true"
+        or coverage["source"] != ["warhammer40k_core"]
+        or type(coverage["current_floor"]) is not int
+        or coverage["current_floor"] != 50
+    ):
+        raise SystemExit("Comparison deferral changed full-package branch coverage.")
+    return tuple(nodes)
+
+
 def behavioral_selection(root: Path) -> BehavioralSelection:
     """Fresh finite cutover admission shared by pytest and shard discovery."""
     root = root.resolve(strict=True)
@@ -307,6 +353,8 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
         "benchmark_files",
         "retirements",
         "coverage",
+        "comparison_disposition",
+        "deferred_quality_cases",
     }
     if (
         not isinstance(value, dict)
@@ -314,6 +362,7 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
         or value["schema"] != "finite-test-cutover-v1"
     ):
         raise SystemExit("Invalid finite test cutover schema.")
+    deferred_comparison_cases(value)
     if value["source_base"] != {"commit": CUTOVER_BASE, "tree": CUTOVER_TREE}:
         raise SystemExit("Test cutover source authority changed.")
     if value["active_roots"] != list(ACTIVE_TEST_ROOTS):

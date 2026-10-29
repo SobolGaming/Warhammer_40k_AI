@@ -5,6 +5,27 @@ Policy ID: `rules-engine-performance-v3`, owner-approved tiered workflow,
 historical head report whenever the global runtime ID or a shared fixture hash
 changes. It does not turn any previously failed measurement into a pass.
 
+## PR591 prototype comparison exception
+
+For the finite Core + Faction cutover against exact base
+5f509724da25a2f6ded0c2739a8e7c84bdf59c91, the owner explicitly approved
+comparison_disposition: deferred and the 157 exact comparison-only quality
+cases recorded in data/source_audits/ci64_provenance_v1/test-cutover.json.
+Fresh comparative reports and their historical qualification are not merge
+prerequisites for this cutover. Existing reports remain historical; deferred or
+unrun checks are not passes. This exception does not certify a speedup.
+Actual-base assessment, every changed-owner mapping, live current source/index
+and dependency identity, real serial smoke and independently fresh postflight,
+static checks, all 4,886 selected gameplay cases, full-package branch coverage
+at 50%, and absolute timing gates remain required. Restore coverage to 85% as
+documented in the cutover record. Other bases and ordinary assessments retain
+the existing comparison policy.
+
+The separately approved final complete covered run for this cutover is the
+required GitHub CI run, rather than a duplicate local full run. Focused local
+regressions and static checks remain required; the full selected gameplay suite
+and unchanged 50% full-package branch-coverage gate must pass in CI.
+
 ## Required evidence tiers
 
 Every PR, including documentation and development-tool changes, must provide

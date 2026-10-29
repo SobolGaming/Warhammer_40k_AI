@@ -1178,7 +1178,7 @@ def test_category_forwarder_real_pytest_reporter_lifetime(tmp_path: Path) -> Non
     nodes = [f"test_probe.py::test_probe[{value}]" for value in ("one", "two", "error")]
     admitted = {
         "binding": binding,
-        "inventory": {"shards": {"diagnostic": {"nodes": nodes}}},
+        "inventory": {"shards": {"diagnostic": {"nodes": nodes, "deferred": []}}},
     }
     (evidence / "admitted.json").write_text(json.dumps(admitted), encoding="utf-8")
     (evidence / "start.json").write_text('{"shard":"diagnostic"}', encoding="utf-8")

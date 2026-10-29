@@ -385,6 +385,8 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
         "benchmark_files",
         "retirements",
         "coverage",
+        "comparison_disposition",
+        "deferred_quality_cases",
     }
     if (
         type(record) is not dict
@@ -409,6 +411,19 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
         != "207e59b1e4f56c209ca35f1839823a3dfa94e0ad71e231334549b3ce74945217"
     ):
         raise ValueError("Finite native5734 behavioral selection baseline changed.")
+    cases = record["deferred_quality_cases"]
+    if (
+        record["comparison_disposition"] != "deferred"
+        or type(cases) is not list
+        or any(type(case) is not str for case in cases)
+        or cases != sorted(set(cases))
+        or len(cases) != 157
+        or hashlib.sha256(
+            json.dumps(cases, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+        ).hexdigest()
+        != "c10cb4d337c5876a562cb4afd5612e596498f90f68b720242b081d92cedd170e"
+    ):
+        raise ValueError("Finite prototype comparison disposition changed.")
     retired = retirement_rows(record)
     coverage = record["coverage"]
     if (

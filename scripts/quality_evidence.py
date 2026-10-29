@@ -19,6 +19,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
+from scripts.build_test_shards import CUTOVER_PATH, deferred_comparison_cases
+
 SCHEMA = "quality-runtime-v1"
 WORKERS = [f"gw{i}" for i in range(4)]
 MANIFEST = "ci/quality_shards"
@@ -360,7 +362,37 @@ def inventory(root: Path) -> dict[str, Any]:
         "tests/code_quality/test_performance_policy.py" in shards["2"]["modules"],
         "Performance receipt consumer must stay on its producing lane",
     )
-    return {"all": all_nodes, "shards": shards}
+    cutover = root / CUTOVER_PATH
+    deferred = (
+        list(deferred_comparison_cases(read_json(cutover)))
+        if cutover.exists() or cutover.is_symlink()
+        else []
+    )
+    require(set(deferred) <= set(all_nodes), "Deferred quality case missing from full inventory")
+    require(
+        all(
+            [node for node in all_nodes if node.startswith(prefix)] == [prefix]
+            for prefix in deferred
+        ),
+        "Comparison deselection prefix would omit another case",
+    )
+    if deferred:
+        require(
+            (directory / "prototype-comparison-deferred.args").read_text()
+            == "".join("--deselect=" + node + "\n" for node in deferred),
+            "Local comparison deselection arguments differ from the finite declaration",
+        )
+    deferred_set = set(deferred)
+    for shard in shards.values():
+        full_nodes = shard["nodes"]
+        shard["deferred"] = [node for node in full_nodes if node in deferred_set]
+        shard["nodes"] = [node for node in full_nodes if node not in deferred_set]
+    return {
+        "full_all": all_nodes,
+        "deferred": deferred,
+        "all": [node for node in all_nodes if node not in deferred_set],
+        "shards": shards,
+    }
 
 
 def pytest_arguments(
@@ -380,6 +412,7 @@ def pytest_arguments(
     if collect:
         options += ["--collect-only", "-n0"]
     else:
+        options += ["--deselect=" + node for node in selected["deferred"]]
         options += [
             "-n",
             "4",
@@ -494,6 +527,11 @@ def validate_lane(
     shard: str,
     lock_root: Path,
 ) -> dict[str, Any]:
+    require(
+        not inventories["deferred"]
+        or expected["base"] == "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+        "Prototype comparison exception is bound to PR591's approved base",
+    )
     start = read_json(directory / "start.json")
     require(
         start.keys() == {"schema", "context", "shard", "shard_count", "workers", "producer"}
@@ -543,15 +581,27 @@ def validate_lane(
     collection = journal_events(directory, "collect-controller", binding)
     require(
         [e["kind"] for e in collection] == ["session_start", "collection", "session_finish"]
-        and sorted(collection[1]["nodes"]) == inventories["all"]
+        and sorted(collection[1]["nodes"]) == inventories["full_all"]
+        and collection[1]["deferred"] == []
         and collection[-1]["exit_status"] == 0,
         "Independent full collection failed",
     )
-    validate_execution(directory, binding, inventories["shards"][shard]["nodes"])
+    validate_execution(
+        directory,
+        binding,
+        inventories["shards"][shard]["nodes"],
+        deferred=inventories["shards"][shard]["deferred"],
+    )
     return admitted
 
 
-def validate_execution(directory: Path, binding: str, selected: list[str]) -> None:
+def validate_execution(
+    directory: Path,
+    binding: str,
+    selected: list[str],
+    *,
+    deferred: list[str] | tuple[str, ...] = (),
+) -> None:
     """Validate the actual causal execution protocol independently of transport admission."""
     executed: set[str] = set()
     origins: dict[tuple[str, int], dict[str, Any]] = {}
@@ -565,7 +615,9 @@ def validate_execution(directory: Path, binding: str, selected: list[str]) -> No
             "Worker did not close cleanly: " + worker,
         )
         require(
-            events[1]["kind"] == "collection" and events[1]["nodes"] == selected,
+            events[1]["kind"] == "collection"
+            and events[1]["nodes"] == selected
+            and events[1]["deferred"] == list(deferred),
             "Worker collection differs from authoritative manifest",
         )
         active = ""

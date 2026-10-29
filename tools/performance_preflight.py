@@ -664,6 +664,11 @@ def _admission_binding(value: object) -> object:
     return value
 
 
+def ci60_repository_identity(root: Path) -> tuple[object, ...]:
+    """Fresh repository boundary using the existing transaction identity checks."""
+    return _AdmissionTransaction.repository_identity(root)
+
+
 def ci60_admission_bindings() -> tuple[object, ...]:
     """Finite bindings used by the complete admission path, not mutable results."""
     import ast
@@ -674,16 +679,22 @@ def ci60_admission_bindings() -> tuple[object, ...]:
     from tools import performance_policy as policy
     from tools import performance_preflight_successor as successor
 
+    q_namespace = vars(q)
+    ci69_namespace = vars(ci69)
+    policy_namespace = vars(policy)
     if (
-        q.ci69 is not ci69
-        or q.ast is not ast
-        or q.json is not json
-        or q.hashlib is not hashlib
-        or ci69.ast is not ast
-        or ci69.json is not json
-        or ci69.hashlib is not hashlib
-        or policy.ast is not ast
-        or policy.hashlib is not hashlib
+        not {"ci69", "ast", "json", "hashlib"} <= q_namespace.keys()
+        or not {"ast", "json", "hashlib"} <= ci69_namespace.keys()
+        or not {"ast", "hashlib"} <= policy_namespace.keys()
+        or q_namespace["ci69"] is not ci69
+        or q_namespace["ast"] is not ast
+        or q_namespace["json"] is not json
+        or q_namespace["hashlib"] is not hashlib
+        or ci69_namespace["ast"] is not ast
+        or ci69_namespace["json"] is not json
+        or ci69_namespace["hashlib"] is not hashlib
+        or policy_namespace["ast"] is not ast
+        or policy_namespace["hashlib"] is not hashlib
     ):
         raise ValueError("Admission transaction pure module alias changed.")
     owner = policy.owner_hashes

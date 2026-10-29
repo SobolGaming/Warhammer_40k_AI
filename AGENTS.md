@@ -375,6 +375,29 @@ Allowed process:
 
 Legacy code containing broad exceptions, fallback behavior, ambiguous model access, or runtime string parsing must be rewritten.
 
+## PR591 prototype comparison exception
+
+For the finite Core + Faction cutover against exact base
+5f509724da25a2f6ded0c2739a8e7c84bdf59c91, the owner explicitly approved
+comparison_disposition: deferred and the 157 exact comparison-only quality
+cases recorded in data/source_audits/ci64_provenance_v1/test-cutover.json.
+Fresh comparative reports and their historical qualification are not merge
+prerequisites for this cutover. Existing reports remain historical; deferred or
+unrun checks are not passes. This exception does not certify a speedup.
+Actual-base assessment, every changed-owner mapping, live current source/index
+and dependency identity, real serial smoke and independently fresh postflight,
+static checks, all 4,886 selected gameplay cases, full-package branch coverage
+at 50%, and absolute timing gates remain required. Restore coverage to 85% as
+documented in the cutover record. Other bases and ordinary assessments retain
+the existing comparison policy.
+
+For this same PR591 cutover, the owner separately approved using the final
+required GitHub CI complete covered run instead of duplicating that full run
+locally. The complete 4,886-case selection and 50% full-package branch-coverage
+gate remain mandatory in CI. Run focused local regressions and static checks;
+collection or a partial local run is not complete covered qualification. The
+canonical complete covered command below remains the required CI workload.
+
 ## Required commands before PR
 
 The temporary owner-approved coverage floor is 50%; post-merge coverage work must restore
@@ -388,7 +411,7 @@ uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
 PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=50
-uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
+uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
 uv run pre-commit run --all-files

@@ -46,7 +46,9 @@ def transport(
             "binding": binding,
             "inventory": {
                 "all": sorted(nodes),
-                "shards": {"4": {"nodes": nodes}},
+                "full_all": sorted(nodes),
+                "deferred": [],
+                "shards": {"4": {"nodes": nodes, "deferred": []}},
             },
         },
     )

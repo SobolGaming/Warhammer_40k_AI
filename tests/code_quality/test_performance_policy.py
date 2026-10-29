@@ -12,7 +12,6 @@ from typing import Any, cast
 import pytest
 from scripts.check_performance_policy import validate_current, validate_smoke_report
 from scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_SECONDS, WORKLOAD
-from tools import quality_runtime_successor as ci54
 from tools.performance_policy import (
     ASSESSMENT,
     MAP,
@@ -616,13 +615,11 @@ def test_required_current_receipt_matches_this_checkout_and_assessment() -> None
 
 
 def test_current_smoke_is_in_the_required_serial_ci_lane() -> None:
-    workflow = ci54.previous(
-        ROOT, ".github/workflows/ci.yml", (ROOT / ".github/workflows/ci.yml").read_bytes()
-    ).decode()
-    quality = workflow.split("  code-quality:", 1)[1].split("  semantic-audit-macos:", 1)[0]
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text()
+    quality = workflow.split("  quality-policy:", 1)[1].split("  quality-shards:", 1)[0]
     assert "fetch-depth: 0" in quality
     assert quality.index("scripts.check_performance_policy") < quality.index(
-        "pytest tests/code_quality"
+        "scripts.quality_runner run --shard 2"
     )
     assert "--base-ref" in quality
     assert "performance-smoke.json" in quality

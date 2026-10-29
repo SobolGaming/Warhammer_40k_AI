@@ -394,6 +394,11 @@ def run_lane(
         source = source_identity(root)
         dependencies = dependency_identity()
         inventories = inventory(root)
+        require(
+            not inventories["deferred"]
+            or expected["base"] == "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
+            "Prototype comparison exception is bound to PR591's approved base",
+        )
         selected = inventories["shards"][shard]
         project = importlib.util.find_spec("warhammer40k_core")
         require(project is not None and project.origin is not None, "Project import origin missing")

@@ -34,8 +34,8 @@ def test_live_workflow_preserves_required_names_and_all_four_producer_controls()
         == (before.split("  quality-fast:\n")[1].split("  lint:\n")[0])
     )
     assert (
-        workflow.split("  semantic-audit-macos:\n")[1]
-        == (before.split("  semantic-audit-macos:\n")[1])
+        workflow.split("  semantic-audit-macos:\n")[1].split("  mypy:\n")[0]
+        == (before.split("  semantic-audit-macos:\n")[1].split("  mypy:\n")[0])
     )
     aggregate = workflow.split("  code-quality:\n")[1].split("  quality-policy:\n")[0]
     assert "if: always()" in aggregate
@@ -87,7 +87,10 @@ def test_complete_inventory_preserves_every_ci53_case_and_whole_module() -> None
     current = evidence.inventory(ROOT)
     baseline = evidence.lines(ROOT / "ci/quality_shards/baseline-ci53.txt")
     assert len(baseline) == 1696
-    assert set(baseline) <= set(current["all"])
+    assert set(baseline) <= set(current["full_all"])
+    assert len(current["deferred"]) == 157
+    assert set(current["all"]).isdisjoint(current["deferred"])
+    assert sorted(current["all"] + current["deferred"]) == current["full_all"]
     modules = current["shards"]["2"]["modules"]
     assert "tests/code_quality/test_performance_policy.py" in modules
     assert runner.Deadlines(570, 585, 590, 595) == runner.DEFAULT_DEADLINES
@@ -316,7 +319,7 @@ def execution(tmp_path: Path) -> tuple[Path, list[str]]:
     for worker, node in zip(evidence.WORKERS, selected, strict=True):
         journal = evidence.Journal(tmp_path, "execute-" + worker, binding)
         journal.emit("session_start")
-        journal.emit("collection", nodes=selected)
+        journal.emit("collection", nodes=selected, deferred=[])
         journal.emit("node_start", node=node)
         for phase in ("setup", "call", "teardown"):
             journal.emit("phase_start", node=node, phase=phase)
@@ -479,9 +482,12 @@ def lane(
     }
     inventories: dict[str, Any] = {
         "all": sorted(selected),
+        "full_all": sorted(selected),
+        "deferred": [],
         "shards": {
             "4": {
                 "nodes": selected,
+                "deferred": [],
                 "modules": ["tests/code_quality/test_sample.py"],
             }
         },
@@ -544,6 +550,8 @@ def lane(
         mode = "collect" if path.name.startswith("collect-") else "execute"
         for event in events:
             event["binding"] = binding
+            if event["kind"] == "collection":
+                event["deferred"] = []
             if event["kind"] == "session_start":
                 event.update(
                     args=commands[mode][4:], plugins=[], ini=copy.deepcopy(ini), generation=0
@@ -551,7 +559,13 @@ def lane(
         if mode == "collect":
             header = {key: events[0][key] for key in ("schema", "binding", "role", "monotonic")}
             events += [
-                {**header, "kind": "collection", "sequence": 2, "nodes": sorted(selected)},
+                {
+                    **header,
+                    "kind": "collection",
+                    "sequence": 2,
+                    "nodes": sorted(selected),
+                    "deferred": [],
+                },
                 {**header, "kind": "session_finish", "sequence": 3, "exit_status": 0},
             ]
         path.write_bytes(b"".join(evidence.encoded(event) for event in events))
@@ -1385,6 +1399,7 @@ def test_real_lane_creates_absent_scratch_before_four_worker_pytest(tmp_path: Pa
         "scripts/quality_runner.py",
         "scripts/quality_reporter.py",
         "scripts/quality_evidence.py",
+        "scripts/build_test_shards.py",
         "pyproject.toml",
         "uv.lock",
     ):

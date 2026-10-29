@@ -28683,6 +28683,1361 @@
       ],
       "sensitive": false,
       "mandatory": true
+    },
+    "ci78-prototype-evidence-b993103c8756949d6e18a5c7bbc83d537b714e12ea71073a04714d38bd6a7d01": {
+      "paths": [
+        "ci/test_shards/case-partitions.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-5fc68ea274a298667f6ed29d743a93932b0f4339e442df66eb3a3cb0ed193c7a": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/emergency_geometry_helpers.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-fc335d82937d4c2a061eaa400acf0524f04947c5021fd6f7fb312f59db991aa4": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/order101_failed_setup_helpers.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-c59d461c3c9fdfdcfda5ebbcbf2717e11eec2e9c8e6da8cc17e9b48025a8a624": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/benchmark-api-preimages/tests/phase13b_shooting_declaration_helpers.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-9185d6f5a12e24cda5c8266167c9a5f1a668a541dfa3b5dbd71cd9864947a719": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order127_infiltrators_redeploy.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-8d1a6ed9b93e542822efbbc0207544554a0e234b108205488532c602a96f4ee0": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order128_setup_overhang.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-075e12f35fe4e2cf105f4b95c6a9a79564ef8107fccabc4a73df26b6fd826515": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order135_gathered_override.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-ee89618aec59fa9e5c89dbd18c518679947a2dc479573f8e5add68c97c1d5a32": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/integration/test_order135_gathered_psychic_preparation.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-9296a2f0f8020ae479a9d978403508050672f8d458dfbc7e30dadfd2ac6f5973": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order100_frame_measurement.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-36aff1f28ebece40b145f1c4a9be2364a8def50d17bec4642fed5a6fb739071e": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order101_setup_failure.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-1e7bacc81d3958ab5b5969c153d0c782c962e4d1ba17c63c0d97f128f53d500c": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order104_range_visibility.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-ffcb144030621b92d6278a713280a237fe0e800a6d1ae2dbacf591c8532c0c00": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order105_hazard.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-09512ce65a3dd75adfa86f3adaab4ce32975d9ddb962cf233fe3ab4e1bb52ab2": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order106_pile_in.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-4734559be54d7fe09cc3b8610741682961fa4a47e99417ab9821a46c914015fc": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order107_fight_distance_window.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-0ec8849f62a93dc58ff8be90fd10dc0dcda5878df4e45368f792c64c0c932f4f": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order108_terrain_semantics.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-f4513db7354174732de0dc5af092f6895f29a46c1fb0cbecb8e1cc1a9319dc65": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order109_unit_control.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-aa63d4f78119b7b6d42a7907e1e11568fe25b5b405056b4b73bb57f0a2ec294c": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order111_friendly_transit.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-67472b478517052932dc609b5716fc46142e23da6188de1667fb5897949689e0": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order115_absent_movement.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-000c493fdff98ae009e00a5b37e527a64d8b23d86cdfe2b0daba50415554a07f": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order116_additional_mortals.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-4c962827c7b5a7440a31534f0acc41c3371237320c4b6083978ca1fd1e4e12c4": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order117_mortal_allocation.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-21db730823ce4bf449910eee20f6d5c5872af2784d032d693f524ce56d241896": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order121_command_abilities.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-61c747c370dabeda757d8eedfadcb5bef8efc27c547a8a09354db64e535d24ad": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order122_effect_defaults.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-02493a80a1f59f2245bf73eb574cef160ddcc3672c624b28533e7377f108a221": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order123_datasheet_identity.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-020591e90220f0b28feea425a76d8be8464089570e28db4c8b8030a0c2711ee6": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order124_nested_conditions.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-aef22fbe6718b7ac77f732152f70af229577741e0bf35362a80d4d983467f73d": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order125_implicit_subjects.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-94e86c2e6393abc78d617b7f9af9fad62a02e4ab027d0365fdf6d33ae973c54a": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order126_sequential_movement.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-65303ddcc7fb3782cd4f78f9de4423c0a6178b41a7813e285b7821b39288c958": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order128_setup_model_fit.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-d7f35b2a74e37e1bcb3d6d2e98afa4438b4a3e2007a14952df08f22a37b4e7ad": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order129_flight_history.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-f0498736bcf2f572980fb89847c1f2ce39acab87a5dfa1696e95e4b202e496d5": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order130_model_mission_destruction.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-5adaf0891219c99064a6919cedce62ecd0e6bc83a9428fb2e1ad3a7d638acc05": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order131_objective_endpoint_geometry.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-4cb1c4e6d82935a37e18d4f16578751303bba3c2f0b902f0d52333876cacbd6b": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order131_objective_movement.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-73001b9720d0327b12d02044e1885634536d2decc981e0626b3982f1f4dab136": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order132_disembark_distance.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-eee78b124121513dc0bad246bd694a4fd5871aaac3a9a1f5e6e478d975ff2d96": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order133_keyword_materialization.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-331d73f9b0ddc3bdcc6b28fee37ea3d96f005b83cacac18fae59ab4c3f0cb335": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order133_keyword_numbers.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-1957d2ecfda4bcc73df4be865aa98b24873305419e65e1099f86bb8ede637905": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order134_deployment_restrictions.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-984ac7ad96d85c651d932f0597d342e26f1b4781a91bbe0fe792fc3feaff7e0e": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_combat_tactical_feasibility.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-1a2f8066cce39a88afea54c12d13912959390fdce64317b861c3968e22a9779c": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_counteroffensive_band.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-1f2e39ba55d625a3121c6f6bd071034872c6a900c8c493aa5ca4d6a3f88b15fa": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_counteroffensive_timing.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-5f136f259535c0e742118c8245261a063269ab961fedec549e8a0d130a375855": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_fight_pass.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-b959f9f72df0ec1f32e36819030d09b032723f14ef051a598e2d947ed1716c83": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_fight_transition.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-5ca7881f61d228aa162a8f7a571aac32e4809f08f83a6b742d8d10b8903cb35f": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_gathered_attack_steps.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-7883123e736802c6445f415e6ee701948a061a7e6d321bfb1c49f4014770d0be": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_gathered_wound_callback.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-d244c647df070ceacbacc3d1756ed0530007bbe2e9db8c4b6b90ac603d53e66b": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_objective_overlap.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-fe322c0440b7d3026a2a2e0574b5288ad5dfadac3e262607a92c3f189445260e": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_physical_visibility.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-176c221611d64e5f3001cf77c36521eae5a677e8d292c3e6586d911c6b04c731": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_shooting_boundary.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-8d4a99dec071c1765608e0b42d7f40a7eaabecfdcf60e476e729c31fadb54147": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_tactical_setup_proof.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-2fea16cd04f3dbf75c3423a24bad872c10cd87406f89eff3dbe5bd96fdb4c6e5": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_transport_boundaries.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-ab62f8b6e2f20bfd508cbf0c10077b3ad0c1d535b8a53964c4ee85119903e310": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_visibility_facade.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-f363a9993beecd59de3a17889a547ce0505016c01465b9e6f959f4fdc99dfce4": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order135_visibility_rng_projection.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-9627355a0de1fbac8d20a29d93aff2bf9fc87a8d8badcc32aa1aaa63d585fb79": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order36_sequencing.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-e11c5994914e444d4ba7bd8d55b67ffc8995563617550904958e2dcba070ee88": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order36_timing_authority.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-a1558504bb81fc498df2ef1f8274ae40a56cfb95aba58651380036e57a5f6467": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order51_flight.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-6f136e0553729e5c2d7eb33f67ce881443f4083306fa7fd3f0f44cd95e28b64b": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order52_surge.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-9b6fb433452aeb3012530b7aa13f670b599fa9ef95aba4bef44caea3351378bb": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order53_movement_abilities.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-b76f520f5790d23dd248fe006174be13d2bb5594c612d6b1b6b40321436876cf": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order54_setup.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-3d9e3ed07d450182c066b39daf37fe7fd15ad825b52c3cc5d5dc2b8bd2608716": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order55_disembark.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-c283110512ece1f7426fb5aa74fed313629a18048f3ab8ff12be801dc78b5c70": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order57_destroyed_referent_measurement.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-c7c277b50314ce518a74d6e5292c71ce0b4180b1a39d9efaf727118d0e6cedea": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order58_failed_save_damage_timing.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-5607c19c08eee956b54b56c7886d70902dad5bd2c69c8bf3dffd6f4bc1afdb1e": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order59_empty_dedicated_transport.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-48f97a11f17dc5f9a61f26905757d0ed6dcecf3ef6de044d045b4992d6e0ba0a": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order60_emergency_disembark.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-08d0111c6e3f1dd1924ee9615704abeaf0f7970a249499204302369607e09ffe": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order61_embark.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-ee2c275a31548059bf7e936ee34ee122e60cf2752553c1b872db24e1d438caf4": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order63_reserve_transports.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-cdf53e870729e1f75738f1b77ba0d98234ac134561b573004d0cab91dc6b7c26": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order64_reserve_lifetimes.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-440c0a4854fc2f5d59792b5129ef1166246110a52eae9ccaf4e86b8ba9a7a86a": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order65_firing_deck.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-35e7a037e12a98c9ba578a7f82bbf309210cfd688f93de8560ccb2d711225578": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order78_gone_to_ground.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-0895bbf3d62fb7266b5573c754104dba2d031d8f9d75f8a6ecee5844f016705c": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order79_control_first.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-91a4879f67a0547327e85cbfc463aa577e5ec35bf85f6bc562d727171dca336f": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order80_normal_move.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-11beb1f3652fabb0ca4a03dbd98bab61da032dacc2fe29a1face4c870fd54b49": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order81_parameterized_projection.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-420c8e122ef31dd1c4e8d835f0b8d18d26bea3f18b7af565b27e71bf000ce91f": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order82_revival_engagement.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-b640edc776dd4528a192c205a4bfafc9a3b8419b4a2e609f89b3af324a0689cc": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order85_deemed_base_contact.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-3335a5ecd19eb15a3f1d6d204fd5605264776a6c8767288736dee52ef14ac62a": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order86_table_quarters.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-1430e3e08195e37d2257f461110cd72b6e1312c53ac547c396c3be1c54f9b682": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order87_gathered_profile_restore.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-a556c2f201ed38ce6e87ad6ac561900a9859164f3e4879207be6c93e31a7e576": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order87_random_profiles.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-f5dd06df1b2aca72e91336235d6d096a5e6a11c97de31acddee1662b158852d1": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order88_absent_strength.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-c4306df1a17f4c080fe970761f9088bfa18640759b640fe37adcde2087ee2137": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order89_healing.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-68720ef3d912d35f6cd898b9430a5ae58eb964d2d1d48e68b9bc36a6e93307e3": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order90_off_battlefield_revival.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-f55b4f43eb783c60a027a90874da6dec1ec7abf99b137f3de5fb8e7ab6e016d0": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order91_empty_shooting.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-26662f444cc24e41876b63060fc6b8de91b63d366e42592cb8f421368e2660c3": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order92_random_melee.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-bf5e2f3ae50b88c705dabb8bd58501d2600a1c1f2a54a8e296ef3a6edcd3e248": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_attack_modifiers.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-b2cc86f9b67d5a2d6cbe2dc122599f2eda927e4b8cfac4290ae2aede13326239": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_catalog_leadership_modifiers.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-606d2bcda74f6d61e21bec23c9b21d93b45fa23e749817d236bd7cbbbc1acdc2": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_healing_modifiers.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-bf890679d09601474442ada09164aa5a579b44b75bc7913bd94f4ed65e2555db": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_mission_action_modifiers.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-24ae363c4db25d3183d6ff3af3cdf4a8ea66f941c197be5988d703afb9cbe440": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_modifier_ignore.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-29153c2c6a7aa7a83574d60bb4ba80b65f036fb54f5e72fb2c3e8d208cbeb98c": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_nonattack_modifiers.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-921fef5c0cc46f1dd1247d3471f4d1634138fc13cb36869cf7db2fa95c9f80d7": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_permission_context.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-e89c261cbfff3c7644728411eb9c12be480da678975ae4e0cce62438cd603fde": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order93_weapon_modifiers.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-fd18687c6d3896bf700acada3dd20f8cb3cce76327ffa47ab0a5ced7413adb78": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order95_optional_shooting.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-62fe75612269c47957ba45c2362424bbdc14a02b004f492a74ab4d59321810c2": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order96_twin_linked.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-d9a3a9ce9470926e9f9d687685392f1a679dfe858193e34469b4699e6ad1597a": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_attack_evidence.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-9b0f04f0cb17d69ce11a7e9527434a1d00aaa3bc670fd5572ab0a9ceb655241f": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_damage_evidence.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-095211f7f9fabc625ff0971b7f8a50afd3eac3b83d541f66ccc314840bbb1579": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_facade_evidence.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-c003928304701b9a65469c2d7035e617ce6b9d520d234f3654fbf059c9e457df": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_foundation_evidence.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-409eebb39d29c3bd059b3ff2bd17c55f7d268201bfb53aa4c1e854347dd6c0e8": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_movement_evidence.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-3115912f425d02175bcc5dc140d773c7b0ef10de33de731ecbb5c6d8dbede4bd": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_secondary_clause_evidence.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-45634a4e102395e30a1e03a1abaa5ea206e1231aed5398ad31fda833a0059046": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_semantic_evidence_18_25.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-4ebdea720c5c05f6aed1630b3c3e90f9acda757756bc7948ed0af17efe468841": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/retired-tests/tests/unit/test_order97_timing_evidence.py.txt"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/test-cutover.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-policy-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334": {
+      "paths": [
+        "tools/performance_policy.py"
+      ],
+      "owners": [
+        "prototype_comparison_deferral"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-policy-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f": {
+      "paths": [
+        "scripts/build_test_shards.py"
+      ],
+      "owners": [
+        "deferred_comparison_cases"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-policy-3cacc2199960a29e392d67004401cdff9c1b806dd2e5493132e7b711e29e5faa": {
+      "paths": [
+        "tools/performance_preflight.py"
+      ],
+      "owners": [
+        "ci60_repository_identity"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-policy-503f1e4e0b15d48dbe108962d5a1af6a283723f32ee6424f62751179346673e2": {
+      "paths": [
+        "tests/code_quality/test_cumulative_preservation.py"
+      ],
+      "owners": [
+        "_CumulativeMechanisms",
+        "_CumulativeMechanisms._json",
+        "_CumulativeMechanisms._registry",
+        "_CumulativeMechanisms.json",
+        "_CumulativeMechanisms.registry",
+        "test_actual_dependency_selection_owner_assertion_or_authority_drift_refuses",
+        "test_d09_successor_does_not_repin_historical_after_or_assertions",
+        "test_every_d07_recipe_is_independently_sensitive_to_extra_or_removed_assertion",
+        "test_explicit_content_route_retains_historical_measurement_identity",
+        "test_finite_owner_and_operation_union_preserves_all_prior_obligations",
+        "test_ignored_consumer_inputs_do_not_escape_membership",
+        "test_later_d07_successors_preserve_exact_separate_prerequisite_stages",
+        "test_physical_ownership_refuses_aliases",
+        "test_registry_and_accepted_evidence_cannot_be_rewritten",
+        "test_three_changed_controls_require_exact_transformations"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-policy-d3f5e09a1943ec18a50ed4e0f4e8696c01bcfb66f444110580bc950fcc8e36cd": {
+      "paths": [
+        "tests/code_quality/test_s25_fixture_preservation.py"
+      ],
+      "owners": [
+        "_mutated_current",
+        "test_actual_projection_rejects_complete_byte_tamper_before_returning_history"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ci78-prototype-policy-1b88d36a2782dc3ec2df266b09435ce5cda5411c53f31a60da2f29511ae3af4f": {
+      "paths": [
+        "tests/code_quality/test_thousand_sons_perils_preservation.py"
+      ],
+      "owners": [
+        "test_perils_successor_preserves_complete_source_and_original_test_bytes",
+        "test_perils_successor_rejects_source_drift_and_blind_repins"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
