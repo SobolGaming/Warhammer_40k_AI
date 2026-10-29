@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "5f509724da25a2f6ded0c2739a8e7c84bdf59c91",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ce95991ea3858da5cbd281c3004cd0d0c66d0b2e7c21f6afcc0d8f07b6eff0f0",
-  "operation_map_sha256": "29264cdd46851e23aa14d071ad3fdac85ae4672d99964594aec760c83b004b6d",
+  "operation_map_sha256": "beba81d15aab76e80a05ee7fd62a6cc5a5083fedf54d4f93c5d4ddc5f6eea761",
   "changes": {
     ".github/pull_request_template.md": {
       "before_sha256": "50fd30af40ed199b0d8d99560496fcfcd02b1ff8dc2d0f22fd9971b48633fc09",
@@ -4926,11 +4926,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-      "after_sha256": "92c7ea52a2e2ddb5d03519f050311c1229cdf91ca47c3c866ae1c3900e0d5b2f",
+      "after_sha256": "512c8b0cc84faa881e1e32124b995c9bb875b56908458ffc27c7d338d3106183",
       "owners": {
         "@document": {
           "before": "c3005f3bed2c91b4e25964d41ab66286cec63f002e649ed499d964ece9093447",
-          "after": "92c7ea52a2e2ddb5d03519f050311c1229cdf91ca47c3c866ae1c3900e0d5b2f"
+          "after": "512c8b0cc84faa881e1e32124b995c9bb875b56908458ffc27c7d338d3106183"
         }
       }
     },
@@ -7653,11 +7653,11 @@
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "before_sha256": "23dc913cc9d2def5a1a0625f4acd95881fb06fa3561d54feb21c158446a25267",
-      "after_sha256": "c3d206e3f1c609ac4934d63d9ad6bade1624a2f574022aca042a2fb02d51018a",
+      "after_sha256": "08d2075e8b6d2f58f7de41d7d9df4822f583106895c69de0d18185c9558266a2",
       "owners": {
         "@module": {
           "before": "5f6e7450e2b71187ea696f4e6c5ec311062ec2e0645701c8e8e160a3506b7e6a",
-          "after": "708f5eb1d27c8682d0354d21fddb0888eed4c131bfde93d7a7976f91df663892"
+          "after": "452dd03a7e7032f7fd81a730aa98ab7cbb63e130e0d6886c47228fc520d1e4e2"
         },
         "_collection_environment": {
           "before": null,
@@ -7701,7 +7701,7 @@
         },
         "test_finite_partition_has_real_complete_pytest_collection": {
           "before": null,
-          "after": "d0fcf0f826d616ad99ba314490d629e895790fc80f54ca0b082c7e3b0b0a9666"
+          "after": "b86ce3ca4a4a5a87863ee1a4c276d6def166e32061f8f93f4a6ca8eea90b16c9"
         },
         "test_finite_partition_preserves_total_weight_and_other_file_weights": {
           "before": null,
@@ -9773,11 +9773,15 @@
     },
     "tests/conftest.py": {
       "before_sha256": "db7fe5a9246d0aa44cc115b59840781806bdd5228b115bbd9dce8309d28292b7",
-      "after_sha256": "c1d324ff1ad8f6ba56d713afabbb7055fb97560e7c426c710033221225a37d0e",
+      "after_sha256": "1ed797609cbef7db5786ad767f554c8c6ad92a077f317df6dc1977e5ee235196",
       "owners": {
         "@module": {
           "before": "8957a5dde9d9009821741d4ababc17be4c5e26cae67c34b3b4be4a6970567156",
-          "after": "232ef52fa89143a72698f93ec9e099bbbd1aae3c450eca2410ce0a5f95e9114e"
+          "after": "8058a5f1f036599ec2e72efa7c21ca8ff23e5e1c8f182f40b73e58540373adfa"
+        },
+        "SchedulerWorker": {
+          "before": null,
+          "after": "1ea487af96f22db3c25aafc168ec2d67e65eec6a8e02ee04ca5c913e7abd0f3a"
         },
         "_configured_selection": {
           "before": null,
@@ -9801,11 +9805,15 @@
         },
         "pytest_collection_modifyitems": {
           "before": null,
-          "after": "eaeda68a7e31758c53b0d59b17e50e2f6dcd5cc7428ef804a76db2009d88fa2b"
+          "after": "a0152ea6e73407357ec31b143109ec64a8a559198ef18f7fdf64669a72341c06"
         },
         "pytest_configure": {
           "before": null,
           "after": "ebb6d514ae01be1a06a87c63edceaae89ee80a4cc987896f7e337115d66e5ba3"
+        },
+        "pytest_configure_node": {
+          "before": null,
+          "after": "e9f8868669ed283551b031c3ee0600917416201e8a3b1c72ff1da36f32a58838"
         },
         "pytest_ignore_collect": {
           "before": null,
@@ -31424,9 +31432,9 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI79 scheduling-only correction: start the authenticated finite S25 cases on separate initial four-worker worksteal chunks in hosted behavioral shards; keep every selected item, assertion, relative group order, current validators and all deadlines unchanged. Existing finite collection regression exercises the actual failed layout.",
-      "source_obligation": "Preserve the exact 4,886 selected gameplay cases and 1,848 active quality cases, with no engine, catalog, fixture, coverage metric or threshold change.",
-      "unchanged_work": "All native workload, validation I/O, runtime identity, source-index preparation, four workers, scheduler and 180/600-second limits remain; only deterministic initial item order changes in the guarded hosted worker context."
+      "rationale": "CI79 corrects the observed xdist controller/worker scheduler handoff: the supported controller hook forwards the selected scheduler before xdist resets worker options. The existing guarded S25 permutation remains unchanged; regression covers the actual reset value and a real four-worker activation run is separately required.",
+      "source_obligation": "Retain all current selection, source admission and gameplay assertions; no new cases, engine behavior, source-index semantics, coverage metric or threshold changes.",
+      "unchanged_work": "The same 4,886 behavior cases, 1,848 active quality cases, 260 approved deferrals, four workers, worksteal algorithm, original deadline controls and independent validation phases remain unchanged."
     },
     "tests/code_quality/test_ci_runtime_successor.py": {
       "category": "governance",
@@ -31761,14 +31769,15 @@
       "operations": [
         "qualification40-exact-e52e4ddd58b7ef88",
         "ci78-cutover-owners-e52e4ddd58b7ef887ab03c04116e676f6280b824ab7469d5d3080e5cba4f2128",
-        "ci79-ordering-e52e4ddd58b7ef887ab03c04116e676f6280b824ab7469d5d3080e5cba4f2128"
+        "ci79-ordering-e52e4ddd58b7ef887ab03c04116e676f6280b824ab7469d5d3080e5cba4f2128",
+        "ci79-controller-handoff-e52e4ddd58b7ef887ab03c04116e676f6280b824ab7469d5d3080e5cba4f2128"
       ],
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "CI79 scheduling-only correction: start the authenticated finite S25 cases on separate initial four-worker worksteal chunks in hosted behavioral shards; keep every selected item, assertion, relative group order, current validators and all deadlines unchanged. Existing finite collection regression exercises the actual failed layout.",
-      "source_obligation": "Preserve the exact 4,886 selected gameplay cases and 1,848 active quality cases, with no engine, catalog, fixture, coverage metric or threshold change.",
-      "unchanged_work": "All native workload, validation I/O, runtime identity, source-index preparation, four workers, scheduler and 180/600-second limits remain; only deterministic initial item order changes in the guarded hosted worker context."
+      "rationale": "CI79 corrects the observed xdist controller/worker scheduler handoff: the supported controller hook forwards the selected scheduler before xdist resets worker options. The existing guarded S25 permutation remains unchanged; regression covers the actual reset value and a real four-worker activation run is separately required.",
+      "source_obligation": "Retain all current selection, source admission and gameplay assertions; no new cases, engine behavior, source-index semantics, coverage metric or threshold changes.",
+      "unchanged_work": "The same 4,886 behavior cases, 1,848 active quality cases, 260 approved deferrals, four workers, worksteal algorithm, original deadline controls and independent validation phases remain unchanged."
     },
     "tests/d07_geometry_containment.py": {
       "category": "measured_workload",

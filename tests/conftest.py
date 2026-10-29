@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol, cast
 
 import pytest
 
@@ -72,11 +72,23 @@ def _explicit_benchmark(config: pytest.Config) -> bool:
     return False
 
 
+class SchedulerWorker(Protocol):
+    config: pytest.Config
+    workerinput: dict[str, object]
+
+
+@pytest.hookimpl(optionalhook=True)
+def pytest_configure_node(node: SchedulerWorker) -> None:
+    # xdist resets worker config.option.dist to "no" before collection.
+    node.workerinput["s25_scheduler"] = node.config.getoption("dist")
+
+
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    worker_input = cast(dict[str, object], getattr(config, "workerinput", {}))
     if (
         not os.environ.get("SHARD_ID")
         or os.environ.get("PYTEST_XDIST_WORKER_COUNT") != "4"
-        or config.getoption("dist") != "worksteal"
+        or worker_input.get("s25_scheduler") != "worksteal"
     ):
         return
     from scripts.build_test_shards import worksteal_relevance_order

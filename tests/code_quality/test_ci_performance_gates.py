@@ -11,6 +11,7 @@ import tomllib
 import xml.etree.ElementTree as ET
 from collections.abc import Callable
 from pathlib import Path
+from types import SimpleNamespace
 from typing import cast
 
 import pytest
@@ -582,7 +583,9 @@ def _collection_environment(root: Path) -> dict[str, str]:
     return environment
 
 
-def test_finite_partition_has_real_complete_pytest_collection() -> None:
+def test_finite_partition_has_real_complete_pytest_collection(
+    pytestconfig: pytest.Config, monkeypatch: pytest.MonkeyPatch
+) -> None:
     expected = sharding._literal_partition_nodes(ROOT)
     result = subprocess.run(
         [
@@ -643,6 +646,32 @@ def test_finite_partition_has_real_complete_pytest_collection() -> None:
     ) == tuple(range(8))
     assert sharding.worksteal_relevance_order(expected, workers=4) == tuple(range(20))
     assert sharding.worksteal_relevance_order(expected[:2], workers=4) == (0, 1)
+
+    # Exercise the real controller hook with xdist's actual worker reset value.
+
+    from tests import conftest as root_hooks
+
+    worker_input: dict[str, object] = {}
+    controller = SimpleNamespace(config=pytestconfig, workerinput=worker_input)
+    with monkeypatch.context() as patch:
+        patch.setattr(pytestconfig.option, "dist", "worksteal")
+        root_hooks.pytest_configure_node(controller)
+        assert worker_input["s25_scheduler"] == "worksteal"
+        patch.setattr(pytestconfig.option, "dist", "no")
+        patch.setattr(pytestconfig, "workerinput", worker_input, raising=False)
+        patch.setenv("SHARD_ID", "controller-handoff-control")
+        patch.setenv("PYTEST_XDIST_WORKER_COUNT", "4")
+        names = tuple(f"ordinary:{index}" for index in range(6)) + expected[:2]
+        items = [cast(pytest.Item, SimpleNamespace(nodeid=name)) for name in names]
+        original = tuple(items)
+        root_hooks.pytest_collection_modifyitems(pytestconfig, items)
+        assert items[0] is original[6]
+        assert items[2] is original[7]
+        assert {id(item) for item in items} == {id(item) for item in original}
+        worker_input["s25_scheduler"] = "load"
+        items[:] = original
+        root_hooks.pytest_collection_modifyitems(pytestconfig, items)
+        assert tuple(items) == original
 
 
 @pytest.fixture
