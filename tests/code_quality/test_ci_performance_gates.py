@@ -652,7 +652,13 @@ def test_finite_partition_has_real_complete_pytest_collection(
     from tests import conftest as root_hooks
 
     worker_input: dict[str, object] = {}
-    controller = SimpleNamespace(config=pytestconfig, workerinput=worker_input)
+
+    class Controller:
+        def __init__(self, config: pytest.Config, workerinput: dict[str, object]) -> None:
+            self.config = config
+            self.workerinput = workerinput
+
+    controller = Controller(pytestconfig, worker_input)
     with monkeypatch.context() as patch:
         patch.setattr(pytestconfig.option, "dist", "worksteal")
         root_hooks.pytest_configure_node(controller)
