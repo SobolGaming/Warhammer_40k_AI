@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import errno
+import socket
+import sys
 from typing import Protocol, cast
 
 from tests.shared.category_migration.phase18f_session_commands import (
@@ -115,6 +118,7 @@ from tests.shared.category_migration.phase18f_session_commands import (
     urlopen,
     validate_json_value,
 )
+from warhammer40k_core.adapters.http_transport import create_http_server
 
 
 def test_phase18f_session_source_identity_publishes_active_rules_overlay() -> None:
@@ -423,3 +427,69 @@ __all__ += ["_schema_payloads", "_schema_registry", "_start_command"]
 __all__ += ["_terminal_progress_option_id", "chapter_approved_2026_27_mission_pack", "datetime"]
 __all__ += ["pre_record_unsupported_session", "project_game_view", "pytest"]
 __all__ += ["recorded_unsupported_session", "urlopen", "validate_json_value"]
+
+
+@pytest.mark.parametrize("competitor", ["factory", "reuse_address"])
+def test_http_listener_excludes_competitors_and_preserves_authenticated_session(
+    competitor: str,
+) -> None:
+    server = create_http_server(host="127.0.0.1", port=0, api=AdapterGameServer())
+    host, port = cast(tuple[str, int], server.server_address)
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    base_url = f"http://{host}:{port}"
+    try:
+        if sys.platform == "win32":
+            assert server.socket.getsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE) == 1
+            assert server.socket.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR) == 0
+        else:
+            assert server.allow_reuse_address is True
+            assert server.socket.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR) == 1
+        created = _http_json(
+            Request(
+                f"{base_url}/sessions",
+                data=json.dumps(_session_create_body("listener-exclusivity")).encode(),
+                headers={
+                    "Authorization": bearer_authorization(DEV_ADMIN_TOKEN),
+                    "Content-Type": "application/json",
+                },
+                method="POST",
+            )
+        )
+        session_id = _field_string(created, "session_id")
+        envelope = _command_envelope(
+            session_id=session_id,
+            command_id="listener-exclusivity-start",
+            expected_revision=0,
+            submission_kind="start_session",
+        )
+        first_status, first_bytes = _http_command_bytes(base_url, session_id, envelope)
+        assert first_status == 200
+        first = _json_object(validate_json_value(json.loads(first_bytes)))
+        assert first["committed"] is True
+        assert _field_int(_field_object(first, "session"), "session_revision") == 1
+
+        with pytest.raises(OSError) as refused:
+            if competitor == "factory":
+                with create_http_server(host=host, port=port, api=AdapterGameServer()):
+                    pytest.fail("A second factory listener acquired an occupied address")
+            else:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as competing_socket:
+                    competing_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    competing_socket.bind((host, port))
+        assert refused.value.errno in {errno.EADDRINUSE, errno.EACCES}
+
+        # The original authority and its committed session survive both failed binds.
+        retry_status, retry_bytes = _http_command_bytes(base_url, session_id, envelope)
+        assert retry_status == 200
+        assert retry_bytes == first_bytes
+        assert thread.is_alive()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5.0)
+    assert not thread.is_alive()
+    if sys.platform != "win32":
+        # Preserve the existing POSIX quick-restart behavior after real HTTP traffic.
+        with create_http_server(host=host, port=port, api=AdapterGameServer()) as restarted:
+            assert restarted.server_address == (host, port)

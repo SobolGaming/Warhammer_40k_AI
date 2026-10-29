@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import socket
+import sys
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import ClassVar
@@ -17,7 +19,19 @@ def create_http_server(
     port: int,
     api: AdapterGameServer,
 ) -> ThreadingHTTPServer:
-    return ThreadingHTTPServer((host, port), _handler_for_api(api))
+    return _AdapterHTTPServer((host, port), _handler_for_api(api))
+
+
+class _AdapterHTTPServer(ThreadingHTTPServer):
+    # Windows SO_REUSEADDR permits another listener to steal the bound address.
+    allow_reuse_address = (
+        False if sys.platform == "win32" else ThreadingHTTPServer.allow_reuse_address
+    )
+
+    def server_bind(self) -> None:
+        if sys.platform == "win32":
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
 
 
 def _handler_for_api(api: AdapterGameServer) -> type[BaseHTTPRequestHandler]:
