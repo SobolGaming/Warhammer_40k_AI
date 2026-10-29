@@ -531,7 +531,8 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
         current_row(row["archive"], row["native"])
     updates = record["inactive_updates"]
     typed_name = "tests/integration/test_embarked_ability_authority.py"
-    if type(updates) is not dict or updates.keys() != recipes.keys() | {typed_name}:
+    server_name = "tests/unit/test_phase18e_server_api.py"
+    if type(updates) is not dict or updates.keys() != recipes.keys() | {typed_name, server_name}:
         raise ValueError("Finite inactive API update membership changed.")
     wanted = ast.dump(
         ast.parse("lifecycle.decision_controller.queue.pending_requests", mode="eval").body,
@@ -555,6 +556,41 @@ def validate_cutover(operands: tuple[tuple[str, int, bytes], ...]) -> None:
         != typed["before"]["sha256"]
     ):
         raise ValueError("Finite inactive typing update changed bytes beyond the exact cast.")
+    server = updates[server_name]
+    if (
+        type(server) is not dict
+        or server.keys() != {"before", "after", "recipe"}
+        or server["before"] != record["inactive_legacy_files"][server_name]
+        or server["recipe"] != "type-only-server-session-test-access-v1"
+    ):
+        raise ValueError("Finite server typing update changed its native preimage or recipe.")
+    current_row(server_name, server["after"])
+    restored_server = frozen[server_name]
+    server_typing_changes = (
+        (b"from warhammer40k_core.adapters.session_protocol import AuthoritativeSession\n", b""),
+        (
+            b"class _SessionInspectableServer(AdapterGameServer):\n"
+            b"    def authoritative_session_for_test(self, session_id: str) "
+            b"-> AuthoritativeSession:\n"
+            b"        return self._sessions[session_id]\n\n\n",
+            b"",
+        ),
+        (
+            b"_SessionInspectableServer(session_factory=lambda: local_session)",
+            b"AdapterGameServer(session_factory=lambda: local_session)",
+        ),
+        (
+            b"        server.authoritative_session_for_test(session_id).adapter_session,\n",
+            b"        server._sessions[session_id].adapter_session,  "
+            b"# pyright: ignore[reportPrivateUsage]\n",
+        ),
+    )
+    for after_typing, before_typing in server_typing_changes:
+        if restored_server.count(after_typing) != 1:
+            raise ValueError("Finite server typing update changed an exact access site.")
+        restored_server = restored_server.replace(after_typing, before_typing, 1)
+    if hashlib.sha256(restored_server).hexdigest() != server["before"]["sha256"]:
+        raise ValueError("Finite server typing update changed an original byte or assertion.")
     for name, recipe in recipes.items():
         update = updates[name]
         if (

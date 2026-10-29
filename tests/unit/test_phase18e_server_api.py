@@ -52,6 +52,7 @@ from warhammer40k_core.adapters.server import (
     ServerResponse,
     create_local_dev_http_server,
 )
+from warhammer40k_core.adapters.session_protocol import AuthoritativeSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
@@ -126,6 +127,11 @@ SELECT_MOVEMENT_UNIT = "select_movement_unit"
 SELECT_MOVEMENT_ACTION = "select_movement_action"
 ADVANCE_ACTION_OPTION_ID = "advance"
 NORMAL_MOVE_ACTION_OPTION_ID = "normal_move"
+
+
+class _SessionInspectableServer(AdapterGameServer):
+    def authoritative_session_for_test(self, session_id: str) -> AuthoritativeSession:
+        return self._sessions[session_id]
 
 
 class _PayloadValidator(Protocol):
@@ -744,7 +750,7 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
 
 def test_phase18e_recorded_invalid_retry_commits_one_session_revision() -> None:
     local_session = LocalGameSession()
-    server = AdapterGameServer(session_factory=lambda: local_session)
+    server = _SessionInspectableServer(session_factory=lambda: local_session)
     game_id = "phase18e-recorded-invalid-retry"
     created = _request(
         server,
@@ -806,7 +812,7 @@ def test_phase18e_recorded_invalid_retry_commits_one_session_revision() -> None:
     )
     authoritative_session = cast(
         LocalGameSession,
-        server._sessions[session_id].adapter_session,  # pyright: ignore[reportPrivateUsage]
+        server.authoritative_session_for_test(session_id).adapter_session,
     )
     invalid_witness = straight_line_witness_for_unit(
         authoritative_session.lifecycle,

@@ -1,400 +1,272 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "eff825d14cff10422ab3c143c5cce5de122621c6",
+  "base": "7f2bc25958b1297e0e246ab9a34aa04be8182cef",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ce95991ea3858da5cbd281c3004cd0d0c66d0b2e7c21f6afcc0d8f07b6eff0f0",
-  "operation_map_sha256": "beba81d15aab76e80a05ee7fd62a6cc5a5083fedf54d4f93c5d4ddc5f6eea761",
+  "operation_map_sha256": "708b62b3af707d3e60d1d54c662e56c57c9151ce7f83bd277caef62700c0cd0d",
   "changes": {
-    ".github/pull_request_template.md": {
-      "before_sha256": "dbe56937f2954ee419d13ec7f8b13e290b5f3f40a1f29df88c725fc211390b20",
-      "after_sha256": "7769f0ddafc7d0bad30d8c4c129307c63e431144f99ba4373bb685d0527ad03a",
-      "owners": {
-        "@document": {
-          "before": "dbe56937f2954ee419d13ec7f8b13e290b5f3f40a1f29df88c725fc211390b20",
-          "after": "7769f0ddafc7d0bad30d8c4c129307c63e431144f99ba4373bb685d0527ad03a"
-        }
-      }
-    },
     ".github/workflows/ci.yml": {
-      "before_sha256": "6eb5458183556d5d33f1f787958d4721dd4ecf773a536190a70ae1e2ef6d330d",
-      "after_sha256": "461dbc322a5d18a5f783084eee19a945cb59ab5806fdd590ae0487c948de14c1",
+      "before_sha256": "461dbc322a5d18a5f783084eee19a945cb59ab5806fdd590ae0487c948de14c1",
+      "after_sha256": "eb86b54a0df6cff7b6cdc8187dce619f8d9bc60494e65554f580bb8e3816044a",
       "owners": {
         "@document": {
-          "before": "6eb5458183556d5d33f1f787958d4721dd4ecf773a536190a70ae1e2ef6d330d",
-          "after": "461dbc322a5d18a5f783084eee19a945cb59ab5806fdd590ae0487c948de14c1"
-        }
-      }
-    },
-    "AGENTS.md": {
-      "before_sha256": "ba2b751ed0d689cd0807309143cd23ebe926c7f8ed10f5ddbd9e85e43901cbba",
-      "after_sha256": "b74cbd4b92504927db1d47cb87ed686fe552c844e751b72d8c0e1596f5cc3c28",
-      "owners": {
-        "@document": {
-          "before": "ba2b751ed0d689cd0807309143cd23ebe926c7f8ed10f5ddbd9e85e43901cbba",
-          "after": "b74cbd4b92504927db1d47cb87ed686fe552c844e751b72d8c0e1596f5cc3c28"
+          "before": "461dbc322a5d18a5f783084eee19a945cb59ab5806fdd590ae0487c948de14c1",
+          "after": "eb86b54a0df6cff7b6cdc8187dce619f8d9bc60494e65554f580bb8e3816044a"
         }
       }
     },
     "README.md": {
-      "before_sha256": "dc56745fbffccc97c257292ed367c5d2f3110b33d4926065df271fa583ad7897",
-      "after_sha256": "5128889a8404a7c0bb1b416b95a49790fdfd78759b78b69e7b158604d0f9f1bb",
+      "before_sha256": "5128889a8404a7c0bb1b416b95a49790fdfd78759b78b69e7b158604d0f9f1bb",
+      "after_sha256": "6876c8b78d8736b86e2f5215981247bdb24d5b21c1056aee661ce6dd03c50932",
       "owners": {
         "@document": {
-          "before": "dc56745fbffccc97c257292ed367c5d2f3110b33d4926065df271fa583ad7897",
-          "after": "5128889a8404a7c0bb1b416b95a49790fdfd78759b78b69e7b158604d0f9f1bb"
+          "before": "5128889a8404a7c0bb1b416b95a49790fdfd78759b78b69e7b158604d0f9f1bb",
+          "after": "6876c8b78d8736b86e2f5215981247bdb24d5b21c1056aee661ce6dd03c50932"
         }
       }
     },
     "ci/test_shards/case-partitions.json": {
-      "before_sha256": "9c93a01948d84acb01cb94d39ced103371f89f23700c4274d1d0c2a4aa2c59a4",
-      "after_sha256": "321b51d16590fc43a5e740e557d8e00ce8c234bdf91178571e7b1ac6f5bfeb23",
+      "before_sha256": "321b51d16590fc43a5e740e557d8e00ce8c234bdf91178571e7b1ac6f5bfeb23",
+      "after_sha256": "bcfc36b844a020466f03e568058e3ab6600dc5beb756cffad32d3193bd18f8f1",
       "owners": {
         "@document": {
-          "before": "9c93a01948d84acb01cb94d39ced103371f89f23700c4274d1d0c2a4aa2c59a4",
-          "after": "321b51d16590fc43a5e740e557d8e00ce8c234bdf91178571e7b1ac6f5bfeb23"
+          "before": "321b51d16590fc43a5e740e557d8e00ce8c234bdf91178571e7b1ac6f5bfeb23",
+          "after": "bcfc36b844a020466f03e568058e3ab6600dc5beb756cffad32d3193bd18f8f1"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "1680b97ca3e51714b959e604802418cde6363cd095905f9ce74cfccb86e7aad0",
-      "after_sha256": "75b8229b64b7649d7ef5aeb436729edee2e8995fa1e13fc164ba7600e90de2ff",
+      "before_sha256": "75b8229b64b7649d7ef5aeb436729edee2e8995fa1e13fc164ba7600e90de2ff",
+      "after_sha256": "06860cc19cf2641f036f21cd3ca85d5f8f8657b5a8dae847d76d9e20ae3072dd",
       "owners": {
         "@document": {
-          "before": "1680b97ca3e51714b959e604802418cde6363cd095905f9ce74cfccb86e7aad0",
-          "after": "75b8229b64b7649d7ef5aeb436729edee2e8995fa1e13fc164ba7600e90de2ff"
+          "before": "75b8229b64b7649d7ef5aeb436729edee2e8995fa1e13fc164ba7600e90de2ff",
+          "after": "06860cc19cf2641f036f21cd3ca85d5f8f8657b5a8dae847d76d9e20ae3072dd"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "5028201d7b1b7de3356c1ebfb63ebd202e7854bebccbec882268c9ccaf9729ef",
-      "after_sha256": "eb532303907d5eab7ea2bdc80bb5708fe767a0f08d46b4e65795775b074f240e",
+      "before_sha256": "eb532303907d5eab7ea2bdc80bb5708fe767a0f08d46b4e65795775b074f240e",
+      "after_sha256": "a65ee8dc95c935904a6d0adb26019eaab45add4ce99fa4ea37613650e13ca5f9",
       "owners": {
         "@document": {
-          "before": "5028201d7b1b7de3356c1ebfb63ebd202e7854bebccbec882268c9ccaf9729ef",
-          "after": "eb532303907d5eab7ea2bdc80bb5708fe767a0f08d46b4e65795775b074f240e"
+          "before": "eb532303907d5eab7ea2bdc80bb5708fe767a0f08d46b4e65795775b074f240e",
+          "after": "a65ee8dc95c935904a6d0adb26019eaab45add4ce99fa4ea37613650e13ca5f9"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "c9ec5e76b9af44e43b8a6956e9f2fcf3ee5a310a8f50c1f6bf3820172cee5afb",
-      "after_sha256": "8e0768d6ab3c86115192707f7364ba4ac26a2d223e1f094affb956a9fe669169",
+      "before_sha256": "8e0768d6ab3c86115192707f7364ba4ac26a2d223e1f094affb956a9fe669169",
+      "after_sha256": "600ecff5cbab5794401518628c158dbb2ce41b973f2396214cc4a17e890b6a46",
       "owners": {
         "@document": {
-          "before": "c9ec5e76b9af44e43b8a6956e9f2fcf3ee5a310a8f50c1f6bf3820172cee5afb",
-          "after": "8e0768d6ab3c86115192707f7364ba4ac26a2d223e1f094affb956a9fe669169"
+          "before": "8e0768d6ab3c86115192707f7364ba4ac26a2d223e1f094affb956a9fe669169",
+          "after": "600ecff5cbab5794401518628c158dbb2ce41b973f2396214cc4a17e890b6a46"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "8d093426d2f1469f00c52ae6f8bacd9f58dbe3335807c2ca500510901c50c0e4",
-      "after_sha256": "3fef00091839b4c393fc6a7f23bcd144040de3349fb6f78c254c155c7670d63d",
+      "before_sha256": "3fef00091839b4c393fc6a7f23bcd144040de3349fb6f78c254c155c7670d63d",
+      "after_sha256": "a43cd8f55f4070213458549ed1ee9ae74d640d3c993af4ff89a00ae835e3a793",
       "owners": {
         "@document": {
-          "before": "8d093426d2f1469f00c52ae6f8bacd9f58dbe3335807c2ca500510901c50c0e4",
-          "after": "3fef00091839b4c393fc6a7f23bcd144040de3349fb6f78c254c155c7670d63d"
+          "before": "3fef00091839b4c393fc6a7f23bcd144040de3349fb6f78c254c155c7670d63d",
+          "after": "a43cd8f55f4070213458549ed1ee9ae74d640d3c993af4ff89a00ae835e3a793"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "3249bac605709c7ac9261b5c0c2f2dc90658a3257009d34127ef864072c0db35",
-      "after_sha256": "47817589262f1888856b766260f6787be45dcab82b8671e5f9f12843c635c341",
+      "before_sha256": "47817589262f1888856b766260f6787be45dcab82b8671e5f9f12843c635c341",
+      "after_sha256": "181d41961284f2f164afc8ac272f74f0c68327ab49fbc8f3a9ab706bc590a9cf",
       "owners": {
         "@document": {
-          "before": "3249bac605709c7ac9261b5c0c2f2dc90658a3257009d34127ef864072c0db35",
-          "after": "47817589262f1888856b766260f6787be45dcab82b8671e5f9f12843c635c341"
+          "before": "47817589262f1888856b766260f6787be45dcab82b8671e5f9f12843c635c341",
+          "after": "181d41961284f2f164afc8ac272f74f0c68327ab49fbc8f3a9ab706bc590a9cf"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "e056b3a0d5cfbc1edb95c34979782763b38e1b4094c9f77fc0d846075799051b",
-      "after_sha256": "4fc3bde919693a764daf5b845d1c0b044cd8d6c25b77e3fb06cca06d6c99ee80",
+      "before_sha256": "4fc3bde919693a764daf5b845d1c0b044cd8d6c25b77e3fb06cca06d6c99ee80",
+      "after_sha256": "69a82836b081c27a283340db8cf4acfd11d48725f45002a5ed4d6b8dbaa857b3",
       "owners": {
         "@document": {
-          "before": "e056b3a0d5cfbc1edb95c34979782763b38e1b4094c9f77fc0d846075799051b",
-          "after": "4fc3bde919693a764daf5b845d1c0b044cd8d6c25b77e3fb06cca06d6c99ee80"
+          "before": "4fc3bde919693a764daf5b845d1c0b044cd8d6c25b77e3fb06cca06d6c99ee80",
+          "after": "69a82836b081c27a283340db8cf4acfd11d48725f45002a5ed4d6b8dbaa857b3"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "9841f53bce282a443946d79d198b8c5279fcfb910168c26d8aeae538713b7723",
-      "after_sha256": "a5deabbc34e06828d441c90f9956019fa8d6aeea3d51ab16908d5407d8742f2b",
+      "before_sha256": "a5deabbc34e06828d441c90f9956019fa8d6aeea3d51ab16908d5407d8742f2b",
+      "after_sha256": "b9ae383df646211ceb6ac4d1e66a6427eaf95c5220226056eef26a88993eea50",
       "owners": {
         "@document": {
-          "before": "9841f53bce282a443946d79d198b8c5279fcfb910168c26d8aeae538713b7723",
-          "after": "a5deabbc34e06828d441c90f9956019fa8d6aeea3d51ab16908d5407d8742f2b"
+          "before": "a5deabbc34e06828d441c90f9956019fa8d6aeea3d51ab16908d5407d8742f2b",
+          "after": "b9ae383df646211ceb6ac4d1e66a6427eaf95c5220226056eef26a88993eea50"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "69247f020eaeb60b78cc82d531b6f458a6da36762e7b7076cbf232d4694584c7",
-      "after_sha256": "fdeac99d0a1b71ac18a958c75bdcc92e96d6e47aa89457c6f5e7c45eb9d31c42",
+      "before_sha256": "fdeac99d0a1b71ac18a958c75bdcc92e96d6e47aa89457c6f5e7c45eb9d31c42",
+      "after_sha256": "5236ad43e4820c0789754ae6a79d5af116481302e9c7cb02c78b801006d7e1a2",
       "owners": {
         "@document": {
-          "before": "69247f020eaeb60b78cc82d531b6f458a6da36762e7b7076cbf232d4694584c7",
-          "after": "fdeac99d0a1b71ac18a958c75bdcc92e96d6e47aa89457c6f5e7c45eb9d31c42"
+          "before": "fdeac99d0a1b71ac18a958c75bdcc92e96d6e47aa89457c6f5e7c45eb9d31c42",
+          "after": "5236ad43e4820c0789754ae6a79d5af116481302e9c7cb02c78b801006d7e1a2"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "b57d2f0ecc3e32fb08c82fe4d520d20482bb749fb1e9574e8e1ba5e9fed3fff3",
-      "after_sha256": "c44a958f93bc0d540915bfcbfe739d55f22b74997b5a502e58aa4e0efa8ed1d6",
+      "before_sha256": "c44a958f93bc0d540915bfcbfe739d55f22b74997b5a502e58aa4e0efa8ed1d6",
+      "after_sha256": "2d66740349fb02f6a14d5b104a50d8a440f79d1b6ed70e6713a130f8c1c54df0",
       "owners": {
         "@document": {
-          "before": "b57d2f0ecc3e32fb08c82fe4d520d20482bb749fb1e9574e8e1ba5e9fed3fff3",
-          "after": "c44a958f93bc0d540915bfcbfe739d55f22b74997b5a502e58aa4e0efa8ed1d6"
+          "before": "c44a958f93bc0d540915bfcbfe739d55f22b74997b5a502e58aa4e0efa8ed1d6",
+          "after": "2d66740349fb02f6a14d5b104a50d8a440f79d1b6ed70e6713a130f8c1c54df0"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "3e9bc3a9801b419190ce739ab82ad0a6649d7c2e20ab360fdf3785843269da4b",
-      "after_sha256": "11ce3ebdb1b8120e631346e13f205716a25cf97ec5b46b28053001c09226d543",
+      "before_sha256": "11ce3ebdb1b8120e631346e13f205716a25cf97ec5b46b28053001c09226d543",
+      "after_sha256": "54ee908095b7b76972110dd3a600ae320eb45abe8d50a3efda93586b372e627d",
       "owners": {
         "@document": {
-          "before": "3e9bc3a9801b419190ce739ab82ad0a6649d7c2e20ab360fdf3785843269da4b",
-          "after": "11ce3ebdb1b8120e631346e13f205716a25cf97ec5b46b28053001c09226d543"
+          "before": "11ce3ebdb1b8120e631346e13f205716a25cf97ec5b46b28053001c09226d543",
+          "after": "54ee908095b7b76972110dd3a600ae320eb45abe8d50a3efda93586b372e627d"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "c6a5bef0b9ef77a61c3cba8b0d7543420bd39645cb6b8b06604ca0211bd15e90",
-      "after_sha256": "aff5c735630c78ae4891c6fac0b5e1ce46f5eb5b53ed2b40ba2b7a18d3619f83",
+      "before_sha256": "aff5c735630c78ae4891c6fac0b5e1ce46f5eb5b53ed2b40ba2b7a18d3619f83",
+      "after_sha256": "5d5d7e55a37ac4b501ca9624e6b525fb2f08c2a36f522d174108bc5b67d5e231",
       "owners": {
         "@document": {
-          "before": "c6a5bef0b9ef77a61c3cba8b0d7543420bd39645cb6b8b06604ca0211bd15e90",
-          "after": "aff5c735630c78ae4891c6fac0b5e1ce46f5eb5b53ed2b40ba2b7a18d3619f83"
+          "before": "aff5c735630c78ae4891c6fac0b5e1ce46f5eb5b53ed2b40ba2b7a18d3619f83",
+          "after": "5d5d7e55a37ac4b501ca9624e6b525fb2f08c2a36f522d174108bc5b67d5e231"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "cfc4ada89cc74694b2c9281688dca68ebc932bbb4f817d5f670acde2f5d157fd",
-      "after_sha256": "2640269b180d31b17e5440e0a5d737bed5dfd808b221301eaf31349809d88a21",
+      "before_sha256": "2640269b180d31b17e5440e0a5d737bed5dfd808b221301eaf31349809d88a21",
+      "after_sha256": "50d247cffe24700f865c3a3dc19204390817771a3bac0a046f22583f5e250cfa",
       "owners": {
         "@document": {
-          "before": "cfc4ada89cc74694b2c9281688dca68ebc932bbb4f817d5f670acde2f5d157fd",
-          "after": "2640269b180d31b17e5440e0a5d737bed5dfd808b221301eaf31349809d88a21"
+          "before": "2640269b180d31b17e5440e0a5d737bed5dfd808b221301eaf31349809d88a21",
+          "after": "50d247cffe24700f865c3a3dc19204390817771a3bac0a046f22583f5e250cfa"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "35fda91bcb6780311dc78fe93b8fb94e7e54ada041e856c8fbf11470f5bd59d7",
-      "after_sha256": "b4c8ebdc9f3cdb376f6b3c690d8d2ad7ad7c7f225edefadb398e1b57f088cc68",
+      "before_sha256": "b4c8ebdc9f3cdb376f6b3c690d8d2ad7ad7c7f225edefadb398e1b57f088cc68",
+      "after_sha256": "31de5d067124cd73d77f20172df51c042f0fd749c24cd2b2a9249dacffa9e27a",
       "owners": {
         "@document": {
-          "before": "35fda91bcb6780311dc78fe93b8fb94e7e54ada041e856c8fbf11470f5bd59d7",
-          "after": "b4c8ebdc9f3cdb376f6b3c690d8d2ad7ad7c7f225edefadb398e1b57f088cc68"
+          "before": "b4c8ebdc9f3cdb376f6b3c690d8d2ad7ad7c7f225edefadb398e1b57f088cc68",
+          "after": "31de5d067124cd73d77f20172df51c042f0fd749c24cd2b2a9249dacffa9e27a"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "e99d6c0641d19442f5c87abb5368a68e8cb77c5bc7265ad83085bae356550d3f",
-      "after_sha256": "2c0f1176ca9581bb9fe53c91496e452a573ef1cdeaf2ab3d2d09e34da605bcab",
+      "before_sha256": "2c0f1176ca9581bb9fe53c91496e452a573ef1cdeaf2ab3d2d09e34da605bcab",
+      "after_sha256": "cb509024abdc79389044920ab2ffe1eaa704123f8dd953c65c1d8bc2dde83753",
       "owners": {
         "@document": {
-          "before": "e99d6c0641d19442f5c87abb5368a68e8cb77c5bc7265ad83085bae356550d3f",
-          "after": "2c0f1176ca9581bb9fe53c91496e452a573ef1cdeaf2ab3d2d09e34da605bcab"
+          "before": "2c0f1176ca9581bb9fe53c91496e452a573ef1cdeaf2ab3d2d09e34da605bcab",
+          "after": "cb509024abdc79389044920ab2ffe1eaa704123f8dd953c65c1d8bc2dde83753"
         }
       }
     },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "before_sha256": "c4a61bdf043bbd1f873df55eed31e03d378f67322f1bd1023b5d29ac19082f91",
-      "after_sha256": "fde188b6bea4e5eabc8f1ce48bde83dff18b14425192d69727c0ffdcfb6498a2",
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "512c8b0cc84faa881e1e32124b995c9bb875b56908458ffc27c7d338d3106183",
+      "after_sha256": "5769f8f4b23c5c7792261f44ce916625fbf97d4586d9a250d1e9bb994cfc9daf",
       "owners": {
         "@document": {
-          "before": "c4a61bdf043bbd1f873df55eed31e03d378f67322f1bd1023b5d29ac19082f91",
-          "after": "fde188b6bea4e5eabc8f1ce48bde83dff18b14425192d69727c0ffdcfb6498a2"
-        }
-      }
-    },
-    "docs/performance/PERFORMANCE_POLICY.md": {
-      "before_sha256": "e604f17a4c8ff08598c15453109b0591db03c671131328f9426c6ab7bd5378f4",
-      "after_sha256": "816c46eb5df02f55795d7bc6c695a6274c4a534ea975f97770d1db2c08cda36e",
-      "owners": {
-        "@document": {
-          "before": "e604f17a4c8ff08598c15453109b0591db03c671131328f9426c6ab7bd5378f4",
-          "after": "816c46eb5df02f55795d7bc6c695a6274c4a534ea975f97770d1db2c08cda36e"
-        }
-      }
-    },
-    "pyproject.toml": {
-      "before_sha256": "f11ef7317eb37d7ebb7eaba3766cafbeb9a422a123c9e77fdc208f960d675627",
-      "after_sha256": "42c1a1c4db411da62bba612820d1922dd50b838e7f93bfd3ceb11aa7b516f513",
-      "owners": {
-        "@document": {
-          "before": "f11ef7317eb37d7ebb7eaba3766cafbeb9a422a123c9e77fdc208f960d675627",
-          "after": "42c1a1c4db411da62bba612820d1922dd50b838e7f93bfd3ceb11aa7b516f513"
+          "before": "512c8b0cc84faa881e1e32124b995c9bb875b56908458ffc27c7d338d3106183",
+          "after": "5769f8f4b23c5c7792261f44ce916625fbf97d4586d9a250d1e9bb994cfc9daf"
         }
       }
     },
     "scripts/build_test_shards.py": {
-      "before_sha256": "17205e6daf0aa72bd2f2ca7419dc4a3b33b3f12f945286e6702f626faa43c64c",
-      "after_sha256": "8f55f7c587357c90cb242f526949ef1b83c1eaeeff583de8b8d5668291aa61aa",
+      "before_sha256": "8f55f7c587357c90cb242f526949ef1b83c1eaeeff583de8b8d5668291aa61aa",
+      "after_sha256": "a3afcf4ffef5effec1aae8c66e2cb1d5340bb0d0376b8b5eecc5c38aea347a06",
       "owners": {
         "behavioral_selection": {
-          "before": "d823d1a04e71f75dedc4daf9304a0c76e0d5b916de8f29e0a2abe1aaa9e82415",
-          "after": "b6d0c4bf5243721f7788ba920f1c596f4264891c49db5c1839ad99e8b623e8af"
-        },
-        "deferred_comparison_cases": {
-          "before": "feda7d4dd6b5d38a53f2c42d13e1b95e1d656e3a86eb2ad3ef5bcba7e757c8d2",
-          "after": "6f2533d4c049a334ca77a3c6b8184d5e8547180f0b4377eafb74c0108af2aa0f"
-        }
-      }
-    },
-    "scripts/check_performance_policy.py": {
-      "before_sha256": "8e8b82227f19d996a323ce4ae8ea70274579839591caed5a5b3d3903eeb037f7",
-      "after_sha256": "f2fd48a34d36739eafd6e81f7be8788272122849aa9536655ab88041b00effa9",
-      "owners": {
-        "validate_current": {
-          "before": "116dfe0289c44743d01fb19215f3d6c606c2eeda59615eed9d8959b53f97a4c4",
-          "after": "cd93e1a0457057b6bb5266b1c6f9fae8df8324101f8ed3038ca98987fdeefefb"
-        }
-      }
-    },
-    "scripts/quality_evidence.py": {
-      "before_sha256": "3c60058458ab6e4222ac6c287bcbacb5f8e0521f1603d6afa4ed759413f5db36",
-      "after_sha256": "74df0addd60256e7269d0c79a53ec4185fc615d2fb46ada5ec97230fc0e4e387",
-      "owners": {
-        "validate_lane": {
-          "before": "2123e58f9389f2bde34131f7a967f72445ed8031554e47dcbecd5cccf6f5be00",
-          "after": "53b358d0b2e49ad19f3cb228083b95414b8bfefb7d3684b2febe7cfa820cbcfe"
-        }
-      }
-    },
-    "scripts/quality_runner.py": {
-      "before_sha256": "87219c6eecc886e535421a31885f10d9d9fadb0a0c1de8a2b447e27331177f5e",
-      "after_sha256": "726bb595636cbb6505ad2a54058598d25f5f74cb9e1e4d9e9e1a0da14c92313a",
-      "owners": {
-        "run_lane": {
-          "before": "456e3b3462684217af27175e3b565725460d0d9b9cc4c7e6de572dfc2d5d977e",
-          "after": "0317f64883a8d0743a9592b85f349f4d83209a964315d1355c592d3ccc9caa17"
-        }
-      }
-    },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "before_sha256": "14bc7317f644f7cce6c9c03afb65d6606e00c780b89788d88da6003a70f39621",
-      "after_sha256": "ec4760ea3dbb6935fb3d4e4b47cdaf1b988b2a2b1e4f3a909f0df04265b56daa",
-      "owners": {
-        "test_quality_gate_requires_every_independent_lane_even_when_skipped": {
-          "before": "d67e87db5364a46cd589547532883ec72ccf8e7fe7af082930031b2e7b5a9659",
-          "after": "d90f7cf92d0ecbc93ed61725c6956383b3e190b8852fcfa62957eff2bb8132ee"
-        }
-      }
-    },
-    "tests/code_quality/test_performance_policy.py": {
-      "before_sha256": "c0ba7bc7954a253620c3f7cee0b89ef77802754927256bd4f94df82f6f75b4dc",
-      "after_sha256": "050e2507a8f79b8ef64551e7d206167c51c0b0832e4870414995ab92ac16f99d",
-      "owners": {
-        "test_required_current_receipt_matches_this_checkout_and_assessment": {
-          "before": "ec4288a7dd1b6cfaf527712cb622fc39fe9ebba9eb9ebd61c6ff814d76d8b384",
-          "after": "39ec07223a69dcbe764cfc8c462a469b9f9dab85ccd7199f6da7cb3bc4d7a9f0"
-        }
-      }
-    },
-    "tests/code_quality/test_phase14i_14h_closeout.py": {
-      "before_sha256": "5b4eb873f50ba994a66b73d4bfabda60d54494f9a9657e5c0228d2811aacc79b",
-      "after_sha256": "a721cf1a94365b034a3e1cabbe1bd6292a12402b05cbf73bab24cd37f39c77e6",
-      "owners": {
-        "test_phase14h_docs_mark_complete_after_attached_formation_cutover": {
-          "before": "62651dc39e1a484d0bd7b3dbfdddafe355baf882a01193263edfdbb35735a838",
-          "after": "54c1164e4fdea6575bc0ec5966290451edaa723ea92950fbf6b85f9a9733bc0f"
-        },
-        "test_phase14i_docs_mark_complete_without_overclaiming_ability_runtime": {
-          "before": "3bcca983b7945d4962988226ae557ede332bde78d456b0d25a3931a2081d8f5a",
-          "after": "1971d12daa8961bfe94fa87b85a9d74a5aa456408863eb6b058d8b199d193b5e"
-        }
-      }
-    },
-    "tests/code_quality/test_phase14k_cutover_hardening.py": {
-      "before_sha256": "fb2dd37224d48aa8e5d2dee79b6c3aeb260fe3f8dad15314eb27c7a76c1c3cde",
-      "after_sha256": "293e09f8347ddda32de45cfc3dab5ea0c93cf788ce34d7dc5b6dbcc708c83d6c",
-      "owners": {
-        "test_phase14k_docs_mark_phase_complete": {
-          "before": "0caef56f6ef4389dc3890f6e35e591ee3ce2cacf0d18f4346d3a883ba26c1f43",
-          "after": "af50a416b99bd6d034330b6bc24dddaf90fe29d055f254baa0ac23aa2814ef99"
-        }
-      }
-    },
-    "tests/code_quality/test_phase17a1_transition_patch_docs.py": {
-      "before_sha256": "f8ae40dba3eb5f545db9f91b3f84f0997743ef35f723cdee79a48d7f6e540f89",
-      "after_sha256": "3c8109fde963a87e49e204eada3f0badc915ebf69c7ce73c1d6c2c6953b8567d",
-      "owners": {
-        "test_phase17a1_docs_mark_transition_patch_packages_complete": {
-          "before": "ea3ab03d753868cf012a3cff3fca9f95c3337b33d067649f3e85cb9c14aceab6",
-          "after": "b21b282b14bebbdb80b3667dafd65d3963e256815a7f529374196d7c6f9b3940"
+          "before": "b6d0c4bf5243721f7788ba920f1c596f4264891c49db5c1839ad99e8b623e8af",
+          "after": "7b413d71fbe13d6f35f4f540ebf307f966dbb7ce52c46466d48d43d8067454cf"
         }
       }
     },
     "tests/code_quality/test_quality_runtime.py": {
-      "before_sha256": "b151333489c53d56f319f221aa2846a05737ac2aef4c9a6482e4ae600f090197",
-      "after_sha256": "c81c324836e9f00f8f4ffb3d57cc18c1d3a58511df97328bf71bf6689e3741c1",
+      "before_sha256": "c81c324836e9f00f8f4ffb3d57cc18c1d3a58511df97328bf71bf6689e3741c1",
+      "after_sha256": "6f780f1e93e729432433e2ede199ed10b033c80f1337737012cee82d4235183c",
       "owners": {
-        "test_complete_lane_admission_requires_authoritative_context_and_invocation": {
-          "before": "ace62d7cddb868eb8ce22a585e1ff674b912561f73e78bce8c8b8e93ee3f7900",
-          "after": "d8f763aa325f84bd443db6d252e1bd5b59fb472d420db3513c9542b0a9a20a8b"
+        "test_live_workflow_preserves_required_names_and_all_four_producer_controls": {
+          "before": "8fc78c5745518f96047f04de842342c6aeabfd5c5aaf65b95c35d4d4b5fda4de",
+          "after": "d424d60be649670cddb645b2a4cde835f0ec4c01fc726ded3c98454dc0cc25fa"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "0a149f7fe9a4fe35d17709e116d330437cc88f6e0b884fc9f211825e7cf6d9b0",
-      "after_sha256": "34ef3e73ba290f4a77585dbf30ed5a8b28209960f5688cf7815bb467e650ca5d",
+      "before_sha256": "34ef3e73ba290f4a77585dbf30ed5a8b28209960f5688cf7815bb467e650ca5d",
+      "after_sha256": "9c0d031999f886cd0c21bfd7ead0a233e485fb0cd005da26cab2282fa616efa7",
       "owners": {
         "@document": {
-          "before": "0a149f7fe9a4fe35d17709e116d330437cc88f6e0b884fc9f211825e7cf6d9b0",
-          "after": "34ef3e73ba290f4a77585dbf30ed5a8b28209960f5688cf7815bb467e650ca5d"
+          "before": "34ef3e73ba290f4a77585dbf30ed5a8b28209960f5688cf7815bb467e650ca5d",
+          "after": "9c0d031999f886cd0c21bfd7ead0a233e485fb0cd005da26cab2282fa616efa7"
+        }
+      }
+    },
+    "tests/unit/test_phase18e_server_api.py": {
+      "before_sha256": "334ce50fbb541155d2b40f51e8ede1276870065e55365b497d1a5a2990c1f766",
+      "after_sha256": "5454f3be7f844d074c490c335cd1eaba94d6b7b3a936e03a6c4b7fe59e9844b8",
+      "owners": {
+        "@module": {
+          "before": "96f73e1b6be952bc87a708f0d6bca0d69b0042a4a3f70a84781fc7672cfba4f4",
+          "after": "c81a5c8be14b8ebf7605ee50bb3d9869d83165e2a773f208fc61fb135fc23177"
+        },
+        "_SessionInspectableServer": {
+          "before": null,
+          "after": "c6d5a4f51e80d494e9776f81d66d661ad16af5033a0abf5e3a7a3be6faf97d79"
+        },
+        "_SessionInspectableServer.authoritative_session_for_test": {
+          "before": null,
+          "after": "ebb7369f81e08413c0b8c60fcc39d6c3b9f66cf589e477747a30049568cdd689"
+        },
+        "test_phase18e_recorded_invalid_retry_commits_one_session_revision": {
+          "before": "6e378122852d1447100b378a90d84fa710e939baa00eedbd1f26eae97d7125d7",
+          "after": "6610c644f36463a716f30d73aac7d0c0cf6e5c9aae9c102301d0fb23ed89038b"
         }
       }
     },
     "tools/performance_ci69_members.py": {
-      "before_sha256": "be659462aaf3483ddfce23d43660c64f0424c46c4c9871f2bfa86a373248815e",
-      "after_sha256": "d7c146dfa55bb42ade20ffa7cda0091d1f04f2dfc3a533e8750056050936f5a6",
+      "before_sha256": "d7c146dfa55bb42ade20ffa7cda0091d1f04f2dfc3a533e8750056050936f5a6",
+      "after_sha256": "ea89fd9659a1abcb27423c17a6598f2f438eb13ecf01b3ae197ff3666f518310",
       "owners": {
         "validate_cutover": {
-          "before": "11108e2b54784253f185c189123abbda4eebb045ef53383645aafd4136fdc414",
-          "after": "a25ef976fe99f7705b4e1f9eba529eb02f0d536393323a68e95d70c68a1c4bf6"
+          "before": "a25ef976fe99f7705b4e1f9eba529eb02f0d536393323a68e95d70c68a1c4bf6",
+          "after": "c6dd1df50b9a50e63341dcadb5b6789eac83c4a74e06de85a60d3e0c6a899158"
         }
       }
     },
-    "tools/performance_policy.py": {
-      "before_sha256": "3b629b4c9c98b91b9140d172f635b1e6f6b558f80b95d74df09840d8096e3aba",
-      "after_sha256": "aee97f2cd33281b79a4b7593ab489d7b5143a7d8f2828036da5ede5af0435ef3",
+    "uv.lock": {
+      "before_sha256": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+      "after_sha256": "d02bdfda8582a5fbe2dce3a961ec5ee8a862eac3eb2265aae245caedadc8238f",
       "owners": {
-        "prototype_comparison_deferral": {
-          "before": "37eda247cb897a58c5f1a2998399dac3449ff5370933e8f7a65eae355424f05e",
-          "after": "71c16200754a129424c4f7cb7b7e403a9c19379914c1ac6bd9f4ba470a4bac76"
+        "@document": {
+          "before": "51896fa6800d7bbb5c6dfe08a8c7155640ec71842fafe9d78020b6a36b43e0aa",
+          "after": "d02bdfda8582a5fbe2dce3a961ec5ee8a862eac3eb2265aae245caedadc8238f"
         }
       }
     }
   },
   "rows": {
-    ".github/pull_request_template.md": {
-      "category": "governance",
-      "operations": [],
+    "uv.lock": {
+      "category": "dependency_environment",
+      "operations": [
+        "development-dependency"
+      ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    ".github/workflows/ci.yml": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "AGENTS.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "README.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Dependabot 592 updates virtualenv21.7.13 to21.14.13 and its development-only distlib0.4.0 to0.4.4 and packaging26.2 to26.3; preserve exact lock artifacts, public tool behavior and all project validation.",
+      "source_obligation": "Preserve every selected behavioral/quality case, full-package branch coverage64%, source/dependency admission and 180-second complete performance, 720-second behavior setup/test, and 600-second quality limits. All fifteen runtime dependency package records and all engine source remain identical to the actual merged main base.",
+      "unchanged_work": "Virtualenv is used by pre-commit; distlib is its development-tool dependency. Packaging serves pytest/development dependency parsing, outside the application runtime closure. The same smoke and full hosted gates remain required; no detailed algorithm/workload/cache comparisons are applicable."
     },
     "ci/test_shards/case-partitions.json": {
       "category": "dependency_environment",
@@ -402,9 +274,9 @@
         "ci78-prototype-evidence-b993103c8756949d6e18a5c7bbc83d537b714e12ea71073a04714d38bd6a7d01"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/durations.json": {
       "category": "dependency_environment",
@@ -412,9 +284,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "dependency_environment",
@@ -422,39 +294,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "dependency_environment",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "dependency_environment",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "dependency_environment",
-      "operations": [
-        "behavior-shard-inventory"
-      ],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "dependency_environment",
@@ -462,9 +304,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "dependency_environment",
@@ -472,9 +314,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "dependency_environment",
@@ -482,9 +324,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "dependency_environment",
@@ -492,9 +334,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "dependency_environment",
@@ -502,9 +344,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "dependency_environment",
@@ -512,9 +354,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "dependency_environment",
@@ -522,9 +364,9 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "dependency_environment",
@@ -532,135 +374,73 @@
         "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
-    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+    "ci/test_shards/shard-10.txt": {
       "category": "dependency_environment",
       "operations": [
-        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+        "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "docs/performance/PERFORMANCE_POLICY.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "pyproject.toml": {
+    "ci/test_shards/shard-11.txt": {
       "category": "dependency_environment",
       "operations": [
-        "development-dependency"
+        "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
-    "scripts/build_test_shards.py": {
+    "ci/test_shards/shard-12.txt": {
       "category": "dependency_environment",
       "operations": [
-        "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f",
-        "ci78-prototype-policy-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
+        "behavior-shard-inventory"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Refresh eighteen underestimated scheduling weights using the complete 405-case, 1215-phase shard-4 report from run40911416598. That enclosing step FAILED its600-second deadline; these measurements are planning data, not a passing CI result. Regenerate all twelve manifests with the existing canonical LPT generator.",
+      "source_obligation": "Preserve all4886 selected behavior cases,1848 active quality cases,260 explicit deferrals, all original assertions, source admission, four workers, coverage64%, and 180-second complete performance, owner-approved720-second behavior setup/test, and unchanged600-second quality limits.",
+      "unchanged_work": "No engine, test source, scheduler, selector membership or historical report changes. Raise measured ceilings only; preserve both original complete profiles. Independent current smoke and full hosted CI must qualify the successor."
     },
-    "scripts/check_performance_policy.py": {
+    ".github/workflows/ci.yml": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Apply the owner-clarified720-second behavior setup-and-test cutoff; pin the unchanged macOS audit to supportedIntel after hostedARM allocation failed; reconcile the exact workflow guard and README binding; remove one unnecessary Pyright suppression without any Python AST change.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The same macOS semantic-audit cases and command remain required; Intel execution does not attest ARM behavior. Engine source, runtime dependency closure, assertions and scheduler remain unchanged. The new operation admits only AST-unchanged text edits of this one server test file."
     },
-    "scripts/quality_evidence.py": {
+    "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Replace a mode-dependent private-usage suppression with a narrow test-local AdapterGameServer subclass exposing one inherited session read. Preserve real server initialization, exact session lookup, LocalGameSession cast, invalid witness and all assertions; no production interface changes.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The test subclass overrides no production method: its single accessor returns the inherited real session dictionary entry. The same factory, requests, lifecycle, validators, decisions and assertions execute. Only this exact test file and four changed AST owners receive finite explicit mapping; no engine or gameplay workload changes."
     },
-    "scripts/quality_runner.py": {
+    "README.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Apply the owner-clarified720-second behavior setup-and-test cutoff; pin the unchanged macOS audit to supportedIntel after hostedARM allocation failed; reconcile the exact workflow guard and README binding; remove one unnecessary Pyright suppression without any Python AST change.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The same macOS semantic-audit cases and command remain required; Intel execution does not attest ARM behavior. Engine source, runtime dependency closure, assertions and scheduler remain unchanged. The new operation admits only AST-unchanged text edits of this one server test file."
     },
-    "tests/code_quality/test_ci_performance_gates.py": {
+    "tests/unit/test_phase18e_server_api.py": {
       "category": "dependency_environment",
       "operations": [
-        "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453"
+        "server-api-session-test-access"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "tests/code_quality/test_performance_policy.py": {
-      "category": "dependency_environment",
-      "operations": [
-        "ci64-provenance-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960",
-        "ci67-transaction-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960"
-      ],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "tests/code_quality/test_phase14i_14h_closeout.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "tests/code_quality/test_phase14k_cutover_hardening.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "tests/code_quality/test_phase17a1_transition_patch_docs.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
-    },
-    "tests/code_quality/test_quality_runtime.py": {
-      "category": "dependency_environment",
-      "operations": [
-        "ci69-qualification-791593bfe3358a4b2494de163105067ce4a8b0311cd0f91b15629ec6395d030a"
-      ],
-      "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Replace a mode-dependent private-usage suppression with a narrow test-local AdapterGameServer subclass exposing one inherited session read. Preserve real server initialization, exact session lookup, LocalGameSession cast, invalid witness and all assertions; no production interface changes.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The test subclass overrides no production method: its single accessor returns the inherited real session dictionary entry. The same factory, requests, lifecycle, validators, decisions and assertions execute. Only this exact test file and four changed AST owners receive finite explicit mapping; no engine or gameplay workload changes."
     },
     "tests/rules/section07/coverage.json": {
       "category": "dependency_environment",
@@ -668,9 +448,29 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Apply the owner-clarified720-second behavior setup-and-test cutoff; pin the unchanged macOS audit to supportedIntel after hostedARM allocation failed; reconcile the exact workflow guard and README binding; remove one unnecessary Pyright suppression without any Python AST change.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The same macOS semantic-audit cases and command remain required; Intel execution does not attest ARM behavior. Engine source, runtime dependency closure, assertions and scheduler remain unchanged. The new operation admits only AST-unchanged text edits of this one server test file."
+    },
+    "tests/code_quality/test_quality_runtime.py": {
+      "category": "dependency_environment",
+      "operations": [
+        "ci69-qualification-791593bfe3358a4b2494de163105067ce4a8b0311cd0f91b15629ec6395d030a"
+      ],
+      "selected_families": [],
+      "rationale": "Apply the owner-clarified720-second behavior setup-and-test cutoff; pin the unchanged macOS audit to supportedIntel after hostedARM allocation failed; reconcile the exact workflow guard and README binding; remove one unnecessary Pyright suppression without any Python AST change.",
+      "source_obligation": "Retain all4886behavior tests,1848activequality tests,260explicitdeferrals,64%full-packagebranchcoverage, source/dependency validation, normalbranchprotections, and the independent180-second completeperformance cap. Quality600-second controls remain unchanged.",
+      "unchanged_work": "The same macOS semantic-audit cases and command remain required; Intel execution does not attest ARM behavior. Engine source, runtime dependency closure, assertions and scheduler remain unchanged. The new operation admits only AST-unchanged text edits of this one server test file."
+    },
+    "scripts/build_test_shards.py": {
+      "category": "dependency_environment",
+      "operations": [
+        "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
+      ],
+      "selected_families": [],
+      "rationale": "Register the exact type-only server-test source update through the existing finite inactive-update mechanism. Keep its original native ledger pin, then authenticate current bytes and reverse exactly four typed-access substitutions to the original SHA256. This does not reactivate or execute legacy tests.",
+      "source_obligation": "Preserve the original5734 native classification, all92retirements, all4886 selected behavior cases,1848 active quality cases,260 explicitdeferrals and every original assertion. Preserve current source/index and fresh phase validation, coverage64%, performance180, quality600 and behavior720-second cutoffs.",
+      "unchanged_work": "Only one existing inactive test source receives an exact before/after update. No generic fallback, new tamper suite, mutable cache, engine change or historical authority replacement. The original three inactive recipes remain unchanged; the selected-suite union is unchanged."
     },
     "tools/performance_ci69_members.py": {
       "category": "dependency_environment",
@@ -678,19 +478,19 @@
         "ci78-cutover-owners-f1ea02aa9819b407d74c91e787679c321c889b96fd25857c0118b6a173302dd1"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Register the exact type-only server-test source update through the existing finite inactive-update mechanism. Keep its original native ledger pin, then authenticate current bytes and reverse exactly four typed-access substitutions to the original SHA256. This does not reactivate or execute legacy tests.",
+      "source_obligation": "Preserve the original5734 native classification, all92retirements, all4886 selected behavior cases,1848 active quality cases,260 explicitdeferrals and every original assertion. Preserve current source/index and fresh phase validation, coverage64%, performance180, quality600 and behavior720-second cutoffs.",
+      "unchanged_work": "Only one existing inactive test source receives an exact before/after update. No generic fallback, new tamper suite, mutable cache, engine change or historical authority replacement. The original three inactive recipes remain unchanged; the selected-suite union is unchanged."
     },
-    "tools/performance_policy.py": {
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "dependency_environment",
       "operations": [
-        "ci78-prototype-policy-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334"
+        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Development validation environment/configuration maintenance: raise full-package coverage to 64%, rebalance unchanged test selection using authentic per-case timing observations, simplify README, refresh three current governance hashes, and retain exact source/base/run validation for ordinary no-comparison follow-up PRs. No package versions, engine or gameplay workload change.",
-      "source_obligation": "Preserve all 4,886 selected behavior cases, 1,848 active quality cases and 260 explicit historical deferrals. Historical source/capture authorities, old passing profiles, and every gameplay assertion remain unchanged. Failed/incomplete CI observations are planning data only, never passing qualification.",
-      "unchanged_work": "Runtime source, dependency declarations/versions, coverage metric/denominator/exclusions, real test work, scheduler, four-worker execution and 180/600-second limits remain unchanged. Ordinary current-source checks run independently before/after smoke; the original PR591 comparison waiver remains exact-base only."
+      "rationale": "Register the exact type-only server-test source update through the existing finite inactive-update mechanism. Keep its original native ledger pin, then authenticate current bytes and reverse exactly four typed-access substitutions to the original SHA256. This does not reactivate or execute legacy tests.",
+      "source_obligation": "Preserve the original5734 native classification, all92retirements, all4886 selected behavior cases,1848 active quality cases,260 explicitdeferrals and every original assertion. Preserve current source/index and fresh phase validation, coverage64%, performance180, quality600 and behavior720-second cutoffs.",
+      "unchanged_work": "Only one existing inactive test source receives an exact before/after update. No generic fallback, new tamper suite, mutable cache, engine change or historical authority replacement. The original three inactive recipes remain unchanged; the selected-suite union is unchanged."
     }
   },
   "milestone": "ordinary",
