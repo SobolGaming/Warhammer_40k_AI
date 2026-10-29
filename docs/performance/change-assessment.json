@@ -9629,7 +9629,7 @@
     },
     "tests/code_quality/test_quality_runtime_process.py": {
       "before_sha256": null,
-      "after_sha256": "5c2a59b92c7c11b41f31426b51bf5af82b1cb60dc322878512413aa4c104adb8",
+      "after_sha256": "a7b1c7694ff923ed1714aa857d8f7334530058e63d7375ddaa50aa2ebdad48a2",
       "owners": {
         "@module": {
           "before": null,
@@ -9649,7 +9649,7 @@
         },
         "transport": {
           "before": null,
-          "after": "c0905f22122d3de0020eacefaf5241cfbed2416fd80971ba73016964f7b25794"
+          "after": "4ff5a6778ad454e87a77678cc0caf82f3853d392267f5a51971742f50c3f9381"
         }
       }
     },
