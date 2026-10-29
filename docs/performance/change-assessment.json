@@ -6,11 +6,11 @@
   "changes": {
     "uv.lock": {
       "before_sha256": "d02bdfda8582a5fbe2dce3a961ec5ee8a862eac3eb2265aae245caedadc8238f",
-      "after_sha256": "6775a3272f73ad9d7160061991af514dd58099cf43ccf6c20d48e168a2a03057",
+      "after_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
       "owners": {
         "@document": {
           "before": "d02bdfda8582a5fbe2dce3a961ec5ee8a862eac3eb2265aae245caedadc8238f",
-          "after": "6775a3272f73ad9d7160061991af514dd58099cf43ccf6c20d48e168a2a03057"
+          "after": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75"
         }
       }
     }
@@ -22,9 +22,9 @@
         "development-dependency"
       ],
       "selected_families": [],
-      "rationale": "Dependabot593 updates development-only filelock3.29.0 to4.2.1 and its virtualenv21.14.13 to21.15.1. Verify exact locked installation, real lock recursion, contention timeout and release, and real virtualenv creation without downloads.",
+      "rationale": "Dependabot593 updates only development-tool filelock3.29.0 to4.2.1 using its refreshed exact official lock. Verify real lock recursion, contention timeout and release, and no-download virtualenv creation with unchanged virtualenv21.14.13.",
       "source_obligation": "Preserve all4886 selected behavioral cases,1848 active quality cases,260 approved historical deferrals, full-package branch coverage64%, current source/dependency identity checks, complete performance180seconds, behavior setup-and-test720seconds, unchangedquality600seconds and ordinary branch protections.",
-      "unchanged_work": "All application runtime package records, runtime engine source, workload selectors, assertions and shard manifests are identical to the actual merged main base. These dependencies serve pre-commit development tooling; no algorithm, search, cache or workload comparison family is changed. The complete serial current smoke and own full hosted CI remain required."
+      "unchanged_work": "All application runtime package records, engine source, selected test workloads, assertions and shard manifests are identical to the actual merged main base. Virtualenv21.14.13 and all other package records are unchanged. Filelock serves pre-commit development tooling; no algorithm, search, cache or workload comparison family is changed. The complete serial current smoke and own full hosted CI remain required."
     }
   },
   "milestone": "ordinary",
