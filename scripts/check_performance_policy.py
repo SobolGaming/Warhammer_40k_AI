@@ -240,7 +240,9 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
             "repository_identity": repository,
             "current_source_identity": before,
             "stable_current_source_digest": owned,
-            "dependency_identity": dependencies,
+            "dependency_identity": json.loads(
+                json.dumps(dependencies, sort_keys=True, separators=(",", ":"), allow_nan=False)
+            ),
         }
 
     from tools.performance_history_snapshot import phase

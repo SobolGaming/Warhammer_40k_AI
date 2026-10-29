@@ -5050,7 +5050,7 @@
     },
     "scripts/check_performance_policy.py": {
       "before_sha256": "520da31556b55271ce74af77e553281d5974e6faf9b8baf23bcd8b5a76605b12",
-      "after_sha256": "16049af94429227f353a48de113c5a487076af45999279b52b32995d828f5077",
+      "after_sha256": "8e8b82227f19d996a323ce4ae8ea70274579839591caed5a5b3d3903eeb037f7",
       "owners": {
         "@module": {
           "before": "49fc81fc3951fdcedab7cb2b0f62867313d7828aae3a09bce8e55652b185957f",
@@ -5074,7 +5074,7 @@
         },
         "validate_current": {
           "before": "b7f165e16b5e2dd615d8038c524079e232ef827d44b2eb5712b641b256977893",
-          "after": "4e4f11a8e67a019ce88b216aaff28890f565711dcb70a3081377c1737a1819df"
+          "after": "116dfe0289c44743d01fb19215f3d6c606c2eeda59615eed9d8959b53f97a4c4"
         }
       }
     },
