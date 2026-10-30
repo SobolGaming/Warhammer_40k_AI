@@ -4,6 +4,16 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6eb801a8cc0f00e24f45d2ca24494fee279bada900cc28a19be549a2613a5bd5",
   "operation_map_sha256": "24052cf45d3c6dca66c1b014a211c75e6a0ca93602cc7cf92d1d50ecbc262804",
   "changes": {
+    ".gitattributes": {
+      "before_sha256": "481625daa59308518b8a38bf90dc9854033459aa1b131f9cbb13a841e7dddd07",
+      "after_sha256": "6a7fdff31280bd61a8af2357f8f3ceb0e4f6d820a093b2218f7bbb1fe4e2ed85",
+      "owners": {
+        "@document": {
+          "before": "481625daa59308518b8a38bf90dc9854033459aa1b131f9cbb13a841e7dddd07",
+          "after": "6a7fdff31280bd61a8af2357f8f3ceb0e4f6d820a093b2218f7bbb1fe4e2ed85"
+        }
+      }
+    },
     "ci/quality_shards/all.txt": {
       "before_sha256": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563",
       "after_sha256": "173b689c37c0f5ee41922319132ea92ae557de64fe75b9cea39e63e4db954aaa",
@@ -166,21 +176,21 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
-      "after_sha256": "9ecaa9e44f4931ecc968fea1b6c243b2f7f12ff76f5a9c0b92d82542ef745766",
+      "after_sha256": "bced12f262eb655df15feb814a18833c7eaff9eebb7c11b0a5f64a70561f2965",
       "owners": {
         "@document": {
           "before": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
-          "after": "9ecaa9e44f4931ecc968fea1b6c243b2f7f12ff76f5a9c0b92d82542ef745766"
+          "after": "bced12f262eb655df15feb814a18833c7eaff9eebb7c11b0a5f64a70561f2965"
         }
       }
     },
     "docs/SUPPORTED_FACTION_RULE_RECONCILIATION_2026_10.md": {
       "before_sha256": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-      "after_sha256": "1327464c042e85dc7e4ab2efe654f696045b0e9f4b97364342bb7fec3b156f58",
+      "after_sha256": "5a8a1f824f0b8bad0f96243f81f10900e172361b3bde2aa6bc8a30373739bea7",
       "owners": {
         "@document": {
           "before": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-          "after": "1327464c042e85dc7e4ab2efe654f696045b0e9f4b97364342bb7fec3b156f58"
+          "after": "5a8a1f824f0b8bad0f96243f81f10900e172361b3bde2aa6bc8a30373739bea7"
         }
       }
     },
@@ -191,6 +201,26 @@
         "@document": {
           "before": "6d0f2fdadf47a678bac5a5041c4d0f833e48e0af0b1e3ea1bd785b82087c18ce",
           "after": "1873a0d4fa643df832deff53c963a99ce715d19df9426ddf7843bf868dcdc87a"
+        }
+      }
+    },
+    "docs/performance/current/vyper-source-bc9-v4.json": {
+      "before_sha256": null,
+      "after_sha256": "36ae186f7dd74899ce437f90aceb5e7940d0797d23a1cc621a39e8e8183fac3b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "36ae186f7dd74899ce437f90aceb5e7940d0797d23a1cc621a39e8e8183fac3b"
+        }
+      }
+    },
+    "docs/performance/evidence/vyper-source-c58420d7-producer.json": {
+      "before_sha256": null,
+      "after_sha256": "c0f669888b5eb4a08eb5b4d058980ce9001d53c5d149b69e56f091c626076c96",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c0f669888b5eb4a08eb5b4d058980ce9001d53c5d149b69e56f091c626076c96"
         }
       }
     },
@@ -548,6 +578,16 @@
     }
   },
   "rows": {
+    ".gitattributes": {
+      "category": "rule_semantics",
+      "operations": [
+        "d09-authenticated-source-bytes"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve the exact 35 historical CRLF test-metadata blobs seen in a clean independent checkout. Only per-path Git materialization attributes change; no JSON, source, test, harness or acceptance bytes change.",
+      "source_obligation": "Fresh checkouts must materialize the same measured committed bytes and remain clean without local info/attributes overrides.",
+      "unchanged_work": "All v4-selected inputs and runtime_inputs remain independently equal to measured c58420d7. Baseline-only local overrides are not copied; no newline normalization or exclusion weakens the comparison."
+    },
     "ci/quality_shards/all.txt": {
       "category": "governance",
       "operations": [],
@@ -720,6 +760,22 @@
       "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "docs/factions/aeldari.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "docs/performance/current/vyper-source-bc9-v4.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "docs/performance/evidence/vyper-source-c58420d7-producer.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],

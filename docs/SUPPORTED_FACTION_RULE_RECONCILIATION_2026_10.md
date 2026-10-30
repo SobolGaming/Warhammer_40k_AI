@@ -152,3 +152,28 @@ the mandatory exact-head aggregate, review and hosted CI gates. The 64% full-pac
 branch-coverage floor, twelve-minute CI goal and 720-second shard cutoff are unchanged.
 
 The existing generic overlay application rebuilds touched-row text metadata: raw text/HTML no longer retains historical bold tags and converted tags is empty, while sanitized/normalized text, tokens and stable source-text IDs are preserved. Original snapshot/PDF bytes remain retained; the title operation does not change gameplay descriptors.
+
+
+The authorized exact-base checker repair now retains a fresh `tool-input-roles-v4`
+comparison from measured head `c58420d729320d01cc28418e74f402676c7474c1` against
+`bc9acd8419e7b97a2c1260c7e932d2cb9c3fc370`. The three original testcase samples were
+134.063, 137.133, 138.313 seconds on base and
+133.876, 135.626, 138.554 seconds on head
+(means 136.503/136.019 seconds).
+The unchanged relative-budget validator passed. This is a bounded source-workload
+comparison on the recorded local host, not full-game or hosted-CI certification.
+
+The campaign retained original command rejection controls, cleanup controls,
+six source scanner checks, the 24-case cheap family, six arm-local runtime import
+proofs, owned process supervision, per-command resource/terminal receipts,
+the attempt journal, and input/dependency checks before and after commands.
+All six generated contract trees matched their own arm's complete bound tree.
+The success marker follows final source/dependency checks and budget validation.
+The [comparison](performance/current/vyper-source-bc9-v4.json) and
+[producer receipts](performance/evidence/vyper-source-c58420d7-producer.json)
+retain the measured commit; later evidence-only commits require independent
+equality of every selected byte. Historical v1/v2/v3 evidence and all limits are
+unchanged. The quality inventory contains 1,938 active cases and the same 260
+historical deferrals; PR600's whole-module scheduling remains intact.
+
+A separate normal checkout without local info/attributes overrides reproduced 35 historical test-metadata JSON paths reported dirty by Git, despite exact equality of their working bytes to the retained CRLF Git blobs. Exact per-path `-text` attributes preserve those current-head bytes and clean checkout status; no JSON content is rewritten and no baseline-only path is inferred. The five existing audit-file preservation entries remain unchanged. A second independent checkout verifies the committed repair and all selected/runtime input equality to measured c58420d7.
