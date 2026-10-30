@@ -2,8 +2,138 @@
   "policy": "rules-engine-performance-v3",
   "base": "d3c5737b39dfa647125b64c24b1e67bc9364c5c9",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ef7e9800c922a8c331094e05c6a7b774f2fa33cc74da0e4bd135cf9b9906bd08",
-  "operation_map_sha256": "d2b7d40e4e6cea2e5e219affd9b6410887fd595b8d8136c66dd9f572bfaf6124",
+  "operation_map_sha256": "b0e117943fd8a066835b9d2b6752ed96702176702f47470224ec64d1b1c37efc",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "06860cc19cf2641f036f21cd3ca85d5f8f8657b5a8dae847d76d9e20ae3072dd",
+      "after_sha256": "33cf406416f98e0d1725c324dbadb0d296dd8325d068fdc702ebef81fe9b8568",
+      "owners": {
+        "@document": {
+          "before": "06860cc19cf2641f036f21cd3ca85d5f8f8657b5a8dae847d76d9e20ae3072dd",
+          "after": "33cf406416f98e0d1725c324dbadb0d296dd8325d068fdc702ebef81fe9b8568"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "a65ee8dc95c935904a6d0adb26019eaab45add4ce99fa4ea37613650e13ca5f9",
+      "after_sha256": "15c386b5fce1db19f263006fc3ffad1ad01360076dd3bbcda72a8e54ca6c1cb8",
+      "owners": {
+        "@document": {
+          "before": "a65ee8dc95c935904a6d0adb26019eaab45add4ce99fa4ea37613650e13ca5f9",
+          "after": "15c386b5fce1db19f263006fc3ffad1ad01360076dd3bbcda72a8e54ca6c1cb8"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "600ecff5cbab5794401518628c158dbb2ce41b973f2396214cc4a17e890b6a46",
+      "after_sha256": "f5fa5d12f923f384df2c7c48e00e275e951fb8f9dce26e64e1614102a656d3f3",
+      "owners": {
+        "@document": {
+          "before": "600ecff5cbab5794401518628c158dbb2ce41b973f2396214cc4a17e890b6a46",
+          "after": "f5fa5d12f923f384df2c7c48e00e275e951fb8f9dce26e64e1614102a656d3f3"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "a43cd8f55f4070213458549ed1ee9ae74d640d3c993af4ff89a00ae835e3a793",
+      "after_sha256": "2b6fcee56341f336bfcd9418c49f7b29eb59e53b93a5a1a3f3be6c0b06b8b580",
+      "owners": {
+        "@document": {
+          "before": "a43cd8f55f4070213458549ed1ee9ae74d640d3c993af4ff89a00ae835e3a793",
+          "after": "2b6fcee56341f336bfcd9418c49f7b29eb59e53b93a5a1a3f3be6c0b06b8b580"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "181d41961284f2f164afc8ac272f74f0c68327ab49fbc8f3a9ab706bc590a9cf",
+      "after_sha256": "384fcaeb970a23eaa1c3253d0da03d185d7e1727231d020365102e4979b3e739",
+      "owners": {
+        "@document": {
+          "before": "181d41961284f2f164afc8ac272f74f0c68327ab49fbc8f3a9ab706bc590a9cf",
+          "after": "384fcaeb970a23eaa1c3253d0da03d185d7e1727231d020365102e4979b3e739"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "69a82836b081c27a283340db8cf4acfd11d48725f45002a5ed4d6b8dbaa857b3",
+      "after_sha256": "a477d1035cc324e60fbd17aa83cd817e82c532c46bede4ffd67196e6efc102a5",
+      "owners": {
+        "@document": {
+          "before": "69a82836b081c27a283340db8cf4acfd11d48725f45002a5ed4d6b8dbaa857b3",
+          "after": "a477d1035cc324e60fbd17aa83cd817e82c532c46bede4ffd67196e6efc102a5"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "b9ae383df646211ceb6ac4d1e66a6427eaf95c5220226056eef26a88993eea50",
+      "after_sha256": "f02e263fd02b446ef6856fe43d34bcbbfc819eeb19224b518162b3867edd809b",
+      "owners": {
+        "@document": {
+          "before": "b9ae383df646211ceb6ac4d1e66a6427eaf95c5220226056eef26a88993eea50",
+          "after": "f02e263fd02b446ef6856fe43d34bcbbfc819eeb19224b518162b3867edd809b"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "5236ad43e4820c0789754ae6a79d5af116481302e9c7cb02c78b801006d7e1a2",
+      "after_sha256": "82c3b2b454e3fd17d87eb301fe62f5cdfde149224c2d452ca58d2e6ebf9374de",
+      "owners": {
+        "@document": {
+          "before": "5236ad43e4820c0789754ae6a79d5af116481302e9c7cb02c78b801006d7e1a2",
+          "after": "82c3b2b454e3fd17d87eb301fe62f5cdfde149224c2d452ca58d2e6ebf9374de"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "2d66740349fb02f6a14d5b104a50d8a440f79d1b6ed70e6713a130f8c1c54df0",
+      "after_sha256": "eabf0850da086ad928a9ad1bd1cc162331118be9588a64c35fa915cb818d158f",
+      "owners": {
+        "@document": {
+          "before": "2d66740349fb02f6a14d5b104a50d8a440f79d1b6ed70e6713a130f8c1c54df0",
+          "after": "eabf0850da086ad928a9ad1bd1cc162331118be9588a64c35fa915cb818d158f"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "54ee908095b7b76972110dd3a600ae320eb45abe8d50a3efda93586b372e627d",
+      "after_sha256": "c94b2b3b7ffa79921738097305f616f8fc693180eb74d5102ccf2f96262e9853",
+      "owners": {
+        "@document": {
+          "before": "54ee908095b7b76972110dd3a600ae320eb45abe8d50a3efda93586b372e627d",
+          "after": "c94b2b3b7ffa79921738097305f616f8fc693180eb74d5102ccf2f96262e9853"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "5d5d7e55a37ac4b501ca9624e6b525fb2f08c2a36f522d174108bc5b67d5e231",
+      "after_sha256": "2e8524f3e747c52012887baf5c1bd582f5d625d05dbd0d610bef8305fc3ccefa",
+      "owners": {
+        "@document": {
+          "before": "5d5d7e55a37ac4b501ca9624e6b525fb2f08c2a36f522d174108bc5b67d5e231",
+          "after": "2e8524f3e747c52012887baf5c1bd582f5d625d05dbd0d610bef8305fc3ccefa"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "50d247cffe24700f865c3a3dc19204390817771a3bac0a046f22583f5e250cfa",
+      "after_sha256": "0dd92a51f2859ad81e2600029033898e983719666be6c5000c0dd0b4ba4f4f37",
+      "owners": {
+        "@document": {
+          "before": "50d247cffe24700f865c3a3dc19204390817771a3bac0a046f22583f5e250cfa",
+          "after": "0dd92a51f2859ad81e2600029033898e983719666be6c5000c0dd0b4ba4f4f37"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "31de5d067124cd73d77f20172df51c042f0fd749c24cd2b2a9249dacffa9e27a",
+      "after_sha256": "61b1b3d929ad3be80528bc6add69504dcebb9fc802d856cb304cdd3f17bd2798",
+      "owners": {
+        "@document": {
+          "before": "31de5d067124cd73d77f20172df51c042f0fd749c24cd2b2a9249dacffa9e27a",
+          "after": "61b1b3d929ad3be80528bc6add69504dcebb9fc802d856cb304cdd3f17bd2798"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "93f38045bb61f69b3e44f7be2adc0691572c1ab049127ec7a3b145defe4460fe",
       "after_sha256": "47ad4a7fc74d0f394e632694f4b440e5bfa6d0e7233f0f3e09004ed74db59c44",
@@ -436,11 +566,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "2e0e8b620d0b31197c9220912d5cef5ba90c63598dcf0c33f5820b8cd8933d00",
-      "after_sha256": "5e87b5c0c89eef3af8071437570a5a7ba29d7c6c61db14ab006964949a51878c",
+      "after_sha256": "11a23d3127fdb73d447b0d043e8005fc497391ecd281bd987e3cc52b466132df",
       "owners": {
         "@document": {
           "before": "2e0e8b620d0b31197c9220912d5cef5ba90c63598dcf0c33f5820b8cd8933d00",
-          "after": "5e87b5c0c89eef3af8071437570a5a7ba29d7c6c61db14ab006964949a51878c"
+          "after": "11a23d3127fdb73d447b0d043e8005fc497391ecd281bd987e3cc52b466132df"
         }
       }
     },
@@ -1200,6 +1330,136 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Updates the complete measured local covered profile and deterministic twelve-shard inventory for the current MFM regressions; preserves every selected case, denominator and cutoff. This local profile does not certify hosted-runner wall time.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
