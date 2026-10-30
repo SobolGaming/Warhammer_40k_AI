@@ -197,8 +197,8 @@
       "budget_profile": "current-change-relative-v1",
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
-        "schema": "tool-input-roles-v3",
-        "role_specification": "data/source_audits/qualification40_v1/tool-input-roles-v3.json"
+        "schema": "tool-input-roles-v4",
+        "role_specification": "docs/performance/policy-v3/vyper-source-input-roles-v4.json"
       }
     },
     "session_command_fork": {
@@ -30435,6 +30435,128 @@
       ],
       "families": [],
       "sensitive": false,
+      "mandatory": true
+    },
+    "supported-vyper-source-title-binding": {
+      "paths": [
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_vyper_title_2026_10*",
+        "tools/generate_vyper_source_overlay.py",
+        "tools/ability_support_sources.py",
+        "tools/aeldari_support_report.py",
+        "data/source_audits/supported_rules_2026_10/vyper-binding.json",
+        "data/generated/ability_coverage/ability_coverage_rows.json",
+        "data/generated/ability_coverage/ability_support_category_rows.json",
+        "data/generated/ability_coverage/datasheet_support_rows.json"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_catalog_blocker_description",
+        "_current_datasheet_name",
+        "_group_markdown",
+        "_source_basis",
+        "ability_support_index_inputs",
+        "generated_overlay_pack",
+        "load_ability_support_sources",
+        "main",
+        "overlay_pack",
+        "overlay_pack_from_json_bytes",
+        "source_release_manifest"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-vyper-source-regression-controls": {
+      "paths": [
+        "tests/rules/section25/test_mfm.py",
+        "tests/code_quality/test_ws12_generated_data_artifacts.py",
+        "tests/code_quality/test_generated_ability_support_artifacts.py"
+      ],
+      "owners": [
+        "@module",
+        "test_current_vyper_report_preserves_source_identity_guard",
+        "test_current_vyper_source_title_reaches_mfm_points",
+        "test_current_vyper_title_preserves_model_and_rule_identity",
+        "test_vyper_title_overlay_is_generated_and_binds_one_unchanged_source_row",
+        "test_vyper_title_overlay_rejects_invalid_artifact",
+        "vyper_catalog"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-vyper-exact-base-performance-admission": {
+      "paths": [
+        "docs/performance/policy-v3/vyper-provenance-20261030/phase14a-predecessor.py.txt",
+        "scripts/check_performance_policy.py",
+        "scripts/measure_vyper_source_binding.py",
+        "tests/category_migration_preservation.py",
+        "tests/code_quality/test_category_migration_preservation.py",
+        "tests/code_quality/test_current_comparison_routing.py",
+        "tests/code_quality/test_performance_tool_inputs_v2.py",
+        "tests/code_quality/test_phase14a_source_identity.py",
+        "tools/performance_policy.py",
+        "tools/performance_tool_inputs.py",
+        "tools/performance_tool_inputs_v4.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_active_identity_text",
+        "_fresh_comparison_metadata",
+        "_historical_snapshot_inputs",
+        "_unique_provenance_object",
+        "_v4_binding",
+        "_v4_inventories",
+        "_v4_provenance_text",
+        "_v4_report",
+        "_validate_single_comparison",
+        "_validate_v4",
+        "_vyper_provenance_text",
+        "binding_enabled",
+        "classify_inputs",
+        "comparison_inputs",
+        "current_inventory",
+        "edition_provenance_predecessor",
+        "edition_root",
+        "git_inventory",
+        "invoke_owned",
+        "main",
+        "read_historical_test_bytes",
+        "read_role_spec",
+        "run",
+        "runtime_id",
+        "selected",
+        "test_exact_v4_uses_current_transaction_without_reclassifying_history",
+        "test_v4_actual_input_and_role_drift_is_rejected",
+        "test_v4_campaign_success_marker_follows_postflight_and_comparison_admission",
+        "test_v4_command_preflight_prevents_launch_without_source_and_time_budget",
+        "test_v4_comparison_preserves_existing_acceptance",
+        "test_v4_current_inventory_includes_ignored_authoritative_runtime_resources",
+        "test_v4_every_generated_tree_requires_complete_exact_bytes",
+        "test_v4_exact_base_complete_inventories_and_six_output_trees_are_admitted",
+        "test_v4_historical_inventory_authenticates_every_allowed_context",
+        "test_v4_measured_git_locator_accepts_equal_squash_bytes_and_rejects_drift",
+        "test_v4_owned_command_retains_receipts_and_rejects_incomplete_attempts",
+        "test_v4_provenance_does_not_hide_active_or_unknown_contexts",
+        "test_v4_provenance_rejects_different_report_identity",
+        "test_v4_provenance_rejects_duplicate_json_members",
+        "test_vyper_edition_additions_remain_exact_with_recomputed_live_pin",
+        "test_vyper_edition_predecessor_archive_is_rechecked_after_success",
+        "test_vyper_edition_predecessor_is_exact_before_original_assertion_proof",
+        "test_vyper_pinned_provenance_rejects_any_document_drift",
+        "test_vyper_provenance_does_not_exempt_another_document",
+        "test_vyper_provenance_preserves_exact_historical_bytes_and_active_identity",
+        "test_vyper_provenance_requires_immutable_snapshot_bytes",
+        "validate_generated_evidence",
+        "validate_spec",
+        "write"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
       "mandatory": true
     }
   },

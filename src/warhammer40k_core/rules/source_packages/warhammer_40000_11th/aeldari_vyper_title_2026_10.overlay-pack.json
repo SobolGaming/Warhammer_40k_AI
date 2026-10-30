@@ -1,0 +1,37 @@
+{
+  "base_source_package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "catalog_version": {
+    "source_date": "2026-10-30",
+    "version_id": "warhammer-40000-11th-aeldari-vyper-title-2026-10"
+  },
+  "effective_date": "2026-10-30",
+  "operations": [
+    {
+      "effective_date": "2026-10-30",
+      "expected_preimage_hash": "058dcfcc7221f364643673a29137c06474bc8c495179c0b6b89f15ee96bfa0ca",
+      "fields": {
+        "name": "Vyper"
+      },
+      "op_id": "aeldari-vyper-current-source-title",
+      "operation_kind": "update_row",
+      "order_index": 1,
+      "reason": "Use the preferred App mirror title after source-bound continuity review; preserve the stable datasheet ID, plural model identity and all rule fields.",
+      "source_reference": "https://www.40k.app/963/factions/aeldari/units/vyper",
+      "source_row_id": "000000605",
+      "source_table": "Datasheets",
+      "target_edition": "warhammer-40000-11th"
+    }
+  ],
+  "package_hash": "7718c6c7286ab5d700aa1647ae6e51d103b0a638d8e81c04e64ecf9dbeb2b095",
+  "package_id": {
+    "namespace": "40k-app",
+    "package_name": "aeldari-vyper-title",
+    "version": "v963-reviewed-2026-10-30"
+  },
+  "schema_version": "phase17-source-overlay-v1",
+  "target_edition": "warhammer-40000-11th"
+}

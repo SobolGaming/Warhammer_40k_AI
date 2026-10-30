@@ -9,3 +9,40 @@ data/source_audits/d09/selected-source.json -text
 data/source_audits/d10/selected-source-and-acceptance.json -text whitespace=cr-at-eol
 # D12 retains the complete sealed selected source/acceptance bytes.
 data/source_audits/d12/selected-source-and-acceptance.json -text whitespace=cr-at-eol
+
+# Preserve selected historical test metadata exactly as committed for raw-byte binding.
+tests/rules/section00/coverage.json -text
+tests/rules/section01/coverage.json -text
+tests/rules/section01/future-fixes.json -text
+tests/rules/section01/prerequisites.json -text
+tests/rules/section01/validation.json -text
+tests/rules/section02/coverage.json -text
+tests/rules/section02/prerequisites.json -text
+tests/rules/section02/validation.json -text
+tests/rules/section03/coverage.json -text
+tests/rules/section03/future-fixes.json -text
+tests/rules/section03/prerequisites.json -text
+tests/rules/section03/validation.json -text
+tests/rules/section04/coverage.json -text
+tests/rules/section04/future-fixes.json -text
+tests/rules/section04/prerequisites.json -text
+tests/rules/section04/validation.json -text
+tests/rules/section05/coverage.json -text
+tests/rules/section05/future-fixes.json -text
+tests/rules/section05/prerequisites.json -text
+tests/rules/section05/validation.json -text
+tests/rules/section06/coverage.json -text
+tests/rules/section06/future-fixes.json -text
+tests/rules/section06/prerequisites.json -text
+tests/rules/section06/validation.json -text
+tests/rules/section07/validation.json -text
+tests/rules/section08/prerequisites.json -text
+tests/rules/section09/coverage.json -text
+tests/rules/section09/future-fixes.json -text
+tests/rules/section15/coverage.json -text
+tests/rules/section16/coverage.json -text
+tests/rules/section17/coverage.json -text
+tests/rules/section19/coverage.json -text
+tests/rules/section21/coverage.json -text
+tests/rules/section23/coverage.json -text
+tests/rules/section25/coverage.json -text

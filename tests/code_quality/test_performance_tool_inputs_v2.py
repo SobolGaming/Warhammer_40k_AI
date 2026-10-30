@@ -265,3 +265,390 @@ def test_derived_inventory_rejects_omission_and_actual_file_tampering(tmp_path: 
     (tmp_path / "contracts/manifest.json").write_text("changed identity leaf\n")
     with pytest.raises(ValueError, match="bound source bytes"):
         v2.validate_derived_outputs(tmp_path, expected)
+
+
+def _v4_inventories() -> tuple[dict[str, str], dict[str, str]]:
+    from tools import performance_tool_inputs_v4 as v4
+
+    common = dict.fromkeys(
+        v4.REQUIRED | {"src/real.py", "contracts/README.md", "data/selected-source.json"}, "a" * 64
+    )
+    return (
+        common | dict.fromkeys(v4.DERIVED | (v4.TREATMENT - v4.NEW_TREATMENT), "b" * 64),
+        common | dict.fromkeys(v4.DERIVED | v4.TREATMENT | v4.CONTROL, "c" * 64),
+    )
+
+
+def _v4_binding(
+    base: dict[str, str], head: dict[str, str], **overrides: object
+) -> dict[str, object]:
+    from tools import performance_tool_inputs_v4 as v4
+
+    values: dict[str, object] = {
+        "spec": v4.read_role_spec(ROOT),
+        "base": base,
+        "head": head,
+        "base_revision": v4.BASE,
+        "head_revision": "d" * 40,
+        "head_input_digest": "e" * 64,
+        "harness_base": {p: head[p] for p in v4.HARNESS},
+        "harness_head": {p: head[p] for p in v4.HARNESS},
+    }
+    values.update(overrides)
+    return v4.classify_inputs(**values)  # type: ignore[arg-type]
+
+
+def _v4_report() -> tuple[dict[str, object], dict[str, object], dict[str, object]]:
+    from tools import performance_tool_inputs_v4 as v4
+
+    report, specification, _ = _report()
+    binding = _v4_binding(*_v4_inventories())
+    report["base_revision"] = v4.BASE
+    report["input_binding"] = binding
+    report["generated_output_binding"] = _generated(binding)
+    for side in ("base", "head"):
+        cast(dict[str, object], report[side])["fixture_sha256"] = binding["common_sha256"]
+    specification["input_binding"] = {"schema": v4.SCHEMA, "role_specification": v4.SPEC_PATH}
+    return report, specification, binding
+
+
+def _validate_v4(
+    report: dict[str, object], specification: dict[str, object], binding: dict[str, object]
+) -> None:
+    from tools import performance_tool_inputs_v4 as v4
+
+    side = cast(dict[str, object], report["head"])
+    validate_comparison(
+        report,
+        base=v4.BASE,
+        runtime_id=str(side["runtime_build_id"]),
+        input_digest="e" * 64,
+        family=v1.FAMILY,
+        specification=specification,
+        base_runtime_id=str(side["runtime_build_id"]),
+        expected_inputs={
+            "lock_sha256": "lock",
+            "workload_sha256": "workload",
+            "fixture_sha256": str(binding["common_sha256"]),
+        },
+        expected_binding=binding,
+    )
+
+
+def test_v4_exact_base_complete_inventories_and_six_output_trees_are_admitted() -> None:
+    from tools import performance_tool_inputs_v4 as v4
+
+    report, specification, binding = _v4_report()
+    _validate_v4(report, specification, binding)
+    sides = cast(dict[str, dict[str, object]], binding["sides"])
+    for side, inventory in zip(("base", "head"), _v4_inventories(), strict=True):
+        assert sides[side]["inventory"] == inventory
+        assert sides[side]["inventory_sha256"] == v1.digest(inventory)
+    assert v1.binding_enabled(v1.FAMILY, specification)
+    assert binding["schema"] == v4.SCHEMA
+
+
+@pytest.mark.parametrize(
+    "drift",
+    [
+        "base",
+        "schema",
+        "role",
+        "missing_dependency",
+        "dependency",
+        "new_common",
+        "source",
+        "base_treatment",
+        "head_treatment",
+        "harness",
+    ],
+)
+def test_v4_actual_input_and_role_drift_is_rejected(drift: str) -> None:
+    from tools import performance_tool_inputs_v4 as v4
+
+    base, head = _v4_inventories()
+    overrides: dict[str, object] = {}
+    if drift == "base":
+        overrides["base_revision"] = "f" * 40
+    elif drift in {"schema", "role"}:
+        spec = v4.read_role_spec(ROOT)
+        if drift == "schema":
+            spec["schema"] = v2.SCHEMA
+        else:
+            cast(list[str], spec["treatment"]).append("src/real.py")
+        overrides["spec"] = spec
+    elif drift == "missing_dependency":
+        del head["uv.lock"]
+    elif drift == "dependency":
+        head["uv.lock"] = "f" * 64
+    elif drift == "new_common":
+        head["data/new-unreviewed.json"] = "f" * 64
+    elif drift == "source":
+        head["data/selected-source.json"] = "f" * 64
+    elif drift == "base_treatment":
+        base[next(iter(v4.NEW_TREATMENT))] = "f" * 64
+    elif drift == "head_treatment":
+        del head[next(iter(v4.NEW_TREATMENT))]
+    else:
+        overrides["harness_base"] = dict.fromkeys(v4.HARNESS, "f" * 64)
+    with pytest.raises(ValueError, match=r"V4|v4|True common"):
+        _v4_binding(base, head, **overrides)
+
+
+@pytest.mark.parametrize(
+    ("side", "index"), [(side, index) for side in ("base", "head") for index in range(3)]
+)
+@pytest.mark.parametrize("drift", ["hash", "omission", "extra"])
+def test_v4_every_generated_tree_requires_complete_exact_bytes(
+    side: str, index: int, drift: str
+) -> None:
+    report, specification, binding = _v4_report()
+    outputs = cast(dict[str, list[dict[str, str]]], report["generated_output_binding"])
+    tree = outputs[side][index]
+    member = next(iter(tree))
+    if drift == "hash":
+        tree[member] = "f" * 64
+    elif drift == "omission":
+        del tree[member]
+    else:
+        tree["orphan.json"] = "f" * 64
+    with pytest.raises(ValueError, match="complete exact generated trees"):
+        _validate_v4(report, specification, binding)
+
+
+@pytest.mark.parametrize(
+    "drift", ["budget", "sample_count", "binding", "workload", "dependency", "schema"]
+)
+def test_v4_comparison_preserves_existing_acceptance(drift: str) -> None:
+    report, specification, binding = _v4_report()
+    side = cast(dict[str, object], report["head"])
+    if drift in {"budget", "sample_count"}:
+        side["samples"] = {
+            "orphan-write-independent-check": [100.0] * 3 if drift == "budget" else [1.0]
+        }
+    elif drift == "binding":
+        report["input_binding"] = {**binding, "head_input_digest": "f" * 64}
+    elif drift == "workload":
+        side["workload_sha256"] = "wrong"
+    elif drift == "dependency":
+        side["lock_sha256"] = "wrong"
+    else:
+        specification["input_binding"] = {
+            "schema": "tool-input-roles-unknown",
+            "role_specification": "arbitrary",
+        }
+    with pytest.raises(
+        ValueError,
+        match=r"budget exceeded|samples missing|actual-base/head|Unmatched|input-binding",
+    ):
+        _validate_v4(report, specification, binding)
+
+
+@pytest.mark.parametrize("drift", [False, True])
+def test_v4_measured_git_locator_accepts_equal_squash_bytes_and_rejects_drift(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, drift: bool
+) -> None:
+    from tools import performance_tool_inputs_v4 as v4
+
+    before, after = _v4_inventories()
+    blobs = dict.fromkeys(after, "a" * 40)
+    measured = dict(blobs)
+    if drift:
+        measured["src/real.py"] = "f" * 40
+    spec = v4.read_role_spec(ROOT)
+
+    def read_spec(root: Path) -> dict[str, object]:
+        assert root == tmp_path
+        return spec
+
+    def read_current(root: Path) -> tuple[dict[str, str], dict[str, str]]:
+        assert root == tmp_path
+        return after, blobs
+
+    def read_git(root: Path, revision: str) -> tuple[dict[str, str], dict[str, str]]:
+        assert root == tmp_path
+        return (before, {}) if revision == v4.BASE else (after, measured)
+
+    monkeypatch.setattr(v4, "read_role_spec", read_spec)
+    monkeypatch.setattr(v4, "current_inventory", read_current)
+    monkeypatch.setattr(v4, "git_inventory", read_git)
+
+    def git_command(command: list[str], *, cwd: Path) -> bytes:
+        assert command == ["git", "rev-parse", "HEAD"]
+        assert cwd == tmp_path
+        return b"dddddddddddddddddddddddddddddddddddddddd\n"
+
+    monkeypatch.setattr("tools.performance_tool_inputs_v4.subprocess.check_output", git_command)
+    if drift:
+        with pytest.raises(ValueError, match="measured head bytes differ"):
+            v1.comparison_inputs(
+                tmp_path,
+                base=v4.BASE,
+                family=v1.FAMILY,
+                head_input_digest="e" * 64,
+                measured_head="f" * 40,
+                schema=v4.SCHEMA,
+            )
+    else:
+        result = v1.comparison_inputs(
+            tmp_path,
+            base=v4.BASE,
+            family=v1.FAMILY,
+            head_input_digest="e" * 64,
+            measured_head="f" * 40,
+            schema=v4.SCHEMA,
+        )
+        assert cast(dict[str, dict[str, object]], result["sides"])["head"]["revision"] == "f" * 40
+
+
+def test_v4_current_inventory_includes_ignored_authoritative_runtime_resources(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tools import performance_tool_inputs_v4 as v4
+
+    package = tmp_path / "src/warhammer40k_core"
+    package.mkdir(parents=True)
+    for name in ("ignored.py", "ignored.json", "py.typed"):
+        (package / name).write_text("runtime bytes")
+
+    def empty_git(command: list[str], *, cwd: Path) -> bytes:
+        assert command[0:2] == ["git", "ls-files"]
+        assert cwd == tmp_path
+        return b""
+
+    monkeypatch.setattr("tools.performance_tool_inputs_v4.subprocess.check_output", empty_git)
+    inventory, blobs = v4.current_inventory(tmp_path)
+    expected = {
+        "src/warhammer40k_core/" + name for name in ("ignored.py", "ignored.json", "py.typed")
+    }
+    assert inventory.keys() == blobs.keys() == expected
+    (package / "alias.json").symlink_to("ignored.json")
+    with pytest.raises(ValueError, match="regular files"):
+        v4.current_inventory(tmp_path)
+
+
+@pytest.mark.parametrize(
+    "fault", [None, "exit_code", "timeout", "descendants_remained", "cleanup_complete"]
+)
+def test_v4_owned_command_retains_receipts_and_rejects_incomplete_attempts(
+    tmp_path: Path, fault: str | None
+) -> None:
+    import time
+
+    from scripts.measure_vyper_source_binding import invoke_owned
+
+    result: dict[str, object] = {
+        "exit_code": 0,
+        "timeout": False,
+        "descendants_remained": False,
+        "cleanup_complete": True,
+    }
+    if fault is not None:
+        result[fault] = 1 if fault == "exit_code" else fault != "cleanup_complete"
+    checks: list[str] = []
+    attempts: list[dict[str, object]] = []
+
+    def check_arms() -> None:
+        checks.append("checked")
+
+    def supervisor(command: list[str], **kwargs: object) -> dict[str, object]:
+        assert checks == ["checked"]
+        assert command == [
+            "/usr/bin/time",
+            "-v",
+            "-o",
+            str(tmp_path / "attempt/resource.txt"),
+            "owned-command",
+        ]
+        assert kwargs["timeout"] == 405
+        assert kwargs["cwd"] == tmp_path
+        assert kwargs["env"] == {"PYTHONDONTWRITEBYTECODE": "1"}
+        return result
+
+    def invoke() -> Path:
+        return invoke_owned(
+            "attempt",
+            ["owned-command"],
+            tmp_path,
+            420,
+            output=tmp_path,
+            deadline=time.monotonic() + 600,
+            attempts=attempts,
+            run_owned=supervisor,
+            env={"PYTHONDONTWRITEBYTECODE": "1"},
+            check_arms=check_arms,
+        )
+
+    if fault is None:
+        assert invoke() == tmp_path / "attempt"
+        assert checks == ["checked", "checked"]
+    else:
+        with pytest.raises(RuntimeError, match="Failed/incomplete command"):
+            invoke()
+        assert checks == ["checked"]
+    assert len(attempts) == 1
+    assert json.loads((tmp_path / "attempt/receipt.json").read_bytes()) == attempts[0]
+    assert json.loads((tmp_path / "attempts.json").read_bytes()) == attempts
+    assert not (tmp_path / "complete.json").exists()
+
+
+@pytest.mark.parametrize("fault", ["source_drift", "deadline"])
+def test_v4_command_preflight_prevents_launch_without_source_and_time_budget(
+    tmp_path: Path, fault: str
+) -> None:
+    import time
+
+    from scripts.measure_vyper_source_binding import invoke_owned
+
+    def check_arms() -> None:
+        if fault == "source_drift":
+            raise ValueError("source drift")
+
+    def supervisor(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("Preflight failure must not launch a process")
+
+    with pytest.raises((ValueError, TimeoutError), match=r"source drift|Insufficient controller"):
+        invoke_owned(
+            "attempt",
+            ["owned-command"],
+            tmp_path,
+            420,
+            output=tmp_path,
+            deadline=time.monotonic() + 1,
+            attempts=[],
+            run_owned=supervisor,
+            env={},
+            check_arms=check_arms,
+        )
+    assert not list(tmp_path.iterdir())
+
+
+def test_v4_campaign_success_marker_follows_postflight_and_comparison_admission() -> None:
+    """Audit the producer's success boundary without inventing measured samples."""
+    import ast
+    import inspect
+
+    from scripts import measure_vyper_source_binding as driver
+
+    tree = ast.parse(inspect.getsource(driver.run))
+    writes = {
+        node.args[0].right.value: node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "write"
+        and node.args
+        and isinstance(node.args[0], ast.BinOp)
+        and isinstance(node.args[0].right, ast.Constant)
+    }
+    validations = [
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in {"validate_comparison", "check_arms"}
+    ]
+    assert writes["input-binding-after.json"] < writes["comparison.json"]
+    assert writes["dependencies-after.json"] < writes["comparison.json"]
+    assert max(validations) < writes["comparison.json"] < writes["complete.json"]

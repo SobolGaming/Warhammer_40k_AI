@@ -31,7 +31,80 @@ UTF8_AFTER_SHA256 = "7b4ce6c6d14243afe9f08fedf616e867f9555a5101e98de45bad130f66f
 EDITION_TEST = "tests/code_quality/test_phase14a_source_identity.py"
 EDITION_ARCHIVE = "docs/performance/policy-v3/ci-compatibility-20261015/phase14a-original.py.txt"
 EDITION_BEFORE_SHA256 = "22146cd184b4267c71b482cba021cd31387c8df1bd4a0d27f1157647cbc93e8b"
-EDITION_AFTER_SHA256 = "d67b860dbe557bd557536537d43c466176e2e6d14e1e48d6b8c08c1cb4d34eaf"
+EDITION_AFTER_SHA256 = "4d4edccdda4369e6e0aeafb41d0f13ed4dcad0696ccefaa86149cb8de1516302"
+
+EDITION_PREDECESSOR_ARCHIVE = (
+    "docs/performance/policy-v3/vyper-provenance-20261030/phase14a-predecessor.py.txt"
+)
+EDITION_PREDECESSOR_SHA256 = "d67b860dbe557bd557536537d43c466176e2e6d14e1e48d6b8c08c1cb4d34eaf"
+EDITION_PROVENANCE_ADDITIONS = {
+    "import:typing.Any": ("68c3503c96524a291ba3f175e383b38269e898b6c29bd9965c11d7e1d2ae8ae9"),
+    "assignment:VYPER_CURRENT_COMPARISON": (
+        "929487e6abde506854a73e40e553093029ed9cbead94369464554b5dff6e647d"
+    ),
+    "assignment:VYPER_ARCHIVED_COMPARISON": (
+        "7d6eff5159df557d583f59cabb59361906598c81a29b3a0fe1c1a6de5eff0d65"
+    ),
+    "assignment:VYPER_ROLE_SPEC": (
+        "86780a58e53c507eb077d9da6d38a2ca090caf091a8c414ce33d924f991e7e3f"
+    ),
+    "assignment:VYPER_OVERLAY": (
+        "42ac90324570d02f82a9b9d7be1f76647da018ac4da43409978b38cfa3fcd811"
+    ),
+    "assignment:VYPER_BEHAVIORAL_TEST": (
+        "2efe34f1f9a755397aec5c9c3c059b8786b593af106226c857d2be09d9915ffd"
+    ),
+    "assignment:VYPER_PROVENANCE_DOCUMENT_SHA256": (
+        "a0420c6d842de19b37b00b2b2b9a289ebdaf9ca0448a885f0d2576fdab03d46c"
+    ),
+    "assignment:HISTORICAL_SNAPSHOT_PATHS": (
+        "99b95c4431fdd85fe5c0a717623449a210bc5a447467ac6133d05456157a7237"
+    ),
+    "assignment:HISTORICAL_SNAPSHOT_INVENTORY_SHA256": (
+        "14966269c2e2ea81f5468bcd65debf2bc35772df29ba7d34a9d2df9efcb4ceb3"
+    ),
+    "assignment:HISTORICAL_VYPER_SOURCE_ID": (
+        "06e0b16b963bad0ead2cd9d6cc31c40e19c2ffdf98d70f81918423fa656141a4"
+    ),
+    "function:_historical_snapshot_inputs": (
+        "de3f160a669549ecd20f7de0beaa9d84496b1ef404370b0d847b6f3d852dc70f"
+    ),
+    "function:_unique_provenance_object": (
+        "98847f62e34036a972735d37c21cff9cb8b78b9d4ff1841aca8ffa709308dea4"
+    ),
+    "function:_v4_provenance_text": (
+        "522926551d76fce840e0e88292dd0050621a55ebe90ff0aef79599e4f9478a00"
+    ),
+    "function:_vyper_provenance_text": (
+        "3fda78049b4cc12f37569a2771ab4eed5cb4b84f1be4608e5c94dc2f26aea89c"
+    ),
+    "function:test_vyper_provenance_preserves_exact_historical_bytes_and_active_identity": (
+        "1805e227fe0f5a3d3fa8f030c74905beab217e141fa4ff2c04ad2997eecfcd78"
+    ),
+    "function:test_vyper_pinned_provenance_rejects_any_document_drift": (
+        "d56fb539c799317f8590414fcdbf1c1d871ac29d54c51be3866a422f582f91bf"
+    ),
+    "function:test_v4_historical_inventory_authenticates_every_allowed_context": (
+        "fe9baa6d9a55833d35d620e9fa8998fe9df6f0ebdc32f71a08f6efb4b17bfd1a"
+    ),
+    "function:test_v4_provenance_does_not_hide_active_or_unknown_contexts": (
+        "ac8710b60d0f2fe9123695b72c97ba108e410439f5ee94a29111aa75612ee9eb"
+    ),
+    "function:test_v4_provenance_rejects_different_report_identity": (
+        "c717cef65dbee423e10152ef6faf41d5f9e77354027cc13fc3c17d54af7da7c2"
+    ),
+    "function:test_v4_provenance_rejects_duplicate_json_members": (
+        "83f51445734bd28d03e336b4ed9432b960e6dd8529b172e85d7f839f9b0a6158"
+    ),
+    "function:test_vyper_provenance_does_not_exempt_another_document": (
+        "4d6ee1d80445f6cf822280497fae145d6e8225915ee30f8c086789dd7047b2b7"
+    ),
+    "function:test_vyper_provenance_requires_immutable_snapshot_bytes": (
+        "1ce663169c5a728c664b6b07f16f91041c9c4c5d6d2599c224ae39077a63eed7"
+    ),
+}
+EDITION_PROVENANCE_ROUTE_SHA256 = "417bc5fa0a01cd0f6bd33c41c61c9632a1c2b3962451d2ed74bb6f1b7bede907"
+
 MIGRATED_PATHS: frozenset[str] = frozenset(
     [
         "tests/integration/test_horror_split_materialization.py",
@@ -472,6 +545,52 @@ def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRec
     return original, record
 
 
+def edition_provenance_predecessor(root: Path, current: bytes) -> bytes:
+    """Authenticate only the reviewed additive guard extension before its old proof."""
+    predecessor = _read(root, EDITION_PREDECESSOR_ARCHIVE)
+    if hashlib.sha256(predecessor).hexdigest() != EDITION_PREDECESSOR_SHA256:
+        raise ValueError("Exact edition-scanner predecessor archive changed.")
+    tree = ast.parse(current)
+    observed: dict[str, str] = {}
+    retained: list[ast.stmt] = []
+    for node in tree.body:
+        key = ""
+        if isinstance(node, ast.FunctionDef):
+            key = "function:" + node.name
+        elif isinstance(node, ast.Assign) and len(node.targets) == 1:
+            if isinstance(node.targets[0], ast.Name):
+                key = "assignment:" + node.targets[0].id
+        elif isinstance(node, ast.ImportFrom) and ast.unparse(node) == "from typing import Any":
+            key = "import:typing.Any"
+        if key in EDITION_PROVENANCE_ADDITIONS:
+            if key in observed:
+                raise ValueError("Duplicate edition provenance maintenance addition.")
+            observed[key] = hashlib.sha256(ast.dump(node).encode()).hexdigest()
+        else:
+            retained.append(node)
+    if observed != EDITION_PROVENANCE_ADDITIONS:
+        raise ValueError("Exact edition provenance maintenance additions changed.")
+    tree.body = retained
+    routes = [
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "_active_identity_text"
+    ]
+    if (
+        len(routes) != 1
+        or len(routes[0].body) < 3
+        or (
+            hashlib.sha256(ast.dump(routes[0].body[2]).encode()).hexdigest()
+            != EDITION_PROVENANCE_ROUTE_SHA256
+        )
+    ):
+        raise ValueError("Exact edition provenance maintenance route changed.")
+    del routes[0].body[2]
+    if ast.dump(tree) != ast.dump(ast.parse(predecessor)):
+        raise ValueError("Original edition assertions or unrelated semantics changed.")
+    return predecessor
+
+
 def read_historical_test_bytes(root: Path, relative: str) -> bytes:
     """Historical readers may use authenticated retired bytes after source/absence checks."""
     if relative in FACTION_LAYOUT_ORIGINALS:
@@ -484,6 +603,7 @@ def read_historical_test_bytes(root: Path, relative: str) -> bytes:
             or hashlib.sha256(original).hexdigest() != EDITION_BEFORE_SHA256
         ):
             raise ValueError("Exact edition-scanner maintenance bytes changed.")
+        current = edition_provenance_predecessor(root, current)
         before = b'_without_non_edition_references(path.read_text(encoding="utf-8"))'
         after = b"_without_non_edition_references(_active_identity_text(path))"
         if current.count(after) != 1:

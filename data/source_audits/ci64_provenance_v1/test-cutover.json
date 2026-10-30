@@ -2329,10 +2329,10 @@
       "sha256": "874e9e808f4e5b2ebc22e75c18ec8a6d991f30c59d0f237f430a73fe3341b10a"
     },
     "tests/rules/section25/test_mfm.py": {
-      "blob_sha1": "0ca7a3a6d874142bbcaf80d61104858f95d78c4b",
-      "bytes": 18828,
+      "blob_sha1": "45da4cd186562f39823a3a9a55f014bea3193536",
+      "bytes": 22816,
       "mode": "100644",
-      "sha256": "697300f10064e0383b071b997f51eb8323ef4c617563ca07687278d7665585b8"
+      "sha256": "6d2758590363c16f2f72048780631028cf67cc59e297740ca96b5f5c93e5696a"
     },
     "tests/rules/section25/test_native.py": {
       "blob_sha1": "b829b15cfd457fb0c3f7c0f0a80f3da4914fdb85",

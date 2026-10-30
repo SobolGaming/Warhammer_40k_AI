@@ -7,6 +7,10 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tools.aeldari_datasheet_semantic_coverage import aeldari_datasheet_semantic_coverage
+from tools.aeldari_support_report import (
+    _catalog_blocker_description,  # pyright: ignore[reportPrivateUsage]
+)
 from tools.cross_source_semantic_equivalence import (
     DEFAULT_DOCS_PATH as DEFAULT_SEMANTIC_EQUIVALENCE_DOCS_PATH,
 )
@@ -474,3 +478,24 @@ def test_maulerfiend_cross_faction_report_separates_generic_and_local_support() 
         "thousand-sons:000001029": ((1, 2, 1, 120), (3, None, 1, 130)),
         "world-eaters:000002639": ((1, 2, 1, 140), (3, None, 1, 150)),
     }
+
+
+@pytest.mark.parametrize("drift", ["current_name", "historical_name", "datasheet_id", "faction_id"])
+def test_current_vyper_report_preserves_source_identity_guard(drift: str) -> None:
+    semantic = next(
+        row for row in aeldari_datasheet_semantic_coverage().rows if row.datasheet_id == "000000605"
+    )
+    support = next(row for row in _datasheet_support_rows() if row.datasheet_id == "000000605")
+    assert semantic.datasheet_name == "Vypers"
+    assert support.datasheet_name == "Vyper"
+    _catalog_blocker_description(semantic_row=semantic, support_row=support)
+    if drift == "current_name":
+        support = replace(support, datasheet_name="Unreviewed title")
+    elif drift == "historical_name":
+        semantic = replace(semantic, datasheet_name="Unreviewed predecessor")
+    elif drift == "datasheet_id":
+        support = replace(support, datasheet_id="000004195")
+    else:
+        support = replace(support, faction_id="world-eaters")
+    with pytest.raises(ValueError, match=r"(identity drifted|predecessor differs)"):
+        _catalog_blocker_description(semantic_row=semantic, support_row=support)

@@ -353,3 +353,53 @@ def test_independent_postflight_rejects_changed_current_inputs(
     (root / DRIVER).write_text("VALUE = 2\n")
     with pytest.raises(ValueError, match="Fresh comparison has stale"):
         checker.validate_current(root, base, pr_head=None)
+
+
+@pytest.mark.parametrize("drift", ["none", "base", "input", "old_report", "extra"])
+def test_exact_v4_uses_current_transaction_without_reclassifying_history(
+    current_checkout: tuple[Path, str],
+    drift: str,
+) -> None:
+    from tools import performance_tool_inputs as original
+    from tools import performance_tool_inputs_v4 as exact
+
+    root, _ = current_checkout
+    assessment = read_object(root / ASSESSMENT)
+    report = read_object(root / REPORT)
+    assessment["base"] = exact.BASE
+    assessment["comparisons"] = {original.FAMILY: REPORT}
+    report["base_revision"] = exact.BASE
+    report["family"] = original.FAMILY
+    report["input_binding"] = {"schema": exact.SCHEMA}
+    report["generated_output_binding"] = {"base": [], "head": []}
+    base = exact.BASE
+    base_paths: set[str] = set()
+    if drift == "base":
+        base = "a" * 40
+        assessment["base"] = base
+        report["base_revision"] = base
+    elif drift == "input":
+        report["head_input_digest"] = "stale"
+    elif drift == "old_report":
+        base_paths.add(REPORT)
+    elif drift == "extra":
+        report["owner_exception"] = {}
+
+    def classify() -> bool:
+        return checker._fresh_comparison_metadata(  # pyright: ignore[reportPrivateUsage]
+            assessment,
+            {original.FAMILY: report},
+            base=base,
+            runtime_id=str(assessment["runtime_build_id"]),
+            input_digest=canonical_digest(runtime_inputs(root)),
+            base_paths=base_paths,
+            input_bound_families={original.FAMILY},
+        )
+
+    if drift == "none":
+        assert classify()
+        report["input_binding"] = {"schema": "tool-input-roles-v3"}
+        assert not classify()
+    else:
+        with pytest.raises(ValueError, match=r"exact PR600|stale|newly added|closed generic"):
+            classify()

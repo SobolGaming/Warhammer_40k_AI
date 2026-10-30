@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from collections.abc import Iterable, Mapping
 from typing import TYPE_CHECKING
 
@@ -19,6 +20,7 @@ if TYPE_CHECKING or __package__:
         SEMANTIC_BUCKET_BRIDGE_BLOCKED,
         SEMANTIC_BUCKET_HOST_NEEDED,
         SEMANTIC_BUCKET_UNSUPPORTED_IR,
+        SOURCE_JSON_DIR,
         AeldariDatasheetSemanticCoverage,
         aeldari_datasheet_semantic_coverage,
     )
@@ -38,12 +40,39 @@ else:
         SEMANTIC_BUCKET_BRIDGE_BLOCKED,
         SEMANTIC_BUCKET_HOST_NEEDED,
         SEMANTIC_BUCKET_UNSUPPORTED_IR,
+        SOURCE_JSON_DIR,
         AeldariDatasheetSemanticCoverage,
         aeldari_datasheet_semantic_coverage,
     )
     from aeldari_datasheet_semantic_snapshot import (
         aeldari_datasheet_semantic_snapshot_markdown,
     )
+
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import aeldari_vyper_title_2026_10
+from warhammer40k_core.rules.source_patch import source_row_hash
+from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow
+
+
+def _current_datasheet_name(row: AeldariDatasheetSemanticCoverage) -> str:
+    for operation in aeldari_vyper_title_2026_10.overlay_pack().operations:
+        if operation.source_table != "Datasheets" or operation.source_row_id != row.datasheet_id:
+            continue
+        fields = dict(operation.fields)
+        if set(fields) != {"name"}:
+            raise ValueError("Aeldari current title overlay must update only the datasheet name.")
+        source = json.loads((SOURCE_JSON_DIR / "Datasheets.json").read_text(encoding="utf-8"))
+        original = next(
+            item for item in source["rows"] if item["source_row_id"] == row.datasheet_id
+        )
+        if (
+            original["fields"]["name"] != row.datasheet_name
+            or source_row_hash(NormalizedSourceRow.from_payload(original))
+            != operation.expected_preimage_hash
+        ):
+            raise ValueError("Aeldari current title predecessor differs from semantic evidence.")
+        return fields["name"]
+    return row.datasheet_name
+
 
 _IR_COVERAGE_LABELS = {
     SEMANTIC_BUCKET_ALL_CONSUMED: "All consumed",
@@ -344,7 +373,7 @@ def _group_markdown(
             "| "
             + " | ".join(
                 (
-                    f"{_markdown_text(row.datasheet_name)} (`{row.datasheet_id}`)",
+                    f"{_markdown_text(_current_datasheet_name(row))} (`{row.datasheet_id}`)",
                     _markdown_text(_source_basis(row)),
                     _IR_COVERAGE_LABELS[row.semantic_bucket],
                     _ability_descriptions_markdown(
@@ -400,7 +429,14 @@ def _source_basis(row: AeldariDatasheetSemanticCoverage) -> str:
             raise ValueError(
                 "Aeldari complete-PDF source review requires an exact authoritative page range."
             )
-        return f"PDF pages {reference.removeprefix(prefix)}; supersedes Wahapedia."
+        basis = f"PDF pages {reference.removeprefix(prefix)}; supersedes Wahapedia."
+        current_name = _current_datasheet_name(row)
+        if current_name != row.datasheet_name:
+            basis += (
+                f" Historical PDF title: {row.datasheet_name}; current App title: {current_name} "
+                "(v963 snapshot, reviewed 30 October)."
+            )
+        return basis
     if row.treatment == "rules_update":
         if reference is None:
             raise ValueError("Aeldari Rules Update source review requires a PDF reference.")
@@ -425,7 +461,7 @@ def _catalog_blocker_description(
     if (
         support_row.faction_id != "aeldari"
         or support_row.datasheet_id != semantic_row.datasheet_id
-        or support_row.datasheet_name != semantic_row.datasheet_name
+        or support_row.datasheet_name != _current_datasheet_name(semantic_row)
     ):
         raise ValueError("Aeldari DatasheetSupportRow identity drifted from semantic evidence.")
     failures: list[str] = []

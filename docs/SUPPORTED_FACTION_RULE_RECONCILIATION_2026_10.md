@@ -107,15 +107,35 @@ added or interpreted as whole-game playability/current-source certification.
 
 Murdermind's SUPPORT metadata and Butcher Lord's LEADER metadata remain blocked
 gameplay entries. Grimnar's Mark has no current LEADER allowance or exact matching
-existing execution subrule; no display-name alias was inferred. Of 59 component
-datasheet labels, 58 have current MFM candidates. The remaining Vypers source
-`000000605` is still VYPERS (1–2 models) in current Aeldari v1.4 PDF pages 20–21,
-whereas current MFM uses singular `units-vyper`/`vyper`. The preferred
-[v963 mirror page](https://www.40k.app/963/factions/aeldari/units/vyper) confirms a
-singular Vyper title, but plural Vypers model row/composition, 1–2 models and
-75/140 points. The user-preferred title is therefore singular. Stable source-ID
-and catalog binding remain a separate focused follow-up; no runtime alias was
-added. Label matches do not verify profiles, weapons or semantics.
+existing execution subrule; no display-name alias was inferred. The Vyper follow-up now resolves the former catalog/MFM title discrepancy through
+one source-hashed `Datasheets` update at stable ID `000000605`. The preferred
+[v963 mirror](https://www.40k.app/963/factions/aeldari/units/vyper) supplies singular
+`Vyper`; the current v1.4 PDF pages 20–21 retains plural `VYPERS`. Exact matching
+model characteristics, all seven weapon lines, composition, wargear and
+Harassment Fire establish continuity with the existing sheet. The original row
+preimage hash binds the update; no plural-name alias is installed in the resolver.
+The 105x70 mm base is a mirror-only observation; PDF base dimensions were not
+verified. This comparison does not certify a complete geometry or profile audit.
+
+The plural model ID `000000605:vypers`, 1–2 composition, explicit keyword rows
+(including `VYPERS`), weapon IDs and RuleIR remain intact. The derived name keyword
+becomes `VYPER` with the current title. Ordinary component pricing previously
+raised `ArmyPointsError`; after the source correction, one/two models resolve to
+the current MFM `units-vyper` / `vyper` records and 75/140 points. Catalog JSON
+roundtrip and the shared attachment-overlay path are covered. These component
+requests do not certify a complete fieldable army.
+
+Current support reports show `Vyper` while retaining the historical semantic/PDF
+title `Vypers`; their identity guard validates the exact source preimage and title
+transition. Historical source packages and RuleIR labels retain their provenance.
+The bounded same-invariant scan now finds one current MFM label candidate for all
+59 existing component rows; that is not profile, identity or semantic certification
+for the other rows. See [binding evidence](../data/source_audits/supported_rules_2026_10/vyper-binding.json).
+The mirror update history lists v867 (19 June, addition at 75 points) and v931
+(26 August, Deadly Demise update). v963 is the selected faction snapshot, not a
+claimed Vyper change date; 30 October is the observation date. Latest-faction
+qualification remains an updates-index inference. No raw mirror payload hash is
+claimed.
 
 The prior five bounded PDF checks retain their original scope in
 `data/source_audits/mfm_2026_10/bounded-rule-checks.json`; their separate mirror
@@ -130,3 +150,56 @@ does not independently attest runtime effort or expose the requested speed contr
 No model performance advantage is asserted. Focused results are distinct from
 the mandatory exact-head aggregate, review and hosted CI gates. The 64% full-package
 branch-coverage floor, twelve-minute CI goal and 720-second shard cutoff are unchanged.
+
+The existing generic overlay application rebuilds touched-row text metadata: raw text/HTML no longer retains historical bold tags and converted tags is empty, while sanitized/normalized text, tokens and stable source-text IDs are preserved. Original snapshot/PDF bytes remain retained; the title operation does not change gameplay descriptors.
+
+
+The first authorized exact-base checker repair retained a fresh `tool-input-roles-v4`
+comparison from measured head `c58420d729320d01cc28418e74f402676c7474c1` against
+`bc9acd8419e7b97a2c1260c7e932d2cb9c3fc370`. The three original testcase samples were
+134.063, 137.133, 138.313 seconds on base and
+133.876, 135.626, 138.554 seconds on head
+(means 136.503/136.019 seconds).
+The unchanged relative-budget validator passed. This is a bounded source-workload
+comparison on the recorded local host, not full-game or hosted-CI certification.
+
+The campaign retained original command rejection controls, cleanup controls,
+six source scanner checks, the 24-case cheap family, six arm-local runtime import
+proofs, owned process supervision, per-command resource/terminal receipts,
+the attempt journal, and input/dependency checks before and after commands.
+All six generated contract trees matched their own arm's complete bound tree.
+The success marker follows final source/dependency checks and budget validation.
+The [original comparison](performance/evidence/vyper-source-c58420d7-comparison.json) and
+[producer receipts](performance/evidence/vyper-source-c58420d7-producer.json)
+retain the measured commit; later evidence-only commits require independent
+equality of every selected byte. Historical v1/v2/v3 evidence and all limits are
+unchanged. That measurement checkpoint contained 1,938 active quality cases and the same 260
+historical deferrals; PR600's whole-module scheduling remains intact.
+
+A separate normal checkout without local info/attributes overrides reproduced 35 historical test-metadata JSON paths reported dirty by Git, despite exact equality of their working bytes to the retained CRLF Git blobs. Exact per-path `-text` attributes preserve those current-head bytes and clean checkout status; no JSON content is rewritten and no baseline-only path is inferred. The five existing audit-file preservation entries remain unchanged. A second independent checkout verifies the committed repair and all selected/runtime input equality to measured c58420d7.
+
+The complete local covered behavioral run passed all 4,927 cases at `5d3385f17d77c721bd180ac6b7633cf1cdff8e8a` with 65.49% combined line-and-branch coverage across the full package against the active 64% floor. The twelve-shard duration profile is refreshed from that actual JUnit run and explicitly labeled local WSL timing. The [independent checkout proof](performance/evidence/vyper-source-checkout-proof.json) retains both the reproduced 35-path dirty-status failure and the clean successor result. At that metadata checkpoint the source comparison identified measured c58420d7; later quality exposed the compatibility issue described below.
+
+The subsequent complete quality run at `5c548482` did not pass: 1,931 cases passed, two failed and five had setup errors. Its original result is retained. Six category-migration outcomes were caused by the local shared-environment symlink; moving only that link outside the checkout restored all 34 active migration controls without changing their source or the existing deferrals. The remaining failure classified four authenticated historical-provenance references as active edition identities.
+
+The narrow guard repair keeps the existing v2 report byte pin and permits only authenticated provenance at exact document locations: the pinned Vyper overlay's base package version, the pinned behavioral test's single source-membership assertion, the pinned role specification's five dependency paths, and the closed 22-file historical snapshot inventories in the exact current comparison. All other fields and adjacent strings remain scanned for active retired-edition identities; duplicate members, path/hash changes and other documents fail or remain visible to the guard. Source packages, overlay bytes, runtime behavior and behavioral tests are unchanged. Thirty-five new positive/negative controls bring the active quality inventory to 1,973, with the same 260 historical deferrals and existing whole-module assignments.
+
+The [original c584 comparison](performance/evidence/vyper-source-c58420d7-comparison.json) retains its exact raw bytes and actual measured head. Changing the quality/control inputs requires a fresh six-sample comparison; the original samples do not qualify the new selected input set. The covered behavioral result retains its actual `5d3385f1` identity. A separate protected-input proof distinguishes unchanged runtime, behavioral tests, fixtures, dependencies and source/report tools from the four named quality/control changes; it does not claim equality of the complete new comparison inventory. Exact-final hosted covered behavior and every other required gate remain mandatory.
+
+The required replacement campaign passed at measured `c918319f02e1da5f221eb54a589e48fe55d5d194` against the same actual base. Its three serial original-testcase samples were 131.015, 129.749, 130.914 seconds on base and 130.512, 130.207, 130.467 seconds on head (means 130.559/130.395 seconds). All inherited preflights, six arm-local import proofs, twenty owned-command receipts, six complete generated trees, final source/dependency checks and unchanged relative budgets passed. The [historical c918 comparison](https://github.com/SobolGaming/Warhammer_40k_AI/blob/c2c3d6ab5e4adee42fc6514623aa244d3f51b5a0/docs/performance/current/vyper-source-bc9-v4.json) and [c918 producer receipts](performance/evidence/vyper-source-c918319f-producer.json) retain that actual measurement identity. Later metadata requires equality of every selected input and the runtime-input digest to c918319f.
+
+The retained covered run is still the actual 4,927-case run at 5d3385f1. Independent raw-hash/Git-blob comparison preserves 5,964 selected files, including all packaged runtime, all behavioral tests and fixtures, dependencies, and source/report tools. The only four changed selected controls are the edition guard, v4 classifier, v4 role specification and operation map. A bounded real execution of the sole conservative behavioral consumer observed ten migration predecessor paths, all outside the historical-category branch, and no reads/imports of those changed controls. This supports the reviewed production/behavior-input-equivalent carry; it does not claim the full comparison inventory or all possible dynamic calls are unchanged. Exact-final hosted covered behavior remains required, alongside all active quality, serial performance, static gates and both reviews.
+
+The first c918 attempt stopped when the execution environment restarted after one completed base sample. Its partial receipts remain preserved and unqualified. The successful replacement used a new directory, repeated every preflight and all six original samples from zero, and did not reuse the interrupted sample.
+
+The exact 47b0e3de quality run subsequently passed 1,969 active cases and failed four category-preservation controls. Their old edition-maintenance reader had not authenticated the new provenance guard as a successor. The repair preserves the raw d67b860d guard preimage separately, authenticates the current guard and a closed set of 22 additive AST nodes plus one routing statement, and requires the reconstructed whole-module AST to equal that predecessor. It then runs the original archive/hash, single-call and original-assertion AST checks unchanged. Recomputed live pins cannot hide an original assertion change or an unreviewed added control. Seven new preservation controls bring the active quality inventory to 1,980 with the same 260 historical deferrals.
+
+This repair changes a shared behavioral preservation helper. The earlier covered-input carry is no longer current acceptance evidence: a fresh complete covered run and full active quality validation are required before another measurement campaign. The successful c918 comparison, its interrupted precursor, and both failed complete quality runs remain historical records with their actual outcomes. No source package, runtime engine, behavioral testcase or historical evidence bytes are rewritten.
+
+The fresh complete covered run after the preservation-helper repair passed all 4,927 cases at `c2c3d6ab5e4adee42fc6514623aa244d3f51b5a0` in 860.272 seconds, with 65.49418006% combined line-and-branch coverage across the complete package. Its actual JUnit report refreshes the twelve-shard duration profile and is labeled local WSL timing. This supersedes the earlier bounded carry for current qualification. A metadata-only measurement successor must preserve all 5,969 selected raw hashes and Git blobs plus the runtime-input digest; fresh six-sample measurement and every exact-final gate remain required.
+
+The new campaign after the shared-helper repair passed at actual measured `3c85735f84231afdd4b4465df2eed755669be166` against the same exact base. The three original-testcase samples were 140.990, 139.930, 140.237 seconds on base and 140.886, 139.227, 139.945 seconds on head (means 140.386/140.019 seconds). All twenty owned commands, original preflights, six independent arm import proofs, six complete generated trees, final source/dependency checks and unchanged budget validation passed. The [current comparison](performance/current/vyper-source-bc9-v4.json) and [actual producer receipts](performance/evidence/vyper-source-3c85735f-producer.json) retain that measured identity. Every selected raw hash and Git blob, plus the runtime-input digest, remains equal to actual covered `c2c3d6ab5e4adee42fc6514623aa244d3f51b5a0` and the measured head; final metadata freeze independently checks both. Final serial performance, all 1,980 active quality cases with the unchanged 260 historical deferrals, static/contract/client gates, both exact-head reviews and hosted CI remain separate requirements.
+
+The prior c918 comparison remains byte-for-byte available at the immutable Git locator above, with SHA-256 `0c1e6d810fda9b1f6e8c9a09a4209f5b89ee8565be0e413450760cff387e3ac3`, an external raw copy, and its existing committed producer archive unchanged. It is historical evidence for its actual input set. The earlier interrupted samples and failed quality receipts remain unqualified history.
+
+The first ready CI run for PR601 at `389185a4` exposed an ordered-manifest error before quality test execution: lane 1 and lane 4 collected exactly their admitted 646 and 449 active cases, but 57 and 37 positions among newly added tests differed from pytest definition/parameter order. All four real lane collections confirm identical membership and preserve every pre-existing case in its original lane and relative order, including PR600's front-loaded ten-case module on lane 3. Only the new-node ordering in the two generated manifests is corrected. The 2,240 total cases, 1,980 active cases, 260 standing deferrals, module assignments, strict reporter equality and original supervision remain unchanged. Original failure artifacts and prior passing local results retain their actual head identities. The corrected successor requires all four original strict local lanes and reconciliation, followed by complete hosted CI and refreshed exact-head reviews. All selected source bytes remain equal to actual covered c2c3d6ab and measured 3c85735f.

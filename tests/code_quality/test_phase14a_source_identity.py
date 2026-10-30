@@ -5,6 +5,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -459,9 +460,146 @@ def _without_non_edition_references(text: str) -> str:
     return _without_hex_identities(text).replace(phase_reference, '""')
 
 
+VYPER_CURRENT_COMPARISON = "docs/performance/current/vyper-source-bc9-v4.json"
+VYPER_ARCHIVED_COMPARISON = "docs/performance/evidence/vyper-source-c58420d7-comparison.json"
+VYPER_ROLE_SPEC = "docs/performance/policy-v3/vyper-source-input-roles-v4.json"
+VYPER_OVERLAY = (
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+    "aeldari_vyper_title_2026_10.overlay-pack.json"
+)
+VYPER_BEHAVIORAL_TEST = "tests/rules/section25/test_mfm.py"
+VYPER_PROVENANCE_DOCUMENT_SHA256 = {
+    VYPER_ARCHIVED_COMPARISON: "36ae186f7dd74899ce437f90aceb5e7940d0797d23a1cc621a39e8e8183fac3b",
+    VYPER_ROLE_SPEC: "76d0e3bc6cd71c5205cabf30c990f16bf190632953d5fec2978ac660abb7c37f",
+    VYPER_OVERLAY: "ae4416a45ddddbcf9784123ee25c60113e71249eae699431b36655fbd9e663f3",
+    VYPER_BEHAVIORAL_TEST: "6d2758590363c16f2f72048780631028cf67cc59e297740ca96b5f5c93e5696a",
+}
+HISTORICAL_SNAPSHOT_PATHS = (
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Abilities.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_abilities.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_detachment_abilities.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_enhancements.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_keywords.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_leader.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_models.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_models_cost.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_options.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_stratagems.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_unit_composition.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_wargear.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Detachment_abilities.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Detachments.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Enhancements.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Factions.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Last_update.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Source.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Stratagems.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/source_package_manifest.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/raw/source_snapshot.json",
+)
+HISTORICAL_SNAPSHOT_INVENTORY_SHA256 = (
+    "b877588db3f751f764fb74e9b9d5a1e3c3ab2525480e2954d2598520492b3557"
+)
+HISTORICAL_VYPER_SOURCE_ID = (
+    "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets:000000605"
+)
+
+
+def _historical_snapshot_inputs() -> dict[str, str]:
+    """Authenticate the closed original source inventory before exempting its keys."""
+    observed = {
+        relative: hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
+        for relative in HISTORICAL_SNAPSHOT_PATHS
+    }
+    digest = hashlib.sha256(
+        json.dumps(observed, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    assert digest == HISTORICAL_SNAPSHOT_INVENTORY_SHA256, "Historical snapshot bytes drifted."
+    return observed
+
+
+def _unique_provenance_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        assert key not in result, "Duplicate provenance JSON member."
+        result[key] = value
+    return result
+
+
+def _v4_provenance_text(report: dict[str, Any], historical: dict[str, str]) -> str:
+    """Remove authenticated inventory keys only; every other value remains scanned."""
+    assert report["policy"] == "rules-engine-performance-v3"
+    assert report["family"] == "external_contract_source_reuse"
+    assert report["base_revision"] == "bc9acd8419e7b97a2c1260c7e932d2cb9c3fc370"
+    binding = report["input_binding"]
+    assert binding["schema"] == "tool-input-roles-v4"
+    assert binding["family"] == "external_contract_source_reuse"
+    assert binding["sides"]["base"]["revision"] == report["base_revision"]
+    for inventory in (
+        binding["common"],
+        binding["sides"]["base"]["inventory"],
+        binding["sides"]["head"]["inventory"],
+    ):
+        for relative, expected in historical.items():
+            assert inventory.get(relative) == expected, "Historical inventory path/hash drifted."
+            del inventory[relative]
+    return json.dumps(report)
+
+
+def _vyper_provenance_text(path: Path, raw: bytes) -> str:
+    relative = path.relative_to(ROOT).as_posix()
+    if relative != VYPER_CURRENT_COMPARISON:
+        assert hashlib.sha256(raw).hexdigest() == VYPER_PROVENANCE_DOCUMENT_SHA256[relative], (
+            "Vyper provenance document requires its exact reviewed bytes."
+        )
+    if relative == VYPER_BEHAVIORAL_TEST:
+        # The complete test is pinned. Only its one historical source-membership
+        # assertion literal is removed; all active source identities stay visible.
+        literal = json.dumps(HISTORICAL_VYPER_SOURCE_ID)
+        text = raw.decode("utf-8")
+        assert text.count(literal) == 1
+        return text.replace(literal, '""')
+    value = json.loads(raw, object_pairs_hook=_unique_provenance_object)
+    if relative in {VYPER_CURRENT_COMPARISON, VYPER_ARCHIVED_COMPARISON}:
+        return _v4_provenance_text(value, _historical_snapshot_inputs())
+    if relative == VYPER_ROLE_SPEC:
+        assert value["schema"] == "tool-input-roles-v4"
+        required = value["required_dependencies"]
+        historical = _historical_snapshot_inputs()
+        for name in (
+            "Abilities.json",
+            "Datasheets.json",
+            "Datasheets_abilities.json",
+            "Datasheets_keywords.json",
+            "Datasheets_leader.json",
+        ):
+            reference = "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/" + name
+            assert reference in historical
+            assert required.count(reference) == 1
+            required.remove(reference)
+    else:
+        assert relative == VYPER_OVERLAY
+        assert value["schema_version"] == "phase17-source-overlay-v1"
+        assert value["target_edition"] == "warhammer-40000-11th"
+        package = value["base_source_package_id"]
+        assert package == {
+            "namespace": "wahapedia",
+            "package_name": "source-mirror",
+            "version": "10th-edition-2026-06-14",
+        }
+        del package["version"]
+    return json.dumps(value)
+
+
 def _active_identity_text(path: Path) -> str:
     """Keep exact historical hash-map keys distinct from active edition identities."""
     raw = path.read_bytes()
+    if path in {
+        ROOT / VYPER_CURRENT_COMPARISON,
+        *(ROOT / relative for relative in VYPER_PROVENANCE_DOCUMENT_SHA256),
+    }:
+        return _vyper_provenance_text(path, raw)
     if path != ROOT / "docs/performance/current/source-token-reuse-v2.json":
         return raw.decode("utf-8")
     assert hashlib.sha256(raw).hexdigest() == (
@@ -546,3 +684,120 @@ def _static_string_value(node: ast.AST) -> str | None:
         if left is not None and right is not None:
             return left + right
     return None
+
+
+@pytest.mark.parametrize(
+    "relative",
+    [
+        VYPER_CURRENT_COMPARISON,
+        VYPER_ARCHIVED_COMPARISON,
+        VYPER_ROLE_SPEC,
+        VYPER_OVERLAY,
+        VYPER_BEHAVIORAL_TEST,
+    ],
+)
+def test_vyper_provenance_preserves_exact_historical_bytes_and_active_identity(
+    relative: str,
+) -> None:
+    path = ROOT / relative
+    raw = path.read_bytes()
+    text = _without_non_edition_references(_active_identity_text(path))
+    assert not any(token in text for token in _retired_identity_tokens())
+    assert path.read_bytes() == raw
+
+
+@pytest.mark.parametrize("relative", list(VYPER_PROVENANCE_DOCUMENT_SHA256))
+@pytest.mark.parametrize("mutation", ["byte_drift", "active_identity"])
+def test_vyper_pinned_provenance_rejects_any_document_drift(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, relative: str, mutation: str
+) -> None:
+    raw = (ROOT / relative).read_bytes()
+    raw += b"\n" if mutation == "byte_drift" else b"\nwarhammer_40000_10th\n"
+    path = tmp_path / relative
+    path.parent.mkdir(parents=True)
+    path.write_bytes(raw)
+    monkeypatch.setattr(f"{__name__}.ROOT", tmp_path)
+    with pytest.raises(AssertionError, match="exact reviewed bytes"):
+        _active_identity_text(path)
+
+
+@pytest.mark.parametrize("context", ["common", "base", "head"])
+@pytest.mark.parametrize("mutation", ["path", "digest", "missing"])
+def test_v4_historical_inventory_authenticates_every_allowed_context(
+    context: str, mutation: str
+) -> None:
+    report = json.loads((ROOT / VYPER_CURRENT_COMPARISON).read_bytes())
+    historical = _historical_snapshot_inputs()
+    binding = report["input_binding"]
+    inventory = binding["common"] if context == "common" else binding["sides"][context]["inventory"]
+    key = next(iter(historical))
+    if mutation == "digest":
+        inventory[key] = "f" * 64
+    else:
+        value = inventory.pop(key)
+        if mutation == "path":
+            inventory[key + ".extra"] = value
+    with pytest.raises(AssertionError, match="Historical inventory path/hash drifted"):
+        _v4_provenance_text(report, historical)
+
+
+@pytest.mark.parametrize(
+    "context", ["top", "binding", "side", "wrong_slot", "near_path", "adjacent"]
+)
+def test_v4_provenance_does_not_hide_active_or_unknown_contexts(context: str) -> None:
+    report = json.loads((ROOT / VYPER_CURRENT_COMPARISON).read_bytes())
+    historical = _historical_snapshot_inputs()
+    binding = report["input_binding"]
+    key = next(iter(historical))
+    token = "warhammer_40000_10th"
+    if context == "top":
+        report["active_edition"] = token
+    elif context == "binding":
+        binding["active_edition"] = token
+    elif context == "side":
+        binding["sides"]["head"]["active_edition"] = token
+    elif context == "wrong_slot":
+        report["active_source"] = key
+    elif context == "near_path":
+        binding["common"][key + ".extra"] = historical[key]
+    else:
+        report["description"] = key + " " + token
+    text = _without_non_edition_references(_v4_provenance_text(report, historical))
+    assert "10th" in text
+
+
+@pytest.mark.parametrize("member", ["policy", "family", "base_revision", "schema"])
+def test_v4_provenance_rejects_different_report_identity(member: str) -> None:
+    report = json.loads((ROOT / VYPER_CURRENT_COMPARISON).read_bytes())
+    if member == "schema":
+        report["input_binding"][member] = "arbitrary-schema"
+    else:
+        report[member] = "arbitrary-identity"
+    with pytest.raises(AssertionError):
+        _v4_provenance_text(report, _historical_snapshot_inputs())
+
+
+def test_v4_provenance_rejects_duplicate_json_members() -> None:
+    raw = '{"active_edition":"warhammer_40000_10th","active_edition":"warhammer_40000_11th"}'
+    with pytest.raises(AssertionError, match="Duplicate provenance JSON member"):
+        json.loads(raw, object_pairs_hook=_unique_provenance_object)
+
+
+def test_vyper_provenance_does_not_exempt_another_document(tmp_path: Path) -> None:
+    path = tmp_path / "other.json"
+    raw = (ROOT / VYPER_CURRENT_COMPARISON).read_bytes()
+    path.write_bytes(raw)
+    assert _active_identity_text(path) == raw.decode()
+    assert "10th" in _active_identity_text(path)
+
+
+def test_vyper_provenance_requires_immutable_snapshot_bytes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    for relative in HISTORICAL_SNAPSHOT_PATHS:
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"changed historical source")
+    monkeypatch.setattr(f"{__name__}.ROOT", tmp_path)
+    with pytest.raises(AssertionError, match="Historical snapshot bytes drifted"):
+        _historical_snapshot_inputs()

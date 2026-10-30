@@ -1274,7 +1274,7 @@
     "catalog_support": "descriptor_only",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/core/000008339/none",
     "datasheet_id": "000000605",
-    "datasheet_name": "Vypers",
+    "datasheet_name": "Vyper",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
       "descriptor:destruction-reaction:deadly-demise-source",
@@ -1294,7 +1294,7 @@
     "catalog_support": "generic_rule_ir",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/datasheet/000000605:harassment-fire/none",
     "datasheet_id": "000000605",
-    "datasheet_name": "Vypers",
+    "datasheet_name": "Vyper",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
       "catalog-ir:post-shoot-hit-target-effect"
@@ -1313,7 +1313,7 @@
     "catalog_support": "descriptor_only",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/faction/000009894/none",
     "datasheet_id": "000000605",
-    "datasheet_name": "Vypers",
+    "datasheet_name": "Vyper",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:aeldari:army_rule:fade_back",

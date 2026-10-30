@@ -148,12 +148,14 @@ def validate_spec(spec: dict[str, object]) -> None:
 def binding_enabled(family: str, specification: dict[str, object]) -> bool:
     from tools import performance_tool_inputs_v2 as fresh
     from tools import performance_tool_inputs_v3 as current
+    from tools import performance_tool_inputs_v4 as exact
 
     declaration = specification.get("input_binding")
     supported = (
         {"schema": SCHEMA, "role_specification": SPEC_PATH},
         {"schema": fresh.SCHEMA, "role_specification": fresh.SPEC_PATH},
         {"schema": current.SCHEMA, "role_specification": current.SPEC_PATH},
+        {"schema": exact.SCHEMA, "role_specification": exact.SPEC_PATH},
     )
     if family == FAMILY:
         if (
@@ -358,7 +360,12 @@ def comparison_inputs(
     if family != FAMILY:
         raise ValueError("Tool input roles are restricted to the declared family.")
     from tools import performance_tool_inputs_v2 as fresh
+    from tools import performance_tool_inputs_v4 as exact
 
+    if schema == exact.SCHEMA:
+        return exact.comparison_inputs(
+            root, base=base, head_input_digest=head_input_digest, measured_head=measured_head
+        )
     if schema not in {SCHEMA, fresh.SCHEMA}:
         raise ValueError("Unsupported tool input-binding schema.")
     spec = read_role_spec(root) if schema == SCHEMA else fresh.read_role_spec(root)

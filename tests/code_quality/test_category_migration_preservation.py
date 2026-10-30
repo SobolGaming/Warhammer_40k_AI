@@ -300,7 +300,11 @@ def test_utf8_maintenance_proves_only_the_encoding_edit_even_with_recomputed_liv
 
 @pytest.fixture
 def edition_root(tmp_path: Path) -> Path:
-    for name in (migration.EDITION_TEST, migration.EDITION_ARCHIVE):
+    for name in (
+        migration.EDITION_TEST,
+        migration.EDITION_ARCHIVE,
+        migration.EDITION_PREDECESSOR_ARCHIVE,
+    ):
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes((ROOT / name).read_bytes())
@@ -453,3 +457,65 @@ def test_ci60_historical_test_view_requires_current_bytes_and_original_native_pi
     monkeypatch.setitem(ci60.HISTORICAL_TEST_PINS, path, "0" * 64)
     with pytest.raises(ValueError, match="native preimage changed"):
         ci60.historical_test_preimage(ROOT, path, current)
+
+
+def test_vyper_edition_predecessor_is_exact_before_original_assertion_proof(
+    edition_root: Path,
+) -> None:
+    current = (edition_root / migration.EDITION_TEST).read_bytes()
+    prior = migration.edition_provenance_predecessor(edition_root, current)
+    assert hashlib.sha256(prior).hexdigest() == migration.EDITION_PREDECESSOR_SHA256
+    assert prior == (ROOT / migration.EDITION_PREDECESSOR_ARCHIVE).read_bytes()
+    assert prior != current
+    assert (
+        migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+        == (ROOT / migration.EDITION_ARCHIVE).read_bytes()
+    )
+    assert (edition_root / migration.EDITION_TEST).read_bytes() == current
+
+
+def test_vyper_edition_predecessor_archive_is_rechecked_after_success(
+    edition_root: Path,
+) -> None:
+    migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+    archive = edition_root / migration.EDITION_PREDECESSOR_ARCHIVE
+    archive.write_bytes(archive.read_bytes() + b"\n")
+    with pytest.raises(ValueError, match="predecessor archive changed"):
+        migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+
+
+@pytest.mark.parametrize(
+    "mutation", ["added_assertion", "removed_control", "duplicate_control", "route", "initializer"]
+)
+def test_vyper_edition_additions_remain_exact_with_recomputed_live_pin(
+    edition_root: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
+    path = edition_root / migration.EDITION_TEST
+    tree = ast.parse(path.read_bytes())
+    control = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "_historical_snapshot_inputs"
+    )
+    if mutation == "added_assertion":
+        assertion = next(node for node in ast.walk(control) if isinstance(node, ast.Assert))
+        assertion.test = ast.Constant(True)
+    elif mutation == "removed_control":
+        tree.body.remove(control)
+    elif mutation == "duplicate_control":
+        tree.body.append(control)
+    elif mutation == "route":
+        route = next(
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == "_active_identity_text"
+        )
+        assert isinstance(route.body[2], ast.If)
+        route.body[2].test = ast.Constant(True)
+    else:
+        tree.body.append(ast.parse("unreviewed_guard_initializer = True").body[0])
+    changed = (ast.unparse(tree) + "\n").encode()
+    path.write_bytes(changed)
+    monkeypatch.setattr(migration, "EDITION_AFTER_SHA256", hashlib.sha256(changed).hexdigest())
+    with pytest.raises(ValueError, match=r"edition provenance|Original edition"):
+        migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)

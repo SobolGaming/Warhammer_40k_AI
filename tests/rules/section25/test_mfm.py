@@ -8,16 +8,29 @@ from pathlib import Path
 
 import pytest
 from tools.build_mfm_update_review import build_current_review_payload
+from tools.generate_ability_support_matrix import (
+    _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
+)
 
 from tests.support.section25_fixtures import BODY, LEADER, SUPPORT, assignment, request, selection
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.engine.army_mustering import ArmyMusteringError, muster_army
+from warhammer40k_core.engine.army_mustering import (
+    ArmyMusteringError,
+    ArmyMusterRequest,
+    muster_army,
+)
 from warhammer40k_core.engine.army_points import (
+    ArmyPointsError,
     calculate_mfm_army_points,
     catalog_with_mfm_attachment_allowances,
     catalog_with_mfm_points,
 )
-from warhammer40k_core.engine.list_validation import AttachmentDeclaration
+from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
+    DetachmentSelection,
+    UnitMusterSelection,
+)
+from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.rules.mfm_source import (
     MfmDetachmentRecord,
     MfmFactionRecord,
@@ -465,3 +478,88 @@ def test_current_mfm_v3_rejects_missing_or_inconsistent_dispositions() -> None:
         "skorpekh-destroyers",
         "lokhust-destroyers",
     )
+
+
+@pytest.fixture(scope="session")
+def vyper_catalog(selected_army_source_index: Path | None) -> ArmyCatalog:
+    return _ability_support_catalog_package(
+        datasheet_ids=("000000605", "000004195"),
+        source_index_dir=selected_army_source_index,
+    ).army_catalog
+
+
+@pytest.mark.parametrize(("model_count", "points"), [(1, 75), (2, 140)])
+def test_current_vyper_source_title_reaches_mfm_points(
+    vyper_catalog: ArmyCatalog, model_count: int, points: int
+) -> None:
+    # The real stable source IDs survive a catalog JSON round trip. This is a
+    # component pricing request, not a claim that two vehicles form a legal army.
+    catalog = ArmyCatalog.from_payload(json.loads(json.dumps(vyper_catalog.to_payload())))
+    roster = ArmyMusterRequest(
+        army_id="vyper-pricing",
+        player_id="owner",
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection("AE", ("corsair-coterie",)),
+        force_disposition_id="take-and-hold",
+        unit_selections=(
+            UnitMusterSelection(
+                unit_selection_id="vyper",
+                datasheet_id="000000605",
+                model_profile_selections=(ModelProfileSelection("000000605:vypers", model_count),),
+            ),
+        ),
+    )
+    line = calculate_mfm_army_points(catalog=catalog, request=roster).unit_lines[0]
+    assert (line.datasheet_id, line.mfm_unit_record_id, line.mfm_unit_id) == (
+        "000000605",
+        "units-vyper",
+        "vyper",
+    )
+    assert (line.model_count, line.base_points, line.wargear_points, line.total_points) == (
+        model_count,
+        points,
+        0,
+        points,
+    )
+    assert all(source.startswith("gw-11e-mfm-2026-10:") for source in line.source_ids)
+    assert line.roster_unit_point_value().points == points
+    overlaid = catalog_with_mfm_attachment_allowances(catalog=catalog, faction_id="AE")
+    assert overlaid.datasheets == catalog.datasheets
+    assert calculate_mfm_army_points(catalog=overlaid, request=roster).unit_lines == (line,)
+
+    # The source correction does not install plural guessing in the shared resolver.
+    stale = replace(
+        catalog,
+        datasheets=tuple(
+            replace(sheet, name="Vypers") if sheet.datasheet_id == "000000605" else sheet
+            for sheet in catalog.datasheets
+        ),
+    )
+    with pytest.raises(ArmyPointsError, match="mapping did not resolve"):
+        calculate_mfm_army_points(catalog=stale, request=roster)
+
+
+def test_current_vyper_title_preserves_model_and_rule_identity(vyper_catalog: ArmyCatalog) -> None:
+    sheet = vyper_catalog.datasheet_by_id("000000605")
+    assert sheet.name == "Vyper"
+    assert sheet.model_profiles[0].model_profile_id == "000000605:vypers"
+    assert sheet.model_profiles[0].name == "Vypers"
+    assert [
+        (part.model_profile_id, part.min_models, part.max_models) for part in sheet.composition
+    ] == [("000000605:vypers", 1, 2)]
+    assert sheet.keywords.keywords == ("AELDARI", "FLY", "VEHICLE", "VYPERS")
+    assert (
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets:000000605"
+        in sheet.source_ids
+    )
+    harassment = next(
+        ability for ability in sheet.abilities if ability.ability_id == "000000605:harassment-fire"
+    )
+    assert harassment.rule_ir_payload is not None
+    assert (
+        harassment.rule_ir_payload["source_id"]
+        == "gw-11e-aeldari-yriel-vypers-starfangs-datasheets-2026-06-09:datasheet:000000605:3"
+    )
+    assert vyper_catalog.datasheet_by_id("000004195").name == "Starfangs"
