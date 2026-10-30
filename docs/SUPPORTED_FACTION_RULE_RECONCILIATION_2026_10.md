@@ -111,9 +111,11 @@ existing execution subrule; no display-name alias was inferred. The Vyper follow
 one source-hashed `Datasheets` update at stable ID `000000605`. The preferred
 [v963 mirror](https://www.40k.app/963/factions/aeldari/units/vyper) supplies singular
 `Vyper`; the current v1.4 PDF pages 20–21 retains plural `VYPERS`. Exact matching
-model characteristics, base, all seven weapon lines, composition, wargear and
+model characteristics, all seven weapon lines, composition, wargear and
 Harassment Fire establish continuity with the existing sheet. The original row
 preimage hash binds the update; no plural-name alias is installed in the resolver.
+The 105x70 mm base is a mirror-only observation; PDF base dimensions were not
+verified. This comparison does not certify a complete geometry or profile audit.
 
 The plural model ID `000000605:vypers`, 1–2 composition, explicit keyword rows
 (including `VYPERS`), weapon IDs and RuleIR remain intact. The derived name keyword

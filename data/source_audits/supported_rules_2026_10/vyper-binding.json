@@ -188,14 +188,14 @@
     },
     "matched_evidence": [
       "M14 T6 Sv3+ W6 Ld7+ OC2",
-      "105x70mm oval base",
       "1-2 Vypers composition",
       "all seven weapon profile lines",
       "default bright lance, shuriken cannon, wraithbone hull",
       "wargear replacement options",
       "Harassment Fire complete clause"
     ],
-    "binding_method": "Exact stable original row, source-row preimage hash, complete corroborating datasheet fingerprint and preferred mirror title. No pluralization alias or external provider ID replaces the catalog ID."
+    "base_evidence": "105x70mm oval base observed on the mirror only; no PDF base-dimension corroboration or complete geometry/profile audit is claimed.",
+    "binding_method": "Exact stable original row, source-row preimage hash, corroborating selected datasheet fields and preferred mirror title. No pluralization alias or external provider ID replaces the catalog ID."
   },
   "normal_entry_path": {
     "path": "calculate_mfm_army_points -> _priced_unit_records -> _mfm_unit_for_datasheet",
