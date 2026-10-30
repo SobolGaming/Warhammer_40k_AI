@@ -44,6 +44,136 @@
         }
       }
     },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "db71caf457eeff044f15968646f25ea6a40fb625d329d126bcea880c8bc630a7",
+      "after_sha256": "dce47c64f994c8e01a6301272acdd0936da242ebb9eaf892a79c5d72e36fb912",
+      "owners": {
+        "@document": {
+          "before": "db71caf457eeff044f15968646f25ea6a40fb625d329d126bcea880c8bc630a7",
+          "after": "dce47c64f994c8e01a6301272acdd0936da242ebb9eaf892a79c5d72e36fb912"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "a6f271bc0fcef884ffe62199a64c682f3c4acfb19d9530379c9295741cc99e27",
+      "after_sha256": "d0cb0521d47e11fe9ecb42b8d612de149ac151ade5d051b81241c2d59bfd110d",
+      "owners": {
+        "@document": {
+          "before": "a6f271bc0fcef884ffe62199a64c682f3c4acfb19d9530379c9295741cc99e27",
+          "after": "d0cb0521d47e11fe9ecb42b8d612de149ac151ade5d051b81241c2d59bfd110d"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "ce83c142d4ffea74d68b9c3a3fb7455a56ccac3d9eb4f5b0e7735ff6d0e74bee",
+      "after_sha256": "731867cdf633527094c235a0518a8b69e019672d6d09965faf22a61ad0141b4a",
+      "owners": {
+        "@document": {
+          "before": "ce83c142d4ffea74d68b9c3a3fb7455a56ccac3d9eb4f5b0e7735ff6d0e74bee",
+          "after": "731867cdf633527094c235a0518a8b69e019672d6d09965faf22a61ad0141b4a"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "fa421d9cf52ae432225fe525b5bd5a380b9a7ed8b591b5f98c98e0db825425bb",
+      "after_sha256": "b877ea3e5bf42fac83c8f161c4d53f23eb3582bcffaad6b748c0f08663b70fec",
+      "owners": {
+        "@document": {
+          "before": "fa421d9cf52ae432225fe525b5bd5a380b9a7ed8b591b5f98c98e0db825425bb",
+          "after": "b877ea3e5bf42fac83c8f161c4d53f23eb3582bcffaad6b748c0f08663b70fec"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "b435f8649768e46f8e6ca193775747b1b2e924940e45c649d0ee7dc0d1d652e4",
+      "after_sha256": "1031f9fcecdd4c94d4ed027d4330dd10727a247ae94ccd2ccd843adab0396778",
+      "owners": {
+        "@document": {
+          "before": "b435f8649768e46f8e6ca193775747b1b2e924940e45c649d0ee7dc0d1d652e4",
+          "after": "1031f9fcecdd4c94d4ed027d4330dd10727a247ae94ccd2ccd843adab0396778"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "d3b215afc3c8e510887343b273783e2ac0f360fdb5a4a8436293ecb618c3aa4b",
+      "after_sha256": "dcd93d09020778b85ccc24a64663728a3c77eee8d62382db8619b36afa8616cc",
+      "owners": {
+        "@document": {
+          "before": "d3b215afc3c8e510887343b273783e2ac0f360fdb5a4a8436293ecb618c3aa4b",
+          "after": "dcd93d09020778b85ccc24a64663728a3c77eee8d62382db8619b36afa8616cc"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "f5a3f70f6f652d9ed16cc09ecb68d9c5d534d5e307ddcf88b43c878e4b756115",
+      "after_sha256": "26f6896d335c57c4733d7deba4530d20ffe97aeb41984d77a34f5c0b923bd774",
+      "owners": {
+        "@document": {
+          "before": "f5a3f70f6f652d9ed16cc09ecb68d9c5d534d5e307ddcf88b43c878e4b756115",
+          "after": "26f6896d335c57c4733d7deba4530d20ffe97aeb41984d77a34f5c0b923bd774"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "e8e1dd28cb72d4354afd1be240c65cf3e8e09616f827ad1a62f55c0a0433d128",
+      "after_sha256": "aa35c206949ddb9de041080f3e361484278313fe268d32127088f316eda71ef4",
+      "owners": {
+        "@document": {
+          "before": "e8e1dd28cb72d4354afd1be240c65cf3e8e09616f827ad1a62f55c0a0433d128",
+          "after": "aa35c206949ddb9de041080f3e361484278313fe268d32127088f316eda71ef4"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "b128091daa9cfdcc3267b1026a22289367d1acfd2b6add3a88fb3e1f905e2926",
+      "after_sha256": "34bfd62e1576755876bfb5d0091c09194e87d73442545526248643ba79faa627",
+      "owners": {
+        "@document": {
+          "before": "b128091daa9cfdcc3267b1026a22289367d1acfd2b6add3a88fb3e1f905e2926",
+          "after": "34bfd62e1576755876bfb5d0091c09194e87d73442545526248643ba79faa627"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "d9e9c827902625cae964da0e91ed53e402605bbfa50203d8e5d8097a4405152b",
+      "after_sha256": "5ea45098e19b9398665d12f62f5b4edd48838c06a2535f0ed8d4a1058c01b42a",
+      "owners": {
+        "@document": {
+          "before": "d9e9c827902625cae964da0e91ed53e402605bbfa50203d8e5d8097a4405152b",
+          "after": "5ea45098e19b9398665d12f62f5b4edd48838c06a2535f0ed8d4a1058c01b42a"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "9175ecdbce1e90535b77d9b9904f35d2c518a0758d36023f6cf088f26960345f",
+      "after_sha256": "c9ab2bce716215f25ff4f597600f69533080f4ce8554a7fb711645bd625ebd56",
+      "owners": {
+        "@document": {
+          "before": "9175ecdbce1e90535b77d9b9904f35d2c518a0758d36023f6cf088f26960345f",
+          "after": "c9ab2bce716215f25ff4f597600f69533080f4ce8554a7fb711645bd625ebd56"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "15007640cc6bd12c774872d798ed2abf3f285de4868dfeca1b905250d9c2d9b9",
+      "after_sha256": "eba5f507559cf37cfd715914dd1169540306ffdd72d0fa155429394dc3538a2c",
+      "owners": {
+        "@document": {
+          "before": "15007640cc6bd12c774872d798ed2abf3f285de4868dfeca1b905250d9c2d9b9",
+          "after": "eba5f507559cf37cfd715914dd1169540306ffdd72d0fa155429394dc3538a2c"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "9b44b05e5a9ecabdf6cf6594d0a53d1081b43297e5362d8685ae20b8ffa573a1",
+      "after_sha256": "09dbf196db5cc716b4aa80d7307de96a9cfb63b955d164ee23bf82487c150c94",
+      "owners": {
+        "@document": {
+          "before": "9b44b05e5a9ecabdf6cf6594d0a53d1081b43297e5362d8685ae20b8ffa573a1",
+          "after": "09dbf196db5cc716b4aa80d7307de96a9cfb63b955d164ee23bf82487c150c94"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "b4cec5ba021b2369a5a6f57b03382bc3cf496c0208df969ae534b7b78db1c0a2",
       "after_sha256": "24ec39e2980cf72ac1c53e60da898ba4edbd59781ed59cf759fa75e953def139",
@@ -186,11 +316,11 @@
     },
     "docs/SUPPORTED_FACTION_RULE_RECONCILIATION_2026_10.md": {
       "before_sha256": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-      "after_sha256": "5a8a1f824f0b8bad0f96243f81f10900e172361b3bde2aa6bc8a30373739bea7",
+      "after_sha256": "dde857912e664108e191512ca090759795618d2285fb48ebef5c205e5627b392",
       "owners": {
         "@document": {
           "before": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-          "after": "5a8a1f824f0b8bad0f96243f81f10900e172361b3bde2aa6bc8a30373739bea7"
+          "after": "dde857912e664108e191512ca090759795618d2285fb48ebef5c205e5627b392"
         }
       }
     },
@@ -221,6 +351,16 @@
         "@document": {
           "before": null,
           "after": "c0f669888b5eb4a08eb5b4d058980ce9001d53c5d149b69e56f091c626076c96"
+        }
+      }
+    },
+    "docs/performance/evidence/vyper-source-checkout-proof.json": {
+      "before_sha256": null,
+      "after_sha256": "bd76120565e4063c0d69e360b3acd1ca1024cfdb7b12a81b64f688c5ac26c9c5",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bd76120565e4063c0d69e360b3acd1ca1024cfdb7b12a81b64f688c5ac26c9c5"
         }
       }
     },
@@ -612,6 +752,136 @@
       "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
       "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
@@ -776,6 +1046,14 @@
       "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "docs/performance/evidence/vyper-source-c58420d7-producer.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "docs/performance/evidence/vyper-source-checkout-proof.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
