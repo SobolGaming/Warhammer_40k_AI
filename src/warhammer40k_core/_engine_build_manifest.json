@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e1ecfcb90c91cd5f790bcab4390a43d3e85f7d10e6d36643d534339526930cee",
-  "fingerprint": "e1ecfcb90c91cd5f790bcab4390a43d3e85f7d10e6d36643d534339526930cee",
-  "resource_count": 3162,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6eb801a8cc0f00e24f45d2ca24494fee279bada900cc28a19be549a2613a5bd5",
+  "fingerprint": "6eb801a8cc0f00e24f45d2ca24494fee279bada900cc28a19be549a2613a5bd5",
+  "resource_count": 3164,
   "resources": [
     {
       "byte_length": 113,
@@ -14133,6 +14133,16 @@
       "byte_length": 1185,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/adepta_sororitas_triumph_sources_2026_27.py",
       "sha256": "8c549929c0d825c962bfcdc80b84491717200a99970be67691909871d10f0558"
+    },
+    {
+      "byte_length": 1334,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_vyper_title_2026_10.overlay-pack.json",
+      "sha256": "ae4416a45ddddbcf9784123ee25c60113e71249eae699431b36655fbd9e663f3"
+    },
+    {
+      "byte_length": 1286,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_vyper_title_2026_10.py",
+      "sha256": "897f9d0c5f7db3aa5364f1e5206bb26bf9bb76f1ede721bd8887a04888ebb8fa"
     },
     {
       "byte_length": 5921,

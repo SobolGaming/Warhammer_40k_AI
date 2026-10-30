@@ -19,6 +19,9 @@ from warhammer40k_core.rules.source_overlay import (
     apply_source_release_overlays,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    aeldari_vyper_title_2026_10 as vyper_title_overlay,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_maulerfiend_datasheet_overlay_2026_07 as maulerfiend_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -126,7 +129,7 @@ def load_ability_support_sources(source_json_dir: Path) -> tuple[BridgeSourceArt
             ),
         )
     )
-    return apply_source_release_overlays(
+    aeldari_overlaid_artifacts = apply_source_release_overlays(
         source_artifacts=maulerfiend_overlaid_artifacts,
         release_manifest=aeldari_release_manifest,
         overlay_packs=(
@@ -134,6 +137,11 @@ def load_ability_support_sources(source_json_dir: Path) -> tuple[BridgeSourceArt
             aeldari_tacoma_overlay_pack,
             aeldari_july_overlay_pack,
         ),
+    )
+    return apply_source_release_overlays(
+        source_artifacts=aeldari_overlaid_artifacts,
+        release_manifest=vyper_title_overlay.source_release_manifest(),
+        overlay_packs=(vyper_title_overlay.overlay_pack(),),
     )
 
 
@@ -163,6 +171,7 @@ def ability_support_index_inputs(source_json_dir: Path) -> tuple[Path, ...]:
                 coverage.TACOMA_OVERLAY_PACK_PATH,
                 coverage.JULY_OVERLAY_PACK_PATH,
                 coverage.RELEASE_MANIFEST_PATH,
+                Path(vyper_title_overlay.__file__).with_name(vyper_title_overlay.ARTIFACT_NAME),
             }
         )
     )

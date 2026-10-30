@@ -1,0 +1,220 @@
+{
+  "schema": "supported-vyper-source-binding-v1",
+  "base": "bc9acd8419e7b97a2c1260c7e932d2cb9c3fc370",
+  "scope": "One source title update at existing stable datasheet000000605. No rule, model, weapon, composition, source keyword, faction, detachment, layout or mission addition.",
+  "preferred_source_observation": {
+    "observed_utc": "2026-10-30T16:16:00Z",
+    "method": "ordinary background in-app browser rendered accessibility observations; no credentials, custom headers or bypass",
+    "raw_payload_hash_claimed": false,
+    "web_retrieval": "HTTP 403; browser readable",
+    "index": {
+      "url": "https://www.40k.app/factions/updates",
+      "latest_global_version": 995,
+      "latest_global_date": "2026-10-16",
+      "latest_global_scope": "Genestealer Cults one unit one change",
+      "latest_listed_aeldari_faction_version": 963,
+      "latest_listed_aeldari_faction_date": "2026-09-30",
+      "qualification": "absence of a later listed faction update is index-based inference"
+    },
+    "vyper": {
+      "url": "https://www.40k.app/963/factions/aeldari/units/vyper",
+      "page_snapshot_version": 963,
+      "title": "Vyper",
+      "model_row": "Vypers",
+      "composition": "1-2 Vypers",
+      "base": "105x70mm Oval Base",
+      "characteristics": {
+        "move": 14,
+        "toughness": 6,
+        "save": 3,
+        "wounds": 6,
+        "leadership": 7,
+        "objective_control": 2
+      },
+      "points": [
+        {
+          "models": 1,
+          "points": 75
+        },
+        {
+          "models": 2,
+          "points": 140
+        }
+      ],
+      "keywords": [
+        "AELDARI",
+        "FLY",
+        "VEHICLE",
+        "VYPERS"
+      ],
+      "default_weapons": [
+        "shuriken cannon",
+        "bright lance",
+        "wraithbone hull"
+      ],
+      "core_abilities": [
+        "Deadly Demise 1"
+      ],
+      "faction_abilities": [
+        "Battle Focus"
+      ],
+      "unit_abilities": [
+        "Harassment Fire"
+      ],
+      "weapon_observations": [
+        {
+          "name": "Bright lance",
+          "range": "36",
+          "attacks": "1",
+          "skill": "3+",
+          "strength": "12",
+          "ap": "-3",
+          "damage": "D6+2"
+        },
+        {
+          "name": "Missile launcher (starshot)",
+          "range": "48",
+          "attacks": "1",
+          "skill": "3+",
+          "strength": "10",
+          "ap": "-2",
+          "damage": "D6"
+        },
+        {
+          "name": "Missile launcher (sunburst)",
+          "range": "48",
+          "attacks": "D6",
+          "skill": "3+",
+          "strength": "4",
+          "ap": "-1",
+          "damage": "1",
+          "abilities": [
+            "BLAST"
+          ]
+        },
+        {
+          "name": "Scatter laser",
+          "range": "36",
+          "attacks": "6",
+          "skill": "3+",
+          "strength": "5",
+          "ap": "0",
+          "damage": "1",
+          "abilities": [
+            "SUSTAINED HITS 2"
+          ]
+        },
+        {
+          "name": "Shuriken cannon",
+          "range": "24",
+          "attacks": "3",
+          "skill": "3+",
+          "strength": "6",
+          "ap": "-1",
+          "damage": "2",
+          "abilities": [
+            "LETHAL HITS"
+          ]
+        },
+        {
+          "name": "Starcannon",
+          "range": "36",
+          "attacks": "2",
+          "skill": "2+",
+          "strength": "8",
+          "ap": "-3",
+          "damage": "2"
+        },
+        {
+          "name": "Wraithbone hull",
+          "range": "Melee",
+          "attacks": "3",
+          "skill": "4+",
+          "strength": "6",
+          "ap": "0",
+          "damage": "1"
+        }
+      ],
+      "updates_url": "https://www.40k.app/963/factions/aeldari/units/vyper/updates",
+      "displayed_updates": [
+        {
+          "version": 931,
+          "date": "2026-08-26",
+          "scope": "Deadly Demise 1 ability updated"
+        },
+        {
+          "version": 867,
+          "date": "2026-06-19",
+          "scope": "added to faction; points cost 75"
+        }
+      ],
+      "qualification": "The visible page does not expose the repository's stable numeric source ID; page version is not a claim of a Vyper-specific v963 change."
+    }
+  },
+  "continuity": {
+    "catalog_datasheet_id": "000000605",
+    "prior_title": "Vypers",
+    "current_title": "Vyper",
+    "model_profile_id": "000000605:vypers",
+    "model_name": "Vypers",
+    "composition": [
+      1,
+      2
+    ],
+    "explicit_keywords": [
+      "AELDARI",
+      "FLY",
+      "VEHICLE",
+      "VYPERS"
+    ],
+    "derived_name_keyword": "VYPER (follows the corrected title; explicit VYPERS remains)",
+    "source_row_sha256": "058dcfcc7221f364643673a29137c06474bc8c495179c0b6b89f15ee96bfa0ca",
+    "source_snapshot": "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets.json",
+    "mfm_record_id": "units-vyper",
+    "mfm_unit_id": "vyper",
+    "mfm_package": "gw-11e-mfm-2026-10",
+    "mfm_points": {
+      "1": 75,
+      "2": 140
+    },
+    "corroborating_pdf": {
+      "url": "https://assets.warhammer-community.com/eng_14-10_wh40k_-faction_pack_aeldari-seqmcs1mu0-g8gzewikcm.pdf",
+      "sha256": "ca54d5039e6466c239e56a334e02fb14da4e7ce8113ba5a3335ddfad5a1c6ca2",
+      "pages": [
+        20,
+        21
+      ],
+      "title": "VYPERS"
+    },
+    "matched_evidence": [
+      "M14 T6 Sv3+ W6 Ld7+ OC2",
+      "105x70mm oval base",
+      "1-2 Vypers composition",
+      "all seven weapon profile lines",
+      "default bright lance, shuriken cannon, wraithbone hull",
+      "wargear replacement options",
+      "Harassment Fire complete clause"
+    ],
+    "binding_method": "Exact stable original row, source-row preimage hash, complete corroborating datasheet fingerprint and preferred mirror title. No pluralization alias or external provider ID replaces the catalog ID."
+  },
+  "normal_entry_path": {
+    "path": "calculate_mfm_army_points -> _priced_unit_records -> _mfm_unit_for_datasheet",
+    "before": "Both real1-model and2-model component requests raise ArmyPointsError; title Vypers does not match current MFM vyper.",
+    "after": "The shared source overlay updates only name and shared resolver prices75/140 through exact singular source title. The same correction reaches the attachment-overlay path.",
+    "reachability": "Normal generated selected catalog and valid component selections, including catalog JSON roundtrip; this is component pricing, not full roster fieldability certification."
+  },
+  "same_invariant_scan": {
+    "component_labels": 59,
+    "unique_current_mfm_label_candidates": 59,
+    "unresolved": [],
+    "limitation": "Exact label candidate scan only, not identity/profile/rule currency certification for other datasheets."
+  },
+  "remaining_gaps": [
+    "Murdermind SUPPORT gameplay blocked",
+    "Butcher Lord LEADER gameplay blocked",
+    "Grimnar's Mark lacks exact current LEADER allowance/execution-subrule match",
+    "Wider faction books, characteristics, weapons and unreviewed profiles",
+    "Non-executable World Eaters detachments"
+  ],
+  "prior_source_claims": "PR599 MFM and PR600 historical mirror/PDF records retain their original scope and bytes. No broad source currency or whole-game claim."
+}

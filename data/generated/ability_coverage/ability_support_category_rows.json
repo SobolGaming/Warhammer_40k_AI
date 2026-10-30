@@ -190,7 +190,7 @@
         "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/faction/000009894/none",
         "datasheet_id": "000000605",
-        "datasheet_name": "Vypers",
+        "datasheet_name": "Vyper",
         "source_kind": "faction"
       },
       {
@@ -277,7 +277,7 @@
       "Starfangs",
       "Striking Scorpions",
       "Swooping Hawks",
-      "Vypers",
+      "Vyper",
       "War Walkers",
       "Warp Spiders",
       "Wave Serpent"
@@ -763,7 +763,7 @@
         "ability_name": "Deadly Demise",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/core/000008339/none",
         "datasheet_id": "000000605",
-        "datasheet_name": "Vypers",
+        "datasheet_name": "Vyper",
         "source_kind": "core"
       },
       {
@@ -826,7 +826,7 @@
       "Night Spinner",
       "Soul Grinder",
       "Starfangs",
-      "Vypers",
+      "Vyper",
       "Wave Serpent",
       "Wraithlord"
     ],
@@ -1644,7 +1644,7 @@
         "ability_name": "Harassment Fire",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/datasheet/000000605:harassment-fire/none",
         "datasheet_id": "000000605",
-        "datasheet_name": "Vypers",
+        "datasheet_name": "Vyper",
         "source_kind": "datasheet"
       }
     ],
@@ -1658,7 +1658,7 @@
       "chaos-daemons-bridge-catalog/000000605/datasheet/000000605:harassment-fire/none"
     ],
     "datasheet_names": [
-      "Vypers"
+      "Vyper"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:post-shoot-hit-target-effect"

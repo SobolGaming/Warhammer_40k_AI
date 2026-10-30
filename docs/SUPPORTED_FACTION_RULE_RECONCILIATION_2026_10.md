@@ -107,15 +107,33 @@ added or interpreted as whole-game playability/current-source certification.
 
 Murdermind's SUPPORT metadata and Butcher Lord's LEADER metadata remain blocked
 gameplay entries. Grimnar's Mark has no current LEADER allowance or exact matching
-existing execution subrule; no display-name alias was inferred. Of 59 component
-datasheet labels, 58 have current MFM candidates. The remaining Vypers source
-`000000605` is still VYPERS (1–2 models) in current Aeldari v1.4 PDF pages 20–21,
-whereas current MFM uses singular `units-vyper`/`vyper`. The preferred
-[v963 mirror page](https://www.40k.app/963/factions/aeldari/units/vyper) confirms a
-singular Vyper title, but plural Vypers model row/composition, 1–2 models and
-75/140 points. The user-preferred title is therefore singular. Stable source-ID
-and catalog binding remain a separate focused follow-up; no runtime alias was
-added. Label matches do not verify profiles, weapons or semantics.
+existing execution subrule; no display-name alias was inferred. The Vyper follow-up now resolves the former catalog/MFM title discrepancy through
+one source-hashed `Datasheets` update at stable ID `000000605`. The preferred
+[v963 mirror](https://www.40k.app/963/factions/aeldari/units/vyper) supplies singular
+`Vyper`; the current v1.4 PDF pages 20–21 retains plural `VYPERS`. Exact matching
+model characteristics, base, all seven weapon lines, composition, wargear and
+Harassment Fire establish continuity with the existing sheet. The original row
+preimage hash binds the update; no plural-name alias is installed in the resolver.
+
+The plural model ID `000000605:vypers`, 1–2 composition, explicit keyword rows
+(including `VYPERS`), weapon IDs and RuleIR remain intact. The derived name keyword
+becomes `VYPER` with the current title. Ordinary component pricing previously
+raised `ArmyPointsError`; after the source correction, one/two models resolve to
+the current MFM `units-vyper` / `vyper` records and 75/140 points. Catalog JSON
+roundtrip and the shared attachment-overlay path are covered. These component
+requests do not certify a complete fieldable army.
+
+Current support reports show `Vyper` while retaining the historical semantic/PDF
+title `Vypers`; their identity guard validates the exact source preimage and title
+transition. Historical source packages and RuleIR labels retain their provenance.
+The bounded same-invariant scan now finds one current MFM label candidate for all
+59 existing component rows; that is not profile, identity or semantic certification
+for the other rows. See [binding evidence](../data/source_audits/supported_rules_2026_10/vyper-binding.json).
+The mirror update history lists v867 (19 June, addition at 75 points) and v931
+(26 August, Deadly Demise update). v963 is the selected faction snapshot, not a
+claimed Vyper change date; 30 October is the observation date. Latest-faction
+qualification remains an updates-index inference. No raw mirror payload hash is
+claimed.
 
 The prior five bounded PDF checks retain their original scope in
 `data/source_audits/mfm_2026_10/bounded-rule-checks.json`; their separate mirror

@@ -5,6 +5,7 @@ import hashlib
 import json
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -13,10 +14,20 @@ from tools.faction_rule_ir_bundle import (
     datasheet_faction_ids_from_source_snapshot,
     generate_registered_rule_ir_shard,
 )
+from tools.generate_vyper_source_overlay import generated_overlay_pack
 
+from warhammer40k_core.rules.source_overlay import (
+    SourceOverlayError,
+    apply_source_release_overlays,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    aeldari_vyper_title_2026_10,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_pack_rule_ir as runtime_rule_ir_registry,
 )
+from warhammer40k_core.rules.source_patch import source_row_hash
+from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow, WahapediaJsonArtifact
 
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "tools"
@@ -1118,3 +1129,47 @@ def _has_json_path_argument(node: ast.Call) -> bool:
         ):
             return True
     return False
+
+
+def test_vyper_title_overlay_is_generated_and_binds_one_unchanged_source_row() -> None:
+    overlay = aeldari_vyper_title_2026_10.overlay_pack()
+    assert overlay.to_payload() == generated_overlay_pack().to_payload()
+    assert len(overlay.operations) == 1
+    operation = overlay.operations[0]
+    assert operation.source_table == "Datasheets"
+    assert operation.source_row_id == "000000605"
+    assert operation.fields == (("name", "Vyper"),)
+    assert operation.source_reference == "https://www.40k.app/963/factions/aeldari/units/vyper"
+    raw = json.loads(DATASHEETS_SOURCE_SNAPSHOT.read_text())
+    row = next(row for row in raw["rows"] if row["source_row_id"] == "000000605")
+    assert row["fields"]["name"] == "Vypers"
+    assert (
+        source_row_hash(NormalizedSourceRow.from_payload(row)) == operation.expected_preimage_hash
+    )
+
+    source = WahapediaJsonArtifact(
+        source_package_id=overlay.base_source_package_id,
+        source_table="Datasheets",
+        source_checksum_sha256=raw["source_checksum_sha256"],
+        rows=(NormalizedSourceRow.from_payload(row),),
+    )
+    stale = replace(overlay, operations=(replace(operation, expected_preimage_hash="0" * 64),))
+    with pytest.raises(SourceOverlayError, match="target_drift"):
+        apply_source_release_overlays(
+            source_artifacts=(source,),
+            release_manifest=aeldari_vyper_title_2026_10.source_release_manifest(),
+            overlay_packs=(stale,),
+        )
+    assert source.rows[0].to_payload() == row
+
+
+@pytest.mark.parametrize("mutation", ["malformed", "missing", "hash"])
+def test_vyper_title_overlay_rejects_invalid_artifact(mutation: str) -> None:
+    payload = generated_overlay_pack().to_payload()
+    if mutation == "missing":
+        del payload["operations"]  # type: ignore[misc]
+    elif mutation == "hash":
+        payload["package_hash"] = "0" * 64
+    raw = b"{" if mutation == "malformed" else json.dumps(payload).encode()
+    with pytest.raises(SourceOverlayError):
+        aeldari_vyper_title_2026_10.overlay_pack_from_json_bytes(raw)
