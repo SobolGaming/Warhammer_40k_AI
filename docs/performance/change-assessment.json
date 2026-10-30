@@ -1208,6 +1208,16 @@
         }
       }
     },
+    "tests/code_quality/test_performance_category_migration.py": {
+      "before_sha256": "47969f28c27c90a14532f19f41a71f80dc4f27e23d3b1b731e8108db491d7711",
+      "after_sha256": "e564a874bd27034e7a89f95d9d63886b6d92c8727508f1b2c8afe0278d77c04e",
+      "owners": {
+        "test_direct_v2_api_still_rejects_migrated_current_source": {
+          "before": "e433953771be5aca401ccf465906affbdb9d1246360a0c21ceabc55f8e858b10",
+          "after": "03e1be182ad1f1f4363ff3b90db8ab808bfd48fd0b6dd97d449b974c237dd65f"
+        }
+      }
+    },
     "tests/code_quality/test_ws12_generated_data_artifacts.py": {
       "before_sha256": "94e54106006b9c3ea8f71065bb8ff61879157d1efc0069551b96d235f3b9a226",
       "after_sha256": "8c16fd4ff13d3fe52697b30eb1d32d8814560619a3cd61262b019c97bf994c18",
@@ -1215,6 +1225,16 @@
         "@module": {
           "before": "9b567c5f2512af4a3a55d60a669c9801654c6a2c797967c44f55fd4a4bbeeeb5",
           "after": "c6f24febbfcb7c0b69221c2b8efb858030e7909ad9b836a4b8b19ca4f4d56d89"
+        }
+      }
+    },
+    "tests/code_quality/tool_input_history.py": {
+      "before_sha256": "5c2cd034511c68272971567ddf8681de0b7ee036a2de80548527ba6ec32909f5",
+      "after_sha256": "fcbc642de896d55c5232825eba9bf96003913a07b9cb344c9bcc4b18e69f5d1f",
+      "owners": {
+        "archival_fixture": {
+          "before": "e4ac9f44228eb5a9c6a289e3b6b7745f89224a38f95f07e61a895fccaeca0fc5",
+          "after": "2dbde6ead0f1e0c2434162d03260f37d817725b4b069c14df243612bbc54925f"
         }
       }
     },
@@ -2264,11 +2284,29 @@
       "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
       "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
+    "tests/code_quality/test_performance_category_migration.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci68-quality-b9967ff3a58e5b467283dcf99e88f929db96605c02d44dbe23905f77ed577d4f"
+      ],
+      "selected_families": [],
+      "rationale": "Repairs the existing active quality fixtures for this authorized isolated Git worktree: resolve the real read-only Git directory and keep mutable historical HEAD/index in a private shared-object clone. Every original guard and deferred-case identity remains intact.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
     "tests/code_quality/test_ws12_generated_data_artifacts.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
       "rationale": "Documents and maps the bounded official MFM reconciliation; preserves every existing behavioral, quality, performance, coverage and protection requirement.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "tests/code_quality/tool_input_history.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Repairs the existing active quality fixtures for this authorized isolated Git worktree: resolve the real read-only Git directory and keep mutable historical HEAD/index in a private shared-object clone. Every original guard and deferred-case identity remains intact.",
       "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
       "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },

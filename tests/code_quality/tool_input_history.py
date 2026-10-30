@@ -76,5 +76,10 @@ def archival_fixture(root: Path, destination: Path) -> tuple[dict[str, str], dic
         target = destination / name
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(raw)
-    (destination / ".git").write_text(f"gitdir: {(root / '.git').as_posix()}\n")
+    git_dir = (
+        subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=root)
+        .decode()
+        .strip()
+    )
+    (destination / ".git").write_text("gitdir: " + git_dir + "\n", encoding="utf-8")
     return inputs, json.loads(documents[REPORT_ARCHIVE])
