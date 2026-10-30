@@ -3,11 +3,11 @@
     "completed": true,
     "concurrency": 1,
     "coverage": false,
-    "fixture_sha256": "e97be5f74ebae42708e51415f8e34a8f0df93a54d504524a1221fe60ec681a02",
+    "fixture_sha256": "4de4db1c49fcb90f5f97081df76ea4dff461321872ced989b91f01c301d1eeb8",
     "host": {
       "cpu": "x86_64",
       "logical_cpus": 64,
-      "memory_bytes": 67359412224,
+      "memory_bytes": 67359379456,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
       "role": "provisional"
@@ -16,9 +16,9 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e1ecfcb90c91cd5f790bcab4390a43d3e85f7d10e6d36643d534339526930cee",
     "samples": {
       "orphan-write-independent-check": [
-        134.063,
-        137.133,
-        138.313
+        131.015,
+        129.749,
+        130.914
       ]
     },
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be"
@@ -1488,11 +1488,11 @@
     "completed": true,
     "concurrency": 1,
     "coverage": false,
-    "fixture_sha256": "e97be5f74ebae42708e51415f8e34a8f0df93a54d504524a1221fe60ec681a02",
+    "fixture_sha256": "4de4db1c49fcb90f5f97081df76ea4dff461321872ced989b91f01c301d1eeb8",
     "host": {
       "cpu": "x86_64",
       "logical_cpus": 64,
-      "memory_bytes": 67359412224,
+      "memory_bytes": 67359379456,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
       "role": "provisional"
@@ -1501,14 +1501,14 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6eb801a8cc0f00e24f45d2ca24494fee279bada900cc28a19be549a2613a5bd5",
     "samples": {
       "orphan-write-independent-check": [
-        133.876,
-        135.626,
-        138.554
+        130.512,
+        130.207,
+        130.467
       ]
     },
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be"
   },
-  "head_input_digest": "a7dd742e87e7905893cb1ec3b607caefc68f09202f41447634a5abf170c86a5a",
+  "head_input_digest": "acf5841c7cc93544bc53c7cfc6da416f9bced75504693370d393f3a9d01df738",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6eb801a8cc0f00e24f45d2ca24494fee279bada900cc28a19be549a2613a5bd5",
   "historical_failures": [],
   "input_binding": {
@@ -6065,7 +6065,6 @@
       "tests/code_quality/test_performance_reconstruction_campaign.py": "9e4ed11e92f06cfdea7b9967e9f018a2965d265a20ddbb3d2794259b6cd4cd2a",
       "tests/code_quality/test_performance_static_successor.py": "d692fa9c0e99d4e17fb36257b82ff115caadc0be97ac4e3f7e201597ee3ae559",
       "tests/code_quality/test_performance_tool_inputs.py": "3847fc6a3db10414abde698c504d1b5a9b186f295fec3e3ff7b2fc0cb8baacf6",
-      "tests/code_quality/test_phase14a_source_identity.py": "d67b860dbe557bd557536537d43c466176e2e6d14e1e48d6b8c08c1cb4d34eaf",
       "tests/code_quality/test_phase14c_shared_primitives.py": "d07731c69d93bdbb900cdd42517b1f29037a525e0e79a3bb705164b2a9ee4629",
       "tests/code_quality/test_phase14h_attack_resolution_convergence.py": "6950af8fefe2a62e96e5fa1b4d3f759e2a26b2178f64dbac7de70bc305342b7f",
       "tests/code_quality/test_phase14i_14h_closeout.py": "a721cf1a94365b034a3e1cabbe1bd6292a12402b05cbf73bab24cd37f39c77e6",
@@ -7451,7 +7450,7 @@
       "tools/wahapedia_fetch.py": "9c605d9c3af086dc92e0663a4783dfdb426ac3268701a007fbe6f23fa503f7d3",
       "uv.lock": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75"
     },
-    "common_sha256": "e97be5f74ebae42708e51415f8e34a8f0df93a54d504524a1221fe60ec681a02",
+    "common_sha256": "4de4db1c49fcb90f5f97081df76ea4dff461321872ced989b91f01c301d1eeb8",
     "family": "external_contract_source_reuse",
     "harness": {
       "base": {
@@ -7474,8 +7473,8 @@
       },
       "sha256": "668e1d9ffc5104327d60bf4339f6400737559b0b23c7719b813e42481b53990a"
     },
-    "head_input_digest": "a7dd742e87e7905893cb1ec3b607caefc68f09202f41447634a5abf170c86a5a",
-    "role_spec_sha256": "46baaf7210ba7421f7164766858effefc75ad3a863c21cc2a65999648ee7095f",
+    "head_input_digest": "acf5841c7cc93544bc53c7cfc6da416f9bced75504693370d393f3a9d01df738",
+    "role_spec_sha256": "6692225f25457799c65ee3a71b479c13e4a967fe768918815a0d59bf9aa19810",
     "schema": "tool-input-roles-v4",
     "sides": {
       "base": {
@@ -7489,6 +7488,7 @@
           "tests/code_quality/test_current_comparison_routing.py": "31451a8c17a8dffc81029a1693fd966938ba726b883e20dd8d3ae9adaf3b78b2",
           "tests/code_quality/test_generated_ability_support_artifacts.py": "d74b2edf600ef329eec26529ecb1f71c50f2831dce9abf35d48bb020627d5936",
           "tests/code_quality/test_performance_tool_inputs_v2.py": "69cc8f3a9f5ba1ea2a7cae9921ca95779566cb04e65cae2c82b54ba1bf220565",
+          "tests/code_quality/test_phase14a_source_identity.py": "d67b860dbe557bd557536537d43c466176e2e6d14e1e48d6b8c08c1cb4d34eaf",
           "tests/code_quality/test_ws12_generated_data_artifacts.py": "8c16fd4ff13d3fe52697b30eb1d32d8814560619a3cd61262b019c97bf994c18",
           "tests/rules/section25/test_mfm.py": "697300f10064e0383b071b997f51eb8323ef4c617563ca07687278d7665585b8",
           "tools/performance_policy.py": "aee97f2cd33281b79a4b7593ab489d7b5143a7d8f2828036da5ede5af0435ef3",
@@ -13486,18 +13486,19 @@
         "control_plane": {
           "data/source_audits/ci64_provenance_v1/test-cutover.json": "8a4ced7715840f56a4c217437e3acb81878e89b1d7baf0a74000787ce9fe87ca",
           "data/source_audits/supported_rules_2026_10/vyper-binding.json": "1c7dfb6c0f8a42e722ddaeb51f24826d0f87ce4bd9edb2d57359b735df1835ef",
-          "docs/performance/policy-v3/operation-map.json": "08a2504091d2fcc474a5db3f6d306e999e4edaba7815ff2009dc771033fb4e61",
-          "docs/performance/policy-v3/vyper-source-input-roles-v4.json": "5247a595db1189c8d63609a36fe7b959e98d777a13bc3ff57458f23d73e5e2b1",
+          "docs/performance/policy-v3/operation-map.json": "58544ab17a4236ed5da8ecd628a86f62f894a9acffd7e98886cc63c4beb13a8a",
+          "docs/performance/policy-v3/vyper-source-input-roles-v4.json": "cf03cf629bc9f8d5afee9f122aa3cdbe3130614c4414b1497156802647ae9d87",
           "scripts/check_performance_policy.py": "86b6a22b38a1d74ee074b902395133778e44a1ab54723a544d5c34924d73d3a6",
           "scripts/measure_vyper_source_binding.py": "b36f5722f72e70148645a711d575e12b9512216b6b0ec96a5956809fc2b71af9",
           "tests/code_quality/test_current_comparison_routing.py": "e4dc1f9a2a2368eb202868fdb3aff3babeb7f38659687e7047b5d35f06b10831",
           "tests/code_quality/test_generated_ability_support_artifacts.py": "a7b8c693d1ab79195d989777a3a8d02d97c05d0acad94a971acd0fa52e638380",
           "tests/code_quality/test_performance_tool_inputs_v2.py": "287adadae7d83ba2860fb0f39e091df467b67899017d8a16fe29dc11f81173fa",
+          "tests/code_quality/test_phase14a_source_identity.py": "f004e500e5e3548af581d2bf5a3df16505fd63354bd39a48963a86508f8983a7",
           "tests/code_quality/test_ws12_generated_data_artifacts.py": "727a3107c8af13b9cf2937fd06c59fbd84351dc93b5b01167b35c313b97af285",
           "tests/rules/section25/test_mfm.py": "6d2758590363c16f2f72048780631028cf67cc59e297740ca96b5f5c93e5696a",
           "tools/performance_policy.py": "74462b456e357fac5d5490243248d061eed0459838d5b75a3baa7bb5ec0daf7c",
           "tools/performance_tool_inputs.py": "f15d4371b8b013bf709c32ff429c1538911d422142791ae65dd435e80c72cbe9",
-          "tools/performance_tool_inputs_v4.py": "2f2f372ce6f35f93a7f19b65237611ca97662e4d460a5eb998939836cd31784a"
+          "tools/performance_tool_inputs_v4.py": "81dac96d51388980ecf37c7f48ce0c125e05919e0b0ab006ddca6317c89ec577"
         },
         "derived_outputs": {
           "contracts/examples/persistence/session-persistence.json": "24ec39e2980cf72ac1c53e60da898ba4edbd59781ed59cf759fa75e953def139",
@@ -14685,8 +14686,8 @@
           "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Stratagems.json": "fd437e999b2cf484e76dd84307e00125f054b548dd10a3bfeb97dfa38293a514",
           "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/source_package_manifest.json": "cb2f1c5c7f658c428faffe8bc599fc4739ec0cd95534b1ba256d238288770f32",
           "data/source_snapshots/wahapedia/10th-edition/2026-06-14/raw/source_snapshot.json": "19a1a84df2a31224604db2dfb2fb22d9af7636a18ac7cce5560c0ee99fe798dc",
-          "docs/performance/policy-v3/operation-map.json": "08a2504091d2fcc474a5db3f6d306e999e4edaba7815ff2009dc771033fb4e61",
-          "docs/performance/policy-v3/vyper-source-input-roles-v4.json": "5247a595db1189c8d63609a36fe7b959e98d777a13bc3ff57458f23d73e5e2b1",
+          "docs/performance/policy-v3/operation-map.json": "58544ab17a4236ed5da8ecd628a86f62f894a9acffd7e98886cc63c4beb13a8a",
+          "docs/performance/policy-v3/vyper-source-input-roles-v4.json": "cf03cf629bc9f8d5afee9f122aa3cdbe3130614c4414b1497156802647ae9d87",
           "docs/source_rules/faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf": "5beadb2c29e100a31bb7ee54f429498555e07430997063111aa4694556568f97",
           "docs/source_rules/tacoma-open-2026-source-package.json": "6723634f13a3ccb0239c1238fef7847163550a532fb9ff0dc7578ada0ea14e38",
           "pyproject.toml": "42c1a1c4db411da62bba612820d1922dd50b838e7f93bfd3ceb11aa7b516f513",
@@ -18096,7 +18097,7 @@
           "tests/code_quality/test_performance_static_successor.py": "d692fa9c0e99d4e17fb36257b82ff115caadc0be97ac4e3f7e201597ee3ae559",
           "tests/code_quality/test_performance_tool_inputs.py": "3847fc6a3db10414abde698c504d1b5a9b186f295fec3e3ff7b2fc0cb8baacf6",
           "tests/code_quality/test_performance_tool_inputs_v2.py": "287adadae7d83ba2860fb0f39e091df467b67899017d8a16fe29dc11f81173fa",
-          "tests/code_quality/test_phase14a_source_identity.py": "d67b860dbe557bd557536537d43c466176e2e6d14e1e48d6b8c08c1cb4d34eaf",
+          "tests/code_quality/test_phase14a_source_identity.py": "f004e500e5e3548af581d2bf5a3df16505fd63354bd39a48963a86508f8983a7",
           "tests/code_quality/test_phase14c_shared_primitives.py": "d07731c69d93bdbb900cdd42517b1f29037a525e0e79a3bb705164b2a9ee4629",
           "tests/code_quality/test_phase14h_attack_resolution_convergence.py": "6950af8fefe2a62e96e5fa1b4d3f759e2a26b2178f64dbac7de70bc305342b7f",
           "tests/code_quality/test_phase14i_14h_closeout.py": "a721cf1a94365b034a3e1cabbe1bd6292a12402b05cbf73bab24cd37f39c77e6",
@@ -19480,7 +19481,7 @@
           "tools/performance_tool_inputs.py": "f15d4371b8b013bf709c32ff429c1538911d422142791ae65dd435e80c72cbe9",
           "tools/performance_tool_inputs_v2.py": "e32fbfcd15747522f64bfefde20318defe397e2c152a2d80743ada8ff68568b0",
           "tools/performance_tool_inputs_v3.py": "5572c99bec3b6002dfb9922faec51f0948a3a893425ae3bfa01609d648c686cf",
-          "tools/performance_tool_inputs_v4.py": "2f2f372ce6f35f93a7f19b65237611ca97662e4d460a5eb998939836cd31784a",
+          "tools/performance_tool_inputs_v4.py": "81dac96d51388980ecf37c7f48ce0c125e05919e0b0ab006ddca6317c89ec577",
           "tools/promote_july_faction_packs.py": "d864a6e5df27a4f3be9714838e3109ff36189140664109ff5365eac5a58062d6",
           "tools/quality_runtime_successor.py": "de0d1a9ed29b0efe9dffa15667c03854204fe390588f81a55817acea841f2c80",
           "tools/thousand_sons_perils_preservation.py": "32718561e2154c6c869e66b411328e8a953b4d3365b884a535503fc3136cc0cc",
@@ -19490,8 +19491,8 @@
           "tools/wahapedia_fetch.py": "9c605d9c3af086dc92e0663a4783dfdb426ac3268701a007fbe6f23fa503f7d3",
           "uv.lock": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75"
         },
-        "inventory_sha256": "e0d44bcebd16c1b3ca53b88604c763a893906b4aaa7f180608192acfd6a77263",
-        "revision": "c58420d729320d01cc28418e74f402676c7474c1"
+        "inventory_sha256": "88993bf9f769ca4e6d1a76ecff1cf40603fe39379924f1bfef5056a5c7ddedfc",
+        "revision": "c918319f02e1da5f221eb54a589e48fe55d5d194"
       }
     }
   },

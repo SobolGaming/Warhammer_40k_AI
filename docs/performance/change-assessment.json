@@ -306,21 +306,21 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
-      "after_sha256": "d1fde5e508901a617e267cdf01871c6d34a5cdde949e84270971a537911bad8e",
+      "after_sha256": "3390569a9af22a37981d434a4df64642cfed9893dbde98e5bb8db4c7773fdf5f",
       "owners": {
         "@document": {
           "before": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
-          "after": "d1fde5e508901a617e267cdf01871c6d34a5cdde949e84270971a537911bad8e"
+          "after": "3390569a9af22a37981d434a4df64642cfed9893dbde98e5bb8db4c7773fdf5f"
         }
       }
     },
     "docs/SUPPORTED_FACTION_RULE_RECONCILIATION_2026_10.md": {
       "before_sha256": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-      "after_sha256": "dbd6e2b60043270fd33afae1fb8754e521130092f075234730e29e01223a6e99",
+      "after_sha256": "3260469c3d0b9574210fec666ea4d4c49203b73640c38e6d71a0b19132a96e9b",
       "owners": {
         "@document": {
           "before": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-          "after": "dbd6e2b60043270fd33afae1fb8754e521130092f075234730e29e01223a6e99"
+          "after": "3260469c3d0b9574210fec666ea4d4c49203b73640c38e6d71a0b19132a96e9b"
         }
       }
     },
@@ -336,11 +336,11 @@
     },
     "docs/performance/current/vyper-source-bc9-v4.json": {
       "before_sha256": null,
-      "after_sha256": "36ae186f7dd74899ce437f90aceb5e7940d0797d23a1cc621a39e8e8183fac3b",
+      "after_sha256": "0c1e6d810fda9b1f6e8c9a09a4209f5b89ee8565be0e413450760cff387e3ac3",
       "owners": {
         "@document": {
           "before": null,
-          "after": "36ae186f7dd74899ce437f90aceb5e7940d0797d23a1cc621a39e8e8183fac3b"
+          "after": "0c1e6d810fda9b1f6e8c9a09a4209f5b89ee8565be0e413450760cff387e3ac3"
         }
       }
     },
@@ -361,6 +361,16 @@
         "@document": {
           "before": null,
           "after": "c0f669888b5eb4a08eb5b4d058980ce9001d53c5d149b69e56f091c626076c96"
+        }
+      }
+    },
+    "docs/performance/evidence/vyper-source-c918319f-producer.json": {
+      "before_sha256": null,
+      "after_sha256": "3ddeb26b71f5a917a2acc6a6f3b2de7abc232b0226bd0dcfdc6b8d48e9856361",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3ddeb26b71f5a917a2acc6a6f3b2de7abc232b0226bd0dcfdc6b8d48e9856361"
         }
       }
     },
@@ -1126,6 +1136,14 @@
       "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "docs/performance/evidence/vyper-source-c58420d7-producer.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "docs/performance/evidence/vyper-source-c918319f-producer.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
