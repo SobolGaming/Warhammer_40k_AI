@@ -94,6 +94,16 @@
         }
       }
     },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "before_sha256": "2a876950c4234a3d1c41d2c1d47213bd0d5ab568a13a64011af8ab78580606dc",
+      "after_sha256": "e800999b9cf075a08083f6c628c1dbb8a99e68e611368e6c9ee8ecb043beff17",
+      "owners": {
+        "@document": {
+          "before": "2a876950c4234a3d1c41d2c1d47213bd0d5ab568a13a64011af8ab78580606dc",
+          "after": "e800999b9cf075a08083f6c628c1dbb8a99e68e611368e6c9ee8ecb043beff17"
+        }
+      }
+    },
     "docs/performance/current/issue590-command-fork.json": {
       "before_sha256": null,
       "after_sha256": "c3ee95e29f3eadb154721ec99d7b9ebdeee4de17b20a68d9348776554072cf80",
@@ -599,6 +609,14 @@
       ],
       "selected_families": [],
       "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Records the bounded repair, exact current comparison inputs and sanitized public HTTP receipts without changing engine execution.",
       "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
       "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
