@@ -1,0 +1,336 @@
+{
+  "schema": "supported-faction-rule-reconciliation-v1",
+  "base": "764b5321af2b05d6537861910dba0540abaa6d94",
+  "scope": "Existing World Eaters Blessings and Icon rules-unit consumers only; declaration counts overlap and are not whole-faction or whole-game certification.",
+  "current_official_sources": {
+    "official_index_url": "https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/",
+    "receipts": [
+      {
+        "faction": "world-eaters",
+        "checked_utc": "2026-10-30T13:29:17.309769+00:00",
+        "url": "https://assets.warhammer-community.com/eng_30-09_wh40k_faction_pack_world_eaters-rxxj1fzeoh-kfx1cectxb.pdf",
+        "sha256": "93e29f1b166d2a06fafa37a543890e56ae59c712b73b5a1e26f0a1c1ecf6a8e9",
+        "bytes": 4019819,
+        "method": "ordinary public curl, retained PDF; source link freshly observed in rendered official index",
+        "matches_prior_capture": true,
+        "retained_pdf": "/tmp/task-current-sources-20261030/evidence/rules/eng_30-09_wh40k_faction_pack_world_eaters-rxxj1fzeoh-kfx1cectxb.pdf"
+      },
+      {
+        "faction": "aeldari",
+        "checked_utc": "2026-10-30T13:29:17.317612+00:00",
+        "url": "https://assets.warhammer-community.com/eng_14-10_wh40k_-faction_pack_aeldari-seqmcs1mu0-g8gzewikcm.pdf",
+        "sha256": "ca54d5039e6466c239e56a334e02fb14da4e7ce8113ba5a3335ddfad5a1c6ca2",
+        "bytes": 15522415,
+        "method": "ordinary public curl streamed hash; retained identical PDF reused rather than copied; source link freshly observed in rendered official index",
+        "matches_prior_capture": true,
+        "retained_pdf": "/tmp/task-current-sources-20261030/evidence/rules/eng_14-10_wh40k_-faction_pack_aeldari-seqmcs1mu0-g8gzewikcm.pdf"
+      }
+    ]
+  },
+  "prior_world_eaters_source": {
+    "manifest": "data/source_manifests/gw_11e_faction_packs.yaml",
+    "package_id": "gw-11e-world-eaters-faction-pack-2026-07",
+    "sha256": "42d9344798c0f359f2a3fb8338d7a0adf9ad0a12751450a929b64045eff8b239",
+    "local_cache_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_world_eaters-5g8k1b5jg0-3ttsio6riy.pdf"
+  },
+  "declaration_inventory": {
+    "checked_utc": "2026-10-30T13:21:44.131245+00:00",
+    "phase17f_execution_statuses": {
+      "executable_named_handler": 23,
+      "blocked_structured_semantics_required": 1889,
+      "blocked_approved_unsupported_source_gap": 28,
+      "executable_generic_ir": 133
+    },
+    "generated_manifest_semantic_statuses": {
+      "partial": 69,
+      "placeholder": 221,
+      "implemented": 131
+    },
+    "generated_component_summaries": {
+      "ability_coverage_rows.json": {
+        "sha256": "e308909c7f0179cfbd36dc8b9e4c667a0574fdbf392ec92856c5ca69fa59c285",
+        "rows": 293,
+        "counts": {
+          "support_stage": {
+            "engine_consumed": 293
+          },
+          "catalog_support": {
+            "descriptor_only": 158,
+            "generic_rule_ir": 132,
+            "unsupported": 3
+          }
+        },
+        "scope": "Existing generated component declarations; not new semantic certification or a whole-game playability claim."
+      },
+      "datasheet_support_rows.json": {
+        "sha256": "b6553ee4aabca631a1792372c39ebe0c1f2a96bf8883709a1189521dcebbcc06",
+        "rows": 59,
+        "counts": {
+          "overall": {
+            "Playable": 56,
+            "Blocked": 3
+          },
+          "catalog_status": {
+            "Full": 59
+          },
+          "datasheet_ability_status": {
+            "Full": 56,
+            "Blocked": 3
+          },
+          "faction_interaction_status": {
+            "Partial": 59
+          }
+        },
+        "scope": "Existing generated component declarations; not new semantic certification or a whole-game playability claim."
+      },
+      "mustering_support_rows.json": {
+        "sha256": "1244455677b64d69bbfd75123087b6eb1ae60bed2274dfa543e8fb9e52918019",
+        "rows": 11,
+        "counts": {
+          "support_stage": {
+            "full": 11
+          }
+        },
+        "scope": "Existing generated component declarations; not new semantic certification or a whole-game playability claim."
+      }
+    },
+    "world_eaters_phase17f": {
+      "executable_army_rule": 1,
+      "blocked_structured_semantics": 68,
+      "blocked_approved_source_gap": 1
+    },
+    "qualification": "Counts describe different overlapping declaration surfaces. They are not additive. Later datasheet RuleIR consumers, including Maulerfiend, are outside the Phase17F count.",
+    "later_generic_ir": {
+      "scope": "Later generic faction-pack IR declaration inventory; record presence does not independently certify execution or current official source currency. Overlaps other inventory surfaces.",
+      "manifest_sha256": "60afad5af52c1c36468239d46f977d9b9f5148a52477094b53ebda62b391e9f0",
+      "shards": 6,
+      "source_packages": 21,
+      "records_by_shard": {
+        "aeldari": 42,
+        "chaos-daemons": 27,
+        "chaos-space-marines": 1,
+        "emperors-children": 19,
+        "thousand-sons": 1,
+        "world-eaters": 2
+      },
+      "world_eaters_records": [
+        {
+          "source_row_id": "000002639:3",
+          "ability_name": "The Scent of Blood"
+        },
+        {
+          "source_row_id": "000002639:4",
+          "ability_name": "Savage Exaltation"
+        }
+      ]
+    }
+  },
+  "selected_checks": [
+    {
+      "rule": "Blessings of Khorne including all six blessings",
+      "faction": "world-eaters",
+      "version": "963",
+      "release_date": "2026-09-30",
+      "url": "https://www.40k.app/963/factions/world-eaters/army-rules",
+      "observation": "Eight D6; up to two blessings; once each per round; unused dice discarded; abilities last to round end. Recipes match existing definitions: any double; double2+; double3+; double4+ or any triple; double5+ or triple2+; double6 or triple3+. Effects match current existing implementation's +1charge,6inchpile/consolidate,4+melee fight-on-death,SustainedHits1,LethalHits,Infantry-target DevastatingWounds.",
+      "disposition": "No selected effect/recipe discrepancy. Rules-unit ownership correction remains required. Full World Eaters support is not certified.",
+      "latest_rules_qualification": "selected_clause_browser_verified_against_preferred_versioned_mirror; latest_faction_version_is_index_based_inference",
+      "owner": "world_eaters/army_rule.py:BLESSING_DEFINITIONS and existing Blessings consumers",
+      "pdf_corroboration": {
+        "version": "1.3",
+        "page": 7,
+        "clause": "Unbridled Bloodlust only; full base table is verified from the mirror"
+      },
+      "recipes_verified": {
+        "unbridled_bloodlust": "any double",
+        "rage_fuelled_invigoration": "double 2+",
+        "total_carnage": "double 3+",
+        "martial_excellence": "double 4+ or any triple",
+        "warp_blades": "double 5+ or triple 2+",
+        "decapitating_strikes": "double 6 or triple 3+"
+      }
+    },
+    {
+      "rule": "Icon of Khorne",
+      "faction": "world-eaters",
+      "version": "963",
+      "release_date": "2026-09-30",
+      "url": "https://www.40k.app/963/factions/world-eaters/units/khorne-berzerkers",
+      "observation": "One or more Icons in bearer's unit credits one Bloodshed point when that unit destroys an enemy unit. Each subsequent Blessings roll adds one D6 per point and then loses all points.",
+      "disposition": "Selected accounting matches PDF/current implementation; attached rules-unit lookup correction remains required.",
+      "latest_rules_qualification": "selected_clause_browser_verified_against_preferred_versioned_mirror; latest_faction_version_is_index_based_inference",
+      "owner": "world_eaters/army_rule.py:bloodshed_points_available",
+      "pdf_corroboration": {
+        "version": "1.3",
+        "page": 8
+      }
+    },
+    {
+      "rule": "The Scent of Blood",
+      "faction": "world-eaters",
+      "version": "963",
+      "release_date": "2026-09-30",
+      "url": "https://www.40k.app/963/factions/world-eaters/units/maulerfiend",
+      "observation": "At charge declaration, nearby enemy within9in below starting strength gives+1charge; alternative below-half strength gives+2. Existing generic IR already uses exclusive thresholds.",
+      "disposition": "No selected discrepancy; no runtime patch.",
+      "latest_rules_qualification": "selected_clause_browser_verified_against_preferred_versioned_mirror; latest_faction_version_is_index_based_inference",
+      "source_rule_id": "000002639:3",
+      "artifact": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/world-eaters.json",
+      "pdf_corroboration": {
+        "version": "1.3",
+        "page": 8
+      }
+    },
+    {
+      "rule": "Rangers: Path of the Outcast",
+      "faction": "aeldari",
+      "version": "963",
+      "release_date": "2026-09-30",
+      "url": "https://www.40k.app/963/factions/aeldari/units/rangers",
+      "observation": "Opponent Movement ending within8in; if unengaged, Rangers may make D6inchNormalMove.",
+      "disposition": "EarlierPR599 selected PDF clause comparison confirmed against preferred mirror; no discrepancy.",
+      "latest_rules_qualification": "selected_clause_browser_verified_against_preferred_versioned_mirror; latest_faction_version_is_index_based_inference",
+      "historical_comparison_record": "data/source_audits/mfm_2026_10/bounded-rule-checks.json"
+    },
+    {
+      "rule": "Daemonic Manifestation",
+      "faction": "chaos-daemons",
+      "version": "963",
+      "release_date": "2026-09-30",
+      "url": "https://www.40k.app/963/factions/chaos-daemons/army-rules",
+      "observation": "Friendly LegionesDaemonica in ShadowOfChaos gains+1battle-shock roll; success healsD3, or Battleline may returnD3 nonCharacter models instead.",
+      "disposition": "EarlierPR599 selected PDF clause comparison confirmed against preferred mirror; no discrepancy.",
+      "latest_rules_qualification": "selected_clause_browser_verified_against_preferred_versioned_mirror; latest_faction_version_is_index_based_inference",
+      "historical_comparison_record": "data/source_audits/mfm_2026_10/bounded-rule-checks.json"
+    },
+    {
+      "rule": "Defiler: Daemonforge",
+      "faction": "chaos-space-marines",
+      "version": "963",
+      "release_date": "2026-09-30",
+      "url": "https://www.40k.app/963/factions/chaos-space-marines/units/defiler",
+      "observation": "DarkPact gives wound-roll1 rerolls until phase end.",
+      "disposition": "EarlierPR599 selected PDF clause comparison confirmed against preferred mirror; no discrepancy.",
+      "latest_rules_qualification": "selected_clause_browser_verified_against_preferred_versioned_mirror; latest_faction_version_is_index_based_inference",
+      "historical_comparison_record": "data/source_audits/mfm_2026_10/bounded-rule-checks.json"
+    },
+    {
+      "rule": "Exalted Patron",
+      "faction": "emperors-children",
+      "version": "981",
+      "release_date": "2026-10-14",
+      "url": "https://www.40k.app/981/factions/emperors-children/detachments/court-of-the-phoenician",
+      "observation": "LordExultant-only enhancement gives bearer+1inchMove;15points. EC latest listed faction changes are981 although earlier PDFv1.3 is September30. Current981LordExultant/Sorcerer change listing was observed, but their entire datasheets were not audited.",
+      "disposition": "EarlierPR599 selected PDF clause comparison confirmed against newer preferred mirror; no selected discrepancy. No full unit/source freshness claim.",
+      "latest_rules_qualification": "selected_clause_browser_verified_against_preferred_versioned_mirror; latest_faction_version_is_index_based_inference",
+      "historical_comparison_record": "data/source_audits/mfm_2026_10/bounded-rule-checks.json"
+    },
+    {
+      "rule": "Defiler: Destroyer of Futures",
+      "faction": "thousand-sons",
+      "version": "963",
+      "release_date": "2026-09-30",
+      "url": "https://www.40k.app/963/factions/thousand-sons/units/defiler",
+      "observation": "Once per phase per unit, Counteroffensive may target this unit regardless of other uses, costs1CPless and does not prevent uses on other units.",
+      "disposition": "EarlierPR599 selected PDF clause comparison confirmed against preferred mirror; no discrepancy.",
+      "latest_rules_qualification": "selected_clause_browser_verified_against_preferred_versioned_mirror; latest_faction_version_is_index_based_inference",
+      "historical_comparison_record": "data/source_audits/mfm_2026_10/bounded-rule-checks.json"
+    }
+  ],
+  "normal_play_defect": {
+    "entry": "LocalGameSession finite fight submissions -> fight activation hook -> Rage-fuelled Invigoration -> unit_has_active_blessing -> physical-only unit lookup",
+    "canonical_source": "attached-unit:army-alpha:bodyguard",
+    "impact": "An ordinarily mustered Leader/bodyguard rules unit could not complete its fight even without an active Blessing. Same lookup class affected charge, melee weapon modifiers, attached target keywords and Icon destruction credit.",
+    "normal_reachability": "Reproduced on exact base with real canonical catalog mustering, AttachmentDeclaration, physical placements, engine-generated requests, and adapter submissions. Analytical fixture is not official roster certification.",
+    "acceptance": "Existing supported faction rules must work through shared engine authority for attached rules units; preserve native valid state restore/replay.",
+    "repair": "Use shared RulesUnitView identity, present components, canonical effect targets and group alive models. Icon checks all physical components with the existing event-time live-bearer check, awarding once per enemy unit. No historical tamper fallback or detachment support."
+  },
+  "metadata_followups": [
+    {
+      "name": "Murdermind",
+      "source_subrule_id": "000010668003",
+      "detachment": "Cursed Legion",
+      "current_mfm": "15pts; SUPPORT four Destroyer unit types",
+      "execution": "blocked; metadata does not establish gameplay support"
+    },
+    {
+      "name": "Butcher Lord",
+      "source_subrule_id": "000010074003",
+      "detachment": "Cult of Blood",
+      "current_mfm": "10pts; LEADER Jakhals/Goremongers",
+      "execution": "blocked; metadata does not establish gameplay support"
+    },
+    {
+      "name": "Grimnar's Mark",
+      "detachment": "Saga of the Great Wolf",
+      "current_mfm": "15pts; no LEADER allowance",
+      "execution": "No exact matching existing subrule/execution row; no alias inferred"
+    },
+    {
+      "name": "Vypers",
+      "source_datasheet_id": "000000605",
+      "current_pdf": "Aeldari v1.4 physical pages20-21, VYPERS and1-2models",
+      "current_mfm": "units-vyper, unit_id vyper",
+      "execution": "Source label discrepancy confirmed: preferred mirror title is singular Vyper, while model row/composition remain plural Vypers and PDF title is plural. Stable source-ID/catalog binding remains a focused follow-up; no alias added. The 58 other label candidates do not certify profiles or identity.",
+      "preferred_mirror": {
+        "rule": "Vyper identity",
+        "faction": "aeldari",
+        "version": "963",
+        "release_date": "2026-09-30",
+        "url": "https://www.40k.app/963/factions/aeldari/units/vyper",
+        "observation": "Mirror titleVyper, modelrowVypers, keywordVYPERS, composition1-2Vypers. Costs75/140. CurrentPDFv1.4p20-21 titleVYPERS; currentMFMsingularunit_idvyper andrecordunits-vyper. Mirror also shows HarassmentFire suppression until nextturn.",
+        "disposition": "Confirmed source label discrepancy. User-preferred title is singular. Stable source/catalog binding remains separate focused follow-up; no blanket alias or full profile certification."
+      }
+    }
+  ],
+  "remaining_gaps": [
+    "The complete selected Blessings table and its six effect/recipe definitions are now browser-verified against preferred mirror v963. This resolves the previous table access gap only; whole faction, Codex/book, weapon and characteristic audits remain unqualified.",
+    "World Eaters detachments remain non-executable where already blocked. The Disciple of Khorne FAQ does not authorize new enhancement or attachment implementation.",
+    "Other Phase17F entries and later component consumers are not comprehensively qualified. The five earlier PR599 selected PDF clauses have separate confirming mirror observations here; the original historical source record is unchanged.",
+    "Vyper/Vypers stable source-ID binding and enhancement metadata gaps remain follow-up work. No new faction, battlefield layout or mission support.",
+    "Maulerfiend Savage Exaltation source 000002639:4 remains outside the selected mirror clause comparison.",
+    "The v981 Emperor's Children Lord Exultant/Sorcerer change listing was observed, but their entire datasheets were not audited. Earlier limited Custodes and Space Marines PDF lookups remain historical, not current App-data audits.",
+    "No later listed delta for the selected v963 factions is an inference from the inspected update index, not raw official API attestation. No raw mirror HTML/JSON payload hash is claimed."
+  ],
+  "delivery": "Focused regressions, complete local and hosted gates, exact-head reviews and normal merge remain separate evidence;64percent branch-coverage floor,12minute CI goal and720second shard cutoff unchanged.",
+  "authority": {
+    "preferred_updates_url": "https://www.40k.app/factions/updates",
+    "user_direction": "User explicitly prefers the mirrored app data when it disagrees with PDF faction rules. PDFs remain corroborating historical evidence. This does not itself invalidate the separate official interactive MFM reconciliation.",
+    "provider_status": "40k.app is a non-affiliated App-data mirror, not an official Games Workshop site.",
+    "mirror_comparison_status": "selected versioned content verified in the ordinary browser on 2026-10-30; no selected effect or recipe discrepancy found",
+    "observation_method": "Ordinary background in-app browser, rendered visible source content; no credentials, special headers or bypass. Research-web retrieval returned403; ordinary curl returned429 and was not retried. Browser content was readable. No raw mirror HTML/JSON payload hash is claimed.",
+    "latest_listed_version": "995",
+    "latest_listed_release_date": "2026-10-16",
+    "version_history_observed": [
+      {
+        "version": "995",
+        "released": "2026-10-16",
+        "changed_factions": 1,
+        "notes": "Genestealer Cults, one unit/one change; outside selected slice."
+      },
+      {
+        "version": "981",
+        "released": "2026-10-14",
+        "changed_factions": 11,
+        "notes": "Emperor's Children two units (Lord Exultant and Sorcerer); Custodes 42 units/18 detachments; Space Marines two units/five detachments. This is not a full audit of those changes."
+      },
+      {
+        "version": "972",
+        "released": "2026-10-02",
+        "changed_factions": 7
+      },
+      {
+        "version": "963",
+        "released": "2026-09-30",
+        "changed_factions": 37,
+        "notes": "Latest listed World Eaters, Aeldari, Chaos Daemons, Chaos Space Marines and Thousand Sons changes on the inspected index. World Eaters 11 units/one detachment; its changes page lists Berzerker Warband 3DP to 2DP and unit changes."
+      }
+    ],
+    "qualification_limits": "Versioned page content was confirmed in browser. The inspected update index shows no later listed faction delta for the v963 factions above; this is an index-based inference, not a raw official API attestation. No whole-faction/book/weapon/characteristic audit is claimed. Earlier limited Custodes/Marines PDF matching lookups remain historical and are not requalified as current app-data audits. No new faction or detachment support is authorized by these observations."
+  },
+  "historical_evidence_preservation": {
+    "record": "data/source_audits/mfm_2026_10/bounded-rule-checks.json",
+    "sha256_unchanged": "8c9f64c1ac43d523ffa4c63db7d9335ddea2e1231bbeec3c9cf376c56d3ca1ce",
+    "meaning": "Prior PDF-only checks retain their original scope. New selected mirror confirmations do not invalidate the separate official interactive MFM v1.6 reconciliation."
+  }
+}

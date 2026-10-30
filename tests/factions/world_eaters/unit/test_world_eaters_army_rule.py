@@ -1058,7 +1058,7 @@ def test_world_eaters_army_rule_fail_fast_edges_are_explicit() -> None:
             event_log=cast(EventLog, object()),
             player_id="player-a",
         )
-    with pytest.raises(GameLifecycleError, match="unit_instance_id was not found"):
+    with pytest.raises(GameLifecycleError, match="unit_instance_id is unknown"):
         army_rule.unit_has_active_blessing(
             state,
             unit_instance_id="missing-unit",

@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import NotRequired, TypedDict, cast
 
 MANIFEST = "data/source_audits/faction_test_layout/preservation.json"
-MANIFEST_SHA256 = "f1bb410efe3a3d9a063adc2a2b980257097cd4ef4687d4a38d3c343fbb752806"
+MANIFEST_SHA256 = "7b092d9304f52885883d09c32893a35589419d6bf95dbf1331a60ce3cd51442a"
 ORIGINALS = frozenset(
     [
         "tests/factions/aeldari/test_selected_consumers.py",
@@ -52,7 +52,12 @@ def _read(root: Path, relative: str) -> bytes:
     return path.read_bytes()
 
 
-def _definitions(raw: bytes, *, shadow_fixture_maintenance: bool = False) -> dict[str, str]:
+def _definitions(
+    raw: bytes,
+    *,
+    shadow_fixture_maintenance: bool = False,
+    world_eaters_lookup_maintenance: bool = False,
+) -> dict[str, str]:
     result: dict[str, str] = {}
     for node in ast.parse(raw).body:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
@@ -72,6 +77,22 @@ def _definitions(raw: bytes, *, shadow_fixture_maintenance: bool = False) -> dic
                 if len(identities) != 1:
                     raise ValueError("Shadow omission fixture identity maintenance drifted.")
                 identities[0].value = old
+            if world_eaters_lookup_maintenance and node.name == (
+                "test_world_eaters_army_rule_fail_fast_edges_are_explicit"
+            ):
+                # The canonical rules-unit lookup keeps the same domain error;
+                # only its reviewed diagnostic match differs from the archive.
+                matches = [
+                    value.value
+                    for value in ast.walk(node)
+                    if isinstance(value, ast.keyword)
+                    and value.arg == "match"
+                    and isinstance(value.value, ast.Constant)
+                    and value.value.value == "unit_instance_id is unknown"
+                ]
+                if len(matches) != 1:
+                    raise ValueError("Faction layout World Eaters lookup maintenance drifted.")
+                matches[0].value = "unit_instance_id was not found"
             result[node.name] = ast.dump(node)
     return result
 
@@ -101,6 +122,10 @@ def verify_layout_original(root: Path, relative: str) -> tuple[bytes, LayoutReco
             shadow_fixture_maintenance=(
                 relative == "tests/unit/test_phase17g_tyranids_army_rule.py"
                 and name == "tests/factions/tyranids/unit/test_tyranids_army_rule.py"
+            ),
+            world_eaters_lookup_maintenance=(
+                relative == "tests/unit/test_phase17g_world_eaters_army_rule.py"
+                and name == "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py"
             ),
         )
     # Explicit extensions preserve the complete original function as a prefix.

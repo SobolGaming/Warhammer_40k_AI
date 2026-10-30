@@ -562,7 +562,7 @@
         "_runtime_content_bundle": "tests/factions/world_eaters/world_eaters_helpers.py::_runtime_content_bundle"
       },
       "successors": {
-        "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": "9384e78c9d389dd77d57478c8aa2c56558c033e11767800afed20dd787690940",
+        "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": "f2d9e5541c9449e4f24a83d7d4cc723516660ea166a8e9c2819a2c8a06a4a30c",
         "tests/factions/world_eaters/unit/test_icon_of_khorne.py": "5978709148ceaafad7adc244b16d1f87bad62be96293d8e19a06c8f12b3dba24",
         "tests/factions/world_eaters/world_eaters_helpers.py": "8aaa7d2a366c35313dbdc35ca57caa81f460f38133003977c28bd32195fe0c26"
       },

@@ -1,3 +1,4 @@
+tests/code_quality/test_phase18m_conformance_boundary.py
 tests/code_quality/test_faction_content_runtime_structure.py
 tests/code_quality/test_faction_integration_contract.py
 tests/code_quality/test_v963_shock_source.py
@@ -60,3 +61,4 @@ tests/code_quality/test_order57_destroyed_referent_measurement.py
 tests/code_quality/test_order129_source_authority.py
 tests/code_quality/test_ws14_generic_ir_runtime_boundary.py
 tests/code_quality/test_order53_movement_abilities.py
+tests/code_quality/test_world_eaters_layout_maintenance.py

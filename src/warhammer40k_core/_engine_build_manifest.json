@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ef7e9800c922a8c331094e05c6a7b774f2fa33cc74da0e4bd135cf9b9906bd08",
-  "fingerprint": "ef7e9800c922a8c331094e05c6a7b774f2fa33cc74da0e4bd135cf9b9906bd08",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e1ecfcb90c91cd5f790bcab4390a43d3e85f7d10e6d36643d534339526930cee",
+  "fingerprint": "e1ecfcb90c91cd5f790bcab4390a43d3e85f7d10e6d36643d534339526930cee",
   "resource_count": 3162,
   "resources": [
     {
@@ -9805,9 +9805,9 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 40901,
+      "byte_length": 40908,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py",
-      "sha256": "4f7f5558470c3feb0d7cd53bd3c02df3791c9f94970e6e8b682a1940022ebf0b"
+      "sha256": "7910129ae427729ef4686bc55cae0838ae6139f61c95d7979c9f0c9cc1ab8316"
     },
     {
       "byte_length": 172,

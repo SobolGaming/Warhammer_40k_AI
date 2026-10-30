@@ -175,16 +175,16 @@
       "sha256": "17495a45fc129f7d40eb5bec143a1605d52643a2da2597ddac81e8ea668dbcc4"
     },
     "tests/factions/world_eaters/unit/test_blessings_gameplay.py": {
-      "blob_sha1": "070f308b04ea655b524a3bc761f1d82ce088467e",
-      "bytes": 10114,
+      "blob_sha1": "a2a54739adee2994764c145fb52950bfb9ed041c",
+      "bytes": 17190,
       "mode": "100644",
-      "sha256": "38e1bba324f0f1ce0840a6a730cf6abc0f41d6b28781d0aa9da6aafe76a9176a"
+      "sha256": "939aad793501c35a415e39866b505ad12bf38a31c2b2c7e856745232aa402e3a"
     },
     "tests/factions/world_eaters/unit/test_icon_gameplay.py": {
-      "blob_sha1": "517f3aa7ed7471fc6cae89bfbd1990105f2d94e1",
-      "bytes": 2197,
+      "blob_sha1": "e705b2758baff722f3ea182c301a195ba63687e2",
+      "bytes": 6316,
       "mode": "100644",
-      "sha256": "c45edbe3f7b9de84d40230435bd0500e9bc4596eec2f01dff95e36c5b7044d6e"
+      "sha256": "0eaf5f39c5dd42bd20db998404cd90c76dc7e06050b0fafe595fe979c38d2489"
     },
     "tests/factions/world_eaters/unit/test_icon_of_khorne.py": {
       "blob_sha1": "a91be17c918a7fe9e88607b30ccceccdf04c5b73",
@@ -199,10 +199,10 @@
       "sha256": "1ebfea084cc927407627558291b6ad9a771b3abe0d4e9d78e00c6df7ba310500"
     },
     "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": {
-      "blob_sha1": "36c6682a706f9899d76adcacca249313fee74901",
-      "bytes": 44182,
+      "blob_sha1": "a491404aec87cf0a9884538e02f748224735cf58",
+      "bytes": 44179,
       "mode": "100644",
-      "sha256": "9384e78c9d389dd77d57478c8aa2c56558c033e11767800afed20dd787690940"
+      "sha256": "f2d9e5541c9449e4f24a83d7d4cc723516660ea166a8e9c2819a2c8a06a4a30c"
     },
     "tests/infrastructure/adapters/unit/test_session_commands.py": {
       "blob_sha1": "f4f32f78d3d2f274dc50108cbbef704f77b52e77",

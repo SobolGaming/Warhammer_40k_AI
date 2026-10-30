@@ -47,6 +47,10 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FightActivationAbilityOption,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_view_by_id,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierBinding,
     ChargeRollModifierContext,
@@ -439,10 +443,7 @@ def unit_has_active_blessing(
 ) -> bool:
     _validate_game_state(state)
     requested_blessing = _blessing_from_token(blessing)
-    unit, army = _unit_and_army_by_id(state, unit_instance_id=unit_instance_id)
-    if not _unit_has_blessings_of_khorne(unit):
-        return False
-    return requested_blessing in active_blessings_for_player(state, player_id=army.player_id)
+    return requested_blessing in active_blessings_for_unit(state, unit_instance_id=unit_instance_id)
 
 
 def unbridled_bloodlust_charge_roll_modifier(
@@ -551,10 +552,13 @@ def active_blessings_for_unit(
     *,
     unit_instance_id: str,
 ) -> tuple[BlessingOfKhorne, ...]:
-    unit, army = _unit_and_army_by_id(state, unit_instance_id=unit_instance_id)
-    if not _unit_has_blessings_of_khorne(unit):
+    _validate_game_state(state)
+    unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+    if not any(
+        _unit_has_blessings_of_khorne(component.unit) for component in unit.rules_present_components
+    ):
         return ()
-    return active_blessings_for_player(state, player_id=army.player_id)
+    return active_blessings_for_player(state, player_id=unit.owner_player_id)
 
 
 def bloodshed_points_available(
@@ -599,22 +603,30 @@ def bloodshed_points_available(
         target_unit_id = _payload_string(payload, key="target_unit_instance_id")
         if _unit_owner_player_id(state, unit_instance_id=target_unit_id) == requested_player_id:
             continue
-        attacking_unit, _army = _unit_and_army_by_id(state, unit_instance_id=attacking_unit_id)
-        if _unit_contains_icon_of_khorne_at_event(
-            state=state,
-            unit=attacking_unit,
-            completion_event_order=completion.event_order,
-            interval_events=interval_events,
+        if any(
+            _unit_contains_icon_of_khorne_at_event(
+                state=state,
+                unit=component,
+                completion_event_order=completion.event_order,
+                interval_events=interval_events,
+            )
+            for component in (
+                item.unit
+                for item in rules_unit_view_by_id(
+                    state=state, unit_instance_id=attacking_unit_id
+                ).components
+            )
         ):
             points += 1
     return points
 
 
 def _record_total_carnage_sources(*, state: GameState, army: ArmyDefinition) -> None:
-    for unit in army.units:
-        if not _unit_has_blessings_of_khorne(unit):
+    eligible_ids = set(eligible_blessings_unit_ids_for_army(army))
+    for unit in rules_unit_views_from_armies(armies=(army,)):
+        if unit.unit_instance_id not in eligible_ids:
             continue
-        for model in unit.alive_own_models():
+        for model in unit.alive_models():
             existing = tuple(
                 source
                 for source in state.destruction_reaction_sources_for_model(
@@ -774,7 +786,12 @@ def eligible_blessings_unit_ids_for_army(army: ArmyDefinition) -> tuple[str, ...
     if type(army) is not ArmyDefinition:
         raise GameLifecycleError("Blessings of Khorne requires an ArmyDefinition.")
     return tuple(
-        unit.unit_instance_id for unit in army.units if _unit_has_blessings_of_khorne(unit)
+        unit.unit_instance_id
+        for unit in rules_unit_views_from_armies(armies=(army,))
+        if any(
+            _unit_has_blessings_of_khorne(component.unit)
+            for component in unit.rules_present_components
+        )
     )
 
 
@@ -787,7 +804,7 @@ def _unit_has_blessings_of_khorne(unit: UnitInstance) -> bool:
 
 
 def _target_unit_has_keyword(state: GameState, *, unit_instance_id: str, keyword: str) -> bool:
-    unit, _army = _unit_and_army_by_id(state, unit_instance_id=unit_instance_id)
+    unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
     return _unit_has_keyword_token((*unit.keywords, *unit.faction_keywords), keyword)
 
 
@@ -816,20 +833,6 @@ def _world_eaters_army_for_player(
         if army.player_id == requested_player_id:
             return army
     return None
-
-
-def _unit_and_army_by_id(
-    state: GameState,
-    *,
-    unit_instance_id: str,
-) -> tuple[UnitInstance, ArmyDefinition]:
-    _validate_game_state(state)
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return unit, army
-    raise GameLifecycleError("Blessings of Khorne unit_instance_id was not found.")
 
 
 def _unit_owner_player_id(state: GameState, *, unit_instance_id: str) -> str:
