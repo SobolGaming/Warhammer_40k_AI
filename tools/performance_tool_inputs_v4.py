@@ -54,6 +54,8 @@ HARNESS = frozenset(
     {
         DRIVER,
         "scripts/source_reuse_experiment.py",
+        "scripts/ci_attribution_supervisor.py",
+        "scripts/check_ci_attribution_supervisor.py",
         original.WORKLOAD,
         "tests/conftest.py",
         "tests/timing_plugin.py",

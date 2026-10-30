@@ -2,25 +2,25 @@
   "policy": "rules-engine-performance-v3",
   "base": "bc9acd8419e7b97a2c1260c7e932d2cb9c3fc370",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6eb801a8cc0f00e24f45d2ca24494fee279bada900cc28a19be549a2613a5bd5",
-  "operation_map_sha256": "9f2d8450647cf05bf20920cb1bd417a6807407de973f72787b004d708a81aa47",
+  "operation_map_sha256": "24052cf45d3c6dca66c1b014a211c75e6a0ca93602cc7cf92d1d50ecbc262804",
   "changes": {
     "ci/quality_shards/all.txt": {
       "before_sha256": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563",
-      "after_sha256": "f57fe3bfe27e64a80d6b31e3ca70daa46971b319f2bfd5c889c64512a75722a0",
+      "after_sha256": "173b689c37c0f5ee41922319132ea92ae557de64fe75b9cea39e63e4db954aaa",
       "owners": {
         "@document": {
           "before": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563",
-          "after": "f57fe3bfe27e64a80d6b31e3ca70daa46971b319f2bfd5c889c64512a75722a0"
+          "after": "173b689c37c0f5ee41922319132ea92ae557de64fe75b9cea39e63e4db954aaa"
         }
       }
     },
     "ci/quality_shards/shard-1.txt": {
       "before_sha256": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f",
-      "after_sha256": "6e6661d1ff9f7d410fbba0b0b1d215ef6d89c081b2f7e9dfc1e2f5276fd80739",
+      "after_sha256": "f66a7b67adef5285af582d3090a2331c270253b8998ee1561f591bdcb4e9d4f7",
       "owners": {
         "@document": {
           "before": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f",
-          "after": "6e6661d1ff9f7d410fbba0b0b1d215ef6d89c081b2f7e9dfc1e2f5276fd80739"
+          "after": "f66a7b67adef5285af582d3090a2331c270253b8998ee1561f591bdcb4e9d4f7"
         }
       }
     },
@@ -196,21 +196,21 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "bc0083148585d3ae3c2dfcf3099e4755655160747f0dbc33c1feec0c0473bcbe",
-      "after_sha256": "1a06317b3c5a6f0eb6f288126587021eb38adbfe0f1f309e304d4b7bd60aef46",
+      "after_sha256": "08a2504091d2fcc474a5db3f6d306e999e4edaba7815ff2009dc771033fb4e61",
       "owners": {
         "@document": {
           "before": "bc0083148585d3ae3c2dfcf3099e4755655160747f0dbc33c1feec0c0473bcbe",
-          "after": "1a06317b3c5a6f0eb6f288126587021eb38adbfe0f1f309e304d4b7bd60aef46"
+          "after": "08a2504091d2fcc474a5db3f6d306e999e4edaba7815ff2009dc771033fb4e61"
         }
       }
     },
     "docs/performance/policy-v3/vyper-source-input-roles-v4.json": {
       "before_sha256": null,
-      "after_sha256": "2d9dde40969ad103576b70e9a4a3bf70387ff73e7b66d2c5c82dee59d7ff556b",
+      "after_sha256": "5247a595db1189c8d63609a36fe7b959e98d777a13bc3ff57458f23d73e5e2b1",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2d9dde40969ad103576b70e9a4a3bf70387ff73e7b66d2c5c82dee59d7ff556b"
+          "after": "5247a595db1189c8d63609a36fe7b959e98d777a13bc3ff57458f23d73e5e2b1"
         }
       }
     },
@@ -226,11 +226,15 @@
     },
     "scripts/measure_vyper_source_binding.py": {
       "before_sha256": null,
-      "after_sha256": "4fa432b30d077b510f28b5a95e17562ce14703cdc17f1e70faee01cec02bee71",
+      "after_sha256": "b36f5722f72e70148645a711d575e12b9512216b6b0ec96a5956809fc2b71af9",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ee913ec6407e726f04f97c007c87fc7000cdf7f037784bbd70787756943f293a"
+          "after": "c249b2e9e17e2f335a028bbe03a08896e08de3a68978ba0bc1e6c9bc0171b9fb"
+        },
+        "invoke_owned": {
+          "before": null,
+          "after": "15b65e518c700792b4efa9f25845a51adcec12240debaec4e3ef87bab4f74dba"
         },
         "main": {
           "before": null,
@@ -238,7 +242,7 @@
         },
         "run": {
           "before": null,
-          "after": "7c51bd8a4400c31011e40c3195f26496fdd8aea39b2ed967b3522dda2556c019"
+          "after": "2e957a46387f8e5bcb640963d5966fe110d5ba8d6a8ceb3c6ecddd5141abeb3c"
         },
         "runtime_id": {
           "before": null,
@@ -318,7 +322,7 @@
     },
     "tests/code_quality/test_performance_tool_inputs_v2.py": {
       "before_sha256": "69cc8f3a9f5ba1ea2a7cae9921ca95779566cb04e65cae2c82b54ba1bf220565",
-      "after_sha256": "a14157e66889457eee02a8b4983e6d159c9336279dfbd8b3184d7e451606de17",
+      "after_sha256": "287adadae7d83ba2860fb0f39e091df467b67899017d8a16fe29dc11f81173fa",
       "owners": {
         "_v4_binding": {
           "before": null,
@@ -340,6 +344,14 @@
           "before": null,
           "after": "7319b44269c288aa31ae04ff1973aa52e57b64f425a9df9e486704c3f10e33dc"
         },
+        "test_v4_campaign_success_marker_follows_postflight_and_comparison_admission": {
+          "before": null,
+          "after": "835d291049777c1aedf850e1b97546a303860596ea84bf18753edb02b5544ae9"
+        },
+        "test_v4_command_preflight_prevents_launch_without_source_and_time_budget": {
+          "before": null,
+          "after": "b9716e5de211f960620152c88e1a4356727d7493a0e675810c67f1caf9ef3a5d"
+        },
         "test_v4_comparison_preserves_existing_acceptance": {
           "before": null,
           "after": "1bc5b99145b38b9a819f9a1b63104623aa89bb386a31438384371a8140ffef80"
@@ -359,6 +371,10 @@
         "test_v4_measured_git_locator_accepts_equal_squash_bytes_and_rejects_drift": {
           "before": null,
           "after": "dbfa7728b78f3686d6c2d3d1341d42695c48ffa097d37a4e1dbfb2472bff3c03"
+        },
+        "test_v4_owned_command_retains_receipts_and_rejects_incomplete_attempts": {
+          "before": null,
+          "after": "4ad7549851069103819e4a60a00ba6c10a82ba8f03e7e7eab1679be89ee95a1e"
         }
       }
     },
@@ -490,11 +506,11 @@
     },
     "tools/performance_tool_inputs_v4.py": {
       "before_sha256": null,
-      "after_sha256": "d69b9f41ff6ddd95c3c35bf4c3fac4fede96484249f81644bfe2d12548f13ff8",
+      "after_sha256": "2f2f372ce6f35f93a7f19b65237611ca97662e4d460a5eb998939836cd31784a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "24dbfa42572fbeaf0338c5d7ab368ab5f822943bbb3e8be26328a26946ad25fe"
+          "after": "e17a78a7dad0f36201e150fafaeee8a45d274b6e78737e202adc75048687184c"
         },
         "classify_inputs": {
           "before": null,

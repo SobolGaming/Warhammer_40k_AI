@@ -526,3 +526,129 @@ def test_v4_current_inventory_includes_ignored_authoritative_runtime_resources(
     (package / "alias.json").symlink_to("ignored.json")
     with pytest.raises(ValueError, match="regular files"):
         v4.current_inventory(tmp_path)
+
+
+@pytest.mark.parametrize(
+    "fault", [None, "exit_code", "timeout", "descendants_remained", "cleanup_complete"]
+)
+def test_v4_owned_command_retains_receipts_and_rejects_incomplete_attempts(
+    tmp_path: Path, fault: str | None
+) -> None:
+    import time
+
+    from scripts.measure_vyper_source_binding import invoke_owned
+
+    result: dict[str, object] = {
+        "exit_code": 0,
+        "timeout": False,
+        "descendants_remained": False,
+        "cleanup_complete": True,
+    }
+    if fault is not None:
+        result[fault] = 1 if fault == "exit_code" else fault != "cleanup_complete"
+    checks: list[str] = []
+    attempts: list[dict[str, object]] = []
+
+    def check_arms() -> None:
+        checks.append("checked")
+
+    def supervisor(command: list[str], **kwargs: object) -> dict[str, object]:
+        assert checks == ["checked"]
+        assert command == [
+            "/usr/bin/time",
+            "-v",
+            "-o",
+            str(tmp_path / "attempt/resource.txt"),
+            "owned-command",
+        ]
+        assert kwargs["timeout"] == 405
+        assert kwargs["cwd"] == tmp_path
+        assert kwargs["env"] == {"PYTHONDONTWRITEBYTECODE": "1"}
+        return result
+
+    def invoke() -> Path:
+        return invoke_owned(
+            "attempt",
+            ["owned-command"],
+            tmp_path,
+            420,
+            output=tmp_path,
+            deadline=time.monotonic() + 600,
+            attempts=attempts,
+            run_owned=supervisor,
+            env={"PYTHONDONTWRITEBYTECODE": "1"},
+            check_arms=check_arms,
+        )
+
+    if fault is None:
+        assert invoke() == tmp_path / "attempt"
+        assert checks == ["checked", "checked"]
+    else:
+        with pytest.raises(RuntimeError, match="Failed/incomplete command"):
+            invoke()
+        assert checks == ["checked"]
+    assert len(attempts) == 1
+    assert json.loads((tmp_path / "attempt/receipt.json").read_bytes()) == attempts[0]
+    assert json.loads((tmp_path / "attempts.json").read_bytes()) == attempts
+    assert not (tmp_path / "complete.json").exists()
+
+
+@pytest.mark.parametrize("fault", ["source_drift", "deadline"])
+def test_v4_command_preflight_prevents_launch_without_source_and_time_budget(
+    tmp_path: Path, fault: str
+) -> None:
+    import time
+
+    from scripts.measure_vyper_source_binding import invoke_owned
+
+    def check_arms() -> None:
+        if fault == "source_drift":
+            raise ValueError("source drift")
+
+    def supervisor(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("Preflight failure must not launch a process")
+
+    with pytest.raises((ValueError, TimeoutError), match=r"source drift|Insufficient controller"):
+        invoke_owned(
+            "attempt",
+            ["owned-command"],
+            tmp_path,
+            420,
+            output=tmp_path,
+            deadline=time.monotonic() + 1,
+            attempts=[],
+            run_owned=supervisor,
+            env={},
+            check_arms=check_arms,
+        )
+    assert not list(tmp_path.iterdir())
+
+
+def test_v4_campaign_success_marker_follows_postflight_and_comparison_admission() -> None:
+    """Audit the producer's success boundary without inventing measured samples."""
+    import ast
+    import inspect
+
+    from scripts import measure_vyper_source_binding as driver
+
+    tree = ast.parse(inspect.getsource(driver.run))
+    writes = {
+        node.args[0].right.value: node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "write"
+        and node.args
+        and isinstance(node.args[0], ast.BinOp)
+        and isinstance(node.args[0].right, ast.Constant)
+    }
+    validations = [
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in {"validate_comparison", "check_arms"}
+    ]
+    assert writes["input-binding-after.json"] < writes["comparison.json"]
+    assert writes["dependencies-after.json"] < writes["comparison.json"]
+    assert max(validations) < writes["comparison.json"] < writes["complete.json"]

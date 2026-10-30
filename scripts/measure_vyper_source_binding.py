@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import platform
@@ -15,6 +16,7 @@ import subprocess
 import sys
 import time
 import xml.etree.ElementTree as ET
+from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
@@ -27,6 +29,7 @@ from scripts.source_reuse_experiment import (
     ORDER,
     environment,
     junit_cases,
+    optional_metadata,
     pytest_command,
     retained_contract_tree,
     validate_test_command,
@@ -45,9 +48,65 @@ def runtime_id(root: Path) -> str:
     )
 
 
+def invoke_owned(
+    name: str,
+    command: list[str],
+    arm: Path,
+    cap: int,
+    *,
+    output: Path,
+    deadline: float,
+    attempts: list[dict[str, object]],
+    run_owned: Callable[..., dict[str, object]],
+    env: dict[str, str],
+    check_arms: Callable[[], None],
+) -> Path:
+    """Retain terminal receipts and reject incomplete commands before advancing."""
+    check_arms()
+    if time.monotonic() + cap + 60 > deadline:
+        raise TimeoutError("Insufficient controller budget for a complete command and receipt.")
+    directory = output / name
+    directory.mkdir()
+    timed = ["/usr/bin/time", "-v", "-o", str(directory / "resource.txt"), *command]
+    with (
+        (directory / "stdout.txt").open("wb") as stdout,
+        (directory / "stderr.txt").open("wb") as stderr,
+    ):
+        result = run_owned(
+            timed,
+            timeout=cap - 15,
+            cwd=arm,
+            env=env,
+            stdout=stdout,
+            stderr=stderr,
+        )
+    attempts.append({"name": name, "argv": timed, "cwd": str(arm), "cap_seconds": cap, **result})
+    write(directory / "receipt.json", attempts[-1])
+    write(output / "attempts.json", attempts)
+    if (
+        result["exit_code"] != 0
+        or result["timeout"]
+        or result["descendants_remained"]
+        or result["cleanup_complete"] is not True
+    ):
+        raise RuntimeError("Failed/incomplete command " + name + "; no retries.")
+    check_arms()
+    return directory
+
+
 def run(base: Path, head: Path, output: Path) -> None:
+    started = time.monotonic()
+    remaining_job = (
+        3600 - (time.time() - float(os.environ["REUSE_JOB_START"])) - 120
+        if "REUSE_JOB_START" in os.environ
+        else 3300
+    )
+    deadline = started + min(3300, remaining_job)
     roots = {"base": base.resolve(strict=True), "head": head.resolve(strict=True)}
-    if roots["base"] == roots["head"] or not __debug__:
+    output = output.resolve()
+    if any(output.is_relative_to(root) for root in roots.values()):
+        raise ValueError("Harness and retained outputs must be external to both arms.")
+    if platform.system() != "Linux" or roots["base"] == roots["head"] or not __debug__:
         raise ValueError("Two independent checkouts and Python assertions are required.")
     if output.exists():
         raise ValueError("Retained evidence requires a new output directory.")
@@ -85,17 +144,137 @@ def run(base: Path, head: Path, output: Path) -> None:
     harness = {p: hashlib.sha256((head / p).read_bytes()).hexdigest() for p in exact.HARNESS}
     if original.input_object(binding["harness"])["head"] != harness:
         raise ValueError("Executing harness differs from the admitted candidate.")
+    external_harness = output / "harness"
+    external_harness.mkdir()
+    for relative in exact.HARNESS:
+        target = external_harness / Path(relative).name
+        if target.exists():
+            raise ValueError("Ambiguous copied harness basename.")
+        target.write_bytes((head / relative).read_bytes())
+    supervisor_spec = importlib.util.spec_from_file_location(
+        "_vyper_source_supervisor", external_harness / "ci_attribution_supervisor.py"
+    )
+    if supervisor_spec is None or supervisor_spec.loader is None:
+        raise ValueError("Cannot load the hash-bound external supervisor.")
+    supervisor = importlib.util.module_from_spec(supervisor_spec)
+    supervisor_spec.loader.exec_module(supervisor)
+    run_owned = cast(Callable[..., dict[str, object]], supervisor.run_owned)
+    attempts: list[dict[str, object]] = []
+    write(
+        output / "host.json",
+        {
+            "platform": platform.platform(),
+            "python": sys.version,
+            "cpus": os.cpu_count(),
+            "cpuinfo": Path("/proc/cpuinfo").read_text(),
+            "meminfo": Path("/proc/meminfo").read_text(),
+            "cpu_max": optional_metadata(Path("/sys/fs/cgroup/cpu.max")),
+            "memory_max": optional_metadata(Path("/sys/fs/cgroup/memory.max")),
+        },
+    )
+
+    def check_arms() -> None:
+        for arm_side, arm in roots.items():
+            actual, _ = exact.current_inventory(arm)
+            expected = original.input_object(original.input_object(sides[arm_side])["inventory"])
+            if actual != expected or subprocess.check_output(
+                ["git", "status", "--porcelain", "--untracked-files=normal"], cwd=arm
+            ):
+                raise ValueError("Measured arm source bytes/status drifted: " + arm_side)
+        for relative, expected_hash in harness.items():
+            if (
+                hashlib.sha256((external_harness / Path(relative).name).read_bytes()).hexdigest()
+                != expected_hash
+            ):
+                raise ValueError("External copied harness drifted.")
+        if dependency_identity() != dependencies:
+            raise ValueError("Installed interpreter/dependencies changed during the campaign.")
+
+    def arm_environment(arm: Path) -> dict[str, str]:
+        env = environment()
+        env["PYTHONPATH"] = os.pathsep.join((str(arm / "src"), str(arm)))
+        env["UV_PROJECT_ENVIRONMENT"] = str(Path(sys.prefix))
+        env["UV_NO_SYNC"] = "1"
+        return env
+
+    def invoke(name: str, command: list[str], arm: Path, cap: int) -> Path:
+        return invoke_owned(
+            name,
+            command,
+            arm,
+            cap,
+            output=output,
+            deadline=deadline,
+            attempts=attempts,
+            run_owned=run_owned,
+            env=arm_environment(arm),
+            check_arms=check_arms,
+        )
+
+    negatives: list[dict[str, object]] = []
+    for side, arm in roots.items():
+        proof_directory = output / ("command-proof-" + side)
+        command = pytest_command(arm, proof_directory)
+        validate_test_command(command, arm, proof_directory, cheap=False)
+        for replacement in (
+            command[:-1],
+            [*command, "--maxfail=1"],
+            ["python", *command[1:]],
+            [part if part != "--no-cov" else "--cov" for part in command],
+        ):
+            try:
+                validate_test_command(replacement, arm, proof_directory, cheap=False)
+            except ValueError:
+                negatives.append({"rejected": replacement})
+            else:
+                raise ValueError("Unsafe original command control was accepted.")
+    write(output / "command-preflight.json", {"passed": True, "negative_controls": negatives})
+    invoke(
+        "cleanup-preflight",
+        [
+            sys.executable,
+            str(external_harness / "check_ci_attribution_supervisor.py"),
+            "checks",
+            str(output / "cleanup-cases"),
+        ],
+        external_harness,
+        120,
+    )
+    micro_identity: object = None
+    for index, side in enumerate(ORDER):
+        invoke(
+            f"micro-{index}-{side}",
+            [
+                str(roots[side] / ".venv/bin/python"),
+                "-B",
+                str(external_harness / "source_reuse_experiment.py"),
+                "micro",
+                "--root",
+                str(roots[side]),
+                "--baseline",
+                str(base),
+                "--output",
+                str(output / f"micro-{index}.json"),
+            ],
+            roots[side],
+            60,
+        )
+        evidence = json.loads((output / f"micro-{index}.json").read_bytes())
+        identity = (evidence["python"], evidence["dependencies"])
+        if micro_identity is not None and micro_identity != identity:
+            raise ValueError("Actual arm interpreter/dependencies differ.")
+        micro_identity = identity
+    cheap_directory = output / "cheap-family"
+    cheap_command = pytest_command(head, cheap_directory, cheap=True)
+    validate_test_command(cheap_command, head, cheap_directory, cheap=True)
+    invoke("cheap-family", cheap_command, head, 90)
+    family_cases = set(junit_cases(cheap_directory, 24))
     times: dict[str, list[float]] = {"base": [], "head": []}
     generated: dict[str, list[dict[str, str]]] = {"base": [], "head": []}
     for index, side in enumerate(ORDER):
         directory = output / f"original-{index}-{side}"
-        directory.mkdir()
         command = pytest_command(roots[side], directory)
         validate_test_command(command, roots[side], directory, cheap=False)
-        env = environment()
-        env["PYTHONPATH"] = os.pathsep.join((str(roots[side] / "src"), str(roots[side])))
-        env["UV_PROJECT_ENVIRONMENT"] = str(Path(sys.prefix))
-        env["UV_NO_SYNC"] = "1"
         proof_code = (
             "import json,sys; from pathlib import Path; "
             "import warhammer40k_core.build_identity as m; "
@@ -103,47 +282,24 @@ def run(base: Path, head: Path, output: Path) -> None:
             "'build_id':m.verified_engine_build_identity().build_id,"
             "'prefix':sys.prefix,'executable':sys.executable}))"
         )
-        proof = json.loads(
-            subprocess.check_output(
-                [str(roots[side] / ".venv/bin/python"), "-B", "-c", proof_code],
-                cwd=roots[side],
-                env=env,
-            )
+        proof_directory = invoke(
+            f"import-proof-{index}-{side}",
+            [str(roots[side] / ".venv/bin/python"), "-B", "-c", proof_code],
+            roots[side],
+            60,
         )
+        proof = json.loads((proof_directory / "stdout.txt").read_bytes())
         if (
             not Path(proof["module"]).is_relative_to(roots[side] / "src")
             or proof["build_id"] != runtime_id(roots[side])
             or Path(proof["prefix"]).resolve() != Path(sys.prefix).resolve()
         ):
             raise ValueError("Measured process imported another arm/runtime/environment.")
-        write(directory / "import-runtime-proof.json", proof)
-        write(
-            directory / "command.json",
-            {
-                "argv": command,
-                "cwd": str(roots[side]),
-                "timeout_seconds": 420,
-                "coverage": False,
-                "concurrency": 1,
-            },
-        )
-        started = time.monotonic()
-        with (directory / "output.log").open("wb") as stream:
-            completed = subprocess.run(
-                command,
-                cwd=roots[side],
-                env=env,
-                stdout=stream,
-                stderr=subprocess.STDOUT,
-                timeout=420,
-                check=False,
-            )
-        write(
-            directory / "exit.json",
-            {"returncode": completed.returncode, "process_seconds": time.monotonic() - started},
-        )
-        completed.check_returncode()
-        junit_cases(directory, 1)
+        write(output / f"import-runtime-proof-{index}-{side}.json", proof)
+        invoke(directory.name, command, roots[side], 420)
+        original_cases = junit_cases(directory, 1)
+        if side == "head":
+            family_cases.update(original_cases)
         cases = ET.parse(directory / "junit.xml").findall(".//testcase")
         times[side].append(float(cases[0].attrib["time"]))
         tree = retained_contract_tree(directory / "tmp")
@@ -166,6 +322,10 @@ def run(base: Path, head: Path, output: Path) -> None:
             f"{index + 1}/6 {side}: {times[side][-1]:.3f}s; complete generated tree verified",
             flush=True,
         )
+    if len(family_cases) != 25:
+        raise ValueError("Original candidate family set-union differs from 25 cases.")
+    if time.monotonic() > deadline:
+        raise TimeoutError("Original controller deadline exceeded before completion.")
     after = exact.comparison_inputs(
         head,
         base=exact.BASE,
@@ -231,7 +391,25 @@ def run(base: Path, head: Path, output: Path) -> None:
         expected_inputs=expected_inputs,
         expected_binding=binding,
     )
+    check_arms()
+    if time.monotonic() > deadline:
+        raise TimeoutError("Controller deadline exceeded during final validation.")
     write(output / "comparison.json", report)
+    write(
+        output / "complete.json",
+        {
+            "complete": True,
+            "elapsed": time.monotonic() - started,
+            "order": ORDER,
+            "original_processes": 6,
+            "source_batches": 6,
+            "candidate_family_case_union": sorted(family_cases),
+            "qualification": (
+                "Bounded three-pair original testcase timings; process-tree RSS is max "
+                "reported RSS, not concurrent summed RSS. No whole-CI claim."
+            ),
+        },
+    )
     print(
         "Six real samples satisfy unchanged relative budgets and all exact output bindings.",
         flush=True,

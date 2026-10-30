@@ -49,6 +49,8 @@
     "docs/source_rules/faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf",
     "docs/source_rules/tacoma-open-2026-source-package.json",
     "pyproject.toml",
+    "scripts/check_ci_attribution_supervisor.py",
+    "scripts/ci_attribution_supervisor.py",
     "scripts/source_reuse_experiment.py",
     "tests/code_quality/test_phase18m_conformance_boundary.py",
     "tests/conftest.py",
@@ -56,6 +58,8 @@
     "uv.lock"
   ],
   "harness": [
+    "scripts/check_ci_attribution_supervisor.py",
+    "scripts/ci_attribution_supervisor.py",
     "scripts/measure_vyper_source_binding.py",
     "scripts/source_reuse_experiment.py",
     "tests/code_quality/test_phase18m_conformance_boundary.py",
