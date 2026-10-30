@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import gzip
+import hashlib
 import json
 import subprocess
+from datetime import UTC, datetime
 from pathlib import Path
 from urllib.request import Request, urlopen
 
@@ -15,6 +18,9 @@ from warhammer40k_core.rules.mfm_source import (
     parse_mfm_index_html,
     parse_mfm_version_html,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_07 import (
+    supported_faction_ids,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = (
@@ -24,13 +30,13 @@ DEFAULT_OUTPUT = (
     / "rules"
     / "source_packages"
     / "warhammer_40000_11th"
-    / "mfm_2026_07"
+    / "mfm_2026_10"
 )
 SOURCE_URL = "https://mfm.warhammer-community.com/en/"
-SOURCE_PACKAGE_ID = "gw-11e-mfm-2026-07"
+SOURCE_PACKAGE_ID = "gw-11e-mfm-2026-10"
 SOURCE_TITLE = "Warhammer 40,000: Munitorum Field Manual"
-SOURCE_VERSION = "v1.1"
-SOURCE_DATE = "2026-07-22"
+SOURCE_VERSION = "v1.6"
+SOURCE_DATE = "2026-10-14"
 EXCLUDED_FACTION_IDS = ("chaos-titan-legions", "titan-legions")
 
 
@@ -40,20 +46,39 @@ class MfmImportToolError(ValueError):
 
 def main() -> None:
     args = _parse_args()
-    index_html = _fetch_url(SOURCE_URL, use_curl=args.use_curl)
+    captures: list[dict[str, str]] = []
+
+    def source_html(slug: str, url: str) -> str:
+        if args.source_directory is None:
+            html = _fetch_url(url, use_curl=args.use_curl)
+        else:
+            html = gzip.decompress((args.source_directory / f"{slug}.html.gz").read_bytes()).decode(
+                "utf-8"
+            )
+        captures.append(
+            {
+                "source_id": slug,
+                "url": url,
+                "status": "checked",
+                "sha256": hashlib.sha256(html.encode("utf-8")).hexdigest(),
+            }
+        )
+        return html
+
+    index_html = source_html("index", SOURCE_URL)
     _validate_source_version(html=index_html, url=SOURCE_URL)
     factions = tuple(
         faction
         for faction in parse_mfm_index_html(index_html)
         if faction.faction_id not in EXCLUDED_FACTION_IDS
     )
-    if not factions:
-        raise MfmImportToolError("MFM import found no supported factions.")
+    if {faction.faction_id for faction in factions} != set(supported_faction_ids()):
+        raise MfmImportToolError("MFM import requires the reviewed 28-faction scope.")
 
     records: list[MfmFactionRecord] = []
     for faction in factions:
         faction_url = _absolute_url(faction)
-        faction_html = _fetch_url(faction_url, use_curl=args.use_curl)
+        faction_html = source_html(faction.faction_id, faction_url)
         _validate_source_version(html=faction_html, url=faction_url)
         try:
             records.append(
@@ -79,6 +104,21 @@ def main() -> None:
     output_path = args.output
     output_path.mkdir(parents=True, exist_ok=True)
     _write_package_artifacts(output_path=output_path, package=package)
+    if args.capture_manifest is not None:
+        args.capture_manifest.parent.mkdir(parents=True, exist_ok=True)
+        args.capture_manifest.write_text(
+            _json_artifact_text(
+                {
+                    "source_version": SOURCE_VERSION,
+                    "source_date": SOURCE_DATE,
+                    "checked_on": datetime.now(UTC).date().isoformat(),
+                    "captures": captures,
+                    "inaccessible_sources": [],
+                    "excluded_faction_ids": list(EXCLUDED_FACTION_IDS),
+                }
+            ),
+            encoding="utf-8",
+        )
 
 
 def _parse_args() -> argparse.Namespace:
@@ -92,6 +132,16 @@ def _parse_args() -> argparse.Namespace:
         help="Generated source-package artifact directory path.",
     )
     parser.add_argument(
+        "--source-directory",
+        type=Path,
+        help="Read reviewed captured <faction>.html.gz pages without network.",
+    )
+    parser.add_argument(
+        "--capture-manifest",
+        type=Path,
+        help="Write the exact decoded source-page hashes and checked URLs.",
+    )
+    parser.add_argument(
         "--use-curl",
         action="store_true",
         help="Fetch pages through curl instead of urllib.",
@@ -102,7 +152,7 @@ def _parse_args() -> argparse.Namespace:
 def _fetch_url(url: str, *, use_curl: bool) -> str:
     if use_curl:
         completed = subprocess.run(
-            ("curl", "-L", "--compressed", "-s", url),
+            ("curl", "-L", "-f", "--max-time", "30", "--compressed", "-sS", url),
             check=True,
             capture_output=True,
             text=True,
@@ -147,7 +197,7 @@ def _write_package_artifacts(*, output_path: Path, package: MfmSourcePackage) ->
         artifact_path.write_text(_json_artifact_text(faction.to_payload()), encoding="utf-8")
 
     manifest = {
-        "artifact_schema": "core-v2-mfm-source-package-v2",
+        "artifact_schema": "core-v2-mfm-source-package-v3",
         "source_package_id": package.source_package_id,
         "source_title": package.source_title,
         "source_version": package.source_version,

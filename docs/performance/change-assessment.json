@@ -1,756 +1,1284 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "5657bf5f127466edeecf3259e0a53e29f6a9a352",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3bf79c73db5c5f28d8401fcf9f10298fae6aac5a349ef00cf4e79c9f7785bac7",
-  "operation_map_sha256": "996327cc27e6322ebfe71436094eaa146d66cf9f753fc5ba89db592a054e6f1e",
+  "base": "d3c5737b39dfa647125b64c24b1e67bc9364c5c9",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ef7e9800c922a8c331094e05c6a7b774f2fa33cc74da0e4bd135cf9b9906bd08",
+  "operation_map_sha256": "d2b7d40e4e6cea2e5e219affd9b6410887fd595b8d8136c66dd9f572bfaf6124",
   "changes": {
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "861e7fb5aaf6eda98f8b90c99a97e95a6e1ee61b791a5279b94d1d13c0bab489",
-      "after_sha256": "2b77d4b88cd631404ecb9722a703f7ac4a706c3ec52f43b5f231e6b911d871bf",
-      "owners": {
-        "@document": {
-          "before": "861e7fb5aaf6eda98f8b90c99a97e95a6e1ee61b791a5279b94d1d13c0bab489",
-          "after": "2b77d4b88cd631404ecb9722a703f7ac4a706c3ec52f43b5f231e6b911d871bf"
-        }
-      }
-    },
-    "ci/quality_shards/shard-1-modules.txt": {
-      "before_sha256": "5c61df88031eb6c4b71f900ff09769c17c22cc4a8f6cf85fde9bf73ab0d160fb",
-      "after_sha256": "b3b500c620eadc8afa8031b7b5932bfaef5ad5851bc7e0441cc17c7453b84d16",
-      "owners": {
-        "@document": {
-          "before": "5c61df88031eb6c4b71f900ff09769c17c22cc4a8f6cf85fde9bf73ab0d160fb",
-          "after": "b3b500c620eadc8afa8031b7b5932bfaef5ad5851bc7e0441cc17c7453b84d16"
-        }
-      }
-    },
-    "ci/quality_shards/shard-1.txt": {
-      "before_sha256": "1fa44ca9afa5c5be7807bdf728fb8bab411f0f03cb156a83fddb0bc416fdaa90",
-      "after_sha256": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f",
-      "owners": {
-        "@document": {
-          "before": "1fa44ca9afa5c5be7807bdf728fb8bab411f0f03cb156a83fddb0bc416fdaa90",
-          "after": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f"
-        }
-      }
-    },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "470673254e8c6c2658bf754b12e40cebf0d393d8e69bf154b17cf0efc2a61c80",
-      "after_sha256": "93f38045bb61f69b3e44f7be2adc0691572c1ab049127ec7a3b145defe4460fe",
+      "before_sha256": "93f38045bb61f69b3e44f7be2adc0691572c1ab049127ec7a3b145defe4460fe",
+      "after_sha256": "47ad4a7fc74d0f394e632694f4b440e5bfa6d0e7233f0f3e09004ed74db59c44",
       "owners": {
         "@document": {
-          "before": "470673254e8c6c2658bf754b12e40cebf0d393d8e69bf154b17cf0efc2a61c80",
-          "after": "93f38045bb61f69b3e44f7be2adc0691572c1ab049127ec7a3b145defe4460fe"
+          "before": "93f38045bb61f69b3e44f7be2adc0691572c1ab049127ec7a3b145defe4460fe",
+          "after": "47ad4a7fc74d0f394e632694f4b440e5bfa6d0e7233f0f3e09004ed74db59c44"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "7d381760593db52a9ec14a217299b238a8fa0bfd83e0ba3caf82ddcdfb6c9960",
-      "after_sha256": "2f18f245f2db8935fb047f1ffee1173a35dda0ecbc32cf5f809dea6fc77dbb42",
+      "before_sha256": "2f18f245f2db8935fb047f1ffee1173a35dda0ecbc32cf5f809dea6fc77dbb42",
+      "after_sha256": "11529f737a625a9d61b5e2bf2797a5812285c87908c6a2ff3898c31ffe763ddc",
       "owners": {
         "@document": {
-          "before": "7d381760593db52a9ec14a217299b238a8fa0bfd83e0ba3caf82ddcdfb6c9960",
-          "after": "2f18f245f2db8935fb047f1ffee1173a35dda0ecbc32cf5f809dea6fc77dbb42"
+          "before": "2f18f245f2db8935fb047f1ffee1173a35dda0ecbc32cf5f809dea6fc77dbb42",
+          "after": "11529f737a625a9d61b5e2bf2797a5812285c87908c6a2ff3898c31ffe763ddc"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "4233db05af3ae94419748df15ae2c328d065780c58144929bf1799a12d3bd64b",
-      "after_sha256": "eb29bb7b0eb7cf399917d11ac4719565ac12a237b582e956833bdf4d3e21abea",
+      "before_sha256": "eb29bb7b0eb7cf399917d11ac4719565ac12a237b582e956833bdf4d3e21abea",
+      "after_sha256": "9ef6914b336d30dc0315cd688a115a4feb6c08069de51604a60f5ff5b34f2d5a",
       "owners": {
         "@document": {
-          "before": "4233db05af3ae94419748df15ae2c328d065780c58144929bf1799a12d3bd64b",
-          "after": "eb29bb7b0eb7cf399917d11ac4719565ac12a237b582e956833bdf4d3e21abea"
+          "before": "eb29bb7b0eb7cf399917d11ac4719565ac12a237b582e956833bdf4d3e21abea",
+          "after": "9ef6914b336d30dc0315cd688a115a4feb6c08069de51604a60f5ff5b34f2d5a"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "b7b3b3f4602292e7a7d04c62062bbdccd9a6f71db4994ac70dd39b60b4276c04",
-      "after_sha256": "9b6a7cc14207234e2c3f80172d8a3a9e57b9292e56d11118cc2f291e2558b263",
+      "before_sha256": "9b6a7cc14207234e2c3f80172d8a3a9e57b9292e56d11118cc2f291e2558b263",
+      "after_sha256": "17545bcd39e2f48112ce5b72faaa45c89081d8c89b69b16c91747f32473c3fa4",
       "owners": {
         "@document": {
-          "before": "b7b3b3f4602292e7a7d04c62062bbdccd9a6f71db4994ac70dd39b60b4276c04",
-          "after": "9b6a7cc14207234e2c3f80172d8a3a9e57b9292e56d11118cc2f291e2558b263"
+          "before": "9b6a7cc14207234e2c3f80172d8a3a9e57b9292e56d11118cc2f291e2558b263",
+          "after": "17545bcd39e2f48112ce5b72faaa45c89081d8c89b69b16c91747f32473c3fa4"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "15f09362eb9f7a8eb2a06f33166a9610e74186a9d6091e8695110e06f44801d7",
-      "after_sha256": "4573d00e9ebbbf62b5685411cbad827e1ee7352794629c73c1937d52e8e9247b",
+      "before_sha256": "4573d00e9ebbbf62b5685411cbad827e1ee7352794629c73c1937d52e8e9247b",
+      "after_sha256": "f89d2e406d1fe6e778c1b61cc50a8ed8f274b58cb3ce990a3bb2933ced292bf7",
       "owners": {
         "@document": {
-          "before": "15f09362eb9f7a8eb2a06f33166a9610e74186a9d6091e8695110e06f44801d7",
-          "after": "4573d00e9ebbbf62b5685411cbad827e1ee7352794629c73c1937d52e8e9247b"
+          "before": "4573d00e9ebbbf62b5685411cbad827e1ee7352794629c73c1937d52e8e9247b",
+          "after": "f89d2e406d1fe6e778c1b61cc50a8ed8f274b58cb3ce990a3bb2933ced292bf7"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "839bb1dada208f12ec8119f25f1dccc204eb04bd5b38f44a776f6da19be1dcdb",
-      "after_sha256": "e20a44cee8109cbdbd02d3a883c524f2f72d90aa7e20d32ec1a65c8d6d84c5ad",
+      "before_sha256": "e20a44cee8109cbdbd02d3a883c524f2f72d90aa7e20d32ec1a65c8d6d84c5ad",
+      "after_sha256": "0005409f1c730e10036a767dc657eb5bddd9b60514c9de750b303193ce906dde",
       "owners": {
         "@document": {
-          "before": "839bb1dada208f12ec8119f25f1dccc204eb04bd5b38f44a776f6da19be1dcdb",
-          "after": "e20a44cee8109cbdbd02d3a883c524f2f72d90aa7e20d32ec1a65c8d6d84c5ad"
+          "before": "e20a44cee8109cbdbd02d3a883c524f2f72d90aa7e20d32ec1a65c8d6d84c5ad",
+          "after": "0005409f1c730e10036a767dc657eb5bddd9b60514c9de750b303193ce906dde"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "fc5c020f8b69807a53baa7b9a35ef121cd5dd45142b174d9ed5da677e845e6e6",
-      "after_sha256": "9c6e0ed215024c4862578b66809352f214c8176131312ee71f35c37dc368796e",
+      "before_sha256": "9c6e0ed215024c4862578b66809352f214c8176131312ee71f35c37dc368796e",
+      "after_sha256": "9bab363dddb9707d700da62fca858e33fcf52af99be87be5cf50b41fcd7ffeae",
       "owners": {
         "@document": {
-          "before": "fc5c020f8b69807a53baa7b9a35ef121cd5dd45142b174d9ed5da677e845e6e6",
-          "after": "9c6e0ed215024c4862578b66809352f214c8176131312ee71f35c37dc368796e"
+          "before": "9c6e0ed215024c4862578b66809352f214c8176131312ee71f35c37dc368796e",
+          "after": "9bab363dddb9707d700da62fca858e33fcf52af99be87be5cf50b41fcd7ffeae"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "f801641681381172defed6541fb8b8c7333df2f76c59044c291e70e80f648e78",
-      "after_sha256": "86cdd2a753a7f52ab3bf0de8466c5093d03b1fcd6098207676f718da5ac2a684",
+      "before_sha256": "86cdd2a753a7f52ab3bf0de8466c5093d03b1fcd6098207676f718da5ac2a684",
+      "after_sha256": "3ee5984e50b32ff1c0f5dc8e4016eff379edd7beb23f95f5fcae5700e5524f4d",
       "owners": {
         "@document": {
-          "before": "f801641681381172defed6541fb8b8c7333df2f76c59044c291e70e80f648e78",
-          "after": "86cdd2a753a7f52ab3bf0de8466c5093d03b1fcd6098207676f718da5ac2a684"
+          "before": "86cdd2a753a7f52ab3bf0de8466c5093d03b1fcd6098207676f718da5ac2a684",
+          "after": "3ee5984e50b32ff1c0f5dc8e4016eff379edd7beb23f95f5fcae5700e5524f4d"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "e6fb38ea9794db2c17c7c9a70c23f0587cbdfae3ce0864c3466b81933dc6625d",
-      "after_sha256": "5293c08fbcf01545bdfc1fc0712a1ff0ad639db157508a89c8b55b240a368b30",
+      "before_sha256": "5293c08fbcf01545bdfc1fc0712a1ff0ad639db157508a89c8b55b240a368b30",
+      "after_sha256": "9d7025dc6e543aa3b9415424d840c085d2483a03f3be7823fc6ae59105da3bc1",
       "owners": {
         "@document": {
-          "before": "e6fb38ea9794db2c17c7c9a70c23f0587cbdfae3ce0864c3466b81933dc6625d",
-          "after": "5293c08fbcf01545bdfc1fc0712a1ff0ad639db157508a89c8b55b240a368b30"
+          "before": "5293c08fbcf01545bdfc1fc0712a1ff0ad639db157508a89c8b55b240a368b30",
+          "after": "9d7025dc6e543aa3b9415424d840c085d2483a03f3be7823fc6ae59105da3bc1"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/adepta-sororitas.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "bfdf4bf6c8cd03a228993af049887e119550243a28c7470463081f9e74baf38e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bfdf4bf6c8cd03a228993af049887e119550243a28c7470463081f9e74baf38e"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/adeptus-custodes.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "12152e1c4c388026a4e313e83fa77fd9a1ab9dd26de65f88579adf0824f8c3e4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "12152e1c4c388026a4e313e83fa77fd9a1ab9dd26de65f88579adf0824f8c3e4"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/adeptus-mechanicus.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "a14b2defb916f7fa6cdc7a104df66341cd790ab67eaf264e088b032440147253",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a14b2defb916f7fa6cdc7a104df66341cd790ab67eaf264e088b032440147253"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/aeldari.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "18e780b2e4eeab35ece0a2f74ff17a9b6b527be91433b8f2d97d53f609a318a6",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "18e780b2e4eeab35ece0a2f74ff17a9b6b527be91433b8f2d97d53f609a318a6"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/astra-militarum.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "f3aec11dd1d443f3050eb15e693dba6f7c718b1f9fc5c969e5a75376f6f58eb2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f3aec11dd1d443f3050eb15e693dba6f7c718b1f9fc5c969e5a75376f6f58eb2"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/black-templars.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "fe1d98bd8a785903cb5e46ab4bcc4d7a95d1bcbb91201ffef1e43756b979faee",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fe1d98bd8a785903cb5e46ab4bcc4d7a95d1bcbb91201ffef1e43756b979faee"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/blood-angels.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "bf968704093476ef80e5cb5065eeb41b0a6fdcb30dcb2e41839c921429901f33",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bf968704093476ef80e5cb5065eeb41b0a6fdcb30dcb2e41839c921429901f33"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/bounded-rule-checks.json": {
+      "before_sha256": null,
+      "after_sha256": "8c9f64c1ac43d523ffa4c63db7d9335ddea2e1231bbeec3c9cf376c56d3ca1ce",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8c9f64c1ac43d523ffa4c63db7d9335ddea2e1231bbeec3c9cf376c56d3ca1ce"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/chaos-daemons.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "85909a0428e6f62987c00a111e791b06d9be3e95ec51cf83dce3281616e594bc",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "85909a0428e6f62987c00a111e791b06d9be3e95ec51cf83dce3281616e594bc"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/chaos-knights.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "0f5e2547b2d1570cbd10051424813cba67599d907f50cf0d5f34df75303c6c4a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0f5e2547b2d1570cbd10051424813cba67599d907f50cf0d5f34df75303c6c4a"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/chaos-space-marines.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "2e95ed2cd6a8a7908beef64e934cfa4483c7515591830b9e939d4af727e3d242",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2e95ed2cd6a8a7908beef64e934cfa4483c7515591830b9e939d4af727e3d242"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/dark-angels.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "13109fb685c539383c86acf2719a5098b1bf2043aae5b8a6d64428ea773ed752",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "13109fb685c539383c86acf2719a5098b1bf2043aae5b8a6d64428ea773ed752"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/death-guard.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "b9fdbb61e8677143d1a44486e5350cdd51cee5601f31da5c5fc8c518a4cdd9ad",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b9fdbb61e8677143d1a44486e5350cdd51cee5601f31da5c5fc8c518a4cdd9ad"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/deathwatch.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "eb07bb0e8a58b1a0aa1ade46173d5f3a6e745e6e2cdf304ec8a4db3beb5cb0cd",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "eb07bb0e8a58b1a0aa1ade46173d5f3a6e745e6e2cdf304ec8a4db3beb5cb0cd"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/drukhari.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "58a1f9df046f31af29cb1e0df5960a4de18680d045ddeece1d70a61ac2492c8a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "58a1f9df046f31af29cb1e0df5960a4de18680d045ddeece1d70a61ac2492c8a"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/emperors-children.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "b8889007d005cc2883551d7b01de673cd9381e3869cdecf1022363fd927d317a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b8889007d005cc2883551d7b01de673cd9381e3869cdecf1022363fd927d317a"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/genestealer-cults.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "25dcd37d7565d0734701982eedb70a5d6eea6c8b46b73b9665f4d95752f7730e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "25dcd37d7565d0734701982eedb70a5d6eea6c8b46b73b9665f4d95752f7730e"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/grey-knights.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "d5afbfb7634755a60b9a6ac3338ba3391f0f72110b3ec6aff86bc6926761e00e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d5afbfb7634755a60b9a6ac3338ba3391f0f72110b3ec6aff86bc6926761e00e"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/imperial-agents.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "31da47914d668486cb3d8adf5a746d7a8e3ec34530fc5cab7e81d2470401d2af",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "31da47914d668486cb3d8adf5a746d7a8e3ec34530fc5cab7e81d2470401d2af"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/imperial-knights.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "6b4b474595318a28f0fbc0cd59e49518545ffadb1f2d66f788055d53deb2ae6d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6b4b474595318a28f0fbc0cd59e49518545ffadb1f2d66f788055d53deb2ae6d"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/index.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "123ab10a5b94e067cfea8d3959f0ad2146ce49b883673b57ba31cdd5e85ecf24",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "123ab10a5b94e067cfea8d3959f0ad2146ce49b883673b57ba31cdd5e85ecf24"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/leagues-of-votann.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "2beae87ea513ba0fcfe12c47cea67e5e30cecec1cdf89487e08bbb06bcff8313",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2beae87ea513ba0fcfe12c47cea67e5e30cecec1cdf89487e08bbb06bcff8313"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/necrons.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "d3524ed9b1e6c4dcc3085011920bee5544ce7004c72d92e8134a41a801d6e1be",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d3524ed9b1e6c4dcc3085011920bee5544ce7004c72d92e8134a41a801d6e1be"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/orks.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "11392c9d6bf6a77961daca482b0e60edd8ff80f88b9e727326eca07572ba0b25",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "11392c9d6bf6a77961daca482b0e60edd8ff80f88b9e727326eca07572ba0b25"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/space-marines.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "6de0942abf7cce6882e199043919549e780000fd9de64e3176eb4c33034b9078",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6de0942abf7cce6882e199043919549e780000fd9de64e3176eb4c33034b9078"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/space-wolves.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "879056833b48207d23cd8a0bc84ca09d0d45f7ad2e4c1073a1996e56e9d73975",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "879056833b48207d23cd8a0bc84ca09d0d45f7ad2e4c1073a1996e56e9d73975"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/tau-empire.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "506fc538846bf48682f45eb9ca77c83ef1254e51e1f609a74def4d33b5d2744f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "506fc538846bf48682f45eb9ca77c83ef1254e51e1f609a74def4d33b5d2744f"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/thousand-sons.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "c7c2e8b7a1eba33587addac1f17ef60a0bc8e6693ed6b3a4663ce1cf25257619",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c7c2e8b7a1eba33587addac1f17ef60a0bc8e6693ed6b3a4663ce1cf25257619"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/tyranids.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "05ed9664ca500b0508e94a2bef7ceca3766aae737fa6f83610e7f9f9cb4b390c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "05ed9664ca500b0508e94a2bef7ceca3766aae737fa6f83610e7f9f9cb4b390c"
+        }
+      }
+    },
+    "data/source_audits/mfm_2026_10/world-eaters.html.gz": {
+      "before_sha256": null,
+      "after_sha256": "795c2fe7641ca7d24ac5911f472c205a8bb88dba4644379353b5812d2a4d64bc",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "795c2fe7641ca7d24ac5911f472c205a8bb88dba4644379353b5812d2a4d64bc"
+        }
+      }
+    },
+    "data/source_manifests/mfm_2026_10_review.json": {
+      "before_sha256": null,
+      "after_sha256": "beebf4bf26588e974e0b22a64ded941e241d3774602a3d3f306afc21914d5b95",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "beebf4bf26588e974e0b22a64ded941e241d3774602a3d3f306afc21914d5b95"
+        }
+      }
+    },
+    "data/source_manifests/mfm_2026_10_sources.json": {
+      "before_sha256": null,
+      "after_sha256": "3fe32b6a7188c4f14d823bedb4da3d3b37092722230fcda894428baf1cddb7cd",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3fe32b6a7188c4f14d823bedb4da3d3b37092722230fcda894428baf1cddb7cd"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "2a876950c4234a3d1c41d2c1d47213bd0d5ab568a13a64011af8ab78580606dc",
-      "after_sha256": "2cba1a768e51779a1e3090df36ddb13a37a4038673ef71a6bbe3c3c26c5ec4c2",
+      "before_sha256": "2cba1a768e51779a1e3090df36ddb13a37a4038673ef71a6bbe3c3c26c5ec4c2",
+      "after_sha256": "48f46233b826b1b435d859b4b89a00704a4f700cbb7517c2bf49faa0f37b9cc1",
       "owners": {
         "@document": {
-          "before": "2a876950c4234a3d1c41d2c1d47213bd0d5ab568a13a64011af8ab78580606dc",
-          "after": "2cba1a768e51779a1e3090df36ddb13a37a4038673ef71a6bbe3c3c26c5ec4c2"
+          "before": "2cba1a768e51779a1e3090df36ddb13a37a4038673ef71a6bbe3c3c26c5ec4c2",
+          "after": "48f46233b826b1b435d859b4b89a00704a4f700cbb7517c2bf49faa0f37b9cc1"
         }
       }
     },
-    "docs/performance/current/issue590-command-fork.json": {
+    "docs/MFM_2026_10_RECONCILIATION.md": {
       "before_sha256": null,
-      "after_sha256": "43d8e617db484aa47d49e0a5ea9eb51fc58cabf4d42bd1ce4fa63d141b2e9d6f",
+      "after_sha256": "469e94269f9f1ffbe23aa4295e1dbe8124a867fa946caa4c611b9f05a5522330",
       "owners": {
         "@document": {
           "before": null,
-          "after": "43d8e617db484aa47d49e0a5ea9eb51fc58cabf4d42bd1ce4fa63d141b2e9d6f"
-        }
-      }
-    },
-    "docs/performance/current/issue590-movement.json": {
-      "before_sha256": null,
-      "after_sha256": "0cfb7a2051e07630252800a8575d583b2e621e674bc341f8df968fef332a4b91",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "0cfb7a2051e07630252800a8575d583b2e621e674bc341f8df968fef332a4b91"
-        }
-      }
-    },
-    "docs/performance/current/issue590-setup.json": {
-      "before_sha256": null,
-      "after_sha256": "65a7b9536f8af76992854d4ddcfbe8e2866c280a5483f5bca3729a41a5811670",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "65a7b9536f8af76992854d4ddcfbe8e2866c280a5483f5bca3729a41a5811670"
-        }
-      }
-    },
-    "docs/performance/current/issue590-visibility.json": {
-      "before_sha256": null,
-      "after_sha256": "ba075033c02fc82e2735407c6103ae2baa26b6b168b04984726f3f6427f6cf08",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "ba075033c02fc82e2735407c6103ae2baa26b6b168b04984726f3f6427f6cf08"
-        }
-      }
-    },
-    "docs/performance/issue590-http.json": {
-      "before_sha256": null,
-      "after_sha256": "1d6a89334ec9490e3158af1b28a1a2d64819b978839e19c28ba87cd48dae1110",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "1d6a89334ec9490e3158af1b28a1a2d64819b978839e19c28ba87cd48dae1110"
-        }
-      }
-    },
-    "docs/performance/issue590.md": {
-      "before_sha256": null,
-      "after_sha256": "8cb548eb190d257c90ac925a0bc8c1e5631f80a5b17e60018b9ff129659fcf49",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "8cb548eb190d257c90ac925a0bc8c1e5631f80a5b17e60018b9ff129659fcf49"
+          "after": "469e94269f9f1ffbe23aa4295e1dbe8124a867fa946caa4c611b9f05a5522330"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "06b3357d35386c600d109f1a79dedf2a42539005401ce18c7b8d97a42bfa881a",
-      "after_sha256": "2e0e8b620d0b31197c9220912d5cef5ba90c63598dcf0c33f5820b8cd8933d00",
+      "before_sha256": "2e0e8b620d0b31197c9220912d5cef5ba90c63598dcf0c33f5820b8cd8933d00",
+      "after_sha256": "5e87b5c0c89eef3af8071437570a5a7ba29d7c6c61db14ab006964949a51878c",
       "owners": {
         "@document": {
-          "before": "06b3357d35386c600d109f1a79dedf2a42539005401ce18c7b8d97a42bfa881a",
-          "after": "2e0e8b620d0b31197c9220912d5cef5ba90c63598dcf0c33f5820b8cd8933d00"
-        }
-      }
-    },
-    "scripts/check_performance_policy.py": {
-      "before_sha256": "f2fd48a34d36739eafd6e81f7be8788272122849aa9536655ab88041b00effa9",
-      "after_sha256": "01310f1cdba3520f77cf0c877c9f818eeb32e23e79ae448c2064b5de4053e779",
-      "owners": {
-        "@module": {
-          "before": "fdb925d1aa51a2581b960aa6993721b571b78788c91d027e6630d56a5e780dc8",
-          "after": "517df7c229779d26547dea8255c533c603da026d88c3d924d3b575ae9cf68a46"
-        },
-        "_fresh_comparison_metadata": {
-          "before": null,
-          "after": "aac0aa79b23d8ec86606225a318eed13a68aa4e9d5c495bb881d79644669bc59"
-        },
-        "_uses_fresh_current_comparisons": {
-          "before": null,
-          "after": "ccbca78214ab9544a157fba2c914ecb6c25949505b290e500aec7a8060e3deb4"
-        },
-        "validate_current": {
-          "before": "cd93e1a0457057b6bb5266b1c6f9fae8df8324101f8ed3038ca98987fdeefefb",
-          "after": "44539c4436f9f01c27965efb1711ba3c66d4dd18bc5e265de758e2e02b355633"
-        }
-      }
-    },
-    "scripts/measure_command_fork.py": {
-      "before_sha256": null,
-      "after_sha256": "9a0e09be4c94901206eb4fef77111f8d3f655db3a14202fe80042b6056d630b2",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "99303949625530007818087fd2a33cd8e49f3dfa90a1815e91925431b3e7bfb8"
-        },
-        "_sample": {
-          "before": null,
-          "after": "92079b21015294154ecb7631f6471ae4ace7aa5b9f75caf713aaaf2d28f41886"
-        },
-        "main": {
-          "before": null,
-          "after": "48d5f57d6d26779f253f7c5b6f81ba441664e2b44b8776d0cc288454e2c922dc"
+          "before": "2e0e8b620d0b31197c9220912d5cef5ba90c63598dcf0c33f5820b8cd8933d00",
+          "after": "5e87b5c0c89eef3af8071437570a5a7ba29d7c6c61db14ab006964949a51878c"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "f637d11f2a82af201cdc37e072792bbcdc558bee4c609c8c4f38c39860ece725",
-      "after_sha256": "31243a5447707531113a0766962dc3d146aea25c2af8675e4619bcaae6b91878",
+      "before_sha256": "31243a5447707531113a0766962dc3d146aea25c2af8675e4619bcaae6b91878",
+      "after_sha256": "62183827fa1f4fe4e7701bdab3cca5b1c9a1336e56b7ab27033d398bb67f0bd9",
       "owners": {
         "@document": {
-          "before": "f637d11f2a82af201cdc37e072792bbcdc558bee4c609c8c4f38c39860ece725",
-          "after": "31243a5447707531113a0766962dc3d146aea25c2af8675e4619bcaae6b91878"
+          "before": "31243a5447707531113a0766962dc3d146aea25c2af8675e4619bcaae6b91878",
+          "after": "62183827fa1f4fe4e7701bdab3cca5b1c9a1336e56b7ab27033d398bb67f0bd9"
         }
       }
     },
-    "src/warhammer40k_core/adapters/session_protocol.py": {
-      "before_sha256": "c8061df015723ccfaa5de8d8280a646c0e3fdcafda9d4b05f84430e0b681ae62",
-      "after_sha256": "534931789f1bca9b5fa71c438b71738740d889a6a75123a5bdf017ba918c51c5",
+    "src/warhammer40k_core/engine/army_points.py": {
+      "before_sha256": "f42f5d47fc2b6077f50fe621874c6eaee0171ee8a8a93398a730fb3bc25ba672",
+      "after_sha256": "b1e28b7b4756e6ec988699b241ea8bbcc8f0706ad7ab0c1dbf3fd1f77f4fcb2a",
       "owners": {
-        "@module": {
-          "before": "c26515b3e3aa2e5c5d1f1ac393b9a6c4a94ed3d9473ba7666339cf234de54836",
-          "after": "df8876a904ce0414dd065271bbe7f193ad95bbc8f936720f5fa93a23768e6d4f"
+        "_current_mfm_faction_record": {
+          "before": "ab9cf43c7878bc56ff0e372a4df7682f025f0eb70453cb7c6ec3761f31dec2b3",
+          "after": "005ae0c6a6e789c9573bb4aa88de3270f1754c7b831b8a0a0f3676b0e73ee806"
         },
-        "AuthoritativeSession.fork_for_command": {
-          "before": "98b24d118607156c6df0e801686d5046db1f3b9be0bd2d52e434a6866322beaa",
-          "after": "92e5b25134defac967ef8b47a49b5f2c034092e9a1772442b1b2f3ddfbba0814"
+        "_current_mfm_supported_faction_ids": {
+          "before": "35b1bf099bd609cdf4aa65446572b480e4b9690bcdfbd49ea05c8402624bfaaa",
+          "after": "cd37967a36609bebf4e3b7632176c77944ca7d05cc9bd9343022312e9a528c78"
+        },
+        "_detachments_with_mfm_rules": {
+          "before": "9f48186f2737b63a8efabbf82808d4f05c5187d67489743f0467aa7bf1edd37e",
+          "after": "d0dcc4f982c9742fdc4f9750223ef8f8cf0191adbdcdf04d10744eb1c5c01eab"
         }
       }
     },
-    "src/warhammer40k_core/geometry/pathing.py": {
-      "before_sha256": "6436354d70dad24441579347fba51751dff8159a6080259f0b6f63a85fd1bbd9",
-      "after_sha256": "a80eaeac284c8bcefe5054024262bd27c47f5554ef82a8b907ab848da1043bda",
+    "src/warhammer40k_core/rules/mfm_html_tree.py": {
+      "before_sha256": "f9c6c5b0ada18657260d576105deed8b5b73506d6e6665012f9a66cd114e673c",
+      "after_sha256": "66b885e6ca6626099598113d943faa9492fa98526680f8ed2887f9773b185392",
       "owners": {
-        "TerrainPathLegalityContext._append_terrain_volume_segment": {
-          "before": "1e9c0706513b91b717cb7a603fe7ccdeee04b83ae643c6ccf5c0142d6602ca63",
-          "after": "6cee92e57ecd42821e7eaf2a767fd2e5cff85402e0072ca6ae06c9033f400ce2"
+        "enhancement_wrappers": {
+          "before": null,
+          "after": "51ba528f3aa3eb5d42611ef0c25d2a17cad0d5b8c8a76ab2e1987ecb879bdf16"
+        },
+        "resolve_streamed_structure": {
+          "before": null,
+          "after": "8a74b59a1c971b4f36d6b80a20add7db57b7fa9a01fc5c56fa4580551a1140fb"
+        },
+        "template_texts": {
+          "before": null,
+          "after": "08f4d367522e06219a6bc6634a3e35ed7a634bd3d136b83f88f1cff3904fce89"
         }
       }
     },
-    "tests/code_quality/test_current_comparison_routing.py": {
+    "src/warhammer40k_core/rules/mfm_payloads.py": {
       "before_sha256": null,
-      "after_sha256": "31451a8c17a8dffc81029a1693fd966938ba726b883e20dd8d3ae9adaf3b78b2",
+      "after_sha256": "f0b9e9864c9b7371c628357c6584aeef8fae42faa2d418fb565e9a2c61c81c86",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e5e1102f46aab61bb2aa77a33b1f5a10de4ca241ad9a1bc212422135665adf1a"
+          "after": "0b1025908ca34e8af2cd7efc29414df4512175c8e23ee306d79605c1561d7600"
         },
-        "_classify": {
+        "MfmDetachmentRecordPayload": {
           "before": null,
-          "after": "b98aa3850ce32d99f14bbd00b8d9129f353cd84d24f01613ac6a36c37ccf52d1"
+          "after": "58b27d3db8547ccd32f2a07aaaae8f640b78f757a75d9c679209b39b27a2b474"
         },
-        "_commit": {
+        "MfmEnhancementRecordPayload": {
           "before": null,
-          "after": "337b4c36e55607ce636813f42a70eec991d842e0ce95353879f64e2f8f831888"
+          "after": "60a5f7879ce4aedd50eb6ed70ddeab26341c960699d36e0613d547d6b51256b4"
         },
-        "_write": {
+        "MfmFactionRecordPayload": {
           "before": null,
-          "after": "257a3dff706f0c67b16b0a8d0081824ce48420a9ae76cfef34ef024e14fd08ad"
+          "after": "54777d25d7addea6cbc1455c88c40a0ef8fa394d5c6eeab9cfb03ba08cc271b5"
         },
-        "current_checkout": {
+        "MfmIndexFactionPayload": {
           "before": null,
-          "after": "e9e0a39e4730e615c95a9726f601f955a98e01a094048bbdcd70596444e93631"
+          "after": "f4d0f080676a6452ce19b9ed1dd220b7555c0ecc63edf3e47abfc8149a62e671"
         },
-        "test_current_route_preserves_full_comparison_failures": {
+        "MfmLeaderAllowancePayload": {
           "before": null,
-          "after": "40af6dd2f9142a2f9a97184b6f198b0171f770a3694f629b64418d8133a85ac9"
+          "after": "14ac3a07e93662bae06aa8acc3d7a000e6a0baf3f43a9ce2d3b5fbb9803a365c"
         },
-        "test_current_transaction_rechecks_source_after_full_validation": {
+        "MfmSourcePackagePayload": {
           "before": null,
-          "after": "1c2f16651b524fa0782d343f840b46f6e75e961345b6169c79292408975891e7"
+          "after": "de6362be7ab6caed72756ae812679229eafb9845d45b929ee647c7a8ee8eaf1f"
         },
-        "test_existing_report_cannot_be_relabelled_fresh_against_real_git_base": {
+        "MfmUnitCostBracketPayload": {
           "before": null,
-          "after": "aa0cf1e1a9b8dd22f6e856319f8554f5a4fdf51a872dfb6f6e92937cd55cd2c2"
+          "after": "c6707192dd5ea6f4badb7bd7225d90fb541202bb0db5658faf9db09da9ac3d00"
         },
-        "test_fresh_assessment_requires_actual_base_and_runtime": {
+        "MfmUnitCostRowPayload": {
           "before": null,
-          "after": "b259a9fc0d9d87b38b7413dae2a2a4364d4d40db483eeab5daea664a594d226f"
+          "after": "c6a09e667cf47d42f816e33db08a07c5b888e2f07ce58dee16a0aa53dceac07f"
         },
-        "test_fresh_comparisons_reach_full_current_source_and_budget_validation": {
+        "MfmUnitRecordPayload": {
           "before": null,
-          "after": "969a6da65655ac0d59c9aabacce05afb43f50a3e25160a50246b031e8af3998d"
+          "after": "ca5536bbe391fb91636fb15f52ff14841c56fa2440ee787b9e1f6ab470d33163"
         },
-        "test_fresh_report_paths_are_canonical_current_json": {
+        "MfmWargearCostPayload": {
           "before": null,
-          "after": "3953d9ef8c1649a3dec4484d28ffa2634a1d7087ef9861676ababa110bedb6e3"
-        },
-        "test_fresh_report_symlink_and_reused_base_member_are_rejected": {
-          "before": null,
-          "after": "dc9117edf5f361dce8527e2c744a48044ccd3406de131755f26a4defa9aa9f70"
-        },
-        "test_independent_postflight_rejects_changed_current_inputs": {
-          "before": null,
-          "after": "eaa7a1e6bfc9a1758c05b9b1473820cacd0aecf194cc04369f2c96f52db584f2"
-        },
-        "test_malformed_generic_report_cannot_fall_back_to_history": {
-          "before": null,
-          "after": "6b2d05ec9c6981922ae6f79eb7b7ea8d69ccf1d72ce1e2f2d838d336e5eb0b0e"
-        },
-        "test_retained_base_keeps_original_phase_dispatch": {
-          "before": null,
-          "after": "aab0c67097fa0d237b8d6235468ce67ce952d44cd86af06b8bcdd12c488c7ac4"
-        },
-        "test_retained_markers_preserve_route_and_cannot_mix_with_fresh": {
-          "before": null,
-          "after": "95dd6d276256fa6f17cf15da5882135c373e1891b5f37aa828d317eb81dd4335"
-        },
-        "test_stale_generic_comparisons_fail_before_historical_routing": {
-          "before": null,
-          "after": "5470d12920a810de7682dd3234dc9b71b2f867cec6f1dc93dec911fdd41bb867"
+          "after": "28a64fbf67fa24afbb76c6f47339cece1df6be97ded6b69ca094a242cec88c99"
         }
       }
     },
-    "tests/infrastructure/adapters/unit/test_session_commands.py": {
-      "before_sha256": "f4ea5e8c94fc0766a043cbc35e7fb8bd14c45b48b10ab74d86c60fbf84fd1886",
-      "after_sha256": "3472212073a7814b9cfa10fe262450e05d5747dba9b322c18b0bb8b139ec98fc",
+    "src/warhammer40k_core/rules/mfm_sections.py": {
+      "before_sha256": "aa95d5f169a6c0f56adef31096ca0d4591988d7d926f909233b0730f6af39017",
+      "after_sha256": "06e5a4e57a41ff057aa2fb311cc6eff754ecdaa056551474d5c44cc31daf3db3",
       "owners": {
         "@module": {
-          "before": "021531b621efe828490766cd53b3c6913c5c4cb366433a9f26f38d6bc374e07f",
-          "after": "dcbb17f0d71eca99909d46fc0572c0ece54c9df707025a672c0f5336494396f2"
+          "before": "5434ea30d7576ab1d0e5baab2436e65dfaca20e91c16b25e05e129796fdb691a",
+          "after": "b9302ef34b016c376c30336932f29e68edf2cd2a5bc22932218b37ddf415027e"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/mfm_source.py": {
+      "before_sha256": "2d0f61fcdb6b215204c366a97d6997387ce1e675b9d6b9227a6c82aa634ced6e",
+      "after_sha256": "d91fd2f5d34f6ca5a1ebcace35e3cc8ff5ffd6a551dfcd2e16b787919ef7000e",
+      "owners": {
+        "@module": {
+          "before": "072cf4d5aead114d9702083a0c8b2ed7c6615cf3486f6abd9fc8be1391b402b9",
+          "after": "61647979ffbe823a5854b3550a62522277bd1da9cf5fe172a11ef2fb529b7b6a"
         },
-        "test_command_fork_isolates_live_owners_without_reexporting_retained_history": {
-          "before": null,
-          "after": "18fb3a4418f6254f08e3e6f3e0548de26deb542dad7dd672716d6340a25e33ca"
+        "MfmDetachmentRecord": {
+          "before": "b214c6bc55cd01fc246906869011def61440ee802e1da6515268917c25130fc9",
+          "after": "171de69d5a8494d604223827e0c053560af9320e328c070e344d4161829ea7fe"
         },
-        "test_command_fork_keeps_creation_and_persistence_history_validation": {
-          "before": null,
-          "after": "b839e5028f7780afaea97e8f21bb9d48e0564ec53b159ef504e53ad6b20ebb27"
+        "MfmDetachmentRecord.__post_init__": {
+          "before": "d2eefbc2bdd01ef3dc9a2e06d68a571aa7ff980be9a3e435ecf64d53432eec32",
+          "after": "cfb7a08e040f5e7f94acbd39cd152a34f2ffa82be2b122aa1346b882bf6090dc"
         },
-        "test_terrain_path_reuses_volume_footprint_preserving_complete_result": {
+        "MfmDetachmentRecord.allowed_force_disposition_ids": {
           "before": null,
-          "after": "c7a75e0b45cbf8f77ef96a4a7670195c5a5d53c2b48522b1637138d7100d1f52"
+          "after": "8e39a0784530e78305140f3b5015e3a47499ec5b1192eadf1e23eb61f190af5a"
+        },
+        "MfmDetachmentRecord.from_payload": {
+          "before": "2de8106d7d23717c2a9a7c1f0b3175a079bce1c0824843413b46bd4160279608",
+          "after": "36f075955281cca5e37983900309584474563c6ab023416e8a52cb7ed76b63c2"
+        },
+        "MfmDetachmentRecord.to_payload": {
+          "before": "8adb098fc28dad4bf3d2c86629cb3ba8bafd1da6e364c6e351c194b986e34840",
+          "after": "c97e1d7e2544317a14a3d7f89e9c2f5c3946fbf518ccd83dfefa3e7080a6e6ba"
+        },
+        "MfmDetachmentRecordPayload": {
+          "before": "6a332466fc7e2e075b3397d2c27616dc74c6f147af00961536fe2855c2aadbcf",
+          "after": null
+        },
+        "MfmEnhancementRecord": {
+          "before": "ab49054e408cf7bfbeb6f40d44cc044589dcd76513f1371d127796c4c2bd6bbc",
+          "after": "c179e25ca0c21ff802d311bef3ade917cc314e6559fed0a8fb57ebe7527dd331"
+        },
+        "MfmEnhancementRecord.__post_init__": {
+          "before": "deb554ece3159902c58fce00df268024199b70c867bb27580d7eedba7b8cd10c",
+          "after": "9aea18b600629132cf77a6af64e542ff22e9c5dacf3ea210d5320d58fdc6a8bf"
+        },
+        "MfmEnhancementRecord.from_payload": {
+          "before": "50b5270bb9bf525c86d6575b5ca3d3b923f7a0c696206ee57773ea499cb871a8",
+          "after": "8e4a4351c05eb423f271b9a5ef8edb0d78c9e1bfa9b487e2a4d82b09b9873e5d"
+        },
+        "MfmEnhancementRecord.to_payload": {
+          "before": "dbe2f70c68387685901726ce02898faef2ae29e115199ac6666376bf6fdc7dfc",
+          "after": "6fb658d679a7367af06bfb836a33c817355b06191f9479751dc10589d4a66238"
+        },
+        "MfmEnhancementRecordPayload": {
+          "before": "4e8571307fe3f6f03b47eded709caf62c110627fc4076cf0ccdafffc2713bea2",
+          "after": null
+        },
+        "MfmFactionRecordPayload": {
+          "before": "54777d25d7addea6cbc1455c88c40a0ef8fa394d5c6eeab9cfb03ba08cc271b5",
+          "after": null
+        },
+        "MfmIndexFactionPayload": {
+          "before": "f4d0f080676a6452ce19b9ed1dd220b7555c0ecc63edf3e47abfc8149a62e671",
+          "after": null
+        },
+        "MfmLeaderAllowancePayload": {
+          "before": "14ac3a07e93662bae06aa8acc3d7a000e6a0baf3f43a9ce2d3b5fbb9803a365c",
+          "after": null
+        },
+        "MfmSourcePackagePayload": {
+          "before": "de6362be7ab6caed72756ae812679229eafb9845d45b929ee647c7a8ee8eaf1f",
+          "after": null
+        },
+        "MfmUnitCostBracketPayload": {
+          "before": "c6707192dd5ea6f4badb7bd7225d90fb541202bb0db5658faf9db09da9ac3d00",
+          "after": null
+        },
+        "MfmUnitCostRowPayload": {
+          "before": "c6a09e667cf47d42f816e33db08a07c5b888e2f07ce58dee16a0aa53dceac07f",
+          "after": null
+        },
+        "MfmUnitRecordPayload": {
+          "before": "ca5536bbe391fb91636fb15f52ff14841c56fa2440ee787b9e1f6ab470d33163",
+          "after": null
+        },
+        "MfmWargearCostPayload": {
+          "before": "28a64fbf67fa24afbb76c6f47339cece1df6be97ded6b69ca094a242cec88c99",
+          "after": null
+        },
+        "_enhancement_leader_allowance_from_wrapper": {
+          "before": "dba169ecb830e821ebcec166ce67db3ff78f2189e0e2dc19f58e4b18abbaaba8",
+          "after": "ffc289fc67bb8aed1a49f71166beaf968a30ad13e08e639859e1d513df0885e0"
+        },
+        "_enhancements_from_section": {
+          "before": "c08dfa83bcb15309c75a7cc35e7b8a24ea59cc0a5a40dacb791ba7a4d952dc6f",
+          "after": "ff9dd46b153d3b0d73b7a50476f473b5ac2e23ad71e83158620f4abfbcaaca42"
+        },
+        "_parse_detachment_cards": {
+          "before": "8f58cdb18c46be01d935738d2b6b913c38845441588fde667bb5e8208e8dd7e3",
+          "after": "816d3360230094420d5a3798ee2ba982913c09c28c5b079766c70c72a2a2a705"
+        },
+        "_template_texts": {
+          "before": "507cb37d1fb04f433df288c82afa9153382e0f3531eeae9cc677811b5e132b31",
+          "after": null
+        },
+        "parse_mfm_faction_html": {
+          "before": "2883b000c4a206afaef1e5a45265bd98699536067777d1ad2bc4eaaa90e36571",
+          "after": "f72a030107ee5200d7bd27cb7c0454b96afa43256f84f8c26ae972d8e7e869c8"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/__init__.py": {
+      "before_sha256": null,
+      "after_sha256": "2e98164dc2f60a1e1ba4a46065b8b25088ba72b8ce6afc296d7961aff68eb6fe",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "f61095a75bf8aaa58c28cf493d8302066ef2d2bd1a8533334b9b4083e99f15c9"
+        },
+        "_artifact_bytes": {
+          "before": null,
+          "after": "b411e387b3e24dcefd95ebae8fd310c03e7231c7a4bf0cc7320348e1c5c9fec1"
+        },
+        "_load_manifest": {
+          "before": null,
+          "after": "6c36eb42417e91aea29e79eb667d34d73e0313a57badedac3ea14be7b70550b6"
+        },
+        "_source_package_payload": {
+          "before": null,
+          "after": "c47d725ab2c771c108bab42de9a76d8a7847ef3018eb08aec5c05d54697a32fc"
+        },
+        "faction_record": {
+          "before": null,
+          "after": "2e7b04a0c05c61fa9fd65e6041b9e410d73d9408a96eb8315fad833ce8710e36"
+        },
+        "source_package": {
+          "before": null,
+          "after": "66ec1a21f347375fb0581089e955b4091340e99e60663d705cdd41f78e35ab45"
+        },
+        "supported_faction_ids": {
+          "before": null,
+          "after": "c6931398968128d7c998ccb032eb2011104ce51d5422042cbe45d28c608fdbde"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/_artifacts.py": {
+      "before_sha256": null,
+      "after_sha256": "bc3c87f2520579094cdc859c339965564b6f4bd8163cbfe28a5dcb665222ce88",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "ebbb8c52bfea06e070e6527f125a1dfb7ea6f20701248dc8b055b24d8a9a0366"
+        },
+        "MfmPackageArtifact": {
+          "before": null,
+          "after": "3a6e5f24bb467d4af603a6eecf1058065fec4b2a68e0efc699749857b5cdfaf9"
+        },
+        "MfmPackageArtifact.validate": {
+          "before": null,
+          "after": "2582986252b1504820b6fd52319034c6126b2be34e11bda39ca5b9685289dd5c"
+        },
+        "_MfmDetachmentRecordArtifact": {
+          "before": null,
+          "after": "ef303baecdc151190b174f27848663ecaee66dc5d68fd3fb7a7e6e0a2ed472c9"
+        },
+        "_MfmDetachmentRecordArtifact.to_payload": {
+          "before": null,
+          "after": "0f194c665b69dd52f7459814f592b54547a60654c54597ce1595a19448d51088"
+        },
+        "_MfmEnhancementRecordArtifact": {
+          "before": null,
+          "after": "ed953a0b2ca2f42f02d55014d1369ac7e6df084193479f49caefa563160d78c2"
+        },
+        "_MfmEnhancementRecordArtifact.to_payload": {
+          "before": null,
+          "after": "6fb658d679a7367af06bfb836a33c817355b06191f9479751dc10589d4a66238"
+        },
+        "_MfmFactionRecordArtifact": {
+          "before": null,
+          "after": "f8ece3c1d0169f4ff49d7c96c24aa06dc00d2380091f5590e13c0b7d697c842f"
+        },
+        "_MfmFactionRecordArtifact.to_payload": {
+          "before": null,
+          "after": "b1e48a55c967c3576212269acb7187f1a9122a617679ef065fabf056df6b1f0d"
+        },
+        "_MfmLeaderAllowanceArtifact": {
+          "before": null,
+          "after": "32b5eabd621a14e88142b5bec290463b286accd006c4b9cb67503bb004913ffa"
+        },
+        "_MfmLeaderAllowanceArtifact.to_payload": {
+          "before": null,
+          "after": "decd1a9824ecde350d2f9f84cb27e63f945b29a7c541eed9d8deb29637a79239"
+        },
+        "_MfmUnitCostBracketArtifact": {
+          "before": null,
+          "after": "88ae4c23b417ca8712494decd762b8869c11a45f072d43d8a1cd2d7e54292923"
+        },
+        "_MfmUnitCostBracketArtifact.to_payload": {
+          "before": null,
+          "after": "c12db0182fca314dfb605254eb6f73d5d62406b687fe61beefc3c1a62eb2776c"
+        },
+        "_MfmUnitCostRowArtifact": {
+          "before": null,
+          "after": "5511875e9ba27785c1a42e01977e1fcb1b4d2bac381e3f2d0250554f05203732"
+        },
+        "_MfmUnitCostRowArtifact.to_payload": {
+          "before": null,
+          "after": "8bd863420663f41c49fc7f6702fea0cd4191235420b33226929975fa95af4bfd"
+        },
+        "_MfmUnitRecordArtifact": {
+          "before": null,
+          "after": "7cf232219bf1da499637d74adea068e9729af301c2ac117e1491e84aea1b24cf"
+        },
+        "_MfmUnitRecordArtifact.to_payload": {
+          "before": null,
+          "after": "8c429a545549d0784ba4e2e636846f83a32392cbea7fe9618539988ffed2193f"
+        },
+        "_MfmWargearCostArtifact": {
+          "before": null,
+          "after": "b990ddb01f395ede797239bada7322924e0a185796b27087aecb92d2ba974018"
+        },
+        "_MfmWargearCostArtifact.to_payload": {
+          "before": null,
+          "after": "33f733af8a9e027f2b4883e5d6be76ec14da39e70182c82c931c35e05f576e1d"
+        },
+        "_decode_json_artifact": {
+          "before": null,
+          "after": "97407c33bc998f77f21defea3fabcb6667f082864b12a4c4a620052e83678eb9"
+        },
+        "_validate_artifact_path": {
+          "before": null,
+          "after": "0c52af79e903c5774d20dfefaa4015bc05d62e98113d6e8cbeded6eac4abf170"
+        },
+        "mfm_faction_payload_from_json_bytes": {
+          "before": null,
+          "after": "0e58bad3cfa3d1ad0c13df66dd22a4d44168cb64f6666973271692b785a70ab9"
+        },
+        "mfm_package_artifact_from_json_bytes": {
+          "before": null,
+          "after": "0be50456e63422dccbc0295e41d4d78b546e492f66eb4ab70513777a06ca152f"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/adepta-sororitas.json": {
+      "before_sha256": null,
+      "after_sha256": "934d504f85585558f9af5216a6babac3b9c8057352be9e92eccb63568c548a8d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "934d504f85585558f9af5216a6babac3b9c8057352be9e92eccb63568c548a8d"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/adeptus-custodes.json": {
+      "before_sha256": null,
+      "after_sha256": "250b44e3c5c58329633e631cbe0bc56a3583d2dbf18268e3078b2b26a0cd9f3e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "250b44e3c5c58329633e631cbe0bc56a3583d2dbf18268e3078b2b26a0cd9f3e"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/adeptus-mechanicus.json": {
+      "before_sha256": null,
+      "after_sha256": "11228bf19d6f69bfff969fae0d40a0b7ab30d85474411a01ec45c1285e32e62e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "11228bf19d6f69bfff969fae0d40a0b7ab30d85474411a01ec45c1285e32e62e"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/aeldari.json": {
+      "before_sha256": null,
+      "after_sha256": "1dbb21789e9768d00427984cdd54c33968599a372ea364fbe91375368cda1d42",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1dbb21789e9768d00427984cdd54c33968599a372ea364fbe91375368cda1d42"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/astra-militarum.json": {
+      "before_sha256": null,
+      "after_sha256": "d43ea73cacb30f94cba980d5faa4e2ef66ec712e1a0618e0ed1385ec470ada6e",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d43ea73cacb30f94cba980d5faa4e2ef66ec712e1a0618e0ed1385ec470ada6e"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/black-templars.json": {
+      "before_sha256": null,
+      "after_sha256": "885b83b8e61b548bff56cfc89279c0ad2acb4897c3afb2ba29364427868016be",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "885b83b8e61b548bff56cfc89279c0ad2acb4897c3afb2ba29364427868016be"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/blood-angels.json": {
+      "before_sha256": null,
+      "after_sha256": "bdc64ee1191af90e911686900f544aad2d476c62dc6f3ab9aaeb45aec01a5be2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bdc64ee1191af90e911686900f544aad2d476c62dc6f3ab9aaeb45aec01a5be2"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/chaos-daemons.json": {
+      "before_sha256": null,
+      "after_sha256": "3fd71c41181a98dbcad47f0bb987d7f201b237a1fbe7dbd88c1e2e16d80a17e3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3fd71c41181a98dbcad47f0bb987d7f201b237a1fbe7dbd88c1e2e16d80a17e3"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/chaos-knights.json": {
+      "before_sha256": null,
+      "after_sha256": "204b886235d941ae9392376d517cc2fbf7f646db740e2f3e80d54f0edffe8adf",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "204b886235d941ae9392376d517cc2fbf7f646db740e2f3e80d54f0edffe8adf"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/chaos-space-marines.json": {
+      "before_sha256": null,
+      "after_sha256": "ec54e972734e7c4c646114f19402a5069112e174a523f185da2229845e950345",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ec54e972734e7c4c646114f19402a5069112e174a523f185da2229845e950345"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/dark-angels.json": {
+      "before_sha256": null,
+      "after_sha256": "a820ab6747ff9eee9c24c8c5fe8468cf88c6a98cf57f61a45ea3baecc288af4c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a820ab6747ff9eee9c24c8c5fe8468cf88c6a98cf57f61a45ea3baecc288af4c"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/death-guard.json": {
+      "before_sha256": null,
+      "after_sha256": "9a36767ef9f91833ffb786cfbac8b1029d5464bd1d29451258a28e506c99d23d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9a36767ef9f91833ffb786cfbac8b1029d5464bd1d29451258a28e506c99d23d"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/deathwatch.json": {
+      "before_sha256": null,
+      "after_sha256": "13bd0c074a3cb308c0640138f066bbf3dd90a57217e368b0edec782bdd2f11f4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "13bd0c074a3cb308c0640138f066bbf3dd90a57217e368b0edec782bdd2f11f4"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/drukhari.json": {
+      "before_sha256": null,
+      "after_sha256": "c1ef0ae3e88184028ab1d1e528fcd30460a472844f2ca5612ce76beef2ca659f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c1ef0ae3e88184028ab1d1e528fcd30460a472844f2ca5612ce76beef2ca659f"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/emperors-children.json": {
+      "before_sha256": null,
+      "after_sha256": "eee0a5861b52b67ad9e10f4ce34793d5ec17781a945b904a2a14723a55ed43bf",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "eee0a5861b52b67ad9e10f4ce34793d5ec17781a945b904a2a14723a55ed43bf"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/genestealer-cults.json": {
+      "before_sha256": null,
+      "after_sha256": "9a9271733eca91003b89f63662ad57e8538a6ab1a950ce3b45ece563b15459a7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9a9271733eca91003b89f63662ad57e8538a6ab1a950ce3b45ece563b15459a7"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/grey-knights.json": {
+      "before_sha256": null,
+      "after_sha256": "3cf7c74f5532db382da058eb420bf8adb9b15a5c89d4c0ca482fc782550b08d6",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3cf7c74f5532db382da058eb420bf8adb9b15a5c89d4c0ca482fc782550b08d6"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/imperial-agents.json": {
+      "before_sha256": null,
+      "after_sha256": "94924db3be59846cdca4f2f31b33ecfacda79fadb02eaad207f5ecb551f66f63",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "94924db3be59846cdca4f2f31b33ecfacda79fadb02eaad207f5ecb551f66f63"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/imperial-knights.json": {
+      "before_sha256": null,
+      "after_sha256": "3bd8be32701a73a34f1895c6a0b57683ce807242350b96d45b11a26ecac327a4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3bd8be32701a73a34f1895c6a0b57683ce807242350b96d45b11a26ecac327a4"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/leagues-of-votann.json": {
+      "before_sha256": null,
+      "after_sha256": "c04a2010afb15fc67eb41dce9ed75436fc5eb6ccb5d3077af43ae4e6e0351801",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c04a2010afb15fc67eb41dce9ed75436fc5eb6ccb5d3077af43ae4e6e0351801"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/necrons.json": {
+      "before_sha256": null,
+      "after_sha256": "6ba13a941dd7b3b5fef5cca5b413e769bee191d44dd8cfc23f188487705c3a49",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6ba13a941dd7b3b5fef5cca5b413e769bee191d44dd8cfc23f188487705c3a49"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/orks.json": {
+      "before_sha256": null,
+      "after_sha256": "ce77068cc63d3bee9afeb35f113142a8361d76ac86730447f1de94cbeb3e4a60",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ce77068cc63d3bee9afeb35f113142a8361d76ac86730447f1de94cbeb3e4a60"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/space-marines.json": {
+      "before_sha256": null,
+      "after_sha256": "bb9f99025a45ec58e248c64c5fd17f89cb41c940db06c4a70d61dbcc887a548b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bb9f99025a45ec58e248c64c5fd17f89cb41c940db06c4a70d61dbcc887a548b"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/space-wolves.json": {
+      "before_sha256": null,
+      "after_sha256": "26d7bfcd1898a6ce46ec2221c285c280bba1d96b8a31d3b4f06a75c2634ec269",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "26d7bfcd1898a6ce46ec2221c285c280bba1d96b8a31d3b4f06a75c2634ec269"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/tau-empire.json": {
+      "before_sha256": null,
+      "after_sha256": "36bd30186ea5471af653c0972ca68ed098fc4a52acc37bbff763b0f791a5377d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "36bd30186ea5471af653c0972ca68ed098fc4a52acc37bbff763b0f791a5377d"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/thousand-sons.json": {
+      "before_sha256": null,
+      "after_sha256": "a56eeaf152a7f0c4bebb6ee739a39a5e999724eca2bb977cc9306cb319e29206",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "a56eeaf152a7f0c4bebb6ee739a39a5e999724eca2bb977cc9306cb319e29206"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/tyranids.json": {
+      "before_sha256": null,
+      "after_sha256": "fc026aa3e5dd201e1109c806fa18ee07a6ee7a6d45e44cfee868204753d068b7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fc026aa3e5dd201e1109c806fa18ee07a6ee7a6d45e44cfee868204753d068b7"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/world-eaters.json": {
+      "before_sha256": null,
+      "after_sha256": "d7ea2422e4f7fd1d3ab6983f68006e04ec0f069259f820f83072462f7c91992a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d7ea2422e4f7fd1d3ab6983f68006e04ec0f069259f820f83072462f7c91992a"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/package.json": {
+      "before_sha256": null,
+      "after_sha256": "e2952240e5b8889844fb18409f2b9e75a37d95e5ca206ed96423e85e92cc6362",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e2952240e5b8889844fb18409f2b9e75a37d95e5ca206ed96423e85e92cc6362"
+        }
+      }
+    },
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
+      "before_sha256": "94e54106006b9c3ea8f71065bb8ff61879157d1efc0069551b96d235f3b9a226",
+      "after_sha256": "8c16fd4ff13d3fe52697b30eb1d32d8814560619a3cd61262b019c97bf994c18",
+      "owners": {
+        "@module": {
+          "before": "9b567c5f2512af4a3a55d60a669c9801654c6a2c797967c44f55fd4a4bbeeeb5",
+          "after": "c6f24febbfcb7c0b69221c2b8efb858030e7909ad9b836a4b8b19ca4f4d56d89"
+        }
+      }
+    },
+    "tests/rules/section25/test_mfm.py": {
+      "before_sha256": "4df94f7f668ed9b6feae6a771283a51f328afa85e44bc178c40416ef5ee33cdd",
+      "after_sha256": "697300f10064e0383b071b997f51eb8323ef4c617563ca07687278d7665585b8",
+      "owners": {
+        "@module": {
+          "before": "3fead794e5746c59a9ad54ee37abbcfcf714740a44b5dba946f391dfc169062f",
+          "after": "7ce8f602cfe1414fcffd8525dcfb8576322985cabc609c7874626aaedb26fd30"
+        },
+        "_current_mfm_catalog": {
+          "before": null,
+          "after": "5cb3175236a7e5622a5c6348d7cc79f9c1d15a46fdbb1c79e61d5f05bb6af4eb"
+        },
+        "test_current_mfm_default_enhancement_points_reach_roster_total": {
+          "before": null,
+          "after": "14c704bebcbea073272934510dda1d7f246da4c5bf5eef34335d0b06de7065eb"
+        },
+        "test_current_mfm_default_prices_repeated_units_and_detachment_disposition": {
+          "before": null,
+          "after": "784bb4375cf032492177788d90b0bf4500b7d797c4c1be06c69c5020bf6070f5"
+        },
+        "test_current_mfm_detachment_cost_replaces_previous_charge": {
+          "before": null,
+          "after": "8a83e17526a567201f506003b62f4d405f1e83b3c433f03a56644580442b664b"
+        },
+        "test_current_mfm_new_attachment_permissions_reach_real_mustering": {
+          "before": null,
+          "after": "98dd8de15f751213c47c96b5f5d0c29324151100e84c39ee4e8a0af4c4245ad6"
+        },
+        "test_current_mfm_new_wargear_surcharge_prices_selected_equipment": {
+          "before": null,
+          "after": "7e549065a5b31d19be9b9330efc50ba049da5e999ff8cb6b5d2a7f5bb9991068"
+        },
+        "test_current_mfm_reproduces_all_checked_official_pages_and_review": {
+          "before": null,
+          "after": "b7ac9b31735e29135735294584766509df25902979f8d964b8bc837b73771088"
+        },
+        "test_current_mfm_v3_rejects_missing_or_inconsistent_dispositions": {
+          "before": null,
+          "after": "c0611697cc0ecffc07647d2bdd3ded68003ce2af07696e3aa293ffac13a0ec35"
+        },
+        "test_mfm_streamed_cards_keep_own_section_and_current_enhancement_rows": {
+          "before": null,
+          "after": "d1cfadf6dc764c8ed5e5bfbc8891844e5da8cc4190b184ce140555bd2bf20261"
+        }
+      }
+    },
+    "tools/build_mfm_update_review.py": {
+      "before_sha256": "023b3beec11b2204578ce8423bb8161414af78a4d2b66952a783e18132b17bba",
+      "after_sha256": "9768e3fb9cf9e324d191d187d8d42339d57db409fb34e5b6f8bd0e000c9cf798",
+      "owners": {
+        "@module": {
+          "before": "6133ab53d5a4ad0121577e332146528c28ebf1ccb5ade4775b64b0bb84464e40",
+          "after": "5bde6076013984929969bf5ca3f22fa24ba094b05e583271f23f1101d6c9f02c"
+        },
+        "_current_detachment_rule_signature": {
+          "before": null,
+          "after": "30944fe3d86786c5a3ddde8702c9999989f4567e2d1cebdb3528e25f78f85baa"
+        },
+        "_enhancement_leader_signature": {
+          "before": null,
+          "after": "382f4abfd7fe7a8a46d176b07550946339491cfefc7371716b1deafc5af4c26b"
+        },
+        "_enhancement_support_signature": {
+          "before": null,
+          "after": "8d437b13f99751e093044fa98314cfb01debb7c6495713ccc3d3d6ed440d7e05"
+        },
+        "_parse_args": {
+          "before": "46be64035e443d3c803803f628b158bc75a8ad606a1d41ed4a4ecf8ff2ce51b7",
+          "after": "e883daa484e5fec6cea36a58ed47d06569348f635cd0a8ea44543559a85c4a63"
+        },
+        "_support_signature": {
+          "before": null,
+          "after": "1dfc6bcfcf040983feaf5ded37f6e9912dd27032abbd124ee803ff4e629050cd"
+        },
+        "build_current_review_payload": {
+          "before": null,
+          "after": "f30a830c6360c8b40164c9d946677f66304c299622cded21c05f3e121cc76647"
+        },
+        "main": {
+          "before": "fac731e1f30ca66cc3bec308455c9eb8de344d8a9505b16b0d69641299323298",
+          "after": "ceac2c9c053826fadff85db073b792b1df2e82681cd92c17dfe7dfa83636c0de"
+        }
+      }
+    },
+    "tools/import_mfm_points.py": {
+      "before_sha256": "2868d68ccad8b9145e636ab248b54411bd19ed77dba41c2cf80048d599636fe3",
+      "after_sha256": "d9f5a7eb373dfc1168924ecf072eec1d5a29ef3c70a9202c8c9ab07a569ce8fa",
+      "owners": {
+        "@module": {
+          "before": "7679aaa6696604c04d013018c172a46d7262efc76d8d1d458d38aeef2c3b4ee9",
+          "after": "1ace5dd03ec92f2d3f1bd8ea0ee389e23ec7d1bec60cf9b0320ae4851bff3040"
+        },
+        "_fetch_url": {
+          "before": "f509cc8181b1da864a1ce5cef8ea0df186b1201608ec614e88b4575d70e83177",
+          "after": "3542d356528de45c0733634d4bc7931c8da42cbb0b7a50e6437bdd4c46c45eb5"
+        },
+        "_parse_args": {
+          "before": "e33eaa5e03c177e733ff33d4b41ea0ade003c28a981e2af85034eac2197e98bb",
+          "after": "10f81a5a2f469bc22ad8956dc16aa21651900f7e05609620a07f60b632d4c1ca"
+        },
+        "_write_package_artifacts": {
+          "before": "0e6a707693f53f67a56ac7a53d4c4577b94b09f2f494138ed481b0d269c8853b",
+          "after": "07709729865c0c13f236af269040df589a400017cb7cac0f8d184a642e03d19f"
+        },
+        "main": {
+          "before": "19cbb5165c4469f0a8847ce15532a823f30dff9b1cf8a73e115c040cd630460a",
+          "after": "260368b1e5a16ac1c8f10b9ad28e5c56f687f77da669f6971a6aa189efafea3d"
         }
       }
     }
   },
   "rows": {
-    "ci/quality_shards/all.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
-    },
-    "ci/quality_shards/shard-1-modules.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
-    },
-    "ci/quality_shards/shard-1.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
-    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "d07-generated-current-contract-inventory",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "issue588-contract-publication",
-        "order103-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "v963-snap-contract-publication"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "d07-generated-current-contract-inventory",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "issue588-contract-publication",
-        "order103-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "v963-snap-contract-publication"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "d07-generated-current-contract-inventory",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "issue588-contract-publication",
-        "order103-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "v963-snap-contract-publication"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "d07-generated-current-contract-inventory",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "issue588-contract-publication",
-        "order103-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "v963-snap-contract-publication"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "d07-generated-current-contract-inventory",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "issue588-contract-publication",
-        "order103-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "v963-snap-contract-publication"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "d07-generated-current-contract-inventory",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "issue588-contract-publication",
-        "order103-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "v963-snap-contract-publication"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "d07-generated-current-contract-inventory",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "issue588-contract-publication",
-        "order103-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "v963-snap-contract-publication"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "d07-generated-current-contract-inventory",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "issue588-contract-publication",
-        "order103-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "v963-snap-contract-publication"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -758,162 +1286,765 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/adepta-sororitas.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/adeptus-custodes.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/adeptus-mechanicus.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/aeldari.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/astra-militarum.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/black-templars.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/blood-angels.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/bounded-rule-checks.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/chaos-daemons.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/chaos-knights.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/chaos-space-marines.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/dark-angels.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/death-guard.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/deathwatch.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/drukhari.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/emperors-children.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/genestealer-cults.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/grey-knights.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/imperial-agents.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/imperial-knights.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/index.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/leagues-of-votann.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/necrons.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/orks.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/space-marines.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/space-wolves.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/tau-empire.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/thousand-sons.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/tyranids.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_audits/mfm_2026_10/world-eaters.html.gz": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_manifests/mfm_2026_10_review.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "data/source_manifests/mfm_2026_10_sources.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Documents and maps the bounded official MFM reconciliation; preserves every existing behavioral, quality, performance, coverage and protection requirement.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
-    "docs/performance/current/issue590-command-fork.json": {
+    "docs/MFM_2026_10_RECONCILIATION.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
-    },
-    "docs/performance/current/issue590-movement.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
-    },
-    "docs/performance/current/issue590-setup.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
-    },
-    "docs/performance/current/issue590-visibility.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
-    },
-    "docs/performance/issue590-http.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
-    },
-    "docs/performance/issue590.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Documents and maps the bounded official MFM reconciliation; preserves every existing behavioral, quality, performance, coverage and protection requirement.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
-    },
-    "scripts/check_performance_policy.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
-    },
-    "scripts/measure_command_fork.py": {
-      "category": "measured_workload",
-      "operations": [
-        "workload-authoritative-command-fork"
-      ],
-      "selected_families": [
-        "session_command_fork"
-      ],
-      "rationale": "Adds a bounded three-sample canonical authority-fork workload with separate untimed work counts and exact persistence/history equality checks.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Documents and maps the bounded official MFM reconciliation; preserves every existing behavioral, quality, performance, coverage and protection requirement.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "order108-terrain-semantics",
-        "order109-unit-control-semantics",
-        "order110-action-battle-shock-semantics",
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
-    "src/warhammer40k_core/adapters/session_protocol.py": {
-      "category": "hot_query_or_data_structure",
+    "src/warhammer40k_core/engine/army_points.py": {
+      "category": "rule_semantics",
       "operations": [
-        "authoritative-command-fork"
+        "mfm-current-army-construction"
       ],
-      "selected_families": [
-        "session_command_fork"
-      ],
-      "rationale": "Trusted command staging copies already validated authority while preserving isolated live owners; direct fork samples and revision-19 HTTP receipts measure its cost.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
-    "src/warhammer40k_core/geometry/pathing.py": {
-      "category": "algorithm_or_search",
+    "src/warhammer40k_core/rules/mfm_html_tree.py": {
+      "category": "rule_semantics",
       "operations": [
-        "geometry-search",
-        "order108-terrain-semantics"
+        "mfm-source-boundary-reconciliation"
       ],
-      "selected_families": [
-        "movement",
-        "setup",
-        "visibility"
-      ],
-      "rationale": "Hoists an unchanged terrain footprint out of the sampled-pose loop and preserves the exact predicate, segments, diagnostics and sample counts.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
-    "tests/code_quality/test_current_comparison_routing.py": {
+    "src/warhammer40k_core/rules/mfm_payloads.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-boundary-reconciliation"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/mfm_sections.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-boundary-reconciliation"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/mfm_source.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-boundary-reconciliation"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/__init__.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/_artifacts.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/adepta-sororitas.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/adeptus-custodes.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/adeptus-mechanicus.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/aeldari.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/astra-militarum.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/black-templars.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/blood-angels.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/chaos-daemons.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/chaos-knights.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/chaos-space-marines.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/dark-angels.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/death-guard.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/deathwatch.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/drukhari.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/emperors-children.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/genestealer-cults.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/grey-knights.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/imperial-agents.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/imperial-knights.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/leagues-of-votann.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/necrons.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/orks.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/space-marines.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/space-wolves.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/tau-empire.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/thousand-sons.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/tyranids.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/world-eaters.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/package.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Documents and maps the bounded official MFM reconciliation; preserves every existing behavioral, quality, performance, coverage and protection requirement.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     },
-    "tests/infrastructure/adapters/unit/test_session_commands.py": {
+    "tests/rules/section25/test_mfm.py": {
       "category": "rule_semantics",
       "operations": [
-        "ci-restructure-tests-infrastructure-adapters-unit-test_session_commands.py",
-        "http-command-rejection-diagnostics",
-        "http-listener-regression",
-        "issue590-regression-controls"
+        "mfm-current-regression-controls",
+        "qualification40-exact-7ab593fa098a23f7"
       ],
       "selected_families": [],
-      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
-      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
-      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "tools/build_mfm_update_review.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
+    },
+    "tools/import_mfm_points.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-source-import-and-review"
+      ],
+      "selected_families": [],
+      "rationale": "Reconciles the current official MFM v1.6 source and its existing army-construction consumers, with source replay, direct behavior regressions and corresponding generated publication. This is a bounded rules/data correction, not a deliberate performance change.",
+      "source_obligation": "Official MFM v1.6, listed 14 October 2026 and captured 30 October, supplies current prices, complete dispositions and attachment permissions for the existing 28 faction groups; preserve exact historical source packages and blocked execution classifications.",
+      "unchanged_work": "Existing quote, mustering, decision, replay and adapter authorities remain shared. Source import runs at the data boundary; this adds no search algorithm, cache policy, hot-query optimization, serializer workload or dependency change. Complete serial smoke and live source/semantic checks remain required."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "session_command_fork": "docs/performance/current/issue590-command-fork.json",
-    "visibility": "docs/performance/current/issue590-visibility.json",
-    "movement": "docs/performance/current/issue590-movement.json",
-    "setup": "docs/performance/current/issue590-setup.json"
-  },
+  "comparisons": {},
   "full_game": null
 }

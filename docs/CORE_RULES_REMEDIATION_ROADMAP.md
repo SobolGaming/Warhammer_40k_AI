@@ -10,6 +10,12 @@ This checkpoint awaits the same independent reviewer and does not retire other g
 
 ## Where this stands
 
+MFM source maintenance (30 October 2026; no new numbered Core order): the default
+army-construction lookup previously used July v1.1. It now uses the separately
+versioned v1.6 package, with source-bound points/disposition/attachment regressions
+and corrected streamed HTML ownership. [Scope, source evidence and remaining catalog
+limitations](MFM_2026_10_RECONCILIATION.md) remain distinct from Core-order closure.
+
 This roadmap is the closure inventory for Warhammer 40,000 11th Edition Core Rules categories 01–25. Orders 1–101 are merged. Order 101 / P03F restores movement selection after failed complete setup; see [scope](ORDER_101_SCOPE_PLAN.md) and merged [PR #524](https://github.com/SobolGaming/Warhammer_40k_AI/pull/524), verified on main at `38ce2265b81f2c0b2c9c668dae7536c239095193`. The Order 97 evidence inventory remains the selected clause record after Order 96 / [PR #519](https://github.com/SobolGaming/Warhammer_40k_AI/pull/519); it is not a compliance certificate.
 
 Order 97 / PEVIDENCE records the complete selected source-block inventory, decomposed clauses, exact assertion receipts and runtime source reconciliation. Its [scope and limits](ORDER_97_SCOPE_PLAN.md) and [clause report](ORDER_97_EVIDENCE_REPORT.md) identify additional source and gameplay prerequisites below. Assertion links include explicitly qualified evidence and do not certify those clauses. `CAUDIT-01` remains open; `PFINAL` follows every newly scheduled repair. The historical [Order 95 negative audit](ORDER_95_AUDIT_REPORT.md), [its evidence limits](ORDER_95_AUDIT_NOTES.md), and the [Order 84 audit](ORDER_84_AUDIT_REPORT.md) remain unchanged.

@@ -136,3 +136,67 @@ def node_has_class_token(node: HtmlNode, token: str) -> bool:
 
 def node_contains_template(node: HtmlNode) -> bool:
     return any(child.tag == "template" for child in walk(node))
+
+
+def resolve_streamed_structure(root: HtmlNode) -> HtmlNode:
+    """Place streamed markup at its template slot, preserving scalar value readers."""
+    targets = {
+        node.attrs["id"]: node for node in walk(root) if node.attrs.get("id", "").startswith("S:")
+    }
+
+    def resolve(node: HtmlNode, active: tuple[str, ...]) -> HtmlNode:
+        children: list[HtmlNode | str] = []
+        for child in node.children:
+            if isinstance(child, str):
+                children.append(child)
+                continue
+            if child.attrs.get("id", "").startswith("S:"):
+                continue
+            if child.tag == "template":
+                template_id = child.attrs.get("id", "")
+                target_id = "S:" + template_id.partition(":")[2]
+                target = targets.get(target_id)
+                if target is not None and direct_node_children(target):
+                    if target_id in active:
+                        raise MfmSourceError("MFM streamed structure contains a template cycle.")
+                    children.extend(resolve(target, (*active, target_id)).children)
+                    continue
+            children.append(resolve(child, active))
+        return HtmlNode(node.tag, dict(node.attrs), children)
+
+    return resolve(root, ())
+
+
+def enhancement_wrappers(section: HtmlNode) -> tuple[HtmlNode, ...]:
+    """Normalize legacy wrappers and current sibling allowance rows once at import."""
+    wrappers: list[HtmlNode] = []
+    for listing in walk(section, tag="ul"):
+        for child in direct_node_children(listing):
+            if child.tag == "div" and any(row.tag == "li" for row in direct_node_children(child)):
+                wrappers.append(child)
+            elif child.tag == "li":
+                spans = walk(child, tag="span")
+                if spans and node_text(spans[0]).upper() in {"LEADER:", "SUPPORT:"}:
+                    if not wrappers:
+                        raise MfmSourceError("MFM enhancement allowance has no enhancement.")
+                    previous = wrappers[-1]
+                    wrappers[-1] = HtmlNode(
+                        "div", {}, [*previous.children, HtmlNode("div", {}, child.children)]
+                    )
+                else:
+                    wrappers.append(HtmlNode("div", {}, [child]))
+    if not wrappers:
+        raise MfmSourceError("MFM enhancement section contains no price rows.")
+    return tuple(wrappers)
+
+
+def template_texts(template_nodes: dict[str, HtmlNode]) -> dict[str, str]:
+    texts: dict[str, str] = {}
+    for template_id, node in template_nodes.items():
+        text = node_text(node)
+        if not text:
+            continue
+        texts[template_id] = text
+    if not texts:
+        raise MfmSourceError("MFM page did not contain streamed template values.")
+    return texts

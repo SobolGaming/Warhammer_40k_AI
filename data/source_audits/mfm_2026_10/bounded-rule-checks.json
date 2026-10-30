@@ -1,0 +1,140 @@
+{
+  "schema": "bounded-official-rule-source-checks-v1",
+  "checked_utc": "2026-10-30T11:27:01.291495+00:00",
+  "base": "d3c5737b39dfa647125b64c24b1e67bc9364c5c9",
+  "index_url": "https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/",
+  "source_receipts": [
+    {
+      "faction": "aeldari",
+      "date": "2026-10-14",
+      "url": "https://assets.warhammer-community.com/eng_14-10_wh40k_-faction_pack_aeldari-seqmcs1mu0-g8gzewikcm.pdf",
+      "sha256": "ca54d5039e6466c239e56a334e02fb14da4e7ce8113ba5a3335ddfad5a1c6ca2",
+      "bytes": 15522415,
+      "pages": 79,
+      "method": "ordinary public HTTPS curl; pypdf text extraction"
+    },
+    {
+      "faction": "chaos-daemons",
+      "date": "2026-09-30",
+      "url": "https://assets.warhammer-community.com/eng_30-09_wh40k_faction_pack_chaos_daemons-e67vyzvv3x-mownb49uc3.pdf",
+      "sha256": "de3f7c0319fa96530dfa687a516668cf7e52dc9d5a87954c44c7e38842569075",
+      "bytes": 40217356,
+      "pages": 151,
+      "method": "ordinary public HTTPS curl; pypdf text extraction"
+    },
+    {
+      "faction": "chaos-space-marines",
+      "date": "2026-09-30",
+      "url": "https://assets.warhammer-community.com/eng_30-09_wh40k_faction_pack_chaos_space_marines-xlmrglqa2b-zd2fzntrqu.pdf",
+      "sha256": "237a44973f019f0bf72def98f747a0fcf2d5644a559b815a64987bdb468a7cf9",
+      "bytes": 17721387,
+      "pages": 102,
+      "method": "ordinary public HTTPS curl; pypdf text extraction"
+    },
+    {
+      "faction": "emperors-children",
+      "date": "2026-09-30",
+      "url": "https://assets.warhammer-community.com/eng_30-09_wh40k_faction_pack_emperors_children-xp2mhzppxs-1cvykicdxu.pdf",
+      "sha256": "18a192a36c22468368d957aac3eb230a40c8f7bbfaefa46372d8918422b0b49a",
+      "bytes": 8757381,
+      "pages": 10,
+      "method": "ordinary public HTTPS curl; pypdf text extraction"
+    },
+    {
+      "faction": "thousand-sons",
+      "date": "2026-09-30",
+      "url": "https://assets.warhammer-community.com/eng_30-09_wh40k_faction_pack_thousand_sons-4lioijwxdj-otjrinzt8c.pdf",
+      "sha256": "5fdaea586b13dcfdc3254cd763de5a7af1d0851490b035322fc257a33a58049a",
+      "bytes": 18367885,
+      "pages": 11,
+      "method": "ordinary public HTTPS curl; pypdf text extraction"
+    },
+    {
+      "faction": "world-eaters",
+      "date": "2026-09-30",
+      "url": "https://assets.warhammer-community.com/eng_30-09_wh40k_faction_pack_world_eaters-rxxj1fzeoh-kfx1cectxb.pdf",
+      "sha256": "93e29f1b166d2a06fafa37a543890e56ae59c712b73b5a1e26f0a1c1ecf6a8e9",
+      "bytes": 4019819,
+      "pages": 8,
+      "method": "ordinary public HTTPS curl; pypdf text extraction"
+    },
+    {
+      "faction": "adeptus-custodes-print",
+      "date": "2026-10-14",
+      "url": "https://assets.warhammer-community.com/eng_14-10_wh40k_printed_product_updates_adeptus_custodes_updates-fmj4bdwwhh-0qshh8eauk.pdf",
+      "sha256": "1adb1ccfde5c11b2e521a6cbe740095ecf3340954c8b1fbfd19f09876afa2357",
+      "bytes": 930611,
+      "pages": 1,
+      "method": "ordinary public HTTPS curl; pypdf text extraction"
+    },
+    {
+      "faction": "space-marines-print",
+      "date": "2026-10-14",
+      "url": "https://assets.warhammer-community.com/eng_14-10_wh40k_printed_product_updates_space_marines_updates-91hillwcff-wzs8qnozam.pdf",
+      "sha256": "98c2b114e4e4b33ea385c7115bb9acba83c32ae4e17f753a3d73ef20c7d45d1f",
+      "bytes": 933727,
+      "pages": 1,
+      "method": "ordinary public HTTPS curl; pypdf text extraction"
+    }
+  ],
+  "checks": [
+    {
+      "faction": "aeldari",
+      "version": "1.4",
+      "pdf_page": 31,
+      "rule": "Rangers: Path of the Outcast",
+      "disposition": "selected_executable_semantics_unchanged",
+      "comparison": "Enemy movement ending within 8 inches; unengaged Rangers may make D6-inch Normal move. Current text matches the existing source-backed RuleIR."
+    },
+    {
+      "faction": "chaos-daemons",
+      "version": "1.2",
+      "pdf_page": 2,
+      "rule": "Daemonic Manifestation",
+      "disposition": "selected_executable_semantics_unchanged",
+      "comparison": "Shadow of Chaos +1 Battle-shock; success heals D3 or returns D3 non-CHARACTER BATTLELINE models. Matches July active artifact."
+    },
+    {
+      "faction": "chaos-space-marines",
+      "version": "1.3",
+      "pdf_page": 21,
+      "rule": "Defiler: Daemonforge",
+      "disposition": "selected_executable_semantics_unchanged",
+      "comparison": "Dark Pact grants Wound re-rolls of 1 through phase end. Matches July active artifact."
+    },
+    {
+      "faction": "emperors-children",
+      "version": "1.3",
+      "pdf_page": 5,
+      "rule": "Exalted Patron",
+      "disposition": "selected_executable_semantics_unchanged",
+      "comparison": "LORD EXULTANT bearer gains +1 inch Move. Matches July active generic RuleIR artifact."
+    },
+    {
+      "faction": "thousand-sons",
+      "version": "1.3",
+      "pdf_page": 7,
+      "rule": "Defiler: Destroyer of Futures",
+      "disposition": "selected_executable_semantics_unchanged",
+      "comparison": "Once per phase per unit, Counteroffensive use costs 1 CP less and permits other uses. Matches July active artifact."
+    },
+    {
+      "faction": "adeptus-custodes-print",
+      "version": "1.0",
+      "pdf_page": 1,
+      "rule": "Superior Creation / Shield-Captain on Dawneagle Jetbike",
+      "disposition": "reviewed_no_bounded_runtime_patch",
+      "comparison": "Printed errata applies Superior Creation to Auric Champions, while retained same-name source row belongs Lions of the Emperor and has no runtime consumer. Do not migrate by display-name equality. Jetbike Leader already exists in the prior MFM allowance."
+    },
+    {
+      "faction": "space-marines-print",
+      "version": "1.1",
+      "pdf_page": 1,
+      "rule": "Captain Titus / Iron Father Feirros / Kayvaan Shrike / Librarian in Terminator Armour / Techmarine",
+      "disposition": "reviewed_no_bounded_runtime_patch",
+      "comparison": "Exact source-rule names did not identify executable matching entries in the packaged faction RuleIR shards. This is a limited lookup, not whole-faction support or freshness certification."
+    }
+  ],
+  "scope": "MFM army-construction reconciliation is the implementation scope. These selected executable-rule comparisons supplement it. Full current faction PDF reconciliation, codex replacements, datasheet characteristic/weapon updates and other unlisted rules are unqualified and remain separate bounded work. The World Eaters current PDF was captured and inspected but no complete semantic reconciliation is claimed.",
+  "access": "Web retrieval of interactive MFM returned HTTP403. Normal in-app-browser and ordinary curl access succeeded without special headers, challenges, credentials, alternate restricted endpoints or bypass. Public official PDF downloads succeeded."
+}

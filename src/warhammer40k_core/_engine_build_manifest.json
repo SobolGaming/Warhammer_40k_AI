@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3bf79c73db5c5f28d8401fcf9f10298fae6aac5a349ef00cf4e79c9f7785bac7",
-  "fingerprint": "3bf79c73db5c5f28d8401fcf9f10298fae6aac5a349ef00cf4e79c9f7785bac7",
-  "resource_count": 3130,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ef7e9800c922a8c331094e05c6a7b774f2fa33cc74da0e4bd135cf9b9906bd08",
+  "fingerprint": "ef7e9800c922a8c331094e05c6a7b774f2fa33cc74da0e4bd135cf9b9906bd08",
+  "resource_count": 3162,
   "resources": [
     {
       "byte_length": 113,
@@ -805,9 +805,9 @@
       "sha256": "4ca230cace66cd337c225dd8fca53d283740918e247a9f28f28bdc810a49dc18"
     },
     {
-      "byte_length": 36302,
+      "byte_length": 36313,
       "path": "warhammer40k_core/engine/army_points.py",
-      "sha256": "f42f5d47fc2b6077f50fe621874c6eaee0171ee8a8a93398a730fb3bc25ba672"
+      "sha256": "b1e28b7b4756e6ec988699b241ea8bbcc8f0706ad7ab0c1dbf3fd1f77f4fcb2a"
     },
     {
       "byte_length": 6038,
@@ -13920,19 +13920,24 @@
       "sha256": "f800b9332a080b8b69b6fe9516a55e3272a766f20133ea280f98b3f3ae20e503"
     },
     {
-      "byte_length": 4079,
+      "byte_length": 6899,
       "path": "warhammer40k_core/rules/mfm_html_tree.py",
-      "sha256": "f9c6c5b0ada18657260d576105deed8b5b73506d6e6665012f9a66cd114e673c"
+      "sha256": "66b885e6ca6626099598113d943faa9492fa98526680f8ed2887f9773b185392"
     },
     {
-      "byte_length": 1212,
+      "byte_length": 2564,
+      "path": "warhammer40k_core/rules/mfm_payloads.py",
+      "sha256": "f0b9e9864c9b7371c628357c6584aeef8fae42faa2d418fb565e9a2c61c81c86"
+    },
+    {
+      "byte_length": 1240,
       "path": "warhammer40k_core/rules/mfm_sections.py",
-      "sha256": "aa95d5f169a6c0f56adef31096ca0d4591988d7d926f909233b0730f6af39017"
+      "sha256": "06e5a4e57a41ff057aa2fb311cc6eff754ecdaa056551474d5c44cc31daf3db3"
     },
     {
-      "byte_length": 67798,
+      "byte_length": 68482,
       "path": "warhammer40k_core/rules/mfm_source.py",
-      "sha256": "2d0f61fcdb6b215204c366a97d6997387ce1e675b9d6b9227a6c82aa634ced6e"
+      "sha256": "d91fd2f5d34f6ca5a1ebcace35e3cc8ff5ffd6a551dfcd2e16b787919ef7000e"
     },
     {
       "byte_length": 4147,
@@ -15453,6 +15458,161 @@
       "byte_length": 1935,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_07/artifacts/package.json",
       "sha256": "5a0888d2568592a99e2cd31c1155950ad1c731f1be4b46bd9e220d45a9453bfc"
+    },
+    {
+      "byte_length": 3245,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/__init__.py",
+      "sha256": "2e98164dc2f60a1e1ba4a46065b8b25088ba72b8ce6afc296d7961aff68eb6fe"
+    },
+    {
+      "byte_length": 9300,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/_artifacts.py",
+      "sha256": "bc3c87f2520579094cdc859c339965564b6f4bd8163cbfe28a5dcb665222ce88"
+    },
+    {
+      "byte_length": 83631,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/adepta-sororitas.json",
+      "sha256": "934d504f85585558f9af5216a6babac3b9c8057352be9e92eccb63568c548a8d"
+    },
+    {
+      "byte_length": 95000,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/adeptus-custodes.json",
+      "sha256": "250b44e3c5c58329633e631cbe0bc56a3583d2dbf18268e3078b2b26a0cd9f3e"
+    },
+    {
+      "byte_length": 95591,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/adeptus-mechanicus.json",
+      "sha256": "11228bf19d6f69bfff969fae0d40a0b7ab30d85474411a01ec45c1285e32e62e"
+    },
+    {
+      "byte_length": 165889,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/aeldari.json",
+      "sha256": "1dbb21789e9768d00427984cdd54c33968599a372ea364fbe91375368cda1d42"
+    },
+    {
+      "byte_length": 178287,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/astra-militarum.json",
+      "sha256": "d43ea73cacb30f94cba980d5faa4e2ef66ec712e1a0618e0ed1385ec470ada6e"
+    },
+    {
+      "byte_length": 214697,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/black-templars.json",
+      "sha256": "885b83b8e61b548bff56cfc89279c0ad2acb4897c3afb2ba29364427868016be"
+    },
+    {
+      "byte_length": 230482,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/blood-angels.json",
+      "sha256": "bdc64ee1191af90e911686900f544aad2d476c62dc6f3ab9aaeb45aec01a5be2"
+    },
+    {
+      "byte_length": 108425,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/chaos-daemons.json",
+      "sha256": "3fd71c41181a98dbcad47f0bb987d7f201b237a1fbe7dbd88c1e2e16d80a17e3"
+    },
+    {
+      "byte_length": 57643,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/chaos-knights.json",
+      "sha256": "204b886235d941ae9392376d517cc2fbf7f646db740e2f3e80d54f0edffe8adf"
+    },
+    {
+      "byte_length": 146693,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/chaos-space-marines.json",
+      "sha256": "ec54e972734e7c4c646114f19402a5069112e174a523f185da2229845e950345"
+    },
+    {
+      "byte_length": 234740,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/dark-angels.json",
+      "sha256": "a820ab6747ff9eee9c24c8c5fe8468cf88c6a98cf57f61a45ea3baecc288af4c"
+    },
+    {
+      "byte_length": 87950,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/death-guard.json",
+      "sha256": "9a36767ef9f91833ffb786cfbac8b1029d5464bd1d29451258a28e506c99d23d"
+    },
+    {
+      "byte_length": 208030,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/deathwatch.json",
+      "sha256": "13bd0c074a3cb308c0640138f066bbf3dd90a57217e368b0edec782bdd2f11f4"
+    },
+    {
+      "byte_length": 64703,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/drukhari.json",
+      "sha256": "c1ef0ae3e88184028ab1d1e528fcd30460a472844f2ca5612ce76beef2ca659f"
+    },
+    {
+      "byte_length": 63461,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/emperors-children.json",
+      "sha256": "eee0a5861b52b67ad9e10f4ce34793d5ec17781a945b904a2a14723a55ed43bf"
+    },
+    {
+      "byte_length": 72049,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/genestealer-cults.json",
+      "sha256": "9a9271733eca91003b89f63662ad57e8538a6ab1a950ce3b45ece563b15459a7"
+    },
+    {
+      "byte_length": 80615,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/grey-knights.json",
+      "sha256": "3cf7c74f5532db382da058eb420bf8adb9b15a5c89d4c0ca482fc782550b08d6"
+    },
+    {
+      "byte_length": 117892,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/imperial-agents.json",
+      "sha256": "94924db3be59846cdca4f2f31b33ecfacda79fadb02eaad207f5ecb551f66f63"
+    },
+    {
+      "byte_length": 63380,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/imperial-knights.json",
+      "sha256": "3bd8be32701a73a34f1895c6a0b57683ce807242350b96d45b11a26ecac327a4"
+    },
+    {
+      "byte_length": 67782,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/leagues-of-votann.json",
+      "sha256": "c04a2010afb15fc67eb41dce9ed75436fc5eb6ccb5d3077af43ae4e6e0351801"
+    },
+    {
+      "byte_length": 130317,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/necrons.json",
+      "sha256": "6ba13a941dd7b3b5fef5cca5b413e769bee191d44dd8cfc23f188487705c3a49"
+    },
+    {
+      "byte_length": 143369,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/orks.json",
+      "sha256": "ce77068cc63d3bee9afeb35f113142a8361d76ac86730447f1de94cbeb3e4a60"
+    },
+    {
+      "byte_length": 238928,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/space-marines.json",
+      "sha256": "bb9f99025a45ec58e248c64c5fd17f89cb41c940db06c4a70d61dbcc887a548b"
+    },
+    {
+      "byte_length": 251501,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/space-wolves.json",
+      "sha256": "26d7bfcd1898a6ce46ec2221c285c280bba1d96b8a31d3b4f06a75c2634ec269"
+    },
+    {
+      "byte_length": 102757,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/tau-empire.json",
+      "sha256": "36bd30186ea5471af653c0972ca68ed098fc4a52acc37bbff763b0f791a5377d"
+    },
+    {
+      "byte_length": 89039,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/thousand-sons.json",
+      "sha256": "a56eeaf152a7f0c4bebb6ee739a39a5e999724eca2bb977cc9306cb319e29206"
+    },
+    {
+      "byte_length": 120823,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/tyranids.json",
+      "sha256": "fc026aa3e5dd201e1109c806fa18ee07a6ee7a6d45e44cfee868204753d068b7"
+    },
+    {
+      "byte_length": 77253,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/factions/world-eaters.json",
+      "sha256": "d7ea2422e4f7fd1d3ab6983f68006e04ec0f069259f820f83072462f7c91992a"
+    },
+    {
+      "byte_length": 1935,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_10/artifacts/package.json",
+      "sha256": "e2952240e5b8889844fb18409f2b9e75a37d95e5ca206ed96423e85e92cc6362"
     },
     {
       "byte_length": 5416,

@@ -1,0 +1,186 @@
+{
+  "captures": [
+    {
+      "sha256": "9ab86757392e5a20af93bb8567b35ccbc1e1a81dd3b62a0f66c821f944bc4ef0",
+      "source_id": "index",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/"
+    },
+    {
+      "sha256": "7d438cc99a1e77396a0b953e6a1cbc251e0bf1112a56a4895bcb7dddf9610613",
+      "source_id": "adepta-sororitas",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/adepta-sororitas"
+    },
+    {
+      "sha256": "b31aee1899187f8f6440c93ee0d3f74963b275f2670ece0e5b8bfc5a23dcabe9",
+      "source_id": "adeptus-custodes",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/adeptus-custodes"
+    },
+    {
+      "sha256": "3e3e583727ec35acb435931d827d7b8e5e753d57f0310321e0976fa6e4f5acd8",
+      "source_id": "adeptus-mechanicus",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/adeptus-mechanicus"
+    },
+    {
+      "sha256": "3298b243a40faccca93228297ecc1691f6747bb68631fc2b04e7a32daaf11757",
+      "source_id": "aeldari",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/aeldari"
+    },
+    {
+      "sha256": "ab0c62cc34100fd0e3a641af347566b5877e46126c17592a712d93bf81b6f977",
+      "source_id": "astra-militarum",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/astra-militarum"
+    },
+    {
+      "sha256": "62918b68dfc4acb7c6df4bc7102fb892308de44bbd64b155160709e801bfc326",
+      "source_id": "black-templars",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/black-templars"
+    },
+    {
+      "sha256": "0679236eba2cf2e84155d37b479e472d934ee2b7e4d5f07e76f30db68ea713ff",
+      "source_id": "blood-angels",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/blood-angels"
+    },
+    {
+      "sha256": "a4bd9e59aab357ee8e6adc620c507bfa7e7582c1a120b8bc8c16f19469ffe70a",
+      "source_id": "chaos-daemons",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/chaos-daemons"
+    },
+    {
+      "sha256": "c5da87d7576a000a892161b644dba84216d039bb268e8099b099bdd704a816fb",
+      "source_id": "chaos-knights",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/chaos-knights"
+    },
+    {
+      "sha256": "0841761fcc0193ece32b51c64cc74bd14efd975f6a4b5429ae7fab8fb7a128c1",
+      "source_id": "chaos-space-marines",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/chaos-space-marines"
+    },
+    {
+      "sha256": "94006eb92c73e34545a22d9846210cebc53ef65c3eb28daea0fc4b3a30841f7e",
+      "source_id": "dark-angels",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/dark-angels"
+    },
+    {
+      "sha256": "1a0a6bcf68f19dd056239f4a3703043cb72f377cde4230b0cf3124af4185c2ad",
+      "source_id": "death-guard",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/death-guard"
+    },
+    {
+      "sha256": "d693dbbab1ccdeb117e17833fe42e392ff9bfa85580185df471f028d296d172b",
+      "source_id": "deathwatch",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/deathwatch"
+    },
+    {
+      "sha256": "f49b3fb13a4ee7e0ec1139e7f34fd38135de4d8f58d11ac905eaa8093c2849ac",
+      "source_id": "drukhari",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/drukhari"
+    },
+    {
+      "sha256": "75bf9f807ea793e42ad9a29c17d0323d8e5fe2af088ad1cf937261bcc6ae6a71",
+      "source_id": "emperors-children",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/emperors-children"
+    },
+    {
+      "sha256": "d4321baed04f333529081c7e70be8d10b2c02f063f514b4e7ded2b93480b56dc",
+      "source_id": "genestealer-cults",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/genestealer-cults"
+    },
+    {
+      "sha256": "d7f181951c58ad74d2f084a24ec13f7adbcb9109372e8ae8874b28f0fcc73c75",
+      "source_id": "grey-knights",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/grey-knights"
+    },
+    {
+      "sha256": "1c3b8738ff4531c54ee85027d4ca4276f8a0d22223b9edd2479ff9e7f7f88ac2",
+      "source_id": "imperial-agents",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/imperial-agents"
+    },
+    {
+      "sha256": "cb9a553b37b6b44d7b13aacc9c772c097ba89f7f5b58ae9c18118025ae8ff16d",
+      "source_id": "imperial-knights",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/imperial-knights"
+    },
+    {
+      "sha256": "d76df07362f2f9e92e5af1b74098fd4da01eeab8406408993dfeac7e7d635077",
+      "source_id": "leagues-of-votann",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/leagues-of-votann"
+    },
+    {
+      "sha256": "8240a8d6f510f3a9bdb5f47ddeab95be83420dd1dc7f0bbdfe59d24a4e6399d7",
+      "source_id": "necrons",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/necrons"
+    },
+    {
+      "sha256": "c70c7f604bf9e78d165afdf8bd848066b6eda9f6ed67b2c29fab3e0349ea99ff",
+      "source_id": "orks",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/orks"
+    },
+    {
+      "sha256": "0832884e4e9143543f81d71080dfcc4e4c309bd7c7c736fd6d529f82275c1434",
+      "source_id": "space-marines",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/space-marines"
+    },
+    {
+      "sha256": "c22dfcdab9faf5cb0f0fbe6fb7c4e3a4ee4e071c60c6c7bd9a6d026caf04f8f5",
+      "source_id": "space-wolves",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/space-wolves"
+    },
+    {
+      "sha256": "fff425a79d52f8db4b06b1774cebb7acea9f35f28e04cc3183e89bb05b7b243f",
+      "source_id": "tau-empire",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/tau-empire"
+    },
+    {
+      "sha256": "28c7a236b358370043c86e5ee75f2533951b0a9fa6c2d60bfaa1bb0a2a65e0e7",
+      "source_id": "thousand-sons",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/thousand-sons"
+    },
+    {
+      "sha256": "393a498613830ded0c32b218e30c30d5e256d20016db7e1adcfbe0f89ea2034e",
+      "source_id": "tyranids",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/tyranids"
+    },
+    {
+      "sha256": "a59f1cb499f8c40835f6713558fa0451af7e57b19875d2250337f54fba4c7270",
+      "source_id": "world-eaters",
+      "status": "checked",
+      "url": "https://mfm.warhammer-community.com/en/world-eaters"
+    }
+  ],
+  "checked_on": "2026-10-30",
+  "excluded_faction_ids": [
+    "chaos-titan-legions",
+    "titan-legions"
+  ],
+  "inaccessible_sources": [],
+  "source_date": "2026-10-14",
+  "source_version": "v1.6"
+}
