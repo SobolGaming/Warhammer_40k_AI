@@ -30423,7 +30423,7 @@
     "supported-world-eaters-archive-binding-maintenance": {
       "paths": [
         "tests/support/faction_layout_preservation.py",
-        "tests/code_quality/test_order97_faction_relocation.py",
+        "tests/code_quality/test_world_eaters_layout_maintenance.py",
         "data/source_audits/faction_test_layout/preservation.json"
       ],
       "owners": [

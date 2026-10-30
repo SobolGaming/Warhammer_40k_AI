@@ -2,8 +2,38 @@
   "policy": "rules-engine-performance-v3",
   "base": "764b5321af2b05d6537861910dba0540abaa6d94",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e1ecfcb90c91cd5f790bcab4390a43d3e85f7d10e6d36643d534339526930cee",
-  "operation_map_sha256": "ff83ade1491a2aaa03d473f2615c2bd5244dfc4816fd864136903d3d2d575cb1",
+  "operation_map_sha256": "118b6bc224afb91037f52ef4e1050c4dd239c7291eeb0e39b7ca75fadea86685",
   "changes": {
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "2b77d4b88cd631404ecb9722a703f7ac4a706c3ec52f43b5f231e6b911d871bf",
+      "after_sha256": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563",
+      "owners": {
+        "@document": {
+          "before": "2b77d4b88cd631404ecb9722a703f7ac4a706c3ec52f43b5f231e6b911d871bf",
+          "after": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563"
+        }
+      }
+    },
+    "ci/quality_shards/shard-3-modules.txt": {
+      "before_sha256": "1df349523951e20ea21a406b251838b9b870eb0780c3abc8ccd5b2e7787b4dd7",
+      "after_sha256": "a7ca1f0188d331700d73bb3bbd7982fc7644d8e7096c323392e1d5c4417ec3b7",
+      "owners": {
+        "@document": {
+          "before": "1df349523951e20ea21a406b251838b9b870eb0780c3abc8ccd5b2e7787b4dd7",
+          "after": "a7ca1f0188d331700d73bb3bbd7982fc7644d8e7096c323392e1d5c4417ec3b7"
+        }
+      }
+    },
+    "ci/quality_shards/shard-3.txt": {
+      "before_sha256": "9a7ed8884590b1211ad1806074f5016aeebc2319d9c795ffa45d36640ff06772",
+      "after_sha256": "914eff60a3cdcb8d88b0c54657a5e6a2826fe331028695451cdc4b7dc29ed061",
+      "owners": {
+        "@document": {
+          "before": "9a7ed8884590b1211ad1806074f5016aeebc2319d9c795ffa45d36640ff06772",
+          "after": "914eff60a3cdcb8d88b0c54657a5e6a2826fe331028695451cdc4b7dc29ed061"
+        }
+      }
+    },
     "ci/test_shards/durations.json": {
       "before_sha256": "33cf406416f98e0d1725c324dbadb0d296dd8325d068fdc702ebef81fe9b8568",
       "after_sha256": "db71caf457eeff044f15968646f25ea6a40fb625d329d126bcea880c8bc630a7",
@@ -276,11 +306,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "11a23d3127fdb73d447b0d043e8005fc497391ecd281bd987e3cc52b466132df",
-      "after_sha256": "d4342e4948b993e0b9527657f247e325f2c07907e7bd5678231001468bcb662a",
+      "after_sha256": "bc0083148585d3ae3c2dfcf3099e4755655160747f0dbc33c1feec0c0473bcbe",
       "owners": {
         "@document": {
           "before": "11a23d3127fdb73d447b0d043e8005fc497391ecd281bd987e3cc52b466132df",
-          "after": "d4342e4948b993e0b9527657f247e325f2c07907e7bd5678231001468bcb662a"
+          "after": "bc0083148585d3ae3c2dfcf3099e4755655160747f0dbc33c1feec0c0473bcbe"
         }
       }
     },
@@ -332,13 +362,13 @@
         }
       }
     },
-    "tests/code_quality/test_order97_faction_relocation.py": {
-      "before_sha256": "0ee571c76b471dd9940f2a716c0c1f71ebc8a766f90ce2ae94c8239d47feda22",
-      "after_sha256": "4ca92fabd422af4845df0a7f0959b9388ecf13eba74bf399ad441de51b17c835",
+    "tests/code_quality/test_world_eaters_layout_maintenance.py": {
+      "before_sha256": null,
+      "after_sha256": "4c8ce5f35be40fffa9f2aa2dbe019cd8dcdb9dc7332037a011099a24915d2f63",
       "owners": {
         "@module": {
-          "before": "0bc0ee5674eee188e02d67d1390433ee0153632bdeef56e9f00a96dc263f675e",
-          "after": "7775b470964a8b9aae6804a3edd9662f5e1cc7cdf5c69c610307c4a28988cd42"
+          "before": null,
+          "after": "90ec712dae23b41886608dbb1ada4a33174cb4ea58df20d06f53a207f6336231"
         },
         "test_world_eaters_lookup_maintenance_preserves_every_other_archived_assertion": {
           "before": null,
@@ -430,6 +460,30 @@
     }
   },
   "rows": {
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Documents and maps the bounded supported-faction reconciliation, preserving all historical evidence, finite deferred checks and active delivery gates.",
+      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
+      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+    },
+    "ci/quality_shards/shard-3-modules.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Documents and maps the bounded supported-faction reconciliation, preserving all historical evidence, finite deferred checks and active delivery gates.",
+      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
+      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+    },
+    "ci/quality_shards/shard-3.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Documents and maps the bounded supported-faction reconciliation, preserving all historical evidence, finite deferred checks and active delivery gates.",
+      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
+      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+    },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
@@ -723,7 +777,7 @@
       "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
       "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
     },
-    "tests/code_quality/test_order97_faction_relocation.py": {
+    "tests/code_quality/test_world_eaters_layout_maintenance.py": {
       "category": "rule_semantics",
       "operations": [
         "supported-world-eaters-archive-binding-maintenance"
