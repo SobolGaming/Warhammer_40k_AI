@@ -16,21 +16,41 @@
     },
     "ci/quality_shards/shard-3-modules.txt": {
       "before_sha256": "1df349523951e20ea21a406b251838b9b870eb0780c3abc8ccd5b2e7787b4dd7",
-      "after_sha256": "a7ca1f0188d331700d73bb3bbd7982fc7644d8e7096c323392e1d5c4417ec3b7",
+      "after_sha256": "e3dfea5b332cabefdadb22a84c41b073b2070a442ce926466a0ef7242a4f02c4",
       "owners": {
         "@document": {
           "before": "1df349523951e20ea21a406b251838b9b870eb0780c3abc8ccd5b2e7787b4dd7",
-          "after": "a7ca1f0188d331700d73bb3bbd7982fc7644d8e7096c323392e1d5c4417ec3b7"
+          "after": "e3dfea5b332cabefdadb22a84c41b073b2070a442ce926466a0ef7242a4f02c4"
         }
       }
     },
     "ci/quality_shards/shard-3.txt": {
       "before_sha256": "9a7ed8884590b1211ad1806074f5016aeebc2319d9c795ffa45d36640ff06772",
-      "after_sha256": "914eff60a3cdcb8d88b0c54657a5e6a2826fe331028695451cdc4b7dc29ed061",
+      "after_sha256": "a4731adf71e0afd9ab7447cac51e103e7bc76f9de9066a99e9525c209fc90d7c",
       "owners": {
         "@document": {
           "before": "9a7ed8884590b1211ad1806074f5016aeebc2319d9c795ffa45d36640ff06772",
-          "after": "914eff60a3cdcb8d88b0c54657a5e6a2826fe331028695451cdc4b7dc29ed061"
+          "after": "a4731adf71e0afd9ab7447cac51e103e7bc76f9de9066a99e9525c209fc90d7c"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4-modules.txt": {
+      "before_sha256": "95a7a3dc37b594c9c186facc3789f9b94a42049f1641a9d3b03b7efba0031953",
+      "after_sha256": "050017c277461337eda4a51472b95a08c4c6644d82aababe82abae2f72d3e750",
+      "owners": {
+        "@document": {
+          "before": "95a7a3dc37b594c9c186facc3789f9b94a42049f1641a9d3b03b7efba0031953",
+          "after": "050017c277461337eda4a51472b95a08c4c6644d82aababe82abae2f72d3e750"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "before_sha256": "cc12f43786228cb5cc6a3b75646cf8d4dc7dc1d4419dc69a1fac16aed3cc90e9",
+      "after_sha256": "1668298c232f67d6e54d0616f56d0dfba5f3b6e57713e7b15f869a91d405bb8e",
+      "owners": {
+        "@document": {
+          "before": "cc12f43786228cb5cc6a3b75646cf8d4dc7dc1d4419dc69a1fac16aed3cc90e9",
+          "after": "1668298c232f67d6e54d0616f56d0dfba5f3b6e57713e7b15f869a91d405bb8e"
         }
       }
     },
@@ -264,6 +284,16 @@
         }
       }
     },
+    "data/source_audits/supported_rules_2026_10/quality_lane_balance.json": {
+      "before_sha256": null,
+      "after_sha256": "6adaa25d02af6b2078353fdf0989a5a9968f4c9b18d45d297f596865cb7449fc",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6adaa25d02af6b2078353fdf0989a5a9968f4c9b18d45d297f596865cb7449fc"
+        }
+      }
+    },
     "data/source_audits/supported_rules_2026_10/reconciliation.json": {
       "before_sha256": null,
       "after_sha256": "9e3768c80aaa88919271b949f460a0807fac258b9ecb2b1916bbd654f4ba9db9",
@@ -472,17 +502,33 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents and maps the bounded supported-faction reconciliation, preserving all historical evidence, finite deferred checks and active delivery gates.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "Measured hosted lane balancing moves one complete ten-case conformance module from lane4 to lane3. The exact global module and case multisets, all 260 deferrals, worker scheduling and every deadline remain unchanged. The original timeout remains failed; this is CI metadata maintenance.",
+      "source_obligation": "Run41076387852 job124133596389 failed the fixed570-second supervisor deadline despite420 passing tests. Same-run lane3 took127.259seconds; the moved module measured271.699summed seconds. Preserved JUnit and supervisor hashes document the planning inputs and exact moved nodes.",
+      "unchanged_work": "All2139 collected and1879 active quality nodes remain selected once, with whole-module lane ownership. Source, test, guard, workflow, runtime and behavioral selection semantics are unchanged. Timing sums are planning estimates; fresh hosted gates and serial smoke remain required."
     },
     "ci/quality_shards/shard-3.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents and maps the bounded supported-faction reconciliation, preserving all historical evidence, finite deferred checks and active delivery gates.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "Measured hosted lane balancing moves one complete ten-case conformance module from lane4 to lane3. The exact global module and case multisets, all 260 deferrals, worker scheduling and every deadline remain unchanged. The original timeout remains failed; this is CI metadata maintenance.",
+      "source_obligation": "Run41076387852 job124133596389 failed the fixed570-second supervisor deadline despite420 passing tests. Same-run lane3 took127.259seconds; the moved module measured271.699summed seconds. Preserved JUnit and supervisor hashes document the planning inputs and exact moved nodes.",
+      "unchanged_work": "All2139 collected and1879 active quality nodes remain selected once, with whole-module lane ownership. Source, test, guard, workflow, runtime and behavioral selection semantics are unchanged. Timing sums are planning estimates; fresh hosted gates and serial smoke remain required."
+    },
+    "ci/quality_shards/shard-4-modules.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Measured hosted lane balancing moves one complete ten-case conformance module from lane4 to lane3. The exact global module and case multisets, all 260 deferrals, worker scheduling and every deadline remain unchanged. The original timeout remains failed; this is CI metadata maintenance.",
+      "source_obligation": "Run41076387852 job124133596389 failed the fixed570-second supervisor deadline despite420 passing tests. Same-run lane3 took127.259seconds; the moved module measured271.699summed seconds. Preserved JUnit and supervisor hashes document the planning inputs and exact moved nodes.",
+      "unchanged_work": "All2139 collected and1879 active quality nodes remain selected once, with whole-module lane ownership. Source, test, guard, workflow, runtime and behavioral selection semantics are unchanged. Timing sums are planning estimates; fresh hosted gates and serial smoke remain required."
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Measured hosted lane balancing moves one complete ten-case conformance module from lane4 to lane3. The exact global module and case multisets, all 260 deferrals, worker scheduling and every deadline remain unchanged. The original timeout remains failed; this is CI metadata maintenance.",
+      "source_obligation": "Run41076387852 job124133596389 failed the fixed570-second supervisor deadline despite420 passing tests. Same-run lane3 took127.259seconds; the moved module measured271.699summed seconds. Preserved JUnit and supervisor hashes document the planning inputs and exact moved nodes.",
+      "unchanged_work": "All2139 collected and1879 active quality nodes remain selected once, with whole-module lane ownership. Source, test, guard, workflow, runtime and behavioral selection semantics are unchanged. Timing sums are planning estimates; fresh hosted gates and serial smoke remain required."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -714,6 +760,16 @@
       "rationale": "Development fixture maintenance admits exactly one reviewed World Eaters diagnostic literal in the current successor. Immutable archived bytes, definition mappings, exception type, target call and every other AST node remain authenticated; focused controls reject adjacent assertion changes. Runtime and behavioral case bodies are unchanged by this maintenance.",
       "source_obligation": "The active Order97 historical-evidence guard must accept the reviewed current diagnostic while preserving the original archive and all unrelated successor records. Maintenance is scoped to the exact original, successor and named fail-fast test through the existing preservation protocol.",
       "unchanged_work": "Only development archive verification, its direct controls and the current successor SHA binding change. No production or behavioral-test semantics change. The complete active quality suite and serial current-runtime smoke remain required."
+    },
+    "data/source_audits/supported_rules_2026_10/quality_lane_balance.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-rules-current-source-audit"
+      ],
+      "selected_families": [],
+      "rationale": "Measured hosted lane balancing moves one complete ten-case conformance module from lane4 to lane3. The exact global module and case multisets, all 260 deferrals, worker scheduling and every deadline remain unchanged. The original timeout remains failed; this is CI metadata maintenance.",
+      "source_obligation": "Run41076387852 job124133596389 failed the fixed570-second supervisor deadline despite420 passing tests. Same-run lane3 took127.259seconds; the moved module measured271.699summed seconds. Preserved JUnit and supervisor hashes document the planning inputs and exact moved nodes.",
+      "unchanged_work": "All2139 collected and1879 active quality nodes remain selected once, with whole-module lane ownership. Source, test, guard, workflow, runtime and behavioral selection semantics are unchanged. Timing sums are planning estimates; fresh hosted gates and serial smoke remain required."
     },
     "data/source_audits/supported_rules_2026_10/reconciliation.json": {
       "category": "rule_semantics",

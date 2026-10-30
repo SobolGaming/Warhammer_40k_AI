@@ -1,0 +1,77 @@
+{
+  "schema": "quality-lane-redistribution-v1",
+  "source_head": "c5f5dc376f6e90e990b6d0806f0f97944130301e",
+  "run_id": 41076387852,
+  "failed_job_id": 124133596389,
+  "failed_run_disposition": "Remains failed: all 420 cases passed, but the supervisor exceeded its fixed deadline.",
+  "source_lane": 4,
+  "destination_lane": 3,
+  "module": "tests/code_quality/test_phase18m_conformance_boundary.py",
+  "moved_nodes": [
+    "tests/code_quality/test_phase18m_conformance_boundary.py::test_phase18m_typescript_client_does_not_import_engine_internals",
+    "tests/code_quality/test_phase18m_conformance_boundary.py::test_phase18m_typescript_modules_respect_new_module_size_budget",
+    "tests/code_quality/test_phase18m_conformance_boundary.py::test_phase18m_package_pins_generation_typecheck_and_live_conformance",
+    "tests/code_quality/test_phase18m_conformance_boundary.py::test_phase18m_conformance_version_matches_published_contract",
+    "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_check_regenerates_into_an_isolated_tree_before_validation",
+    "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_manifest_hashes_current_files_and_all_documentation",
+    "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_regeneration_discards_orphan_generated_fixtures",
+    "tests/code_quality/test_phase18m_conformance_boundary.py::test_external_contract_write_mode_removes_orphan_generated_fixture",
+    "tests/code_quality/test_phase18m_conformance_boundary.py::test_phase18m_executable_client_is_operation_bound_without_identifier_conventions",
+    "tests/code_quality/test_phase18m_conformance_boundary.py::test_phase18m_cross_backend_replay_uses_canonical_semantic_comparison"
+  ],
+  "measured_seconds": {
+    "lane4_supervisor": 574.162593255,
+    "lane3_supervisor": 127.259441739,
+    "module_junit_sum": 271.699,
+    "longest_indivisible_case": 271.385,
+    "destination_serial_addition_estimate": 398.958441739,
+    "destination_serial_addition_margin_to_570": 171.041558261,
+    "balanced_source_work_reduction_estimate": 67.92475
+  },
+  "planning_limits": "JUnit sums and same-run worker timing are planning evidence, not guaranteed wall-time savings. Fresh hosted gates remain required.",
+  "placement": "The complete module is first in lane3 so the long indivisible contract check can start early; worker count and worksteal scheduling are unchanged.",
+  "preserved": {
+    "collected_nodes": 2139,
+    "active_nodes": 1879,
+    "deferred_nodes": 260,
+    "all_txt_sha256": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563",
+    "historical_baseline_sha256": "308870fb4095de8e263def2e75ac71687bc65c3b32f06f591fed848fc34b4ef3",
+    "deferred_args_sha256": "b15074dd5729be688af390dcbb6b3232a1f32e3f9d85a49586c90706660743a8",
+    "supervisor_deadlines_seconds": [
+      570,
+      585,
+      590,
+      595
+    ],
+    "outer_quality_allowance_seconds": 600,
+    "behavior_shard_cutoff_seconds": 720,
+    "ci_goal_minutes": 12,
+    "coverage_floor_percent": 64,
+    "runtime_test_and_guard_semantics": "Unchanged; only whole-module lane metadata is redistributed."
+  },
+  "artifact_sha256": {
+    "ready-quality3-artifact/supervisor.json": "b8dc1dac070b81ad73d7cfbab242cb2f8a19d1e9fc41da1ae080fd695d450880",
+    "ready-quality3-artifact/junit.xml": "9cb0f95acb77a28317e4e6a07598264915012e3d8585afa8a621e39c8c0b8e21",
+    "ready-quality3-artifact/execute-process.json": "ecb646ebed97c2ab32718c4d717fc14e4898492df3709efd25354e3478f5168b",
+    "ready-quality3-artifact/watchdog.jsonl": "8f0e75a34daf2f1dfebb9d81855d4cbfb3f62fe2d3b25a590cd6a90db9ef53a6",
+    "ready-quality4-artifact/supervisor.json": "7732c0b2478f2d4fea11bd88b6cfcec339df1d6df2db342da2be844ad23c5340",
+    "ready-quality4-artifact/junit.xml": "d527dc1dad59716cc193222f63914b8ebff53f4707f8fd0dbadfbd44ee9ed1da",
+    "ready-quality4-artifact/execute-process.json": "6108c2b1617afbc5bb0af4bd3705313bb45ae7308e6db3b82a944782612631c8",
+    "ready-quality4-artifact/watchdog.jsonl": "c9ef5a58bf9834ea21878f26126c31364d5c31b6ea7b522033730df8dd0a4bd3",
+    "ready-quality3-artifact/start.json": "b34da06bff2f6a4157a2bbbb2b6fc1f7538cee7b1f46994f1dcf057d033dbe92",
+    "ready-quality4-artifact/start.json": "fd23931e70fd46862599a84e54b25c7694c0202510f3b8856dcdf8f8bb4ef1ba"
+  },
+  "hosted_context": {
+    "base": "764b5321af2b05d6537861910dba0540abaa6d94",
+    "checkout": "6457ead9a8f1465566120fd7c1d4dd919b4f08d9",
+    "event": "pull_request",
+    "mode": "hosted",
+    "pr_head": "c5f5dc376f6e90e990b6d0806f0f97944130301e",
+    "repository": "SobolGaming/Warhammer_40k_AI",
+    "repository_id": "1249438828",
+    "run_attempt": "1",
+    "run_id": "41076387852",
+    "tree": "98aa570f99b584aa255067a5b0eb0b613471f946",
+    "workflow_ref": "SobolGaming/Warhammer_40k_AI/.github/workflows/ci.yml@refs/pull/600/merge"
+  }
+}

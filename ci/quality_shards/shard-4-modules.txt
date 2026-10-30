@@ -1,5 +1,4 @@
 tests/code_quality/test_qualification40_successor.py
-tests/code_quality/test_phase18m_conformance_boundary.py
 tests/code_quality/test_generated_faction_docs.py
 tests/code_quality/test_order64_reconstruction_guard.py
 tests/code_quality/test_generated_ability_support_artifacts.py
