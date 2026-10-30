@@ -231,6 +231,13 @@ def submit_gameplay_request(session: LocalGameSession, request: DecisionRequest)
             payload=stratagem_decline_payload(),
         )
         assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
+    elif request.decision_type == "select_movement_action":
+        status = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"{request.request_id}:stationary",
+            option_id="remain_stationary",
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
     else:
         submit_fixture_request(session, request)
 
@@ -265,3 +272,115 @@ def move_fight(session: LocalGameSession, request: DecisionRequest, *, dx: float
         },
     )
     assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
+
+
+def attached_gameplay_session(
+    *,
+    game_id: str,
+    phase: BattlePhase = BattlePhase.FIGHT,
+    icon: bool = True,
+    enemy_x: float = 13.5,
+    bodyguard_count: int = 5,
+) -> LocalGameSession:
+    """Real canonical mustering and attachment; analytical profiles, not roster certification."""
+    from warhammer40k_core.core.datasheet import DatasheetWargearOption
+    from warhammer40k_core.engine.list_validation import AttachmentDeclaration
+
+    catalog = _world_eaters_catalog()
+    ids = ("core-character-leader", "core-intercessor-like-infantry")
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            replace(
+                sheet,
+                composition=tuple(replace(part, min_models=1) for part in sheet.composition)
+                if bodyguard_count == 1 and sheet.datasheet_id == ids[1]
+                else sheet.composition,
+                keywords=replace(
+                    sheet.keywords,
+                    keywords=tuple(token.upper() for token in sheet.keywords.keywords),
+                    faction_keywords=(*sheet.keywords.faction_keywords, "WORLD EATERS"),
+                ),
+                wargear_options=(
+                    *sheet.wargear_options,
+                    DatasheetWargearOption(
+                        option_id="we-attached:icon",
+                        model_profile_id="core-intercessor-like",
+                        default_wargear_ids=(ICON_OF_KHORNE_WARGEAR_ID,),
+                        allowed_wargear_ids=(ICON_OF_KHORNE_WARGEAR_ID,),
+                        min_selections=1,
+                        max_selections=1,
+                        source_ids=(army_rule.ICON_OF_KHORNE_RULE_UPDATE_SOURCE,),
+                    ),
+                )
+                if icon and sheet.datasheet_id == ids[1]
+                else sheet.wargear_options,
+            )
+            if sheet.datasheet_id in ids
+            else sheet
+            for sheet in catalog.datasheets
+        ),
+        detachments=tuple(
+            replace(
+                item,
+                unit_datasheet_ids=(*item.unit_datasheet_ids, *ids),
+                force_disposition_ids=(*item.force_disposition_ids, "purge-the-foe"),
+            )
+            if item.detachment_id == "berzerker-warband"
+            else item
+            for item in catalog.detachments
+        ),
+        wargear=tuple(
+            replace(
+                item,
+                weapon_profiles=tuple(
+                    replace(
+                        profile,
+                        attack_profile=AttackProfile.fixed(1),
+                        skill=CharacteristicValue.from_raw(Characteristic.WEAPON_SKILL, 2),
+                        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
+                        armor_penetration=CharacteristicValue.from_raw(
+                            Characteristic.ARMOR_PENETRATION, -6
+                        ),
+                        damage_profile=DamageProfile.fixed(10),
+                    )
+                    for profile in item.weapon_profiles
+                ),
+            )
+            if item.wargear_id == "core-leader-blade"
+            else item
+            for item in catalog.wargear
+        ),
+    )
+    lifecycle, _units = fight_lifecycle(
+        alpha_unit_ids=("bodyguard", "leader"),
+        enemy_unit_ids=("enemy",),
+        origins={},
+        poses_by_unit_key={
+            "bodyguard": (
+                (Pose.at(11.5, 11.5),)
+                if bodyguard_count == 1
+                else tuple(Pose.at(10, 10 + 1.5 * i) for i in range(bodyguard_count))
+            ),
+            "leader": (Pose.at(11.5, 10),),
+            "enemy": (Pose.at(enemy_x, 10),),
+        },
+        alpha_unit_specs={
+            "leader": ("core-character-leader", "core-character-leader", 1),
+            "bodyguard": (
+                "core-intercessor-like-infantry",
+                "core-intercessor-like",
+                bodyguard_count,
+            ),
+        },
+        enemy_unit_specs={"enemy": ("core-character-leader", "core-character-leader", 1)},
+        alpha_attachment_declarations=(AttachmentDeclaration("leader", "bodyguard"),),
+        alpha_faction_id="world-eaters",
+        alpha_detachment_ids=("berzerker-warband",),
+        catalog=catalog,
+        game_id=game_id,
+        battle_phase=phase,
+        fights_first_unit_keys=("bodyguard",),
+        record_deployment=True,
+    )
+    return LocalGameSession(lifecycle)

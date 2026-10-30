@@ -30368,6 +30368,57 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "supported-world-eaters-rules-unit-semantics": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "_record_total_carnage_sources",
+        "_target_unit_has_keyword",
+        "_unit_and_army_by_id",
+        "active_blessings_for_unit",
+        "bloodshed_points_available",
+        "eligible_blessings_unit_ids_for_army",
+        "unit_has_active_blessing"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-world-eaters-regression-controls": {
+      "paths": [
+        "tests/factions/world_eaters/gameplay_helpers.py",
+        "tests/factions/world_eaters/unit/test_blessings_gameplay.py",
+        "tests/factions/world_eaters/unit/test_icon_gameplay.py",
+        "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py"
+      ],
+      "owners": [
+        "@module",
+        "attached_gameplay_session",
+        "submit_gameplay_request",
+        "test_attached_blessing_selection_targets_one_rules_unit_and_all_component_models",
+        "test_attached_leader_kill_credits_bodyguard_icon_once_and_spends",
+        "test_attached_world_eaters_complete_native_fight_without_active_blessings",
+        "test_icon_credit_preserves_casualty_order_after_bodyguard_destruction",
+        "test_native_attached_unbridled_bloodlust_charge_completes_witness_and_replay",
+        "test_world_eaters_army_rule_fail_fast_edges_are_explicit"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "supported-rules-current-source-audit": {
+      "paths": [
+        "data/source_audits/supported_rules_2026_10/*"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

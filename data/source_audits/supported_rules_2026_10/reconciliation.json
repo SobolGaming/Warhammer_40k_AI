@@ -1,0 +1,207 @@
+{
+  "schema": "supported-faction-rule-reconciliation-v1",
+  "base": "764b5321af2b05d6537861910dba0540abaa6d94",
+  "scope": "Existing World Eaters Blessings and Icon rules-unit consumers only; declaration counts overlap and are not whole-faction or whole-game certification.",
+  "current_official_sources": {
+    "official_index_url": "https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/",
+    "receipts": [
+      {
+        "faction": "world-eaters",
+        "checked_utc": "2026-10-30T13:29:17.309769+00:00",
+        "url": "https://assets.warhammer-community.com/eng_30-09_wh40k_faction_pack_world_eaters-rxxj1fzeoh-kfx1cectxb.pdf",
+        "sha256": "93e29f1b166d2a06fafa37a543890e56ae59c712b73b5a1e26f0a1c1ecf6a8e9",
+        "bytes": 4019819,
+        "method": "ordinary public curl, retained PDF; source link freshly observed in rendered official index",
+        "matches_prior_capture": true,
+        "retained_pdf": "/tmp/task-current-sources-20261030/evidence/rules/eng_30-09_wh40k_faction_pack_world_eaters-rxxj1fzeoh-kfx1cectxb.pdf"
+      },
+      {
+        "faction": "aeldari",
+        "checked_utc": "2026-10-30T13:29:17.317612+00:00",
+        "url": "https://assets.warhammer-community.com/eng_14-10_wh40k_-faction_pack_aeldari-seqmcs1mu0-g8gzewikcm.pdf",
+        "sha256": "ca54d5039e6466c239e56a334e02fb14da4e7ce8113ba5a3335ddfad5a1c6ca2",
+        "bytes": 15522415,
+        "method": "ordinary public curl streamed hash; retained identical PDF reused rather than copied; source link freshly observed in rendered official index",
+        "matches_prior_capture": true,
+        "retained_pdf": "/tmp/task-current-sources-20261030/evidence/rules/eng_14-10_wh40k_-faction_pack_aeldari-seqmcs1mu0-g8gzewikcm.pdf"
+      }
+    ]
+  },
+  "prior_world_eaters_source": {
+    "manifest": "data/source_manifests/gw_11e_faction_packs.yaml",
+    "package_id": "gw-11e-world-eaters-faction-pack-2026-07",
+    "sha256": "42d9344798c0f359f2a3fb8338d7a0adf9ad0a12751450a929b64045eff8b239",
+    "local_cache_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_world_eaters-5g8k1b5jg0-3ttsio6riy.pdf"
+  },
+  "declaration_inventory": {
+    "checked_utc": "2026-10-30T13:21:44.131245+00:00",
+    "phase17f_execution_statuses": {
+      "executable_named_handler": 23,
+      "blocked_structured_semantics_required": 1889,
+      "blocked_approved_unsupported_source_gap": 28,
+      "executable_generic_ir": 133
+    },
+    "generated_manifest_semantic_statuses": {
+      "partial": 69,
+      "placeholder": 221,
+      "implemented": 131
+    },
+    "generated_component_summaries": {
+      "ability_coverage_rows.json": {
+        "sha256": "e308909c7f0179cfbd36dc8b9e4c667a0574fdbf392ec92856c5ca69fa59c285",
+        "rows": 293,
+        "counts": {
+          "support_stage": {
+            "engine_consumed": 293
+          },
+          "catalog_support": {
+            "descriptor_only": 158,
+            "generic_rule_ir": 132,
+            "unsupported": 3
+          }
+        },
+        "scope": "Existing generated component declarations; not new semantic certification or a whole-game playability claim."
+      },
+      "datasheet_support_rows.json": {
+        "sha256": "b6553ee4aabca631a1792372c39ebe0c1f2a96bf8883709a1189521dcebbcc06",
+        "rows": 59,
+        "counts": {
+          "overall": {
+            "Playable": 56,
+            "Blocked": 3
+          },
+          "catalog_status": {
+            "Full": 59
+          },
+          "datasheet_ability_status": {
+            "Full": 56,
+            "Blocked": 3
+          },
+          "faction_interaction_status": {
+            "Partial": 59
+          }
+        },
+        "scope": "Existing generated component declarations; not new semantic certification or a whole-game playability claim."
+      },
+      "mustering_support_rows.json": {
+        "sha256": "1244455677b64d69bbfd75123087b6eb1ae60bed2274dfa543e8fb9e52918019",
+        "rows": 11,
+        "counts": {
+          "support_stage": {
+            "full": 11
+          }
+        },
+        "scope": "Existing generated component declarations; not new semantic certification or a whole-game playability claim."
+      }
+    },
+    "world_eaters_phase17f": {
+      "executable_army_rule": 1,
+      "blocked_structured_semantics": 68,
+      "blocked_approved_source_gap": 1
+    },
+    "qualification": "Counts describe different overlapping declaration surfaces. They are not additive. Later datasheet RuleIR consumers, including Maulerfiend, are outside the Phase17F count.",
+    "later_generic_ir": {
+      "scope": "Later generic faction-pack IR declaration inventory; record presence does not independently certify execution or current official source currency. Overlaps other inventory surfaces.",
+      "manifest_sha256": "60afad5af52c1c36468239d46f977d9b9f5148a52477094b53ebda62b391e9f0",
+      "shards": 6,
+      "source_packages": 21,
+      "records_by_shard": {
+        "aeldari": 42,
+        "chaos-daemons": 27,
+        "chaos-space-marines": 1,
+        "emperors-children": 19,
+        "thousand-sons": 1,
+        "world-eaters": 2
+      },
+      "world_eaters_records": [
+        {
+          "source_row_id": "000002639:3",
+          "ability_name": "The Scent of Blood"
+        },
+        {
+          "source_row_id": "000002639:4",
+          "ability_name": "Savage Exaltation"
+        }
+      ]
+    }
+  },
+  "selected_checks": [
+    {
+      "rule": "Unbridled Bloodlust",
+      "pdf_page": 7,
+      "current_version": "1.3",
+      "disposition": "pdf_text_matches_existing_plus_one_charge_modifier; canonical_attached_consumer_repaired",
+      "owner": "world_eaters/army_rule.py:unbridled_bloodlust_charge_roll_modifier",
+      "latest_rules_qualification": "conditional_pending_preferred_app_data_comparison"
+    },
+    {
+      "rule": "Icon of Khorne",
+      "pdf_page": 8,
+      "current_version": "1.3",
+      "disposition": "pdf_text_matches_one_point_per_enemy_unit_destroyed_and_one_extra_D6_per_point_then_spend; canonical_attached_source_group_repaired",
+      "owner": "world_eaters/army_rule.py:bloodshed_points_available",
+      "latest_rules_qualification": "conditional_pending_preferred_app_data_comparison"
+    },
+    {
+      "rule": "Maulerfiend: The Scent of Blood",
+      "source_rule_id": "000002639:3",
+      "pdf_page": 8,
+      "current_version": "1.3",
+      "disposition": "selected_pdf_semantics_match_retained_executable_ir",
+      "comparison": "Within9in, nearby enemy below starting strength grants+1 charge, or below half strength grants+2; existing clauses use one exclusive modifier group with higher priority for+2.",
+      "artifact": "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/world-eaters.json",
+      "latest_rules_qualification": "conditional_pending_preferred_app_data_comparison"
+    }
+  ],
+  "normal_play_defect": {
+    "entry": "LocalGameSession finite fight submissions -> fight activation hook -> Rage-fuelled Invigoration -> unit_has_active_blessing -> physical-only unit lookup",
+    "canonical_source": "attached-unit:army-alpha:bodyguard",
+    "impact": "An ordinarily mustered Leader/bodyguard rules unit could not complete its fight even without an active Blessing. Same lookup class affected charge, melee weapon modifiers, attached target keywords and Icon destruction credit.",
+    "normal_reachability": "Reproduced on exact base with real canonical catalog mustering, AttachmentDeclaration, physical placements, engine-generated requests, and adapter submissions. Analytical fixture is not official roster certification.",
+    "acceptance": "Existing supported faction rules must work through shared engine authority for attached rules units; preserve native valid state restore/replay.",
+    "repair": "Use shared RulesUnitView identity, present components, canonical effect targets and group alive models. Icon checks all physical components with the existing event-time live-bearer check, awarding once per enemy unit. No historical tamper fallback or detachment support."
+  },
+  "metadata_followups": [
+    {
+      "name": "Murdermind",
+      "source_subrule_id": "000010668003",
+      "detachment": "Cursed Legion",
+      "current_mfm": "15pts; SUPPORT four Destroyer unit types",
+      "execution": "blocked; metadata does not establish gameplay support"
+    },
+    {
+      "name": "Butcher Lord",
+      "source_subrule_id": "000010074003",
+      "detachment": "Cult of Blood",
+      "current_mfm": "10pts; LEADER Jakhals/Goremongers",
+      "execution": "blocked; metadata does not establish gameplay support"
+    },
+    {
+      "name": "Grimnar's Mark",
+      "detachment": "Saga of the Great Wolf",
+      "current_mfm": "15pts; no LEADER allowance",
+      "execution": "No exact matching existing subrule/execution row; no alias inferred"
+    },
+    {
+      "name": "Vypers",
+      "source_datasheet_id": "000000605",
+      "current_pdf": "Aeldari v1.4 physical pages20-21, VYPERS and1-2models",
+      "current_mfm": "units-vyper, unit_id vyper",
+      "execution": "Exact label mismatch needs stable source-ID review; no alias added.58of59component labels have candidates, not profile/identity certification."
+    }
+  ],
+  "remaining_gaps": [
+    "Current World Eaters PDF is a Codex supplement. Full base Blessings recipes, base ability coverage and current Codex/book wording require authoritative access; unchanged retained behavior is not newly source-certified.",
+    "World Eaters detachments remain non-executable where already blocked. Disciple of Khorne FAQ does not authorize new enhancement/attachment implementation.",
+    "Characteristics, weapons, other factions, other Phase17F entries and later component consumers are not comprehensively qualified by this slice. Prior five bounded checks retain their individual scope in mfm_2026_10/bounded-rule-checks.json.",
+    "Vypers identity discrepancy and enhancement metadata gaps remain follow-up work. No new faction, battlefield layout or mission support.",
+    "Maulerfiend Savage Exaltation source000002639:4 is a later retained RuleIR declaration; current Codex wording is not established by the supplement and remains unqualified.",
+    "Preferred40k.app/factions/updates and relevant current faction App-data comparison is required; PDF-only matching does not establish latest rules if versions disagree."
+  ],
+  "delivery": "Focused regressions, complete local and hosted gates, exact-head reviews and normal merge remain separate evidence;64percent branch-coverage floor,12minute CI goal and720second shard cutoff unchanged.",
+  "authority": {
+    "preferred_updates_url": "https://www.40k.app/factions/updates",
+    "user_direction": "App data mirrored by 40k.app is more authoritative than faction PDFs when they disagree.",
+    "mirror_comparison_status": "pending relevant World Eaters App-data retrieval/comparison; PDF matching is not final latest-rules qualification"
+  }
+}

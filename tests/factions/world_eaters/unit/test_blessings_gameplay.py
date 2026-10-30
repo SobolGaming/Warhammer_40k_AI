@@ -9,6 +9,7 @@ from tests.factions.world_eaters.attack_helpers import resolve_native_attack
 from tests.factions.world_eaters.gameplay_helpers import (
     ENEMY,
     SOURCE,
+    attached_gameplay_session,
     complete_activation,
     events,
     gameplay_session,
@@ -28,6 +29,7 @@ from warhammer40k_core.engine.fight_resolution import fight_movement_maximum_dis
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest, ProposalKind
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
+from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
 
 
 @pytest.mark.parametrize("kind", ["pile_in", "consolidate"])
@@ -224,3 +226,159 @@ def test_unbridled_bloodlust_charge_finishes_witnessed_move() -> None:
         rel_tol=0.0,
         abs_tol=1e-9,
     )
+
+
+def test_attached_world_eaters_complete_native_fight_without_active_blessings() -> None:
+    session = attached_gameplay_session(game_id="we-attached-fight")
+    source_id = "attached-unit:army-alpha:bodyguard"
+    complete_activation(session, source_id)
+    assert_completed_melee(session.lifecycle, unit_instance_id=source_id)
+    checkpoint = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+    replay = ReplayRunner(
+        ReplayArtifact.from_payload(session.replay_artifact(artifact_id="we-attached-fight"))
+    ).run()
+    assert replay.reproduced_exactly, replay
+
+
+@pytest.mark.parametrize("blessing", list(army_rule.BlessingOfKhorne))
+def test_attached_blessing_selection_targets_one_rules_unit_and_all_component_models(
+    blessing: army_rule.BlessingOfKhorne,
+) -> None:
+    game_id = (
+        "we-attached-native-1"
+        if blessing
+        in {
+            army_rule.BlessingOfKhorne.WARP_BLADES,
+            army_rule.BlessingOfKhorne.DECAPITATING_STRIKES,
+        }
+        else "we-attached-native-0"
+    )
+    session = attached_gameplay_session(game_id=game_id, phase=BattlePhase.COMMAND)
+    request = reach(session, "select_faction_rule_battle_round_option")
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id="we-native-blessing",
+        option_id=f"world_eaters:blessings:{blessing.value}",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
+    state = session.lifecycle.state
+    assert state is not None
+    source_id = "attached-unit:army-alpha:bodyguard"
+    effects = [
+        effect
+        for effect in state.persisting_effects
+        if effect.source_rule_id == army_rule.SOURCE_RULE_ID
+    ]
+    assert effects
+    assert all(effect.target_unit_instance_ids == (source_id,) for effect in effects)
+    for unit_id in (source_id, "army-alpha:bodyguard", "army-alpha:leader"):
+        assert army_rule.active_blessings_for_unit(state, unit_instance_id=unit_id) == (blessing,)
+    if blessing is army_rule.BlessingOfKhorne.TOTAL_CARNAGE:
+        for unit_id in ("army-alpha:bodyguard", "army-alpha:leader"):
+            for model in _unit_by_id(state, unit_id).own_models:
+                sources = state.destruction_reaction_sources_for_model(
+                    model_instance_id=model.model_instance_id
+                )
+                assert len(sources) == 1
+                payload = cast(dict[str, JsonValue], sources[0].payload)
+                assert payload["unit_instance_id"] == source_id
+    complete_activation(session, source_id)
+    assert_completed_melee(session.lifecycle, unit_instance_id=source_id)
+    checkpoint = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+
+
+def test_native_attached_unbridled_bloodlust_charge_completes_witness_and_replay() -> None:
+    from tests.factions.world_eaters.gameplay_helpers import submit_gameplay_request
+
+    from warhammer40k_core.engine.event_log import validate_json_value
+    from warhammer40k_core.engine.phases.shooting_model import COMPLETE_SHOOTING_PHASE_OPTION_ID
+    from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+    from warhammer40k_core.geometry.pathing import PathWitness
+    from warhammer40k_core.geometry.pose import Pose
+
+    session = attached_gameplay_session(
+        game_id="we-attached-native-0",
+        phase=BattlePhase.COMMAND,
+        enemy_x=16,
+        bodyguard_count=1,
+    )
+    request = reach(session, "select_faction_rule_battle_round_option")
+    session.submit_option(
+        request_id=request.request_id,
+        result_id="we-native-charge-blessing",
+        option_id="world_eaters:blessings:unbridled_bloodlust",
+    )
+    for _ in range(50):
+        request = pending_request(session)
+        if request.decision_type == "select_charging_unit":
+            break
+        if request.decision_type == "select_shooting_unit":
+            session.submit_option(
+                request_id=request.request_id,
+                result_id="we-no-shooting",
+                option_id=COMPLETE_SHOOTING_PHASE_OPTION_ID,
+            )
+        else:
+            submit_gameplay_request(session, request)
+    else:
+        raise AssertionError("Native attached charge selection not reached")
+    source_id = "attached-unit:army-alpha:bodyguard"
+    status = session.submit_option(
+        request_id=request.request_id, result_id="we-attached-charge", option_id=source_id
+    )
+    assert status.decision_request is not None
+    request = select_targets(
+        session, status.decision_request, (ENEMY,), result_id="we-attached-target"
+    )
+    move = MovementProposalRequest.from_decision_request_payload(request.payload)
+    assert move.proposal_kind is ProposalKind.CHARGE_MOVE
+    roll = cast(dict[str, JsonValue], events(session, "charge_roll_resolved")[0]["roll_result"])
+    roll_state = cast(dict[str, JsonValue], roll["roll_state"])
+    assert roll["value"] == cast(int, roll_state["current_total"]) + 1
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    placement = RulesUnitPlacement.from_battlefield(
+        view=rules_unit_view_by_id(state=state, unit_instance_id=source_id),
+        battlefield_state=state.battlefield_state,
+    )
+    dx = 4.5 - 40 / 25.4
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="we-attached-charge-witness",
+        payload={
+            "proposal_request_id": move.request_id,
+            "proposal_kind": "charge_move",
+            "unit_instance_id": source_id,
+            "movement_phase_action": "charge_move",
+            "movement_mode": "charge",
+            "charge_target_unit_instance_ids": [ENEMY],
+            "witness": validate_json_value(
+                PathWitness.for_paths(
+                    tuple(
+                        (
+                            model.model_instance_id,
+                            (
+                                model.pose,
+                                Pose.at(model.pose.position.x + dx, model.pose.position.y),
+                            ),
+                        )
+                        for model in placement.model_placements
+                    )
+                ).to_payload()
+            ),
+        },
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
+    completed = events(session, "charge_move_completed")
+    assert len(completed) == 1
+    assert cast(dict[str, JsonValue], completed[0]["endpoint_witness"])[
+        "engaged_target_unit_instance_ids"
+    ] == [ENEMY]
+    replay = ReplayRunner(
+        ReplayArtifact.from_payload(session.replay_artifact(artifact_id="we-attached-charge"))
+    ).run()
+    assert replay.reproduced_exactly, replay
