@@ -13,26 +13,53 @@ Its [official source](https://assets.warhammer-community.com/eng_30-09_wh40k_fac
 matches the earlier retained capture. The July source package/hash remains
 historical evidence; it has not been relabelled current.
 
-The user subsequently clarified that [40k.app faction updates](https://www.40k.app/factions/updates)
+The user clarified that [40k.app faction updates](https://www.40k.app/factions/updates)
 mirror newer App data and take precedence when they disagree with a faction PDF.
-The comparisons below establish agreement with the currently linked official PDF,
-conditional on the preferred App-data comparison. They are not final latest-rules
-qualification while that comparison is pending. The ordinary attached-unit engine
-failure is independently reproduced; source access limits do not erase that defect.
+40k.app is a non-affiliated mirror, not an official Games Workshop site. The
+selected versioned pages below were verified in an ordinary background browser
+on 30 October. Research-web retrieval returned HTTP 403; ordinary curl returned
+HTTP 429 and was not retried. Browser content was readable without credentials,
+special headers or bypass. No raw mirror HTML/JSON payload hash is claimed.
 
-## Selected PDF and consumer comparison
+The inspected index lists v995 (16 October), v981 (14 October), v972 (2 October)
+and v963 (30 September). The v995 delta concerns one Genestealer Cults unit,
+outside this slice. The latest listed World Eaters, Aeldari, Chaos Daemons,
+Chaos Space Marines and Thousand Sons faction changes are v963; Emperor's
+Children's are v981. Absence of a later listed faction delta is an index-based
+inference, not raw official API attestation or a complete faction audit.
 
-| PDF clause | Existing behavior and result |
+## Selected preferred-mirror and consumer comparison
+
+| Selected clause and source | Existing behavior and result |
 |---|---|
-| Unbridled Bloodlust, p7 | The existing +1 charge modifier matches the PDF. Canonical attached-unit IDs now reach that modifier without a physical-unit lookup failure. |
-| Icon of Khorne, p8 | Existing one-point-per-enemy-unit, extra-D6 and point-spend semantics match the PDF. An attached Leader's kill now finds live Icons in the body's complete rules unit; multiple Icons still earn only one point. Event-time bearer death ordering is retained. |
-| Maulerfiend, The Scent of Blood, p8 | Later generic RuleIR source `000002639:3` already implements the two nearby-enemy strength thresholds within 9 inches with mutually exclusive +1/+2 charge modifiers. No semantic change. This consumer is outside the older Phase17F declaration count. |
+| [Blessings of Khorne, v963, 30 September](https://www.40k.app/963/factions/world-eaters/army-rules) | Full table verified: eight D6, up to two blessings, each once per round, unused dice discarded, duration through round end. All six effect/recipe definitions match the existing implementation. Canonical attached-unit consumers are repaired. |
+| [Icon of Khorne, v963, 30 September](https://www.40k.app/963/factions/world-eaters/units/khorne-berzerkers) | One point when the bearer's unit with one or more Icons destroys an enemy unit; one extra D6 per point at the next Blessings roll, then all points lost. The repaired attached-unit lookup finds bodyguard Icons for a Leader's kill, with one point per destroyed unit and event-time bearer ordering retained. |
+| [Maulerfiend, The Scent of Blood, v963, 30 September](https://www.40k.app/963/factions/world-eaters/units/maulerfiend) | Source `000002639:3` already implements the nearby-enemy strength thresholds within 9 inches, with exclusive +1/+2 charge modifiers. No selected discrepancy or runtime change. This later consumer is outside the older Phase17F declaration count. |
 
-The official pack supplements a Codex. It does not contain the full underlying
-Blessings recipe table. The existing other Blessings are exercised as regression
-controls for the shared identity repair; their full current Codex wording is not
-newly certified. The Disciple of Khorne FAQ does not turn its blocked enhancement
-into supported gameplay.
+The six verified recipes are any double; double 2+; double 3+; double 4+ or any
+triple; double 5+ or triple 2+; and double 6 or triple 3+, in the existing
+Unbridled Bloodlust, Rage-fuelled Invigoration, Total Carnage, Martial Excellence,
+Warp Blades and Decapitating Strikes order. Their effects match the existing +1
+charge, 6-inch Pile-in/Consolidation, 4+ melee fight-on-death, Sustained Hits 1,
+Lethal Hits and Infantry-target Devastating Wounds consumers. The previous
+full-table access gap is resolved for this selected mirror comparison. It does
+not certify all World Eaters rules, a complete Codex or blocked detachments.
+
+The earlier PR599 five selected PDF clauses also match the preferred mirror:
+
+| Earlier selected clause | Preferred version and confirming scope |
+|---|---|
+| [Rangers: Path of the Outcast](https://www.40k.app/963/factions/aeldari/units/rangers) | v963, 30 September: opponent's Movement ending within 8 inches; unengaged Rangers may make a D6-inch Normal move. |
+| [Daemonic Manifestation](https://www.40k.app/963/factions/chaos-daemons/army-rules) | v963, 30 September: +1 Battle-shock in Shadow of Chaos; success heals D3 or returns D3 non-Character Battleline models. |
+| [Defiler: Daemonforge](https://www.40k.app/963/factions/chaos-space-marines/units/defiler) | v963, 30 September: Dark Pact permits wound-roll re-rolls of 1 through phase end. |
+| [Exalted Patron](https://www.40k.app/981/factions/emperors-children/detachments/court-of-the-phoenician) | v981, 14 October: Lord Exultant bearer gains +1 inch Move; 15 points. The Lord Exultant/Sorcerer update listing was observed, but their entire datasheets were not audited. |
+| [Defiler: Destroyer of Futures](https://www.40k.app/963/factions/thousand-sons/units/defiler) | v963, 30 September: once per phase per unit, Counteroffensive costs 1 CP less and permits other uses. |
+
+These are new, bounded mirror confirmations. The original PR599 PDF-only source
+record remains byte-identical and keeps its historical meaning; the separate
+official interactive MFM reconciliation is not invalidated. The earlier limited
+Custodes and Space Marines PDF lookups are not requalified as current App-data
+audits. The Disciple of Khorne FAQ adds no blocked enhancement support here.
 
 ## Reproduced defect and smallest complete repair
 
@@ -73,8 +100,8 @@ interaction status; 56 declare full abilities and three blocked abilities.
 Eleven mustering declarations are separate. A later generic RuleIR surface has six
 shards, 21 source packages and 92 records (Aeldari 42, Daemons 27, Chaos Space
 Marines one, Emperor's Children 19, Thousand Sons one and World Eaters two).
-World Eaters' second row is Maulerfiend Savage Exaltation `000002639:4`; current
-Codex wording remains unqualified. Record presence does not independently prove
+World Eaters' second row is Maulerfiend Savage Exaltation `000002639:4`; it remains
+outside the selected mirror comparison. Record presence does not independently prove
 execution or current source currency. These overlapping counts must not be
 added or interpreted as whole-game playability/current-source certification.
 
@@ -83,15 +110,20 @@ gameplay entries. Grimnar's Mark has no current LEADER allowance or exact matchi
 existing execution subrule; no display-name alias was inferred. Of 59 component
 datasheet labels, 58 have current MFM candidates. The remaining Vypers source
 `000000605` is still VYPERS (1–2 models) in current Aeldari v1.4 PDF pages 20–21,
-whereas current MFM uses singular `units-vyper`/`vyper`. This requires stable
-source-ID reconciliation; no runtime alias was added. Label matches do not verify
-profiles, weapons or semantics.
+whereas current MFM uses singular `units-vyper`/`vyper`. The preferred
+[v963 mirror page](https://www.40k.app/963/factions/aeldari/units/vyper) confirms a
+singular Vyper title, but plural Vypers model row/composition, 1–2 models and
+75/140 points. The user-preferred title is therefore singular. Stable source-ID
+and catalog binding remain a separate focused follow-up; no runtime alias was
+added. Label matches do not verify profiles, weapons or semantics.
 
-The prior five bounded clause checks retain their individual scope in
-`data/source_audits/mfm_2026_10/bounded-rule-checks.json`. This slice does not
-qualify the rest of the Phase17F entries, later component consumers, characteristics,
-weapons, unreviewed Codex/book rules or non-executable World Eaters detachments.
-Full source access and those discrepancies remain separate bounded follow-ups.
+The prior five bounded PDF checks retain their original scope in
+`data/source_audits/mfm_2026_10/bounded-rule-checks.json`; their separate mirror
+confirmations are recorded above and in the new compact audit. This slice does
+not qualify other Phase17F entries, later component consumers, characteristics,
+weapons, whole faction books or non-executable World Eaters detachments. Those
+unreviewed sources and the remaining identity discrepancies are separate bounded
+follow-ups.
 
 Implementation uses the accepted GPT-6 Astra High selection. The tool environment
 does not independently attest runtime effort or expose the requested speed control.

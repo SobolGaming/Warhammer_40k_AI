@@ -7,6 +7,15 @@ labels the update 14 October 2026. The two Titan Legions groups and policy-exclu
 sections remain outside scope. This is a points and army-construction source update,
 not certification of all current faction rules or new playable datasheets.
 
+For faction rules, the user's subsequent direction gives
+[40k.app mirrored App-data updates](https://www.40k.app/factions/updates)
+precedence over PDFs when they disagree. The [supported-rule follow-up](SUPPORTED_FACTION_RULE_RECONCILIATION_2026_10.md)
+records versioned browser confirmations of all five selected PR599 clauses,
+World Eaters' selected army-rule table and the Vyper/Vypers label discrepancy.
+The original PDF-only receipts below remain unchanged historical evidence.
+This faction-rule precedence clarification does not invalidate this separate
+official interactive MFM points and army-construction reconciliation.
+
 ## Source and behavior
 
 `mfm_2026_10` preserves current unit brackets, wargear prices, detachment points and
@@ -68,7 +77,9 @@ metric, 64% floor and all 260 deferred quality identities remain unchanged.
 The limited supporting faction-PDF checks are retained in
 `data/source_audits/mfm_2026_10/bounded-rule-checks.json`. They identify checked current
 PDF versions/hashes and selected unchanged executable clauses. They do not reconcile
-whole faction books; unreviewed World Eaters and other source changes remain open.
+whole faction books. The later linked audit confirms selected World Eaters and
+the five earlier clauses against the preferred mirror; unreviewed faction sources
+remain open.
 No core-layout, mission or broader faction-rule implementation changes are included.
 
 This maintenance has no allocated numbered Core remediation Order. Its completion
