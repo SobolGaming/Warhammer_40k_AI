@@ -46,131 +46,131 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "db71caf457eeff044f15968646f25ea6a40fb625d329d126bcea880c8bc630a7",
-      "after_sha256": "dce47c64f994c8e01a6301272acdd0936da242ebb9eaf892a79c5d72e36fb912",
+      "after_sha256": "d181aa11cf1225fbd014c1e62ee3c984c0c9df408c744e2f4f1a4fed95b1aae3",
       "owners": {
         "@document": {
           "before": "db71caf457eeff044f15968646f25ea6a40fb625d329d126bcea880c8bc630a7",
-          "after": "dce47c64f994c8e01a6301272acdd0936da242ebb9eaf892a79c5d72e36fb912"
+          "after": "d181aa11cf1225fbd014c1e62ee3c984c0c9df408c744e2f4f1a4fed95b1aae3"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "a6f271bc0fcef884ffe62199a64c682f3c4acfb19d9530379c9295741cc99e27",
-      "after_sha256": "d0cb0521d47e11fe9ecb42b8d612de149ac151ade5d051b81241c2d59bfd110d",
+      "after_sha256": "783a7f92642e584d29ab30fb557804b41d7fe378ceb9bd9f4f43cb3ebd30636c",
       "owners": {
         "@document": {
           "before": "a6f271bc0fcef884ffe62199a64c682f3c4acfb19d9530379c9295741cc99e27",
-          "after": "d0cb0521d47e11fe9ecb42b8d612de149ac151ade5d051b81241c2d59bfd110d"
+          "after": "783a7f92642e584d29ab30fb557804b41d7fe378ceb9bd9f4f43cb3ebd30636c"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "ce83c142d4ffea74d68b9c3a3fb7455a56ccac3d9eb4f5b0e7735ff6d0e74bee",
-      "after_sha256": "731867cdf633527094c235a0518a8b69e019672d6d09965faf22a61ad0141b4a",
+      "after_sha256": "9b800fecded3b058039acc503170dcfadca558ddef9f26300be38d993ae50148",
       "owners": {
         "@document": {
           "before": "ce83c142d4ffea74d68b9c3a3fb7455a56ccac3d9eb4f5b0e7735ff6d0e74bee",
-          "after": "731867cdf633527094c235a0518a8b69e019672d6d09965faf22a61ad0141b4a"
+          "after": "9b800fecded3b058039acc503170dcfadca558ddef9f26300be38d993ae50148"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "fa421d9cf52ae432225fe525b5bd5a380b9a7ed8b591b5f98c98e0db825425bb",
-      "after_sha256": "b877ea3e5bf42fac83c8f161c4d53f23eb3582bcffaad6b748c0f08663b70fec",
+      "after_sha256": "52b517768dba4d141429132a9ae7f4d01a28b0b6c86c06ded116b60994d46649",
       "owners": {
         "@document": {
           "before": "fa421d9cf52ae432225fe525b5bd5a380b9a7ed8b591b5f98c98e0db825425bb",
-          "after": "b877ea3e5bf42fac83c8f161c4d53f23eb3582bcffaad6b748c0f08663b70fec"
+          "after": "52b517768dba4d141429132a9ae7f4d01a28b0b6c86c06ded116b60994d46649"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "b435f8649768e46f8e6ca193775747b1b2e924940e45c649d0ee7dc0d1d652e4",
-      "after_sha256": "1031f9fcecdd4c94d4ed027d4330dd10727a247ae94ccd2ccd843adab0396778",
+      "after_sha256": "c8d78a8c953c3c04f8e1396454f84c10877c97f2a4e5b0d68d045ab28f122fa2",
       "owners": {
         "@document": {
           "before": "b435f8649768e46f8e6ca193775747b1b2e924940e45c649d0ee7dc0d1d652e4",
-          "after": "1031f9fcecdd4c94d4ed027d4330dd10727a247ae94ccd2ccd843adab0396778"
+          "after": "c8d78a8c953c3c04f8e1396454f84c10877c97f2a4e5b0d68d045ab28f122fa2"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "d3b215afc3c8e510887343b273783e2ac0f360fdb5a4a8436293ecb618c3aa4b",
-      "after_sha256": "dcd93d09020778b85ccc24a64663728a3c77eee8d62382db8619b36afa8616cc",
+      "after_sha256": "e79468b04d8cbf773f490a1a9428323dd5f55d29e9848b94fa7174b7c1f8bdab",
       "owners": {
         "@document": {
           "before": "d3b215afc3c8e510887343b273783e2ac0f360fdb5a4a8436293ecb618c3aa4b",
-          "after": "dcd93d09020778b85ccc24a64663728a3c77eee8d62382db8619b36afa8616cc"
+          "after": "e79468b04d8cbf773f490a1a9428323dd5f55d29e9848b94fa7174b7c1f8bdab"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "f5a3f70f6f652d9ed16cc09ecb68d9c5d534d5e307ddcf88b43c878e4b756115",
-      "after_sha256": "26f6896d335c57c4733d7deba4530d20ffe97aeb41984d77a34f5c0b923bd774",
+      "after_sha256": "363355a1db78be5e318a87fe64428efd70bf4071bae424be113903e709306678",
       "owners": {
         "@document": {
           "before": "f5a3f70f6f652d9ed16cc09ecb68d9c5d534d5e307ddcf88b43c878e4b756115",
-          "after": "26f6896d335c57c4733d7deba4530d20ffe97aeb41984d77a34f5c0b923bd774"
+          "after": "363355a1db78be5e318a87fe64428efd70bf4071bae424be113903e709306678"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "e8e1dd28cb72d4354afd1be240c65cf3e8e09616f827ad1a62f55c0a0433d128",
-      "after_sha256": "aa35c206949ddb9de041080f3e361484278313fe268d32127088f316eda71ef4",
+      "after_sha256": "10df4b77ea853c5d149381c5625df78d65d5ed35018558e315256915f2e2805c",
       "owners": {
         "@document": {
           "before": "e8e1dd28cb72d4354afd1be240c65cf3e8e09616f827ad1a62f55c0a0433d128",
-          "after": "aa35c206949ddb9de041080f3e361484278313fe268d32127088f316eda71ef4"
+          "after": "10df4b77ea853c5d149381c5625df78d65d5ed35018558e315256915f2e2805c"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "b128091daa9cfdcc3267b1026a22289367d1acfd2b6add3a88fb3e1f905e2926",
-      "after_sha256": "34bfd62e1576755876bfb5d0091c09194e87d73442545526248643ba79faa627",
+      "after_sha256": "ab67fb2b41db4e9970f92fd2a02ad4f1e862cf8081a7f848a77b75af01666b60",
       "owners": {
         "@document": {
           "before": "b128091daa9cfdcc3267b1026a22289367d1acfd2b6add3a88fb3e1f905e2926",
-          "after": "34bfd62e1576755876bfb5d0091c09194e87d73442545526248643ba79faa627"
+          "after": "ab67fb2b41db4e9970f92fd2a02ad4f1e862cf8081a7f848a77b75af01666b60"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "d9e9c827902625cae964da0e91ed53e402605bbfa50203d8e5d8097a4405152b",
-      "after_sha256": "5ea45098e19b9398665d12f62f5b4edd48838c06a2535f0ed8d4a1058c01b42a",
+      "after_sha256": "fe0eb73fa4fb00dddfd1f83c718ac08da16e354cb5e83c79f1636038f35bb06d",
       "owners": {
         "@document": {
           "before": "d9e9c827902625cae964da0e91ed53e402605bbfa50203d8e5d8097a4405152b",
-          "after": "5ea45098e19b9398665d12f62f5b4edd48838c06a2535f0ed8d4a1058c01b42a"
+          "after": "fe0eb73fa4fb00dddfd1f83c718ac08da16e354cb5e83c79f1636038f35bb06d"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "9175ecdbce1e90535b77d9b9904f35d2c518a0758d36023f6cf088f26960345f",
-      "after_sha256": "c9ab2bce716215f25ff4f597600f69533080f4ce8554a7fb711645bd625ebd56",
+      "after_sha256": "46c9f95ac8e9aae25b1ef89d66759e342a19e172d80b760afe3305841f9923ff",
       "owners": {
         "@document": {
           "before": "9175ecdbce1e90535b77d9b9904f35d2c518a0758d36023f6cf088f26960345f",
-          "after": "c9ab2bce716215f25ff4f597600f69533080f4ce8554a7fb711645bd625ebd56"
+          "after": "46c9f95ac8e9aae25b1ef89d66759e342a19e172d80b760afe3305841f9923ff"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "15007640cc6bd12c774872d798ed2abf3f285de4868dfeca1b905250d9c2d9b9",
-      "after_sha256": "eba5f507559cf37cfd715914dd1169540306ffdd72d0fa155429394dc3538a2c",
+      "after_sha256": "1edcf67c53ecf9b6feb08960cf0df342092f5be2b7dd8d904a93c31bf348f5bf",
       "owners": {
         "@document": {
           "before": "15007640cc6bd12c774872d798ed2abf3f285de4868dfeca1b905250d9c2d9b9",
-          "after": "eba5f507559cf37cfd715914dd1169540306ffdd72d0fa155429394dc3538a2c"
+          "after": "1edcf67c53ecf9b6feb08960cf0df342092f5be2b7dd8d904a93c31bf348f5bf"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "9b44b05e5a9ecabdf6cf6594d0a53d1081b43297e5362d8685ae20b8ffa573a1",
-      "after_sha256": "09dbf196db5cc716b4aa80d7307de96a9cfb63b955d164ee23bf82487c150c94",
+      "after_sha256": "0b64b8d0c4aaa59cb5e1cf890a2946302e907da5931f8f6d617881c09cdd86d8",
       "owners": {
         "@document": {
           "before": "9b44b05e5a9ecabdf6cf6594d0a53d1081b43297e5362d8685ae20b8ffa573a1",
-          "after": "09dbf196db5cc716b4aa80d7307de96a9cfb63b955d164ee23bf82487c150c94"
+          "after": "0b64b8d0c4aaa59cb5e1cf890a2946302e907da5931f8f6d617881c09cdd86d8"
         }
       }
     },
@@ -306,21 +306,21 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
-      "after_sha256": "5da5b2c2f1077e8445d54e9fbb16729359683dda75a13601bcc2f1d6dc7a9e21",
+      "after_sha256": "8e1a6bc2d873f83192854b161920e80dac904106465247b871e1bd5706b78a93",
       "owners": {
         "@document": {
           "before": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
-          "after": "5da5b2c2f1077e8445d54e9fbb16729359683dda75a13601bcc2f1d6dc7a9e21"
+          "after": "8e1a6bc2d873f83192854b161920e80dac904106465247b871e1bd5706b78a93"
         }
       }
     },
     "docs/SUPPORTED_FACTION_RULE_RECONCILIATION_2026_10.md": {
       "before_sha256": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-      "after_sha256": "4f3ecfcc8a2fef39e651911eec73b166502f4b2e627b34b97fe2775b4b50b1a6",
+      "after_sha256": "994b6b1dabefc899c3ffa0e756ff987b7a982f5fd7ce9cfe38f142e8e1b498c0",
       "owners": {
         "@document": {
           "before": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-          "after": "4f3ecfcc8a2fef39e651911eec73b166502f4b2e627b34b97fe2775b4b50b1a6"
+          "after": "994b6b1dabefc899c3ffa0e756ff987b7a982f5fd7ce9cfe38f142e8e1b498c0"
         }
       }
     },
@@ -856,9 +856,9 @@
         "d09-authenticated-source-bytes"
       ],
       "selected_families": [],
-      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
-      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
-      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+      "rationale": "Preserve the exact 35 historical CRLF test-metadata blobs seen in a clean independent checkout. Only per-path Git materialization attributes change; no JSON, source, test, harness or acceptance bytes change.",
+      "source_obligation": "Fresh checkouts must materialize the same measured committed bytes and remain clean without local info/attributes overrides.",
+      "unchanged_work": "These exact-path materialization attributes preserve historical CRLF blobs; the new metadata freeze independently proves every selected input and runtime_inputs equal to its actual covered and measured heads. Baseline-only local overrides are not copied; no newline normalization or exclusion weakens the comparison."
     },
     "ci/quality_shards/all.txt": {
       "category": "governance",
