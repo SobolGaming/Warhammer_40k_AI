@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "764b5321af2b05d6537861910dba0540abaa6d94",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e1ecfcb90c91cd5f790bcab4390a43d3e85f7d10e6d36643d534339526930cee",
-  "operation_map_sha256": "abfeee265a46f153e115beaf98b50b5ca67c1209a750dbacfc690afaf8165940",
+  "operation_map_sha256": "ff83ade1491a2aaa03d473f2615c2bd5244dfc4816fd864136903d3d2d575cb1",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "33cf406416f98e0d1725c324dbadb0d296dd8325d068fdc702ebef81fe9b8568",
@@ -224,6 +224,16 @@
         }
       }
     },
+    "data/source_audits/faction_test_layout/preservation.json": {
+      "before_sha256": "f1bb410efe3a3d9a063adc2a2b980257097cd4ef4687d4a38d3c343fbb752806",
+      "after_sha256": "7b092d9304f52885883d09c32893a35589419d6bf95dbf1331a60ce3cd51442a",
+      "owners": {
+        "@document": {
+          "before": "f1bb410efe3a3d9a063adc2a2b980257097cd4ef4687d4a38d3c343fbb752806",
+          "after": "7b092d9304f52885883d09c32893a35589419d6bf95dbf1331a60ce3cd51442a"
+        }
+      }
+    },
     "data/source_audits/supported_rules_2026_10/reconciliation.json": {
       "before_sha256": null,
       "after_sha256": "9e3768c80aaa88919271b949f460a0807fac258b9ecb2b1916bbd654f4ba9db9",
@@ -266,11 +276,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "11a23d3127fdb73d447b0d043e8005fc497391ecd281bd987e3cc52b466132df",
-      "after_sha256": "829f00ba12b66a1d1a7233e906fcc74e819fb868430f661a08fb0192b28dbbd2",
+      "after_sha256": "d4342e4948b993e0b9527657f247e325f2c07907e7bd5678231001468bcb662a",
       "owners": {
         "@document": {
           "before": "11a23d3127fdb73d447b0d043e8005fc497391ecd281bd987e3cc52b466132df",
-          "after": "829f00ba12b66a1d1a7233e906fcc74e819fb868430f661a08fb0192b28dbbd2"
+          "after": "d4342e4948b993e0b9527657f247e325f2c07907e7bd5678231001468bcb662a"
         }
       }
     },
@@ -319,6 +329,20 @@
         "unit_has_active_blessing": {
           "before": "5cd21ab890d44e1a1be4a37bcee7bbd423315afc4e49bdc096d3d63e84018d2f",
           "after": "9dd0dff0341972f31a6005eabe0b031172bd609f848e142c172e75a17a3ff68f"
+        }
+      }
+    },
+    "tests/code_quality/test_order97_faction_relocation.py": {
+      "before_sha256": "0ee571c76b471dd9940f2a716c0c1f71ebc8a766f90ce2ae94c8239d47feda22",
+      "after_sha256": "4ca92fabd422af4845df0a7f0959b9388ecf13eba74bf399ad441de51b17c835",
+      "owners": {
+        "@module": {
+          "before": "0bc0ee5674eee188e02d67d1390433ee0153632bdeef56e9f00a96dc263f675e",
+          "after": "7775b470964a8b9aae6804a3edd9662f5e1cc7cdf5c69c610307c4a28988cd42"
+        },
+        "test_world_eaters_lookup_maintenance_preserves_every_other_archived_assertion": {
+          "before": null,
+          "after": "f0cf2a2cfb74ce7d708f71d89da64c56e6861ef1fcd1d736ac5d13acd9191ce4"
         }
       }
     },
@@ -383,6 +407,24 @@
         "test_world_eaters_army_rule_fail_fast_edges_are_explicit": {
           "before": "6b4dc672526cb48db4e713451414d4e93f06a4edc4f4adb68076e86a10040f28",
           "after": "9df2dad2e9865d21babcb88d53c420a07a08e30534dfbdd9dcbe36447f55637d"
+        }
+      }
+    },
+    "tests/support/faction_layout_preservation.py": {
+      "before_sha256": "b491512f6a84067563ac3c2bef81ec439e3b8d6d7df044924ef52088ac394671",
+      "after_sha256": "a8e611ffc38b76922c2dd7a416f7978d803ac860d1ce58ec3f5bf0199f28552c",
+      "owners": {
+        "@module": {
+          "before": "80e1425d1dda2da499668fe65363d4310e6dbe7495272d7eff27d2d1c3a53c18",
+          "after": "a800a279878c163efd327e857e7dd3936b79693155cb2d3e01bf8f33c132bce1"
+        },
+        "_definitions": {
+          "before": "c9741356f40948f6fb74d239874007f63fb812646d62e7d781dd9d182f29512c",
+          "after": "882fcd01e86c7b1a947258f899ae8dee57b5b36b4f5bb74e8090b4a9857eb285"
+        },
+        "verify_layout_original": {
+          "before": "ace74cac33d2f38c1eb589e5dd516f5b18574bf57384b67c844b65fb7c8ea7ae",
+          "after": "ae66d56caa8e344c240767b689ee4d26cccc278404eadfc1f9d68d1afab889b3"
         }
       }
     }
@@ -608,6 +650,17 @@
       "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
       "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
     },
+    "data/source_audits/faction_test_layout/preservation.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-a72e242c23f7d49d",
+        "supported-world-eaters-archive-binding-maintenance"
+      ],
+      "selected_families": [],
+      "rationale": "Development fixture maintenance admits exactly one reviewed World Eaters diagnostic literal in the current successor. Immutable archived bytes, definition mappings, exception type, target call and every other AST node remain authenticated; focused controls reject adjacent assertion changes. Runtime and behavioral case bodies are unchanged by this maintenance.",
+      "source_obligation": "The active Order97 historical-evidence guard must accept the reviewed current diagnostic while preserving the original archive and all unrelated successor records. Maintenance is scoped to the exact original, successor and named fail-fast test through the existing preservation protocol.",
+      "unchanged_work": "Only development archive verification, its direct controls and the current successor SHA binding change. No production or behavioral-test semantics change. The complete active quality suite and serial current-runtime smoke remain required."
+    },
     "data/source_audits/supported_rules_2026_10/reconciliation.json": {
       "category": "rule_semantics",
       "operations": [
@@ -670,6 +723,16 @@
       "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
       "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
     },
+    "tests/code_quality/test_order97_faction_relocation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-world-eaters-archive-binding-maintenance"
+      ],
+      "selected_families": [],
+      "rationale": "Development fixture maintenance admits exactly one reviewed World Eaters diagnostic literal in the current successor. Immutable archived bytes, definition mappings, exception type, target call and every other AST node remain authenticated; focused controls reject adjacent assertion changes. Runtime and behavioral case bodies are unchanged by this maintenance.",
+      "source_obligation": "The active Order97 historical-evidence guard must accept the reviewed current diagnostic while preserving the original archive and all unrelated successor records. Maintenance is scoped to the exact original, successor and named fail-fast test through the existing preservation protocol.",
+      "unchanged_work": "Only development archive verification, its direct controls and the current successor SHA binding change. No production or behavioral-test semantics change. The complete active quality suite and serial current-runtime smoke remain required."
+    },
     "tests/factions/world_eaters/gameplay_helpers.py": {
       "category": "rule_semantics",
       "operations": [
@@ -713,6 +776,17 @@
       "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
       "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
       "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+    },
+    "tests/support/faction_layout_preservation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-c51c9fa6ee134bd8",
+        "supported-world-eaters-archive-binding-maintenance"
+      ],
+      "selected_families": [],
+      "rationale": "Development fixture maintenance admits exactly one reviewed World Eaters diagnostic literal in the current successor. Immutable archived bytes, definition mappings, exception type, target call and every other AST node remain authenticated; focused controls reject adjacent assertion changes. Runtime and behavioral case bodies are unchanged by this maintenance.",
+      "source_obligation": "The active Order97 historical-evidence guard must accept the reviewed current diagnostic while preserving the original archive and all unrelated successor records. Maintenance is scoped to the exact original, successor and named fail-fast test through the existing preservation protocol.",
+      "unchanged_work": "Only development archive verification, its direct controls and the current successor SHA binding change. No production or behavioral-test semantics change. The complete active quality suite and serial current-runtime smoke remain required."
     }
   },
   "milestone": "ordinary",

@@ -30419,6 +30419,23 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "supported-world-eaters-archive-binding-maintenance": {
+      "paths": [
+        "tests/support/faction_layout_preservation.py",
+        "tests/code_quality/test_order97_faction_relocation.py",
+        "data/source_audits/faction_test_layout/preservation.json"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_definitions",
+        "test_world_eaters_lookup_maintenance_preserves_every_other_archived_assertion",
+        "verify_layout_original"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
