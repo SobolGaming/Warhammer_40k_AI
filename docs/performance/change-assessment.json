@@ -1,490 +1,532 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "764b5321af2b05d6537861910dba0540abaa6d94",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e1ecfcb90c91cd5f790bcab4390a43d3e85f7d10e6d36643d534339526930cee",
-  "operation_map_sha256": "118b6bc224afb91037f52ef4e1050c4dd239c7291eeb0e39b7ca75fadea86685",
+  "base": "bc9acd8419e7b97a2c1260c7e932d2cb9c3fc370",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6eb801a8cc0f00e24f45d2ca24494fee279bada900cc28a19be549a2613a5bd5",
+  "operation_map_sha256": "9f2d8450647cf05bf20920cb1bd417a6807407de973f72787b004d708a81aa47",
   "changes": {
     "ci/quality_shards/all.txt": {
-      "before_sha256": "2b77d4b88cd631404ecb9722a703f7ac4a706c3ec52f43b5f231e6b911d871bf",
-      "after_sha256": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563",
+      "before_sha256": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563",
+      "after_sha256": "f57fe3bfe27e64a80d6b31e3ca70daa46971b319f2bfd5c889c64512a75722a0",
       "owners": {
         "@document": {
-          "before": "2b77d4b88cd631404ecb9722a703f7ac4a706c3ec52f43b5f231e6b911d871bf",
-          "after": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563"
+          "before": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563",
+          "after": "f57fe3bfe27e64a80d6b31e3ca70daa46971b319f2bfd5c889c64512a75722a0"
         }
       }
     },
-    "ci/quality_shards/shard-3-modules.txt": {
-      "before_sha256": "1df349523951e20ea21a406b251838b9b870eb0780c3abc8ccd5b2e7787b4dd7",
-      "after_sha256": "e3dfea5b332cabefdadb22a84c41b073b2070a442ce926466a0ef7242a4f02c4",
+    "ci/quality_shards/shard-1.txt": {
+      "before_sha256": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f",
+      "after_sha256": "6e6661d1ff9f7d410fbba0b0b1d215ef6d89c081b2f7e9dfc1e2f5276fd80739",
       "owners": {
         "@document": {
-          "before": "1df349523951e20ea21a406b251838b9b870eb0780c3abc8ccd5b2e7787b4dd7",
-          "after": "e3dfea5b332cabefdadb22a84c41b073b2070a442ce926466a0ef7242a4f02c4"
-        }
-      }
-    },
-    "ci/quality_shards/shard-3.txt": {
-      "before_sha256": "9a7ed8884590b1211ad1806074f5016aeebc2319d9c795ffa45d36640ff06772",
-      "after_sha256": "a4731adf71e0afd9ab7447cac51e103e7bc76f9de9066a99e9525c209fc90d7c",
-      "owners": {
-        "@document": {
-          "before": "9a7ed8884590b1211ad1806074f5016aeebc2319d9c795ffa45d36640ff06772",
-          "after": "a4731adf71e0afd9ab7447cac51e103e7bc76f9de9066a99e9525c209fc90d7c"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4-modules.txt": {
-      "before_sha256": "95a7a3dc37b594c9c186facc3789f9b94a42049f1641a9d3b03b7efba0031953",
-      "after_sha256": "050017c277461337eda4a51472b95a08c4c6644d82aababe82abae2f72d3e750",
-      "owners": {
-        "@document": {
-          "before": "95a7a3dc37b594c9c186facc3789f9b94a42049f1641a9d3b03b7efba0031953",
-          "after": "050017c277461337eda4a51472b95a08c4c6644d82aababe82abae2f72d3e750"
+          "before": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f",
+          "after": "6e6661d1ff9f7d410fbba0b0b1d215ef6d89c081b2f7e9dfc1e2f5276fd80739"
         }
       }
     },
     "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "cc12f43786228cb5cc6a3b75646cf8d4dc7dc1d4419dc69a1fac16aed3cc90e9",
-      "after_sha256": "1668298c232f67d6e54d0616f56d0dfba5f3b6e57713e7b15f869a91d405bb8e",
+      "before_sha256": "1668298c232f67d6e54d0616f56d0dfba5f3b6e57713e7b15f869a91d405bb8e",
+      "after_sha256": "5b58c877d4e30a8ff8e8fae9c00ded18a5200b60c9463d04a3b10c819db24bf1",
       "owners": {
         "@document": {
-          "before": "cc12f43786228cb5cc6a3b75646cf8d4dc7dc1d4419dc69a1fac16aed3cc90e9",
-          "after": "1668298c232f67d6e54d0616f56d0dfba5f3b6e57713e7b15f869a91d405bb8e"
-        }
-      }
-    },
-    "ci/test_shards/durations.json": {
-      "before_sha256": "33cf406416f98e0d1725c324dbadb0d296dd8325d068fdc702ebef81fe9b8568",
-      "after_sha256": "db71caf457eeff044f15968646f25ea6a40fb625d329d126bcea880c8bc630a7",
-      "owners": {
-        "@document": {
-          "before": "33cf406416f98e0d1725c324dbadb0d296dd8325d068fdc702ebef81fe9b8568",
-          "after": "db71caf457eeff044f15968646f25ea6a40fb625d329d126bcea880c8bc630a7"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "15c386b5fce1db19f263006fc3ffad1ad01360076dd3bbcda72a8e54ca6c1cb8",
-      "after_sha256": "a6f271bc0fcef884ffe62199a64c682f3c4acfb19d9530379c9295741cc99e27",
-      "owners": {
-        "@document": {
-          "before": "15c386b5fce1db19f263006fc3ffad1ad01360076dd3bbcda72a8e54ca6c1cb8",
-          "after": "a6f271bc0fcef884ffe62199a64c682f3c4acfb19d9530379c9295741cc99e27"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "f5fa5d12f923f384df2c7c48e00e275e951fb8f9dce26e64e1614102a656d3f3",
-      "after_sha256": "ce83c142d4ffea74d68b9c3a3fb7455a56ccac3d9eb4f5b0e7735ff6d0e74bee",
-      "owners": {
-        "@document": {
-          "before": "f5fa5d12f923f384df2c7c48e00e275e951fb8f9dce26e64e1614102a656d3f3",
-          "after": "ce83c142d4ffea74d68b9c3a3fb7455a56ccac3d9eb4f5b0e7735ff6d0e74bee"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "2b6fcee56341f336bfcd9418c49f7b29eb59e53b93a5a1a3f3be6c0b06b8b580",
-      "after_sha256": "fa421d9cf52ae432225fe525b5bd5a380b9a7ed8b591b5f98c98e0db825425bb",
-      "owners": {
-        "@document": {
-          "before": "2b6fcee56341f336bfcd9418c49f7b29eb59e53b93a5a1a3f3be6c0b06b8b580",
-          "after": "fa421d9cf52ae432225fe525b5bd5a380b9a7ed8b591b5f98c98e0db825425bb"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "384fcaeb970a23eaa1c3253d0da03d185d7e1727231d020365102e4979b3e739",
-      "after_sha256": "b435f8649768e46f8e6ca193775747b1b2e924940e45c649d0ee7dc0d1d652e4",
-      "owners": {
-        "@document": {
-          "before": "384fcaeb970a23eaa1c3253d0da03d185d7e1727231d020365102e4979b3e739",
-          "after": "b435f8649768e46f8e6ca193775747b1b2e924940e45c649d0ee7dc0d1d652e4"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "a477d1035cc324e60fbd17aa83cd817e82c532c46bede4ffd67196e6efc102a5",
-      "after_sha256": "d3b215afc3c8e510887343b273783e2ac0f360fdb5a4a8436293ecb618c3aa4b",
-      "owners": {
-        "@document": {
-          "before": "a477d1035cc324e60fbd17aa83cd817e82c532c46bede4ffd67196e6efc102a5",
-          "after": "d3b215afc3c8e510887343b273783e2ac0f360fdb5a4a8436293ecb618c3aa4b"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "f02e263fd02b446ef6856fe43d34bcbbfc819eeb19224b518162b3867edd809b",
-      "after_sha256": "f5a3f70f6f652d9ed16cc09ecb68d9c5d534d5e307ddcf88b43c878e4b756115",
-      "owners": {
-        "@document": {
-          "before": "f02e263fd02b446ef6856fe43d34bcbbfc819eeb19224b518162b3867edd809b",
-          "after": "f5a3f70f6f652d9ed16cc09ecb68d9c5d534d5e307ddcf88b43c878e4b756115"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "82c3b2b454e3fd17d87eb301fe62f5cdfde149224c2d452ca58d2e6ebf9374de",
-      "after_sha256": "e8e1dd28cb72d4354afd1be240c65cf3e8e09616f827ad1a62f55c0a0433d128",
-      "owners": {
-        "@document": {
-          "before": "82c3b2b454e3fd17d87eb301fe62f5cdfde149224c2d452ca58d2e6ebf9374de",
-          "after": "e8e1dd28cb72d4354afd1be240c65cf3e8e09616f827ad1a62f55c0a0433d128"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "eabf0850da086ad928a9ad1bd1cc162331118be9588a64c35fa915cb818d158f",
-      "after_sha256": "b128091daa9cfdcc3267b1026a22289367d1acfd2b6add3a88fb3e1f905e2926",
-      "owners": {
-        "@document": {
-          "before": "eabf0850da086ad928a9ad1bd1cc162331118be9588a64c35fa915cb818d158f",
-          "after": "b128091daa9cfdcc3267b1026a22289367d1acfd2b6add3a88fb3e1f905e2926"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "c94b2b3b7ffa79921738097305f616f8fc693180eb74d5102ccf2f96262e9853",
-      "after_sha256": "d9e9c827902625cae964da0e91ed53e402605bbfa50203d8e5d8097a4405152b",
-      "owners": {
-        "@document": {
-          "before": "c94b2b3b7ffa79921738097305f616f8fc693180eb74d5102ccf2f96262e9853",
-          "after": "d9e9c827902625cae964da0e91ed53e402605bbfa50203d8e5d8097a4405152b"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "2e8524f3e747c52012887baf5c1bd582f5d625d05dbd0d610bef8305fc3ccefa",
-      "after_sha256": "9175ecdbce1e90535b77d9b9904f35d2c518a0758d36023f6cf088f26960345f",
-      "owners": {
-        "@document": {
-          "before": "2e8524f3e747c52012887baf5c1bd582f5d625d05dbd0d610bef8305fc3ccefa",
-          "after": "9175ecdbce1e90535b77d9b9904f35d2c518a0758d36023f6cf088f26960345f"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "0dd92a51f2859ad81e2600029033898e983719666be6c5000c0dd0b4ba4f4f37",
-      "after_sha256": "15007640cc6bd12c774872d798ed2abf3f285de4868dfeca1b905250d9c2d9b9",
-      "owners": {
-        "@document": {
-          "before": "0dd92a51f2859ad81e2600029033898e983719666be6c5000c0dd0b4ba4f4f37",
-          "after": "15007640cc6bd12c774872d798ed2abf3f285de4868dfeca1b905250d9c2d9b9"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "61b1b3d929ad3be80528bc6add69504dcebb9fc802d856cb304cdd3f17bd2798",
-      "after_sha256": "9b44b05e5a9ecabdf6cf6594d0a53d1081b43297e5362d8685ae20b8ffa573a1",
-      "owners": {
-        "@document": {
-          "before": "61b1b3d929ad3be80528bc6add69504dcebb9fc802d856cb304cdd3f17bd2798",
-          "after": "9b44b05e5a9ecabdf6cf6594d0a53d1081b43297e5362d8685ae20b8ffa573a1"
+          "before": "1668298c232f67d6e54d0616f56d0dfba5f3b6e57713e7b15f869a91d405bb8e",
+          "after": "5b58c877d4e30a8ff8e8fae9c00ded18a5200b60c9463d04a3b10c819db24bf1"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "47ad4a7fc74d0f394e632694f4b440e5bfa6d0e7233f0f3e09004ed74db59c44",
-      "after_sha256": "b4cec5ba021b2369a5a6f57b03382bc3cf496c0208df969ae534b7b78db1c0a2",
+      "before_sha256": "b4cec5ba021b2369a5a6f57b03382bc3cf496c0208df969ae534b7b78db1c0a2",
+      "after_sha256": "24ec39e2980cf72ac1c53e60da898ba4edbd59781ed59cf759fa75e953def139",
       "owners": {
         "@document": {
-          "before": "47ad4a7fc74d0f394e632694f4b440e5bfa6d0e7233f0f3e09004ed74db59c44",
-          "after": "b4cec5ba021b2369a5a6f57b03382bc3cf496c0208df969ae534b7b78db1c0a2"
+          "before": "b4cec5ba021b2369a5a6f57b03382bc3cf496c0208df969ae534b7b78db1c0a2",
+          "after": "24ec39e2980cf72ac1c53e60da898ba4edbd59781ed59cf759fa75e953def139"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "11529f737a625a9d61b5e2bf2797a5812285c87908c6a2ff3898c31ffe763ddc",
-      "after_sha256": "057be96dc78758bff8a0d39b713325cc16a2c78cb248baa9e8231def3b5cc283",
+      "before_sha256": "057be96dc78758bff8a0d39b713325cc16a2c78cb248baa9e8231def3b5cc283",
+      "after_sha256": "b74e1f9c40184eedb281884fb64aff86cab8b673e3738663f0bfa29fcc874cac",
       "owners": {
         "@document": {
-          "before": "11529f737a625a9d61b5e2bf2797a5812285c87908c6a2ff3898c31ffe763ddc",
-          "after": "057be96dc78758bff8a0d39b713325cc16a2c78cb248baa9e8231def3b5cc283"
+          "before": "057be96dc78758bff8a0d39b713325cc16a2c78cb248baa9e8231def3b5cc283",
+          "after": "b74e1f9c40184eedb281884fb64aff86cab8b673e3738663f0bfa29fcc874cac"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "9ef6914b336d30dc0315cd688a115a4feb6c08069de51604a60f5ff5b34f2d5a",
-      "after_sha256": "c299e32a06b6416b42a50322d3a451acb386ca6e1f3fac8e721ced68b21cec04",
+      "before_sha256": "c299e32a06b6416b42a50322d3a451acb386ca6e1f3fac8e721ced68b21cec04",
+      "after_sha256": "0475377e5ee29497e0e351e79097ac436a58d3390751da68bd6e6a7b9302bc9e",
       "owners": {
         "@document": {
-          "before": "9ef6914b336d30dc0315cd688a115a4feb6c08069de51604a60f5ff5b34f2d5a",
-          "after": "c299e32a06b6416b42a50322d3a451acb386ca6e1f3fac8e721ced68b21cec04"
+          "before": "c299e32a06b6416b42a50322d3a451acb386ca6e1f3fac8e721ced68b21cec04",
+          "after": "0475377e5ee29497e0e351e79097ac436a58d3390751da68bd6e6a7b9302bc9e"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "17545bcd39e2f48112ce5b72faaa45c89081d8c89b69b16c91747f32473c3fa4",
-      "after_sha256": "98ff5ae825c801dec585b5b884972e2edcce6817122cf354dcd27ab78c563d5a",
+      "before_sha256": "98ff5ae825c801dec585b5b884972e2edcce6817122cf354dcd27ab78c563d5a",
+      "after_sha256": "ee6111ffd48e30e93cad2060aa106705dafb56d846b3d1887eaf95d88873708e",
       "owners": {
         "@document": {
-          "before": "17545bcd39e2f48112ce5b72faaa45c89081d8c89b69b16c91747f32473c3fa4",
-          "after": "98ff5ae825c801dec585b5b884972e2edcce6817122cf354dcd27ab78c563d5a"
+          "before": "98ff5ae825c801dec585b5b884972e2edcce6817122cf354dcd27ab78c563d5a",
+          "after": "ee6111ffd48e30e93cad2060aa106705dafb56d846b3d1887eaf95d88873708e"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "f89d2e406d1fe6e778c1b61cc50a8ed8f274b58cb3ce990a3bb2933ced292bf7",
-      "after_sha256": "2f8b9daa58e9e0b20db00dc4bfda88781a840f086d8e8ebae2f065e3e88fe80e",
+      "before_sha256": "2f8b9daa58e9e0b20db00dc4bfda88781a840f086d8e8ebae2f065e3e88fe80e",
+      "after_sha256": "eb48e2f416ef5b41a8606586a303486817c51aa6fe3a3a21d17fe79daa3693e6",
       "owners": {
         "@document": {
-          "before": "f89d2e406d1fe6e778c1b61cc50a8ed8f274b58cb3ce990a3bb2933ced292bf7",
-          "after": "2f8b9daa58e9e0b20db00dc4bfda88781a840f086d8e8ebae2f065e3e88fe80e"
+          "before": "2f8b9daa58e9e0b20db00dc4bfda88781a840f086d8e8ebae2f065e3e88fe80e",
+          "after": "eb48e2f416ef5b41a8606586a303486817c51aa6fe3a3a21d17fe79daa3693e6"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "0005409f1c730e10036a767dc657eb5bddd9b60514c9de750b303193ce906dde",
-      "after_sha256": "fe57224c82d133c779796c1b635c2aa021d6a955ad28dfa3d9e43d783795b3e7",
+      "before_sha256": "fe57224c82d133c779796c1b635c2aa021d6a955ad28dfa3d9e43d783795b3e7",
+      "after_sha256": "f32da118dbcf0395d6a72806c5ee7bde58cb348bd74f8bc68e0b6e42c16ddb86",
       "owners": {
         "@document": {
-          "before": "0005409f1c730e10036a767dc657eb5bddd9b60514c9de750b303193ce906dde",
-          "after": "fe57224c82d133c779796c1b635c2aa021d6a955ad28dfa3d9e43d783795b3e7"
+          "before": "fe57224c82d133c779796c1b635c2aa021d6a955ad28dfa3d9e43d783795b3e7",
+          "after": "f32da118dbcf0395d6a72806c5ee7bde58cb348bd74f8bc68e0b6e42c16ddb86"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "9bab363dddb9707d700da62fca858e33fcf52af99be87be5cf50b41fcd7ffeae",
-      "after_sha256": "8f21901685f4520e4904ec3b1c2f34db31facdc81cb8feaf031452af1ac96842",
+      "before_sha256": "8f21901685f4520e4904ec3b1c2f34db31facdc81cb8feaf031452af1ac96842",
+      "after_sha256": "7d640b2aeaf2daca7e95f0e24e9ef8e2e40375c4edd40f1bedde913613fb4982",
       "owners": {
         "@document": {
-          "before": "9bab363dddb9707d700da62fca858e33fcf52af99be87be5cf50b41fcd7ffeae",
-          "after": "8f21901685f4520e4904ec3b1c2f34db31facdc81cb8feaf031452af1ac96842"
+          "before": "8f21901685f4520e4904ec3b1c2f34db31facdc81cb8feaf031452af1ac96842",
+          "after": "7d640b2aeaf2daca7e95f0e24e9ef8e2e40375c4edd40f1bedde913613fb4982"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "3ee5984e50b32ff1c0f5dc8e4016eff379edd7beb23f95f5fcae5700e5524f4d",
-      "after_sha256": "bc2e1b6995674f9e4f196c041f92e48554fa21f099434fda82cd88706daa082e",
+      "before_sha256": "bc2e1b6995674f9e4f196c041f92e48554fa21f099434fda82cd88706daa082e",
+      "after_sha256": "fad1f52d5d3063b26e21774edd26bbe83e69ddfbf95c0a61cfa51ff71d767a42",
       "owners": {
         "@document": {
-          "before": "3ee5984e50b32ff1c0f5dc8e4016eff379edd7beb23f95f5fcae5700e5524f4d",
-          "after": "bc2e1b6995674f9e4f196c041f92e48554fa21f099434fda82cd88706daa082e"
+          "before": "bc2e1b6995674f9e4f196c041f92e48554fa21f099434fda82cd88706daa082e",
+          "after": "fad1f52d5d3063b26e21774edd26bbe83e69ddfbf95c0a61cfa51ff71d767a42"
+        }
+      }
+    },
+    "data/generated/ability_coverage/ability_coverage_rows.json": {
+      "before_sha256": "e308909c7f0179cfbd36dc8b9e4c667a0574fdbf392ec92856c5ca69fa59c285",
+      "after_sha256": "83b64aead50d8f96a14d354cb9c93ddfa33aac5fdf63677bf59ff7405810b7be",
+      "owners": {
+        "@document": {
+          "before": "e308909c7f0179cfbd36dc8b9e4c667a0574fdbf392ec92856c5ca69fa59c285",
+          "after": "83b64aead50d8f96a14d354cb9c93ddfa33aac5fdf63677bf59ff7405810b7be"
+        }
+      }
+    },
+    "data/generated/ability_coverage/ability_support_category_rows.json": {
+      "before_sha256": "bff910dea7e9a848ce7c936deb94a1169c68966fa9efc9f7302760ca5d6f6e4a",
+      "after_sha256": "0b0a9d47f2a524ec35855efcf09b622f41b347f88430e28d9fe1747c9630078d",
+      "owners": {
+        "@document": {
+          "before": "bff910dea7e9a848ce7c936deb94a1169c68966fa9efc9f7302760ca5d6f6e4a",
+          "after": "0b0a9d47f2a524ec35855efcf09b622f41b347f88430e28d9fe1747c9630078d"
+        }
+      }
+    },
+    "data/generated/ability_coverage/datasheet_support_rows.json": {
+      "before_sha256": "b6553ee4aabca631a1792372c39ebe0c1f2a96bf8883709a1189521dcebbcc06",
+      "after_sha256": "88063548c2535777339cb19ddfe5b6816c172dd2974e44c93e1451333202f418",
+      "owners": {
+        "@document": {
+          "before": "b6553ee4aabca631a1792372c39ebe0c1f2a96bf8883709a1189521dcebbcc06",
+          "after": "88063548c2535777339cb19ddfe5b6816c172dd2974e44c93e1451333202f418"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "9d7025dc6e543aa3b9415424d840c085d2483a03f3be7823fc6ae59105da3bc1",
-      "after_sha256": "0553533ffddce95eba47ce92615a13ff479739ab9317ae776a6c23e5dd26fc8c",
+      "before_sha256": "0553533ffddce95eba47ce92615a13ff479739ab9317ae776a6c23e5dd26fc8c",
+      "after_sha256": "8a4ced7715840f56a4c217437e3acb81878e89b1d7baf0a74000787ce9fe87ca",
       "owners": {
         "@document": {
-          "before": "9d7025dc6e543aa3b9415424d840c085d2483a03f3be7823fc6ae59105da3bc1",
-          "after": "0553533ffddce95eba47ce92615a13ff479739ab9317ae776a6c23e5dd26fc8c"
+          "before": "0553533ffddce95eba47ce92615a13ff479739ab9317ae776a6c23e5dd26fc8c",
+          "after": "8a4ced7715840f56a4c217437e3acb81878e89b1d7baf0a74000787ce9fe87ca"
         }
       }
     },
-    "data/source_audits/faction_test_layout/preservation.json": {
-      "before_sha256": "f1bb410efe3a3d9a063adc2a2b980257097cd4ef4687d4a38d3c343fbb752806",
-      "after_sha256": "7b092d9304f52885883d09c32893a35589419d6bf95dbf1331a60ce3cd51442a",
-      "owners": {
-        "@document": {
-          "before": "f1bb410efe3a3d9a063adc2a2b980257097cd4ef4687d4a38d3c343fbb752806",
-          "after": "7b092d9304f52885883d09c32893a35589419d6bf95dbf1331a60ce3cd51442a"
-        }
-      }
-    },
-    "data/source_audits/supported_rules_2026_10/quality_lane_balance.json": {
+    "data/source_audits/supported_rules_2026_10/vyper-binding.json": {
       "before_sha256": null,
-      "after_sha256": "6adaa25d02af6b2078353fdf0989a5a9968f4c9b18d45d297f596865cb7449fc",
+      "after_sha256": "1c7dfb6c0f8a42e722ddaeb51f24826d0f87ce4bd9edb2d57359b735df1835ef",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6adaa25d02af6b2078353fdf0989a5a9968f4c9b18d45d297f596865cb7449fc"
-        }
-      }
-    },
-    "data/source_audits/supported_rules_2026_10/reconciliation.json": {
-      "before_sha256": null,
-      "after_sha256": "9e3768c80aaa88919271b949f460a0807fac258b9ecb2b1916bbd654f4ba9db9",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "9e3768c80aaa88919271b949f460a0807fac258b9ecb2b1916bbd654f4ba9db9"
+          "after": "1c7dfb6c0f8a42e722ddaeb51f24826d0f87ce4bd9edb2d57359b735df1835ef"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "48f46233b826b1b435d859b4b89a00704a4f700cbb7517c2bf49faa0f37b9cc1",
-      "after_sha256": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
+      "before_sha256": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
+      "after_sha256": "9ecaa9e44f4931ecc968fea1b6c243b2f7f12ff76f5a9c0b92d82542ef745766",
       "owners": {
         "@document": {
-          "before": "48f46233b826b1b435d859b4b89a00704a4f700cbb7517c2bf49faa0f37b9cc1",
-          "after": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876"
-        }
-      }
-    },
-    "docs/MFM_2026_10_RECONCILIATION.md": {
-      "before_sha256": "469e94269f9f1ffbe23aa4295e1dbe8124a867fa946caa4c611b9f05a5522330",
-      "after_sha256": "0c0af87d54ab71f178256ae956e839060a4946a1b9c7787f7c73b09f1657f3bb",
-      "owners": {
-        "@document": {
-          "before": "469e94269f9f1ffbe23aa4295e1dbe8124a867fa946caa4c611b9f05a5522330",
-          "after": "0c0af87d54ab71f178256ae956e839060a4946a1b9c7787f7c73b09f1657f3bb"
+          "before": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
+          "after": "9ecaa9e44f4931ecc968fea1b6c243b2f7f12ff76f5a9c0b92d82542ef745766"
         }
       }
     },
     "docs/SUPPORTED_FACTION_RULE_RECONCILIATION_2026_10.md": {
-      "before_sha256": null,
-      "after_sha256": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
+      "before_sha256": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
+      "after_sha256": "1327464c042e85dc7e4ab2efe654f696045b0e9f4b97364342bb7fec3b156f58",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8"
+          "before": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
+          "after": "1327464c042e85dc7e4ab2efe654f696045b0e9f4b97364342bb7fec3b156f58"
+        }
+      }
+    },
+    "docs/factions/aeldari.md": {
+      "before_sha256": "6d0f2fdadf47a678bac5a5041c4d0f833e48e0af0b1e3ea1bd785b82087c18ce",
+      "after_sha256": "1873a0d4fa643df832deff53c963a99ce715d19df9426ddf7843bf868dcdc87a",
+      "owners": {
+        "@document": {
+          "before": "6d0f2fdadf47a678bac5a5041c4d0f833e48e0af0b1e3ea1bd785b82087c18ce",
+          "after": "1873a0d4fa643df832deff53c963a99ce715d19df9426ddf7843bf868dcdc87a"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "11a23d3127fdb73d447b0d043e8005fc497391ecd281bd987e3cc52b466132df",
-      "after_sha256": "bc0083148585d3ae3c2dfcf3099e4755655160747f0dbc33c1feec0c0473bcbe",
+      "before_sha256": "bc0083148585d3ae3c2dfcf3099e4755655160747f0dbc33c1feec0c0473bcbe",
+      "after_sha256": "1a06317b3c5a6f0eb6f288126587021eb38adbfe0f1f309e304d4b7bd60aef46",
       "owners": {
         "@document": {
-          "before": "11a23d3127fdb73d447b0d043e8005fc497391ecd281bd987e3cc52b466132df",
-          "after": "bc0083148585d3ae3c2dfcf3099e4755655160747f0dbc33c1feec0c0473bcbe"
+          "before": "bc0083148585d3ae3c2dfcf3099e4755655160747f0dbc33c1feec0c0473bcbe",
+          "after": "1a06317b3c5a6f0eb6f288126587021eb38adbfe0f1f309e304d4b7bd60aef46"
+        }
+      }
+    },
+    "docs/performance/policy-v3/vyper-source-input-roles-v4.json": {
+      "before_sha256": null,
+      "after_sha256": "2d9dde40969ad103576b70e9a4a3bf70387ff73e7b66d2c5c82dee59d7ff556b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2d9dde40969ad103576b70e9a4a3bf70387ff73e7b66d2c5c82dee59d7ff556b"
+        }
+      }
+    },
+    "scripts/check_performance_policy.py": {
+      "before_sha256": "01310f1cdba3520f77cf0c877c9f818eeb32e23e79ae448c2064b5de4053e779",
+      "after_sha256": "86b6a22b38a1d74ee074b902395133778e44a1ab54723a544d5c34924d73d3a6",
+      "owners": {
+        "_fresh_comparison_metadata": {
+          "before": "aac0aa79b23d8ec86606225a318eed13a68aa4e9d5c495bb881d79644669bc59",
+          "after": "af45d9f3ed756d767cbdbd47fa728943a24020002effd69a62c6062d3f8ed75b"
+        }
+      }
+    },
+    "scripts/measure_vyper_source_binding.py": {
+      "before_sha256": null,
+      "after_sha256": "4fa432b30d077b510f28b5a95e17562ce14703cdc17f1e70faee01cec02bee71",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "ee913ec6407e726f04f97c007c87fc7000cdf7f037784bbd70787756943f293a"
+        },
+        "main": {
+          "before": null,
+          "after": "44396d5ebada469dcdbf00cae18330507201d20210ff5189ff332e8e79f0954a"
+        },
+        "run": {
+          "before": null,
+          "after": "7c51bd8a4400c31011e40c3195f26496fdd8aea39b2ed967b3522dda2556c019"
+        },
+        "runtime_id": {
+          "before": null,
+          "after": "5f64c3d6e997d9a72e25a9f8c1c9fa4d46ddb6ae4a7195c2a7b2defa41af0447"
+        },
+        "write": {
+          "before": null,
+          "after": "dcfb1790145992a319da9aa80e0566cddab54741d415832f3b9b77652f8c5d11"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "62183827fa1f4fe4e7701bdab3cca5b1c9a1336e56b7ab27033d398bb67f0bd9",
-      "after_sha256": "72b2a3301d82589b497f8e7a2d7af60d1400674eb8cb900f5d34929177590f34",
+      "before_sha256": "72b2a3301d82589b497f8e7a2d7af60d1400674eb8cb900f5d34929177590f34",
+      "after_sha256": "e723630dff1e2b77622c60062ff318f3f7a1fb799a799525f4abe88143a57b21",
       "owners": {
         "@document": {
-          "before": "62183827fa1f4fe4e7701bdab3cca5b1c9a1336e56b7ab27033d398bb67f0bd9",
-          "after": "72b2a3301d82589b497f8e7a2d7af60d1400674eb8cb900f5d34929177590f34"
+          "before": "72b2a3301d82589b497f8e7a2d7af60d1400674eb8cb900f5d34929177590f34",
+          "after": "e723630dff1e2b77622c60062ff318f3f7a1fb799a799525f4abe88143a57b21"
         }
       }
     },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py": {
-      "before_sha256": "4f7f5558470c3feb0d7cd53bd3c02df3791c9f94970e6e8b682a1940022ebf0b",
-      "after_sha256": "7910129ae427729ef4686bc55cae0838ae6139f61c95d7979c9f0c9cc1ab8316",
-      "owners": {
-        "@module": {
-          "before": "0f58f182a2197a10e6177fec07a14131e5eba24ee2e7887ca4b70bd3e689c38d",
-          "after": "6de431e8663b4fe687075a11c5502e992bdb4a01ac6ab7e9d78646790be112c8"
-        },
-        "_record_total_carnage_sources": {
-          "before": "84e26ecb0858182521250d8af5d23aa192b73f3d04ffdbba62b217a45b622fb2",
-          "after": "493a34033866bbb8794e73e385b563843112d2aba2c2c24e8f6185dfe099fe60"
-        },
-        "_target_unit_has_keyword": {
-          "before": "f93128858ae711f5d48fec1207a1007e8ae8b71ceaf7f971d28fc26d1bb2fdb1",
-          "after": "aa980c34f72c3140994c1d3123dee88e4154689234ba3f84141f438ab97910f2"
-        },
-        "_unit_and_army_by_id": {
-          "before": "6679c2b1c21af4f67bd338273970997a462cf663810c9cb447fd59e3c5af1009",
-          "after": null
-        },
-        "active_blessings_for_unit": {
-          "before": "cbdcdb7be6de1c13bd9e5b0e429c61175340d557257387e4aad8149af27a1a95",
-          "after": "7e6398b07f08be939019ceb9beb7cfe8abb02c80ff324f59a764e939b30c4312"
-        },
-        "bloodshed_points_available": {
-          "before": "93efc48a160126321bc19abd7b03d7dd882da05f7e42b98da2e0c342a992729e",
-          "after": "280b77a1637cd7f6c186454801c9054986bc0aac600b2393abb015bc3b4ced4c"
-        },
-        "eligible_blessings_unit_ids_for_army": {
-          "before": "96cb31563aa10e187b175d22d9ecc8f9647c4483acb99c0f04a6d5dea8877629",
-          "after": "a02de31c7a241896dc936b15ce18a4fcc337a6dd0efa63bf62bfb5747e232e9a"
-        },
-        "unit_has_active_blessing": {
-          "before": "5cd21ab890d44e1a1be4a37bcee7bbd423315afc4e49bdc096d3d63e84018d2f",
-          "after": "9dd0dff0341972f31a6005eabe0b031172bd609f848e142c172e75a17a3ff68f"
-        }
-      }
-    },
-    "tests/code_quality/test_world_eaters_layout_maintenance.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_vyper_title_2026_10.overlay-pack.json": {
       "before_sha256": null,
-      "after_sha256": "4c8ce5f35be40fffa9f2aa2dbe019cd8dcdb9dc7332037a011099a24915d2f63",
+      "after_sha256": "ae4416a45ddddbcf9784123ee25c60113e71249eae699431b36655fbd9e663f3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ae4416a45ddddbcf9784123ee25c60113e71249eae699431b36655fbd9e663f3"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_vyper_title_2026_10.py": {
+      "before_sha256": null,
+      "after_sha256": "897f9d0c5f7db3aa5364f1e5206bb26bf9bb76f1ede721bd8887a04888ebb8fa",
       "owners": {
         "@module": {
           "before": null,
-          "after": "90ec712dae23b41886608dbb1ada4a33174cb4ea58df20d06f53a207f6336231"
+          "after": "d8d42cadf7a94396b69ceca260b43b5dea33005ece77dca88b3860cad6c6a72e"
         },
-        "test_world_eaters_lookup_maintenance_preserves_every_other_archived_assertion": {
+        "overlay_pack": {
           "before": null,
-          "after": "f0cf2a2cfb74ce7d708f71d89da64c56e6861ef1fcd1d736ac5d13acd9191ce4"
+          "after": "c9c669acebc0721e3401ae244e2f71f1b1a2c177b38349d1fcb34522b2c9dac9"
+        },
+        "overlay_pack_from_json_bytes": {
+          "before": null,
+          "after": "08616cc5463169b9aa47959c55c7cef00c6cfa1c4a5d035a1336fd85f20c400d"
+        },
+        "source_release_manifest": {
+          "before": null,
+          "after": "78ab09139cc0428c8fc6d2a911fab116e54db7fb8ac65377a2a2ab5a2c78e970"
         }
       }
     },
-    "tests/factions/world_eaters/gameplay_helpers.py": {
-      "before_sha256": "58e5cbf928cd0560a1661ed8a0457bc5fafa6205f21853708220844eb7436469",
-      "after_sha256": "5a8fc86e0cb14f55cdee740bbb9039419d10e56554f3db4ffda623d5b17469cb",
+    "tests/code_quality/test_current_comparison_routing.py": {
+      "before_sha256": "31451a8c17a8dffc81029a1693fd966938ba726b883e20dd8d3ae9adaf3b78b2",
+      "after_sha256": "e4dc1f9a2a2368eb202868fdb3aff3babeb7f38659687e7047b5d35f06b10831",
       "owners": {
-        "attached_gameplay_session": {
+        "test_exact_v4_uses_current_transaction_without_reclassifying_history": {
           "before": null,
-          "after": "ed282c589fb9f1a05c162226cdfe3a37e8e48257bbfa1dc20d219f4653b66bbc"
-        },
-        "submit_gameplay_request": {
-          "before": "9db900f21e67a104cd93f1f09d6bcae4f524641e3df70962b684a4609399ca67",
-          "after": "438098adb7b4b63b17cbf22f19640c218366b4858530c7dad87172357c95d5c7"
+          "after": "996c4033e3c5df72f8d7e83af6ad2a0b33cbb0ba3fa08f22075a811b311c551b"
         }
       }
     },
-    "tests/factions/world_eaters/unit/test_blessings_gameplay.py": {
-      "before_sha256": "38e1bba324f0f1ce0840a6a730cf6abc0f41d6b28781d0aa9da6aafe76a9176a",
-      "after_sha256": "939aad793501c35a415e39866b505ad12bf38a31c2b2c7e856745232aa402e3a",
-      "owners": {
-        "@module": {
-          "before": "ceb71276c4ec8f39b00fa91a45df6ab521d584441881d334e835881a42449149",
-          "after": "35a3f669a2493ac5896868deade8035d75386cce6ab3fa22199296e88880e866"
-        },
-        "test_attached_blessing_selection_targets_one_rules_unit_and_all_component_models": {
-          "before": null,
-          "after": "0d5b34b3d8bcf1e4cb4a234a62aa3ab14b895280ae185c70c56dd772bcd62d38"
-        },
-        "test_attached_world_eaters_complete_native_fight_without_active_blessings": {
-          "before": null,
-          "after": "f8d915ae270b311c0fc3b5fa93b31f77db16a2e3ce6b9e77fd7879922197f12b"
-        },
-        "test_native_attached_unbridled_bloodlust_charge_completes_witness_and_replay": {
-          "before": null,
-          "after": "3b1b8b09ce753b8e6d9bdc83f7f280b2bc10582b8214b5ff8cf3c238d46ebb06"
-        }
-      }
-    },
-    "tests/factions/world_eaters/unit/test_icon_gameplay.py": {
-      "before_sha256": "c45edbe3f7b9de84d40230435bd0500e9bc4596eec2f01dff95e36c5b7044d6e",
-      "after_sha256": "0eaf5f39c5dd42bd20db998404cd90c76dc7e06050b0fafe595fe979c38d2489",
+    "tests/code_quality/test_generated_ability_support_artifacts.py": {
+      "before_sha256": "d74b2edf600ef329eec26529ecb1f71c50f2831dce9abf35d48bb020627d5936",
+      "after_sha256": "a7b8c693d1ab79195d989777a3a8d02d97c05d0acad94a971acd0fa52e638380",
       "owners": {
         "@module": {
-          "before": "073d373db3a84511be83df3aac8a2232ed71aeea1d345bfbb3e32ba34f7aecf3",
-          "after": "30c037164a8a91e53fdc401db3e2c0a9273b3cc1af8efb68e5d51afb157eabec"
+          "before": "64cdd1d0406c1fecd692b22657adb8e3e052cc83bbb97a6c61d28d00d82f578d",
+          "after": "bac96800c66340d7fc573190ab84f1387e5c3908601407afaf00ce6c352f2210"
         },
-        "test_attached_leader_kill_credits_bodyguard_icon_once_and_spends": {
+        "test_current_vyper_report_preserves_source_identity_guard": {
           "before": null,
-          "after": "c7fa80c2c51c927ae9c42131159cea41e3538c2c28da1a9f21cab3a9fed1b898"
-        },
-        "test_icon_credit_preserves_casualty_order_after_bodyguard_destruction": {
-          "before": null,
-          "after": "55c5e201cc9bcf241466b736c02ab0544f9c3448f066e019c8e925a6050a82df"
+          "after": "01c55756192be8978c204c07536d92a82185afc86ca988b61202a42ee5d71d0f"
         }
       }
     },
-    "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": {
-      "before_sha256": "9384e78c9d389dd77d57478c8aa2c56558c033e11767800afed20dd787690940",
-      "after_sha256": "f2d9e5541c9449e4f24a83d7d4cc723516660ea166a8e9c2819a2c8a06a4a30c",
+    "tests/code_quality/test_performance_tool_inputs_v2.py": {
+      "before_sha256": "69cc8f3a9f5ba1ea2a7cae9921ca95779566cb04e65cae2c82b54ba1bf220565",
+      "after_sha256": "a14157e66889457eee02a8b4983e6d159c9336279dfbd8b3184d7e451606de17",
       "owners": {
-        "test_world_eaters_army_rule_fail_fast_edges_are_explicit": {
-          "before": "6b4dc672526cb48db4e713451414d4e93f06a4edc4f4adb68076e86a10040f28",
-          "after": "9df2dad2e9865d21babcb88d53c420a07a08e30534dfbdd9dcbe36447f55637d"
+        "_v4_binding": {
+          "before": null,
+          "after": "7049d78023bde570619a3f98437b0e52b91390083a353ec22fafec7126de4223"
+        },
+        "_v4_inventories": {
+          "before": null,
+          "after": "b768a35a0938724f9a06bdac30566c1d5bea5cec0779e61a89ddb25fbd943130"
+        },
+        "_v4_report": {
+          "before": null,
+          "after": "51b413cc941995d273de20f7e71c60364a3b41bfc56d577bef73a8009dd13452"
+        },
+        "_validate_v4": {
+          "before": null,
+          "after": "fd9b5ec99ff1c4ba887cde1deb5b28756c9c394a51381b272cf67937a67fd44a"
+        },
+        "test_v4_actual_input_and_role_drift_is_rejected": {
+          "before": null,
+          "after": "7319b44269c288aa31ae04ff1973aa52e57b64f425a9df9e486704c3f10e33dc"
+        },
+        "test_v4_comparison_preserves_existing_acceptance": {
+          "before": null,
+          "after": "1bc5b99145b38b9a819f9a1b63104623aa89bb386a31438384371a8140ffef80"
+        },
+        "test_v4_current_inventory_includes_ignored_authoritative_runtime_resources": {
+          "before": null,
+          "after": "32b9fd338dba9e998427432d1d253f16c06edc543da4212a6a343af3fd85fa28"
+        },
+        "test_v4_every_generated_tree_requires_complete_exact_bytes": {
+          "before": null,
+          "after": "d47d78fc799d12f0d792f7be1f055438fcaa099fb1340234f676d790e1b1e0e7"
+        },
+        "test_v4_exact_base_complete_inventories_and_six_output_trees_are_admitted": {
+          "before": null,
+          "after": "f8265f4dc8c7986efa0fa570c8fd447350ae7e91d8a14a9b5a8ee00c9bc1c1e3"
+        },
+        "test_v4_measured_git_locator_accepts_equal_squash_bytes_and_rejects_drift": {
+          "before": null,
+          "after": "dbfa7728b78f3686d6c2d3d1341d42695c48ffa097d37a4e1dbfb2472bff3c03"
         }
       }
     },
-    "tests/support/faction_layout_preservation.py": {
-      "before_sha256": "b491512f6a84067563ac3c2bef81ec439e3b8d6d7df044924ef52088ac394671",
-      "after_sha256": "a8e611ffc38b76922c2dd7a416f7978d803ac860d1ce58ec3f5bf0199f28552c",
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
+      "before_sha256": "8c16fd4ff13d3fe52697b30eb1d32d8814560619a3cd61262b019c97bf994c18",
+      "after_sha256": "727a3107c8af13b9cf2937fd06c59fbd84351dc93b5b01167b35c313b97af285",
       "owners": {
         "@module": {
-          "before": "80e1425d1dda2da499668fe65363d4310e6dbe7495272d7eff27d2d1c3a53c18",
-          "after": "a800a279878c163efd327e857e7dd3936b79693155cb2d3e01bf8f33c132bce1"
+          "before": "c6f24febbfcb7c0b69221c2b8efb858030e7909ad9b836a4b8b19ca4f4d56d89",
+          "after": "de49586f26c87e87d15e24ec11264feaf77a101881b1d0f3831feca8b5d3b117"
         },
-        "_definitions": {
-          "before": "c9741356f40948f6fb74d239874007f63fb812646d62e7d781dd9d182f29512c",
-          "after": "882fcd01e86c7b1a947258f899ae8dee57b5b36b4f5bb74e8090b4a9857eb285"
+        "test_vyper_title_overlay_is_generated_and_binds_one_unchanged_source_row": {
+          "before": null,
+          "after": "bcbefdb4b1069843dd609be9970a4ea91fbe3a6229d0880e0e671ebf724f8229"
         },
-        "verify_layout_original": {
-          "before": "ace74cac33d2f38c1eb589e5dd516f5b18574bf57384b67c844b65fb7c8ea7ae",
-          "after": "ae66d56caa8e344c240767b689ee4d26cccc278404eadfc1f9d68d1afab889b3"
+        "test_vyper_title_overlay_rejects_invalid_artifact": {
+          "before": null,
+          "after": "eacac28604c340e43ef3ea248b7a230b45684a8511c655b6014ce9f70538f927"
+        }
+      }
+    },
+    "tests/rules/section25/test_mfm.py": {
+      "before_sha256": "697300f10064e0383b071b997f51eb8323ef4c617563ca07687278d7665585b8",
+      "after_sha256": "6d2758590363c16f2f72048780631028cf67cc59e297740ca96b5f5c93e5696a",
+      "owners": {
+        "@module": {
+          "before": "7ce8f602cfe1414fcffd8525dcfb8576322985cabc609c7874626aaedb26fd30",
+          "after": "b7e96cc6d4b6f8e46bde2b82e41782d6b83757dd61d0ad8990176ed35beffa97"
+        },
+        "test_current_vyper_source_title_reaches_mfm_points": {
+          "before": null,
+          "after": "db3ae948514fe143c47fdd240cbda98c661847cb8a2ed0d5c03d1e40898758c1"
+        },
+        "test_current_vyper_title_preserves_model_and_rule_identity": {
+          "before": null,
+          "after": "9356ff0cd4957b3a813a86784604f224bf68b3d303144ceca114fab414b009ad"
+        },
+        "vyper_catalog": {
+          "before": null,
+          "after": "3b30dfe88700c8750102284942305846ddf0aca109c646c4578de947b6928c8f"
+        }
+      }
+    },
+    "tools/ability_support_sources.py": {
+      "before_sha256": "e8494d41b8f94810cfdf533d967c4814f12896294740ef89d15f7e50a1e2a322",
+      "after_sha256": "0465175c8394d9b074ff4a0c2a277ae1dc9fa44bb83dfea23a4d4640744347ce",
+      "owners": {
+        "@module": {
+          "before": "549bedd1ca694c0ce3688a2a05941f67178644f171551041a8b75ed59a6b0d2d",
+          "after": "6bd5881bfcb0c8df65e02610d491a99e32c018d82e391aba2563b43afcab823c"
+        },
+        "ability_support_index_inputs": {
+          "before": "dd6d127ee60460556e346c9b6c5860c16328b657f99fccf549eb46b08dcf4d1c",
+          "after": "c2f8b975b8f0cf96e6848845a40b590256956bca50e9a29447ef3ccbcabaf275"
+        },
+        "load_ability_support_sources": {
+          "before": "d98f37cd5ccaea392e32c01b6ce9bbc1be88a94836718ab97aced4c0f8be5144",
+          "after": "b3bfb8af0e02e4a0f144de71bdced5cb65fad60adb2f7ab226f9e29fdf701c82"
+        }
+      }
+    },
+    "tools/aeldari_support_report.py": {
+      "before_sha256": "8c5bab7c5a6bb07c34fd7ca4ebcecb2ea3f59b97c57af44299710905db13f85b",
+      "after_sha256": "ea2e6cc76e7d1e5cfaec06467bc4552eb042e5a3ce9864446fb93da68790ddf6",
+      "owners": {
+        "@module": {
+          "before": "3541947f012a3b1baf3b9b02100dfde85c8e536022f7c88ce368673dfaef8f17",
+          "after": "7cf8c3a3d93def85b81b1ac1795e2a706c268a15121d08be3b9699da72e322dd"
+        },
+        "_catalog_blocker_description": {
+          "before": "f7801a3a128683a5df3c4fef5b183bc0d59bb82d52bd01eaa0e43110d52dccda",
+          "after": "86847e2b7a1623d0a16a28558fe496db55b83533b630d4e9a0003cf840667c18"
+        },
+        "_current_datasheet_name": {
+          "before": null,
+          "after": "e71825e320a39a85d9551367ca5d2ae397578fa7a254f902029fa3d4ddc8eab7"
+        },
+        "_group_markdown": {
+          "before": "29602480c4d751ea6099dd2ff3d09cb1b1431f14fa7228938de360141da19a1a",
+          "after": "18991264d1aaa7d30f5daf3724824f7d62f38fadd6264c623520278f320e27fd"
+        },
+        "_source_basis": {
+          "before": "16d69f16b59a1aa18d8710f16259b2714527b0afb68ac0fd8c420518a830bcba",
+          "after": "1d8dd537768635c6e218fcd4789522d06d85039045453fdb7ea723f0e326e31c"
+        }
+      }
+    },
+    "tools/generate_vyper_source_overlay.py": {
+      "before_sha256": null,
+      "after_sha256": "9e5d496966e4063c663a1c76858eccad23c406c8578b87186eaf2d5b23b61d8a",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "4ed6e81dceb658ee9792c96ba0f622588959fd2b71492a074554d866ecaea627"
+        },
+        "generated_overlay_pack": {
+          "before": null,
+          "after": "b82de8bf13e71f73b716a82aeac377e34c9e3db9f338e373b7e5d4bfdba3ba9e"
+        },
+        "main": {
+          "before": null,
+          "after": "a14bd4be8d04eaa827412434973a47315d485b23131155a62420af28e6ef7264"
+        }
+      }
+    },
+    "tools/performance_policy.py": {
+      "before_sha256": "aee97f2cd33281b79a4b7593ab489d7b5143a7d8f2828036da5ede5af0435ef3",
+      "after_sha256": "74462b456e357fac5d5490243248d061eed0459838d5b75a3baa7bb5ec0daf7c",
+      "owners": {
+        "_validate_single_comparison": {
+          "before": "149d1ce66e6f87b070ac0ddd911109bd5d4e0123940f0bcfc09485edad091e70",
+          "after": "4c01f389ed280e95c0a5a51f1179110718b30584317d41943f17de2cf8d06e52"
+        }
+      }
+    },
+    "tools/performance_tool_inputs.py": {
+      "before_sha256": "a5aef72397cf6d7180484ff2ce62f9bb73c31dafa23829edd8bbf676b90cee62",
+      "after_sha256": "f15d4371b8b013bf709c32ff429c1538911d422142791ae65dd435e80c72cbe9",
+      "owners": {
+        "binding_enabled": {
+          "before": "4c19e5428e49fc07c8415e1e8dbf80135ca0b46f20fff2cd6c0f47562dec28e1",
+          "after": "d43a60baff5d66a3ce538df2dbb1b7034b1189946f2255fbea63484d04a06a4b"
+        },
+        "comparison_inputs": {
+          "before": "83297795437f026dec26e52398ae0c19ddfd78d5353b83900e7f2c7e9cc19576",
+          "after": "8d7f94a62784248a0f31b144768461ae4e09f4e7333582985fac56b46498995f"
+        }
+      }
+    },
+    "tools/performance_tool_inputs_v4.py": {
+      "before_sha256": null,
+      "after_sha256": "d69b9f41ff6ddd95c3c35bf4c3fac4fede96484249f81644bfe2d12548f13ff8",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "24dbfa42572fbeaf0338c5d7ab368ab5f822943bbb3e8be26328a26946ad25fe"
+        },
+        "classify_inputs": {
+          "before": null,
+          "after": "10ebd8c27e9647842b63fa7e5fd44d42849f577370cd5d340a3f6941fa3efe7e"
+        },
+        "comparison_inputs": {
+          "before": null,
+          "after": "b3949d6d21a7e0d75c1b0b46c8e47dafc52e5f81197558e04d956f41ed574b40"
+        },
+        "current_inventory": {
+          "before": null,
+          "after": "a019174b0c0220f832bf7bfcaafac18db0826f71a5ffcab4da7aa8d934c7f69a"
+        },
+        "git_inventory": {
+          "before": null,
+          "after": "26d20fc5db01ed5345dd382e9708467c000711c99d93d14e0b0e5ff7abc08972"
+        },
+        "read_role_spec": {
+          "before": null,
+          "after": "e59b17de38f00d932a95600af1ac0ab3cc6e04626ae46c9e84a3cf2a718cdb9b"
+        },
+        "selected": {
+          "before": null,
+          "after": "ec2b388de533589a9ee0324cd5a7973fd297facdb45541b0ba548ce4c2bdfaa8"
+        },
+        "validate_generated_evidence": {
+          "before": null,
+          "after": "5257a9264ec50a95511aa45f1c1a54137580761986ae328df05047fb55cf5ec5"
+        },
+        "validate_spec": {
+          "before": null,
+          "after": "773cd33056b832cbf80a9b9e37f41298de9d1c939ed4b9a5140d6abca1517a18"
         }
       }
     }
@@ -494,171 +536,25 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents and maps the bounded supported-faction reconciliation, preserving all historical evidence, finite deferred checks and active delivery gates.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
-    "ci/quality_shards/shard-3-modules.txt": {
+    "ci/quality_shards/shard-1.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Measured hosted lane balancing moves one complete ten-case conformance module from lane4 to lane3. The exact global module and case multisets, all 260 deferrals, worker scheduling and every deadline remain unchanged. The original timeout remains failed; this is CI metadata maintenance.",
-      "source_obligation": "Run41076387852 job124133596389 failed the fixed570-second supervisor deadline despite420 passing tests. Same-run lane3 took127.259seconds; the moved module measured271.699summed seconds. Preserved JUnit and supervisor hashes document the planning inputs and exact moved nodes.",
-      "unchanged_work": "All2139 collected and1879 active quality nodes remain selected once, with whole-module lane ownership. Source, test, guard, workflow, runtime and behavioral selection semantics are unchanged. Timing sums are planning estimates; fresh hosted gates and serial smoke remain required."
-    },
-    "ci/quality_shards/shard-3.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Measured hosted lane balancing moves one complete ten-case conformance module from lane4 to lane3. The exact global module and case multisets, all 260 deferrals, worker scheduling and every deadline remain unchanged. The original timeout remains failed; this is CI metadata maintenance.",
-      "source_obligation": "Run41076387852 job124133596389 failed the fixed570-second supervisor deadline despite420 passing tests. Same-run lane3 took127.259seconds; the moved module measured271.699summed seconds. Preserved JUnit and supervisor hashes document the planning inputs and exact moved nodes.",
-      "unchanged_work": "All2139 collected and1879 active quality nodes remain selected once, with whole-module lane ownership. Source, test, guard, workflow, runtime and behavioral selection semantics are unchanged. Timing sums are planning estimates; fresh hosted gates and serial smoke remain required."
-    },
-    "ci/quality_shards/shard-4-modules.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Measured hosted lane balancing moves one complete ten-case conformance module from lane4 to lane3. The exact global module and case multisets, all 260 deferrals, worker scheduling and every deadline remain unchanged. The original timeout remains failed; this is CI metadata maintenance.",
-      "source_obligation": "Run41076387852 job124133596389 failed the fixed570-second supervisor deadline despite420 passing tests. Same-run lane3 took127.259seconds; the moved module measured271.699summed seconds. Preserved JUnit and supervisor hashes document the planning inputs and exact moved nodes.",
-      "unchanged_work": "All2139 collected and1879 active quality nodes remain selected once, with whole-module lane ownership. Source, test, guard, workflow, runtime and behavioral selection semantics are unchanged. Timing sums are planning estimates; fresh hosted gates and serial smoke remain required."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "ci/quality_shards/shard-4.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Measured hosted lane balancing moves one complete ten-case conformance module from lane4 to lane3. The exact global module and case multisets, all 260 deferrals, worker scheduling and every deadline remain unchanged. The original timeout remains failed; this is CI metadata maintenance.",
-      "source_obligation": "Run41076387852 job124133596389 failed the fixed570-second supervisor deadline despite420 passing tests. Same-run lane3 took127.259seconds; the moved module measured271.699summed seconds. Preserved JUnit and supervisor hashes document the planning inputs and exact moved nodes.",
-      "unchanged_work": "All2139 collected and1879 active quality nodes remain selected once, with whole-module lane ownership. Source, test, guard, workflow, runtime and behavioral selection semantics are unchanged. Timing sums are planning estimates; fresh hosted gates and serial smoke remain required."
-    },
-    "ci/test_shards/durations.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "rule_semantics",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -666,9 +562,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -676,9 +572,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -686,9 +582,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -696,9 +592,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -706,9 +602,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -716,9 +612,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -726,9 +622,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -736,9 +632,39 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "data/generated/ability_coverage/ability_coverage_rows.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "data/generated/ability_coverage/ability_support_category_rows.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "data/generated/ability_coverage/datasheet_support_rows.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -746,72 +672,84 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
-    "data/source_audits/faction_test_layout/preservation.json": {
+    "data/source_audits/supported_rules_2026_10/vyper-binding.json": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-a72e242c23f7d49d",
-        "supported-world-eaters-archive-binding-maintenance"
+        "supported-rules-current-source-audit",
+        "supported-vyper-source-title-binding"
       ],
       "selected_families": [],
-      "rationale": "Development fixture maintenance admits exactly one reviewed World Eaters diagnostic literal in the current successor. Immutable archived bytes, definition mappings, exception type, target call and every other AST node remain authenticated; focused controls reject adjacent assertion changes. Runtime and behavioral case bodies are unchanged by this maintenance.",
-      "source_obligation": "The active Order97 historical-evidence guard must accept the reviewed current diagnostic while preserving the original archive and all unrelated successor records. Maintenance is scoped to the exact original, successor and named fail-fast test through the existing preservation protocol.",
-      "unchanged_work": "Only development archive verification, its direct controls and the current successor SHA binding change. No production or behavioral-test semantics change. The complete active quality suite and serial current-runtime smoke remain required."
-    },
-    "data/source_audits/supported_rules_2026_10/quality_lane_balance.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-rules-current-source-audit"
-      ],
-      "selected_families": [],
-      "rationale": "Measured hosted lane balancing moves one complete ten-case conformance module from lane4 to lane3. The exact global module and case multisets, all 260 deferrals, worker scheduling and every deadline remain unchanged. The original timeout remains failed; this is CI metadata maintenance.",
-      "source_obligation": "Run41076387852 job124133596389 failed the fixed570-second supervisor deadline despite420 passing tests. Same-run lane3 took127.259seconds; the moved module measured271.699summed seconds. Preserved JUnit and supervisor hashes document the planning inputs and exact moved nodes.",
-      "unchanged_work": "All2139 collected and1879 active quality nodes remain selected once, with whole-module lane ownership. Source, test, guard, workflow, runtime and behavioral selection semantics are unchanged. Timing sums are planning estimates; fresh hosted gates and serial smoke remain required."
-    },
-    "data/source_audits/supported_rules_2026_10/reconciliation.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-rules-current-source-audit"
-      ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents and maps the bounded supported-faction reconciliation, preserving all historical evidence, finite deferred checks and active delivery gates.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
-    },
-    "docs/MFM_2026_10_RECONCILIATION.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Documents and maps the bounded supported-faction reconciliation, preserving all historical evidence, finite deferred checks and active delivery gates.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "docs/SUPPORTED_FACTION_RULE_RECONCILIATION_2026_10.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents and maps the bounded supported-faction reconciliation, preserving all historical evidence, finite deferred checks and active delivery gates.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "docs/factions/aeldari.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents and maps the bounded supported-faction reconciliation, preserving all historical evidence, finite deferred checks and active delivery gates.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "docs/performance/policy-v3/vyper-source-input-roles-v4.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "scripts/check_performance_policy.py": {
+      "category": "measured_workload",
+      "operations": [
+        "supported-vyper-exact-base-performance-admission"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Authorized exact-base checker compatibility admits fresh Vyper source evidence against bc9 with closed input roles, independently hashed source inventories and complete generated trees. The original six-sample workload and acceptance budgets remain unchanged.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "scripts/measure_vyper_source_binding.py": {
+      "category": "measured_workload",
+      "operations": [
+        "supported-vyper-exact-base-performance-admission"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Authorized exact-base checker compatibility admits fresh Vyper source evidence against bc9 with closed input roles, independently hashed source inventories and complete generated trees. The original six-sample workload and acceptance budgets remain unchanged.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -819,87 +757,161 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/world_eaters/army_rule.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_vyper_title_2026_10.overlay-pack.json": {
       "category": "rule_semantics",
       "operations": [
-        "supported-world-eaters-rules-unit-semantics"
+        "supported-vyper-source-title-binding"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
-    "tests/code_quality/test_world_eaters_layout_maintenance.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_vyper_title_2026_10.py": {
       "category": "rule_semantics",
       "operations": [
-        "supported-world-eaters-archive-binding-maintenance"
+        "supported-vyper-source-title-binding"
       ],
       "selected_families": [],
-      "rationale": "Development fixture maintenance admits exactly one reviewed World Eaters diagnostic literal in the current successor. Immutable archived bytes, definition mappings, exception type, target call and every other AST node remain authenticated; focused controls reject adjacent assertion changes. Runtime and behavioral case bodies are unchanged by this maintenance.",
-      "source_obligation": "The active Order97 historical-evidence guard must accept the reviewed current diagnostic while preserving the original archive and all unrelated successor records. Maintenance is scoped to the exact original, successor and named fail-fast test through the existing preservation protocol.",
-      "unchanged_work": "Only development archive verification, its direct controls and the current successor SHA binding change. No production or behavioral-test semantics change. The complete active quality suite and serial current-runtime smoke remain required."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
-    "tests/factions/world_eaters/gameplay_helpers.py": {
+    "tests/code_quality/test_current_comparison_routing.py": {
+      "category": "measured_workload",
+      "operations": [
+        "supported-vyper-exact-base-performance-admission"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Authorized exact-base checker compatibility admits fresh Vyper source evidence against bc9 with closed input roles, independently hashed source inventories and complete generated trees. The original six-sample workload and acceptance budgets remain unchanged.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "tests/code_quality/test_generated_ability_support_artifacts.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-ced71b9c36a9c2ff",
-        "supported-world-eaters-regression-controls"
+        "supported-vyper-source-regression-controls"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
-    "tests/factions/world_eaters/unit/test_blessings_gameplay.py": {
+    "tests/code_quality/test_performance_tool_inputs_v2.py": {
+      "category": "measured_workload",
+      "operations": [
+        "supported-vyper-exact-base-performance-admission"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Authorized exact-base checker compatibility admits fresh Vyper source evidence against bc9 with closed input roles, independently hashed source inventories and complete generated trees. The original six-sample workload and acceptance budgets remain unchanged.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-ce6d003a90fffd3a",
-        "supported-world-eaters-regression-controls"
+        "supported-vyper-source-regression-controls"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
-    "tests/factions/world_eaters/unit/test_icon_gameplay.py": {
+    "tests/rules/section25/test_mfm.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-cc98f3cb2a7698aa",
-        "supported-world-eaters-regression-controls"
+        "mfm-current-regression-controls",
+        "qualification40-exact-7ab593fa098a23f7",
+        "supported-vyper-source-regression-controls"
       ],
       "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
-    "tests/factions/world_eaters/unit/test_world_eaters_army_rule.py": {
+    "tools/ability_support_sources.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-a5b3cb2fb1f0cfac",
-        "supported-world-eaters-regression-controls"
+        "qualification40-exact-b0712fa66a9cc38e",
+        "supported-vyper-source-title-binding"
       ],
-      "selected_families": [],
-      "rationale": "Reconciles existing World Eaters Blessings and Icon consumers with canonical attached rules-unit ownership, preserving current official clause semantics. Regressions and generated build/contract identity follow the bounded fix. This is ordinary rule correction, not deliberate performance work.",
-      "source_obligation": "User-preferred 40k.app World Eaters v963 pages, browser-verified on30October, confirm the full Blessings table, +1charge and Icon point/extra-D6/spend semantics; official PDFv1.3 is corroborating evidence. Shared existing attached-unit authority must admit native legal fight, charge and destruction credit. Latest listed faction version is index-based inference.",
-      "unchanged_work": "Shared rules-unit views replace physical-only lookup in one faction owner. No search algorithm, cache policy, serializer or dependency redesign. The existing serial current-runtime smoke and live semantic/work/cache checks remain required. Full-game performance is not certified."
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
-    "tests/support/faction_layout_preservation.py": {
+    "tools/aeldari_support_report.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-c51c9fa6ee134bd8",
-        "supported-world-eaters-archive-binding-maintenance"
+        "supported-vyper-source-title-binding"
       ],
       "selected_families": [],
-      "rationale": "Development fixture maintenance admits exactly one reviewed World Eaters diagnostic literal in the current successor. Immutable archived bytes, definition mappings, exception type, target call and every other AST node remain authenticated; focused controls reject adjacent assertion changes. Runtime and behavioral case bodies are unchanged by this maintenance.",
-      "source_obligation": "The active Order97 historical-evidence guard must accept the reviewed current diagnostic while preserving the original archive and all unrelated successor records. Maintenance is scoped to the exact original, successor and named fail-fast test through the existing preservation protocol.",
-      "unchanged_work": "Only development archive verification, its direct controls and the current successor SHA binding change. No production or behavioral-test semantics change. The complete active quality suite and serial current-runtime smoke remain required."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "tools/generate_vyper_source_overlay.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "tools/performance_policy.py": {
+      "category": "measured_workload",
+      "operations": [
+        "ci64-provenance-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
+        "ci67-transaction-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
+        "supported-vyper-exact-base-performance-admission"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Authorized exact-base checker compatibility admits fresh Vyper source evidence against bc9 with closed input roles, independently hashed source inventories and complete generated trees. The original six-sample workload and acceptance budgets remain unchanged.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "tools/performance_tool_inputs.py": {
+      "category": "measured_workload",
+      "operations": [
+        "supported-vyper-exact-base-performance-admission"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Authorized exact-base checker compatibility admits fresh Vyper source evidence against bc9 with closed input roles, independently hashed source inventories and complete generated trees. The original six-sample workload and acceptance budgets remain unchanged.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "tools/performance_tool_inputs_v4.py": {
+      "category": "measured_workload",
+      "operations": [
+        "supported-vyper-exact-base-performance-admission"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Authorized exact-base checker compatibility admits fresh Vyper source evidence against bc9 with closed input roles, independently hashed source inventories and complete generated trees. The original six-sample workload and acceptance budgets remain unchanged.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "external_contract_source_reuse": "docs/performance/current/vyper-source-bc9-v4.json"
+  },
   "full_game": null
 }

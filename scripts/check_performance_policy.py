@@ -64,9 +64,20 @@ def _fresh_comparison_metadata(
     comparisons = object_value(assessment["comparisons"])
     if not comparisons or comparisons.keys() != reports.keys():
         raise ValueError("Fresh comparison selection is empty or incomplete.")
+    from tools import performance_tool_inputs_v4 as exact
+
     routes: set[str] = set()
     for family, report in reports.items():
-        if (
+        binding = report.get("input_binding")
+        exact_binding = (
+            family in input_bound_families
+            and family == "external_contract_source_reuse"
+            and isinstance(binding, dict)
+            and binding.get("schema") == exact.SCHEMA
+        )
+        if exact_binding and base != exact.BASE:
+            raise ValueError("V4 current admission requires the exact PR600 base.")
+        if not exact_binding and (
             family in input_bound_families
             or {"owner_exception", "input_binding", "ordered_pairs"} & report.keys()
             or report.get("schema") == "matched-reconstruction-abba-v1"
@@ -84,7 +95,7 @@ def _fresh_comparison_metadata(
             "base",
             "head",
             "historical_failures",
-        }:
+        } | ({"input_binding", "generated_output_binding"} if exact_binding else set()):
             raise ValueError("Fresh comparisons require the closed generic report format.")
         if comparisons[family] in base_paths:
             raise ValueError(
@@ -448,7 +459,7 @@ def _validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict
                     root, current=inputs, report=comparison, base=base
                 )
             else:
-                # Fresh v2 records bind current inputs; no historical applicability bridge.
+                # Fresh v2/v4 records bind current inputs; no historical applicability bridge.
                 measured_inputs, applicability_sha = inputs, None
         elif (
             family == "reconstruction"

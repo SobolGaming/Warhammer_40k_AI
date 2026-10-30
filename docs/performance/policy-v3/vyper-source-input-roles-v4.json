@@ -1,0 +1,65 @@
+{
+  "schema": "tool-input-roles-v4",
+  "family": "external_contract_source_reuse",
+  "workload": "tests/code_quality/test_phase18m_conformance_boundary.py",
+  "base": "bc9acd8419e7b97a2c1260c7e932d2cb9c3fc370",
+  "treatment": [
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_vyper_title_2026_10.overlay-pack.json",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_vyper_title_2026_10.py",
+    "tools/ability_support_sources.py",
+    "tools/aeldari_support_report.py",
+    "tools/generate_vyper_source_overlay.py"
+  ],
+  "derived_outputs": [
+    "contracts/examples/persistence/session-persistence.json",
+    "contracts/examples/sessions/session-command-outcome.json",
+    "contracts/examples/sessions/session-command-started.json",
+    "contracts/examples/sessions/session-metadata-created.json",
+    "contracts/examples/support-profile-player-a-redacted.json",
+    "contracts/examples/support-profile-player-b-redacted.json",
+    "contracts/examples/support-profile.json",
+    "contracts/manifest.json",
+    "data/generated/ability_coverage/ability_coverage_rows.json",
+    "data/generated/ability_coverage/ability_support_category_rows.json",
+    "data/generated/ability_coverage/datasheet_support_rows.json",
+    "src/warhammer40k_core/_engine_build_manifest.json"
+  ],
+  "control_plane": {
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": "Read by unchanged conftest during untimed admission/collection; only the current test_mfm fingerprint follows the new source regression bytes. The original testcase and timed setup/call/teardown remain unchanged.",
+    "data/source_audits/supported_rules_2026_10/vyper-binding.json": "Untimed regression or audit record; the original selected pytest node neither imports nor reads this file.",
+    "docs/performance/policy-v3/operation-map.json": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker.",
+    "docs/performance/policy-v3/vyper-source-input-roles-v4.json": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker.",
+    "scripts/check_performance_policy.py": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker.",
+    "scripts/measure_vyper_source_binding.py": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker.",
+    "tests/code_quality/test_current_comparison_routing.py": "Untimed regression or audit record; the original selected pytest node neither imports nor reads this file.",
+    "tests/code_quality/test_generated_ability_support_artifacts.py": "Untimed regression or audit record; the original selected pytest node neither imports nor reads this file.",
+    "tests/code_quality/test_performance_tool_inputs_v2.py": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker.",
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": "Untimed regression or audit record; the original selected pytest node neither imports nor reads this file.",
+    "tests/rules/section25/test_mfm.py": "Hashed by unchanged conftest during untimed behavioral-file admission; never executed or imported by the selected contract testcase. Only the three new source-pricing regression cases differ.",
+    "tools/performance_policy.py": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker.",
+    "tools/performance_tool_inputs.py": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker.",
+    "tools/performance_tool_inputs_v4.py": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker."
+  },
+  "required_dependencies": [
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Abilities.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_abilities.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_keywords.json",
+    "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Datasheets_leader.json",
+    "docs/source_rules/faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf",
+    "docs/source_rules/tacoma-open-2026-source-package.json",
+    "pyproject.toml",
+    "scripts/source_reuse_experiment.py",
+    "tests/code_quality/test_phase18m_conformance_boundary.py",
+    "tests/conftest.py",
+    "tests/timing_plugin.py",
+    "uv.lock"
+  ],
+  "harness": [
+    "scripts/measure_vyper_source_binding.py",
+    "scripts/source_reuse_experiment.py",
+    "tests/code_quality/test_phase18m_conformance_boundary.py",
+    "tests/conftest.py",
+    "tests/timing_plugin.py"
+  ]
+}

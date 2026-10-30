@@ -216,5 +216,6 @@
     "Wider faction books, characteristics, weapons and unreviewed profiles",
     "Non-executable World Eaters detachments"
   ],
-  "prior_source_claims": "PR599 MFM and PR600 historical mirror/PDF records retain their original scope and bytes. No broad source currency or whole-game claim."
+  "prior_source_claims": "PR599 MFM and PR600 historical mirror/PDF records retain their original scope and bytes. No broad source currency or whole-game claim.",
+  "transformed_text_metadata_qualification": "The existing generic source-overlay application rebuilds touched-row text metadata: historical HTML bold tags are absent from raw_text/raw_html and converted_tags is empty; sanitized/normalized text, tokens and stable source_text_id remain identical. Original source snapshot and PDF bytes are retained. The overlay operation changes only the name field; no generic text-metadata transformation repair is included."
 }

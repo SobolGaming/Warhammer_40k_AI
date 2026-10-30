@@ -150,3 +150,5 @@ does not independently attest runtime effort or expose the requested speed contr
 No model performance advantage is asserted. Focused results are distinct from
 the mandatory exact-head aggregate, review and hosted CI gates. The 64% full-package
 branch-coverage floor, twelve-minute CI goal and 720-second shard cutoff are unchanged.
+
+The existing generic overlay application rebuilds touched-row text metadata: raw text/HTML no longer retains historical bold tags and converted tags is empty, while sanitized/normalized text, tokens and stable source-text IDs are preserved. Original snapshot/PDF bytes remain retained; the title operation does not change gameplay descriptors.

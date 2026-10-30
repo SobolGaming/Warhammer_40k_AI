@@ -683,7 +683,11 @@ def _validate_single_comparison(
     tool_binding = binding_enabled(family, specification)
     from tools import performance_tool_inputs_v2 as fresh
     from tools import performance_tool_inputs_v3 as current
+    from tools import performance_tool_inputs_v4 as exact
 
+    exact_binding = (
+        tool_binding and object_value(specification["input_binding"])["schema"] == exact.SCHEMA
+    )
     current_binding = (
         tool_binding and object_value(specification["input_binding"])["schema"] == current.SCHEMA
     )
@@ -692,7 +696,11 @@ def _validate_single_comparison(
     )
     if tool_binding:
         validate_binding(observed=report.get("input_binding"), expected=expected_binding)
-        if current_binding:
+        if exact_binding:
+            exact.validate_generated_evidence(
+                report.get("generated_output_binding"), object_value(expected_binding)
+            )
+        elif current_binding:
             current.validate_generated_evidence(
                 report.get("generated_output_binding"), object_value(expected_binding)
             )
@@ -718,7 +726,11 @@ def _validate_single_comparison(
         }
         | ({"owner_exception"} if "owner_exception" in report else set())
         | ({"input_binding"} if tool_binding else set())
-        | ({"generated_output_binding"} if fresh_binding or current_binding else set()),
+        | (
+            {"generated_output_binding"}
+            if fresh_binding or current_binding or exact_binding
+            else set()
+        ),
     )
     if (
         report["policy"],
