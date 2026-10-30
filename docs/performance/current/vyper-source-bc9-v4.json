@@ -3,11 +3,11 @@
     "completed": true,
     "concurrency": 1,
     "coverage": false,
-    "fixture_sha256": "4de4db1c49fcb90f5f97081df76ea4dff461321872ced989b91f01c301d1eeb8",
+    "fixture_sha256": "3795900cad94b2ac31efa9803a3cdad61af846cf8c30b03fd76e7c19993f8420",
     "host": {
       "cpu": "x86_64",
       "logical_cpus": 64,
-      "memory_bytes": 67359379456,
+      "memory_bytes": 67359391744,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
       "role": "provisional"
@@ -16,9 +16,9 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e1ecfcb90c91cd5f790bcab4390a43d3e85f7d10e6d36643d534339526930cee",
     "samples": {
       "orphan-write-independent-check": [
-        131.015,
-        129.749,
-        130.914
+        140.99,
+        139.93,
+        140.237
       ]
     },
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be"
@@ -1488,11 +1488,11 @@
     "completed": true,
     "concurrency": 1,
     "coverage": false,
-    "fixture_sha256": "4de4db1c49fcb90f5f97081df76ea4dff461321872ced989b91f01c301d1eeb8",
+    "fixture_sha256": "3795900cad94b2ac31efa9803a3cdad61af846cf8c30b03fd76e7c19993f8420",
     "host": {
       "cpu": "x86_64",
       "logical_cpus": 64,
-      "memory_bytes": 67359379456,
+      "memory_bytes": 67359391744,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
       "role": "provisional"
@@ -1501,14 +1501,14 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6eb801a8cc0f00e24f45d2ca24494fee279bada900cc28a19be549a2613a5bd5",
     "samples": {
       "orphan-write-independent-check": [
-        130.512,
-        130.207,
-        130.467
+        140.886,
+        139.227,
+        139.945
       ]
     },
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be"
   },
-  "head_input_digest": "acf5841c7cc93544bc53c7cfc6da416f9bced75504693370d393f3a9d01df738",
+  "head_input_digest": "5d6e7dd4a4acbec5c8a38c68a9776ecfae6255e735ba43954e3632e17a24a8e9",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6eb801a8cc0f00e24f45d2ca24494fee279bada900cc28a19be549a2613a5bd5",
   "historical_failures": [],
   "input_binding": {
@@ -5930,7 +5930,6 @@
       "tests/aircraft_helpers.py": "b9d44fff415a72e211841e28f382671d6fda77041ef67ab20956e6e83cf877a4",
       "tests/battle_shock_historical_helpers.py": "a73f555239a5647c6ad7d0668228c3c3475f7eae2661597b395b93b1f1a278a6",
       "tests/benchmarks/test_geometry_visibility_pathing_benchmarks.py": "8fcf7b1a4bb51cd5d39b77bdfb187a600c200c5eff4059c0a37b8222cd2f75fb",
-      "tests/category_migration_preservation.py": "3bd63fbde97911dc3bc5c796977755db5497d9da4a84d82cd06dc57588fe6e8f",
       "tests/chaos_defiler_catalog_helpers.py": "99e8d9690f4d28cfa73d4c0cfa9420bf89461038010e4966334dd87054fcca1a",
       "tests/characteristic_modifier_helpers.py": "5a68ce8dad60d67f76054f41e1ddf0a88a0a6e8e9bb507324216aea8f829ba3b",
       "tests/charge_distance_helpers.py": "a80495e4491882721165bc9dbfce05c284155693746f1b3fcf11cc7a98ae334a",
@@ -5943,7 +5942,6 @@
       "tests/code_quality/test_action_movement_interruption.py": "5b8c75d4718a754a2a082179bf3c95a8f4b65ad96e83ba9d52fa5c3b23ea25fa",
       "tests/code_quality/test_adapter_decision_contract.py": "1d0d7acece32a6434fd1805b1aa3d4169695746c97eff95796b358a4fa30abb1",
       "tests/code_quality/test_battle_shock_resolution_contract.py": "f47c0cfe7611a03dcaf5eb89890dad6869e4616b3e5d9b6b36d1ac4ba3b33053",
-      "tests/code_quality/test_category_migration_preservation.py": "16175a80e71a256b3faa172ee6e582072fb9de98e3d080c9aa89429b65ba176d",
       "tests/code_quality/test_ci_history_input.py": "204350bb9b037839d42c60975a35055d54aefbb0222f718b8937860464c18833",
       "tests/code_quality/test_ci_lookup_history.py": "2e3b3f8901aed5d55f0113b021f917da9f2fd14571579057291db7e1160e7379",
       "tests/code_quality/test_ci_performance_gates.py": "ec4760ea3dbb6935fb3d4e4b47cdaf1b988b2a2b1e4f3a909f0df04265b56daa",
@@ -7450,7 +7448,7 @@
       "tools/wahapedia_fetch.py": "9c605d9c3af086dc92e0663a4783dfdb426ac3268701a007fbe6f23fa503f7d3",
       "uv.lock": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75"
     },
-    "common_sha256": "4de4db1c49fcb90f5f97081df76ea4dff461321872ced989b91f01c301d1eeb8",
+    "common_sha256": "3795900cad94b2ac31efa9803a3cdad61af846cf8c30b03fd76e7c19993f8420",
     "family": "external_contract_source_reuse",
     "harness": {
       "base": {
@@ -7473,8 +7471,8 @@
       },
       "sha256": "668e1d9ffc5104327d60bf4339f6400737559b0b23c7719b813e42481b53990a"
     },
-    "head_input_digest": "acf5841c7cc93544bc53c7cfc6da416f9bced75504693370d393f3a9d01df738",
-    "role_spec_sha256": "6692225f25457799c65ee3a71b479c13e4a967fe768918815a0d59bf9aa19810",
+    "head_input_digest": "5d6e7dd4a4acbec5c8a38c68a9776ecfae6255e735ba43954e3632e17a24a8e9",
+    "role_spec_sha256": "0df4b51388949aa86d8fd0cc4f0952e49341d80a6bd1c57754971209576fd258",
     "schema": "tool-input-roles-v4",
     "sides": {
       "base": {
@@ -7482,9 +7480,12 @@
           "data/source_audits/ci64_provenance_v1/test-cutover.json": "0553533ffddce95eba47ce92615a13ff479739ab9317ae776a6c23e5dd26fc8c",
           "data/source_audits/supported_rules_2026_10/vyper-binding.json": null,
           "docs/performance/policy-v3/operation-map.json": "bc0083148585d3ae3c2dfcf3099e4755655160747f0dbc33c1feec0c0473bcbe",
+          "docs/performance/policy-v3/vyper-provenance-20261030/phase14a-predecessor.py.txt": null,
           "docs/performance/policy-v3/vyper-source-input-roles-v4.json": null,
           "scripts/check_performance_policy.py": "01310f1cdba3520f77cf0c877c9f818eeb32e23e79ae448c2064b5de4053e779",
           "scripts/measure_vyper_source_binding.py": null,
+          "tests/category_migration_preservation.py": "3bd63fbde97911dc3bc5c796977755db5497d9da4a84d82cd06dc57588fe6e8f",
+          "tests/code_quality/test_category_migration_preservation.py": "16175a80e71a256b3faa172ee6e582072fb9de98e3d080c9aa89429b65ba176d",
           "tests/code_quality/test_current_comparison_routing.py": "31451a8c17a8dffc81029a1693fd966938ba726b883e20dd8d3ae9adaf3b78b2",
           "tests/code_quality/test_generated_ability_support_artifacts.py": "d74b2edf600ef329eec26529ecb1f71c50f2831dce9abf35d48bb020627d5936",
           "tests/code_quality/test_performance_tool_inputs_v2.py": "69cc8f3a9f5ba1ea2a7cae9921ca95779566cb04e65cae2c82b54ba1bf220565",
@@ -13486,19 +13487,22 @@
         "control_plane": {
           "data/source_audits/ci64_provenance_v1/test-cutover.json": "8a4ced7715840f56a4c217437e3acb81878e89b1d7baf0a74000787ce9fe87ca",
           "data/source_audits/supported_rules_2026_10/vyper-binding.json": "1c7dfb6c0f8a42e722ddaeb51f24826d0f87ce4bd9edb2d57359b735df1835ef",
-          "docs/performance/policy-v3/operation-map.json": "58544ab17a4236ed5da8ecd628a86f62f894a9acffd7e98886cc63c4beb13a8a",
-          "docs/performance/policy-v3/vyper-source-input-roles-v4.json": "cf03cf629bc9f8d5afee9f122aa3cdbe3130614c4414b1497156802647ae9d87",
+          "docs/performance/policy-v3/operation-map.json": "0de7ccdda63d9f451a2e998e2e0b8e01604b61d0263d6168c4e3a224fa279794",
+          "docs/performance/policy-v3/vyper-provenance-20261030/phase14a-predecessor.py.txt": "d67b860dbe557bd557536537d43c466176e2e6d14e1e48d6b8c08c1cb4d34eaf",
+          "docs/performance/policy-v3/vyper-source-input-roles-v4.json": "76d0e3bc6cd71c5205cabf30c990f16bf190632953d5fec2978ac660abb7c37f",
           "scripts/check_performance_policy.py": "86b6a22b38a1d74ee074b902395133778e44a1ab54723a544d5c34924d73d3a6",
           "scripts/measure_vyper_source_binding.py": "b36f5722f72e70148645a711d575e12b9512216b6b0ec96a5956809fc2b71af9",
+          "tests/category_migration_preservation.py": "4c645b71cac9fa8dca23cb3e5fd6e6149dff476ccccf4aa3a3e6f170057a1822",
+          "tests/code_quality/test_category_migration_preservation.py": "0a8ed008d2bd234a354208ddb5aa1456741742188672ae6d0dc690a98860bc30",
           "tests/code_quality/test_current_comparison_routing.py": "e4dc1f9a2a2368eb202868fdb3aff3babeb7f38659687e7047b5d35f06b10831",
           "tests/code_quality/test_generated_ability_support_artifacts.py": "a7b8c693d1ab79195d989777a3a8d02d97c05d0acad94a971acd0fa52e638380",
           "tests/code_quality/test_performance_tool_inputs_v2.py": "287adadae7d83ba2860fb0f39e091df467b67899017d8a16fe29dc11f81173fa",
-          "tests/code_quality/test_phase14a_source_identity.py": "f004e500e5e3548af581d2bf5a3df16505fd63354bd39a48963a86508f8983a7",
+          "tests/code_quality/test_phase14a_source_identity.py": "4d4edccdda4369e6e0aeafb41d0f13ed4dcad0696ccefaa86149cb8de1516302",
           "tests/code_quality/test_ws12_generated_data_artifacts.py": "727a3107c8af13b9cf2937fd06c59fbd84351dc93b5b01167b35c313b97af285",
           "tests/rules/section25/test_mfm.py": "6d2758590363c16f2f72048780631028cf67cc59e297740ca96b5f5c93e5696a",
           "tools/performance_policy.py": "74462b456e357fac5d5490243248d061eed0459838d5b75a3baa7bb5ec0daf7c",
           "tools/performance_tool_inputs.py": "f15d4371b8b013bf709c32ff429c1538911d422142791ae65dd435e80c72cbe9",
-          "tools/performance_tool_inputs_v4.py": "81dac96d51388980ecf37c7f48ce0c125e05919e0b0ab006ddca6317c89ec577"
+          "tools/performance_tool_inputs_v4.py": "2df3f461775dfe1a4cf3e0e8560268346d0d55f2d484bc2e443222533b76de39"
         },
         "derived_outputs": {
           "contracts/examples/persistence/session-persistence.json": "24ec39e2980cf72ac1c53e60da898ba4edbd59781ed59cf759fa75e953def139",
@@ -14686,8 +14690,9 @@
           "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Stratagems.json": "fd437e999b2cf484e76dd84307e00125f054b548dd10a3bfeb97dfa38293a514",
           "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/source_package_manifest.json": "cb2f1c5c7f658c428faffe8bc599fc4739ec0cd95534b1ba256d238288770f32",
           "data/source_snapshots/wahapedia/10th-edition/2026-06-14/raw/source_snapshot.json": "19a1a84df2a31224604db2dfb2fb22d9af7636a18ac7cce5560c0ee99fe798dc",
-          "docs/performance/policy-v3/operation-map.json": "58544ab17a4236ed5da8ecd628a86f62f894a9acffd7e98886cc63c4beb13a8a",
-          "docs/performance/policy-v3/vyper-source-input-roles-v4.json": "cf03cf629bc9f8d5afee9f122aa3cdbe3130614c4414b1497156802647ae9d87",
+          "docs/performance/policy-v3/operation-map.json": "0de7ccdda63d9f451a2e998e2e0b8e01604b61d0263d6168c4e3a224fa279794",
+          "docs/performance/policy-v3/vyper-provenance-20261030/phase14a-predecessor.py.txt": "d67b860dbe557bd557536537d43c466176e2e6d14e1e48d6b8c08c1cb4d34eaf",
+          "docs/performance/policy-v3/vyper-source-input-roles-v4.json": "76d0e3bc6cd71c5205cabf30c990f16bf190632953d5fec2978ac660abb7c37f",
           "docs/source_rules/faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf": "5beadb2c29e100a31bb7ee54f429498555e07430997063111aa4694556568f97",
           "docs/source_rules/tacoma-open-2026-source-package.json": "6723634f13a3ccb0239c1238fef7847163550a532fb9ff0dc7578ada0ea14e38",
           "pyproject.toml": "42c1a1c4db411da62bba612820d1922dd50b838e7f93bfd3ceb11aa7b516f513",
@@ -17959,7 +17964,7 @@
           "tests/aircraft_helpers.py": "b9d44fff415a72e211841e28f382671d6fda77041ef67ab20956e6e83cf877a4",
           "tests/battle_shock_historical_helpers.py": "a73f555239a5647c6ad7d0668228c3c3475f7eae2661597b395b93b1f1a278a6",
           "tests/benchmarks/test_geometry_visibility_pathing_benchmarks.py": "8fcf7b1a4bb51cd5d39b77bdfb187a600c200c5eff4059c0a37b8222cd2f75fb",
-          "tests/category_migration_preservation.py": "3bd63fbde97911dc3bc5c796977755db5497d9da4a84d82cd06dc57588fe6e8f",
+          "tests/category_migration_preservation.py": "4c645b71cac9fa8dca23cb3e5fd6e6149dff476ccccf4aa3a3e6f170057a1822",
           "tests/chaos_defiler_catalog_helpers.py": "99e8d9690f4d28cfa73d4c0cfa9420bf89461038010e4966334dd87054fcca1a",
           "tests/characteristic_modifier_helpers.py": "5a68ce8dad60d67f76054f41e1ddf0a88a0a6e8e9bb507324216aea8f829ba3b",
           "tests/charge_distance_helpers.py": "a80495e4491882721165bc9dbfce05c284155693746f1b3fcf11cc7a98ae334a",
@@ -17972,7 +17977,7 @@
           "tests/code_quality/test_action_movement_interruption.py": "5b8c75d4718a754a2a082179bf3c95a8f4b65ad96e83ba9d52fa5c3b23ea25fa",
           "tests/code_quality/test_adapter_decision_contract.py": "1d0d7acece32a6434fd1805b1aa3d4169695746c97eff95796b358a4fa30abb1",
           "tests/code_quality/test_battle_shock_resolution_contract.py": "f47c0cfe7611a03dcaf5eb89890dad6869e4616b3e5d9b6b36d1ac4ba3b33053",
-          "tests/code_quality/test_category_migration_preservation.py": "16175a80e71a256b3faa172ee6e582072fb9de98e3d080c9aa89429b65ba176d",
+          "tests/code_quality/test_category_migration_preservation.py": "0a8ed008d2bd234a354208ddb5aa1456741742188672ae6d0dc690a98860bc30",
           "tests/code_quality/test_ci_history_input.py": "204350bb9b037839d42c60975a35055d54aefbb0222f718b8937860464c18833",
           "tests/code_quality/test_ci_lookup_history.py": "2e3b3f8901aed5d55f0113b021f917da9f2fd14571579057291db7e1160e7379",
           "tests/code_quality/test_ci_performance_gates.py": "ec4760ea3dbb6935fb3d4e4b47cdaf1b988b2a2b1e4f3a909f0df04265b56daa",
@@ -18097,7 +18102,7 @@
           "tests/code_quality/test_performance_static_successor.py": "d692fa9c0e99d4e17fb36257b82ff115caadc0be97ac4e3f7e201597ee3ae559",
           "tests/code_quality/test_performance_tool_inputs.py": "3847fc6a3db10414abde698c504d1b5a9b186f295fec3e3ff7b2fc0cb8baacf6",
           "tests/code_quality/test_performance_tool_inputs_v2.py": "287adadae7d83ba2860fb0f39e091df467b67899017d8a16fe29dc11f81173fa",
-          "tests/code_quality/test_phase14a_source_identity.py": "f004e500e5e3548af581d2bf5a3df16505fd63354bd39a48963a86508f8983a7",
+          "tests/code_quality/test_phase14a_source_identity.py": "4d4edccdda4369e6e0aeafb41d0f13ed4dcad0696ccefaa86149cb8de1516302",
           "tests/code_quality/test_phase14c_shared_primitives.py": "d07731c69d93bdbb900cdd42517b1f29037a525e0e79a3bb705164b2a9ee4629",
           "tests/code_quality/test_phase14h_attack_resolution_convergence.py": "6950af8fefe2a62e96e5fa1b4d3f759e2a26b2178f64dbac7de70bc305342b7f",
           "tests/code_quality/test_phase14i_14h_closeout.py": "a721cf1a94365b034a3e1cabbe1bd6292a12402b05cbf73bab24cd37f39c77e6",
@@ -19481,7 +19486,7 @@
           "tools/performance_tool_inputs.py": "f15d4371b8b013bf709c32ff429c1538911d422142791ae65dd435e80c72cbe9",
           "tools/performance_tool_inputs_v2.py": "e32fbfcd15747522f64bfefde20318defe397e2c152a2d80743ada8ff68568b0",
           "tools/performance_tool_inputs_v3.py": "5572c99bec3b6002dfb9922faec51f0948a3a893425ae3bfa01609d648c686cf",
-          "tools/performance_tool_inputs_v4.py": "81dac96d51388980ecf37c7f48ce0c125e05919e0b0ab006ddca6317c89ec577",
+          "tools/performance_tool_inputs_v4.py": "2df3f461775dfe1a4cf3e0e8560268346d0d55f2d484bc2e443222533b76de39",
           "tools/promote_july_faction_packs.py": "d864a6e5df27a4f3be9714838e3109ff36189140664109ff5365eac5a58062d6",
           "tools/quality_runtime_successor.py": "de0d1a9ed29b0efe9dffa15667c03854204fe390588f81a55817acea841f2c80",
           "tools/thousand_sons_perils_preservation.py": "32718561e2154c6c869e66b411328e8a953b4d3365b884a535503fc3136cc0cc",
@@ -19491,8 +19496,8 @@
           "tools/wahapedia_fetch.py": "9c605d9c3af086dc92e0663a4783dfdb426ac3268701a007fbe6f23fa503f7d3",
           "uv.lock": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75"
         },
-        "inventory_sha256": "88993bf9f769ca4e6d1a76ecff1cf40603fe39379924f1bfef5056a5c7ddedfc",
-        "revision": "c918319f02e1da5f221eb54a589e48fe55d5d194"
+        "inventory_sha256": "63f3bfee61029d7badcfc1b223cc0204dd968efa16c4c2253a985d7f27047d34",
+        "revision": "3c85735f84231afdd4b4465df2eed755669be166"
       }
     }
   },
