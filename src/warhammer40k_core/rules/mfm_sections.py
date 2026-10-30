@@ -4,6 +4,7 @@ from warhammer40k_core.rules.mfm_validation import MfmSourceError
 
 SUPPORTED_MFM_SECTION_IDS = frozenset(
     (
+        "anathema-psykana",
         "blood-legions",
         "detachments",
         "every-model-has-the-imperium-keyword",

@@ -4,13 +4,16 @@ import hashlib
 import json
 import re
 from dataclasses import dataclass, field
-from typing import Self, TypedDict
+from typing import Self
 
 from warhammer40k_core.rules.mfm_html_tree import (
     HtmlNode as _HtmlNode,
 )
 from warhammer40k_core.rules.mfm_html_tree import (
     direct_node_children as _direct_node_children,
+)
+from warhammer40k_core.rules.mfm_html_tree import (
+    enhancement_wrappers as _enhancement_wrappers,
 )
 from warhammer40k_core.rules.mfm_html_tree import (
     first_direct_node_child as _first_direct_node_child,
@@ -31,7 +34,43 @@ from warhammer40k_core.rules.mfm_html_tree import (
     parse_html as _parse_html,
 )
 from warhammer40k_core.rules.mfm_html_tree import (
+    resolve_streamed_structure as _resolve_streamed_structure,
+)
+from warhammer40k_core.rules.mfm_html_tree import (
+    template_texts as _template_texts,
+)
+from warhammer40k_core.rules.mfm_html_tree import (
     walk as _walk,
+)
+from warhammer40k_core.rules.mfm_payloads import (
+    MfmDetachmentRecordPayload as MfmDetachmentRecordPayload,
+)
+from warhammer40k_core.rules.mfm_payloads import (
+    MfmEnhancementRecordPayload as MfmEnhancementRecordPayload,
+)
+from warhammer40k_core.rules.mfm_payloads import (
+    MfmFactionRecordPayload as MfmFactionRecordPayload,
+)
+from warhammer40k_core.rules.mfm_payloads import (
+    MfmIndexFactionPayload as MfmIndexFactionPayload,
+)
+from warhammer40k_core.rules.mfm_payloads import (
+    MfmLeaderAllowancePayload as MfmLeaderAllowancePayload,
+)
+from warhammer40k_core.rules.mfm_payloads import (
+    MfmSourcePackagePayload as MfmSourcePackagePayload,
+)
+from warhammer40k_core.rules.mfm_payloads import (
+    MfmUnitCostBracketPayload as MfmUnitCostBracketPayload,
+)
+from warhammer40k_core.rules.mfm_payloads import (
+    MfmUnitCostRowPayload as MfmUnitCostRowPayload,
+)
+from warhammer40k_core.rules.mfm_payloads import (
+    MfmUnitRecordPayload as MfmUnitRecordPayload,
+)
+from warhammer40k_core.rules.mfm_payloads import (
+    MfmWargearCostPayload as MfmWargearCostPayload,
 )
 from warhammer40k_core.rules.mfm_sections import (
     mfm_section_is_supported as _mfm_section_is_supported,
@@ -82,108 +121,6 @@ from warhammer40k_core.rules.mfm_validation import (
     validate_url_path as _validate_url_path,
 )
 from warhammer40k_core.rules.text_normalization import normalize_source_label
-
-
-class MfmIndexFactionPayload(TypedDict):
-    faction_id: str
-    raw_name: str
-    name: str
-    url_path: str
-
-
-class MfmUnitCostRowPayload(TypedDict):
-    raw_label: str
-    label: str
-    model_count: int | None
-    model_name: str | None
-    model_id: str | None
-    model_component_counts: list[int]
-    model_component_names: list[str]
-    model_component_ids: list[str]
-    additional_model_count: int | None
-    additional_model_name: str | None
-    additional_model_id: str | None
-    points: int
-    source_id: str
-
-
-class MfmUnitCostBracketPayload(TypedDict):
-    raw_label: str
-    label: str
-    unit_number_min: int
-    unit_number_max: int | None
-    rows: list[MfmUnitCostRowPayload]
-    source_id: str
-
-
-class MfmWargearCostPayload(TypedDict):
-    raw_name: str
-    name: str
-    wargear_id: str
-    points_per_item: int
-    source_id: str
-
-
-class MfmLeaderAllowancePayload(TypedDict):
-    allowed_bodyguard_unit_ids: list[str]
-    allowed_bodyguard_names: list[str]
-    source_id: str
-
-
-class MfmUnitRecordPayload(TypedDict):
-    record_id: str
-    unit_id: str
-    raw_name: str
-    name: str
-    source_section_id: str | None
-    source_section_name: str | None
-    cost_brackets: list[MfmUnitCostBracketPayload]
-    wargear_costs: list[MfmWargearCostPayload]
-    leader_allowance: MfmLeaderAllowancePayload | None
-    support_allowance: MfmLeaderAllowancePayload | None
-    source_id: str
-
-
-class MfmEnhancementRecordPayload(TypedDict):
-    enhancement_id: str
-    raw_name: str
-    name: str
-    points: int
-    is_upgrade: bool
-    leader_allowance: MfmLeaderAllowancePayload | None
-    source_id: str
-
-
-class MfmDetachmentRecordPayload(TypedDict):
-    detachment_id: str
-    raw_name: str
-    name: str
-    force_disposition_id: str | None
-    detachment_point_cost: int | None
-    enhancements: list[MfmEnhancementRecordPayload]
-    source_id: str
-
-
-class MfmFactionRecordPayload(TypedDict):
-    faction_id: str
-    raw_name: str
-    name: str
-    url_path: str
-    detachments: list[MfmDetachmentRecordPayload]
-    units: list[MfmUnitRecordPayload]
-    source_id: str
-
-
-class MfmSourcePackagePayload(TypedDict):
-    source_package_id: str
-    source_title: str
-    source_version: str
-    source_date: str
-    source_url: str
-    excluded_faction_ids: list[str]
-    factions: list[MfmFactionRecordPayload]
-    source_payload_checksum_sha256: str
-
 
 _NON_IDENTIFIER_TEXT_RE = re.compile(r"[^a-z0-9]+")
 _MODEL_COUNT_RE = re.compile(r"^(?P<count>[1-9][0-9]*)\s+models?$", re.IGNORECASE)
@@ -614,6 +551,7 @@ class MfmEnhancementRecord:
     is_upgrade: bool
     leader_allowance: MfmLeaderAllowance | None = None
     source_id: str = ""
+    support_allowance: MfmLeaderAllowance | None = None
 
     def __post_init__(self) -> None:
         name = normalize_source_label(self.raw_name)
@@ -635,6 +573,11 @@ class MfmEnhancementRecord:
             raise MfmSourceError(
                 "MfmEnhancementRecord leader_allowance must be MfmLeaderAllowance."
             )
+        if (
+            self.support_allowance is not None
+            and type(self.support_allowance) is not MfmLeaderAllowance
+        ):
+            raise MfmSourceError("MFM enhancement support allowance must be typed.")
         object.__setattr__(self, "source_id", _validate_source_id(self.source_id))
 
     @property
@@ -642,7 +585,7 @@ class MfmEnhancementRecord:
         return normalize_source_label(self.raw_name)
 
     def to_payload(self) -> MfmEnhancementRecordPayload:
-        return {
+        payload: MfmEnhancementRecordPayload = {
             "enhancement_id": self.enhancement_id,
             "raw_name": self.raw_name,
             "name": self.name,
@@ -653,6 +596,10 @@ class MfmEnhancementRecord:
             ),
             "source_id": self.source_id,
         }
+
+        if self.support_allowance is not None:
+            payload["support_allowance"] = self.support_allowance.to_payload()
+        return payload
 
     @classmethod
     def from_payload(cls, payload: MfmEnhancementRecordPayload) -> Self:
@@ -667,6 +614,11 @@ class MfmEnhancementRecord:
                 else MfmLeaderAllowance.from_payload(payload["leader_allowance"])
             ),
             source_id=payload["source_id"],
+            support_allowance=(
+                MfmLeaderAllowance.from_payload(payload["support_allowance"])
+                if "support_allowance" in payload
+                else None
+            ),
         )
         if record.name != payload["name"]:
             raise MfmSourceError("MfmEnhancementRecord payload name is stale.")
@@ -681,6 +633,7 @@ class MfmDetachmentRecord:
     detachment_point_cost: int | None
     enhancements: tuple[MfmEnhancementRecord, ...]
     source_id: str
+    force_disposition_ids: tuple[str, ...] | None = None
 
     def __post_init__(self) -> None:
         name = normalize_source_label(self.raw_name)
@@ -705,6 +658,13 @@ class MfmDetachmentRecord:
                 self.detachment_point_cost,
             ),
         )
+        if self.force_disposition_ids is not None:
+            values = _validate_identifier_tuple("force_disposition_ids", self.force_disposition_ids)
+            if not values or values[0] != self.force_disposition_id:
+                raise MfmSourceError(
+                    "MFM current dispositions must include the primary disposition first."
+                )
+            object.__setattr__(self, "force_disposition_ids", values)
         object.__setattr__(self, "enhancements", _validate_enhancements(self.enhancements))
         object.__setattr__(self, "source_id", _validate_source_id(self.source_id))
 
@@ -712,8 +672,14 @@ class MfmDetachmentRecord:
     def name(self) -> str:
         return normalize_source_label(self.raw_name)
 
+    @property
+    def allowed_force_disposition_ids(self) -> tuple[str, ...]:
+        if self.force_disposition_ids is not None:
+            return self.force_disposition_ids
+        return () if self.force_disposition_id is None else (self.force_disposition_id,)
+
     def to_payload(self) -> MfmDetachmentRecordPayload:
-        return {
+        payload: MfmDetachmentRecordPayload = {
             "detachment_id": self.detachment_id,
             "raw_name": self.raw_name,
             "name": self.name,
@@ -722,6 +688,10 @@ class MfmDetachmentRecord:
             "enhancements": [enhancement.to_payload() for enhancement in self.enhancements],
             "source_id": self.source_id,
         }
+
+        if self.force_disposition_ids is not None:
+            payload["force_disposition_ids"] = list(self.force_disposition_ids)
+        return payload
 
     @classmethod
     def from_payload(cls, payload: MfmDetachmentRecordPayload) -> Self:
@@ -735,6 +705,11 @@ class MfmDetachmentRecord:
                 for enhancement in payload["enhancements"]
             ),
             source_id=payload["source_id"],
+            force_disposition_ids=(
+                tuple(payload["force_disposition_ids"])
+                if "force_disposition_ids" in payload
+                else None
+            ),
         )
         if record.name != payload["name"]:
             raise MfmSourceError("MfmDetachmentRecord payload name is stale.")
@@ -965,6 +940,7 @@ def parse_mfm_faction_html(
     root = _parse_html(html)
     template_nodes = _template_nodes(root)
     template_texts = _template_texts(template_nodes)
+    root = _resolve_streamed_structure(root)
     units = _parse_unit_cards(
         root=root,
         template_nodes=template_nodes,
@@ -1178,7 +1154,7 @@ def _parse_detachment_cards(
         detachment_name = title_spans[0]
         detachment_id = source_label_slug(detachment_name)
         source_prefix = f"{source_package_id}:faction:{faction_id}:detachment:{detachment_id}"
-        force_disposition_id: str | None = None
+        force_disposition_ids: list[str] = []
         detachment_point_cost = _parse_detachment_points(title_spans[1])
         enhancements: list[MfmEnhancementRecord] = []
         for section in _direct_node_children(card):
@@ -1198,12 +1174,12 @@ def _parse_detachment_cards(
                 continue
             if section_text.upper().startswith("UNIQUE:"):
                 continue
-            if force_disposition_id is None:
-                force_disposition_id = source_label_slug(section_text)
+            force_disposition_ids.append(source_label_slug(section_text))
         record = MfmDetachmentRecord(
             detachment_id=detachment_id,
             raw_name=detachment_name,
-            force_disposition_id=force_disposition_id,
+            force_disposition_id=force_disposition_ids[0] if force_disposition_ids else None,
+            force_disposition_ids=tuple(force_disposition_ids),
             detachment_point_cost=detachment_point_cost,
             enhancements=tuple(enhancements),
             source_id=source_prefix,
@@ -1282,12 +1258,7 @@ def _enhancements_from_section(
     source_prefix: str,
 ) -> tuple[MfmEnhancementRecord, ...]:
     enhancements: list[MfmEnhancementRecord] = []
-    wrappers = [
-        node
-        for node in _walk(section, tag="div")
-        if any(child.tag == "li" for child in _direct_node_children(node))
-    ]
-    for wrapper in wrappers:
+    for wrapper in _enhancement_wrappers(section):
         li = next(child for child in _direct_node_children(wrapper) if child.tag == "li")
         spans = [_node_text(span) for span in _walk(li, tag="span")]
         if len(spans) < 2:
@@ -1307,6 +1278,11 @@ def _enhancements_from_section(
                 points=points,
                 is_upgrade=name.lower().endswith(" (upgrade)"),
                 leader_allowance=leader_allowance,
+                support_allowance=_enhancement_leader_allowance_from_wrapper(
+                    wrapper=wrapper,
+                    source_id=f"{source_prefix}:enhancement:{enhancement_id}:support",
+                    role="SUPPORT:",
+                ),
                 source_id=f"{source_prefix}:enhancement:{enhancement_id}",
             )
         )
@@ -1408,10 +1384,11 @@ def _enhancement_leader_allowance_from_wrapper(
     *,
     wrapper: _HtmlNode,
     source_id: str,
+    role: str = "LEADER:",
 ) -> MfmLeaderAllowance | None:
     for div in _walk(wrapper, tag="div"):
         spans = [_node_text(span) for span in _walk(div, tag="span")]
-        if len(spans) >= 2 and spans[0].upper() == "LEADER:":
+        if len(spans) >= 2 and spans[0].upper() == role:
             names = tuple(
                 normalize_source_label(name) for name in _split_attachment_names(spans[1])
             )
@@ -1448,18 +1425,6 @@ def _template_nodes(root: _HtmlNode) -> dict[str, _HtmlNode]:
     if not nodes:
         raise MfmSourceError("MFM page did not contain streamed template nodes.")
     return nodes
-
-
-def _template_texts(template_nodes: dict[str, _HtmlNode]) -> dict[str, str]:
-    texts: dict[str, str] = {}
-    for template_id, node in template_nodes.items():
-        text = _node_text(node)
-        if not text:
-            continue
-        texts[template_id] = text
-    if not texts:
-        raise MfmSourceError("MFM page did not contain streamed template values.")
-    return texts
 
 
 def _section_li_nodes(

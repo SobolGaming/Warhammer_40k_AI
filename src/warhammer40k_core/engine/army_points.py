@@ -319,13 +319,13 @@ def _detachments_with_mfm_rules(
         )
         if mfm_detachment.detachment_point_cost is None:
             raise ArmyPointsError("MFM detachment is missing its Detachment Points value.")
-        if mfm_detachment.force_disposition_id is None:
+        if not mfm_detachment.allowed_force_disposition_ids:
             raise ArmyPointsError("MFM detachment is missing its Force Disposition.")
         updated.append(
             replace(
                 detachment,
                 detachment_point_cost=mfm_detachment.detachment_point_cost,
-                force_disposition_ids=(mfm_detachment.force_disposition_id,),
+                force_disposition_ids=mfm_detachment.allowed_force_disposition_ids,
             )
         )
     return tuple(updated)
@@ -728,7 +728,7 @@ def _current_mfm_faction_by_ids(requested_ids: tuple[str, str]) -> MfmFactionRec
 
 
 def _current_mfm_supported_faction_ids() -> tuple[str, ...]:
-    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_07 import (
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_10 import (
         supported_faction_ids,
     )
 
@@ -736,7 +736,7 @@ def _current_mfm_supported_faction_ids() -> tuple[str, ...]:
 
 
 def _current_mfm_faction_record(faction_id: str) -> MfmFactionRecord:
-    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_07 import (
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_10 import (
         faction_record,
     )
 

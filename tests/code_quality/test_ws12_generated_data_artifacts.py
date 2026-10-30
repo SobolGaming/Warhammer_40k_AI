@@ -229,6 +229,7 @@ _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
     ),
     "mfm_2026_06": "official_points_source",
     "mfm_2026_07": "official_points_source",
+    "mfm_2026_10": "official_points_source",
 }
 
 

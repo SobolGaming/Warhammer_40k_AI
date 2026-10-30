@@ -30258,6 +30258,116 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "mfm-current-army-construction": {
+      "paths": [
+        "src/warhammer40k_core/engine/army_points.py"
+      ],
+      "owners": [
+        "_current_mfm_faction_record",
+        "_current_mfm_supported_faction_ids",
+        "_detachments_with_mfm_rules"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "mfm-source-boundary-reconciliation": {
+      "paths": [
+        "src/warhammer40k_core/rules/mfm_html_tree.py",
+        "src/warhammer40k_core/rules/mfm_payloads.py",
+        "src/warhammer40k_core/rules/mfm_sections.py",
+        "src/warhammer40k_core/rules/mfm_source.py"
+      ],
+      "owners": [
+        "@module",
+        "MfmDetachmentRecord",
+        "MfmDetachmentRecord.__post_init__",
+        "MfmDetachmentRecord.allowed_force_disposition_ids",
+        "MfmDetachmentRecord.from_payload",
+        "MfmDetachmentRecord.to_payload",
+        "MfmDetachmentRecordPayload",
+        "MfmEnhancementRecord",
+        "MfmEnhancementRecord.__post_init__",
+        "MfmEnhancementRecord.from_payload",
+        "MfmEnhancementRecord.to_payload",
+        "MfmEnhancementRecordPayload",
+        "MfmFactionRecordPayload",
+        "MfmIndexFactionPayload",
+        "MfmLeaderAllowancePayload",
+        "MfmSourcePackagePayload",
+        "MfmUnitCostBracketPayload",
+        "MfmUnitCostRowPayload",
+        "MfmUnitRecordPayload",
+        "MfmWargearCostPayload",
+        "_enhancement_leader_allowance_from_wrapper",
+        "_enhancements_from_section",
+        "_parse_detachment_cards",
+        "_template_texts",
+        "enhancement_wrappers",
+        "parse_mfm_faction_html",
+        "resolve_streamed_structure",
+        "template_texts"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "mfm-source-import-and-review": {
+      "paths": [
+        "tools/import_mfm_points.py",
+        "tools/build_mfm_update_review.py",
+        "data/source_audits/mfm_2026_10/*",
+        "data/source_manifests/mfm_2026_10_review.json",
+        "data/source_manifests/mfm_2026_10_sources.json"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_current_detachment_rule_signature",
+        "_enhancement_leader_signature",
+        "_enhancement_support_signature",
+        "_fetch_url",
+        "_parse_args",
+        "_support_signature",
+        "_write_package_artifacts",
+        "build_current_review_payload",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "mfm-current-regression-controls": {
+      "paths": [
+        "tests/rules/section25/test_mfm.py"
+      ],
+      "owners": [
+        "@module",
+        "_current_mfm_catalog",
+        "test_current_mfm_default_enhancement_points_reach_roster_total",
+        "test_current_mfm_default_prices_repeated_units_and_detachment_disposition",
+        "test_current_mfm_detachment_cost_replaces_previous_charge",
+        "test_current_mfm_new_attachment_permissions_reach_real_mustering",
+        "test_current_mfm_new_wargear_surcharge_prices_selected_equipment",
+        "test_current_mfm_reproduces_all_checked_official_pages_and_review",
+        "test_current_mfm_v3_rejects_missing_or_inconsistent_dispositions",
+        "test_mfm_streamed_cards_keep_own_section_and_current_enhancement_rows"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "mfm-current-behavior-profile": {
+      "paths": [
+        "ci/test_shards/*"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

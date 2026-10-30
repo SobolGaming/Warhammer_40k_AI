@@ -15,6 +15,7 @@ from warhammer40k_core.rules.mfm_source import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     mfm_2026_06,
     mfm_2026_07,
+    mfm_2026_10,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,10 +29,18 @@ class MfmReviewError(ValueError):
 
 def main() -> None:
     args = _parse_args()
-    payload = build_review_payload(
-        previous=mfm_2026_06.source_package(),
-        current=mfm_2026_07.source_package(),
+    payload = (
+        build_current_review_payload()
+        if args.current
+        else build_review_payload(
+            previous=mfm_2026_06.source_package(),
+            current=mfm_2026_07.source_package(),
+        )
     )
+    if args.output is None:
+        args.output = (
+            DEFAULT_OUTPUT.with_name("mfm_2026_10_review.json") if args.current else DEFAULT_OUTPUT
+        )
     rendered = json.dumps(payload, sort_keys=True, indent=2) + "\n"
     if args.check:
         if not args.output.is_file():
@@ -77,6 +86,109 @@ def build_review_payload(
         "summary": _review_summary(faction_payloads),
         "factions": faction_payloads,
     }
+
+
+def build_current_review_payload() -> dict[str, object]:
+    previous = mfm_2026_07.source_package()
+    current = mfm_2026_10.source_package()
+    payload = build_review_payload(previous=previous, current=current)
+    factions: dict[str, dict[str, object]] = {}
+    for old, new in zip(previous.factions, current.factions, strict=True):
+        if old.faction_id != new.faction_id:
+            raise MfmReviewError("Current MFM review faction order differs.")
+        row = _faction_review(previous=old, current=new)
+        row["detachment_rules_changed"] = _changed_ids(
+            {d.detachment_id: d for d in old.detachments},
+            {d.detachment_id: d for d in new.detachments},
+            _current_detachment_rule_signature,
+        )
+        old_units = {unit.record_id: unit for unit in old.units}
+        new_units = {unit.record_id: unit for unit in new.units}
+        old_enhancements = _enhancements_by_id(old)
+        new_enhancements = _enhancements_by_id(new)
+        row["support_assignments_changed"] = _changed_ids(old_units, new_units, _support_signature)
+        row["enhancement_records_added"] = sorted(new_enhancements.keys() - old_enhancements.keys())
+        row["enhancement_records_removed"] = sorted(
+            old_enhancements.keys() - new_enhancements.keys()
+        )
+        row["enhancement_leader_assignments_changed"] = _changed_ids(
+            old_enhancements, new_enhancements, _enhancement_leader_signature
+        )
+        row["enhancement_support_assignments_changed"] = _changed_ids(
+            old_enhancements, new_enhancements, _enhancement_support_signature
+        )
+        row["status"] = (
+            "changed"
+            if any(
+                value
+                for key, value in row.items()
+                if key.endswith(("_added", "_removed", "_changed"))
+            )
+            else "unchanged"
+        )
+        factions[new.faction_id] = row
+    summary = _review_summary(factions)
+    for field in (
+        "support_assignments_changed",
+        "enhancement_records_added",
+        "enhancement_records_removed",
+        "enhancement_leader_assignments_changed",
+        "enhancement_support_assignments_changed",
+    ):
+        summary[field] = sum(len(_required_list(row[field])) for row in factions.values())
+    payload.update(
+        {
+            "review_schema": "core-v2-mfm-update-review-v2",
+            "factions": factions,
+            "summary": summary,
+            "support_scope": (
+                "Source records and prices only; additions do not grant catalog "
+                "or semantic execution support."
+            ),
+            "blocked_enhancement_support": [
+                {
+                    "faction_id": "necrons",
+                    "detachment_id": "cursed-legion",
+                    "enhancement_id": "murdermind",
+                    "points": 15,
+                    "source_metadata_status": "captured_in_v3_typed_support_allowance",
+                    "allowed_bodyguard_unit_ids": [
+                        "lokhust-heavy-destroyers",
+                        "ophydian-destroyers",
+                        "skorpekh-destroyers",
+                        "lokhust-destroyers",
+                    ],
+                    "semantic_execution_status": "blocked",
+                    "block_reason": "structured_rule_semantics_required",
+                    "evidence": "july_faction_packs_2026_07/artifacts/subrules.json",
+                    "source_url": "https://mfm.warhammer-community.com/en/necrons",
+                }
+            ],
+        }
+    )
+    return payload
+
+
+def _current_detachment_rule_signature(detachment: MfmDetachmentRecord) -> object:
+    return detachment.detachment_point_cost, detachment.allowed_force_disposition_ids
+
+
+def _support_signature(unit: MfmUnitRecord) -> object:
+    if unit.support_allowance is None:
+        return None
+    return unit.support_allowance.allowed_bodyguard_unit_ids
+
+
+def _enhancement_support_signature(enhancement: MfmEnhancementRecord) -> object:
+    if enhancement.support_allowance is None:
+        return None
+    return enhancement.support_allowance.allowed_bodyguard_unit_ids
+
+
+def _enhancement_leader_signature(enhancement: MfmEnhancementRecord) -> object:
+    if enhancement.leader_allowance is None:
+        return None
+    return enhancement.leader_allowance.allowed_bodyguard_unit_ids
 
 
 def _faction_review(
@@ -235,7 +347,8 @@ def _required_list(value: object) -> list[object]:
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the committed MFM v1.0 to v1.1 review.")
     parser.add_argument("--check", action="store_true")
-    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--current", action="store_true", help="Review v1.1 to v1.6.")
+    parser.add_argument("--output", type=Path)
     return parser.parse_args()
 
 

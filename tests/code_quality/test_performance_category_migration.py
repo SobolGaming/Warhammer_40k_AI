@@ -259,12 +259,24 @@ def test_direct_v2_api_still_rejects_migrated_current_source(tmp_path: Path) -> 
     # checkout at that genuine historical commit reaches its separate inventory
     # refusal; the cumulative qualification HEAD is never reparented or relabeled.
     root = tmp_path / "historical-dirty-checkout"
+    # Borrow immutable objects, but own refs/index/HEAD before mutating history.
+    subprocess.run(
+        ["git", "clone", "--shared", "--no-checkout", "--quiet", str(ROOT), str(root)],
+        check=True,
+    )
+    git_dir = Path(
+        subprocess.check_output(["git", "rev-parse", "--absolute-git-dir"], cwd=root)
+        .decode()
+        .strip()
+    )
+    assert git_dir.is_dir()
+    assert git_dir.resolve() == (root / ".git").resolve()
     shutil.copytree(
         ROOT,
         root,
         ignore=_copy_ignore,
+        dirs_exist_ok=True,
     )
-    shutil.copytree(ROOT / ".git", root / ".git")
     subprocess.run(
         ["git", "update-ref", "--no-deref", "HEAD", migration.MEASURED], cwd=root, check=True
     )
