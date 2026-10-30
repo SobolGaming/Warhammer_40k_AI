@@ -12,7 +12,7 @@ import subprocess
 import sys
 import time
 from collections.abc import Callable
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import cast
 
 from tools.performance_category_migration import applies as migration_applies
@@ -46,6 +46,112 @@ from tools.performance_tool_inputs import (
 from scripts.performance_smoke import CASE_LIMIT_SECONDS, CASES, PROCESS_LIMIT_SECONDS, WORKLOAD
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _fresh_comparison_metadata(
+    assessment: dict[str, object],
+    reports: dict[str, dict[str, object]],
+    *,
+    base: str,
+    runtime_id: str,
+    input_digest: str,
+    base_paths: set[str],
+    input_bound_families: set[str],
+) -> bool:
+    """Classify generic fresh evidence; never reinterpret a retained input role."""
+    if (assessment.get("base"), assessment.get("runtime_build_id")) != (base, runtime_id):
+        raise ValueError("Fresh comparison assessment has stale base/runtime identities.")
+    comparisons = object_value(assessment["comparisons"])
+    if not comparisons or comparisons.keys() != reports.keys():
+        raise ValueError("Fresh comparison selection is empty or incomplete.")
+    routes: set[str] = set()
+    for family, report in reports.items():
+        if (
+            family in input_bound_families
+            or {"owner_exception", "input_binding", "ordered_pairs"} & report.keys()
+            or report.get("schema") == "matched-reconstruction-abba-v1"
+        ):
+            routes.add("retained")
+            continue
+        if report.keys() != {
+            "policy",
+            "family",
+            "workload_id",
+            "base_revision",
+            "head_runtime_build_id",
+            "head_input_digest",
+            "budget_profile",
+            "base",
+            "head",
+            "historical_failures",
+        }:
+            raise ValueError("Fresh comparisons require the closed generic report format.")
+        if comparisons[family] in base_paths:
+            raise ValueError(
+                "Fresh comparison evidence must be newly added against the actual base."
+            )
+        if (
+            report["policy"],
+            report["family"],
+            report["base_revision"],
+            report["head_runtime_build_id"],
+            report["head_input_digest"],
+        ) != (POLICY, family, base, runtime_id, input_digest):
+            raise ValueError("Fresh comparison has stale or unrelated identities.")
+        routes.add("current")
+    if len(routes) != 1:
+        raise ValueError("Fresh and retained comparison routes cannot be mixed.")
+    return routes == {"current"}
+
+
+def _uses_fresh_current_comparisons(
+    root: Path, assessment: dict[str, object], base_ref: str
+) -> bool:
+    from tools import performance_ci60_qualification as ci60
+    from tools import performance_order103_exception as order103
+    from tools import performance_reconstruction_campaign as reconstruction
+
+    from warhammer40k_core.build_identity import verified_engine_build_identity
+
+    if assessment.get("milestone") != "ordinary":
+        return False
+    base = git(root, "rev-parse", "--verify", f"{base_ref}^{{commit}}").decode().strip()
+    # These retained cohorts keep their original phase admission and input bridges.
+    if base in {ci60.PR_BASE, order103.BASE, reconstruction.BASE}:
+        return False
+    comparisons = object_value(assessment["comparisons"])
+    reports: dict[str, dict[str, object]] = {}
+    for family, path in comparisons.items():
+        if (
+            not isinstance(path, str)
+            or not path.startswith("docs/performance/current/")
+            or PurePosixPath(path).as_posix() != path
+            or PurePosixPath(path).suffix != ".json"
+            or ".." in PurePosixPath(path).parts
+            or "\\" in path
+            or ":" in path
+        ):
+            raise ValueError("Fresh comparisons need a canonical current JSON evidence path.")
+        member = root
+        for part in PurePosixPath(path).parts:
+            member /= part
+            if member.is_symlink():
+                raise ValueError("Fresh comparison evidence cannot contain symlink aliases.")
+        reports[family] = read_object(member)
+    families = object_value(read_object(root / MAP)["families"])
+    return _fresh_comparison_metadata(
+        assessment,
+        reports,
+        base=base,
+        runtime_id=verified_engine_build_identity().build_id,
+        input_digest=canonical_digest(runtime_inputs(root)),
+        base_paths=set(git(root, "ls-tree", "-r", "--name-only", "-z", base).decode().split("\0")),
+        input_bound_families={
+            family
+            for family, specification in families.items()
+            if binding_enabled(family, object_value(specification))
+        },
+    )
 
 
 def run_smoke(root: Path, output: Path, *, binding: dict[str, object]) -> dict[str, object]:
@@ -190,7 +296,11 @@ def validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict[
     ordinary_without_comparisons = (
         assessment.get("milestone") == "ordinary" and assessment.get("comparisons") == {}
     )
-    if deferred or ordinary_without_comparisons:
+    if (
+        deferred
+        or ordinary_without_comparisons
+        or _uses_fresh_current_comparisons(root, assessment, base_ref)
+    ):
         from scripts.quality_evidence import dependency_identity, source_identity
 
         base = git(root, "rev-parse", "--verify", f"{base_ref}^{{commit}}").decode().strip()

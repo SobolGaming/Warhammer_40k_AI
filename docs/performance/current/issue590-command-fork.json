@@ -4,14 +4,14 @@
   "workload_id": "issue590-authoritative-command-fork-v1",
   "base_revision": "5657bf5f127466edeecf3259e0a53e29f6a9a352",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3bf79c73db5c5f28d8401fcf9f10298fae6aac5a349ef00cf4e79c9f7785bac7",
-  "head_input_digest": "25895eab398b4e8dd9f026586038270cde2545ed57a09a0e16da85d261da83bc",
+  "head_input_digest": "422e92dc26531c2fed3738b8140a0b5f7293432a555d71b505469f918de562ee",
   "budget_profile": "current-change-relative-v1",
   "historical_failures": [],
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4dca94ddd872001548b4bb3809c4212741804eb0e516e1acf41d794d94f4b18a",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359391744,
+      "memory_bytes": 67359395840,
       "logical_cpus": 64,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -19,17 +19,17 @@
     },
     "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
     "workload_sha256": "9a0e09be4c94901206eb4fef77111f8d3f655db3a14202fe80042b6056d630b2",
-    "fixture_sha256": "04e1432c9098f975d3163e5349206ae81de18c378887389cea721231eefd3095",
+    "fixture_sha256": "cf3a06e58098fb0a228cbbe14f3779c35e6d23f26aaa3b2e900aa2ab573193f5",
     "samples": {
       "created/fork": [
-        0.29050112099999126,
-        0.2879722060000063,
-        0.29022798199999045
+        0.2867520249999984,
+        0.2862628770000022,
+        0.2845089089999995
       ],
       "started/fork": [
-        1.097905370999996,
-        1.1195632059999951,
-        1.1995185570000046
+        1.0901903490000002,
+        1.0909468010000012,
+        1.1828604869999992
       ]
     },
     "completed": true,
@@ -40,7 +40,7 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3bf79c73db5c5f28d8401fcf9f10298fae6aac5a349ef00cf4e79c9f7785bac7",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359391744,
+      "memory_bytes": 67359395840,
       "logical_cpus": 64,
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -48,17 +48,17 @@
     },
     "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
     "workload_sha256": "9a0e09be4c94901206eb4fef77111f8d3f655db3a14202fe80042b6056d630b2",
-    "fixture_sha256": "04e1432c9098f975d3163e5349206ae81de18c378887389cea721231eefd3095",
+    "fixture_sha256": "cf3a06e58098fb0a228cbbe14f3779c35e6d23f26aaa3b2e900aa2ab573193f5",
     "samples": {
       "created/fork": [
-        0.20539419799999337,
-        0.2021981850000003,
-        0.20143341999998654
+        0.19944180400000278,
+        0.1992735099999976,
+        0.19801372999999955
       ],
       "started/fork": [
-        0.5450084409999931,
-        0.5438006679999887,
-        0.6488186530000064
+        0.5492793770000048,
+        0.5412204790000033,
+        0.6494850200000002
       ]
     },
     "completed": true,

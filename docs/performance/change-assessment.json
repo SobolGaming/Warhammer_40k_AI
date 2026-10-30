@@ -4,6 +4,36 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3bf79c73db5c5f28d8401fcf9f10298fae6aac5a349ef00cf4e79c9f7785bac7",
   "operation_map_sha256": "996327cc27e6322ebfe71436094eaa146d66cf9f753fc5ba89db592a054e6f1e",
   "changes": {
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "861e7fb5aaf6eda98f8b90c99a97e95a6e1ee61b791a5279b94d1d13c0bab489",
+      "after_sha256": "2b77d4b88cd631404ecb9722a703f7ac4a706c3ec52f43b5f231e6b911d871bf",
+      "owners": {
+        "@document": {
+          "before": "861e7fb5aaf6eda98f8b90c99a97e95a6e1ee61b791a5279b94d1d13c0bab489",
+          "after": "2b77d4b88cd631404ecb9722a703f7ac4a706c3ec52f43b5f231e6b911d871bf"
+        }
+      }
+    },
+    "ci/quality_shards/shard-1-modules.txt": {
+      "before_sha256": "5c61df88031eb6c4b71f900ff09769c17c22cc4a8f6cf85fde9bf73ab0d160fb",
+      "after_sha256": "b3b500c620eadc8afa8031b7b5932bfaef5ad5851bc7e0441cc17c7453b84d16",
+      "owners": {
+        "@document": {
+          "before": "5c61df88031eb6c4b71f900ff09769c17c22cc4a8f6cf85fde9bf73ab0d160fb",
+          "after": "b3b500c620eadc8afa8031b7b5932bfaef5ad5851bc7e0441cc17c7453b84d16"
+        }
+      }
+    },
+    "ci/quality_shards/shard-1.txt": {
+      "before_sha256": "1fa44ca9afa5c5be7807bdf728fb8bab411f0f03cb156a83fddb0bc416fdaa90",
+      "after_sha256": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f",
+      "owners": {
+        "@document": {
+          "before": "1fa44ca9afa5c5be7807bdf728fb8bab411f0f03cb156a83fddb0bc416fdaa90",
+          "after": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "470673254e8c6c2658bf754b12e40cebf0d393d8e69bf154b17cf0efc2a61c80",
       "after_sha256": "93f38045bb61f69b3e44f7be2adc0691572c1ab049127ec7a3b145defe4460fe",
@@ -96,51 +126,51 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "2a876950c4234a3d1c41d2c1d47213bd0d5ab568a13a64011af8ab78580606dc",
-      "after_sha256": "e800999b9cf075a08083f6c628c1dbb8a99e68e611368e6c9ee8ecb043beff17",
+      "after_sha256": "2cba1a768e51779a1e3090df36ddb13a37a4038673ef71a6bbe3c3c26c5ec4c2",
       "owners": {
         "@document": {
           "before": "2a876950c4234a3d1c41d2c1d47213bd0d5ab568a13a64011af8ab78580606dc",
-          "after": "e800999b9cf075a08083f6c628c1dbb8a99e68e611368e6c9ee8ecb043beff17"
+          "after": "2cba1a768e51779a1e3090df36ddb13a37a4038673ef71a6bbe3c3c26c5ec4c2"
         }
       }
     },
     "docs/performance/current/issue590-command-fork.json": {
       "before_sha256": null,
-      "after_sha256": "c3ee95e29f3eadb154721ec99d7b9ebdeee4de17b20a68d9348776554072cf80",
+      "after_sha256": "43d8e617db484aa47d49e0a5ea9eb51fc58cabf4d42bd1ce4fa63d141b2e9d6f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c3ee95e29f3eadb154721ec99d7b9ebdeee4de17b20a68d9348776554072cf80"
+          "after": "43d8e617db484aa47d49e0a5ea9eb51fc58cabf4d42bd1ce4fa63d141b2e9d6f"
         }
       }
     },
     "docs/performance/current/issue590-movement.json": {
       "before_sha256": null,
-      "after_sha256": "38f9bcd2b375a4bba241c78af821e2d8444130d61f336475a864cd80a885ca25",
+      "after_sha256": "0cfb7a2051e07630252800a8575d583b2e621e674bc341f8df968fef332a4b91",
       "owners": {
         "@document": {
           "before": null,
-          "after": "38f9bcd2b375a4bba241c78af821e2d8444130d61f336475a864cd80a885ca25"
+          "after": "0cfb7a2051e07630252800a8575d583b2e621e674bc341f8df968fef332a4b91"
         }
       }
     },
     "docs/performance/current/issue590-setup.json": {
       "before_sha256": null,
-      "after_sha256": "2e2218fdab7aa7cb0100aa27e490138f70d4f7c4b1a1a04af06f6b4814aa34cf",
+      "after_sha256": "65a7b9536f8af76992854d4ddcfbe8e2866c280a5483f5bca3729a41a5811670",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2e2218fdab7aa7cb0100aa27e490138f70d4f7c4b1a1a04af06f6b4814aa34cf"
+          "after": "65a7b9536f8af76992854d4ddcfbe8e2866c280a5483f5bca3729a41a5811670"
         }
       }
     },
     "docs/performance/current/issue590-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "9faa8dc259a7415e946fdb67ad74c2a28f9b48f193ff91ffd6847500375267e6",
+      "after_sha256": "ba075033c02fc82e2735407c6103ae2baa26b6b168b04984726f3f6427f6cf08",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9faa8dc259a7415e946fdb67ad74c2a28f9b48f193ff91ffd6847500375267e6"
+          "after": "ba075033c02fc82e2735407c6103ae2baa26b6b168b04984726f3f6427f6cf08"
         }
       }
     },
@@ -156,11 +186,11 @@
     },
     "docs/performance/issue590.md": {
       "before_sha256": null,
-      "after_sha256": "9a0030c92e372fbecd98c573c4106a36addec6067a132aeb94b33b2fe3ceba2e",
+      "after_sha256": "8cb548eb190d257c90ac925a0bc8c1e5631f80a5b17e60018b9ff129659fcf49",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9a0030c92e372fbecd98c573c4106a36addec6067a132aeb94b33b2fe3ceba2e"
+          "after": "8cb548eb190d257c90ac925a0bc8c1e5631f80a5b17e60018b9ff129659fcf49"
         }
       }
     },
@@ -171,6 +201,28 @@
         "@document": {
           "before": "06b3357d35386c600d109f1a79dedf2a42539005401ce18c7b8d97a42bfa881a",
           "after": "2e0e8b620d0b31197c9220912d5cef5ba90c63598dcf0c33f5820b8cd8933d00"
+        }
+      }
+    },
+    "scripts/check_performance_policy.py": {
+      "before_sha256": "f2fd48a34d36739eafd6e81f7be8788272122849aa9536655ab88041b00effa9",
+      "after_sha256": "01310f1cdba3520f77cf0c877c9f818eeb32e23e79ae448c2064b5de4053e779",
+      "owners": {
+        "@module": {
+          "before": "fdb925d1aa51a2581b960aa6993721b571b78788c91d027e6630d56a5e780dc8",
+          "after": "517df7c229779d26547dea8255c533c603da026d88c3d924d3b575ae9cf68a46"
+        },
+        "_fresh_comparison_metadata": {
+          "before": null,
+          "after": "aac0aa79b23d8ec86606225a318eed13a68aa4e9d5c495bb881d79644669bc59"
+        },
+        "_uses_fresh_current_comparisons": {
+          "before": null,
+          "after": "ccbca78214ab9544a157fba2c914ecb6c25949505b290e500aec7a8060e3deb4"
+        },
+        "validate_current": {
+          "before": "cd93e1a0457057b6bb5266b1c6f9fae8df8324101f8ed3038ca98987fdeefefb",
+          "after": "44539c4436f9f01c27965efb1711ba3c66d4dd18bc5e265de758e2e02b355633"
         }
       }
     },
@@ -226,6 +278,80 @@
         }
       }
     },
+    "tests/code_quality/test_current_comparison_routing.py": {
+      "before_sha256": null,
+      "after_sha256": "31451a8c17a8dffc81029a1693fd966938ba726b883e20dd8d3ae9adaf3b78b2",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e5e1102f46aab61bb2aa77a33b1f5a10de4ca241ad9a1bc212422135665adf1a"
+        },
+        "_classify": {
+          "before": null,
+          "after": "b98aa3850ce32d99f14bbd00b8d9129f353cd84d24f01613ac6a36c37ccf52d1"
+        },
+        "_commit": {
+          "before": null,
+          "after": "337b4c36e55607ce636813f42a70eec991d842e0ce95353879f64e2f8f831888"
+        },
+        "_write": {
+          "before": null,
+          "after": "257a3dff706f0c67b16b0a8d0081824ce48420a9ae76cfef34ef024e14fd08ad"
+        },
+        "current_checkout": {
+          "before": null,
+          "after": "e9e0a39e4730e615c95a9726f601f955a98e01a094048bbdcd70596444e93631"
+        },
+        "test_current_route_preserves_full_comparison_failures": {
+          "before": null,
+          "after": "40af6dd2f9142a2f9a97184b6f198b0171f770a3694f629b64418d8133a85ac9"
+        },
+        "test_current_transaction_rechecks_source_after_full_validation": {
+          "before": null,
+          "after": "1c2f16651b524fa0782d343f840b46f6e75e961345b6169c79292408975891e7"
+        },
+        "test_existing_report_cannot_be_relabelled_fresh_against_real_git_base": {
+          "before": null,
+          "after": "aa0cf1e1a9b8dd22f6e856319f8554f5a4fdf51a872dfb6f6e92937cd55cd2c2"
+        },
+        "test_fresh_assessment_requires_actual_base_and_runtime": {
+          "before": null,
+          "after": "b259a9fc0d9d87b38b7413dae2a2a4364d4d40db483eeab5daea664a594d226f"
+        },
+        "test_fresh_comparisons_reach_full_current_source_and_budget_validation": {
+          "before": null,
+          "after": "969a6da65655ac0d59c9aabacce05afb43f50a3e25160a50246b031e8af3998d"
+        },
+        "test_fresh_report_paths_are_canonical_current_json": {
+          "before": null,
+          "after": "3953d9ef8c1649a3dec4484d28ffa2634a1d7087ef9861676ababa110bedb6e3"
+        },
+        "test_fresh_report_symlink_and_reused_base_member_are_rejected": {
+          "before": null,
+          "after": "dc9117edf5f361dce8527e2c744a48044ccd3406de131755f26a4defa9aa9f70"
+        },
+        "test_independent_postflight_rejects_changed_current_inputs": {
+          "before": null,
+          "after": "eaa7a1e6bfc9a1758c05b9b1473820cacd0aecf194cc04369f2c96f52db584f2"
+        },
+        "test_malformed_generic_report_cannot_fall_back_to_history": {
+          "before": null,
+          "after": "6b2d05ec9c6981922ae6f79eb7b7ea8d69ccf1d72ce1e2f2d838d336e5eb0b0e"
+        },
+        "test_retained_base_keeps_original_phase_dispatch": {
+          "before": null,
+          "after": "aab0c67097fa0d237b8d6235468ce67ce952d44cd86af06b8bcdd12c488c7ac4"
+        },
+        "test_retained_markers_preserve_route_and_cannot_mix_with_fresh": {
+          "before": null,
+          "after": "95dd6d276256fa6f17cf15da5882135c373e1891b5f37aa828d317eb81dd4335"
+        },
+        "test_stale_generic_comparisons_fail_before_historical_routing": {
+          "before": null,
+          "after": "5470d12920a810de7682dd3234dc9b71b2f867cec6f1dc93dec911fdd41bb867"
+        }
+      }
+    },
     "tests/infrastructure/adapters/unit/test_session_commands.py": {
       "before_sha256": "f4ea5e8c94fc0766a043cbc35e7fb8bd14c45b48b10ab74d86c60fbf84fd1886",
       "after_sha256": "3472212073a7814b9cfa10fe262450e05d5747dba9b322c18b0bb8b139ec98fc",
@@ -250,6 +376,30 @@
     }
   },
   "rows": {
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "ci/quality_shards/shard-1-modules.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "ci/quality_shards/shard-1.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
@@ -616,7 +766,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the bounded repair, exact current comparison inputs and sanitized public HTTP receipts without changing engine execution.",
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
       "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
       "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
@@ -624,7 +774,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the bounded repair, exact current comparison inputs and sanitized public HTTP receipts without changing engine execution.",
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
       "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
       "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
@@ -632,7 +782,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the bounded repair, exact current comparison inputs and sanitized public HTTP receipts without changing engine execution.",
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
       "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
       "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
@@ -640,7 +790,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the bounded repair, exact current comparison inputs and sanitized public HTTP receipts without changing engine execution.",
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
       "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
       "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
@@ -648,7 +798,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the bounded repair, exact current comparison inputs and sanitized public HTTP receipts without changing engine execution.",
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
       "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
       "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
@@ -656,7 +806,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the bounded repair, exact current comparison inputs and sanitized public HTTP receipts without changing engine execution.",
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
       "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
       "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
@@ -664,7 +814,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the bounded repair, exact current comparison inputs and sanitized public HTTP receipts without changing engine execution.",
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
       "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
       "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
@@ -672,7 +822,15 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the bounded repair, exact current comparison inputs and sanitized public HTTP receipts without changing engine execution.",
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "scripts/check_performance_policy.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
       "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
       "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
@@ -725,6 +883,14 @@
         "visibility"
       ],
       "rationale": "Hoists an unchanged terrain footprint out of the sampled-pose loop and preserves the exact predicate, segments, diagnostics and sample counts.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "tests/code_quality/test_current_comparison_routing.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
       "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
       "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },

@@ -95,3 +95,23 @@ Final delivery additionally requires both independent exact-head reviews, the
 serial current-runtime smoke with its complete 180-second cap, focused local
 static/contracts checks and all required hosted covered behavior/quality gates.
 The coverage floor remains 64% with the complete package/branch denominator.
+
+## Fresh current comparison admission
+
+The checker previously routed every nonempty assessment into a retained historical
+cohort phase. That phase has an unfinished freeze and admits only its retained
+base/cohort, so it cannot qualify these fresh reports. Ordinary generic reports
+now use the existing current-source transaction only when their evidence paths
+are canonical, nonsymlink and new against the actual base, and their base,
+runtime and current-input identities match exactly. The complete assessment,
+driver/fixture/hash/sample/family/budget validators still execute unchanged.
+
+Retained bases, input roles and historical markers keep their original route;
+mixed, stale, malformed and reused evidence fails closed. The existing pre/post
+repository/index/source/dependency checks and actual serial smoke remain in force,
+with the same 60-second case and 180-second complete-command limits. Historical
+freezes, validators, measurements and the exact 260 deferred controls are unchanged.
+The new routing controls cover fresh admission, retained routing, bad paths and
+identities, full-validation failures, source drift and independently fresh
+postflight. Prior failed gate receipts and the earlier current report bytes are
+preserved separately; current bindings are requalified after the checker change.
