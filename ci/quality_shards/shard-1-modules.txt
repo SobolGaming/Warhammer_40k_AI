@@ -42,3 +42,4 @@ tests/code_quality/test_phase17a1_transition_patch_docs.py
 tests/code_quality/test_package_smoke.py
 tests/code_quality/test_performance_provenance.py
 tests/code_quality/test_performance_admission_transaction.py
+tests/code_quality/test_current_comparison_routing.py

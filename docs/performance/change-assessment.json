@@ -1,826 +1,756 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "e4f9657c112ef657f33087bddf99c063e64c4d33",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4dca94ddd872001548b4bb3809c4212741804eb0e516e1acf41d794d94f4b18a",
-  "operation_map_sha256": "0b0063d1020b69fb35b41de11fdb9c5b74c36ddfab3ddc34a5f6ba001a934aa3",
+  "base": "5657bf5f127466edeecf3259e0a53e29f6a9a352",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3bf79c73db5c5f28d8401fcf9f10298fae6aac5a349ef00cf4e79c9f7785bac7",
+  "operation_map_sha256": "996327cc27e6322ebfe71436094eaa146d66cf9f753fc5ba89db592a054e6f1e",
   "changes": {
-    "conformance/typescript/src/client.ts": {
-      "before_sha256": "cd82ec6da5bb45f9cf879ceb345bfbb4e031471e71af1f0a97728c286565da38",
-      "after_sha256": "840442651f3651d9f0144254a5d6c1cc419ef0d6374f341002bede07ce2fe3c5",
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "861e7fb5aaf6eda98f8b90c99a97e95a6e1ee61b791a5279b94d1d13c0bab489",
+      "after_sha256": "2b77d4b88cd631404ecb9722a703f7ac4a706c3ec52f43b5f231e6b911d871bf",
       "owners": {
         "@document": {
-          "before": "cd82ec6da5bb45f9cf879ceb345bfbb4e031471e71af1f0a97728c286565da38",
-          "after": "840442651f3651d9f0144254a5d6c1cc419ef0d6374f341002bede07ce2fe3c5"
+          "before": "861e7fb5aaf6eda98f8b90c99a97e95a6e1ee61b791a5279b94d1d13c0bab489",
+          "after": "2b77d4b88cd631404ecb9722a703f7ac4a706c3ec52f43b5f231e6b911d871bf"
         }
       }
     },
-    "conformance/typescript/src/contract.ts": {
-      "before_sha256": "a867549b21c3f1d695c0c9b8c56bc633c56fcf5f86a3ba1e4909a740c3c7092f",
-      "after_sha256": "3e09cf05ae1fd8368fb803bfcb890e98e33719cf299394ab1a31c7d4010a49b9",
+    "ci/quality_shards/shard-1-modules.txt": {
+      "before_sha256": "5c61df88031eb6c4b71f900ff09769c17c22cc4a8f6cf85fde9bf73ab0d160fb",
+      "after_sha256": "b3b500c620eadc8afa8031b7b5932bfaef5ad5851bc7e0441cc17c7453b84d16",
       "owners": {
         "@document": {
-          "before": "a867549b21c3f1d695c0c9b8c56bc633c56fcf5f86a3ba1e4909a740c3c7092f",
-          "after": "3e09cf05ae1fd8368fb803bfcb890e98e33719cf299394ab1a31c7d4010a49b9"
+          "before": "5c61df88031eb6c4b71f900ff09769c17c22cc4a8f6cf85fde9bf73ab0d160fb",
+          "after": "b3b500c620eadc8afa8031b7b5932bfaef5ad5851bc7e0441cc17c7453b84d16"
         }
       }
     },
-    "conformance/typescript/src/generated/openapi.ts": {
-      "before_sha256": "ac57458fdb9437a38311b5b8838b2726914ffddff575a3c3f2749bca2462de13",
-      "after_sha256": "0cc003fc88c79602579fa01d700182d242a810bd8f161ec072a7aac2d2fb2134",
+    "ci/quality_shards/shard-1.txt": {
+      "before_sha256": "1fa44ca9afa5c5be7807bdf728fb8bab411f0f03cb156a83fddb0bc416fdaa90",
+      "after_sha256": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f",
       "owners": {
         "@document": {
-          "before": "ac57458fdb9437a38311b5b8838b2726914ffddff575a3c3f2749bca2462de13",
-          "after": "0cc003fc88c79602579fa01d700182d242a810bd8f161ec072a7aac2d2fb2134"
-        }
-      }
-    },
-    "conformance/typescript/src/proposal-schema.test.ts": {
-      "before_sha256": "9b405f01667d83d048d3c1e057b863b097eb89c558f222e004873af795dba56e",
-      "after_sha256": "a429998c8d5a236f0445cf4ce36c768ceee63149c4e52567271d838c42c585f0",
-      "owners": {
-        "@document": {
-          "before": "9b405f01667d83d048d3c1e057b863b097eb89c558f222e004873af795dba56e",
-          "after": "a429998c8d5a236f0445cf4ce36c768ceee63149c4e52567271d838c42c585f0"
-        }
-      }
-    },
-    "contracts/README.md": {
-      "before_sha256": "1bfb1a20af400559369623d49d24d424b3e414d0b9e0a598de45378605122880",
-      "after_sha256": "5f79ef1ef4e257ef539267ddc3ddf92c1ab08a3d5a604aa93b9e4993ba751f91",
-      "owners": {
-        "@document": {
-          "before": "1bfb1a20af400559369623d49d24d424b3e414d0b9e0a598de45378605122880",
-          "after": "5f79ef1ef4e257ef539267ddc3ddf92c1ab08a3d5a604aa93b9e4993ba751f91"
-        }
-      }
-    },
-    "contracts/compatibility-policy.md": {
-      "before_sha256": "147b7eca1c5b26f5a2f4d4bfe8a549abf888289e28a0f6d0268900c5224548c2",
-      "after_sha256": "b933210544f1d26ee6b68ef1013cde9812e7303dc8678daa970c444aa871f0b8",
-      "owners": {
-        "@document": {
-          "before": "147b7eca1c5b26f5a2f4d4bfe8a549abf888289e28a0f6d0268900c5224548c2",
-          "after": "b933210544f1d26ee6b68ef1013cde9812e7303dc8678daa970c444aa871f0b8"
-        }
-      }
-    },
-    "contracts/compatibility/45.0.0-shape.json": {
-      "before_sha256": null,
-      "after_sha256": "e5099dc48df834ae251648cc9dbab4abaf9304aebe6312233d0f9742e3cd6683",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e5099dc48df834ae251648cc9dbab4abaf9304aebe6312233d0f9742e3cd6683"
-        }
-      }
-    },
-    "contracts/conformance-scenarios/README.md": {
-      "before_sha256": "c4205d252f38bc2f7a69e64762fbea63e4268d629c7af7685ae13bf28fd02e00",
-      "after_sha256": "72faa5f3d512bcc20fd6f329dff4b2d093091cf64b9e84ae578c72b8316be2f1",
-      "owners": {
-        "@document": {
-          "before": "c4205d252f38bc2f7a69e64762fbea63e4268d629c7af7685ae13bf28fd02e00",
-          "after": "72faa5f3d512bcc20fd6f329dff4b2d093091cf64b9e84ae578c72b8316be2f1"
-        }
-      }
-    },
-    "contracts/examples/errors/conflict.json": {
-      "before_sha256": "2f471d89a9bb63bb4304dc71bed5af678d6adee844ed036898a6e498c303d4a7",
-      "after_sha256": "41172aa65f1bcff2611fcae48cbc24ba52323a216a54775e3a4941562e1a6b5e",
-      "owners": {
-        "@document": {
-          "before": "2f471d89a9bb63bb4304dc71bed5af678d6adee844ed036898a6e498c303d4a7",
-          "after": "41172aa65f1bcff2611fcae48cbc24ba52323a216a54775e3a4941562e1a6b5e"
-        }
-      }
-    },
-    "contracts/examples/errors/corruption.json": {
-      "before_sha256": "6476ed70220edf43932a1f7be4d660382c107e1e73c74d75fc50fdc68761c1cd",
-      "after_sha256": "ce7f31da5e32c019d5c50c6227ceb97c45b715878bb553a9a704ce92273a600b",
-      "owners": {
-        "@document": {
-          "before": "6476ed70220edf43932a1f7be4d660382c107e1e73c74d75fc50fdc68761c1cd",
-          "after": "ce7f31da5e32c019d5c50c6227ceb97c45b715878bb553a9a704ce92273a600b"
-        }
-      }
-    },
-    "contracts/examples/errors/forbidden.json": {
-      "before_sha256": "4b8ead7321a93bd261de06853a397606eb7eb496955ffd6fd422f1dad1576b70",
-      "after_sha256": "fd7d11dfaed91b9cc5c3b1fc93af5be86388ed060033a8a30382003e8aa865d3",
-      "owners": {
-        "@document": {
-          "before": "4b8ead7321a93bd261de06853a397606eb7eb496955ffd6fd422f1dad1576b70",
-          "after": "fd7d11dfaed91b9cc5c3b1fc93af5be86388ed060033a8a30382003e8aa865d3"
-        }
-      }
-    },
-    "contracts/examples/errors/invalid-diagnostics.json": {
-      "before_sha256": null,
-      "after_sha256": "eb2ece405e877027f1be42ebb8d4fa40e20b53d5910a737dcb70bdb3731dea3b",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "eb2ece405e877027f1be42ebb8d4fa40e20b53d5910a737dcb70bdb3731dea3b"
-        }
-      }
-    },
-    "contracts/examples/errors/invalid.json": {
-      "before_sha256": "4c1f3aa3af665af2c395535ac61cd38f129a4aa61b0b487855af6a3f026703cb",
-      "after_sha256": "fac2f53ae543c2a95404a7a9758d2801744f80544164a607437fe6cbf1946dae",
-      "owners": {
-        "@document": {
-          "before": "4c1f3aa3af665af2c395535ac61cd38f129a4aa61b0b487855af6a3f026703cb",
-          "after": "fac2f53ae543c2a95404a7a9758d2801744f80544164a607437fe6cbf1946dae"
-        }
-      }
-    },
-    "contracts/examples/errors/malformed.json": {
-      "before_sha256": "ba5545a8aee7816dfc3bcb613373065b9cccd55badd6f4b57c0f1efa64e4dd5a",
-      "after_sha256": "fc633886547e5c759e92410d58ecac2ea89c061921d92007b64605f84c1db63a",
-      "owners": {
-        "@document": {
-          "before": "ba5545a8aee7816dfc3bcb613373065b9cccd55badd6f4b57c0f1efa64e4dd5a",
-          "after": "fc633886547e5c759e92410d58ecac2ea89c061921d92007b64605f84c1db63a"
-        }
-      }
-    },
-    "contracts/examples/errors/stale.json": {
-      "before_sha256": "0573c8eb9fc796a60ab8867e8aee3112a0703ac15722b4e96b457b3e28c8b357",
-      "after_sha256": "c6fc4622bedc2a4f3ddcc3a707eb18d7da5cb162fdd0795dcfbbe470d269cb0b",
-      "owners": {
-        "@document": {
-          "before": "0573c8eb9fc796a60ab8867e8aee3112a0703ac15722b4e96b457b3e28c8b357",
-          "after": "c6fc4622bedc2a4f3ddcc3a707eb18d7da5cb162fdd0795dcfbbe470d269cb0b"
-        }
-      }
-    },
-    "contracts/examples/errors/terminal.json": {
-      "before_sha256": "bfcdafc698b84b8a4d76a56eeee99905a5685bfeb202bf5b452f706d6186e7d3",
-      "after_sha256": "824a10429051ea2b951437e85b9ca1cd41803725aa06221877aec9d836905370",
-      "owners": {
-        "@document": {
-          "before": "bfcdafc698b84b8a4d76a56eeee99905a5685bfeb202bf5b452f706d6186e7d3",
-          "after": "824a10429051ea2b951437e85b9ca1cd41803725aa06221877aec9d836905370"
-        }
-      }
-    },
-    "contracts/examples/errors/unsupported-diagnostics.json": {
-      "before_sha256": null,
-      "after_sha256": "0656054b0f10402c9e233986c7ac1f5150d62df80ec4f6923f812d7b5167ce68",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "0656054b0f10402c9e233986c7ac1f5150d62df80ec4f6923f812d7b5167ce68"
-        }
-      }
-    },
-    "contracts/examples/errors/unsupported.json": {
-      "before_sha256": "15dddde72dfb7b62c053166f4523674ac01112de3e5e78401569a7f77021a866",
-      "after_sha256": "4317a9db5dba73ef1eb449b27337422bfae848862df54125fd4eae3c1943dc7c",
-      "owners": {
-        "@document": {
-          "before": "15dddde72dfb7b62c053166f4523674ac01112de3e5e78401569a7f77021a866",
-          "after": "4317a9db5dba73ef1eb449b27337422bfae848862df54125fd4eae3c1943dc7c"
+          "before": "1fa44ca9afa5c5be7807bdf728fb8bab411f0f03cb156a83fddb0bc416fdaa90",
+          "after": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "31f40c1f802b4b13dd01a4b94d24b9bfe1b82ff296ceb6a6d500eaadd3d2d208",
-      "after_sha256": "470673254e8c6c2658bf754b12e40cebf0d393d8e69bf154b17cf0efc2a61c80",
+      "before_sha256": "470673254e8c6c2658bf754b12e40cebf0d393d8e69bf154b17cf0efc2a61c80",
+      "after_sha256": "93f38045bb61f69b3e44f7be2adc0691572c1ab049127ec7a3b145defe4460fe",
       "owners": {
         "@document": {
-          "before": "31f40c1f802b4b13dd01a4b94d24b9bfe1b82ff296ceb6a6d500eaadd3d2d208",
-          "after": "470673254e8c6c2658bf754b12e40cebf0d393d8e69bf154b17cf0efc2a61c80"
+          "before": "470673254e8c6c2658bf754b12e40cebf0d393d8e69bf154b17cf0efc2a61c80",
+          "after": "93f38045bb61f69b3e44f7be2adc0691572c1ab049127ec7a3b145defe4460fe"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "ebba2fc79e025b6fbd99f49bbf43d5fcba1546f989b5ad26fc40bacc7fea6269",
-      "after_sha256": "7d381760593db52a9ec14a217299b238a8fa0bfd83e0ba3caf82ddcdfb6c9960",
+      "before_sha256": "7d381760593db52a9ec14a217299b238a8fa0bfd83e0ba3caf82ddcdfb6c9960",
+      "after_sha256": "2f18f245f2db8935fb047f1ffee1173a35dda0ecbc32cf5f809dea6fc77dbb42",
       "owners": {
         "@document": {
-          "before": "ebba2fc79e025b6fbd99f49bbf43d5fcba1546f989b5ad26fc40bacc7fea6269",
-          "after": "7d381760593db52a9ec14a217299b238a8fa0bfd83e0ba3caf82ddcdfb6c9960"
+          "before": "7d381760593db52a9ec14a217299b238a8fa0bfd83e0ba3caf82ddcdfb6c9960",
+          "after": "2f18f245f2db8935fb047f1ffee1173a35dda0ecbc32cf5f809dea6fc77dbb42"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "8093b3d3be1db847eca53155a5618a43e6747d4fb9acaeb05e5c284204061e91",
-      "after_sha256": "4233db05af3ae94419748df15ae2c328d065780c58144929bf1799a12d3bd64b",
+      "before_sha256": "4233db05af3ae94419748df15ae2c328d065780c58144929bf1799a12d3bd64b",
+      "after_sha256": "eb29bb7b0eb7cf399917d11ac4719565ac12a237b582e956833bdf4d3e21abea",
       "owners": {
         "@document": {
-          "before": "8093b3d3be1db847eca53155a5618a43e6747d4fb9acaeb05e5c284204061e91",
-          "after": "4233db05af3ae94419748df15ae2c328d065780c58144929bf1799a12d3bd64b"
+          "before": "4233db05af3ae94419748df15ae2c328d065780c58144929bf1799a12d3bd64b",
+          "after": "eb29bb7b0eb7cf399917d11ac4719565ac12a237b582e956833bdf4d3e21abea"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "ea50be8fc0f9317e51af45d4fcb81619e46ca3226979af41110a5abb5e26dcfc",
-      "after_sha256": "b7b3b3f4602292e7a7d04c62062bbdccd9a6f71db4994ac70dd39b60b4276c04",
+      "before_sha256": "b7b3b3f4602292e7a7d04c62062bbdccd9a6f71db4994ac70dd39b60b4276c04",
+      "after_sha256": "9b6a7cc14207234e2c3f80172d8a3a9e57b9292e56d11118cc2f291e2558b263",
       "owners": {
         "@document": {
-          "before": "ea50be8fc0f9317e51af45d4fcb81619e46ca3226979af41110a5abb5e26dcfc",
-          "after": "b7b3b3f4602292e7a7d04c62062bbdccd9a6f71db4994ac70dd39b60b4276c04"
+          "before": "b7b3b3f4602292e7a7d04c62062bbdccd9a6f71db4994ac70dd39b60b4276c04",
+          "after": "9b6a7cc14207234e2c3f80172d8a3a9e57b9292e56d11118cc2f291e2558b263"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "8a7376cf9298f7f74ca8fce8010075674f86a289be242e9bbc4f6df7efaba3cf",
-      "after_sha256": "15f09362eb9f7a8eb2a06f33166a9610e74186a9d6091e8695110e06f44801d7",
+      "before_sha256": "15f09362eb9f7a8eb2a06f33166a9610e74186a9d6091e8695110e06f44801d7",
+      "after_sha256": "4573d00e9ebbbf62b5685411cbad827e1ee7352794629c73c1937d52e8e9247b",
       "owners": {
         "@document": {
-          "before": "8a7376cf9298f7f74ca8fce8010075674f86a289be242e9bbc4f6df7efaba3cf",
-          "after": "15f09362eb9f7a8eb2a06f33166a9610e74186a9d6091e8695110e06f44801d7"
+          "before": "15f09362eb9f7a8eb2a06f33166a9610e74186a9d6091e8695110e06f44801d7",
+          "after": "4573d00e9ebbbf62b5685411cbad827e1ee7352794629c73c1937d52e8e9247b"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "3febedf21567f8159707f918f3939382eb29f1517b6d0d1a761941652a340b06",
-      "after_sha256": "839bb1dada208f12ec8119f25f1dccc204eb04bd5b38f44a776f6da19be1dcdb",
+      "before_sha256": "839bb1dada208f12ec8119f25f1dccc204eb04bd5b38f44a776f6da19be1dcdb",
+      "after_sha256": "e20a44cee8109cbdbd02d3a883c524f2f72d90aa7e20d32ec1a65c8d6d84c5ad",
       "owners": {
         "@document": {
-          "before": "3febedf21567f8159707f918f3939382eb29f1517b6d0d1a761941652a340b06",
-          "after": "839bb1dada208f12ec8119f25f1dccc204eb04bd5b38f44a776f6da19be1dcdb"
+          "before": "839bb1dada208f12ec8119f25f1dccc204eb04bd5b38f44a776f6da19be1dcdb",
+          "after": "e20a44cee8109cbdbd02d3a883c524f2f72d90aa7e20d32ec1a65c8d6d84c5ad"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "68213f00b7690f9631864683325730715ad0f002a5ece13f65d92a9dbc7cec20",
-      "after_sha256": "fc5c020f8b69807a53baa7b9a35ef121cd5dd45142b174d9ed5da677e845e6e6",
+      "before_sha256": "fc5c020f8b69807a53baa7b9a35ef121cd5dd45142b174d9ed5da677e845e6e6",
+      "after_sha256": "9c6e0ed215024c4862578b66809352f214c8176131312ee71f35c37dc368796e",
       "owners": {
         "@document": {
-          "before": "68213f00b7690f9631864683325730715ad0f002a5ece13f65d92a9dbc7cec20",
-          "after": "fc5c020f8b69807a53baa7b9a35ef121cd5dd45142b174d9ed5da677e845e6e6"
+          "before": "fc5c020f8b69807a53baa7b9a35ef121cd5dd45142b174d9ed5da677e845e6e6",
+          "after": "9c6e0ed215024c4862578b66809352f214c8176131312ee71f35c37dc368796e"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "3aaa872fa04fadda95dca8473308cbed0b5c86cac987669536b4363505828bb0",
-      "after_sha256": "f801641681381172defed6541fb8b8c7333df2f76c59044c291e70e80f648e78",
+      "before_sha256": "f801641681381172defed6541fb8b8c7333df2f76c59044c291e70e80f648e78",
+      "after_sha256": "86cdd2a753a7f52ab3bf0de8466c5093d03b1fcd6098207676f718da5ac2a684",
       "owners": {
         "@document": {
-          "before": "3aaa872fa04fadda95dca8473308cbed0b5c86cac987669536b4363505828bb0",
-          "after": "f801641681381172defed6541fb8b8c7333df2f76c59044c291e70e80f648e78"
-        }
-      }
-    },
-    "contracts/migrations/44-to-45.md": {
-      "before_sha256": null,
-      "after_sha256": "71b989465e970590c927d65b66b4cff01b8885bfbbef884bab0a9d01b47a0286",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "71b989465e970590c927d65b66b4cff01b8885bfbbef884bab0a9d01b47a0286"
-        }
-      }
-    },
-    "contracts/openapi.yaml": {
-      "before_sha256": "e66b52ce0bc8cb20394be779c06afd9906a5d0c448f08c98ca01320e5491e354",
-      "after_sha256": "4f7cc0769da02937fd08aba9f27451dac561f1d518c142a2f067ed3830e104ab",
-      "owners": {
-        "@document": {
-          "before": "e66b52ce0bc8cb20394be779c06afd9906a5d0c448f08c98ca01320e5491e354",
-          "after": "4f7cc0769da02937fd08aba9f27451dac561f1d518c142a2f067ed3830e104ab"
-        }
-      }
-    },
-    "contracts/schemas/error-envelope.schema.json": {
-      "before_sha256": "5f9c3a3ba566b09702964ddb7beeca49becb0e6bc3cf553fc2e589f87dd3af65",
-      "after_sha256": "72e39afec377227223233124fffe642cfb9db44dccf09693d437a0d192f6405d",
-      "owners": {
-        "@document": {
-          "before": "5f9c3a3ba566b09702964ddb7beeca49becb0e6bc3cf553fc2e589f87dd3af65",
-          "after": "72e39afec377227223233124fffe642cfb9db44dccf09693d437a0d192f6405d"
-        }
-      }
-    },
-    "contracts/schemas/session-command-outcome.schema.json": {
-      "before_sha256": "677b46c2d6cd147152d71a5563fab939c68523449584e7b3b72dcce6859ea1cc",
-      "after_sha256": "46fd34dd1226a011ca56f82c95c8de2da377852b637fb5ccd9dd753a76902ed9",
-      "owners": {
-        "@document": {
-          "before": "677b46c2d6cd147152d71a5563fab939c68523449584e7b3b72dcce6859ea1cc",
-          "after": "46fd34dd1226a011ca56f82c95c8de2da377852b637fb5ccd9dd753a76902ed9"
-        }
-      }
-    },
-    "contracts/schemas/session-command-result.schema.json": {
-      "before_sha256": "0b24e9e11fa3ad8303c3271de60b9b271c232875b776507fd143d23aa22422c5",
-      "after_sha256": "a05d6180a3226650dfcf9fafd6f2d65a7a1473df215d3bcc8de34a312491b678",
-      "owners": {
-        "@document": {
-          "before": "0b24e9e11fa3ad8303c3271de60b9b271c232875b776507fd143d23aa22422c5",
-          "after": "a05d6180a3226650dfcf9fafd6f2d65a7a1473df215d3bcc8de34a312491b678"
-        }
-      }
-    },
-    "contracts/schemas/session-metadata.schema.json": {
-      "before_sha256": "fea4d3caa1a23483c730ba6b4c85eeabcdd5a04e16c8c6bb5c7009b920ea05f3",
-      "after_sha256": "750da22c97bfe5fc350e7cce00cc05e90115ef5aec942c47e61509c6ec2a6785",
-      "owners": {
-        "@document": {
-          "before": "fea4d3caa1a23483c730ba6b4c85eeabcdd5a04e16c8c6bb5c7009b920ea05f3",
-          "after": "750da22c97bfe5fc350e7cce00cc05e90115ef5aec942c47e61509c6ec2a6785"
-        }
-      }
-    },
-    "contracts/schemas/session-persistence.schema.json": {
-      "before_sha256": "ba13007280a6a629a0cb4f29a5560e1e707523d5ea85d8b9f207820bd79de79e",
-      "after_sha256": "7534615c1ab004148353c3681c54640a69c1766f4e37768d906e178429a00035",
-      "owners": {
-        "@document": {
-          "before": "ba13007280a6a629a0cb4f29a5560e1e707523d5ea85d8b9f207820bd79de79e",
-          "after": "7534615c1ab004148353c3681c54640a69c1766f4e37768d906e178429a00035"
+          "before": "f801641681381172defed6541fb8b8c7333df2f76c59044c291e70e80f648e78",
+          "after": "86cdd2a753a7f52ab3bf0de8466c5093d03b1fcd6098207676f718da5ac2a684"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "7edcaf4787f0860d277ca0b714b9609a35162772bf0c3bed04583fc2d7e33345",
-      "after_sha256": "e6fb38ea9794db2c17c7c9a70c23f0587cbdfae3ce0864c3466b81933dc6625d",
+      "before_sha256": "e6fb38ea9794db2c17c7c9a70c23f0587cbdfae3ce0864c3466b81933dc6625d",
+      "after_sha256": "5293c08fbcf01545bdfc1fc0712a1ff0ad639db157508a89c8b55b240a368b30",
       "owners": {
         "@document": {
-          "before": "7edcaf4787f0860d277ca0b714b9609a35162772bf0c3bed04583fc2d7e33345",
-          "after": "e6fb38ea9794db2c17c7c9a70c23f0587cbdfae3ce0864c3466b81933dc6625d"
-        }
-      }
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "6b00f9836dc6ae22f2939fb16e76bc0a963c76e293d151f9bbb331d6e06224a7",
-      "after_sha256": "bc098aaca083ba9d66bba4f1b55766c9d7ea7d081acc62ab9c00763d4157255e",
-      "owners": {
-        "@document": {
-          "before": "6b00f9836dc6ae22f2939fb16e76bc0a963c76e293d151f9bbb331d6e06224a7",
-          "after": "bc098aaca083ba9d66bba4f1b55766c9d7ea7d081acc62ab9c00763d4157255e"
+          "before": "e6fb38ea9794db2c17c7c9a70c23f0587cbdfae3ce0864c3466b81933dc6625d",
+          "after": "5293c08fbcf01545bdfc1fc0712a1ff0ad639db157508a89c8b55b240a368b30"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "2536c4989558b7c2b9e0345fb26dc0991c7d80e4dcb58a0b9c3fb26e879706ab",
-      "after_sha256": "2a876950c4234a3d1c41d2c1d47213bd0d5ab568a13a64011af8ab78580606dc",
+      "before_sha256": "2a876950c4234a3d1c41d2c1d47213bd0d5ab568a13a64011af8ab78580606dc",
+      "after_sha256": "2cba1a768e51779a1e3090df36ddb13a37a4038673ef71a6bbe3c3c26c5ec4c2",
       "owners": {
         "@document": {
-          "before": "2536c4989558b7c2b9e0345fb26dc0991c7d80e4dcb58a0b9c3fb26e879706ab",
-          "after": "2a876950c4234a3d1c41d2c1d47213bd0d5ab568a13a64011af8ab78580606dc"
+          "before": "2a876950c4234a3d1c41d2c1d47213bd0d5ab568a13a64011af8ab78580606dc",
+          "after": "2cba1a768e51779a1e3090df36ddb13a37a4038673ef71a6bbe3c3c26c5ec4c2"
+        }
+      }
+    },
+    "docs/performance/current/issue590-command-fork.json": {
+      "before_sha256": null,
+      "after_sha256": "43d8e617db484aa47d49e0a5ea9eb51fc58cabf4d42bd1ce4fa63d141b2e9d6f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "43d8e617db484aa47d49e0a5ea9eb51fc58cabf4d42bd1ce4fa63d141b2e9d6f"
+        }
+      }
+    },
+    "docs/performance/current/issue590-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "0cfb7a2051e07630252800a8575d583b2e621e674bc341f8df968fef332a4b91",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0cfb7a2051e07630252800a8575d583b2e621e674bc341f8df968fef332a4b91"
+        }
+      }
+    },
+    "docs/performance/current/issue590-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "65a7b9536f8af76992854d4ddcfbe8e2866c280a5483f5bca3729a41a5811670",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "65a7b9536f8af76992854d4ddcfbe8e2866c280a5483f5bca3729a41a5811670"
+        }
+      }
+    },
+    "docs/performance/current/issue590-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "ba075033c02fc82e2735407c6103ae2baa26b6b168b04984726f3f6427f6cf08",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ba075033c02fc82e2735407c6103ae2baa26b6b168b04984726f3f6427f6cf08"
+        }
+      }
+    },
+    "docs/performance/issue590-http.json": {
+      "before_sha256": null,
+      "after_sha256": "1d6a89334ec9490e3158af1b28a1a2d64819b978839e19c28ba87cd48dae1110",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "1d6a89334ec9490e3158af1b28a1a2d64819b978839e19c28ba87cd48dae1110"
+        }
+      }
+    },
+    "docs/performance/issue590.md": {
+      "before_sha256": null,
+      "after_sha256": "8cb548eb190d257c90ac925a0bc8c1e5631f80a5b17e60018b9ff129659fcf49",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8cb548eb190d257c90ac925a0bc8c1e5631f80a5b17e60018b9ff129659fcf49"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "3b6b84fed812a7201f392ac84d0f96334cca5858f0e68283f62cf4f7941ee748",
-      "after_sha256": "06b3357d35386c600d109f1a79dedf2a42539005401ce18c7b8d97a42bfa881a",
+      "before_sha256": "06b3357d35386c600d109f1a79dedf2a42539005401ce18c7b8d97a42bfa881a",
+      "after_sha256": "2e0e8b620d0b31197c9220912d5cef5ba90c63598dcf0c33f5820b8cd8933d00",
       "owners": {
         "@document": {
-          "before": "3b6b84fed812a7201f392ac84d0f96334cca5858f0e68283f62cf4f7941ee748",
-          "after": "06b3357d35386c600d109f1a79dedf2a42539005401ce18c7b8d97a42bfa881a"
+          "before": "06b3357d35386c600d109f1a79dedf2a42539005401ce18c7b8d97a42bfa881a",
+          "after": "2e0e8b620d0b31197c9220912d5cef5ba90c63598dcf0c33f5820b8cd8933d00"
         }
       }
     },
-    "scripts/build_external_contract.py": {
-      "before_sha256": "78cd9a3a7ba061f98d0e97c47fa1c07091cf8e119d5b0e08fd32081f34f2a210",
-      "after_sha256": "88fa1e60a439edd7a84560b1720760381878592c95981b8a1ee7d29d3d5e0fe8",
+    "scripts/check_performance_policy.py": {
+      "before_sha256": "f2fd48a34d36739eafd6e81f7be8788272122849aa9536655ab88041b00effa9",
+      "after_sha256": "01310f1cdba3520f77cf0c877c9f818eeb32e23e79ae448c2064b5de4053e779",
       "owners": {
-        "_write_error_examples": {
-          "before": "32a717e7718102535b1098b7cb59f9eba99cc5e81057e4a64d86b43a575138f8",
-          "after": "d9bd6bfc4fa6fd6109fad12f4a6c5ad60e88533ef6d6a7e54e877a0f1f9a20ec"
+        "@module": {
+          "before": "fdb925d1aa51a2581b960aa6993721b571b78788c91d027e6630d56a5e780dc8",
+          "after": "517df7c229779d26547dea8255c533c603da026d88c3d924d3b575ae9cf68a46"
+        },
+        "_fresh_comparison_metadata": {
+          "before": null,
+          "after": "aac0aa79b23d8ec86606225a318eed13a68aa4e9d5c495bb881d79644669bc59"
+        },
+        "_uses_fresh_current_comparisons": {
+          "before": null,
+          "after": "ccbca78214ab9544a157fba2c914ecb6c25949505b290e500aec7a8060e3deb4"
+        },
+        "validate_current": {
+          "before": "cd93e1a0457057b6bb5266b1c6f9fae8df8324101f8ed3038ca98987fdeefefb",
+          "after": "44539c4436f9f01c27965efb1711ba3c66d4dd18bc5e265de758e2e02b355633"
+        }
+      }
+    },
+    "scripts/measure_command_fork.py": {
+      "before_sha256": null,
+      "after_sha256": "9a0e09be4c94901206eb4fef77111f8d3f655db3a14202fe80042b6056d630b2",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "99303949625530007818087fd2a33cd8e49f3dfa90a1815e91925431b3e7bfb8"
+        },
+        "_sample": {
+          "before": null,
+          "after": "92079b21015294154ecb7631f6471ae4ace7aa5b9f75caf713aaaf2d28f41886"
+        },
+        "main": {
+          "before": null,
+          "after": "48d5f57d6d26779f253f7c5b6f81ba441664e2b44b8776d0cc288454e2c922dc"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "a6cd8ef487b6c9cb73ad34a7d794087948d98261bf4144a5394082239f90e8d9",
-      "after_sha256": "f637d11f2a82af201cdc37e072792bbcdc558bee4c609c8c4f38c39860ece725",
+      "before_sha256": "f637d11f2a82af201cdc37e072792bbcdc558bee4c609c8c4f38c39860ece725",
+      "after_sha256": "31243a5447707531113a0766962dc3d146aea25c2af8675e4619bcaae6b91878",
       "owners": {
         "@document": {
-          "before": "a6cd8ef487b6c9cb73ad34a7d794087948d98261bf4144a5394082239f90e8d9",
-          "after": "f637d11f2a82af201cdc37e072792bbcdc558bee4c609c8c4f38c39860ece725"
+          "before": "f637d11f2a82af201cdc37e072792bbcdc558bee4c609c8c4f38c39860ece725",
+          "after": "31243a5447707531113a0766962dc3d146aea25c2af8675e4619bcaae6b91878"
         }
       }
     },
-    "src/warhammer40k_core/adapters/external_contract.py": {
-      "before_sha256": "dba9e0995210cc617cad5e8add59d79f630dbfad22657a50eb4f214c214d301c",
-      "after_sha256": "e72ee19e8f437fd5a6516c1a78e3cda6b515e3089dad30528500f0a1fc61a93d",
+    "src/warhammer40k_core/adapters/session_protocol.py": {
+      "before_sha256": "c8061df015723ccfaa5de8d8280a646c0e3fdcafda9d4b05f84430e0b681ae62",
+      "after_sha256": "534931789f1bca9b5fa71c438b71738740d889a6a75123a5bdf017ba918c51c5",
       "owners": {
         "@module": {
-          "before": "e243b4e6de7d8361ed724e6883fab7decb97d345b5d4160bc1f20b2955da1739",
-          "after": "516f3ab7868281ad2d8ce535b2bd5cf1f5f9a180843f960a2d3af0246537b168"
+          "before": "c26515b3e3aa2e5c5d1f1ac393b9a6c4a94ed3d9473ba7666339cf234de54836",
+          "after": "df8876a904ce0414dd065271bbe7f193ad95bbc8f936720f5fa93a23768e6d4f"
+        },
+        "AuthoritativeSession.fork_for_command": {
+          "before": "98b24d118607156c6df0e801686d5046db1f3b9be0bd2d52e434a6866322beaa",
+          "after": "92e5b25134defac967ef8b47a49b5f2c034092e9a1772442b1b2f3ddfbba0814"
         }
       }
     },
-    "src/warhammer40k_core/adapters/redaction.py": {
-      "before_sha256": "c6c3d49eda6851474c67e25c961d618f5510ff03a837c6579ea812a55837ef8d",
-      "after_sha256": "85589ddb44ae47268fc056b4b0c09af9f3452edae0b9ab472a2b447fde408e01",
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "before_sha256": "6436354d70dad24441579347fba51751dff8159a6080259f0b6f63a85fd1bbd9",
+      "after_sha256": "a80eaeac284c8bcefe5054024262bd27c47f5554ef82a8b907ab848da1043bda",
       "owners": {
-        "public_command_rejection_diagnostics": {
+        "TerrainPathLegalityContext._append_terrain_volume_segment": {
+          "before": "1e9c0706513b91b717cb7a603fe7ccdeee04b83ae643c6ccf5c0142d6602ca63",
+          "after": "6cee92e57ecd42821e7eaf2a767fd2e5cff85402e0072ca6ae06c9033f400ce2"
+        }
+      }
+    },
+    "tests/code_quality/test_current_comparison_routing.py": {
+      "before_sha256": null,
+      "after_sha256": "31451a8c17a8dffc81029a1693fd966938ba726b883e20dd8d3ae9adaf3b78b2",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "e1245cf35935b5e0c80f8fa2a0490222e39efb03d2d99d825b288e568921545c"
+          "after": "e5e1102f46aab61bb2aa77a33b1f5a10de4ca241ad9a1bc212422135665adf1a"
         },
-        "public_error_envelope": {
-          "before": "2e8dad02371ff12d5e0d1cac3d628c2e0c014f1f35e872ff16d63746ddddeac3",
-          "after": "4c9388524c608611128b2c79c5bbb361b51736431e01d9332f2fe3b0e6290357"
-        }
-      }
-    },
-    "src/warhammer40k_core/adapters/server.py": {
-      "before_sha256": "1ce0f4bba07c34a2a5b70a5e7f3e7470f4b078fc9ba90986e3766166a4373e05",
-      "after_sha256": "829b690a8249ad17d6e6c508a6fb2349a15d65e1c6dc83898e82cf138f624020",
-      "owners": {
-        "@module": {
-          "before": "b11800ffa76b3ad915e140f0397f2fde4d42291eb5405fa74e667901de1a27f0",
-          "after": "cbcf9836a9a8216197e407f8d99d1adb54b6a005cbb586346d2d7a9402eff7f8"
-        },
-        "AdapterGameServer._execute_protocol_command": {
-          "before": "d33118e3e9cfd43acfb5407477b2f04e90ff92a195e3be80d4cc2c9a3ddab28c",
-          "after": "0838abdb68ec6ff088fe874bda1b8dc328a5f0515e8084d38d0fd9a6f511fea6"
-        }
-      }
-    },
-    "src/warhammer40k_core/adapters/server_commands.py": {
-      "before_sha256": "08b1b96fb2518979d2e1e8f44c79934878dc6c010e823b00add1dccf7a574c88",
-      "after_sha256": "d3317b6fa5a9d3ff3fcec190a6f701afcbcf4db634cd0ae3e404409dcd5d4aeb",
-      "owners": {
-        "@module": {
-          "before": "c6193d8f952b7d84bd010e588dc01112389784e23b70f2321b2c73a3e481f8a4",
-          "after": "0de278968f72e1cb6a8ce28899251d53ea0b6dcdfbc6cddcecf9d55c3133989f"
-        },
-        "uncommitted_command_response": {
+        "_classify": {
           "before": null,
-          "after": "90801394bc07aae47a1f9733e5508ed9fb3d7c66167039627921bf4573dffee5"
-        }
-      }
-    },
-    "src/warhammer40k_core/adapters/server_responses.py": {
-      "before_sha256": "94b8e02b0ae8f1119c3d28cdd62cfce1ec4031e8f936d54cb0f906da4eb661e9",
-      "after_sha256": "de8092c11e4eed8dd452dcd21e28e415e0c040bdbe791203db0d3e1c922a801b",
-      "owners": {
-        "error_response": {
-          "before": "20830885a93c8238c36a778652ea719ccb71e135f8818aa88c15d6c2270d69a0",
-          "after": "e70310dda4110e471d1f8c892a44cf86dc482851e1f7b44637cca69e6ce5c9dd"
+          "after": "b98aa3850ce32d99f14bbd00b8d9129f353cd84d24f01613ac6a36c37ccf52d1"
+        },
+        "_commit": {
+          "before": null,
+          "after": "337b4c36e55607ce636813f42a70eec991d842e0ce95353879f64e2f8f831888"
+        },
+        "_write": {
+          "before": null,
+          "after": "257a3dff706f0c67b16b0a8d0081824ce48420a9ae76cfef34ef024e14fd08ad"
+        },
+        "current_checkout": {
+          "before": null,
+          "after": "e9e0a39e4730e615c95a9726f601f955a98e01a094048bbdcd70596444e93631"
+        },
+        "test_current_route_preserves_full_comparison_failures": {
+          "before": null,
+          "after": "40af6dd2f9142a2f9a97184b6f198b0171f770a3694f629b64418d8133a85ac9"
+        },
+        "test_current_transaction_rechecks_source_after_full_validation": {
+          "before": null,
+          "after": "1c2f16651b524fa0782d343f840b46f6e75e961345b6169c79292408975891e7"
+        },
+        "test_existing_report_cannot_be_relabelled_fresh_against_real_git_base": {
+          "before": null,
+          "after": "aa0cf1e1a9b8dd22f6e856319f8554f5a4fdf51a872dfb6f6e92937cd55cd2c2"
+        },
+        "test_fresh_assessment_requires_actual_base_and_runtime": {
+          "before": null,
+          "after": "b259a9fc0d9d87b38b7413dae2a2a4364d4d40db483eeab5daea664a594d226f"
+        },
+        "test_fresh_comparisons_reach_full_current_source_and_budget_validation": {
+          "before": null,
+          "after": "969a6da65655ac0d59c9aabacce05afb43f50a3e25160a50246b031e8af3998d"
+        },
+        "test_fresh_report_paths_are_canonical_current_json": {
+          "before": null,
+          "after": "3953d9ef8c1649a3dec4484d28ffa2634a1d7087ef9861676ababa110bedb6e3"
+        },
+        "test_fresh_report_symlink_and_reused_base_member_are_rejected": {
+          "before": null,
+          "after": "dc9117edf5f361dce8527e2c744a48044ccd3406de131755f26a4defa9aa9f70"
+        },
+        "test_independent_postflight_rejects_changed_current_inputs": {
+          "before": null,
+          "after": "eaa7a1e6bfc9a1758c05b9b1473820cacd0aecf194cc04369f2c96f52db584f2"
+        },
+        "test_malformed_generic_report_cannot_fall_back_to_history": {
+          "before": null,
+          "after": "6b2d05ec9c6981922ae6f79eb7b7ea8d69ccf1d72ce1e2f2d838d336e5eb0b0e"
+        },
+        "test_retained_base_keeps_original_phase_dispatch": {
+          "before": null,
+          "after": "aab0c67097fa0d237b8d6235468ce67ce952d44cd86af06b8bcdd12c488c7ac4"
+        },
+        "test_retained_markers_preserve_route_and_cannot_mix_with_fresh": {
+          "before": null,
+          "after": "95dd6d276256fa6f17cf15da5882135c373e1891b5f37aa828d317eb81dd4335"
+        },
+        "test_stale_generic_comparisons_fail_before_historical_routing": {
+          "before": null,
+          "after": "5470d12920a810de7682dd3234dc9b71b2f867cec6f1dc93dec911fdd41bb867"
         }
       }
     },
     "tests/infrastructure/adapters/unit/test_session_commands.py": {
-      "before_sha256": "2bebfd82ddf1ff46aa72599bac6e99435b09aa2ca9819e4a2e8c4e1d9c8490f8",
-      "after_sha256": "f4ea5e8c94fc0766a043cbc35e7fb8bd14c45b48b10ab74d86c60fbf84fd1886",
+      "before_sha256": "f4ea5e8c94fc0766a043cbc35e7fb8bd14c45b48b10ab74d86c60fbf84fd1886",
+      "after_sha256": "3472212073a7814b9cfa10fe262450e05d5747dba9b322c18b0bb8b139ec98fc",
       "owners": {
         "@module": {
-          "before": "b583bcb14c622240c452d3edd520d4e6797d5991802a8addfb76da20ab06ca22",
-          "after": "021531b621efe828490766cd53b3c6913c5c4cb366433a9f26f38d6bc374e07f"
+          "before": "021531b621efe828490766cd53b3c6913c5c4cb366433a9f26f38d6bc374e07f",
+          "after": "dcbb17f0d71eca99909d46fc0572c0ece54c9df707025a672c0f5336494396f2"
         },
-        "_error_envelope_validator": {
+        "test_command_fork_isolates_live_owners_without_reexporting_retained_history": {
           "before": null,
-          "after": "a9552f3fc44713716a04bafad8af32075386cf95dce406cc35751c62f7485052"
+          "after": "18fb3a4418f6254f08e3e6f3e0548de26deb542dad7dd672716d6340a25e33ca"
         },
-        "_http_player_command": {
+        "test_command_fork_keeps_creation_and_persistence_history_validation": {
           "before": null,
-          "after": "8ad86abd059329a896ebca93798187aff03f7d1aa2437da05c99c46a3359fa3c"
+          "after": "b839e5028f7780afaea97e8f21bb9d48e0564ec53b159ef504e53ad6b20ebb27"
         },
-        "test_authenticated_http_movement_inventory_rejection_preserves_diagnostics_and_retry": {
+        "test_terrain_path_reuses_volume_footprint_preserving_complete_result": {
           "before": null,
-          "after": "727235b8cde6578348c6408ab1d07ff4540ffdaaf95a92104ba59e984ade1867"
-        },
-        "test_error_diagnostic_schema_rejects_unknown_mixed_and_private_members": {
-          "before": null,
-          "after": "65d9a36943ccdbfacc8f91e15b70089a63a416b030ad7d4e45ab690581b8afb1"
-        },
-        "test_phase18f_recorded_invalid_retry_is_atomically_journaled": {
-          "before": "ca08c88b98650dc391649e4c9647131a211af56ea1cc52d409462bd3a6d64ccc",
-          "after": "c55542f82728a54852e2cd111c0292bf2b1ec219aaf189dae7e45963020b2f25"
-        },
-        "test_uncommitted_unsupported_diagnostics_are_closed_and_optional": {
-          "before": null,
-          "after": "d05ce427d748be3d4e8b4cb3f64e70ce59522655af72744b206589e1e7749afa"
+          "after": "c7a75e0b45cbf8f77ef96a4a7670195c5a5d53c2b48522b1637138d7100d1f52"
         }
       }
     }
   },
   "rows": {
-    "conformance/typescript/src/client.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds conformance/typescript/src/client.ts and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
-    "conformance/typescript/src/contract.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
+    "ci/quality_shards/shard-1-modules.txt": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds conformance/typescript/src/contract.ts and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
-    "conformance/typescript/src/generated/openapi.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
+    "ci/quality_shards/shard-1.txt": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds conformance/typescript/src/generated/openapi.ts and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "conformance/typescript/src/proposal-schema.test.ts": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds conformance/typescript/src/proposal-schema.test.ts and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/README.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/README.md and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/compatibility-policy.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/compatibility-policy.md and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/compatibility/45.0.0-shape.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/compatibility/45.0.0-shape.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/conformance-scenarios/README.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/conformance-scenarios/README.md and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/examples/errors/conflict.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/errors/conflict.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/examples/errors/corruption.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/errors/corruption.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/examples/errors/forbidden.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/errors/forbidden.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/examples/errors/invalid-diagnostics.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/errors/invalid-diagnostics.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/examples/errors/invalid.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/errors/invalid.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/examples/errors/malformed.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/errors/malformed.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/examples/errors/stale.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/errors/stale.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/examples/errors/terminal.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/errors/terminal.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/examples/errors/unsupported-diagnostics.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/errors/unsupported-diagnostics.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/examples/errors/unsupported.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/errors/unsupported.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "issue588-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/persistence/session-persistence.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "issue588-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/sessions/session-command-outcome.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "issue588-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/sessions/session-command-started.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "issue588-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/sessions/session-metadata-created.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "issue588-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/support-profile-player-a-redacted.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "issue588-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/support-profile-player-b-redacted.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "issue588-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/examples/support-profile.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication"
+        "contract-42-1-publication",
+        "d07-generated-current-contract-inventory",
+        "issue532-contract44-publication",
+        "issue533-contract-publication",
+        "issue588-contract-publication",
+        "order103-contract-publication",
+        "order104-contract-publication",
+        "order105-contract-publication",
+        "order106-contract-publication",
+        "order107-contract-publication",
+        "order108-contract-publication",
+        "order109-contract-publication",
+        "order110-contract-publication",
+        "order115-contract-publication",
+        "order116-contract-publication",
+        "order117-contract-publication",
+        "order118-contract-publication",
+        "order119-contract-publication",
+        "order120-contract-publication",
+        "order121-contract-publication",
+        "order122-contract-publication",
+        "order123-contract-publication",
+        "order124-contract-publication",
+        "order125-contract-publication",
+        "order126-contract-publication",
+        "order127-contract-publication",
+        "order128-contract-publication",
+        "order129-contract-publication",
+        "order130-contract-publication",
+        "order131-contract-publication",
+        "order132-contract-publication",
+        "order133-contract-publication",
+        "order134-contract-publication",
+        "order135-contract-publication",
+        "v963-snap-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/manifest.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/migrations/44-to-45.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/migrations/44-to-45.md and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/openapi.yaml": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/openapi.yaml and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/schemas/error-envelope.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/schemas/error-envelope.schema.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/schemas/session-command-outcome.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/schemas/session-command-outcome.schema.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/schemas/session-command-result.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/schemas/session-command-result.schema.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/schemas/session-metadata.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/schemas/session-metadata.schema.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "contracts/schemas/session-persistence.schema.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds contracts/schemas/session-persistence.schema.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -828,117 +758,162 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds data/source_audits/ci64_provenance_v1/test-cutover.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds docs/ADAPTER_DECISION_CONTRACT.md and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds docs/CORE_RULES_REMEDIATION_ROADMAP.md and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "docs/performance/current/issue590-command-fork.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "docs/performance/current/issue590-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "docs/performance/current/issue590-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "docs/performance/current/issue590-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "docs/performance/issue590-http.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "docs/performance/issue590.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds docs/performance/policy-v3/operation-map.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
-    "scripts/build_external_contract.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
+    "scripts/check_performance_policy.py": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds scripts/build_external_contract.py and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
+    },
+    "scripts/measure_command_fork.py": {
+      "category": "measured_workload",
+      "operations": [
+        "workload-authoritative-command-fork"
+      ],
+      "selected_families": [
+        "session_command_fork"
+      ],
+      "rationale": "Adds a bounded three-sample canonical authority-fork workload with separate untimed work counts and exact persistence/history equality checks.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
+        "order108-terrain-semantics",
+        "order109-unit-control-semantics",
+        "order110-action-battle-shock-semantics",
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds src/warhammer40k_core/_engine_build_manifest.json and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
-    "src/warhammer40k_core/adapters/external_contract.py": {
-      "category": "rule_semantics",
+    "src/warhammer40k_core/adapters/session_protocol.py": {
+      "category": "hot_query_or_data_structure",
       "operations": [
-        "issue588-contract-publication"
+        "authoritative-command-fork"
       ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds src/warhammer40k_core/adapters/external_contract.py and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "selected_families": [
+        "session_command_fork"
+      ],
+      "rationale": "Trusted command staging copies already validated authority while preserving isolated live owners; direct fork samples and revision-19 HTTP receipts measure its cost.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
-    "src/warhammer40k_core/adapters/redaction.py": {
-      "category": "rule_semantics",
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "category": "algorithm_or_search",
       "operations": [
-        "http-command-rejection-diagnostics"
+        "geometry-search",
+        "order108-terrain-semantics"
       ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds src/warhammer40k_core/adapters/redaction.py and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Hoists an unchanged terrain footprint out of the sampled-pose loop and preserves the exact predicate, segments, diagnostics and sample counts.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
-    "src/warhammer40k_core/adapters/server.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "http-command-rejection-diagnostics"
-      ],
+    "tests/code_quality/test_current_comparison_routing.py": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds src/warhammer40k_core/adapters/server.py and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "src/warhammer40k_core/adapters/server_commands.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "http-command-rejection-diagnostics"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds src/warhammer40k_core/adapters/server_commands.py and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
-    },
-    "src/warhammer40k_core/adapters/server_responses.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "http-command-rejection-diagnostics"
-      ],
-      "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds src/warhammer40k_core/adapters/server_responses.py and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Maintains the current-report qualification dispatcher, its focused controls/inventory, exact comparison bindings or repair documentation; complete evidence checks and runtime semantics remain mandatory.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     },
     "tests/infrastructure/adapters/unit/test_session_commands.py": {
       "category": "rule_semantics",
       "operations": [
+        "ci-restructure-tests-infrastructure-adapters-unit-test_session_commands.py",
         "http-command-rejection-diagnostics",
-        "http-listener-regression"
+        "http-listener-regression",
+        "issue590-regression-controls"
       ],
       "selected_families": [],
-      "rationale": "Issue588 preserves engine-authored rejection codes/fields in the uncommitted authenticated HTTP error branch. This row binds tests/infrastructure/adapters/unit/test_session_commands.py and all listed changed owners. The closed error family and bundle advance together; generated examples and clients publish the exact current contract/runtime identity. The selected command regression proves wrong-inventory atomicity and corrected retry through the shared engine path; governance documents the scoped behavior.",
-      "source_obligation": "Owner-approved issue588 requires current-request owners to retain viewer-safe typed violation/reason codes and fields when commands reject before commitment, without changing proposal validation, accepted/committed semantics, authoritative state or shared denial redaction. The engine remains sole mutation authority.",
-      "unchanged_work": "This is a bounded response-contract repair. Only the already-produced error status is projected into a small closed diagnostic shape, and the associated schema/examples/client contract is versioned. No search, geometry, cache, gameplay orchestration, persistence/replay algorithm, general serializer, measured workload, dependency or performance optimization changes. The approved bounded-repair direction requires this actual-base assessment, current serial smoke, live controls and complete hosted gates; detailed comparative performance and complete-game certification are not claimed."
+      "rationale": "Regenerates runtime identity/publication or active regression admission and adds direct real-domain controls for the issue590 integrity and geometry invariants.",
+      "source_obligation": "Issue590 requires usable canonical command rejection and legal correction while preserving authoritative validation, immutable retained snapshots and deterministic receipts.",
+      "unchanged_work": "Retains the complete supported decision, rules, restore/import, replay, quality selection and full-package branch-coverage obligations; generated publication and regression admission reflect the same bounded repair."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "session_command_fork": "docs/performance/current/issue590-command-fork.json",
+    "visibility": "docs/performance/current/issue590-visibility.json",
+    "movement": "docs/performance/current/issue590-movement.json",
+    "setup": "docs/performance/current/issue590-setup.json"
+  },
   "full_game": null
 }

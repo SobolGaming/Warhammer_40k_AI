@@ -200,6 +200,17 @@
         "schema": "tool-input-roles-v3",
         "role_specification": "data/source_audits/qualification40_v1/tool-input-roles-v3.json"
       }
+    },
+    "session_command_fork": {
+      "driver": "scripts/measure_command_fork.py",
+      "historical_workload_reference": "docs/performance/current/issue590-command-fork.json",
+      "cases": [
+        "created/fork",
+        "started/fork"
+      ],
+      "samples_per_case": 3,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "issue590-authoritative-command-fork-v1"
     }
   },
   "operations": {
@@ -30202,6 +30213,47 @@
         "@document",
         "@module",
         "_write_error_examples"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "authoritative-command-fork": {
+      "paths": [
+        "src/warhammer40k_core/adapters/session_protocol.py"
+      ],
+      "owners": [
+        "@module",
+        "AuthoritativeSession.fork_for_command"
+      ],
+      "families": [
+        "session_command_fork"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "workload-authoritative-command-fork": {
+      "paths": [
+        "scripts/measure_command_fork.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "session_command_fork"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "issue590-regression-controls": {
+      "paths": [
+        "tests/infrastructure/adapters/unit/test_session_commands.py"
+      ],
+      "owners": [
+        "@module",
+        "test_command_fork_isolates_live_owners_without_reexporting_retained_history",
+        "test_command_fork_keeps_creation_and_persistence_history_validation",
+        "test_terrain_path_reuses_volume_footprint_preserving_complete_result"
       ],
       "families": [],
       "sensitive": false,

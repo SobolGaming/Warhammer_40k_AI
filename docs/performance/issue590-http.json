@@ -1,0 +1,324 @@
+{
+  "schema": "issue590-public-http-evidence-v1",
+  "issue": "https://github.com/SobolGaming/Warhammer_40k_AI/issues/590",
+  "base_revision": "5657bf5f127466edeecf3259e0a53e29f6a9a352",
+  "base_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4dca94ddd872001548b4bb3809c4212741804eb0e516e1acf41d794d94f4b18a",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3bf79c73db5c5f28d8401fcf9f10298fae6aac5a349ef00cf4e79c9f7785bac7",
+  "contract_version": "45.0.0",
+  "host": {
+    "cpu": {
+      "Name": "AMD Ryzen Threadripper 3970X 32-Core Processor ",
+      "NumberOfCores": 32,
+      "NumberOfLogicalProcessors": 64
+    },
+    "os": {
+      "Caption": "Microsoft Windows 11 Pro",
+      "Version": "10.0.26300",
+      "TotalVisibleMemorySize": 134108652
+    }
+  },
+  "python": "Windows x64 CPython 3.14.5",
+  "dependencies": {
+    "orjson": "3.11.9",
+    "msgspec": "0.21.1",
+    "pydantic": "2.13.4",
+    "shapely": "2.1.2",
+    "numpy": "2.4.6",
+    "jsonschema": "4.26.0",
+    "referencing": "0.37.0",
+    "z3-solver": "4.15.4.0"
+  },
+  "budget": {
+    "total_seconds": 30,
+    "connect_cap_seconds": 3,
+    "read_cap_seconds": 30,
+    "read_also_capped_by_remaining_total": true,
+    "verified_source": "https://github.com/SobolGaming/Warhammer_40k_UI_unreal/blob/e3f07cda8bd5b66295af1ab26a04a6c9a6684631/scripts/migration/e01_boundary.py"
+  },
+  "before": {
+    "process_first_start": {
+      "attempts": 2,
+      "completed": 2,
+      "timeout_or_unknown": 0,
+      "min_seconds": 4.335256899998058,
+      "median_seconds": 4.738045899997815,
+      "max_seconds": 5.1408348999975715,
+      "attempt_seconds": [
+        4.335256899998058,
+        5.1408348999975715
+      ],
+      "note": "Unknown attempts are censored at the deadline and excluded from completed latency statistics."
+    },
+    "warm_normal_inventory_unprofiled": {
+      "attempts": 5,
+      "completed": 5,
+      "timeout_or_unknown": 0,
+      "min_seconds": 23.62464330000512,
+      "median_seconds": 24.01947719999589,
+      "max_seconds": 24.498115499998676,
+      "attempt_seconds": [
+        24.012500400000135,
+        24.498115499998676,
+        24.01947719999589,
+        24.092988200005493,
+        23.62464330000512
+      ],
+      "note": "Unknown attempts are censored at the deadline and excluded from completed latency statistics."
+    },
+    "invalid_distance_unprofiled": {
+      "attempts": 3,
+      "completed": 0,
+      "timeout_or_unknown": 3,
+      "min_seconds": null,
+      "median_seconds": null,
+      "max_seconds": null,
+      "attempt_seconds": [
+        30.00058939999144,
+        30.00091089999478,
+        30.00144239999645
+      ],
+      "note": "Unknown attempts are censored at the deadline and excluded from completed latency statistics."
+    },
+    "invalid_distance_profiled": {
+      "attempts": 1,
+      "completed": 0,
+      "timeout_or_unknown": 1,
+      "min_seconds": null,
+      "median_seconds": null,
+      "max_seconds": null,
+      "attempt_seconds": [
+        30.001338999994914
+      ],
+      "note": "Unknown attempts are censored at the deadline and excluded from completed latency statistics."
+    },
+    "corrected_one_inch": {
+      "attempts": 1,
+      "completed": 0,
+      "timeout_or_unknown": 1,
+      "min_seconds": null,
+      "median_seconds": null,
+      "max_seconds": null,
+      "attempt_seconds": [
+        30.00144469999941
+      ],
+      "note": "Unknown attempts are censored at the deadline and excluded from completed latency statistics."
+    }
+  },
+  "after": {
+    "process_first_start": {
+      "n": 2,
+      "seconds": [
+        3.8970095999975456,
+        3.7387134000018705
+      ],
+      "min": 3.7387134000018705,
+      "median": 3.817861499999708,
+      "max": 3.8970095999975456
+    },
+    "inventory_rejections": {
+      "n": 6,
+      "seconds": [
+        2.025299200002337,
+        2.310013499998604,
+        1.6748916000069585,
+        1.83797510000295,
+        2.285069100005785,
+        1.804718800005503
+      ],
+      "min": 1.6748916000069585,
+      "median": 1.9316371500026435,
+      "max": 2.310013499998604
+    },
+    "recorded_invalid_distance": {
+      "n": 4,
+      "seconds": [
+        10.893812999987858,
+        10.461235800001305,
+        10.563425300002564,
+        11.719573900001706
+      ],
+      "min": 10.461235800001305,
+      "median": 10.728619149995211,
+      "max": 11.719573900001706
+    },
+    "corrected_one_inch": {
+      "n": 2,
+      "seconds": [
+        7.585436599998502,
+        7.6698317999980645
+      ],
+      "min": 7.585436599998502,
+      "median": 7.627634199998283,
+      "max": 7.6698317999980645
+    },
+    "exact_duplicate": {
+      "n": 2,
+      "seconds": [
+        0.03776000000652857,
+        0.02907299999787938
+      ],
+      "min": 0.02907299999787938,
+      "median": 0.033416500002203975,
+      "max": 0.03776000000652857
+    }
+  },
+  "sessions": [
+    {
+      "name": "fresh-host-1",
+      "started_utc": "2026-10-30T00:40:11.655918+00:00",
+      "finished_utc": "2026-10-30T00:43:13.678167+00:00",
+      "movement_before": {
+        "revision": 19,
+        "battlefield_sha256": "eee11bdd92c06db13504bda969f3657672b3b820fb6f6d02727684b0293612e1",
+        "decision_records": 18,
+        "request_id": "decision-request-000019"
+      },
+      "checks": [
+        {
+          "case": "inventory-missing",
+          "state_unchanged": true,
+          "revision": 19,
+          "battlefield_sha256": "eee11bdd92c06db13504bda969f3657672b3b820fb6f6d02727684b0293612e1",
+          "decision_records": 18,
+          "request_id": "decision-request-000019"
+        },
+        {
+          "case": "inventory-duplicate",
+          "state_unchanged": true,
+          "revision": 19,
+          "battlefield_sha256": "eee11bdd92c06db13504bda969f3657672b3b820fb6f6d02727684b0293612e1",
+          "decision_records": 18,
+          "request_id": "decision-request-000019"
+        },
+        {
+          "case": "inventory-unknown",
+          "state_unchanged": true,
+          "revision": 19,
+          "battlefield_sha256": "eee11bdd92c06db13504bda969f3657672b3b820fb6f6d02727684b0293612e1",
+          "decision_records": 18,
+          "request_id": "decision-request-000019"
+        },
+        {
+          "case": "invalid-distance-1",
+          "positions_unchanged": true,
+          "fresh_request": true,
+          "revision": 20,
+          "battlefield_sha256": "eee11bdd92c06db13504bda969f3657672b3b820fb6f6d02727684b0293612e1",
+          "decision_records": 19,
+          "request_id": "decision-request-000020"
+        },
+        {
+          "case": "invalid-distance-2",
+          "positions_unchanged": true,
+          "fresh_request": true,
+          "revision": 21,
+          "battlefield_sha256": "eee11bdd92c06db13504bda969f3657672b3b820fb6f6d02727684b0293612e1",
+          "decision_records": 20,
+          "request_id": "decision-request-000021"
+        },
+        {
+          "case": "invalid-distance-3",
+          "positions_unchanged": true,
+          "fresh_request": true,
+          "revision": 22,
+          "battlefield_sha256": "eee11bdd92c06db13504bda969f3657672b3b820fb6f6d02727684b0293612e1",
+          "decision_records": 21,
+          "request_id": "decision-request-000022"
+        },
+        {
+          "case": "move-one-inch",
+          "requested_models": 5,
+          "moved_models": 5,
+          "all_requested_endpoints_match": true,
+          "revision": 23,
+          "battlefield_sha256": "bad3c74879e41f3334bed9c3baf71574ef0bc2f0ad9c688829005100886f26b4",
+          "decision_records": 22,
+          "request_id": "decision-request-000023"
+        },
+        {
+          "case": "exact-idempotent-retry",
+          "byte_equivalent": true,
+          "revision_unchanged": true
+        }
+      ],
+      "host_exit_code": 0,
+      "driver_sha256": "66dd7083d34990177288bab243673c49be79f597891cf363424cc4a04cb949aa",
+      "launcher_sha256": "9f4756c12d456ac4ffd1fc9f9bd6d511d3205d4b7d4b81d9e89f72d0c0c5151b",
+      "result_sha256": "0f9d0a3cbf73e2e10984f94f4f817606734b487986b1c7f34fba67c2fe02bfd9"
+    },
+    {
+      "name": "fresh-host-2",
+      "started_utc": "2026-10-30T00:44:01.424252+00:00",
+      "finished_utc": "2026-10-30T00:46:35.004685+00:00",
+      "movement_before": {
+        "revision": 19,
+        "battlefield_sha256": "fddb6d6c1ca942d6d580eb9208266ddc72ff0768f25e015598a0da928eb6080c",
+        "decision_records": 18,
+        "request_id": "decision-request-000019"
+      },
+      "checks": [
+        {
+          "case": "inventory-missing",
+          "state_unchanged": true,
+          "revision": 19,
+          "battlefield_sha256": "fddb6d6c1ca942d6d580eb9208266ddc72ff0768f25e015598a0da928eb6080c",
+          "decision_records": 18,
+          "request_id": "decision-request-000019"
+        },
+        {
+          "case": "inventory-duplicate",
+          "state_unchanged": true,
+          "revision": 19,
+          "battlefield_sha256": "fddb6d6c1ca942d6d580eb9208266ddc72ff0768f25e015598a0da928eb6080c",
+          "decision_records": 18,
+          "request_id": "decision-request-000019"
+        },
+        {
+          "case": "inventory-unknown",
+          "state_unchanged": true,
+          "revision": 19,
+          "battlefield_sha256": "fddb6d6c1ca942d6d580eb9208266ddc72ff0768f25e015598a0da928eb6080c",
+          "decision_records": 18,
+          "request_id": "decision-request-000019"
+        },
+        {
+          "case": "invalid-distance-1",
+          "positions_unchanged": true,
+          "fresh_request": true,
+          "revision": 20,
+          "battlefield_sha256": "fddb6d6c1ca942d6d580eb9208266ddc72ff0768f25e015598a0da928eb6080c",
+          "decision_records": 19,
+          "request_id": "decision-request-000020"
+        },
+        {
+          "case": "move-one-inch",
+          "requested_models": 5,
+          "moved_models": 5,
+          "all_requested_endpoints_match": true,
+          "revision": 21,
+          "battlefield_sha256": "1f1e9edb3d463457a613af8e062fdbcdcf92695fc16dc999d5ee647765160445",
+          "decision_records": 20,
+          "request_id": "decision-request-000021"
+        },
+        {
+          "case": "exact-idempotent-retry",
+          "byte_equivalent": true,
+          "revision_unchanged": true
+        }
+      ],
+      "host_exit_code": 0,
+      "driver_sha256": "66dd7083d34990177288bab243673c49be79f597891cf363424cc4a04cb949aa",
+      "launcher_sha256": "9f4756c12d456ac4ffd1fc9f9bd6d511d3205d4b7d4b81d9e89f72d0c0c5151b",
+      "result_sha256": "6c43d4e6a22f5ce3e3e324b239df14a1372d9b27302334a03ab8061d8df49e93"
+    }
+  ],
+  "sampling": "Two fresh host processes, serial and uninstrumented. First normal-geometry calls are 10.893812999987858 and 11.719573900001706 seconds; consecutive warm repeats in the first process are 10.461235800001305 and 10.563425300002621 seconds. Legal setup necessarily warms the runtime before normal movement. OS file caches were not cleared. No competing test workers ran.",
+  "installation": "e5a986113892a1ca2053371f289aa997ec78302a8ccfeb7ceca45b49330594ec",
+  "limits": [
+    "Finite canonical synthetic sessions on one desktop; no full-game or universal SLA claim.",
+    "Timeout observations are censored and are not completed-command latencies.",
+    "Successful new sessions do not recover or reclassify the original completion-unknown command.",
+    "Inventory error envelopes omit accepted/committed flags; unchanged state is asserted separately.",
+    "The bootstrap selects the noneditable installed candidate then runs the unchanged reference launcher; it adds no timers or function patches."
+  ]
+}

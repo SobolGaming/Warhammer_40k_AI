@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import cProfile
 import errno
 import socket
 import sys
+from dataclasses import fields
+from types import CodeType
 from typing import Protocol, cast
 
 from jsonschema.exceptions import ValidationError
@@ -129,7 +132,13 @@ from warhammer40k_core.adapters.http_transport import create_http_server
 from warhammer40k_core.adapters.projection import DecisionRequestViewPayload
 from warhammer40k_core.adapters.redaction import redacted_lifecycle_status
 from warhammer40k_core.adapters.server_commands import uncommitted_command_response
+from warhammer40k_core.adapters.session_protocol import AuthoritativeSession, SessionProtocolError
 from warhammer40k_core.engine.phase import GameLifecycleStage, LifecycleStatus
+from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
+from warhammer40k_core.geometry.pathing import PathWitness, TerrainPathLegalityContext
+from warhammer40k_core.geometry.pose import Point3, Pose
+from warhammer40k_core.geometry.terrain import TerrainVolume
+from warhammer40k_core.geometry.volume import Model, ModelVolume
 
 
 def test_phase18f_session_source_identity_publishes_active_rules_overlay() -> None:
@@ -779,3 +788,177 @@ def test_error_diagnostic_schema_rejects_unknown_mixed_and_private_members() -> 
     for invalid in invalid_diagnostics:
         with pytest.raises(ValidationError):
             validator.validate({**base, "error": {**base_error, "diagnostics": invalid}})
+
+
+def test_command_fork_isolates_live_owners_without_reexporting_retained_history() -> None:
+    server = AdapterGameServer()
+    session_id = _create_session(server, game_id="trusted-command-fork")
+    _start_command(server, session_id, "trusted-command-fork-start")
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    original_history = record.adapter_session.authoritative_history_payload()
+    snapshot_histories = {
+        revision: snapshot.adapter_session.authoritative_history_payload()
+        for revision, snapshot in record.revision_snapshots.items()
+    }
+
+    with cProfile.Profile() as profile:
+        fork = record.fork_for_command()
+    exported_history_calls = sum(
+        entry.callcount
+        for entry in profile.getstats()
+        if isinstance(entry.code, CodeType)
+        and entry.code.co_name == "authoritative_history_payload"
+    )
+    assert exported_history_calls == 0
+
+    copied_fields = {
+        "adapter_session",
+        "ruleset_id",
+        "command_journal",
+        "revision_snapshots",
+        "revision_history",
+    }
+    for field in fields(record):
+        original = getattr(record, field.name)
+        cloned = getattr(fork, field.name)
+        if field.name in copied_fields:
+            assert cloned is not original, field.name
+        else:
+            assert cloned is original, field.name
+    for revision, snapshot in record.revision_snapshots.items():
+        assert fork.revision_snapshots[revision] is snapshot
+        assert fork.revision_history[revision] is record.revision_history[revision]
+    for command_id, entry in record.command_journal.items():
+        assert fork.command_journal[command_id] is entry
+
+    pending = _pending_decision_for_any_player(server, session_id=session_id)
+    fork.adapter_session.submit_option(
+        request_id=_field_string(pending, "request_id"),
+        option_id=_first_option_id(pending),
+        result_id="trusted-command-fork-result",
+    )
+    assert (
+        fork.adapter_session.decision_record_count()
+        > record.adapter_session.decision_record_count()
+    )
+    assert record.adapter_session.authoritative_history_payload() == original_history
+    assert {
+        revision: snapshot.adapter_session.authoritative_history_payload()
+        for revision, snapshot in record.revision_snapshots.items()
+    } == snapshot_histories
+    fork.command_journal.clear()
+    fork.revision_snapshots.clear()
+    fork.revision_history.clear()
+    _json_object(fork.ruleset_id)["fork_only"] = ["isolated"]
+    assert record.command_journal
+    assert record.revision_snapshots
+    assert record.revision_history
+    assert "fork_only" not in _json_object(record.ruleset_id)
+
+
+def test_command_fork_keeps_creation_and_persistence_history_validation() -> None:
+    server = AdapterGameServer()
+    session_id = _create_session(server, game_id="trusted-command-boundaries")
+    _start_command(server, session_id, "trusted-command-boundaries-start")
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    payload = record.fork_for_command().to_persistence_payload()
+    restored = AuthoritativeSession.from_persistence_payload(
+        payload, session_recovery_factory=server.session_recovery_factory
+    )
+    assert restored.to_persistence_payload() == payload
+    with pytest.raises(SessionProtocolError, match="revision history is missing"):
+        replace(record, revision_history={})
+    payload["revision_history"] = []
+    with pytest.raises(SessionProtocolError, match="revision history is missing"):
+        AuthoritativeSession.from_persistence_payload(
+            payload, session_recovery_factory=server.session_recovery_factory
+        )
+    fork = record.fork_for_command()
+    fork.revision_history.clear()
+    with pytest.raises(SessionProtocolError, match="revision history is missing"):
+        fork.to_persistence_payload()
+
+
+@pytest.mark.parametrize(
+    "base",
+    [
+        CircularBase(radius=0.5),
+        OvalBase(length=1.4, width=0.6),
+        RectangularBase(length=1.2, width=0.8),
+    ],
+    ids=["circular", "oval", "rectangular"],
+)
+@pytest.mark.parametrize("case", ["valid", "blocked", "clear"])
+def test_terrain_path_reuses_volume_footprint_preserving_complete_result(
+    base: BaseShape, case: str
+) -> None:
+    mover = Model(
+        model_id="terrain-work-mover",
+        pose=Pose.at(1, 1, facing_degrees=25),
+        base=base,
+        volume=ModelVolume(height=2),
+    )
+    terrain = TerrainVolume(
+        terrain_id="terrain-work-volume",
+        bottom_center=Point3(3, 10 if case == "clear" else 1, 0),
+        width=1,
+        depth=1,
+        height=4 if case == "blocked" else 1,
+        rotation_degrees=30,
+    )
+    context = TerrainPathLegalityContext(
+        moving_model=mover,
+        terrain=(terrain,),
+        witness=PathWitness.for_paths(
+            (
+                (
+                    mover.model_id,
+                    (
+                        mover.pose,
+                        Pose.at(3, 1, facing_degrees=40),
+                        Pose.at(5, 1, facing_degrees=65),
+                    ),
+                ),
+            )
+        ),
+        terrain_movement_policy=RulesetDescriptor.warhammer_40000_eleventh().terrain_movement_policy,
+    )
+    with cProfile.Profile() as profile:
+        result = context.validate()
+    footprint_constructions = sum(
+        entry.callcount
+        for entry in profile.getstats()
+        if isinstance(entry.code, CodeType) and entry.code.co_name == "footprint_for_terrain"
+    )
+    # One traversal footprint; intersecting paths also inspect the endpoint once.
+    assert footprint_constructions == (1 if case == "clear" else 2)
+    # Exact pre-optimization results, including touching poses, diagnostics and
+    # sample counts, for all three base shapes against a rotated terrain volume.
+    assert result.to_payload() == {
+        "is_valid": case != "blocked",
+        "violations": [
+            {
+                "violation_code": "terrain_feature_transit_forbidden",
+                "message": "Terrain path crosses terrain without traversal permission.",
+                "terrain_id": "terrain-work-volume",
+                "surface_id": None,
+            }
+        ]
+        if case == "blocked"
+        else [],
+        "segments": [
+            {
+                "terrain_id": "terrain-work-volume",
+                "traversal_mode": "freely_traversable",
+                "start_pose": Pose.at(2, 1, facing_degrees=32.5).to_payload(),
+                "end_pose": Pose.at(4, 1, facing_degrees=52.5).to_payload(),
+                "horizontal_distance_inches": 4.0,
+                "vertical_distance_inches": 0.0,
+                "counted_distance_inches": 4.0,
+                "air_path_measurement_pending": False,
+            }
+        ]
+        if case == "valid"
+        else [],
+        "sampled_pose_count": 9,
+    }
