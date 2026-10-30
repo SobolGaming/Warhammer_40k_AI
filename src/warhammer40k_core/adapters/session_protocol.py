@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass, field, replace
+from copy import copy
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 from typing import TypedDict, cast
@@ -356,13 +357,18 @@ class AuthoritativeSession:
         self.last_activity_at = activity
 
     def fork_for_command(self) -> AuthoritativeSession:
-        return replace(
-            self,
-            adapter_session=self.adapter_session.fork(),
-            command_journal=dict(self.command_journal),
-            revision_snapshots=dict(self.revision_snapshots),
-            revision_history=dict(self.revision_history),
-        )
+        # This is an internal transaction copy of an already validated authority.
+        # Reconstructing through __init__ would revalidate/export every retained
+        # revision. Creation, persistence and recovery keep their full validation.
+        clone = copy(self)
+        clone.adapter_session = self.adapter_session.fork()
+        clone.ruleset_id = validate_json_value(self.ruleset_id)
+        clone.command_journal = dict(self.command_journal)
+        clone.revision_snapshots = dict(self.revision_snapshots)
+        clone.revision_history = dict(self.revision_history)
+        # Retained entries are historical values: commands replace dictionary
+        # entries or append new revisions, never mutate the retained snapshots.
+        return clone
 
     def command_entry(self, command_id: str) -> SessionCommandJournalEntry | None:
         return self.command_journal.get(_validate_identifier("command_id", command_id))

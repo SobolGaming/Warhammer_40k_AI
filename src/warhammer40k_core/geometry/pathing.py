@@ -1160,12 +1160,12 @@ class TerrainPathLegalityContext:
             # A physically empty doorway beneath a lintel is not transit
             # through the lintel, even when Solid closes it for sight/endpoints.
             return None
+        terrain_footprint = shapely_backend.footprint_for_terrain(terrain)
         touching_poses = tuple(
             pose
             for pose in sampled_path
-            if _model_horizontally_intersects_terrain(
-                _model_at_pose(self.moving_model, pose),
-                terrain,
+            if terrain_footprint.intersects(
+                shapely_backend.footprint_for_base(self.moving_model.base, pose)
             )
         )
         if not touching_poses:
