@@ -26,21 +26,21 @@
     },
     "ci/quality_shards/shard-1.txt": {
       "before_sha256": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f",
-      "after_sha256": "94a8a1216e6b55a3fdd8f36e0c7f1e14ee134ba1903b5860872e0c40beb895b6",
+      "after_sha256": "1774f19fe04561246b185f281b4fabe86482a736f3d7c9cbcbd8f506eadc60fa",
       "owners": {
         "@document": {
           "before": "d2ab7170e3153c15eb01ce64f020b9f30324c4b80a183d869ced5a5690582a8f",
-          "after": "94a8a1216e6b55a3fdd8f36e0c7f1e14ee134ba1903b5860872e0c40beb895b6"
+          "after": "1774f19fe04561246b185f281b4fabe86482a736f3d7c9cbcbd8f506eadc60fa"
         }
       }
     },
     "ci/quality_shards/shard-4.txt": {
       "before_sha256": "1668298c232f67d6e54d0616f56d0dfba5f3b6e57713e7b15f869a91d405bb8e",
-      "after_sha256": "226a61bf8b9bba2a69fe0a7955a7cba9b115a2bc5f13cf07556401f139428494",
+      "after_sha256": "0e7ffe6207fd31558773a1c43b6c354de0771963bcb4812c004b024a0c16d8f3",
       "owners": {
         "@document": {
           "before": "1668298c232f67d6e54d0616f56d0dfba5f3b6e57713e7b15f869a91d405bb8e",
-          "after": "226a61bf8b9bba2a69fe0a7955a7cba9b115a2bc5f13cf07556401f139428494"
+          "after": "0e7ffe6207fd31558773a1c43b6c354de0771963bcb4812c004b024a0c16d8f3"
         }
       }
     },
@@ -306,21 +306,21 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
-      "after_sha256": "c9350a22d0a3240e6e8199b7373d0b829b63d53f7df13cef8863524011b1157a",
+      "after_sha256": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76",
       "owners": {
         "@document": {
           "before": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
-          "after": "c9350a22d0a3240e6e8199b7373d0b829b63d53f7df13cef8863524011b1157a"
+          "after": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76"
         }
       }
     },
     "docs/SUPPORTED_FACTION_RULE_RECONCILIATION_2026_10.md": {
       "before_sha256": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-      "after_sha256": "23a9c3e4d42eb626273e2064ddb14dac9c1deda6103ba5b2bf1ab58958587eab",
+      "after_sha256": "c00556f92f54c2f34a07fc6e639b5a682ef866368ea5cb56c6de3b9aecce1459",
       "owners": {
         "@document": {
           "before": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-          "after": "23a9c3e4d42eb626273e2064ddb14dac9c1deda6103ba5b2bf1ab58958587eab"
+          "after": "c00556f92f54c2f34a07fc6e639b5a682ef866368ea5cb56c6de3b9aecce1459"
         }
       }
     },
@@ -882,17 +882,17 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
-      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
-      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+      "rationale": "Correct only newly added Vyper and exact-base compatibility testcase ordering to actual pytest definition/parameter order. Strict worker collection must equal its admitted generated lane manifest.",
+      "source_obligation": "The first ready CI run reproduced identical case sets with 57 differing ordered positions on lane1 and 37 on lane4 before tests. All four real collections independently establish the intended manifest sequence.",
+      "unchanged_work": "All 2240 total cases,1980 active cases,260 exact historical deferrals,prior-node lane membership and relative order,PR600 lane3 front module,reporter equality,source inputs and deadlines remain unchanged."
     },
     "ci/quality_shards/shard-4.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
-      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
-      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+      "rationale": "Correct only newly added Vyper and exact-base compatibility testcase ordering to actual pytest definition/parameter order. Strict worker collection must equal its admitted generated lane manifest.",
+      "source_obligation": "The first ready CI run reproduced identical case sets with 57 differing ordered positions on lane1 and 37 on lane4 before tests. All four real collections independently establish the intended manifest sequence.",
+      "unchanged_work": "All 2240 total cases,1980 active cases,260 exact historical deferrals,prior-node lane membership and relative order,PR600 lane3 front module,reporter equality,source inputs and deadlines remain unchanged."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
