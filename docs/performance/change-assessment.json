@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "bc9acd8419e7b97a2c1260c7e932d2cb9c3fc370",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6eb801a8cc0f00e24f45d2ca24494fee279bada900cc28a19be549a2613a5bd5",
-  "operation_map_sha256": "24052cf45d3c6dca66c1b014a211c75e6a0ca93602cc7cf92d1d50ecbc262804",
+  "operation_map_sha256": "26e8abfa46c7c6cd678aa22a9d2ba73eac7aa1b7a72c788b13a93de71428eead",
   "changes": {
     ".gitattributes": {
       "before_sha256": "481625daa59308518b8a38bf90dc9854033459aa1b131f9cbb13a841e7dddd07",
@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563",
-      "after_sha256": "173b689c37c0f5ee41922319132ea92ae557de64fe75b9cea39e63e4db954aaa",
+      "after_sha256": "24f4b2df5ba732a4eb7613a0c50a6a5324946c6cbd54bf2eecbde245c68901af",
       "owners": {
         "@document": {
           "before": "b983bbf6b43486f08701875570dd470c3c33c76a598fb0fe519ff82ba69b0563",
-          "after": "173b689c37c0f5ee41922319132ea92ae557de64fe75b9cea39e63e4db954aaa"
+          "after": "24f4b2df5ba732a4eb7613a0c50a6a5324946c6cbd54bf2eecbde245c68901af"
         }
       }
     },
@@ -36,11 +36,11 @@
     },
     "ci/quality_shards/shard-4.txt": {
       "before_sha256": "1668298c232f67d6e54d0616f56d0dfba5f3b6e57713e7b15f869a91d405bb8e",
-      "after_sha256": "5b58c877d4e30a8ff8e8fae9c00ded18a5200b60c9463d04a3b10c819db24bf1",
+      "after_sha256": "226a61bf8b9bba2a69fe0a7955a7cba9b115a2bc5f13cf07556401f139428494",
       "owners": {
         "@document": {
           "before": "1668298c232f67d6e54d0616f56d0dfba5f3b6e57713e7b15f869a91d405bb8e",
-          "after": "5b58c877d4e30a8ff8e8fae9c00ded18a5200b60c9463d04a3b10c819db24bf1"
+          "after": "226a61bf8b9bba2a69fe0a7955a7cba9b115a2bc5f13cf07556401f139428494"
         }
       }
     },
@@ -306,21 +306,21 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
-      "after_sha256": "bced12f262eb655df15feb814a18833c7eaff9eebb7c11b0a5f64a70561f2965",
+      "after_sha256": "d1fde5e508901a617e267cdf01871c6d34a5cdde949e84270971a537911bad8e",
       "owners": {
         "@document": {
           "before": "22d5844ca5cadcb16c28d7f6fd6ae19333cfc5c281faa96fba14a749a3410876",
-          "after": "bced12f262eb655df15feb814a18833c7eaff9eebb7c11b0a5f64a70561f2965"
+          "after": "d1fde5e508901a617e267cdf01871c6d34a5cdde949e84270971a537911bad8e"
         }
       }
     },
     "docs/SUPPORTED_FACTION_RULE_RECONCILIATION_2026_10.md": {
       "before_sha256": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-      "after_sha256": "dde857912e664108e191512ca090759795618d2285fb48ebef5c205e5627b392",
+      "after_sha256": "dbd6e2b60043270fd33afae1fb8754e521130092f075234730e29e01223a6e99",
       "owners": {
         "@document": {
           "before": "6291395722e19646741433f0f49f8fe53bc878d280c682cb4b2013421c5f89e8",
-          "after": "dde857912e664108e191512ca090759795618d2285fb48ebef5c205e5627b392"
+          "after": "dbd6e2b60043270fd33afae1fb8754e521130092f075234730e29e01223a6e99"
         }
       }
     },
@@ -335,6 +335,16 @@
       }
     },
     "docs/performance/current/vyper-source-bc9-v4.json": {
+      "before_sha256": null,
+      "after_sha256": "36ae186f7dd74899ce437f90aceb5e7940d0797d23a1cc621a39e8e8183fac3b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "36ae186f7dd74899ce437f90aceb5e7940d0797d23a1cc621a39e8e8183fac3b"
+        }
+      }
+    },
+    "docs/performance/evidence/vyper-source-c58420d7-comparison.json": {
       "before_sha256": null,
       "after_sha256": "36ae186f7dd74899ce437f90aceb5e7940d0797d23a1cc621a39e8e8183fac3b",
       "owners": {
@@ -366,21 +376,21 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "bc0083148585d3ae3c2dfcf3099e4755655160747f0dbc33c1feec0c0473bcbe",
-      "after_sha256": "08a2504091d2fcc474a5db3f6d306e999e4edaba7815ff2009dc771033fb4e61",
+      "after_sha256": "58544ab17a4236ed5da8ecd628a86f62f894a9acffd7e98886cc63c4beb13a8a",
       "owners": {
         "@document": {
           "before": "bc0083148585d3ae3c2dfcf3099e4755655160747f0dbc33c1feec0c0473bcbe",
-          "after": "08a2504091d2fcc474a5db3f6d306e999e4edaba7815ff2009dc771033fb4e61"
+          "after": "58544ab17a4236ed5da8ecd628a86f62f894a9acffd7e98886cc63c4beb13a8a"
         }
       }
     },
     "docs/performance/policy-v3/vyper-source-input-roles-v4.json": {
       "before_sha256": null,
-      "after_sha256": "5247a595db1189c8d63609a36fe7b959e98d777a13bc3ff57458f23d73e5e2b1",
+      "after_sha256": "cf03cf629bc9f8d5afee9f122aa3cdbe3130614c4414b1497156802647ae9d87",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5247a595db1189c8d63609a36fe7b959e98d777a13bc3ff57458f23d73e5e2b1"
+          "after": "cf03cf629bc9f8d5afee9f122aa3cdbe3130614c4414b1497156802647ae9d87"
         }
       }
     },
@@ -548,6 +558,68 @@
         }
       }
     },
+    "tests/code_quality/test_phase14a_source_identity.py": {
+      "before_sha256": "d67b860dbe557bd557536537d43c466176e2e6d14e1e48d6b8c08c1cb4d34eaf",
+      "after_sha256": "f004e500e5e3548af581d2bf5a3df16505fd63354bd39a48963a86508f8983a7",
+      "owners": {
+        "@module": {
+          "before": "97e4a1d4c6d5f1f55dc21f82219831b1e120b9776321f887e161d7d38b99ef5d",
+          "after": "89b9a58cb1c23a48fdbd6b1ee88c417b58adc5b5e93ee5d8d8f1aa9662923931"
+        },
+        "_active_identity_text": {
+          "before": "e98f610b4ea67006daad3d1dec4c1dfcdf5fadfb61fbe39a2eda7c0fd8ab44d4",
+          "after": "b8a18c195a2412381a3dc8b6f89a571a8774f33f747a41ecbc9a83cdedea37f1"
+        },
+        "_historical_snapshot_inputs": {
+          "before": null,
+          "after": "de3f160a669549ecd20f7de0beaa9d84496b1ef404370b0d847b6f3d852dc70f"
+        },
+        "_unique_provenance_object": {
+          "before": null,
+          "after": "98847f62e34036a972735d37c21cff9cb8b78b9d4ff1841aca8ffa709308dea4"
+        },
+        "_v4_provenance_text": {
+          "before": null,
+          "after": "522926551d76fce840e0e88292dd0050621a55ebe90ff0aef79599e4f9478a00"
+        },
+        "_vyper_provenance_text": {
+          "before": null,
+          "after": "3fda78049b4cc12f37569a2771ab4eed5cb4b84f1be4608e5c94dc2f26aea89c"
+        },
+        "test_v4_historical_inventory_authenticates_every_allowed_context": {
+          "before": null,
+          "after": "fe9baa6d9a55833d35d620e9fa8998fe9df6f0ebdc32f71a08f6efb4b17bfd1a"
+        },
+        "test_v4_provenance_does_not_hide_active_or_unknown_contexts": {
+          "before": null,
+          "after": "ac8710b60d0f2fe9123695b72c97ba108e410439f5ee94a29111aa75612ee9eb"
+        },
+        "test_v4_provenance_rejects_different_report_identity": {
+          "before": null,
+          "after": "c717cef65dbee423e10152ef6faf41d5f9e77354027cc13fc3c17d54af7da7c2"
+        },
+        "test_v4_provenance_rejects_duplicate_json_members": {
+          "before": null,
+          "after": "83f51445734bd28d03e336b4ed9432b960e6dd8529b172e85d7f839f9b0a6158"
+        },
+        "test_vyper_pinned_provenance_rejects_any_document_drift": {
+          "before": null,
+          "after": "d56fb539c799317f8590414fcdbf1c1d871ac29d54c51be3866a422f582f91bf"
+        },
+        "test_vyper_provenance_does_not_exempt_another_document": {
+          "before": null,
+          "after": "4d6ee1d80445f6cf822280497fae145d6e8225915ee30f8c086789dd7047b2b7"
+        },
+        "test_vyper_provenance_preserves_exact_historical_bytes_and_active_identity": {
+          "before": null,
+          "after": "1805e227fe0f5a3d3fa8f030c74905beab217e141fa4ff2c04ad2997eecfcd78"
+        },
+        "test_vyper_provenance_requires_immutable_snapshot_bytes": {
+          "before": null,
+          "after": "1ce663169c5a728c664b6b07f16f91041c9c4c5d6d2599c224ae39077a63eed7"
+        }
+      }
+    },
     "tests/code_quality/test_ws12_generated_data_artifacts.py": {
       "before_sha256": "8c16fd4ff13d3fe52697b30eb1d32d8814560619a3cd61262b019c97bf994c18",
       "after_sha256": "727a3107c8af13b9cf2937fd06c59fbd84351dc93b5b01167b35c313b97af285",
@@ -676,11 +748,11 @@
     },
     "tools/performance_tool_inputs_v4.py": {
       "before_sha256": null,
-      "after_sha256": "2f2f372ce6f35f93a7f19b65237611ca97662e4d460a5eb998939836cd31784a",
+      "after_sha256": "81dac96d51388980ecf37c7f48ce0c125e05919e0b0ab006ddca6317c89ec577",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e17a78a7dad0f36201e150fafaeee8a45d274b6e78737e202adc75048687184c"
+          "after": "84b37647a4d248200ae12e16ad24c6caea7ce907514a2e56050e26d0043bd3c5"
         },
         "classify_inputs": {
           "before": null,
@@ -724,9 +796,9 @@
         "d09-authenticated-source-bytes"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 35 historical CRLF test-metadata blobs seen in a clean independent checkout. Only per-path Git materialization attributes change; no JSON, source, test, harness or acceptance bytes change.",
-      "source_obligation": "Fresh checkouts must materialize the same measured committed bytes and remain clean without local info/attributes overrides.",
-      "unchanged_work": "All v4-selected inputs and runtime_inputs remain independently equal to measured c58420d7. Baseline-only local overrides are not copied; no newline normalization or exclusion weakens the comparison."
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "ci/quality_shards/all.txt": {
       "category": "governance",
@@ -1045,6 +1117,14 @@
       "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
       "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
+    "docs/performance/evidence/vyper-source-c58420d7-comparison.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "A separate stable-ID source title correction restores supported Vyper catalog/MFM pricing and current report identity; generated artifacts, regression admission and bounded source provenance follow this correction.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
     "docs/performance/evidence/vyper-source-c58420d7-producer.json": {
       "category": "governance",
       "operations": [],
@@ -1154,6 +1234,18 @@
       "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
     },
     "tests/code_quality/test_performance_tool_inputs_v2.py": {
+      "category": "measured_workload",
+      "operations": [
+        "supported-vyper-exact-base-performance-admission"
+      ],
+      "selected_families": [
+        "external_contract_source_reuse"
+      ],
+      "rationale": "Authorized exact-base checker compatibility admits fresh Vyper source evidence against bc9 with closed input roles, independently hashed source inventories and complete generated trees. The original six-sample workload and acceptance budgets remain unchanged.",
+      "source_obligation": "Preferred mirror Vyper title is linked to original stable datasheet000000605 by its exact source preimage and selected current-PDF fields. Ordinary one/two-model catalog and attachment-overlay requests must price75/140. Historical source records and remaining gaps stay explicit.",
+      "unchanged_work": "No gameplay algorithm, points alias, dependency, benchmark case, sample count, relative budget, coverage floor, deferral inventory or CI deadline is weakened. Historical v1/v2/v3 evidence stays on its original route; current v4 requires independently equal common inputs and all three generated trees per arm."
+    },
+    "tests/code_quality/test_phase14a_source_identity.py": {
       "category": "measured_workload",
       "operations": [
         "supported-vyper-exact-base-performance-admission"

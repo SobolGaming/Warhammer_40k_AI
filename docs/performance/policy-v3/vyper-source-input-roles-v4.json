@@ -38,7 +38,8 @@
     "tests/rules/section25/test_mfm.py": "Hashed by unchanged conftest during untimed behavioral-file admission; never executed or imported by the selected contract testcase. Only the three new source-pricing regression cases differ.",
     "tools/performance_policy.py": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker.",
     "tools/performance_tool_inputs.py": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker.",
-    "tools/performance_tool_inputs_v4.py": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker."
+    "tools/performance_tool_inputs_v4.py": "Untimed benchmark admission and evidence validation; never imported by the measured contract writer/checker.",
+    "tests/code_quality/test_phase14a_source_identity.py": "Untimed static quality guard authenticates historical source provenance separately from active edition identity; never imported or executed by the original measured contract testcase."
   },
   "required_dependencies": [
     "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/Abilities.json",

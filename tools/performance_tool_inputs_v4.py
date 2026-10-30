@@ -43,6 +43,7 @@ CONTROL = frozenset(
         "scripts/check_performance_policy.py",
         "tests/code_quality/test_performance_tool_inputs_v2.py",
         "tests/code_quality/test_current_comparison_routing.py",
+        "tests/code_quality/test_phase14a_source_identity.py",
         "tests/code_quality/test_ws12_generated_data_artifacts.py",
         "tests/code_quality/test_generated_ability_support_artifacts.py",
         "tests/rules/section25/test_mfm.py",
