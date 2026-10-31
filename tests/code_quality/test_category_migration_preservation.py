@@ -306,6 +306,7 @@ def edition_root(tmp_path: Path) -> Path:
         migration.EDITION_PREDECESSOR_ARCHIVE,
         migration.EDITION_REGISTERED_PREDECESSOR_ARCHIVE,
         migration.EDITION_REGISTERED_HELPER,
+        "docs/performance/policy-v3/acts-provenance-20261031/source-scope-predecessor.py.txt",
     ):
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -569,3 +570,71 @@ def test_registered_projection_rejects_repin_of_changed_successor(
     monkeypatch.setattr(migration, "EDITION_AFTER_SHA256", hashlib.sha256(changed).hexdigest())
     with pytest.raises(ValueError, match=r"edition provenance|Original edition"):
         migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+
+
+@pytest.mark.parametrize(
+    "drift", [None, "archive", "original", "addition", "omission", "duplicate"]
+)
+def test_acts_additions_preserve_every_original_assertion(
+    tmp_path: Path, drift: str | None
+) -> None:
+    from tests.support.acts_preservation import ARCHIVE, TEST_PATH, acts_predecessor
+
+    archive = tmp_path / ARCHIVE
+    archive.parent.mkdir(parents=True)
+    archive.write_bytes((ROOT / ARCHIVE).read_bytes())
+    raw = (ROOT / TEST_PATH).read_bytes()
+    if drift is None:
+        assert acts_predecessor(tmp_path, TEST_PATH, raw) == archive.read_bytes()
+        assert acts_predecessor(tmp_path, "tests/unrelated.py", raw) == raw
+        return
+    if drift == "archive":
+        archive.write_bytes(archive.read_bytes() + b"\n")
+    else:
+        tree = ast.parse(raw)
+        original = next(node for node in tree.body if isinstance(node, ast.FunctionDef))
+        addition = next(
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name.startswith("test_acts_")
+        )
+        if drift in {"original", "addition"}:
+            (original if drift == "original" else addition).body = [ast.Pass()]
+        elif drift == "omission":
+            tree.body.remove(addition)
+        else:
+            tree.body.append(addition)
+        raw = ast.unparse(tree).encode()
+    with pytest.raises(ValueError, match="Acts"):
+        acts_predecessor(tmp_path, TEST_PATH, raw)
+
+
+@pytest.mark.parametrize(
+    "mutation", [None, "archive", "original", "addition", "omission", "duplicate"]
+)
+def test_acts_comparison_registration_preserves_exact_historical_helper(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str | None
+) -> None:
+    from tests.support import acts_preservation as acts
+
+    target = tmp_path / acts.PROVENANCE_ARCHIVE
+    target.parent.mkdir(parents=True)
+    target.write_bytes((ROOT / acts.PROVENANCE_ARCHIVE).read_bytes())
+    current = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    if mutation is None:
+        assert acts.acts_provenance_predecessor(tmp_path, current) == target.read_bytes()
+        return
+    if mutation == "archive":
+        target.write_bytes(target.read_bytes() + b"\n")
+    elif mutation == "original":
+        current = current.replace(b"return contexts.get(relative)", b"return None")
+    elif mutation == "addition":
+        current = current.replace(b"(scopes.ACTS_BASE,)", b"(scopes.EC_BASE,)")
+    elif mutation == "omission":
+        current = current.replace(acts.PROVENANCE_ADDITIONS[0], b"")
+    else:
+        current += acts.PROVENANCE_ADDITIONS[0]
+    # Re-pinning current bytes cannot hide a changed old predicate or broadened addition.
+    monkeypatch.setattr(acts, "PROVENANCE_AFTER_SHA256", hashlib.sha256(current).hexdigest())
+    with pytest.raises(ValueError, match="registered edition provenance inputs changed"):
+        acts.acts_provenance_predecessor(tmp_path, current)

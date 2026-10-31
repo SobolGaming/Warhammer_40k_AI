@@ -1209,7 +1209,7 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     "warhammer_40000_11th:chaos_daemons:datasheet:plaguebearers:infected_outbreak": (
         "Infected Outbreak"
     ),
-    adepta_sororitas_army_rule.BATTLE_ROUND_START_HOOK_ID: "Acts of Faith",
+    adepta_sororitas_army_rule.TURN_START_HOOK_ID: "Acts of Faith",
     adepta_sororitas_army_rule.UNIT_DESTROYED_HOOK_ID: "Acts of Faith",
     adeptus_custodes_army_rule.DACATARAI_HOOK_ID: "Martial Ka'tah - Dacatarai",
     adeptus_custodes_army_rule.RENDAX_HOOK_ID: "Martial Ka'tah - Rendax",
@@ -2684,6 +2684,7 @@ def _adepta_sororitas_runtime_consumer_ids() -> tuple[str, ...]:
         sorted(
             {
                 *(binding.hook_id for binding in contribution.battle_round_start_hook_bindings),
+                *(binding.handler_id for binding in contribution.event_handler_bindings),
                 *(binding.hook_id for binding in contribution.unit_destroyed_hook_bindings),
             }
         )

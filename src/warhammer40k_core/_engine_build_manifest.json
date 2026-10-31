@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8a38ade62fcffa2ed689c5fee45c4a8efb4f68922c40b4fdc54cc3e50b1563b2",
-  "fingerprint": "8a38ade62fcffa2ed689c5fee45c4a8efb4f68922c40b4fdc54cc3e50b1563b2",
-  "resource_count": 3166,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9305c4ac4f1bf6a56785538635007afa3ef54c6e294e215bf9f6a2fc4905bcdd",
+  "fingerprint": "9305c4ac4f1bf6a56785538635007afa3ef54c6e294e215bf9f6a2fc4905bcdd",
+  "resource_count": 3167,
   "resources": [
     {
       "byte_length": 113,
@@ -2545,14 +2545,14 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 70771,
+      "byte_length": 69592,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/army_rule.py",
-      "sha256": "a620a636361d6547bea624e9cb79198e523b53a5e3ccf15895ead3e437e25995"
+      "sha256": "891d4c36e6f11b61b12924a1de1a776c70130ccd1b8f23ed3e36cdeeb25e4e18"
     },
     {
-      "byte_length": 3490,
+      "byte_length": 4022,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/destruction_sequencing.py",
-      "sha256": "f2a565554fc4ddb4093f0a71ad9e9e33620aeac8c22c8f96ca3ecf99c19205f0"
+      "sha256": "ca2eced195789998fb72330334be9fdeb2088e8e52248ebd6ccd660bf329ce65"
     },
     {
       "byte_length": 172,
@@ -2765,9 +2765,14 @@
       "sha256": "dbeb18c17348c66b41c2cbe53ffd756c70c2a3ac78a94adf0aa66463c02dfb51"
     },
     {
-      "byte_length": 4881,
+      "byte_length": 3235,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/round_sequencing.py",
-      "sha256": "9ed853d62d484d7706f47669998e1e5add57c8e2e4483281b1d2086a983b540c"
+      "sha256": "b10de531cb38569e9e09f8c2d8d5d2447141615f50b460cd73136a5b5f0404f6"
+    },
+    {
+      "byte_length": 3189,
+      "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/turn_sequencing.py",
+      "sha256": "526efc030f52f6d5db9ed272f4807730003d63f6d0490dd79d62fa3b58024eb5"
     },
     {
       "byte_length": 172,

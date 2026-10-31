@@ -87,6 +87,9 @@ class ReviewedScope:
 EC_BASE = "105b467b1140e6d9ff6710a74ed839ad225d17ec"
 EC_SPEC_PATH = "docs/performance/policy-v3/ec-profile-input-roles-v4.json"
 EC_REPORT_PATH = "docs/performance/current/ec-profile-105b-v4.json"
+ACTS_BASE = "2490faab2c41915c54eb26aed04902165fbfc042"
+ACTS_SPEC_PATH = "docs/performance/policy-v3/acts-of-faith-input-roles-v4.json"
+ACTS_REPORT_PATH = "docs/performance/current/acts-of-faith-2490-v4.json"
 _SCOPES = (
     ReviewedScope(
         BASE,
@@ -162,6 +165,66 @@ _SCOPES = (
                 "tests/rules/section18/test_emergency_status.py",
                 "tests/support/section05_fixtures.py",
                 "tools/performance_tool_inputs.py",
+                "tools/performance_tool_inputs_v4.py",
+                "tools/source_scope_provenance.py",
+            ]
+        ),
+        REQUIRED,
+        HARNESS,
+    ),
+    ReviewedScope(
+        ACTS_BASE,
+        ACTS_SPEC_PATH,
+        "5cc010849ae3bbe74bb11554f72d368fb9e90e1412daf6d07ddf302f8280f3ae",
+        "70d0006277d8fa33d1cdc51758956333226a7c5b7fd415b62b4c7b66b5acbc50",
+        ACTS_REPORT_PATH,
+        frozenset(
+            [
+                "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/turn_sequencing.py"
+            ]
+        ),
+        frozenset(
+            [
+                "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/army_rule.py",
+                "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/destruction_sequencing.py",
+                "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/round_sequencing.py",
+                "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/turn_sequencing.py",
+                "tools/generate_ability_support_matrix.py",
+            ]
+        ),
+        frozenset(
+            [
+                "contracts/examples/persistence/session-persistence.json",
+                "contracts/examples/sessions/session-command-outcome.json",
+                "contracts/examples/sessions/session-command-started.json",
+                "contracts/examples/sessions/session-metadata-created.json",
+                "contracts/examples/support-profile-player-a-redacted.json",
+                "contracts/examples/support-profile-player-b-redacted.json",
+                "contracts/examples/support-profile.json",
+                "contracts/manifest.json",
+                "data/generated/ability_coverage/ability_coverage_rows.json",
+                "data/generated/ability_coverage/ability_support_category_rows.json",
+                "src/warhammer40k_core/_engine_build_manifest.json",
+            ]
+        ),
+        frozenset(
+            [
+                ".gitattributes",
+                "ci/quality_shards/all.txt",
+                "ci/quality_shards/shard-1.txt",
+                "ci/quality_shards/shard-4.txt",
+                "data/source_audits/ci64_provenance_v1/test-cutover.json",
+                "data/source_audits/supported_rules_2026_10/acts-of-faith-timing.json",
+                "docs/performance/policy-v3/acts-of-faith-input-roles-v4.json",
+                "docs/performance/policy-v3/acts-provenance-20261031/runtime-hook-predecessor.py.txt",
+                "docs/performance/policy-v3/acts-provenance-20261031/source-scope-predecessor.py.txt",
+                "docs/performance/policy-v3/operation-map.json",
+                "tests/category_migration_preservation.py",
+                "tests/code_quality/test_category_migration_preservation.py",
+                "tests/code_quality/test_registered_source_scopes.py",
+                "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py",
+                "tests/support/acts_of_faith.py",
+                "tests/support/acts_preservation.py",
                 "tools/performance_tool_inputs_v4.py",
                 "tools/source_scope_provenance.py",
             ]

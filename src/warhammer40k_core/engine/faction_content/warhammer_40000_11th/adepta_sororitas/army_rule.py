@@ -59,6 +59,7 @@ from warhammer40k_core.engine.faction_content.common import (
 from warhammer40k_core.engine.faction_content.common import (
     payload_string as _payload_string,
 )
+from warhammer40k_core.engine.faction_content.events import RuntimeContentEventHandlerBinding
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.profile_modifiers import profile_with_delta
@@ -101,7 +102,7 @@ SOURCE_RULE_ID = "phase17f:phase17e:adepta-sororitas:army-rule"
 
 HOOK_ID = "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith"
 CONTRIBUTION_ID = HOOK_ID
-BATTLE_ROUND_START_HOOK_ID = f"{HOOK_ID}:battle-round-start"
+TURN_START_HOOK_ID = f"{HOOK_ID}:turn-start"
 UNIT_DESTROYED_HOOK_ID = f"{HOOK_ID}:unit-destroyed"
 TRIUMPH_RELICS_HOOK_ID = (
     "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:relics_of_the_matriarchs"
@@ -125,9 +126,9 @@ TRIUMPH_RELICS_STATE_KIND = "adepta_sororitas_relics_of_the_matriarchs_selected"
 TRIUMPH_RELICS_PERSISTING_EFFECT_KIND = "adepta_sororitas_triumph_relics_selection"
 TRIUMPH_RELICS_REROLL_EFFECT_KIND = "adepta_sororitas_triumph_relics_reroll"
 TRIUMPH_RELICS_FEEL_NO_PAIN_SOURCE_PREFIX = f"{TRIUMPH_RELICS_HOOK_ID}:feel-no-pain"
-BATTLE_ROUND_START_TRIGGER = "battle_round_start"
+TURN_START_TRIGGER = "turn_start"
 UNIT_DESTROYED_TRIGGER = "adepta_sororitas_unit_destroyed"
-_SUPPORTED_GAIN_TRIGGERS = frozenset({BATTLE_ROUND_START_TRIGGER, UNIT_DESTROYED_TRIGGER})
+_SUPPORTED_GAIN_TRIGGERS = frozenset({TURN_START_TRIGGER, UNIT_DESTROYED_TRIGGER})
 TRIUMPH_OF_SAINT_KATHERINE_DATASHEET_ID = "000002063"
 TRIUMPH_RELICS_SELECTION_GROUP = "Relics of the Matriarchs ability"
 TRIUMPH_RELICS_AURA_RANGE_INCHES = 6.0
@@ -269,16 +270,19 @@ def runtime_contribution() -> RuntimeContentContribution:
     from .destruction_sequencing import (
         candidates as destruction_candidates,
     )
+    from .turn_sequencing import TURN_START_SUBSCRIPTION, candidates, resolve_turn_start
 
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
-        battle_round_start_hook_bindings=(
-            BattleRoundStartHookBinding(
-                hook_id=BATTLE_ROUND_START_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                request_handler=resolve_battle_round_start,
-                candidate_handler=miracle_sequencing_candidates,
+        event_subscriptions=(TURN_START_SUBSCRIPTION,),
+        event_handler_bindings=(
+            RuntimeContentEventHandlerBinding(
+                handler_id=TURN_START_HOOK_ID,
+                handler=resolve_turn_start,
+                candidate_handler=candidates,
             ),
+        ),
+        battle_round_start_hook_bindings=(
             BattleRoundStartHookBinding(
                 hook_id=TRIUMPH_RELICS_BATTLE_ROUND_START_HOOK_ID,
                 source_id=TRIUMPH_RELICS_SOURCE_RULE_ID,
@@ -323,32 +327,6 @@ def runtime_contribution() -> RuntimeContentContribution:
             ),
         ),
     )
-
-
-def resolve_battle_round_start(
-    context: BattleRoundStartRequestContext,
-) -> DecisionRequest | None:
-    if type(context) is not BattleRoundStartRequestContext:
-        raise GameLifecycleError("Acts of Faith battle-round start requires hook context.")
-    active_player_id = _active_player_id(context.state)
-    for army in context.state.army_definitions:
-        if army.detachment_selection.faction_id != ADEPTA_SORORITAS_FACTION_ID:
-            continue
-        gain_miracle_die(
-            context.state,
-            context.decisions,
-            player_id=army.player_id,
-            trigger=BATTLE_ROUND_START_TRIGGER,
-            source_id=battle_round_start_source_id(
-                player_id=army.player_id,
-                battle_round=context.state.battle_round,
-            ),
-            source_context={
-                "active_player_id": active_player_id,
-                "timing": "start_of_battle_round",
-            },
-        )
-    return None
 
 
 def triumph_relics_selection_request(
@@ -1524,8 +1502,11 @@ def _source_ids_with_triumph_relic(
     return tuple(sorted((*source_ids, source_id)))
 
 
-def battle_round_start_source_id(*, player_id: str, battle_round: int) -> str:
-    return f"{SOURCE_RULE_ID}:battle-round-start:round-{battle_round:02d}:player-{player_id}"
+def turn_start_source_id(*, player_id: str, battle_round: int, active_player_id: str) -> str:
+    return (
+        f"{SOURCE_RULE_ID}:turn-start:round-{battle_round:02d}:"
+        f"turn-{active_player_id}:player-{player_id}"
+    )
 
 
 def unit_destroyed_source_id(*, player_id: str, model_destroyed_event_id: str) -> str:
@@ -1622,12 +1603,6 @@ def _next_miracle_die_spend_index(state: GameState, *, player_id: str) -> int:
     return len(_miracle_die_spend_states(state, player_id=player_id)) + 1
 
 
-def _active_player_id(state: GameState) -> str:
-    if state.active_player_id is None:
-        raise GameLifecycleError("Acts of Faith battle-round start requires active player.")
-    return state.active_player_id
-
-
 def _validate_state(state: object) -> GameState:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -1663,14 +1638,6 @@ def _battle_phase_from_token(token: object) -> BattlePhase:
         return BattlePhase(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported Acts of Faith phase: {token}.") from exc
-
-
-def miracle_sequencing_candidates(
-    context: BattleRoundStartRequestContext,
-) -> tuple[TimingRuleCandidate, ...]:
-    from .round_sequencing import miracle_candidates
-
-    return miracle_candidates(context)
 
 
 def relic_sequencing_candidates(

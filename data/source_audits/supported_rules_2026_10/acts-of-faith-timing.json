@@ -1,0 +1,22 @@
+{
+  "schema": "bounded-source-observation-v1",
+  "observation": {
+    "provider": "40k.app (unofficial maintained App mirror)",
+    "url": "https://www.40k.app/factions/adepta-sororitas/army-rules",
+    "heading": "Acts of Faith / Gaining Miracle Dice",
+    "selected_timing_clause": "At the start of each turn.",
+    "selected_transcription_sha256": "078f1ac484f9d009c582b08969986f55c1ed79a8769c43eb3ac86e4a121b4650",
+    "scope": "automatic gain timing only; not a complete source transcription",
+    "update_index": "https://www.40k.app/factions/updates",
+    "latest_global_index_version": 995,
+    "latest_listed_faction_delta_version": 981,
+    "latest_listed_faction_delta_date": "2026-10-14",
+    "observed_date_utc": "2026-10-31",
+    "recorded_utc": "2026-10-31T17:07:48Z",
+    "timestamp_scope": "recording time; exact browser observation time not independently logged"
+  },
+  "observation_fingerprint_sha256": "6ec53ba39e977f3963eb32e64766a169779b4c18b02f041d09728b8dbf9d80fc",
+  "runtime_source_rule_id": "phase17f:phase17e:adepta-sororitas:army-rule",
+  "prior_behavior": "automatic gain at battle-round start",
+  "required_behavior": "automatic gain at both players turn starts"
+}

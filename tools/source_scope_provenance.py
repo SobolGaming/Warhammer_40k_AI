@@ -47,6 +47,11 @@ PROVENANCE_RECORDS = (
 )
 
 
+# No overlay is added by the Acts timing repair. Only its exact comparison
+# documents contain the independently authenticated historical input paths.
+COMPARISON_ONLY_SCOPE_BASES = (scopes.ACTS_BASE,)
+
+
 def registered_provenance_context(
     relative: str,
 ) -> tuple[ProvenanceRecord, scopes.ReviewedScope] | None:
@@ -55,6 +60,13 @@ def registered_provenance_context(
     for record in PROVENANCE_RECORDS:
         scope = scopes.registered_scope(record.scope_base)
         for context in (record.overlay_path, scope.spec_path, scope.report_path):
+            if context in contexts:
+                raise ValueError("Registered provenance contexts must be unique.")
+            contexts[context] = (record, scope)
+    for base in COMPARISON_ONLY_SCOPE_BASES:
+        scope = scopes.registered_scope(base)
+        record = ProvenanceRecord(base, "", "", "", "", ())
+        for context in (scope.spec_path, scope.report_path):
             if context in contexts:
                 raise ValueError("Registered provenance contexts must be unique.")
             contexts[context] = (record, scope)

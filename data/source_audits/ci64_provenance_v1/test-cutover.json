@@ -439,10 +439,10 @@
       "sha256": "03783dd671bcaf766a7e9a8e995bc62e2d148e91d8d551d10d7b903d88613940"
     },
     "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py": {
-      "blob_sha1": "0a6ce8a7191459d0d4dd2170b30d92103bf313d1",
-      "bytes": 6539,
       "mode": "100644",
-      "sha256": "2097b78ccf59d264f9dfdba560697c84984afa0b7ad61c4ae18d208f1435a0a2"
+      "blob_sha1": "54f47ed8acabfb7bc6686992328e24610eada7f0",
+      "sha256": "96da72ee50675dcdff8141246700d8eb330643949f63555aae1a3ecad081a34f",
+      "bytes": 22039
     },
     "tests/infrastructure/setup/unit/test_deployment.py": {
       "blob_sha1": "d535945205de067cbdb44701b70ff4866a333059",

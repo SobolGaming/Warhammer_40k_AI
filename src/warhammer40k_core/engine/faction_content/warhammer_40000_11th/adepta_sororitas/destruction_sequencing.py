@@ -10,6 +10,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
+from warhammer40k_core.engine.unit_factory import UnitInstance
 
 
 def candidates(context: UnitDestroyedContext) -> tuple[TimingRuleCandidate, ...]:
@@ -23,7 +24,7 @@ def candidates(context: UnitDestroyedContext) -> tuple[TimingRuleCandidate, ...]
     unit = rules.unit_by_id(army, unit_instance_id=context.destroyed_unit_instance_id)
     if unit is None:
         raise GameLifecycleError("Destroyed Adepta Sororitas unit was not found in its army.")
-    if not rules.is_adepta_sororitas_unit(unit):
+    if not _has_retained_sororitas_keyword(unit):
         return ()
     if rules.gain_source_exists(
         context.state,
@@ -57,7 +58,7 @@ def resolve_adepta_sororitas_unit_destroyed(context: UnitDestroyedContext) -> No
     destroyed_unit = rules.unit_by_id(army, unit_instance_id=context.destroyed_unit_instance_id)
     if destroyed_unit is None:
         raise GameLifecycleError("Destroyed Adepta Sororitas unit was not found in its army.")
-    if not rules.is_adepta_sororitas_unit(destroyed_unit):
+    if not _has_retained_sororitas_keyword(destroyed_unit):
         return
     rules.gain_miracle_die(
         context.state,
@@ -76,4 +77,15 @@ def resolve_adepta_sororitas_unit_destroyed(context: UnitDestroyedContext) -> No
             "model_destroyed_event_id": context.model_destroyed_event_id,
             "model_destroyed_payload": validate_json_value(context.model_destroyed_payload),
         },
+    )
+
+
+def _has_retained_sororitas_keyword(unit: UnitInstance) -> bool:
+    # Destruction removes the final live model before this hook runs. Its physical
+    # models retain their canonical keyword assignments; living/spend queries
+    # deliberately continue to use the ordinary live-model unit view.
+    return any(
+        rules.ADEPTA_SORORITAS_FACTION_KEYWORD
+        in model.keyword_assignment.effective_faction_keywords
+        for model in unit.own_models
     )

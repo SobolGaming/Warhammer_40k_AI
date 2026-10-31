@@ -20,7 +20,9 @@ SCOPE = scopes.registered_scope(scopes.EC_BASE)
 
 
 def _inventories() -> tuple[dict[str, str], dict[str, str]]:
-    common = dict.fromkeys(SCOPE.required | {"src/real.py", "contracts/README.md"}, "a" * 64)
+    common = dict.fromkeys(
+        SCOPE.required | SCOPE.harness | {"src/real.py", "contracts/README.md"}, "a" * 64
+    )
     return (
         common | dict.fromkeys(SCOPE.derived | (SCOPE.treatment - SCOPE.new_treatment), "b" * 64),
         common | dict.fromkeys(SCOPE.derived | SCOPE.treatment | SCOPE.control, "c" * 64),
@@ -362,3 +364,142 @@ def test_provenance_registration_rejects_unknown_scope(monkeypatch: pytest.Monke
     monkeypatch.setattr(provenance, "PROVENANCE_RECORDS", (replace(record, scope_base="f" * 40),))
     with pytest.raises(ValueError, match="registered"):
         provenance.registered_provenance_context(record.overlay_path)
+
+
+def _acts_scope(monkeypatch: pytest.MonkeyPatch) -> scopes.ReviewedScope:
+    import sys
+
+    scope = scopes.registered_scope(scopes.ACTS_BASE)
+    monkeypatch.setattr(sys.modules[__name__], "SCOPE", scope)
+    return scope
+
+
+def test_acts_registered_scope_preserves_real_six_sample_contract(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    scope = _acts_scope(monkeypatch)
+    assert scope.base == "2490faab2c41915c54eb26aed04902165fbfc042"
+    assert scopes.scope_for_specification(scope.spec_path) == scope
+    assert (
+        inputs.digest(scopes.read_role_spec(ROOT, scope_base=scope.base))
+        == scope.spec_canonical_sha256
+    )
+    assert scope.harness == scopes.registered_scope(scopes.EC_BASE).harness
+    assert scope.required == scopes.registered_scope(scopes.EC_BASE).required
+    _validate(*_report())
+    for kind in ("spec", "report"):
+        path = ROOT / (scope.spec_path if kind == "spec" else scope.report_path)
+        raw = path.read_bytes() if kind == "spec" else json.dumps(_provenance_report()).encode()
+        text = provenance.registered_provenance_text(ROOT, path, raw, historical_snapshot_inputs)
+        assert text is not None
+        assert not any(token in text for token in retired_identity_tokens())
+    resolved = provenance.registered_provenance_context(scope.spec_path)
+    assert resolved is not None
+    assert resolved[0].overlay_path == ""
+    assert resolved[1] == scope
+
+
+@pytest.mark.parametrize(
+    "drift", ["common", "missing", "new_treatment", "unknown", "harness", "role", "base", "hash"]
+)
+def test_acts_scope_rejects_input_and_role_drift(
+    monkeypatch: pytest.MonkeyPatch, drift: str
+) -> None:
+    scope = _acts_scope(monkeypatch)
+    before, after = _inventories()
+
+    def attempt() -> None:
+        if drift == "role":
+            spec: dict[str, Any] = scopes.read_role_spec(ROOT, scope_base=scope.base)
+            spec["control_plane"]["src/unreviewed.py"] = (
+                "Unreviewed runtime cannot become control plane."
+            )
+            scopes.validate_spec(spec, scope_base=scope.base)
+        elif drift in {"base", "hash"}:
+            binding = _binding(before, after)
+            if drift == "hash":
+                binding["role_spec_sha256"] = "f" * 64
+            scopes.validate_scope_binding(
+                scopes.EC_BASE if drift == "base" else scope.base, binding
+            )
+        else:
+            if drift == "common":
+                after["src/real.py"] = "f" * 64
+            elif drift == "missing":
+                del after["uv.lock"]
+            elif drift == "new_treatment":
+                before[next(iter(scope.new_treatment))] = "f" * 64
+            elif drift == "unknown":
+                after["src/unreviewed.py"] = "f" * 64
+            else:
+                after["tests/timing_plugin.py"] = "f" * 64
+            _binding(before, after)
+
+    with pytest.raises(ValueError, match=r"V4|v4|True common"):
+        attempt()
+
+
+@pytest.mark.parametrize(
+    ("side", "index"), [(side, index) for side in ("base", "head") for index in range(3)]
+)
+@pytest.mark.parametrize("missing", ["tree", "sample"])
+def test_acts_scope_requires_all_six_samples_and_output_trees(
+    monkeypatch: pytest.MonkeyPatch,
+    side: str,
+    index: int,
+    missing: str,
+) -> None:
+    _acts_scope(monkeypatch)
+    report, specification, binding = _report()
+    if missing == "tree":
+        report["generated_output_binding"][side][index].popitem()
+    else:
+        report[side]["samples"]["orphan-write-independent-check"].pop(index)
+    with pytest.raises(ValueError, match=r"samples missing|complete exact generated trees"):
+        _validate(report, specification, binding)
+
+
+@pytest.mark.parametrize(
+    "drift", ["raw", "binding", "historical_hash", "omission", "adjacent", "duplicate"]
+)
+def test_acts_comparison_only_provenance_is_exact_and_closed(
+    monkeypatch: pytest.MonkeyPatch,
+    drift: str,
+) -> None:
+    scope = _acts_scope(monkeypatch)
+    if drift == "duplicate":
+        monkeypatch.setattr(provenance, "COMPARISON_ONLY_SCOPE_BASES", (scope.base, scope.base))
+        with pytest.raises(ValueError, match="contexts must be unique"):
+            provenance.registered_provenance_context(scope.spec_path)
+        return
+    if drift == "raw":
+        path = ROOT / scope.spec_path
+        with pytest.raises(ValueError, match="exact reviewed bytes"):
+            provenance.registered_provenance_text(
+                ROOT, path, path.read_bytes() + b"\n", historical_snapshot_inputs
+            )
+        return
+    report = _provenance_report()
+    if drift == "binding":
+        report["input_binding"]["role_spec_sha256"] = "f" * 64
+    elif drift in {"historical_hash", "omission"}:
+        inventory = report["input_binding"]["common"]
+        reference = next(iter(historical_snapshot_inputs()))
+        if drift == "omission":
+            del inventory[reference]
+        else:
+            inventory[reference] = "f" * 64
+    else:
+        report["unreviewed_active_identity"] = retired_identity_tokens()[0]
+    raw = json.dumps(report).encode()
+    if drift == "adjacent":
+        text = provenance.registered_provenance_text(
+            ROOT, ROOT / scope.report_path, raw, historical_snapshot_inputs
+        )
+        assert text is not None
+        assert retired_identity_tokens()[0] in text
+    else:
+        with pytest.raises(ValueError, match=r"V4|Registered"):
+            provenance.registered_provenance_text(
+                ROOT, ROOT / scope.report_path, raw, historical_snapshot_inputs
+            )

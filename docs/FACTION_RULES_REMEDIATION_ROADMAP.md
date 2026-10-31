@@ -67,7 +67,7 @@ A Stratagem is usable when it appears as `use_stratagem` at the right window wit
 
 | ID | Priority | Finding | Owner |
 |---|---|---|---|
-| F-ARMY-01 | 1 | Acts of Faith grants a Miracle die at each turn start. The Sororitas consumer uses battle-round start | FM0 debt item 9 |
+| F-ARMY-01 | 1 | Acts of Faith previously gained automatically at battle-round start. The bounded repair routes automatic gains through shared turn-start timing with distinct player/round identities; Triumph round selection remains separate; destruction-only eligibility now reads retained canonical physical-model keywords while living/spend eligibility remains unchanged. Exact-head qualification pending; this does not close FM0 or full-faction certification. | [Bounded timing maintenance](ACTS_OF_FAITH_TIMING_2026_10.md); FM0 debt item 9 |
 | F-ORK-01 | 1 | Orks v946 roster, DP, and inventory drift. Retired scaffold directories remain | FM0.5, then U5–U6 |
 | F-DATA-01 | 1 | Current costs and attachments differ from older records (Eldrad, Bloodcrushers, Exorcist) | S3a, FM1, FM3 |
 | F-EVID-01 | 1 | Status, source, execution, and component labels use different denominators | Q1 schema delivered. Live artifact is FM0 |

@@ -1,718 +1,514 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "105b467b1140e6d9ff6710a74ed839ad225d17ec",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8a38ade62fcffa2ed689c5fee45c4a8efb4f68922c40b4fdc54cc3e50b1563b2",
-  "operation_map_sha256": "ef1aec5435e9788acb7da8d757e780dd874892980725e04395c91e5ac919acbf",
+  "base": "2490faab2c41915c54eb26aed04902165fbfc042",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9305c4ac4f1bf6a56785538635007afa3ef54c6e294e215bf9f6a2fc4905bcdd",
+  "operation_map_sha256": "d8e3981fe4f346671ff11550c41d308f288659e89e8dd5a30c3d423a6739ba34",
   "changes": {
     ".gitattributes": {
-      "before_sha256": "6a7fdff31280bd61a8af2357f8f3ceb0e4f6d820a093b2218f7bbb1fe4e2ed85",
-      "after_sha256": "d9f1240cb76e40f2058bb73dce4b792ae901de3aab6ea7e7e5f7c387a86d8232",
+      "before_sha256": "d9f1240cb76e40f2058bb73dce4b792ae901de3aab6ea7e7e5f7c387a86d8232",
+      "after_sha256": "b8ea1e564301eaa3c1dfa4b359306e36a4a15554ae4e090766a3c75c497f5ae6",
       "owners": {
         "@document": {
-          "before": "6a7fdff31280bd61a8af2357f8f3ceb0e4f6d820a093b2218f7bbb1fe4e2ed85",
-          "after": "d9f1240cb76e40f2058bb73dce4b792ae901de3aab6ea7e7e5f7c387a86d8232"
+          "before": "d9f1240cb76e40f2058bb73dce4b792ae901de3aab6ea7e7e5f7c387a86d8232",
+          "after": "b8ea1e564301eaa3c1dfa4b359306e36a4a15554ae4e090766a3c75c497f5ae6"
         }
       }
     },
     "ci/quality_shards/all.txt": {
-      "before_sha256": "e95fee591662915b3661bd8641d09316973ac2daede466d5f9a74a2d61918163",
-      "after_sha256": "851082d9a54e822bb9d7c3c16898a74ab24a418dc4f3fd09d8ff7261e4571da5",
+      "before_sha256": "851082d9a54e822bb9d7c3c16898a74ab24a418dc4f3fd09d8ff7261e4571da5",
+      "after_sha256": "e93f67c8dde61e93ef64cf4a7ff0169ac0187d5b57976180fba0a072b0f57251",
       "owners": {
         "@document": {
-          "before": "e95fee591662915b3661bd8641d09316973ac2daede466d5f9a74a2d61918163",
-          "after": "851082d9a54e822bb9d7c3c16898a74ab24a418dc4f3fd09d8ff7261e4571da5"
+          "before": "851082d9a54e822bb9d7c3c16898a74ab24a418dc4f3fd09d8ff7261e4571da5",
+          "after": "e93f67c8dde61e93ef64cf4a7ff0169ac0187d5b57976180fba0a072b0f57251"
         }
       }
     },
     "ci/quality_shards/shard-1.txt": {
-      "before_sha256": "1774f19fe04561246b185f281b4fabe86482a736f3d7c9cbcbd8f506eadc60fa",
-      "after_sha256": "851a6de8b36eb5083c6a1c4f9de6e675a4455345fa9eea08efe7f48c22c4c986",
+      "before_sha256": "851a6de8b36eb5083c6a1c4f9de6e675a4455345fa9eea08efe7f48c22c4c986",
+      "after_sha256": "668a517a46543d865a75228f7b1e2a8f98770f972df4b6933a3d41387c8e1aaa",
       "owners": {
         "@document": {
-          "before": "1774f19fe04561246b185f281b4fabe86482a736f3d7c9cbcbd8f506eadc60fa",
-          "after": "851a6de8b36eb5083c6a1c4f9de6e675a4455345fa9eea08efe7f48c22c4c986"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4-modules.txt": {
-      "before_sha256": "050017c277461337eda4a51472b95a08c4c6644d82aababe82abae2f72d3e750",
-      "after_sha256": "1ebce2d5411e189b136673e2448986bab44e6ea761da52123526716f855fc39c",
-      "owners": {
-        "@document": {
-          "before": "050017c277461337eda4a51472b95a08c4c6644d82aababe82abae2f72d3e750",
-          "after": "1ebce2d5411e189b136673e2448986bab44e6ea761da52123526716f855fc39c"
+          "before": "851a6de8b36eb5083c6a1c4f9de6e675a4455345fa9eea08efe7f48c22c4c986",
+          "after": "668a517a46543d865a75228f7b1e2a8f98770f972df4b6933a3d41387c8e1aaa"
         }
       }
     },
     "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "0e7ffe6207fd31558773a1c43b6c354de0771963bcb4812c004b024a0c16d8f3",
-      "after_sha256": "cf183dae0d47795fad9e714e8e2998f0764197a9db2bc5880a769eb40bfedb2a",
+      "before_sha256": "cf183dae0d47795fad9e714e8e2998f0764197a9db2bc5880a769eb40bfedb2a",
+      "after_sha256": "a6e543deb2f7394aa872358984489967131e62166db6f6cedf91b3a7ea9ea4a3",
       "owners": {
         "@document": {
-          "before": "0e7ffe6207fd31558773a1c43b6c354de0771963bcb4812c004b024a0c16d8f3",
-          "after": "cf183dae0d47795fad9e714e8e2998f0764197a9db2bc5880a769eb40bfedb2a"
+          "before": "cf183dae0d47795fad9e714e8e2998f0764197a9db2bc5880a769eb40bfedb2a",
+          "after": "a6e543deb2f7394aa872358984489967131e62166db6f6cedf91b3a7ea9ea4a3"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "24ec39e2980cf72ac1c53e60da898ba4edbd59781ed59cf759fa75e953def139",
-      "after_sha256": "032393a06c1c06bec3dfa5d78e38eb629d09e57c0f7ae4cec2a509608d2e9c20",
+      "before_sha256": "032393a06c1c06bec3dfa5d78e38eb629d09e57c0f7ae4cec2a509608d2e9c20",
+      "after_sha256": "5197d2519a2f705faeb7abacbc12a627745ee9228873674a62fb54456cbe2eed",
       "owners": {
         "@document": {
-          "before": "24ec39e2980cf72ac1c53e60da898ba4edbd59781ed59cf759fa75e953def139",
-          "after": "032393a06c1c06bec3dfa5d78e38eb629d09e57c0f7ae4cec2a509608d2e9c20"
+          "before": "032393a06c1c06bec3dfa5d78e38eb629d09e57c0f7ae4cec2a509608d2e9c20",
+          "after": "5197d2519a2f705faeb7abacbc12a627745ee9228873674a62fb54456cbe2eed"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "b74e1f9c40184eedb281884fb64aff86cab8b673e3738663f0bfa29fcc874cac",
-      "after_sha256": "1193baac51251751f309ffa54b2e9956d07bad9606e39bae595cef6fa7227305",
+      "before_sha256": "1193baac51251751f309ffa54b2e9956d07bad9606e39bae595cef6fa7227305",
+      "after_sha256": "16daf78dbf0c0aaa4ddebd4887be62fbc2cad467e1cb3c916a57285c38d7eac8",
       "owners": {
         "@document": {
-          "before": "b74e1f9c40184eedb281884fb64aff86cab8b673e3738663f0bfa29fcc874cac",
-          "after": "1193baac51251751f309ffa54b2e9956d07bad9606e39bae595cef6fa7227305"
+          "before": "1193baac51251751f309ffa54b2e9956d07bad9606e39bae595cef6fa7227305",
+          "after": "16daf78dbf0c0aaa4ddebd4887be62fbc2cad467e1cb3c916a57285c38d7eac8"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "0475377e5ee29497e0e351e79097ac436a58d3390751da68bd6e6a7b9302bc9e",
-      "after_sha256": "cb282c6e667f826e17cacdc33c217b33e75ce2834236f3acc52114ccdefd21ad",
+      "before_sha256": "cb282c6e667f826e17cacdc33c217b33e75ce2834236f3acc52114ccdefd21ad",
+      "after_sha256": "03a13cf534d81ed626700e54160ff2e4018276c91a63e011b5b5956e50074762",
       "owners": {
         "@document": {
-          "before": "0475377e5ee29497e0e351e79097ac436a58d3390751da68bd6e6a7b9302bc9e",
-          "after": "cb282c6e667f826e17cacdc33c217b33e75ce2834236f3acc52114ccdefd21ad"
+          "before": "cb282c6e667f826e17cacdc33c217b33e75ce2834236f3acc52114ccdefd21ad",
+          "after": "03a13cf534d81ed626700e54160ff2e4018276c91a63e011b5b5956e50074762"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "ee6111ffd48e30e93cad2060aa106705dafb56d846b3d1887eaf95d88873708e",
-      "after_sha256": "a25687e175c6a64f634332d948d0a27a67854c7a25564cf891fb899babdb503d",
+      "before_sha256": "a25687e175c6a64f634332d948d0a27a67854c7a25564cf891fb899babdb503d",
+      "after_sha256": "d386534d02245b46a9054036cd69462003f8cc5ef8aa87c6275c041aa9e282ff",
       "owners": {
         "@document": {
-          "before": "ee6111ffd48e30e93cad2060aa106705dafb56d846b3d1887eaf95d88873708e",
-          "after": "a25687e175c6a64f634332d948d0a27a67854c7a25564cf891fb899babdb503d"
+          "before": "a25687e175c6a64f634332d948d0a27a67854c7a25564cf891fb899babdb503d",
+          "after": "d386534d02245b46a9054036cd69462003f8cc5ef8aa87c6275c041aa9e282ff"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "eb48e2f416ef5b41a8606586a303486817c51aa6fe3a3a21d17fe79daa3693e6",
-      "after_sha256": "74f90c130c3825b4895e9868e984c0929c8db511e9c9169f91e7f31c97edd226",
+      "before_sha256": "74f90c130c3825b4895e9868e984c0929c8db511e9c9169f91e7f31c97edd226",
+      "after_sha256": "f1aec3f813a884c494dba1c2a46ffcd17d5d0e1ed98ed6141771d259925f8619",
       "owners": {
         "@document": {
-          "before": "eb48e2f416ef5b41a8606586a303486817c51aa6fe3a3a21d17fe79daa3693e6",
-          "after": "74f90c130c3825b4895e9868e984c0929c8db511e9c9169f91e7f31c97edd226"
+          "before": "74f90c130c3825b4895e9868e984c0929c8db511e9c9169f91e7f31c97edd226",
+          "after": "f1aec3f813a884c494dba1c2a46ffcd17d5d0e1ed98ed6141771d259925f8619"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "f32da118dbcf0395d6a72806c5ee7bde58cb348bd74f8bc68e0b6e42c16ddb86",
-      "after_sha256": "f30771cbd096a99f5d2d2dc3cc08b80bf38a57413d9abcf0b7ceaccfc22fec49",
+      "before_sha256": "f30771cbd096a99f5d2d2dc3cc08b80bf38a57413d9abcf0b7ceaccfc22fec49",
+      "after_sha256": "2d0650b0dbc1a17d2de040e19325f48248b103264eac49c574aa619586273fb4",
       "owners": {
         "@document": {
-          "before": "f32da118dbcf0395d6a72806c5ee7bde58cb348bd74f8bc68e0b6e42c16ddb86",
-          "after": "f30771cbd096a99f5d2d2dc3cc08b80bf38a57413d9abcf0b7ceaccfc22fec49"
+          "before": "f30771cbd096a99f5d2d2dc3cc08b80bf38a57413d9abcf0b7ceaccfc22fec49",
+          "after": "2d0650b0dbc1a17d2de040e19325f48248b103264eac49c574aa619586273fb4"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "7d640b2aeaf2daca7e95f0e24e9ef8e2e40375c4edd40f1bedde913613fb4982",
-      "after_sha256": "9ee3fef9822fcb6b1012c561afe2872ad84afc59d9aa544660d5cf565e658f0f",
+      "before_sha256": "9ee3fef9822fcb6b1012c561afe2872ad84afc59d9aa544660d5cf565e658f0f",
+      "after_sha256": "a27a13d74ad21f31f85cc70f628a0e0780bf54dad23651f3274ef5ff5d277c87",
       "owners": {
         "@document": {
-          "before": "7d640b2aeaf2daca7e95f0e24e9ef8e2e40375c4edd40f1bedde913613fb4982",
-          "after": "9ee3fef9822fcb6b1012c561afe2872ad84afc59d9aa544660d5cf565e658f0f"
+          "before": "9ee3fef9822fcb6b1012c561afe2872ad84afc59d9aa544660d5cf565e658f0f",
+          "after": "a27a13d74ad21f31f85cc70f628a0e0780bf54dad23651f3274ef5ff5d277c87"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "fad1f52d5d3063b26e21774edd26bbe83e69ddfbf95c0a61cfa51ff71d767a42",
-      "after_sha256": "2a4ac293800ce7c54bcc124a4d10e58563bc957a863a49e51929eb854d79cc28",
+      "before_sha256": "2a4ac293800ce7c54bcc124a4d10e58563bc957a863a49e51929eb854d79cc28",
+      "after_sha256": "1b22baeeaf40709b04f3ebca7f8d7751e52b0b8e7177a20422bf9aba247d50da",
       "owners": {
         "@document": {
-          "before": "fad1f52d5d3063b26e21774edd26bbe83e69ddfbf95c0a61cfa51ff71d767a42",
-          "after": "2a4ac293800ce7c54bcc124a4d10e58563bc957a863a49e51929eb854d79cc28"
+          "before": "2a4ac293800ce7c54bcc124a4d10e58563bc957a863a49e51929eb854d79cc28",
+          "after": "1b22baeeaf40709b04f3ebca7f8d7751e52b0b8e7177a20422bf9aba247d50da"
+        }
+      }
+    },
+    "data/generated/ability_coverage/ability_coverage_rows.json": {
+      "before_sha256": "83b64aead50d8f96a14d354cb9c93ddfa33aac5fdf63677bf59ff7405810b7be",
+      "after_sha256": "e7c3ff93fc5637be86353756ce37d46f5bbd088148d97530872231d4b9c4693e",
+      "owners": {
+        "@document": {
+          "before": "83b64aead50d8f96a14d354cb9c93ddfa33aac5fdf63677bf59ff7405810b7be",
+          "after": "e7c3ff93fc5637be86353756ce37d46f5bbd088148d97530872231d4b9c4693e"
+        }
+      }
+    },
+    "data/generated/ability_coverage/ability_support_category_rows.json": {
+      "before_sha256": "0b0a9d47f2a524ec35855efcf09b622f41b347f88430e28d9fe1747c9630078d",
+      "after_sha256": "5d099aaebbb8a098c95dd59fd56c889771af07b425899d4d35235dc8540a60a3",
+      "owners": {
+        "@document": {
+          "before": "0b0a9d47f2a524ec35855efcf09b622f41b347f88430e28d9fe1747c9630078d",
+          "after": "5d099aaebbb8a098c95dd59fd56c889771af07b425899d4d35235dc8540a60a3"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "8a4ced7715840f56a4c217437e3acb81878e89b1d7baf0a74000787ce9fe87ca",
-      "after_sha256": "ea395b3caca761eb588ce2b2034eebfbec6f1708a7ea5e84fe7a219539c5878a",
+      "before_sha256": "ea395b3caca761eb588ce2b2034eebfbec6f1708a7ea5e84fe7a219539c5878a",
+      "after_sha256": "5fd2961d3ae65465ff0164677233b2113523ba1861bfcd1566af4c94bf7b11f3",
       "owners": {
         "@document": {
-          "before": "8a4ced7715840f56a4c217437e3acb81878e89b1d7baf0a74000787ce9fe87ca",
-          "after": "ea395b3caca761eb588ce2b2034eebfbec6f1708a7ea5e84fe7a219539c5878a"
+          "before": "ea395b3caca761eb588ce2b2034eebfbec6f1708a7ea5e84fe7a219539c5878a",
+          "after": "5fd2961d3ae65465ff0164677233b2113523ba1861bfcd1566af4c94bf7b11f3"
         }
       }
     },
-    "data/source_audits/supported_rules_2026_10/ec-profiles.json": {
+    "data/source_audits/supported_rules_2026_10/acts-of-faith-timing.json": {
       "before_sha256": null,
-      "after_sha256": "54ac9341b4ecfc0a89516abe2b523b5101de85c71824bebdd717bc83bf8a4bfc",
+      "after_sha256": "9e8d7263e853683d58fa599176b203b7119753404e2ba5d0de0624342fe33ce7",
       "owners": {
         "@document": {
           "before": null,
-          "after": "54ac9341b4ecfc0a89516abe2b523b5101de85c71824bebdd717bc83bf8a4bfc"
+          "after": "9e8d7263e853683d58fa599176b203b7119753404e2ba5d0de0624342fe33ce7"
+        }
+      }
+    },
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
+      "before_sha256": "52cb76d74fbc9bac0fed661381d846fc2a0e4fd75c61d9c5d43fb3b9585e52d1",
+      "after_sha256": "aada9285ccb21694bd1c31b377f367ab9a7b07bf88a9028e9c510c5974a38c7d",
+      "owners": {
+        "@document": {
+          "before": "52cb76d74fbc9bac0fed661381d846fc2a0e4fd75c61d9c5d43fb3b9585e52d1",
+          "after": "aada9285ccb21694bd1c31b377f367ab9a7b07bf88a9028e9c510c5974a38c7d"
+        }
+      }
+    },
+    "docs/ACTS_OF_FAITH_TIMING_2026_10.md": {
+      "before_sha256": null,
+      "after_sha256": "932a3b801a6d2c9e9b5d211f0d043c8180a1ec0bbd494bbb57b3f7cae95cb751",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "932a3b801a6d2c9e9b5d211f0d043c8180a1ec0bbd494bbb57b3f7cae95cb751"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76",
-      "after_sha256": "3a6c811ec6e6fc994133526a3ad22d7d6dc047df14155e1c42e8b5112b885a9e",
+      "before_sha256": "3a6c811ec6e6fc994133526a3ad22d7d6dc047df14155e1c42e8b5112b885a9e",
+      "after_sha256": "5a2f73abb38c6b32ca6be7fffb03b85072a2b53ef4464611e15dbfacd3851448",
       "owners": {
         "@document": {
-          "before": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76",
-          "after": "3a6c811ec6e6fc994133526a3ad22d7d6dc047df14155e1c42e8b5112b885a9e"
+          "before": "3a6c811ec6e6fc994133526a3ad22d7d6dc047df14155e1c42e8b5112b885a9e",
+          "after": "5a2f73abb38c6b32ca6be7fffb03b85072a2b53ef4464611e15dbfacd3851448"
         }
       }
     },
-    "docs/SUPPORTED_EC_PROFILE_RECONCILIATION_2026_10.md": {
-      "before_sha256": null,
-      "after_sha256": "38253c9183f118637a2106b358d60f5950801c31cbd664b93e73488e67eb4e8c",
+    "docs/FACTION_RULES_REMEDIATION_ROADMAP.md": {
+      "before_sha256": "7b706bfa0ffda899a8c510a39c87d18b5bcd3031bf103445f131a4bd89cbe588",
+      "after_sha256": "9c9ad77dd27a84a83b8ef971e177bab5987303a4f7c885e13ee856a912503a9b",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "38253c9183f118637a2106b358d60f5950801c31cbd664b93e73488e67eb4e8c"
+          "before": "7b706bfa0ffda899a8c510a39c87d18b5bcd3031bf103445f131a4bd89cbe588",
+          "after": "9c9ad77dd27a84a83b8ef971e177bab5987303a4f7c885e13ee856a912503a9b"
         }
       }
     },
-    "docs/performance/current/ec-profile-105b-v4.json": {
+    "docs/performance/policy-v3/acts-of-faith-input-roles-v4.json": {
       "before_sha256": null,
-      "after_sha256": "35535c0ad14233d00e570d4208d79d90c464d8793cdeae5ed086e9c8ecec5be2",
+      "after_sha256": "5cc010849ae3bbe74bb11554f72d368fb9e90e1412daf6d07ddf302f8280f3ae",
       "owners": {
         "@document": {
           "before": null,
-          "after": "35535c0ad14233d00e570d4208d79d90c464d8793cdeae5ed086e9c8ecec5be2"
+          "after": "5cc010849ae3bbe74bb11554f72d368fb9e90e1412daf6d07ddf302f8280f3ae"
         }
       }
     },
-    "docs/performance/policy-v3/ec-profile-input-roles-v4.json": {
+    "docs/performance/policy-v3/acts-provenance-20261031/runtime-hook-predecessor.py.txt": {
       "before_sha256": null,
-      "after_sha256": "27a4bbd23a55f34672dcfb36767bb424b285d0ae65ad6ea08fb5c8e9f6484020",
+      "after_sha256": "2097b78ccf59d264f9dfdba560697c84984afa0b7ad61c4ae18d208f1435a0a2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "27a4bbd23a55f34672dcfb36767bb424b285d0ae65ad6ea08fb5c8e9f6484020"
+          "after": "2097b78ccf59d264f9dfdba560697c84984afa0b7ad61c4ae18d208f1435a0a2"
         }
       }
     },
-    "docs/performance/policy-v3/ec-provenance-20261031/phase14a-predecessor.py.txt": {
+    "docs/performance/policy-v3/acts-provenance-20261031/source-scope-predecessor.py.txt": {
       "before_sha256": null,
-      "after_sha256": "4d4edccdda4369e6e0aeafb41d0f13ed4dcad0696ccefaa86149cb8de1516302",
+      "after_sha256": "ae603f64b1b154f785ac33735c63bc62c8167d9e5e150268c3c08debf7aa14fd",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4d4edccdda4369e6e0aeafb41d0f13ed4dcad0696ccefaa86149cb8de1516302"
+          "after": "ae603f64b1b154f785ac33735c63bc62c8167d9e5e150268c3c08debf7aa14fd"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "0de7ccdda63d9f451a2e998e2e0b8e01604b61d0263d6168c4e3a224fa279794",
-      "after_sha256": "8b9655d28aae72ddab38f4ab9952de54c7127065ac6505edb361fd238beae8a9",
+      "before_sha256": "8b9655d28aae72ddab38f4ab9952de54c7127065ac6505edb361fd238beae8a9",
+      "after_sha256": "60400882b3051bbf6498ab96be0b21fee0a422dbe1ffb3f735eb0d03784d0e8c",
       "owners": {
         "@document": {
-          "before": "0de7ccdda63d9f451a2e998e2e0b8e01604b61d0263d6168c4e3a224fa279794",
-          "after": "8b9655d28aae72ddab38f4ab9952de54c7127065ac6505edb361fd238beae8a9"
-        }
-      }
-    },
-    "scripts/check_performance_policy.py": {
-      "before_sha256": "86b6a22b38a1d74ee074b902395133778e44a1ab54723a544d5c34924d73d3a6",
-      "after_sha256": "7da2467635f713c7bbdf8f2af9ec7d7958cdf1ff97702ce4fb06115dde609896",
-      "owners": {
-        "_fresh_comparison_metadata": {
-          "before": "af45d9f3ed756d767cbdbd47fa728943a24020002effd69a62c6062d3f8ed75b",
-          "after": "38d233d9625a2add55da5d33b0d773b340a03fb71fcd605f27ab847bfada5252"
-        },
-        "_validate_current": {
-          "before": "108bce56b8bd7864a22278edb34023b7c4d4250f626a3c627c6445a132613952",
-          "after": "25afd33245c05089a1155dfc78e73d6805c9ecc9a5f12d6d3f2533e3059c4024"
-        }
-      }
-    },
-    "scripts/measure_vyper_source_binding.py": {
-      "before_sha256": "b36f5722f72e70148645a711d575e12b9512216b6b0ec96a5956809fc2b71af9",
-      "after_sha256": "f548b8c2431d0d1c0bed4f1486aa7be06cd1b55b9489aae7860f9ce51f4d7ec5",
-      "owners": {
-        "@module": {
-          "before": "c249b2e9e17e2f335a028bbe03a08896e08de3a68978ba0bc1e6c9bc0171b9fb",
-          "after": "5a28d8957e01becbfde7ae71bda45253adfb123b626fb217a7cb79325fa937be"
-        },
-        "main": {
-          "before": "44396d5ebada469dcdbf00cae18330507201d20210ff5189ff332e8e79f0954a",
-          "after": "c1c6563f09a561d6ac89150e1834766a7ab9fc698abb4682b4ac0f0b7d61bbf3"
-        },
-        "run": {
-          "before": "2e957a46387f8e5bcb640963d5966fe110d5ba8d6a8ceb3c6ecddd5141abeb3c",
-          "after": "e373d796a57c7f11ffb443399c3a9acfd5d954c6712d050e10cfdc0fc40d1167"
+          "before": "8b9655d28aae72ddab38f4ab9952de54c7127065ac6505edb361fd238beae8a9",
+          "after": "60400882b3051bbf6498ab96be0b21fee0a422dbe1ffb3f735eb0d03784d0e8c"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "e723630dff1e2b77622c60062ff318f3f7a1fb799a799525f4abe88143a57b21",
-      "after_sha256": "976ab9950dd0b07ba99f837bf9d56b0aa7dea862351f4217d03f2b7e50b5ed6e",
+      "before_sha256": "976ab9950dd0b07ba99f837bf9d56b0aa7dea862351f4217d03f2b7e50b5ed6e",
+      "after_sha256": "df3d40b940775f3cb8410e316c81a959dba3c46620ad6900946bba53ca18c14f",
       "owners": {
         "@document": {
-          "before": "e723630dff1e2b77622c60062ff318f3f7a1fb799a799525f4abe88143a57b21",
-          "after": "976ab9950dd0b07ba99f837bf9d56b0aa7dea862351f4217d03f2b7e50b5ed6e"
+          "before": "976ab9950dd0b07ba99f837bf9d56b0aa7dea862351f4217d03f2b7e50b5ed6e",
+          "after": "df3d40b940775f3cb8410e316c81a959dba3c46620ad6900946bba53ca18c14f"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_profiles_2026_10.overlay-pack.json": {
-      "before_sha256": null,
-      "after_sha256": "856706535c9d16c51832d700377105082191a340b0880498b4146cc683fbd451",
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/army_rule.py": {
+      "before_sha256": "a620a636361d6547bea624e9cb79198e523b53a5e3ccf15895ead3e437e25995",
+      "after_sha256": "891d4c36e6f11b61b12924a1de1a776c70130ccd1b8f23ed3e36cdeeb25e4e18",
       "owners": {
-        "@document": {
+        "@module": {
+          "before": "1ca725e044f1540b2ad02641562f9b995bdf79dba063272f86edcf44673653a2",
+          "after": "631feacf159bc29a88bb3ccf8a9952b05a040c1c1cb933375c27843893382586"
+        },
+        "_active_player_id": {
+          "before": "19c136b09fbffdc4767fec23e80b57217d2ecccf27fbd2fc5390a0b85f939b15",
+          "after": null
+        },
+        "battle_round_start_source_id": {
+          "before": "8000832b681652e43be4853a708095e5651b3f927c55eb2bf27f6ed2eb35cda1",
+          "after": null
+        },
+        "miracle_sequencing_candidates": {
+          "before": "94b3d99e68b7345f0925598516aed79a8e82fbf381b12595f45e0ac87c3a6b5d",
+          "after": null
+        },
+        "resolve_battle_round_start": {
+          "before": "43f0c881beacd40c6e5ae865ac58687dfb48063c5fe6f2a298e10d852464fea8",
+          "after": null
+        },
+        "runtime_contribution": {
+          "before": "b6516ab83f67c9ef403412cfaa53eb25b6291d0c441e9c0de7ac3217846ea6b5",
+          "after": "b017bda4e82f8096b496a71d7b4accff3a3d7d988685521246caf73def6a9fc7"
+        },
+        "turn_start_source_id": {
           "before": null,
-          "after": "856706535c9d16c51832d700377105082191a340b0880498b4146cc683fbd451"
+          "after": "2d5b9c7b74b79755aac9d9e515e5f14e4c97c6cd6e8b89f16b434e9d8e871c75"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_profiles_2026_10.py": {
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/destruction_sequencing.py": {
+      "before_sha256": "f2a565554fc4ddb4093f0a71ad9e9e33620aeac8c22c8f96ca3ecf99c19205f0",
+      "after_sha256": "ca2eced195789998fb72330334be9fdeb2088e8e52248ebd6ccd660bf329ce65",
+      "owners": {
+        "@module": {
+          "before": "d3e57eb69f90479ea03ea2d379bd2e2fbbd7b2fc0def361ef8b560276527a808",
+          "after": "c9868bc25163331a7086a5b4b15afa097c9b67302cc5fd3361ab43912795307a"
+        },
+        "_has_retained_sororitas_keyword": {
+          "before": null,
+          "after": "5d371083c691d24cbc11314667df88a687c3168ebe5c4f24022272177ecdd114"
+        },
+        "candidates": {
+          "before": "ac854686e0be4f13820036aaaf8a496654e298d9bed65d28ec16b16230bf2b8c",
+          "after": "e96c5862bf82d177b89a0d7061007b42bf5eaf70d168b9a46b3bad374a51d653"
+        },
+        "resolve_adepta_sororitas_unit_destroyed": {
+          "before": "d6f00eabc49e761f557e07bcd78167e7642548c07e6bae37616e54cec494a9c8",
+          "after": "529b3cb0c33070b485382684b61b2e5e90ff223bb15f01ad22ad4356cc22a440"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/round_sequencing.py": {
+      "before_sha256": "9ed853d62d484d7706f47669998e1e5add57c8e2e4483281b1d2086a983b540c",
+      "after_sha256": "b10de531cb38569e9e09f8c2d8d5d2447141615f50b460cd73136a5b5f0404f6",
+      "owners": {
+        "@module": {
+          "before": "74741b8200ca2a2189acaf9fbf7390ec1f95f357387528d6e791522d35680fba",
+          "after": "6204b61521ecfcbd22f171870d0912dae0c46eeccef8b174643e71d5630e18e1"
+        },
+        "_gain_miracle_die": {
+          "before": "4a3fd24d9dc69feee603b5998d3158403bff16ea473c5a100d1a6e80479e9148",
+          "after": null
+        },
+        "miracle_candidates": {
+          "before": "49668d6d712e0c970d525887981fef4e8c6cb22733152a0df9310df9da7ccc13",
+          "after": null
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/turn_sequencing.py": {
       "before_sha256": null,
-      "after_sha256": "a0f864427493bacaa23bb39d4ab54769a449b58ba8f2aa5b9fa831ad336d202c",
+      "after_sha256": "526efc030f52f6d5db9ed272f4807730003d63f6d0490dd79d62fa3b58024eb5",
       "owners": {
         "@module": {
           "before": null,
-          "after": "6258b5e0ad954cf970a4720d7f12c5f88714603d064a23fdfdce069dd7390481"
+          "after": "7de1d2d93f784166193abad96937459ea2ab075b56304903dbb7afab14dc64c9"
         },
-        "overlay_pack": {
+        "_source_id": {
           "before": null,
-          "after": "c9c669acebc0721e3401ae244e2f71f1b1a2c177b38349d1fcb34522b2c9dac9"
+          "after": "f83273aae432b1a47308f5cb521ddcb81168451806ced0f8d7ce630cbbddc8a4"
         },
-        "overlay_pack_from_json_bytes": {
+        "candidates": {
           "before": null,
-          "after": "9aae19f592890d64d34e2982650b60e1a58349a15d31cd80e260b81ec88ae70b"
+          "after": "6dd4892805e09dbe1e8d7c92cf60a1a85f7a9f195ad26fd5c307466b1be892ee"
         },
-        "source_release_manifest": {
+        "resolve_turn_start": {
           "before": null,
-          "after": "8a53903967ea828bdb134926776606f4f122e090d4155dd8dcaf43b2edc09f00"
+          "after": "feb8bcd1f1e7488847b9699101c391e1504ecb374cf3f32426a35b0c2ce60482"
         }
       }
     },
     "tests/category_migration_preservation.py": {
-      "before_sha256": "4c645b71cac9fa8dca23cb3e5fd6e6149dff476ccccf4aa3a3e6f170057a1822",
-      "after_sha256": "84a0e3f55b5d300d0a7ff6b1a90bc47b6b4d4e48e30bf399605852494cc70291",
+      "before_sha256": "84a0e3f55b5d300d0a7ff6b1a90bc47b6b4d4e48e30bf399605852494cc70291",
+      "after_sha256": "8c4754b916b030076052106253c48237c34f5cda4ef3a3974fcc201357a4a36c",
       "owners": {
         "@module": {
-          "before": "c1559530233fcb26ef651399cceb9d3a5421bc047e62268f93548cf339bb6f55",
-          "after": "f9fb731b9192e5442061a754c9a514652eab3432dfe9ab4a7d722ee316058721"
+          "before": "f9fb731b9192e5442061a754c9a514652eab3432dfe9ab4a7d722ee316058721",
+          "after": "432db5b99303db530b44fe90ac9f47c8c7feb90be926bcc42070dc0894f25618"
         },
         "edition_registered_predecessor": {
-          "before": null,
-          "after": "febb9a50773c32eff2b6b7a7a705c28a7ba4263c312b38e3755b9a2b6e8c6b4a"
+          "before": "febb9a50773c32eff2b6b7a7a705c28a7ba4263c312b38e3755b9a2b6e8c6b4a",
+          "after": "1148ba23158d45caa9ca319fd493959b99636e2bc1f217446c2b525ea7315b7e"
         },
-        "read_historical_test_bytes": {
-          "before": "301363690cd8c671c9f2c2b4a9aa35f0a88a6a64398c3d9122a45f7f40013c91",
-          "after": "e2588974b28d08458906aaa05124c32498b7871662e3e32aec5657343a614a7c"
+        "verify_migrated_test": {
+          "before": "b761ff0779f17a0172fc548694cd3e2f7bc058e74270a918080c3ed24bae0ed8",
+          "after": "6f46b597c30210810a5055d387bc0427ad9155a30a2359c9ad0ea149c9577c1f"
         }
       }
     },
     "tests/code_quality/test_category_migration_preservation.py": {
-      "before_sha256": "0a8ed008d2bd234a354208ddb5aa1456741742188672ae6d0dc690a98860bc30",
-      "after_sha256": "1881570577f2200d1083dd57d77b47cba4b9ea7038b38e3e9548f5f370107524",
+      "before_sha256": "1881570577f2200d1083dd57d77b47cba4b9ea7038b38e3e9548f5f370107524",
+      "after_sha256": "f989a9afbec6c0477887c8a96638af30990295fcfa7120ed3d10e28596940deb",
       "owners": {
         "edition_root": {
-          "before": "c8b7fc6793aa41719bc7cd2406af04c5315eda4ef0cde87ab314c6832c0ba70d",
-          "after": "2ffb1acc3395c87568d6e16da29d601adf438269042fe600aebac6336dec0cd9"
+          "before": "2ffb1acc3395c87568d6e16da29d601adf438269042fe600aebac6336dec0cd9",
+          "after": "28e7fe5072c31be9dff40f3c2cb9f2412255e475c10d732efb303189c79b75f3"
         },
-        "test_registered_projection_rejects_repin_of_changed_successor": {
+        "test_acts_additions_preserve_every_original_assertion": {
           "before": null,
-          "after": "5a6eb7113013f93850566da7e4c9222a5e81070dbb7175708dead90ef50dd4d9"
+          "after": "f5d283a9964d246570de8780b2eb492e8d9e92bbb497f9cb50a11e967f760820"
         },
-        "test_registered_provenance_inputs_rechecked_after_success": {
+        "test_acts_comparison_registration_preserves_exact_historical_helper": {
           "before": null,
-          "after": "5ddf998839600c15cbda2316c65532e8aba0e0f28ba32daa579e0f167a6e2a9d"
-        },
-        "test_vyper_edition_additions_remain_exact_with_recomputed_live_pin": {
-          "before": "8fc7f5434370462f040e3e5698f1f113c54edff028b3aa7787d3d7d80f926822",
-          "after": "a0e14be2da9e4543264ae533cf4836ba03430720a889dbe3ce351436786e6180"
-        },
-        "test_vyper_edition_predecessor_is_exact_before_original_assertion_proof": {
-          "before": "5bb534d54e4248959238c1f8a0210a9f7d7371d5ddcbb72bdb728eebeb9d1974",
-          "after": "494d6d642366983cba9830a21437ea9f6aa04f39e78ae26335c1f1a36f513475"
-        }
-      }
-    },
-    "tests/code_quality/test_current_comparison_routing.py": {
-      "before_sha256": "e4dc1f9a2a2368eb202868fdb3aff3babeb7f38659687e7047b5d35f06b10831",
-      "after_sha256": "d26cfb7bc7ee1225cc805d26b8007be5fd64f6d019ff2bf1d686eaa3523b56e2",
-      "owners": {
-        "test_exact_v4_uses_current_transaction_without_reclassifying_history": {
-          "before": "996c4033e3c5df72f8d7e83af6ad2a0b33cbb0ba3fa08f22075a811b311c551b",
-          "after": "94626c52af82051080ad4c937832e49f7d966df52df99e57c630005737887211"
-        }
-      }
-    },
-    "tests/code_quality/test_performance_tool_inputs.py": {
-      "before_sha256": "3847fc6a3db10414abde698c504d1b5a9b186f295fec3e3ff7b2fc0cb8baacf6",
-      "after_sha256": "643c8bffdaa57f2e228c3b951d57a2bfc2b3950f98a85713d42cf67dd59ebc88",
-      "owners": {
-        "test_original_edition_assertion_preserves_active_reference_boundary": {
-          "before": "1dc3add2731c64568483f83e5c7e54d8b3e54e61cd3f012fda01c526bd81b861",
-          "after": "0c09b762409422785978577a2c5aba992e4a62938f3faf761e59c3c4bd8db3d4"
-        }
-      }
-    },
-    "tests/code_quality/test_phase14a_source_identity.py": {
-      "before_sha256": "4d4edccdda4369e6e0aeafb41d0f13ed4dcad0696ccefaa86149cb8de1516302",
-      "after_sha256": "4f6077374fffba2c61f6897787bc21d055fa9f8fb66ce23f4fd66746919580c3",
-      "owners": {
-        "@module": {
-          "before": "818f74e149c0825e93621675a956688eb5b513703e25ef7206d0c3388802c980",
-          "after": "d5e4d6f604b40b919b72011c21e63000bb165024d3f872e00e15d059153f0320"
-        },
-        "_active_identity_text": {
-          "before": "b8a18c195a2412381a3dc8b6f89a571a8774f33f747a41ecbc9a83cdedea37f1",
-          "after": "efa742e7a1596f518231c4d2fa01a6c77c31d77bab66cd5c77946e10ad01e8f5"
+          "after": "5bc5d2751f0161ffdb4811b87367a809cb9c27a04948b2e56f10de06c4fe43a2"
         }
       }
     },
     "tests/code_quality/test_registered_source_scopes.py": {
-      "before_sha256": null,
-      "after_sha256": "a0e131eb81df3dd4c1745c0c3d31aee3ab6b669a0a0d2daf1b3ff1385449ac22",
+      "before_sha256": "a0e131eb81df3dd4c1745c0c3d31aee3ab6b669a0a0d2daf1b3ff1385449ac22",
+      "after_sha256": "da4dcc1d5912c040c6f3916c5fa75af42959670386d097c05db36314c3a85e4f",
       "owners": {
-        "@module": {
+        "_acts_scope": {
           "before": null,
-          "after": "d5fdf1700de2f05e379e05a88be842db082cdbac56e552ce7f899769f2b58887"
-        },
-        "_binding": {
-          "before": null,
-          "after": "2f28cbf38c0a230bba55c32c87b41d5cf1d4244b302df2316535c2b7ce980cf2"
-        },
-        "_historical_report": {
-          "before": null,
-          "after": "41a4be892fdbbf57982c5ff204af03cd7cf6500328735b521c236e435414dc83"
+          "after": "942610625ccedaf41d302a8807c7ed57212deb323940e217cdba6cecaff381c3"
         },
         "_inventories": {
-          "before": null,
-          "after": "837b9451ffcd6f033c3b134e45e5663da41b385a2f02ecbf26cef18e5fc9f13a"
+          "before": "837b9451ffcd6f033c3b134e45e5663da41b385a2f02ecbf26cef18e5fc9f13a",
+          "after": "ba25e2c69e772c3fde16718bc25f5b471b1b295f4759d5aab934c60d4bab31d4"
         },
-        "_provenance_report": {
+        "test_acts_comparison_only_provenance_is_exact_and_closed": {
           "before": null,
-          "after": "091b3e4427d95b23c63ead46223de6b3c5d07ebc275bf97aae5f8a5d513488f2"
+          "after": "3c97c36c6184f7d2b91334a8cb7665f9dc1cd362183d3b0f39cc8f59946c2db2"
         },
-        "_report": {
+        "test_acts_registered_scope_preserves_real_six_sample_contract": {
           "before": null,
-          "after": "1068b2b2fc4da0d5b3445b73c449a7633532c8a4de974b526899370eb022b274"
+          "after": "1c3ce3396a00502f47f1633ee91285f4652fff3cb4a541b22c3d5fc75f3693ba"
         },
-        "_validate": {
+        "test_acts_scope_rejects_input_and_role_drift": {
           "before": null,
-          "after": "d154518ddaa067a7b4f190da9c5a1ccb6d1c2eb3d1235a8e62b889d451ebfcce"
+          "after": "28bc1851f009dd7288671fdb884517b91706e582e0e3ffa0a2c4813d5550590e"
         },
-        "historical_snapshot_inputs": {
+        "test_acts_scope_requires_all_six_samples_and_output_trees": {
           "before": null,
-          "after": "71209cc42ec4cd5a78bcf6841b62935d25bb27ffce91da35609967d8e6e7cba5"
-        },
-        "retired_identity_tokens": {
-          "before": null,
-          "after": "4b7af4782bd0a72f1409263c6511a440a73bb9e5f801856f1d636cfca07a3d1a"
-        },
-        "test_old_scope_binding_is_retained_but_cannot_qualify_new_scope": {
-          "before": null,
-          "after": "0d98b75f6c2c65b605e121ebe2375cb44d90fed1383f21521d8f0512ecea492b"
-        },
-        "test_provenance_registration_is_immutable_and_resolves_all_closed_contexts": {
-          "before": null,
-          "after": "a0c047968f0fb65c55f554e622d30ed6c993544b08fcc48c3e739c3f754545cb"
-        },
-        "test_provenance_registration_rejects_ambiguous_contexts": {
-          "before": null,
-          "after": "f636e5a8b97beadeda38b67672aa9a6cf92a18c14830e289624ac5d57e4ca1ff"
-        },
-        "test_provenance_registration_rejects_unknown_scope": {
-          "before": null,
-          "after": "3444d4f90bc3b7ae6ae2d7dab9c563d85a2fe3fe0756c5323c36bd0690002031"
-        },
-        "test_registered_ec_scope_keeps_full_input_boundaries": {
-          "before": null,
-          "after": "3ac0366a5cb7a9c381bbc0602ae311da6eedc083d56ce9c5dd240fbe5ad192a0"
-        },
-        "test_registered_exact_artifacts_reject_any_byte_drift": {
-          "before": null,
-          "after": "1274fa8983f273b511bfe2a9fb830fb56d0e29889c807c8c9008ffcd3819b16b"
-        },
-        "test_registered_inventory_scans_ignored_source_and_rejects_symlink": {
-          "before": null,
-          "after": "2361eac9155c6f7136895d14acf6cdeda0065cc05b4c4dfb04b42679f02a32c5"
-        },
-        "test_registered_provenance_projects_only_exact_historical_context": {
-          "before": null,
-          "after": "ea1f205f17c3797a024ef00f0d138f4151d11737de7b2f002887e16a120f9e0d"
-        },
-        "test_registered_report_provenance_rejects_drift_and_retains_adjacent_identity": {
-          "before": null,
-          "after": "ec74f66f75476ae86ff1ddd6d6fbd34b10d54d58add588994901f4ced636b618"
-        },
-        "test_registered_scope_authentication_rejects_unknown_or_mutated_inputs": {
-          "before": null,
-          "after": "d93b4420f9ab6479f73fa4bc52ee1de75c3fbbd4ae13b889038118c81eab9229"
-        },
-        "test_registered_scope_requires_every_real_sample_and_complete_tree": {
-          "before": null,
-          "after": "4e84d94b2d054ec1943323f7f5974e85a7322d47fe7ad64b115d64d594fdd6b5"
-        },
-        "test_registered_scopes_preserve_original_spec_and_admit_closed_ec_scope": {
-          "before": null,
-          "after": "d209ef58ed84e042b18b606e97fd50fa854140e127c7631dec21fd6e87a73725"
+          "after": "3dc7a9758faaff72bef3584aa9b3477ffb2181a9bc548d04a70c723164733789"
         }
       }
     },
-    "tests/factions/aeldari/unit/test_battle_focus_consumers.py": {
-      "before_sha256": "ce19c10f87d7c041e113294d7394211bec0331e35de9abac4ab7d3f8ce02e33e",
-      "after_sha256": "15fabe483a3844b2b769f0c59fbabfffd60ed9813559a973e54892ed0ac73942",
+    "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py": {
+      "before_sha256": "2097b78ccf59d264f9dfdba560697c84984afa0b7ad61c4ae18d208f1435a0a2",
+      "after_sha256": "96da72ee50675dcdff8141246700d8eb330643949f63555aae1a3ecad081a34f",
       "owners": {
-        "test_fade_back_native_hit_or_miss_controls_normal_move": {
-          "before": "e9f8306bdf8ceb1576a1d5a85b767a488c6b81f2683c3f9b9ead6624156c645f",
-          "after": "ebf4b4f66bf5db24bab7ba41c731c88c8923fbec458b42b0d015771a6371f00c"
-        }
-      }
-    },
-    "tests/factions/emperors_children/test_selected_consumers.py": {
-      "before_sha256": "86bcec11b69cb959306a99d2d0aa052b9bd90860f04e7ddb2d9c1292744c3cb4",
-      "after_sha256": "095d35261a80fe87d53b9a011b0a9646ddf73c69e11d701df3cc44f2a3811a2c",
-      "owners": {
-        "test_current_ec_overlay_has_exact_numeric_boundary_and_stale_preimage_rejects": {
+        "test_acts_actual_casualty_and_native_combat_replay": {
           "before": null,
-          "after": "86bef83fe2e48b13cadcfb7311d6ce97b6a40bad122846cec59f603ff06ee72e"
+          "after": "46cd0bb285159916ad05a26536e01245fe1920317809d19e461865d9e4375272"
         },
-        "test_current_lord_exultant_profile_reaches_native_muster_and_restore": {
+        "test_acts_of_faith_turn_transition_duplicate_restore_and_replay": {
           "before": null,
-          "after": "2f789acd5c93b4e970a992f3661c63c0793611479917478681b4d02c244cf676"
+          "after": "07c17133418c5d37e50f49b183af7516777700a7a994f2cc12f04de65d8cbc77"
         },
-        "test_current_six_ec_numeric_profiles_and_keywords": {
+        "test_acts_of_faith_uses_turn_start_and_preserves_triumph_round_hook": {
           "before": null,
-          "after": "9a4a32369ee593a09222535a13dbbbc91f58226d31681115ca03aba41587e426"
+          "after": "b28524bd68b3fd2555e50c7d38e463ff1d442c6f59231012e47d77d3cb805bf8"
         },
-        "test_infractors_native_melee_rerolls_destroy_enemy_then_icon_uses_own_bearer": {
-          "before": "ca03ff73cbf688b13ac6989a984ff67938eb403ac51149dff69ddfc9bf3741ab",
-          "after": "764ff3fee6abdc3dac4af95f9b10bdb6d29cf42f5387eb03fc35be7610dce13a"
-        }
-      }
-    },
-    "tests/factions/emperors_children/test_shared_attack_consumers.py": {
-      "before_sha256": "75ed45e56e6a63ad43eff19a76810cc22377ec609cb98b99a569616e7825ad6a",
-      "after_sha256": "86d2e97316b3eae92ae9097e0e9c0198f74ba3257b7dfbcf0030c0a134a94fb2",
-      "owners": {
-        "test_excessive_assault_native_dice_source_and_objective_branches": {
-          "before": "9daab080ae1868bbe30a1c46de5dd8e47c4cc18cd974ae2804674410433808fb",
-          "after": "3c97c371c3abd616e072bdbb523bf72b94854851fd85ba8a708e9a918c450c2c"
-        }
-      }
-    },
-    "tests/rules/section02/test_02_04_01_constructed_contract.py": {
-      "before_sha256": "52803f952283f6108e3a8294978e3aa3820edb4cfa83500194ac0f898ce93612",
-      "after_sha256": "b44f628dcb6382bb4ced4104339171568c57785a06968d7fe205b9fa5d5464cb",
-      "owners": {
-        "test_02_04_01_absent_strength_is_one_only_for_interaction": {
-          "before": "852f5f73af32dd558c93d8cd06e10fb06ac65f75d73b271e793d221d3162461a",
-          "after": "81292b10803bc3be2a2bcdd909af5feb6cef54edc7f10eee13eac39d25e60052"
-        }
-      }
-    },
-    "tests/rules/section02/test_02_04_weapons.py": {
-      "before_sha256": "97acff201de2ae8245bab98b10eb3b85a51872d1649f33a1555c59fb8de285d3",
-      "after_sha256": "431abffc8e7a72b46fa03137892817f1d83be456a2cc7026a50d8b51d6102983",
-      "owners": {
-        "test_02_04_strength_compares_real_weapon_and_target_profiles": {
-          "before": "fd687f22762bdf7e2d0c9cb2feae7c40d8831fa99f77fbd6e8622a24281a7786",
-          "after": "a38efb958d0b1741081132a7739990c97d3588956e3391923952a6c2d4f260d9"
-        }
-      }
-    },
-    "tests/rules/section05/coverage.json": {
-      "before_sha256": "313fd57066ee4282c206a3a4c896459c630060f2f018a7444e8e8f285c13b0d2",
-      "after_sha256": "699cb17b35928335c140a14df0e073511afecbbc86a61fbe21ad8168f94d62a8",
-      "owners": {
-        "@document": {
-          "before": "313fd57066ee4282c206a3a4c896459c630060f2f018a7444e8e8f285c13b0d2",
-          "after": "699cb17b35928335c140a14df0e073511afecbbc86a61fbe21ad8168f94d62a8"
-        }
-      }
-    },
-    "tests/rules/section05/test_rolls.py": {
-      "before_sha256": "08603efdf8a245cbe9a04a18c70043a8298e735bfeefa891d83022f4204157ff",
-      "after_sha256": "8076519be902b15e48214e235175061b68e9c29992531776cf36f1d44632a5b3",
-      "owners": {
-        "@module": {
-          "before": "f8cd0298ca3ebbb666fff95cc5769068e66a75be3fecb821818b61563fd57807",
-          "after": "85af81c485324eacd144c98adf2ae113c74af7b48d81b3413284a75b4b8930b5"
+        "test_acts_turn_candidates_preserve_spend_destruction_and_source_deduplication": {
+          "before": null,
+          "after": "77f91475030af4ebd8eebb4dccd46d9e349ed91167017b554601676b7a8a2d46"
         },
-        "test_strength_four_wound_table_contract": {
-          "before": "c1aa22b29e1e8435c77bc0c13f9ef40ae9e8c60760471e021ed9df1ed0a6b942",
-          "after": "8428ec0e50894e367db3db2fe640ba32dbd65821e83ee80efd5d10cf3136da94"
+        "test_destruction_keyword_predicate_uses_canonical_retained_physical_models": {
+          "before": null,
+          "after": "634d3c6aa10b6c2e6056c7aea78260fde958240ba76155fd1a892014f8c94116"
         }
       }
     },
-    "tests/rules/section05/test_toughness.py": {
-      "before_sha256": "29dbd25d4c3b41871e7a8a9f26f84fbfbc85d70b118780ce484a49386f3ed7ed",
-      "after_sha256": "ee4ae3d3d62a8eda2b7713edbe625e415434e8fd3a8dc52790658b221e0533d2",
-      "owners": {
-        "test_attached_native_character_groups_and_toughness_contract": {
-          "before": "85c00d663953ea743a1f22e4ade63965fdb129f86ffef82274fe47876ac39218",
-          "after": "2ea0c35bd3ed6dd1269da24658c695998b37c28d9190826648d0233b0f06043b"
-        },
-        "test_ordinary_unit_uses_highest_present_toughness": {
-          "before": "f2f41bc475ead577973792e5570527baf470991971995d75fcdce075eab0b244",
-          "after": "f9b6c75c0ea0ee0a29089d2967e11d9585b85b18adf680129f2ca1ffe9f3e84f"
-        }
-      }
-    },
-    "tests/rules/section18/coverage.json": {
-      "before_sha256": "75695466ade571f86f8a7b9a291e5d9c8c4d7237242cbf6be62b004cca0549d7",
-      "after_sha256": "7756037ea607e0d6d4d049d71dc3e5810bd91560e17be43c7284bc29641431cc",
-      "owners": {
-        "@document": {
-          "before": "75695466ade571f86f8a7b9a291e5d9c8c4d7237242cbf6be62b004cca0549d7",
-          "after": "7756037ea607e0d6d4d049d71dc3e5810bd91560e17be43c7284bc29641431cc"
-        }
-      }
-    },
-    "tests/rules/section18/test_emergency_status.py": {
-      "before_sha256": "037ab1334fceb309480d79d4460b688b98406742b5d7c285d8bfe67dd09b6533",
-      "after_sha256": "fd3db12da38f514cbbb9e4f100b104c149ccd053dfb7d57fab6d56021a7c65e2",
-      "owners": {
-        "test_native_emergency_survivors_become_actually_battle_shocked": {
-          "before": "f389f1b80de1811747ae48163bd88299f17958cc7ee643f5d13e96fa90c76a49",
-          "after": "ae286d1b724886d50e72584c4916cac8f3f6d7c1a08ac51457ded479e712219b"
-        }
-      }
-    },
-    "tests/support/section05_fixtures.py": {
-      "before_sha256": "a6fa8c3b501d6709ad41d019aaaca822ee7b3b22907f9d0ca69bf12265216063",
-      "after_sha256": "f4340e1b9423244aa157d34fc02d20b9aa17926b4131c8a7ecf8120545489ea8",
-      "owners": {
-        "@module": {
-          "before": "47e4d4f482f5d4b23090dba5313fce66774272144aab0c6ebe95a7250d209033",
-          "after": "283a771216acce0bec3dd48a2e4dc318a4471ed382801509a2dc883405cce027"
-        },
-        "section05_definitions": {
-          "before": "7dd4259ce841408f8702dd92d3e6f61157e554ac17b363aa1fabf72501e6395b",
-          "after": "872cdc75b96beb48b132ced3a41671058890faf7b6d81ad375563d930c377cf2"
-        }
-      }
-    },
-    "tools/ability_support_sources.py": {
-      "before_sha256": "0465175c8394d9b074ff4a0c2a277ae1dc9fa44bb83dfea23a4d4640744347ce",
-      "after_sha256": "de7f781cbd8d1a8016a64bcee58feb24722876c258192cdf96bebe0a939d4873",
-      "owners": {
-        "@module": {
-          "before": "6bd5881bfcb0c8df65e02610d491a99e32c018d82e391aba2563b43afcab823c",
-          "after": "0cf32e1b562df58010654b2f9447a5a83966ca3b8dac07c5ec4f1f8e1d2f5af6"
-        },
-        "ability_support_index_inputs": {
-          "before": "c2f8b975b8f0cf96e6848845a40b590256956bca50e9a29447ef3ccbcabaf275",
-          "after": "c4c927908a0d934709737aadd9297c2431503f2078ec5b0e667742191e5c8d75"
-        },
-        "load_ability_support_sources": {
-          "before": "b3bfb8af0e02e4a0f144de71bdced5cb65fad60adb2f7ab226f9e29fdf701c82",
-          "after": "2355ed0e2433ae4e256a5840b749b89644120bce89c053cbe8ff0131b5a3c494"
-        }
-      }
-    },
-    "tools/generate_emperors_children_current_profiles.py": {
+    "tests/support/acts_of_faith.py": {
       "before_sha256": null,
-      "after_sha256": "653d74f0620d38fd27b0b6087db89af7f06450b010cf0da65c763ba4bc56b2df",
+      "after_sha256": "84b54ce8899bb70e675923eebd97950f9cec67e1dae6d124c9a3d248f35fea82",
       "owners": {
         "@module": {
           "before": null,
-          "after": "d3af86042849b52809275ecf77c88f5c63d5bf0dc1a5e7736c2e7e0c804d4265"
+          "after": "9cd87710c7f4645d37ae45fd36259a51bf21c3e511491eec0d1ddce21f637085"
         },
-        "generated_overlay_pack": {
+        "session": {
           "before": null,
-          "after": "c8a40c0c62449c2abd4568ac6d58c8b83fd8cb008b429c03f92ab12a7d81e22c"
-        },
-        "main": {
-          "before": null,
-          "after": "a14bd4be8d04eaa827412434973a47315d485b23131155a62420af28e6ef7264"
+          "after": "33e43c5d36c68fea77f51308b7d0498865fdbd0bfc90d753c9858763c0a2c2cf"
         }
       }
     },
-    "tools/performance_tool_inputs.py": {
-      "before_sha256": "f15d4371b8b013bf709c32ff429c1538911d422142791ae65dd435e80c72cbe9",
-      "after_sha256": "680831bb5fab213eeca71df99ebc6a7800beeb6492a5691fc592fe21ad970255",
+    "tests/support/acts_preservation.py": {
+      "before_sha256": null,
+      "after_sha256": "16d1e812f5e76961fad5f0fba4dca99423a35488459484461c8f2c2cf896a74a",
       "owners": {
-        "binding_enabled": {
-          "before": "d43a60baff5d66a3ce538df2dbb1b7034b1189946f2255fbea63484d04a06a4b",
-          "after": "22edb3a0347687f7fa98b31e91fc8f5e208a72f2887ca4934b9ced1052811b5d"
+        "@module": {
+          "before": null,
+          "after": "ee48c0046437cada360873690a900f7479e030b55a36764458103d577564731c"
+        },
+        "acts_predecessor": {
+          "before": null,
+          "after": "35e993bf58a9cbd508179aff5066856abd627ca7ac8e598c570d145d5e9ffba1"
+        },
+        "acts_provenance_predecessor": {
+          "before": null,
+          "after": "67dfe41fc822574e4f5afd87c83faf35f5767d21e077ac915a93ce127a3707b0"
+        }
+      }
+    },
+    "tools/generate_ability_support_matrix.py": {
+      "before_sha256": "9f8775aede47ba0cd7dd8fe936675b1866fc9e693848acae48447f099d56187d",
+      "after_sha256": "1c30c7d8813aff9e9eeccb9d2305c6823c084ba955f6ae2ae83b517076f14760",
+      "owners": {
+        "@module": {
+          "before": "2f2a447bf6fb894d7f0843b9b93d16cf54c3f836c3c2d2992b2863f5be845d76",
+          "after": "09dd7e273d5024f31d2ab3eaa5afaa63dfdc684fcd9085d671ee4f503caa285b"
+        },
+        "_adepta_sororitas_runtime_consumer_ids": {
+          "before": "2d89562daf3b5d1722ef045ad89fcdc5b57865239d8c60d304b4c1116dbc0be7",
+          "after": "9ef4ab0a4269ca4472f00e528e45f51ceb73658a5e362994808d61efcc14b527"
         }
       }
     },
     "tools/performance_tool_inputs_v4.py": {
-      "before_sha256": "2df3f461775dfe1a4cf3e0e8560268346d0d55f2d484bc2e443222533b76de39",
-      "after_sha256": "8c532e4327b7e25bfb6979f5d320e92ccfb5c43037ce3db54f8982c72f1729ab",
+      "before_sha256": "8c532e4327b7e25bfb6979f5d320e92ccfb5c43037ce3db54f8982c72f1729ab",
+      "after_sha256": "8270c1bfc9585a8a97655f23130f21ea56869373b96782aec9fe2966e6125764",
       "owners": {
         "@module": {
-          "before": "ed95af6ff441991452b0e344f74d3e46e2f1767c90e44a758f49c0af78a72728",
-          "after": "79880141e3b0d8f5ba67b8162ac3d67556b79ad3af8c17da4e541dc852d72593"
-        },
-        "ReviewedScope": {
-          "before": null,
-          "after": "2207d5874c47b92e4cde6ac67fc70d88084ffaccad8e90a9524d352b1a235113"
-        },
-        "classify_inputs": {
-          "before": "10ebd8c27e9647842b63fa7e5fd44d42849f577370cd5d340a3f6941fa3efe7e",
-          "after": "aaef94d6159c3bfc393874b45106264c3453c0bdd6a222e39f8802a4fe38580b"
-        },
-        "comparison_inputs": {
-          "before": "b3949d6d21a7e0d75c1b0b46c8e47dafc52e5f81197558e04d956f41ed574b40",
-          "after": "c7e76fcdd6be6fe1bbea72e07d398e0875490f6eab82ed5febd70a45e30f8483"
-        },
-        "current_inventory": {
-          "before": "a019174b0c0220f832bf7bfcaafac18db0826f71a5ffcab4da7aa8d934c7f69a",
-          "after": "6bf8182791e4188d45c24eaba24c3972377471dc365bf42352ee46d82c1adea7"
-        },
-        "git_inventory": {
-          "before": "26d20fc5db01ed5345dd382e9708467c000711c99d93d14e0b0e5ff7abc08972",
-          "after": "c8ade496bbc21c94d953f39e2f56292543f14ae0e68ab83f38272a611fd755ef"
-        },
-        "read_role_spec": {
-          "before": "e59b17de38f00d932a95600af1ac0ab3cc6e04626ae46c9e84a3cf2a718cdb9b",
-          "after": "31d05f0efcd7efa8de27269ec781ef8fb505baf4c5e7dd0f171f872bbc9767ac"
-        },
-        "registered_declarations": {
-          "before": null,
-          "after": "aa924e2b0a40b51f3533964ea03b67fb637420d781e86d3df2c0fc6535df5ee8"
-        },
-        "registered_scope": {
-          "before": null,
-          "after": "4886074c7ef4f77fb920ee07c22ce2d7450fe4f0f50534066358177c03b82cee"
-        },
-        "scope_for_specification": {
-          "before": null,
-          "after": "20315398f007971cca42d87a1d7aae6b75fc49f21763645629003bc666cd8f7c"
-        },
-        "selected": {
-          "before": "ec2b388de533589a9ee0324cd5a7973fd297facdb45541b0ba548ce4c2bdfaa8",
-          "after": "0759c8d674bd45bbd230aa436797b58e3da5871ade43ef0c343581c5c9973d67"
-        },
-        "validate_scope_binding": {
-          "before": null,
-          "after": "b1d0aa18532e334a50aa5bd6d76fbea0367bb9b282159b499643d7abf762adf1"
-        },
-        "validate_spec": {
-          "before": "773cd33056b832cbf80a9b9e37f41298de9d1c939ed4b9a5140d6abca1517a18",
-          "after": "d6ccf69ef609febb45f22e3b1a3bb6ee1de20b3cb8b5249250660ddb81fe1d1d"
+          "before": "79880141e3b0d8f5ba67b8162ac3d67556b79ad3af8c17da4e541dc852d72593",
+          "after": "47a99948c579b0b7289ae3f42e68c1d09bf2a540d3bea35516a041867d407d6f"
         }
       }
     },
     "tools/source_scope_provenance.py": {
-      "before_sha256": null,
-      "after_sha256": "ae603f64b1b154f785ac33735c63bc62c8167d9e5e150268c3c08debf7aa14fd",
+      "before_sha256": "ae603f64b1b154f785ac33735c63bc62c8167d9e5e150268c3c08debf7aa14fd",
+      "after_sha256": "40ef539dc75aa669df54a099d7788b74ca68453c7ae18a1e009194c48a42f64a",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "7a2ec52c368aa89299b0089bfe5b2caa51358cc534250f977db7364531a7a818"
-        },
-        "ProvenanceRecord": {
-          "before": null,
-          "after": "d53147f6422cecdda3c6872bdc9a2f257e0842b20ef880d64c6220eae04a0d65"
+          "before": "7a2ec52c368aa89299b0089bfe5b2caa51358cc534250f977db7364531a7a818",
+          "after": "5cf1e6ba288fe28372a4d1e0eac6812dfc871efe0a5213a7731830fff67a2092"
         },
         "registered_provenance_context": {
-          "before": null,
-          "after": "362fe74bbbbfaa5a87490c9bc48e92b3dd5de6077281dc2c1200bb8def918d18"
-        },
-        "registered_provenance_text": {
-          "before": null,
-          "after": "2f456bf69529efece50711b54eea4467b1d70e0f15242ae442d377450510e9f9"
+          "before": "362fe74bbbbfaa5a87490c9bc48e92b3dd5de6077281dc2c1200bb8def918d18",
+          "after": "75ed7f3339c3ff3f9f3bded49a5fbc284b77c6c178e688699b6927d612bf720b"
         }
       }
     }
@@ -724,41 +520,33 @@
         "d09-authenticated-source-bytes"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "ci/quality_shards/all.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "ci/quality_shards/shard-1.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "ci/quality_shards/shard-4-modules.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "ci/quality_shards/shard-4.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -766,9 +554,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -776,9 +564,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -786,9 +574,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -796,9 +584,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -806,9 +594,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -816,9 +604,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -826,9 +614,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -836,9 +624,29 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "data/generated/ability_coverage/ability_coverage_rows.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "data/generated/ability_coverage/ability_support_category_rows.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -846,92 +654,83 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
-    "data/source_audits/supported_rules_2026_10/ec-profiles.json": {
+    "data/source_audits/supported_rules_2026_10/acts-of-faith-timing.json": {
       "category": "rule_semantics",
       "operations": [
         "supported-rules-current-source-audit"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "docs/ACTS_OF_FAITH_TIMING_2026_10.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
-    "docs/SUPPORTED_EC_PROFILE_RECONCILIATION_2026_10.md": {
+    "docs/FACTION_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
-    "docs/performance/current/ec-profile-105b-v4.json": {
+    "docs/performance/policy-v3/acts-of-faith-input-roles-v4.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
-    "docs/performance/policy-v3/ec-profile-input-roles-v4.json": {
+    "docs/performance/policy-v3/acts-provenance-20261031/runtime-hook-predecessor.py.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
-    "docs/performance/policy-v3/ec-provenance-20261031/phase14a-predecessor.py.txt": {
+    "docs/performance/policy-v3/acts-provenance-20261031/source-scope-predecessor.py.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "scripts/check_performance_policy.py": {
-      "category": "measured_workload",
-      "operations": [
-        "registered-source-scope-dispatch",
-        "supported-vyper-exact-base-performance-admission"
-      ],
-      "selected_families": [
-        "external_contract_source_reuse"
-      ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "scripts/measure_vyper_source_binding.py": {
-      "category": "measured_workload",
-      "operations": [
-        "supported-vyper-exact-base-performance-admission"
-      ],
-      "selected_families": [
-        "external_contract_source_reuse"
-      ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -939,274 +738,145 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_profiles_2026_10.overlay-pack.json": {
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/army_rule.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "supported-acts-timing-army-rule"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_profiles_2026_10.py": {
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/destruction_sequencing.py": {
       "category": "rule_semantics",
       "operations": [
-        "source-record"
+        "supported-acts-timing-destruction-sequencing"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/round_sequencing.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-timing-round-sequencing"
+      ],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/turn_sequencing.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-timing-turn-sequencing"
+      ],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "tests/category_migration_preservation.py": {
       "category": "measured_workload",
       "operations": [
+        "ci-restructure-tests-category_migration_preservation.py",
         "registered-source-provenance-preservation",
         "supported-vyper-exact-base-performance-admission"
       ],
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "tests/code_quality/test_category_migration_preservation.py": {
       "category": "measured_workload",
       "operations": [
         "registered-source-scope-regression-controls",
+        "supported-acts-migration-quality-controls",
         "supported-vyper-exact-base-performance-admission"
       ],
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tests/code_quality/test_current_comparison_routing.py": {
-      "category": "measured_workload",
-      "operations": [
-        "supported-vyper-exact-base-performance-admission"
-      ],
-      "selected_families": [
-        "external_contract_source_reuse"
-      ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tests/code_quality/test_performance_tool_inputs.py": {
-      "category": "measured_workload",
-      "operations": [
-        "registered-source-scratch-consumer-controls"
-      ],
-      "selected_families": [
-        "external_contract_source_reuse"
-      ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tests/code_quality/test_phase14a_source_identity.py": {
-      "category": "measured_workload",
-      "operations": [
-        "supported-vyper-exact-base-performance-admission"
-      ],
-      "selected_families": [
-        "external_contract_source_reuse"
-      ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "tests/code_quality/test_registered_source_scopes.py": {
       "category": "measured_workload",
       "operations": [
-        "registered-source-scope-regression-controls"
+        "registered-source-scope-regression-controls",
+        "supported-acts-registered-scope-controls"
       ],
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
-    "tests/factions/aeldari/unit/test_battle_focus_consumers.py": {
+    "tests/infrastructure/runtime_hooks/unit/test_runtime_hook_bindings.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-6741624e410251f7",
-        "supported-ec-source-fixture-controls"
+        "supported-acts-native-regression-controls"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
-    "tests/factions/emperors_children/test_selected_consumers.py": {
+    "tests/support/acts_of_faith.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-43d80a5328081a25",
-        "supported-ec-profile-regression-controls"
+        "supported-acts-canonical-fixture"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
-    "tests/factions/emperors_children/test_shared_attack_consumers.py": {
+    "tests/support/acts_preservation.py": {
       "category": "rule_semantics",
       "operations": [
-        "qualification40-exact-b7575b3e0b8cba2c",
-        "supported-ec-source-fixture-controls"
+        "supported-acts-original-test-preservation"
       ],
       "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
-    "tests/rules/section02/test_02_04_01_constructed_contract.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-4e4fc6f5f0a8200e",
-        "supported-ec-source-fixture-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tests/rules/section02/test_02_04_weapons.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-5c91154b98e55444",
-        "supported-ec-source-fixture-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tests/rules/section05/coverage.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-ceca81af9749a228",
-        "supported-ec-source-fixture-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tests/rules/section05/test_rolls.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-da9779c1ffb863f2",
-        "supported-ec-source-fixture-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tests/rules/section05/test_toughness.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-37bef5065fc201a1",
-        "supported-ec-source-fixture-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tests/rules/section18/coverage.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-472204d42ddab990",
-        "supported-ec-source-fixture-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tests/rules/section18/test_emergency_status.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-97ba81bb1395873b",
-        "supported-ec-source-fixture-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tests/support/section05_fixtures.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-c03306f582fcad74",
-        "supported-ec-source-fixture-controls"
-      ],
-      "selected_families": [],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tools/ability_support_sources.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-b0712fa66a9cc38e",
-        "supported-vyper-source-title-binding"
-      ],
-      "selected_families": [
-        "external_contract_source_reuse"
-      ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tools/generate_emperors_children_current_profiles.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-ec-current-profile-generator"
-      ],
-      "selected_families": [
-        "external_contract_source_reuse"
-      ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
-    },
-    "tools/performance_tool_inputs.py": {
+    "tools/generate_ability_support_matrix.py": {
       "category": "measured_workload",
       "operations": [
-        "supported-vyper-exact-base-performance-admission"
+        "qualification40-exact-ded6452f144f095b",
+        "supported-acts-support-consumer-inventory"
       ],
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "tools/performance_tool_inputs_v4.py": {
       "category": "measured_workload",
       "operations": [
-        "registered-source-scope-registry",
         "supported-vyper-exact-base-performance-admission"
       ],
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "tools/source_scope_provenance.py": {
       "category": "measured_workload",
@@ -1216,14 +886,14 @@
       "selected_families": [
         "external_contract_source_reuse"
       ],
-      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
-      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
-      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "external_contract_source_reuse": "docs/performance/current/ec-profile-105b-v4.json"
+    "external_contract_source_reuse": "docs/performance/current/acts-of-faith-2490-v4.json"
   },
   "full_game": null
 }

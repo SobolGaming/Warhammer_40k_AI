@@ -50,3 +50,6 @@ tests/rules/section25/coverage.json -text
 # Exact successor proof inputs keep the same bytes on every platform.
 tools/source_scope_provenance.py text eol=lf
 docs/performance/policy-v3/ec-provenance-20261031/phase14a-predecessor.py.txt text eol=lf
+
+# Preserve the exact historical runtime-hook test byte archive.
+docs/performance/policy-v3/acts-provenance-20261031/runtime-hook-predecessor.py.txt -text whitespace=cr-at-eol

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from functools import partial
 
 from warhammer40k_core.engine.battle_round_hooks import (
     SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
@@ -12,52 +11,11 @@ from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.faction_content.common import payload_object as _payload_object
 from warhammer40k_core.engine.faction_content.common import payload_string as _payload_string
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
+from warhammer40k_core.engine.sequencing import SequencingRequirement
 from warhammer40k_core.engine.timing_request_candidates import timing_candidate_for_request
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 from . import army_rule as _rules
-
-
-def miracle_candidates(context: BattleRoundStartRequestContext) -> tuple[TimingRuleCandidate, ...]:
-    return tuple(
-        TimingRuleCandidate(
-            participant=SequencingParticipant(
-                participant_id=_rules.battle_round_start_source_id(
-                    player_id=army.player_id, battle_round=context.state.battle_round
-                ),
-                player_id=army.player_id,
-                source_rule_id=_rules.SOURCE_RULE_ID,
-                requirement=SequencingRequirement.MANDATORY,
-            ),
-            activate=partial(_gain_miracle_die, context, player_id=army.player_id),
-        )
-        for army in context.state.army_definitions
-        if army.detachment_selection.faction_id == _rules.ADEPTA_SORORITAS_FACTION_ID
-        and not _rules.gain_source_exists(
-            context.state,
-            player_id=army.player_id,
-            source_id=_rules.battle_round_start_source_id(
-                player_id=army.player_id, battle_round=context.state.battle_round
-            ),
-        )
-    )
-
-
-def _gain_miracle_die(context: BattleRoundStartRequestContext, *, player_id: str) -> None:
-    _rules.gain_miracle_die(
-        context.state,
-        context.decisions,
-        player_id=player_id,
-        trigger=_rules.BATTLE_ROUND_START_TRIGGER,
-        source_id=_rules.battle_round_start_source_id(
-            player_id=player_id, battle_round=context.state.battle_round
-        ),
-        source_context={
-            "active_player_id": context.state.turn_order[0],
-            "timing": "start_of_battle_round",
-        },
-    )
 
 
 def relic_candidates(context: BattleRoundStartRequestContext) -> tuple[TimingRuleCandidate, ...]:

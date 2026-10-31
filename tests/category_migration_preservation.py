@@ -13,6 +13,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import TypedDict, cast
 
+from tests.support.acts_preservation import acts_predecessor, acts_provenance_predecessor
 from tests.support.faction_layout_preservation import (
     ORIGINALS as FACTION_LAYOUT_ORIGINALS,
 )
@@ -515,6 +516,7 @@ def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRec
         raw = preserved_section13_golden_bytes(
             root, path, _integration_migration_predecessor(root, path, _read(root, path))
         )
+        raw = acts_predecessor(root, path, raw)
         if hashlib.sha256(raw).hexdigest() != expected:
             raise ValueError("Live migration successor bytes drifted: " + path)
         current[path] = raw
@@ -566,7 +568,9 @@ def edition_registered_predecessor(root: Path, current: bytes) -> bytes:
     predecessor = _read(root, EDITION_REGISTERED_PREDECESSOR_ARCHIVE)
     if (
         hashlib.sha256(predecessor).hexdigest() != EDITION_REGISTERED_PREDECESSOR_SHA256
-        or hashlib.sha256(_read(root, EDITION_REGISTERED_HELPER)).hexdigest()
+        or hashlib.sha256(
+            acts_provenance_predecessor(root, _read(root, EDITION_REGISTERED_HELPER))
+        ).hexdigest()
         != EDITION_REGISTERED_HELPER_SHA256
     ):
         raise ValueError("Exact registered edition provenance inputs changed.")
