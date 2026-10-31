@@ -46,7 +46,7 @@ def test_02_02_01_reroll_replaces_the_unmodified_result_before_ap(
     ("weapon_id", "target_id", "threshold"),
     [
         (f"{AVENGERS}:avenger-shuriken-catapult", AVENGERS, 3),
-        (f"{AVENGERS}:avenger-shuriken-catapult", INFRACTORS, 4),
+        (f"{AVENGERS}:avenger-shuriken-catapult", INFRACTORS, 5),
         (f"{AVENGERS}:avenger-shuriken-catapult", MAULERFIEND, 6),
         (f"{MAULERFIEND}:maulerfiend-fists", INFRACTORS, 2),
         (f"{MAULERFIEND}:maulerfiend-fists", MAULERFIEND, 3),

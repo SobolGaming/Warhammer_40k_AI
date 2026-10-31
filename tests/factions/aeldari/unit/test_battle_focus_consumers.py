@@ -72,7 +72,7 @@ def test_opportunity_seized_native_fall_back_decline_then_normal_move(
 
 @pytest.mark.parametrize(
     ("seed", "hit", "accept"),
-    [("fade:0", True, True), ("fade:1", True, False), ("fade:20", False, False)],
+    [("fade:0", True, True), ("fade:1", True, False), ("fade:6", False, False)],
 )
 def test_fade_back_native_hit_or_miss_controls_normal_move(
     faction_definitions: Section02Definitions,

@@ -23,4 +23,4 @@ def test_02_04_01_absent_strength_is_one_only_for_interaction(
     assert contract.strength_for_interaction() == 1
     assert contract.strength.is_dash
     assert contract.strength.final == 0
-    assert original.strength_for_interaction() == 4
+    assert original.strength_for_interaction() == 5

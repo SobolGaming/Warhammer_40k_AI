@@ -19,10 +19,10 @@
       "sha256": "65d30e6f443d5db19eb1d9f7c456a2d4bc853495ea0a91e6498df6f4c6a7aa70"
     },
     "tests/factions/aeldari/unit/test_battle_focus_consumers.py": {
-      "blob_sha1": "9eefb5d1663614f3da90ac34e537f19879542f93",
-      "bytes": 9225,
+      "blob_sha1": "b7048d30ee43221262726b2f2ddb5b72a367cc64",
+      "bytes": 9224,
       "mode": "100644",
-      "sha256": "ce19c10f87d7c041e113294d7394211bec0331e35de9abac4ab7d3f8ce02e33e"
+      "sha256": "15fabe483a3844b2b769f0c59fbabfffd60ed9813559a973e54892ed0ac73942"
     },
     "tests/factions/aeldari/unit/test_generic_rule_ability_registry.py": {
       "blob_sha1": "67fc2af2d66d9ee2d4616f3cca20b048b709abae",
@@ -103,16 +103,16 @@
       "sha256": "0edf3bc19424cf7882c9a24db3e877fd353696a3ed6718fb0d0ab4e9454ecc44"
     },
     "tests/factions/emperors_children/test_selected_consumers.py": {
-      "blob_sha1": "a6dec68c29e2eae88f64339cfe9e0409c22f7372",
-      "bytes": 20867,
+      "blob_sha1": "3f8dc143a555c90db1d2982fcabac588edce3c33",
+      "bytes": 28751,
       "mode": "100644",
-      "sha256": "86bcec11b69cb959306a99d2d0aa052b9bd90860f04e7ddb2d9c1292744c3cb4"
+      "sha256": "095d35261a80fe87d53b9a011b0a9646ddf73c69e11d701df3cc44f2a3811a2c"
     },
     "tests/factions/emperors_children/test_shared_attack_consumers.py": {
-      "blob_sha1": "4ecaee88b7d221b9569f3c37d2d41ccc4972cdaf",
-      "bytes": 28937,
+      "blob_sha1": "f93626a86f09fb86c7b351d43905f01befec9101",
+      "bytes": 29065,
       "mode": "100644",
-      "sha256": "75ed45e56e6a63ad43eff19a76810cc22377ec609cb98b99a569616e7825ad6a"
+      "sha256": "86d2e97316b3eae92ae9097e0e9c0198f74ba3257b7dfbcf0030c0a134a94fb2"
     },
     "tests/factions/emperors_children/unit/test_generic_rule_ability_registry.py": {
       "blob_sha1": "ea30f12ebf9dfaa6e1d9fbfd8d4e93c8a2763aee",
@@ -889,10 +889,10 @@
       "sha256": "cd3ccec8cc1eec3126d596ebac5e1897a6f92480c64d39927240cac73eb0f3b8"
     },
     "tests/rules/section02/test_02_04_01_constructed_contract.py": {
-      "blob_sha1": "b88afe38d9553f12848c19e8b0a29a279c732dc4",
+      "blob_sha1": "5be8c69b34339273830453a3d5af66c3a09ecb73",
       "bytes": 1024,
       "mode": "100644",
-      "sha256": "52803f952283f6108e3a8294978e3aa3820edb4cfa83500194ac0f898ce93612"
+      "sha256": "b44f628dcb6382bb4ced4104339171568c57785a06968d7fe205b9fa5d5464cb"
     },
     "tests/rules/section02/test_02_04_live_consumers.py": {
       "blob_sha1": "9d153e8e31b579a5103cd3904dc65693d9782fdd",
@@ -901,10 +901,10 @@
       "sha256": "843a100c998fda2149525db6bcf4d43991caf5553012ac8d0257cc91b9656de1"
     },
     "tests/rules/section02/test_02_04_weapons.py": {
-      "blob_sha1": "727c44a70c8c39ef305e0beade313d4c12c5b3f0",
+      "blob_sha1": "48823bde638f55cf7189cdfdf48901df8e303778",
       "bytes": 3481,
       "mode": "100644",
-      "sha256": "97acff201de2ae8245bab98b10eb3b85a51872d1649f33a1555c59fb8de285d3"
+      "sha256": "431abffc8e7a72b46fa03137892817f1d83be456a2cc7026a50d8b51d6102983"
     },
     "tests/rules/section02/test_02_05_keyword_consumers.py": {
       "blob_sha1": "6bbfc9a96b924ee895a8bed7c5d3071e07a99d45",
@@ -1207,10 +1207,10 @@
       "sha256": "7fbe356ccef60b32356507ae6738b2cc6436057c264754be093ccd116eaa7dd5"
     },
     "tests/rules/section05/test_rolls.py": {
-      "blob_sha1": "60e840dcae2c4123c4c1fc700bb8fb06212eac10",
-      "bytes": 4120,
+      "blob_sha1": "93023e74ce56649eed63b4fdc9ca0fa836d24742",
+      "bytes": 4222,
       "mode": "100644",
-      "sha256": "08603efdf8a245cbe9a04a18c70043a8298e735bfeefa891d83022f4204157ff"
+      "sha256": "8076519be902b15e48214e235175061b68e9c29992531776cf36f1d44632a5b3"
     },
     "tests/rules/section05/test_rule_effect_retention.py": {
       "blob_sha1": "636be4947cb87040a0e8b2c4925caac402e8dcce",
@@ -1231,10 +1231,10 @@
       "sha256": "f7c67e3ee62bcc8519cad4dc74c39050a99df52bd5c3023c95784cd71ee5962e"
     },
     "tests/rules/section05/test_toughness.py": {
-      "blob_sha1": "3aedb2bda41d0283a499fe06d78819e5f0ed2726",
+      "blob_sha1": "647ee45b44b15447513eccd5664b5dc6bbc5ce17",
       "bytes": 4346,
       "mode": "100644",
-      "sha256": "29dbd25d4c3b41871e7a8a9f26f84fbfbc85d70b118780ce484a49386f3ed7ed"
+      "sha256": "ee4ae3d3d62a8eda2b7713edbe625e415434e8fd3a8dc52790658b221e0533d2"
     },
     "tests/rules/section06/test_coverage_map.py": {
       "blob_sha1": "fff91defdbd4d4c954bc01943bc3a755789035a6",
@@ -1921,10 +1921,10 @@
       "sha256": "dd10071fe5d07adf4d5960320ce0dba5bda9f58187e5d52df08f1ef2e0871416"
     },
     "tests/rules/section18/test_emergency_status.py": {
-      "blob_sha1": "ee9b462b69de8b2a3dbf15098b79162bef7e7b9d",
-      "bytes": 8147,
+      "blob_sha1": "c34c960c61066ad69d11c128f331770cf59b402e",
+      "bytes": 8238,
       "mode": "100644",
-      "sha256": "037ab1334fceb309480d79d4460b688b98406742b5d7c285d8bfe67dd09b6533"
+      "sha256": "fd3db12da38f514cbbb9e4f100b104c149ccd053dfb7d57fab6d56021a7c65e2"
     },
     "tests/rules/section18/test_facade.py": {
       "blob_sha1": "6f25b3bafe844411830f8f7307982b9cb86ec46e",

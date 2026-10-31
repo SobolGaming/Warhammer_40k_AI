@@ -551,6 +551,34 @@ def test_original_edition_assertion_preserves_active_reference_boundary(
     target = tmp_path / original
     target.parent.mkdir(parents=True)
     target.write_bytes((root / original).read_bytes())
+    tool_dependencies = (
+        "tools/__init__.py",
+        "tools/source_scope_provenance.py",
+        "tools/performance_tool_inputs.py",
+        "tools/performance_tool_inputs_v2.py",
+        "tools/performance_tool_inputs_v4.py",
+    )
+    for relative in tool_dependencies:
+        dependency = tmp_path / relative
+        dependency.parent.mkdir(parents=True, exist_ok=True)
+        dependency.write_bytes((root / relative).read_bytes())
+    origins = {
+        "tools" if relative == "tools/__init__.py" else relative[:-3].replace("/", "."): str(
+            (tmp_path / relative).resolve()
+        )
+        for relative in tool_dependencies
+    }
+    origins["warhammer40k_core"] = str((root / "src/warhammer40k_core/__init__.py").resolve())
+    origin_record = tmp_path / "source-imports.json"
+    (tmp_path / "source_import_probe.py").write_text(
+        "import importlib\nimport json\nfrom pathlib import Path\n"
+        "def pytest_sessionstart(session):\n"
+        f"    expected = {origins!r}\n"
+        "    actual = {name: str(Path(importlib.import_module(name).__file__).resolve()) "
+        "for name in expected}\n"
+        "    assert actual == expected\n"
+        f"    Path({str(origin_record)!r}).write_text(json.dumps(actual))\n"
+    )
     for name in (SPEC_ARCHIVE, REPORT_ARCHIVE):
         archived = tmp_path / name
         archived.parent.mkdir(parents=True, exist_ok=True)
@@ -564,13 +592,17 @@ def test_original_edition_assertion_preserves_active_reference_boundary(
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(json.dumps("warhammer_40000_" + "1" + "0" + "th"))
     config = tmp_path / "pytest.ini"
-    config.write_text("[pytest]\n")
+    config.write_text("[pytest]\npythonpath = " + json.dumps(str(root / "src")) + "\n")
+    child_environment = dict(os.environ)
+    child_environment.pop("PYTHONPATH", None)
     result = subprocess.run(
         [
             sys.executable,
             "-B",
             "-m",
             "pytest",
+            "-p",
+            "source_import_probe",
             "-c",
             str(config),
             original + "::test_active_code_tests_and_docs_do_not_reference_retired_edition_ids",
@@ -580,6 +612,7 @@ def test_original_edition_assertion_preserves_active_reference_boundary(
             "--no-cov",
         ],
         cwd=tmp_path,
+        env=child_environment,
         capture_output=True,
         text=True,
         timeout=60,
@@ -587,6 +620,7 @@ def test_original_edition_assertion_preserves_active_reference_boundary(
     assert result.returncode == (0 if active is None else 1), result.stdout + result.stderr
     if active is not None:
         assert "AssertionError" in result.stdout
+    assert json.loads(origin_record.read_bytes()) == origins
 
 
 @pytest.mark.parametrize(

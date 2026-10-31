@@ -39,3 +39,4 @@ tests/code_quality/test_order101_performance.py
 tests/code_quality/test_order102_historical_evidence.py
 tests/code_quality/test_order128_source_authority.py
 tests/code_quality/test_order55_disembark.py
+tests/code_quality/test_registered_source_scopes.py

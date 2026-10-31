@@ -2281,7 +2281,7 @@
             },
             {
               "node": "tests/rules/section18/test_emergency_status.py::test_native_emergency_survivors_become_actually_battle_shocked",
-              "function_ast_sha256": "f389f1b80de1811747ae48163bd88299f17958cc7ee643f5d13e96fa90c76a49",
+              "function_ast_sha256": "ae286d1b724886d50e72584c4916cac8f3f6d7c1a08ac51457ded479e712219b",
               "assertions": [
                 "assert len(rows) == 1",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()",
@@ -3872,7 +3872,7 @@
     "tests/rules/section18/test_disembark.py": "4ca60395ad8dd62064b49e77c0c48660a89abf901ab4da711c0f8ef8f80c5cf8",
     "tests/rules/section18/test_embark.py": "d148bcd98b7ee35af091d65ce1d4b1da49c7ede1aab56c0611923e4ab6a75cd2",
     "tests/rules/section18/test_emergency.py": "dd10071fe5d07adf4d5960320ce0dba5bda9f58187e5d52df08f1ef2e0871416",
-    "tests/rules/section18/test_emergency_status.py": "037ab1334fceb309480d79d4460b688b98406742b5d7c285d8bfe67dd09b6533",
+    "tests/rules/section18/test_emergency_status.py": "fd3db12da38f514cbbb9e4f100b104c149ccd053dfb7d57fab6d56021a7c65e2",
     "tests/rules/section18/test_facade.py": "2465f2e916ccbf7ea4e433bd6820874287e8dec38a226efb5ecb46f1cede64e3",
     "tests/rules/section18/test_faqs.py": "8897688f2eaaeb5a19c1e90f0f52994b276ded51ee36b67aa1031c0c70673178",
     "tests/rules/section18/test_formations.py": "1e64f5f3a7bd354f572af4d5796ecac0b85c5e48390acc7be94bbd368ee374ad",

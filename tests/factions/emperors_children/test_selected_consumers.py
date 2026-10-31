@@ -49,8 +49,8 @@ from warhammer40k_core.geometry.pose import Pose
 @pytest.mark.parametrize(
     ("seed", "expected_passed", "capped"),
     [
-        ("faction-batch01-ec-fight-2", False, False),
-        ("faction-batch01-ec-fight-3", True, False),
+        ("faction-batch01-ec-fight-2", True, False),
+        ("faction-batch01-ec-fight-3", False, False),
         ("faction-batch01-ec-fight-3", True, True),
     ],
 )
@@ -170,6 +170,16 @@ def test_infractors_native_melee_rerolls_destroy_enemy_then_icon_uses_own_bearer
     bearer = next(m for m in unit.own_models if f"{INFRACTORS}:icon-of-excess" in m.wargear_ids)
     assert leadership[0]["source_model_instance_id"] == bearer.model_instance_id
     assert leadership[0]["leadership_target"] == 6
+    # RNG mixes the real decision/event history, including current weapon profiles.
+    # Retain explicit successful, failed and capped cases after the source correction.
+    rolled = cast(dict[str, Any], leadership[0]["leadership_roll"])
+    modified = cast(dict[str, Any], leadership[0]["leadership_modified_roll"])
+    assert rolled["original_result"]["source"] == "rng"
+    assert rolled["current_total"] == sum(rolled["current_values"])
+    assert modified["modifiers"] == []
+    assert modified["final_value"] == rolled["current_total"]
+    assert leadership[0]["passed"] is (modified["final_value"] >= 6)
+    (tmp_path / "leadership-result.json").write_text(json.dumps(leadership[0]), encoding="utf-8")
     assert leadership[0]["passed"] is expected_passed
     transactions = s.state.command_point_ledger_for_player("owner").transactions
     assert (
@@ -497,3 +507,165 @@ def test_infractors_leading_lord_scouts_moves_all_physical_models_natively(
     for p in starts:
         assert ends[p.model_instance_id].position.x == p.pose.position.x + 0.25
     assert len(events(s.session, "prebattle_scout_move_completed")) == 1
+
+
+def test_current_lord_exultant_profile_reaches_native_muster_and_restore(
+    faction_definitions: Section02Definitions,
+) -> None:
+    """Preferred v981 profile values survive the shared catalog and native state."""
+    d = faction_definitions
+    catalog = d.package.army_catalog
+    lord = catalog.datasheet_by_id(LORD)
+    characteristics = {
+        value.characteristic.value: value.final for value in lord.model_profiles[0].characteristics
+    }
+    assert characteristics["toughness"] == 5
+    weapons = {
+        profile.name: profile
+        for wargear in catalog.wargear
+        if wargear.wargear_id.startswith(f"{LORD}:")
+        for profile in wargear.weapon_profiles
+    }
+    assert weapons["Bolt pistol"].strength_for_interaction() == 5
+    from warhammer40k_core.core.random_profile_values import resolved_profile_characteristic
+
+    assert resolved_profile_characteristic(weapons["Bolt pistol"].armor_penetration).final == -1
+    assert weapons["Close combat weapon"].strength_for_interaction() == 5
+    # Unchanged profiles and identity are positive controls, not a whole-sheet certification.
+    assert lord.model_profiles[0].model_profile_id == "000004078:lord-exultant"
+    assert weapons["Phoenix power spear"].strength_for_interaction() == 7
+    assert weapons["Rapture lash"].strength_for_interaction() == 4
+    s = scene(
+        d,
+        (selection(d, LORD, "lord"),),
+        (selection(d, RANGERS, "target"),),
+        phase=BattlePhase.SHOOTING,
+        seed="ec-current-profile",
+    )
+    physical = s.units["own:lord"].own_models[0]
+    values = {
+        resolved_profile_characteristic(
+            value
+        ).characteristic.value: resolved_profile_characteristic(value).final
+        for value in physical.characteristics
+    }
+    assert values["toughness"] == 5
+    assert (physical.starting_wounds, physical.wounds_remaining) == (5, 5)
+    saved = s.session.to_persistence_payload()
+    assert LocalGameSession.from_persistence_payload(saved).to_persistence_payload() == saved
+    assert (
+        ReplayRunner.from_payload(s.session.replay_artifact(artifact_id="ec-current-profile"))
+        .run()
+        .reproduced_exactly
+    )
+
+
+def test_current_six_ec_numeric_profiles_and_keywords() -> None:
+    from tools.generate_ability_support_matrix import (
+        _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
+    )
+
+    from warhammer40k_core.core.random_profile_values import resolved_profile_characteristic
+
+    expected_models = {
+        "000004078": (5, 5),
+        "000004079": (5, 2),
+        "000004080": (5, 2),
+        "000004084": (6, 6),
+        "000004088": (5, 3),
+        "000004089": (5, 3),
+    }
+    catalog = _ability_support_catalog_package(datasheet_ids=tuple(expected_models)).army_catalog
+    for sheet, (toughness, wounds) in expected_models.items():
+        profile = catalog.datasheet_by_id(sheet).model_profiles[0]
+        values = {value.characteristic.value: value.final for value in profile.characteristics}
+        assert (values["toughness"], values["wounds"]) == (toughness, wounds)
+    profiles = {
+        (wargear.wargear_id.split(":")[0], profile.name): profile
+        for wargear in catalog.wargear
+        for profile in wargear.weapon_profiles
+    }
+    for sheet in ("000004078", "000004079", "000004080", "000004089"):
+        pistol = profiles[sheet, "Bolt pistol"]
+        assert pistol.strength_for_interaction() == 5
+        assert resolved_profile_characteristic(pistol.armor_penetration).final == -1
+        assert WeaponKeyword.PISTOL in pistol.keywords
+    for sheet in ("000004078", "000004079", "000004084", "000004088"):
+        assert profiles[sheet, "Close combat weapon"].strength_for_interaction() == 5
+    boltgun = profiles["000004079", "Boltgun"]
+    assert boltgun.strength_for_interaction() == 5
+    assert resolved_profile_characteristic(boltgun.armor_penetration).final == -1
+    assert WeaponKeyword.PRECISION in boltgun.keywords
+    assert profiles["000004080", "Duelling sabre"].strength_for_interaction() == 5
+    assert WeaponKeyword.PRECISION in profiles["000004080", "Duelling sabre"].keywords
+    # Earlier June corrections and unrelated profiles are positive controls.
+    assert profiles["000004089", "Blissblade"].attack_profile.fixed_attacks == 4
+    assert profiles["000004079", "Power sword"].strength_for_interaction() == 5
+    assert profiles["000004078", "Rapture lash"].strength_for_interaction() == 4
+
+
+def test_current_ec_overlay_has_exact_numeric_boundary_and_stale_preimage_rejects() -> None:
+    from tools.ability_support_sources import load_source_artifacts
+    from tools.generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR
+    from tools.generate_emperors_children_current_profiles import generated_overlay_pack
+
+    from warhammer40k_core.rules.source_overlay import (
+        SourceOverlayError,
+        apply_source_release_overlays,
+    )
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        emperors_children_profiles_2026_10 as current,
+    )
+
+    pack = current.overlay_pack()
+    assert pack == generated_overlay_pack()
+    assert len(pack.operations) == 15
+    assert sum(len(operation.fields) for operation in pack.operations) == 20
+    assert all(
+        set(dict(operation.fields)) <= {"T", "W", "S", "AP"} for operation in pack.operations
+    )
+    sources = load_source_artifacts(DEFAULT_SOURCE_JSON_DIR)
+    updated = apply_source_release_overlays(
+        source_artifacts=sources,
+        release_manifest=current.source_release_manifest(),
+        overlay_packs=(pack,),
+    )
+    original_rows = {
+        (artifact.source_table, row.source_row_id): row
+        for artifact in sources
+        for row in artifact.rows
+    }
+    current_rows = {
+        (artifact.source_table, row.source_row_id): row
+        for artifact in updated
+        for row in artifact.rows
+    }
+    assert original_rows.keys() == current_rows.keys()
+    expected = {
+        (operation.source_table, operation.source_row_id): dict(operation.fields)
+        for operation in pack.operations
+    }
+    observed = {}
+    for identity, before in original_rows.items():
+        after = current_rows[identity]
+        previous_fields, current_fields = (
+            before.runtime_fields_payload(),
+            after.runtime_fields_payload(),
+        )
+        changes = {
+            key: value for key, value in current_fields.items() if previous_fields[key] != value
+        }
+        if changes:
+            observed[identity] = changes
+        if identity not in expected:
+            assert before.to_payload() == after.to_payload()
+    assert observed == expected
+    stale = replace(pack.operations[0], expected_preimage_hash="0" * 64)
+    with pytest.raises(SourceOverlayError, match="target_drift"):
+        apply_source_release_overlays(
+            source_artifacts=sources,
+            release_manifest=current.source_release_manifest(),
+            overlay_packs=(replace(pack, operations=(stale, *pack.operations[1:])),),
+        )
+    with pytest.raises(SourceOverlayError, match="invalid"):
+        current.overlay_pack_from_json_bytes(b"not JSON")

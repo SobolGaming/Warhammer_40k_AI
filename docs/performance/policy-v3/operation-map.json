@@ -198,7 +198,7 @@
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
         "schema": "tool-input-roles-v4",
-        "role_specification": "docs/performance/policy-v3/vyper-source-input-roles-v4.json"
+        "role_specification": "docs/performance/policy-v3/ec-profile-input-roles-v4.json"
       }
     },
     "session_command_fork": {
@@ -30552,6 +30552,176 @@
         "validate_generated_evidence",
         "validate_spec",
         "write"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "registered-source-scope-dispatch": {
+      "paths": [
+        "scripts/check_performance_policy.py"
+      ],
+      "owners": [
+        "_validate_current"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "registered-source-scope-registry": {
+      "paths": [
+        "tools/performance_tool_inputs_v4.py"
+      ],
+      "owners": [
+        "ReviewedScope",
+        "registered_declarations",
+        "registered_scope",
+        "scope_for_specification",
+        "validate_scope_binding"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "registered-source-provenance-projection": {
+      "paths": [
+        "tools/source_scope_provenance.py"
+      ],
+      "owners": [
+        "@module",
+        "ProvenanceRecord",
+        "registered_provenance_context",
+        "registered_provenance_text"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "supported-ec-current-profile-generator": {
+      "paths": [
+        "tools/generate_emperors_children_current_profiles.py"
+      ],
+      "owners": [
+        "@module",
+        "generated_overlay_pack",
+        "main"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "registered-source-provenance-preservation": {
+      "paths": [
+        "tests/category_migration_preservation.py"
+      ],
+      "owners": [
+        "edition_registered_predecessor"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "supported-ec-profile-regression-controls": {
+      "paths": [
+        "tests/factions/emperors_children/test_selected_consumers.py"
+      ],
+      "owners": [
+        "test_current_ec_overlay_has_exact_numeric_boundary_and_stale_preimage_rejects",
+        "test_current_lord_exultant_profile_reaches_native_muster_and_restore",
+        "test_current_six_ec_numeric_profiles_and_keywords",
+        "test_infractors_native_melee_rerolls_destroy_enemy_then_icon_uses_own_bearer"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "registered-source-scope-regression-controls": {
+      "paths": [
+        "tests/code_quality/test_registered_source_scopes.py",
+        "tests/code_quality/test_category_migration_preservation.py"
+      ],
+      "owners": [
+        "@module",
+        "_binding",
+        "_historical_report",
+        "_inventories",
+        "_provenance_report",
+        "_report",
+        "_validate",
+        "edition_root",
+        "historical_snapshot_inputs",
+        "retired_identity_tokens",
+        "test_old_scope_binding_is_retained_but_cannot_qualify_new_scope",
+        "test_provenance_registration_is_immutable_and_resolves_all_closed_contexts",
+        "test_provenance_registration_rejects_ambiguous_contexts",
+        "test_provenance_registration_rejects_unknown_scope",
+        "test_registered_ec_scope_keeps_full_input_boundaries",
+        "test_registered_exact_artifacts_reject_any_byte_drift",
+        "test_registered_inventory_scans_ignored_source_and_rejects_symlink",
+        "test_registered_projection_rejects_repin_of_changed_successor",
+        "test_registered_provenance_inputs_rechecked_after_success",
+        "test_registered_provenance_projects_only_exact_historical_context",
+        "test_registered_report_provenance_rejects_drift_and_retains_adjacent_identity",
+        "test_registered_scope_authentication_rejects_unknown_or_mutated_inputs",
+        "test_registered_scope_requires_every_real_sample_and_complete_tree",
+        "test_registered_scopes_preserve_original_spec_and_admit_closed_ec_scope",
+        "test_vyper_edition_additions_remain_exact_with_recomputed_live_pin",
+        "test_vyper_edition_predecessor_is_exact_before_original_assertion_proof"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "supported-ec-source-fixture-controls": {
+      "paths": [
+        "tests/rules/section05/coverage.json",
+        "tests/rules/section18/coverage.json",
+        "tests/rules/section02/test_02_04_01_constructed_contract.py",
+        "tests/rules/section02/test_02_04_weapons.py",
+        "tests/rules/section05/test_rolls.py",
+        "tests/rules/section05/test_toughness.py",
+        "tests/support/section05_fixtures.py",
+        "tests/rules/section18/test_emergency_status.py",
+        "tests/factions/aeldari/unit/test_battle_focus_consumers.py",
+        "tests/factions/emperors_children/test_shared_attack_consumers.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "section05_definitions",
+        "test_02_04_01_absent_strength_is_one_only_for_interaction",
+        "test_02_04_strength_compares_real_weapon_and_target_profiles",
+        "test_attached_native_character_groups_and_toughness_contract",
+        "test_excessive_assault_native_dice_source_and_objective_branches",
+        "test_fade_back_native_hit_or_miss_controls_normal_move",
+        "test_native_emergency_survivors_become_actually_battle_shocked",
+        "test_ordinary_unit_uses_highest_present_toughness",
+        "test_strength_four_wound_table_contract"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "registered-source-scratch-consumer-controls": {
+      "paths": [
+        "tests/code_quality/test_performance_tool_inputs.py"
+      ],
+      "owners": [
+        "test_original_edition_assertion_preserves_active_reference_boundary"
       ],
       "families": [
         "external_contract_source_reuse"

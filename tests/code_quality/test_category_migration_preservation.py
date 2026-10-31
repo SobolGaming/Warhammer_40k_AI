@@ -304,6 +304,8 @@ def edition_root(tmp_path: Path) -> Path:
         migration.EDITION_TEST,
         migration.EDITION_ARCHIVE,
         migration.EDITION_PREDECESSOR_ARCHIVE,
+        migration.EDITION_REGISTERED_PREDECESSOR_ARCHIVE,
+        migration.EDITION_REGISTERED_HELPER,
     ):
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -463,7 +465,9 @@ def test_vyper_edition_predecessor_is_exact_before_original_assertion_proof(
     edition_root: Path,
 ) -> None:
     current = (edition_root / migration.EDITION_TEST).read_bytes()
-    prior = migration.edition_provenance_predecessor(edition_root, current)
+    registered = migration.edition_registered_predecessor(edition_root, current)
+    assert registered == (ROOT / migration.EDITION_REGISTERED_PREDECESSOR_ARCHIVE).read_bytes()
+    prior = migration.edition_provenance_predecessor(edition_root, registered)
     assert hashlib.sha256(prior).hexdigest() == migration.EDITION_PREDECESSOR_SHA256
     assert prior == (ROOT / migration.EDITION_PREDECESSOR_ARCHIVE).read_bytes()
     assert prior != current
@@ -510,10 +514,56 @@ def test_vyper_edition_additions_remain_exact_with_recomputed_live_pin(
             for node in tree.body
             if isinstance(node, ast.FunctionDef) and node.name == "_active_identity_text"
         )
-        assert isinstance(route.body[2], ast.If)
-        route.body[2].test = ast.Constant(True)
+        assert isinstance(route.body[4], ast.If)
+        route.body[4].test = ast.Constant(True)
     else:
         tree.body.append(ast.parse("unreviewed_guard_initializer = True").body[0])
+    changed = (ast.unparse(tree) + "\n").encode()
+    path.write_bytes(changed)
+    monkeypatch.setattr(migration, "EDITION_AFTER_SHA256", hashlib.sha256(changed).hexdigest())
+    with pytest.raises(ValueError, match=r"edition provenance|Original edition"):
+        migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+
+
+@pytest.mark.parametrize("member", ["predecessor", "helper"])
+def test_registered_provenance_inputs_rechecked_after_success(
+    edition_root: Path, member: str
+) -> None:
+    migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+    relative = (
+        migration.EDITION_REGISTERED_PREDECESSOR_ARCHIVE
+        if member == "predecessor"
+        else migration.EDITION_REGISTERED_HELPER
+    )
+    target = edition_root / relative
+    target.write_bytes(target.read_bytes() + b"\n")
+    with pytest.raises(ValueError, match="registered edition provenance inputs changed"):
+        migration.read_historical_test_bytes(edition_root, migration.EDITION_TEST)
+
+
+@pytest.mark.parametrize("mutation", ["import", "route", "initializer"])
+def test_registered_projection_rejects_repin_of_changed_successor(
+    edition_root: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
+    path = edition_root / migration.EDITION_TEST
+    tree = ast.parse(path.read_bytes())
+    if mutation == "import":
+        node = next(
+            n
+            for n in tree.body
+            if isinstance(n, ast.ImportFrom) and n.module == "tools.source_scope_provenance"
+        )
+        node.names[0].name = "unreviewed_projection"
+    elif mutation == "route":
+        route = next(
+            n
+            for n in tree.body
+            if isinstance(n, ast.FunctionDef) and n.name == "_active_identity_text"
+        )
+        assert isinstance(route.body[3], ast.If)
+        route.body[3].test = ast.Constant(True)
+    else:
+        tree.body.append(ast.parse("unreviewed_initializer = True").body[0])
     changed = (ast.unparse(tree) + "\n").encode()
     path.write_bytes(changed)
     monkeypatch.setattr(migration, "EDITION_AFTER_SHA256", hashlib.sha256(changed).hexdigest())

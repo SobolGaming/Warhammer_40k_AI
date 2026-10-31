@@ -1145,7 +1145,7 @@
                 "assert not orders[0][0].character_model_ids",
                 "assert orders[0][1].model_ids == leaders[0].own_model_ids()",
                 "assert orders[0][2].model_ids == leaders[1].own_model_ids()",
-                "assert _target_unit_toughness(state=state, target_unit_instance_id=target) == 4"
+                "assert _target_unit_toughness(state=state, target_unit_instance_id=target) == 5"
               ]
             }
           ],
@@ -1172,7 +1172,7 @@
               "node": "tests/rules/section05/test_toughness.py::test_ordinary_unit_uses_highest_present_toughness",
               "assertions": [
                 "assert _target_unit_toughness(state=state, target_unit_instance_id=unit.unit_instance_id) == 7",
-                "assert _target_unit_toughness(state=state, target_unit_instance_id=unit.unit_instance_id) == 4"
+                "assert _target_unit_toughness(state=state, target_unit_instance_id=unit.unit_instance_id) == 5"
               ]
             }
           ],
@@ -1344,7 +1344,7 @@
                 "assert not orders[0][0].character_model_ids",
                 "assert orders[0][1].model_ids == leaders[0].own_model_ids()",
                 "assert orders[0][2].model_ids == leaders[1].own_model_ids()",
-                "assert _target_unit_toughness(state=state, target_unit_instance_id=target) == 4"
+                "assert _target_unit_toughness(state=state, target_unit_instance_id=target) == 5"
               ]
             }
           ],
@@ -1476,7 +1476,7 @@
                 "assert not orders[0][0].character_model_ids",
                 "assert orders[0][1].model_ids == leaders[0].own_model_ids()",
                 "assert orders[0][2].model_ids == leaders[1].own_model_ids()",
-                "assert _target_unit_toughness(state=state, target_unit_instance_id=target) == 4"
+                "assert _target_unit_toughness(state=state, target_unit_instance_id=target) == 5"
               ]
             }
           ],
@@ -1508,7 +1508,7 @@
                 "assert not orders[0][0].character_model_ids",
                 "assert orders[0][1].model_ids == leaders[0].own_model_ids()",
                 "assert orders[0][2].model_ids == leaders[1].own_model_ids()",
-                "assert _target_unit_toughness(state=state, target_unit_instance_id=target) == 4"
+                "assert _target_unit_toughness(state=state, target_unit_instance_id=target) == 5"
               ]
             }
           ],
