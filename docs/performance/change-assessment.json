@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "105b467b1140e6d9ff6710a74ed839ad225d17ec",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8a38ade62fcffa2ed689c5fee45c4a8efb4f68922c40b4fdc54cc3e50b1563b2",
-  "operation_map_sha256": "af93cd31d2d2fa33152c869ab3e35f26c057487018d3a3eec24456c98fa1da1d",
+  "operation_map_sha256": "dda94619c37d6e3fa66c62f762563a675f028226b1a1b4b5977b566b69cdaafa",
   "changes": {
     ".gitattributes": {
       "before_sha256": "6a7fdff31280bd61a8af2357f8f3ceb0e4f6d820a093b2218f7bbb1fe4e2ed85",
@@ -16,11 +16,11 @@
     },
     "ci/quality_shards/all.txt": {
       "before_sha256": "e95fee591662915b3661bd8641d09316973ac2daede466d5f9a74a2d61918163",
-      "after_sha256": "28636bc8b36b00588a24613e1858c2b1d4d524a32b059e5fbf33283054bdb4f4",
+      "after_sha256": "851082d9a54e822bb9d7c3c16898a74ab24a418dc4f3fd09d8ff7261e4571da5",
       "owners": {
         "@document": {
           "before": "e95fee591662915b3661bd8641d09316973ac2daede466d5f9a74a2d61918163",
-          "after": "28636bc8b36b00588a24613e1858c2b1d4d524a32b059e5fbf33283054bdb4f4"
+          "after": "851082d9a54e822bb9d7c3c16898a74ab24a418dc4f3fd09d8ff7261e4571da5"
         }
       }
     },
@@ -46,11 +46,11 @@
     },
     "ci/quality_shards/shard-4.txt": {
       "before_sha256": "0e7ffe6207fd31558773a1c43b6c354de0771963bcb4812c004b024a0c16d8f3",
-      "after_sha256": "06c962379ae93f50e83e65d3eef81431a28a4816d7ec00e7e2f2b994fe0d412e",
+      "after_sha256": "cf183dae0d47795fad9e714e8e2998f0764197a9db2bc5880a769eb40bfedb2a",
       "owners": {
         "@document": {
           "before": "0e7ffe6207fd31558773a1c43b6c354de0771963bcb4812c004b024a0c16d8f3",
-          "after": "06c962379ae93f50e83e65d3eef81431a28a4816d7ec00e7e2f2b994fe0d412e"
+          "after": "cf183dae0d47795fad9e714e8e2998f0764197a9db2bc5880a769eb40bfedb2a"
         }
       }
     },
@@ -156,31 +156,31 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76",
-      "after_sha256": "d9a985e70eb2d2deae26490f67a701da04fdaab6e21a27e89c968bdf916cf704",
+      "after_sha256": "e82fb450a16eb976d7eabb20a918c552644e1e014e8c50da674d9bdbc32cf335",
       "owners": {
         "@document": {
           "before": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76",
-          "after": "d9a985e70eb2d2deae26490f67a701da04fdaab6e21a27e89c968bdf916cf704"
+          "after": "e82fb450a16eb976d7eabb20a918c552644e1e014e8c50da674d9bdbc32cf335"
         }
       }
     },
     "docs/SUPPORTED_EC_PROFILE_RECONCILIATION_2026_10.md": {
       "before_sha256": null,
-      "after_sha256": "b962fc8f99e800dcc6b3f8b51aeb7b2c040a83dcd80ea71a858529d2959c55ce",
+      "after_sha256": "402043c99ef41df344c27656f51d93e782aa2da936cc0a53a6519b499f4e673f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b962fc8f99e800dcc6b3f8b51aeb7b2c040a83dcd80ea71a858529d2959c55ce"
+          "after": "402043c99ef41df344c27656f51d93e782aa2da936cc0a53a6519b499f4e673f"
         }
       }
     },
     "docs/performance/policy-v3/ec-profile-input-roles-v4.json": {
       "before_sha256": null,
-      "after_sha256": "6674490af4eead074cd66a13316d20d87eb3c15a0b60657b2154f3f6a347ff6c",
+      "after_sha256": "fb4d0c667a84c944fca4dadf717701d9d608d7c7f58fc4fdc3dd2a433dddc4b9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6674490af4eead074cd66a13316d20d87eb3c15a0b60657b2154f3f6a347ff6c"
+          "after": "fb4d0c667a84c944fca4dadf717701d9d608d7c7f58fc4fdc3dd2a433dddc4b9"
         }
       }
     },
@@ -196,11 +196,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "0de7ccdda63d9f451a2e998e2e0b8e01604b61d0263d6168c4e3a224fa279794",
-      "after_sha256": "8ccdda8fa993baa39a05f3261da0bd54c1019884d092e82762fde7c2717916cc",
+      "after_sha256": "39d322cccd9854ff46c25ca83dd1f9479cac01be7eb1a0191ec2131c16d01236",
       "owners": {
         "@document": {
           "before": "0de7ccdda63d9f451a2e998e2e0b8e01604b61d0263d6168c4e3a224fa279794",
-          "after": "8ccdda8fa993baa39a05f3261da0bd54c1019884d092e82762fde7c2717916cc"
+          "after": "39d322cccd9854ff46c25ca83dd1f9479cac01be7eb1a0191ec2131c16d01236"
         }
       }
     },
@@ -280,11 +280,11 @@
     },
     "tests/category_migration_preservation.py": {
       "before_sha256": "4c645b71cac9fa8dca23cb3e5fd6e6149dff476ccccf4aa3a3e6f170057a1822",
-      "after_sha256": "82bb7979c7ea2a7be867b71946f45f1d5f3fe3736b17661af54b644790d2f488",
+      "after_sha256": "84a0e3f55b5d300d0a7ff6b1a90bc47b6b4d4e48e30bf399605852494cc70291",
       "owners": {
         "@module": {
           "before": "c1559530233fcb26ef651399cceb9d3a5421bc047e62268f93548cf339bb6f55",
-          "after": "d18d52eadae673fcdb53a73d4a6bad03dadcc09e007b0a043ccba9017cc7ae94"
+          "after": "f9fb731b9192e5442061a754c9a514652eab3432dfe9ab4a7d722ee316058721"
         },
         "edition_registered_predecessor": {
           "before": null,
@@ -348,11 +348,11 @@
     },
     "tests/code_quality/test_registered_source_scopes.py": {
       "before_sha256": null,
-      "after_sha256": "b2b28619fa4fac9c474e9ec7ce8563c935665827ecf2f5380d7c7fbf925ec973",
+      "after_sha256": "a0e131eb81df3dd4c1745c0c3d31aee3ab6b669a0a0d2daf1b3ff1385449ac22",
       "owners": {
         "@module": {
           "before": null,
-          "after": "f523adc0c97e415ec61483eaeed1027854149010dfa4e7bce4cfba11a570fe07"
+          "after": "d5fdf1700de2f05e379e05a88be842db082cdbac56e552ce7f899769f2b58887"
         },
         "_binding": {
           "before": null,
@@ -389,6 +389,18 @@
         "test_old_scope_binding_is_retained_but_cannot_qualify_new_scope": {
           "before": null,
           "after": "0d98b75f6c2c65b605e121ebe2375cb44d90fed1383f21521d8f0512ecea492b"
+        },
+        "test_provenance_registration_is_immutable_and_resolves_all_closed_contexts": {
+          "before": null,
+          "after": "a0c047968f0fb65c55f554e622d30ed6c993544b08fcc48c3e739c3f754545cb"
+        },
+        "test_provenance_registration_rejects_ambiguous_contexts": {
+          "before": null,
+          "after": "f636e5a8b97beadeda38b67672aa9a6cf92a18c14830e289624ac5d57e4ca1ff"
+        },
+        "test_provenance_registration_rejects_unknown_scope": {
+          "before": null,
+          "after": "3444d4f90bc3b7ae6ae2d7dab9c563d85a2fe3fe0756c5323c36bd0690002031"
         },
         "test_registered_ec_scope_keeps_full_input_boundaries": {
           "before": null,
@@ -483,6 +495,16 @@
         "test_02_04_strength_compares_real_weapon_and_target_profiles": {
           "before": "fd687f22762bdf7e2d0c9cb2feae7c40d8831fa99f77fbd6e8622a24281a7786",
           "after": "a38efb958d0b1741081132a7739990c97d3588956e3391923952a6c2d4f260d9"
+        }
+      }
+    },
+    "tests/rules/section05/coverage.json": {
+      "before_sha256": "313fd57066ee4282c206a3a4c896459c630060f2f018a7444e8e8f285c13b0d2",
+      "after_sha256": "699cb17b35928335c140a14df0e073511afecbbc86a61fbe21ad8168f94d62a8",
+      "owners": {
+        "@document": {
+          "before": "313fd57066ee4282c206a3a4c896459c630060f2f018a7444e8e8f285c13b0d2",
+          "after": "699cb17b35928335c140a14df0e073511afecbbc86a61fbe21ad8168f94d62a8"
         }
       }
     },
@@ -586,11 +608,11 @@
     },
     "tools/performance_tool_inputs_v4.py": {
       "before_sha256": "2df3f461775dfe1a4cf3e0e8560268346d0d55f2d484bc2e443222533b76de39",
-      "after_sha256": "61bbaf2ae1e24303ee2ff7c6a7ba06861116f36fb88deae700fec5b65be14959",
+      "after_sha256": "679ba28e0733082fda03a3daa73f5076ed0d4abad88020c075f7600e31ad46cb",
       "owners": {
         "@module": {
           "before": "ed95af6ff441991452b0e344f74d3e46e2f1767c90e44a758f49c0af78a72728",
-          "after": "690fad11fec67aac526c30be1143a3d4630898d839868cbae46012a9caf4e30f"
+          "after": "0cee9b3364d815215f4952acd15b9f37a29a14e8671285529cf2aac296da3556"
         },
         "ReviewedScope": {
           "before": null,
@@ -644,15 +666,23 @@
     },
     "tools/source_scope_provenance.py": {
       "before_sha256": null,
-      "after_sha256": "ae08dd5bb7277eb4cf86bae7ecb881cb15a16917ba05fac7a14c74d07376ba04",
+      "after_sha256": "ae603f64b1b154f785ac33735c63bc62c8167d9e5e150268c3c08debf7aa14fd",
       "owners": {
         "@module": {
           "before": null,
-          "after": "205b9722d71661f698c9601823967fa94c6ff5326db407530732238eb2322779"
+          "after": "7a2ec52c368aa89299b0089bfe5b2caa51358cc534250f977db7364531a7a818"
+        },
+        "ProvenanceRecord": {
+          "before": null,
+          "after": "d53147f6422cecdda3c6872bdc9a2f257e0842b20ef880d64c6220eae04a0d65"
+        },
+        "registered_provenance_context": {
+          "before": null,
+          "after": "362fe74bbbbfaa5a87490c9bc48e92b3dd5de6077281dc2c1200bb8def918d18"
         },
         "registered_provenance_text": {
           "before": null,
-          "after": "90a151c71cb12969c0328b6ce392c0cbfcfdf1f8e9adf705e9e18091260388ed"
+          "after": "2f456bf69529efece50711b54eea4467b1d70e0f15242ae442d377450510e9f9"
         }
       }
     }
@@ -1005,6 +1035,17 @@
       "category": "rule_semantics",
       "operations": [
         "qualification40-exact-5c91154b98e55444",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
+      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
+      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+    },
+    "tests/rules/section05/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-ceca81af9749a228",
         "supported-ec-source-fixture-controls"
       ],
       "selected_families": [],

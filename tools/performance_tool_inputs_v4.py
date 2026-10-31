@@ -104,8 +104,8 @@ _SCOPES = (
     ReviewedScope(
         EC_BASE,
         EC_SPEC_PATH,
-        "6674490af4eead074cd66a13316d20d87eb3c15a0b60657b2154f3f6a347ff6c",
-        "9a53158c4c75db03cb273dc118587c5dd14d0e8be1008137065b827e973bd50f",
+        "fb4d0c667a84c944fca4dadf717701d9d608d7c7f58fc4fdc3dd2a433dddc4b9",
+        "2f3b24254f1fdde4ff337b27a7a8e6b53b17ba91b02dc4223c98e0618cb8bc33",
         EC_REPORT_PATH,
         frozenset(
             [
@@ -154,6 +154,7 @@ _SCOPES = (
                 "tests/factions/emperors_children/test_shared_attack_consumers.py",
                 "tests/rules/section02/test_02_04_01_constructed_contract.py",
                 "tests/rules/section02/test_02_04_weapons.py",
+                "tests/rules/section05/coverage.json",
                 "tests/rules/section05/test_rolls.py",
                 "tests/rules/section05/test_toughness.py",
                 "tests/rules/section18/test_emergency_status.py",

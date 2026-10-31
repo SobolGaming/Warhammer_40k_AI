@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+from dataclasses import FrozenInstanceError, replace
 from pathlib import Path
 from typing import Any
 
@@ -325,3 +326,39 @@ def test_old_scope_binding_is_retained_but_cannot_qualify_new_scope() -> None:
     )
     with pytest.raises(ValueError, match="exact registered scope"):
         scopes.validate_scope_binding(SCOPE.base, binding)
+
+
+def test_provenance_registration_is_immutable_and_resolves_all_closed_contexts() -> None:
+    record = provenance.PROVENANCE_RECORDS[0]
+    for path in (record.overlay_path, SCOPE.spec_path, SCOPE.report_path):
+        assert provenance.registered_provenance_context(path) == (record, SCOPE)
+    assert provenance.registered_provenance_context("docs/unregistered.json") is None
+    with pytest.raises(FrozenInstanceError):
+        object.__getattribute__(record, "__setattr__")("scope_base", scopes.BASE)
+
+
+@pytest.mark.parametrize("collision", ["overlay", "spec", "report", "duplicate"])
+def test_provenance_registration_rejects_ambiguous_contexts(
+    monkeypatch: pytest.MonkeyPatch, collision: str
+) -> None:
+    record = provenance.PROVENANCE_RECORDS[0]
+    if collision == "duplicate":
+        records = (record, record)
+    else:
+        other = scopes.registered_scope(scopes.BASE)
+        path = {
+            "overlay": record.overlay_path,
+            "spec": SCOPE.spec_path,
+            "report": SCOPE.report_path,
+        }[collision]
+        records = (record, replace(record, scope_base=other.base, overlay_path=path))
+    monkeypatch.setattr(provenance, "PROVENANCE_RECORDS", records)
+    with pytest.raises(ValueError, match="contexts must be unique"):
+        provenance.registered_provenance_context(record.overlay_path)
+
+
+def test_provenance_registration_rejects_unknown_scope(monkeypatch: pytest.MonkeyPatch) -> None:
+    record = provenance.PROVENANCE_RECORDS[0]
+    monkeypatch.setattr(provenance, "PROVENANCE_RECORDS", (replace(record, scope_base="f" * 40),))
+    with pytest.raises(ValueError, match="registered"):
+        provenance.registered_provenance_context(record.overlay_path)

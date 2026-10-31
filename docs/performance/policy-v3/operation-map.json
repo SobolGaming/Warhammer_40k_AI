@@ -30595,6 +30595,8 @@
       ],
       "owners": [
         "@module",
+        "ProvenanceRecord",
+        "registered_provenance_context",
         "registered_provenance_text"
       ],
       "families": [
@@ -30662,6 +30664,9 @@
         "historical_snapshot_inputs",
         "retired_identity_tokens",
         "test_old_scope_binding_is_retained_but_cannot_qualify_new_scope",
+        "test_provenance_registration_is_immutable_and_resolves_all_closed_contexts",
+        "test_provenance_registration_rejects_ambiguous_contexts",
+        "test_provenance_registration_rejects_unknown_scope",
         "test_registered_ec_scope_keeps_full_input_boundaries",
         "test_registered_exact_artifacts_reject_any_byte_drift",
         "test_registered_inventory_scans_ignored_source_and_rejects_symlink",
@@ -30683,6 +30688,7 @@
     },
     "supported-ec-source-fixture-controls": {
       "paths": [
+        "tests/rules/section05/coverage.json",
         "tests/rules/section02/test_02_04_01_constructed_contract.py",
         "tests/rules/section02/test_02_04_weapons.py",
         "tests/rules/section05/test_rolls.py",
@@ -30693,6 +30699,7 @@
         "tests/factions/emperors_children/test_shared_attack_consumers.py"
       ],
       "owners": [
+        "@document",
         "@module",
         "section05_definitions",
         "test_02_04_01_absent_strength_is_one_only_for_interaction",
