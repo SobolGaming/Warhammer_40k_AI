@@ -214,6 +214,16 @@
         }
       }
     },
+    "docs/performance/current/acts-of-faith-2490-v4.json": {
+      "before_sha256": null,
+      "after_sha256": "f0a190ac5be1c18e1f045d36c4fbc6401a8e2b95bfb0d00a9c669d5538ffce38",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f0a190ac5be1c18e1f045d36c4fbc6401a8e2b95bfb0d00a9c669d5538ffce38"
+        }
+      }
+    },
     "docs/performance/policy-v3/acts-of-faith-input-roles-v4.json": {
       "before_sha256": null,
       "after_sha256": "2959505fa176f0f3832e984f57a95bba960e35830b74d20427751f4e8c60dd92",
@@ -823,6 +833,14 @@
       "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
     },
     "docs/FACTION_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Correct existing Acts of Faith automatic timing and approved last-model destruction eligibility; preserve shared engine authority and retained source/history. Existing sensitive generator and comparison-control mappings retain fresh detailed evidence.",
+      "source_obligation": "Current canonical40k.app Acts of Faith observation31October2026 grants one Miracle die at each turn start and each destroyed Adepta Sororitas unit. Triumph battle-round selection, living/spend eligibility, dice generation, occurrence deduplication and consumption caps remain separate.",
+      "unchanged_work": "No generic lifecycle, algorithm, cache, serialization format, solver, runtime dependency or supported component change. Existing START_TURN provider dispatch and resource records are reused. Finite exact2490 comparison registration preserves the original harness, all true common inputs, six real samples, complete generated trees and original budgets."
+    },
+    "docs/performance/current/acts-of-faith-2490-v4.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
