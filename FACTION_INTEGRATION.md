@@ -116,7 +116,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v3`
 - source-payload SHA-256 checksum:
-  `4ad0a0b76e39e5194db9217fa031e070e7af79e70351daad78c860b6beb9636c`
+  `a2fc77e036246b5834df81179fe0c1718dbef4b8ccafc672917ef6fb67b73cf8`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -183,9 +183,9 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v3`
 - source-payload SHA-256 checksum:
-  `91d65afd0aa5502132997df65fad3e501cd3284d984d8557cc735cd6330958de`
+  `6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c`
 - upstream Phase 17E checksum:
-  `4ad0a0b76e39e5194db9217fa031e070e7af79e70351daad78c860b6beb9636c`
+  `a2fc77e036246b5834df81179fe0c1718dbef4b8ccafc672917ef6fb67b73cf8`
 
 The package emits 2073 execution records, one for every Phase 17E coverage row:
 1889 rows are blocked as `structured_rule_semantics_required`, 28 rows are
@@ -450,9 +450,9 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `b5305589fcfcf644765d79516756bc200f881546669dd1bbff17e6aedf9d6b34`
+  `04fd32ece69f6935772be3a9eee2d8d21c3edb8b43cef4cb37445bc77e28c5d1`
 - upstream Phase 17F checksum:
-  `91d65afd0aa5502132997df65fad3e501cd3284d984d8557cc735cd6330958de`
+  `6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
@@ -492,9 +492,9 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `0680102a6fc9902903f8bb9aea87dabc7e6bec439e84dc176b67cd91852f301d`
+  `7de50a1d4a3fbcd0a664779e61a23acedd8e1e8eca9516d7d93b646d101cb26e`
 - upstream Phase 17F checksum:
-  `91d65afd0aa5502132997df65fad3e501cd3284d984d8557cc735cd6330958de`
+  `6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c`
 
 The budget report tracks 23 executable named-handler Phase 17F rows and 23
 approved entries. The current approved reason is

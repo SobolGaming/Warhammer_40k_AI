@@ -23,10 +23,12 @@
     "data/generated/ability_coverage/ability_coverage_rows.json",
     "data/generated/ability_coverage/ability_support_category_rows.json",
     "data/generated/ability_coverage/cross_source_semantic_equivalence.json",
+    "data/generated/ability_coverage/runtime_content_semantic_coverage.json",
     "src/warhammer40k_core/_engine_build_manifest.json"
   ],
   "control_plane": {
     ".gitattributes": "Literal byte attributes preserve the exact historical preimages, one-token live helper successor and inactive typed successor across platforms; no timed workload import or execution change.",
+    "FACTION_INTEGRATION.md": "Current source identity documentation receives only the seven propagated checksum corrections; validated by untimed integration-contract controls and not read by the unchanged timed contract testcase.",
     "ci/quality_shards/all.txt": "True collected quality node inventory for the additive controls; timed original contract testcase and all 260 existing deferrals remain unchanged.",
     "ci/quality_shards/shard-1.txt": "True collected quality lane nodes; existing module assignment and relative old case order preserved, outside the timed original contract workload.",
     "ci/quality_shards/shard-4.txt": "True collected quality lane nodes; existing module assignment and relative old case order preserved, outside the timed original contract workload.",

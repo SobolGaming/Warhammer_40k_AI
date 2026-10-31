@@ -175,8 +175,8 @@ _SCOPES = (
     ReviewedScope(
         ACTS_BASE,
         ACTS_SPEC_PATH,
-        "2959505fa176f0f3832e984f57a95bba960e35830b74d20427751f4e8c60dd92",
-        "4f859235e0cd0162d164b24b38835c32db885ce875d1b38f92c6b966ce8192e6",
+        "1321bb30199f34a0baff2ede6b58b543113e99fc1d59fb3f42e5547a1e2724ae",
+        "0609643f0ac6d04f9ff8e9ea38d51baec2ef75d24f18c38f68f5b0dac4fa4d42",
         ACTS_REPORT_PATH,
         frozenset(
             [
@@ -204,6 +204,7 @@ _SCOPES = (
                 "contracts/examples/support-profile.json",
                 "contracts/manifest.json",
                 "data/generated/ability_coverage/cross_source_semantic_equivalence.json",
+                "data/generated/ability_coverage/runtime_content_semantic_coverage.json",
                 "data/generated/ability_coverage/ability_coverage_rows.json",
                 "data/generated/ability_coverage/ability_support_category_rows.json",
                 "src/warhammer40k_core/_engine_build_manifest.json",
@@ -212,6 +213,7 @@ _SCOPES = (
         frozenset(
             [
                 ".gitattributes",
+                "FACTION_INTEGRATION.md",
                 "ci/quality_shards/all.txt",
                 "ci/quality_shards/shard-1.txt",
                 "ci/quality_shards/shard-4.txt",
