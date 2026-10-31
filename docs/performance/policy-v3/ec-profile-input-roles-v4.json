@@ -31,6 +31,7 @@
     "tests/category_migration_preservation.py": "Untimed reviewed admission, source audit or regression control; not imported or executed by the original timed contract testcase.",
     "tests/code_quality/test_category_migration_preservation.py": "Untimed reviewed admission, source audit or regression control; not imported or executed by the original timed contract testcase.",
     "tests/code_quality/test_current_comparison_routing.py": "Untimed reviewed admission, source audit or regression control; not imported or executed by the original timed contract testcase.",
+    "tests/code_quality/test_performance_tool_inputs.py": "Untimed preservation scratch fixture copies its real tools import closure and binds current runtime source without inherited checkout-root PYTHONPATH. All four original outcomes/assertions remain. Not part of the unchanged timed original testcase.",
     "tests/code_quality/test_phase14a_source_identity.py": "Untimed reviewed admission, source audit or regression control; not imported or executed by the original timed contract testcase.",
     "tests/code_quality/test_registered_source_scopes.py": "Untimed reviewed admission, source audit or regression control; not imported or executed by the original timed contract testcase.",
     "tests/factions/aeldari/unit/test_battle_focus_consumers.py": "Untimed current-source numeric or native RNG regression fixture. Not imported or executed by the unchanged original external-contract testcase; source correction preserves all original branch assertions.",

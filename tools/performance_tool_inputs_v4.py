@@ -104,8 +104,8 @@ _SCOPES = (
     ReviewedScope(
         EC_BASE,
         EC_SPEC_PATH,
-        "16397e5ffb71cac67ceb6fc5a1754e3f271a0a16b3864292d7bbc8e9d0ef3e7d",
-        "32d32f5822835a19bab1f92804198d076a3ad2c35ea2e2638934027e7d9f9310",
+        "27a4bbd23a55f34672dcfb36767bb424b285d0ae65ad6ea08fb5c8e9f6484020",
+        "9d656dd9200d0d692c9fe3bfd7b1f0ecacaa805e8dd5d610f93ad92a27c40e05",
         EC_REPORT_PATH,
         frozenset(
             [
@@ -147,6 +147,7 @@ _SCOPES = (
                 "tests/category_migration_preservation.py",
                 "tests/code_quality/test_category_migration_preservation.py",
                 "tests/code_quality/test_current_comparison_routing.py",
+                "tests/code_quality/test_performance_tool_inputs.py",
                 "tests/code_quality/test_phase14a_source_identity.py",
                 "tests/code_quality/test_registered_source_scopes.py",
                 "tests/factions/aeldari/unit/test_battle_focus_consumers.py",
