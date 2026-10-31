@@ -236,11 +236,11 @@
     },
     "docs/performance/current/acts-of-faith-2490-v4.json": {
       "before_sha256": null,
-      "after_sha256": "f0a190ac5be1c18e1f045d36c4fbc6401a8e2b95bfb0d00a9c669d5538ffce38",
+      "after_sha256": "490145346c5ee6c0008b1dac9b32146b6a6be3f41946ad8241032a4b19a7f5e9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f0a190ac5be1c18e1f045d36c4fbc6401a8e2b95bfb0d00a9c669d5538ffce38"
+          "after": "490145346c5ee6c0008b1dac9b32146b6a6be3f41946ad8241032a4b19a7f5e9"
         }
       }
     },
