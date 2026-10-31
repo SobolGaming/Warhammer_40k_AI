@@ -156,21 +156,31 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76",
-      "after_sha256": "e82fb450a16eb976d7eabb20a918c552644e1e014e8c50da674d9bdbc32cf335",
+      "after_sha256": "ef7ff67984e7e442570e74da5ad77fa990fc00898f466aaeeaef0cd80aa6894c",
       "owners": {
         "@document": {
           "before": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76",
-          "after": "e82fb450a16eb976d7eabb20a918c552644e1e014e8c50da674d9bdbc32cf335"
+          "after": "ef7ff67984e7e442570e74da5ad77fa990fc00898f466aaeeaef0cd80aa6894c"
         }
       }
     },
     "docs/SUPPORTED_EC_PROFILE_RECONCILIATION_2026_10.md": {
       "before_sha256": null,
-      "after_sha256": "cf81be1eaa19f3b19ba2563d88fe89380aaed29865f330291e505007466bd047",
+      "after_sha256": "67e19fcb09380348112f0fb4a69a577230bf2d2dd3707e0bbae08d182662e0e0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "cf81be1eaa19f3b19ba2563d88fe89380aaed29865f330291e505007466bd047"
+          "after": "67e19fcb09380348112f0fb4a69a577230bf2d2dd3707e0bbae08d182662e0e0"
+        }
+      }
+    },
+    "docs/performance/current/ec-profile-105b-v4.json": {
+      "before_sha256": null,
+      "after_sha256": "e634cbae25faed6f4ffd0486b21397e4daf5fc3f0dd163865a551bd0a9f3db45",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e634cbae25faed6f4ffd0486b21397e4daf5fc3f0dd163865a551bd0a9f3db45"
         }
       }
     },
@@ -849,6 +859,14 @@
       "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
     },
     "docs/SUPPORTED_EC_PROFILE_RECONCILIATION_2026_10.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
+      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
+      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+    },
+    "docs/performance/current/ec-profile-105b-v4.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
