@@ -30653,11 +30653,14 @@
       "owners": [
         "@module",
         "_binding",
+        "_historical_report",
         "_inventories",
         "_provenance_report",
         "_report",
         "_validate",
         "edition_root",
+        "historical_snapshot_inputs",
+        "retired_identity_tokens",
         "test_old_scope_binding_is_retained_but_cannot_qualify_new_scope",
         "test_registered_ec_scope_keeps_full_input_boundaries",
         "test_registered_exact_artifacts_reject_any_byte_drift",
@@ -30676,6 +30679,33 @@
         "external_contract_source_reuse"
       ],
       "sensitive": true,
+      "mandatory": true
+    },
+    "supported-ec-source-fixture-controls": {
+      "paths": [
+        "tests/rules/section02/test_02_04_01_constructed_contract.py",
+        "tests/rules/section02/test_02_04_weapons.py",
+        "tests/rules/section05/test_rolls.py",
+        "tests/rules/section05/test_toughness.py",
+        "tests/support/section05_fixtures.py",
+        "tests/rules/section18/test_emergency_status.py",
+        "tests/factions/aeldari/unit/test_battle_focus_consumers.py",
+        "tests/factions/emperors_children/test_shared_attack_consumers.py"
+      ],
+      "owners": [
+        "@module",
+        "section05_definitions",
+        "test_02_04_01_absent_strength_is_one_only_for_interaction",
+        "test_02_04_strength_compares_real_weapon_and_target_profiles",
+        "test_attached_native_character_groups_and_toughness_contract",
+        "test_excessive_assault_native_dice_source_and_objective_branches",
+        "test_fade_back_native_hit_or_miss_controls_normal_move",
+        "test_native_emergency_survivors_become_actually_battle_shocked",
+        "test_ordinary_unit_uses_highest_present_toughness",
+        "test_strength_four_wound_table_contract"
+      ],
+      "families": [],
+      "sensitive": false,
       "mandatory": true
     }
   },

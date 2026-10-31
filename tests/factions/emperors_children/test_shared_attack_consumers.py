@@ -132,7 +132,8 @@ def test_excessive_assault_native_dice_source_and_objective_branches(
         (selection(d, INFRACTORS, "body", full=True),),
         (selection(d, RANGERS, "target"),),
         phase=BattlePhase.FIGHT,
-        seed="batch02-excessive",
+        # Preserve an observed native wound-one opportunity outside the objective.
+        seed="batch02-excessive" if within else "batch02-excessive-outside:1",
     )
     assert s.state.mission_setup is not None
     marker = s.state.mission_setup.objective_markers[0]

@@ -5,7 +5,7 @@ from dataclasses import replace
 import pytest
 
 from tests.support.section02_consumers import attack_pool
-from tests.support.section02_fixtures import LORD_EXULTANT, Section02Definitions
+from tests.support.section02_fixtures import AVENGERS, LORD_EXULTANT, Section02Definitions
 from tests.support.section04_fixtures import combat_state
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.engine.attack_sequence import (
@@ -74,9 +74,10 @@ def test_strength_four_wound_table_contract(
     modifier: int,
 ) -> None:
     d = section05_definitions
-    unit = d.unit(LORD_EXULTANT)
+    unit = d.unit(AVENGERS)
     target = d.unit(LORD_EXULTANT, army_id="enemy", identity="target")
-    wargear = f"{LORD_EXULTANT}:bolt-pistol"
+    # Keep this S4 boundary contract on an unchanged native profile, owned by its unit.
+    wargear = f"{AVENGERS}:avenger-shuriken-catapult"
     weapon = d.weapon(wargear)
     assert weapon.strength_for_interaction() == 4
     pool = attack_pool(unit, target, weapon, wargear)

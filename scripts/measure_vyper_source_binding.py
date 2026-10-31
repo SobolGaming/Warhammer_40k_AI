@@ -1,4 +1,4 @@
-"""Retain six serial original-workload samples for the exact Vyper source change.
+"""Retain six serial original-workload samples for a registered exact-base source scope.
 
 Invoke from the candidate shared environment with --base-root, --head-root and a
 new --output directory. No checkout, dependency installation or cleanup occurs.

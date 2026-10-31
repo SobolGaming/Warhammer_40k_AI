@@ -87,7 +87,7 @@ def test_attached_native_character_groups_and_toughness_contract(
     assert orders[0][1].model_ids == leaders[0].own_model_ids()
     assert orders[0][2].model_ids == leaders[1].own_model_ids()
     destroy_model_by_rule(state=state, model_instance_id=body.own_model_ids()[0])
-    assert _target_unit_toughness(state=state, target_unit_instance_id=target) == 4
+    assert _target_unit_toughness(state=state, target_unit_instance_id=target) == 5
 
 
 def test_ordinary_unit_uses_highest_present_toughness(
@@ -106,4 +106,4 @@ def test_ordinary_unit_uses_highest_present_toughness(
     place_units(state)
     assert _target_unit_toughness(state=state, target_unit_instance_id=unit.unit_instance_id) == 7
     destroy_model_by_rule(state=state, model_instance_id=unit.own_model_ids()[0])
-    assert _target_unit_toughness(state=state, target_unit_instance_id=unit.unit_instance_id) == 4
+    assert _target_unit_toughness(state=state, target_unit_instance_id=unit.unit_instance_id) == 5

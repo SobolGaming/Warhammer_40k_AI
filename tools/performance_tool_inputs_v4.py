@@ -104,8 +104,8 @@ _SCOPES = (
     ReviewedScope(
         EC_BASE,
         EC_SPEC_PATH,
-        "46cc5ec90ac5ac8f4caebdd750abcd1a22d93079a1d57fd7537bb661a7cfff6d",
-        "bb1e1ffb9595bd19f58c98622ea1bd03937f9e93825b6f9f33569c7bb1cfc705",
+        "6674490af4eead074cd66a13316d20d87eb3c15a0b60657b2154f3f6a347ff6c",
+        "9a53158c4c75db03cb273dc118587c5dd14d0e8be1008137065b827e973bd50f",
         EC_REPORT_PATH,
         frozenset(
             [
@@ -149,7 +149,15 @@ _SCOPES = (
                 "tests/code_quality/test_current_comparison_routing.py",
                 "tests/code_quality/test_phase14a_source_identity.py",
                 "tests/code_quality/test_registered_source_scopes.py",
+                "tests/factions/aeldari/unit/test_battle_focus_consumers.py",
                 "tests/factions/emperors_children/test_selected_consumers.py",
+                "tests/factions/emperors_children/test_shared_attack_consumers.py",
+                "tests/rules/section02/test_02_04_01_constructed_contract.py",
+                "tests/rules/section02/test_02_04_weapons.py",
+                "tests/rules/section05/test_rolls.py",
+                "tests/rules/section05/test_toughness.py",
+                "tests/rules/section18/test_emergency_status.py",
+                "tests/support/section05_fixtures.py",
                 "tools/performance_tool_inputs.py",
                 "tools/performance_tool_inputs_v4.py",
                 "tools/source_scope_provenance.py",

@@ -17,7 +17,7 @@ from warhammer40k_core.core.attributes import Characteristic, CharacteristicValu
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
-NATIVE_IDS = ("000004080", "000004078", "000000968", "000000599")
+NATIVE_IDS = ("000004080", "000004078", "000000968", "000000599", "000000593")
 
 
 @pytest.fixture(scope="session")
@@ -30,7 +30,7 @@ def section05_definitions(
     )
     seconds = perf_counter() - start
     before = hashlib.sha256(json.dumps(package.to_payload(), sort_keys=True).encode()).hexdigest()
-    print(f"Section05 preparation: {seconds:.6f}s; one selected build, four native definitions")
+    print(f"Section05 preparation: {seconds:.6f}s; one selected build, five native definitions")
     yield Section02Definitions(package, seconds)
     assert (
         hashlib.sha256(json.dumps(package.to_payload(), sort_keys=True).encode()).hexdigest()

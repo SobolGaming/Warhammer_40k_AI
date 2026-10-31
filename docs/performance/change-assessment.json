@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "105b467b1140e6d9ff6710a74ed839ad225d17ec",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8a38ade62fcffa2ed689c5fee45c4a8efb4f68922c40b4fdc54cc3e50b1563b2",
-  "operation_map_sha256": "c50aa4e0028b69f3739e61d891bf0a19f34204def551506ceeaacce2a8cc3268",
+  "operation_map_sha256": "af93cd31d2d2fa33152c869ab3e35f26c057487018d3a3eec24456c98fa1da1d",
   "changes": {
     ".gitattributes": {
       "before_sha256": "6a7fdff31280bd61a8af2357f8f3ceb0e4f6d820a093b2218f7bbb1fe4e2ed85",
@@ -136,51 +136,51 @@
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "before_sha256": "8a4ced7715840f56a4c217437e3acb81878e89b1d7baf0a74000787ce9fe87ca",
-      "after_sha256": "9aa8e5d6abc26d5c3121543aabe411625acd9aaa79a8618d08df652ac6938884",
+      "after_sha256": "ea395b3caca761eb588ce2b2034eebfbec6f1708a7ea5e84fe7a219539c5878a",
       "owners": {
         "@document": {
           "before": "8a4ced7715840f56a4c217437e3acb81878e89b1d7baf0a74000787ce9fe87ca",
-          "after": "9aa8e5d6abc26d5c3121543aabe411625acd9aaa79a8618d08df652ac6938884"
+          "after": "ea395b3caca761eb588ce2b2034eebfbec6f1708a7ea5e84fe7a219539c5878a"
         }
       }
     },
     "data/source_audits/supported_rules_2026_10/ec-profiles.json": {
       "before_sha256": null,
-      "after_sha256": "cccb23723a67021cc8d776c2e37611248306bdd33845de7e4dbb1206d55f5268",
+      "after_sha256": "54ac9341b4ecfc0a89516abe2b523b5101de85c71824bebdd717bc83bf8a4bfc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "cccb23723a67021cc8d776c2e37611248306bdd33845de7e4dbb1206d55f5268"
+          "after": "54ac9341b4ecfc0a89516abe2b523b5101de85c71824bebdd717bc83bf8a4bfc"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76",
-      "after_sha256": "25f1e91978c4ff79728e7d7284619b12e36387535d739b8f6ee5cd67fce4a4fb",
+      "after_sha256": "d9a985e70eb2d2deae26490f67a701da04fdaab6e21a27e89c968bdf916cf704",
       "owners": {
         "@document": {
           "before": "49822f821e0707d345c46c53cf0c1ba86a1ed4d6232c4c6b653e230f3ca80b76",
-          "after": "25f1e91978c4ff79728e7d7284619b12e36387535d739b8f6ee5cd67fce4a4fb"
+          "after": "d9a985e70eb2d2deae26490f67a701da04fdaab6e21a27e89c968bdf916cf704"
         }
       }
     },
     "docs/SUPPORTED_EC_PROFILE_RECONCILIATION_2026_10.md": {
       "before_sha256": null,
-      "after_sha256": "2df3588923692cb1c7db94a4877bc759de8e77701b7a431186dc1fa0e91c3d45",
+      "after_sha256": "b962fc8f99e800dcc6b3f8b51aeb7b2c040a83dcd80ea71a858529d2959c55ce",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2df3588923692cb1c7db94a4877bc759de8e77701b7a431186dc1fa0e91c3d45"
+          "after": "b962fc8f99e800dcc6b3f8b51aeb7b2c040a83dcd80ea71a858529d2959c55ce"
         }
       }
     },
     "docs/performance/policy-v3/ec-profile-input-roles-v4.json": {
       "before_sha256": null,
-      "after_sha256": "46cc5ec90ac5ac8f4caebdd750abcd1a22d93079a1d57fd7537bb661a7cfff6d",
+      "after_sha256": "6674490af4eead074cd66a13316d20d87eb3c15a0b60657b2154f3f6a347ff6c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "46cc5ec90ac5ac8f4caebdd750abcd1a22d93079a1d57fd7537bb661a7cfff6d"
+          "after": "6674490af4eead074cd66a13316d20d87eb3c15a0b60657b2154f3f6a347ff6c"
         }
       }
     },
@@ -196,11 +196,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "0de7ccdda63d9f451a2e998e2e0b8e01604b61d0263d6168c4e3a224fa279794",
-      "after_sha256": "992c9cae80e07885658e6a070a2c084723a7b6419c75e03249ba835c019b538c",
+      "after_sha256": "8ccdda8fa993baa39a05f3261da0bd54c1019884d092e82762fde7c2717916cc",
       "owners": {
         "@document": {
           "before": "0de7ccdda63d9f451a2e998e2e0b8e01604b61d0263d6168c4e3a224fa279794",
-          "after": "992c9cae80e07885658e6a070a2c084723a7b6419c75e03249ba835c019b538c"
+          "after": "8ccdda8fa993baa39a05f3261da0bd54c1019884d092e82762fde7c2717916cc"
         }
       }
     },
@@ -220,8 +220,12 @@
     },
     "scripts/measure_vyper_source_binding.py": {
       "before_sha256": "b36f5722f72e70148645a711d575e12b9512216b6b0ec96a5956809fc2b71af9",
-      "after_sha256": "c3c47a78e2f3e635d704c178620d377261e5193fb3e383cc8aa6ecbe954486b7",
+      "after_sha256": "f548b8c2431d0d1c0bed4f1486aa7be06cd1b55b9489aae7860f9ce51f4d7ec5",
       "owners": {
+        "@module": {
+          "before": "c249b2e9e17e2f335a028bbe03a08896e08de3a68978ba0bc1e6c9bc0171b9fb",
+          "after": "5a28d8957e01becbfde7ae71bda45253adfb123b626fb217a7cb79325fa937be"
+        },
         "main": {
           "before": "44396d5ebada469dcdbf00cae18330507201d20210ff5189ff332e8e79f0954a",
           "after": "c1c6563f09a561d6ac89150e1834766a7ab9fc698abb4682b4ac0f0b7d61bbf3"
@@ -344,15 +348,19 @@
     },
     "tests/code_quality/test_registered_source_scopes.py": {
       "before_sha256": null,
-      "after_sha256": "a5d70b6204a6a9b77b8ecfa062da37e92b03923f8efca9b1de82ec673e100f49",
+      "after_sha256": "b2b28619fa4fac9c474e9ec7ce8563c935665827ecf2f5380d7c7fbf925ec973",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7c7483c1fe4b9580519d06b7f38c3405cade582afe9c408fe6a0ca11b1bf5cba"
+          "after": "f523adc0c97e415ec61483eaeed1027854149010dfa4e7bce4cfba11a570fe07"
         },
         "_binding": {
           "before": null,
           "after": "2f28cbf38c0a230bba55c32c87b41d5cf1d4244b302df2316535c2b7ce980cf2"
+        },
+        "_historical_report": {
+          "before": null,
+          "after": "41a4be892fdbbf57982c5ff204af03cd7cf6500328735b521c236e435414dc83"
         },
         "_inventories": {
           "before": null,
@@ -360,19 +368,27 @@
         },
         "_provenance_report": {
           "before": null,
-          "after": "ca9514c20c96815eefe56cdaf204699ae53a973e85958cb308f6a973233d2f7e"
+          "after": "091b3e4427d95b23c63ead46223de6b3c5d07ebc275bf97aae5f8a5d513488f2"
         },
         "_report": {
           "before": null,
-          "after": "02415f1f64dd461acc500f51f56515d10aa426c803e3804044469ab9777951f8"
+          "after": "1068b2b2fc4da0d5b3445b73c449a7633532c8a4de974b526899370eb022b274"
         },
         "_validate": {
           "before": null,
           "after": "d154518ddaa067a7b4f190da9c5a1ccb6d1c2eb3d1235a8e62b889d451ebfcce"
         },
+        "historical_snapshot_inputs": {
+          "before": null,
+          "after": "71209cc42ec4cd5a78bcf6841b62935d25bb27ffce91da35609967d8e6e7cba5"
+        },
+        "retired_identity_tokens": {
+          "before": null,
+          "after": "4b7af4782bd0a72f1409263c6511a440a73bb9e5f801856f1d636cfca07a3d1a"
+        },
         "test_old_scope_binding_is_retained_but_cannot_qualify_new_scope": {
           "before": null,
-          "after": "17552d92fec0b3737630c6c4d1ed2ce48d251f0d9cdde7da5e2e62caf9fcfba7"
+          "after": "0d98b75f6c2c65b605e121ebe2375cb44d90fed1383f21521d8f0512ecea492b"
         },
         "test_registered_ec_scope_keeps_full_input_boundaries": {
           "before": null,
@@ -380,19 +396,19 @@
         },
         "test_registered_exact_artifacts_reject_any_byte_drift": {
           "before": null,
-          "after": "0ee2416b222c652d2a5d149c91d0b0fc9fd518bdae7fa64d82a89279552f6f03"
+          "after": "1274fa8983f273b511bfe2a9fb830fb56d0e29889c807c8c9008ffcd3819b16b"
         },
         "test_registered_inventory_scans_ignored_source_and_rejects_symlink": {
           "before": null,
-          "after": "a3896f74f250022c9d4955b0493e3e0b797823df315e4846ae17205320c4d07e"
+          "after": "2361eac9155c6f7136895d14acf6cdeda0065cc05b4c4dfb04b42679f02a32c5"
         },
         "test_registered_provenance_projects_only_exact_historical_context": {
           "before": null,
-          "after": "70283fe224f09fc61df4b8119b81c4d2b7b4dfd1fe896dd2e73e9a09f0681d49"
+          "after": "ea1f205f17c3797a024ef00f0d138f4151d11737de7b2f002887e16a120f9e0d"
         },
         "test_registered_report_provenance_rejects_drift_and_retains_adjacent_identity": {
           "before": null,
-          "after": "d2b42e2bad6e136c8ff0ef905684139cb66fca1428ee2a9363e93cb092f102ce"
+          "after": "ec74f66f75476ae86ff1ddd6d6fbd34b10d54d58add588994901f4ced636b618"
         },
         "test_registered_scope_authentication_rejects_unknown_or_mutated_inputs": {
           "before": null,
@@ -405,6 +421,16 @@
         "test_registered_scopes_preserve_original_spec_and_admit_closed_ec_scope": {
           "before": null,
           "after": "d209ef58ed84e042b18b606e97fd50fa854140e127c7631dec21fd6e87a73725"
+        }
+      }
+    },
+    "tests/factions/aeldari/unit/test_battle_focus_consumers.py": {
+      "before_sha256": "ce19c10f87d7c041e113294d7394211bec0331e35de9abac4ab7d3f8ce02e33e",
+      "after_sha256": "15fabe483a3844b2b769f0c59fbabfffd60ed9813559a973e54892ed0ac73942",
+      "owners": {
+        "test_fade_back_native_hit_or_miss_controls_normal_move": {
+          "before": "e9f8306bdf8ceb1576a1d5a85b767a488c6b81f2683c3f9b9ead6624156c645f",
+          "after": "ebf4b4f66bf5db24bab7ba41c731c88c8923fbec458b42b0d015771a6371f00c"
         }
       }
     },
@@ -427,6 +453,88 @@
         "test_infractors_native_melee_rerolls_destroy_enemy_then_icon_uses_own_bearer": {
           "before": "ca03ff73cbf688b13ac6989a984ff67938eb403ac51149dff69ddfc9bf3741ab",
           "after": "764ff3fee6abdc3dac4af95f9b10bdb6d29cf42f5387eb03fc35be7610dce13a"
+        }
+      }
+    },
+    "tests/factions/emperors_children/test_shared_attack_consumers.py": {
+      "before_sha256": "75ed45e56e6a63ad43eff19a76810cc22377ec609cb98b99a569616e7825ad6a",
+      "after_sha256": "86d2e97316b3eae92ae9097e0e9c0198f74ba3257b7dfbcf0030c0a134a94fb2",
+      "owners": {
+        "test_excessive_assault_native_dice_source_and_objective_branches": {
+          "before": "9daab080ae1868bbe30a1c46de5dd8e47c4cc18cd974ae2804674410433808fb",
+          "after": "3c97c371c3abd616e072bdbb523bf72b94854851fd85ba8a708e9a918c450c2c"
+        }
+      }
+    },
+    "tests/rules/section02/test_02_04_01_constructed_contract.py": {
+      "before_sha256": "52803f952283f6108e3a8294978e3aa3820edb4cfa83500194ac0f898ce93612",
+      "after_sha256": "b44f628dcb6382bb4ced4104339171568c57785a06968d7fe205b9fa5d5464cb",
+      "owners": {
+        "test_02_04_01_absent_strength_is_one_only_for_interaction": {
+          "before": "852f5f73af32dd558c93d8cd06e10fb06ac65f75d73b271e793d221d3162461a",
+          "after": "81292b10803bc3be2a2bcdd909af5feb6cef54edc7f10eee13eac39d25e60052"
+        }
+      }
+    },
+    "tests/rules/section02/test_02_04_weapons.py": {
+      "before_sha256": "97acff201de2ae8245bab98b10eb3b85a51872d1649f33a1555c59fb8de285d3",
+      "after_sha256": "431abffc8e7a72b46fa03137892817f1d83be456a2cc7026a50d8b51d6102983",
+      "owners": {
+        "test_02_04_strength_compares_real_weapon_and_target_profiles": {
+          "before": "fd687f22762bdf7e2d0c9cb2feae7c40d8831fa99f77fbd6e8622a24281a7786",
+          "after": "a38efb958d0b1741081132a7739990c97d3588956e3391923952a6c2d4f260d9"
+        }
+      }
+    },
+    "tests/rules/section05/test_rolls.py": {
+      "before_sha256": "08603efdf8a245cbe9a04a18c70043a8298e735bfeefa891d83022f4204157ff",
+      "after_sha256": "8076519be902b15e48214e235175061b68e9c29992531776cf36f1d44632a5b3",
+      "owners": {
+        "@module": {
+          "before": "f8cd0298ca3ebbb666fff95cc5769068e66a75be3fecb821818b61563fd57807",
+          "after": "85af81c485324eacd144c98adf2ae113c74af7b48d81b3413284a75b4b8930b5"
+        },
+        "test_strength_four_wound_table_contract": {
+          "before": "c1aa22b29e1e8435c77bc0c13f9ef40ae9e8c60760471e021ed9df1ed0a6b942",
+          "after": "8428ec0e50894e367db3db2fe640ba32dbd65821e83ee80efd5d10cf3136da94"
+        }
+      }
+    },
+    "tests/rules/section05/test_toughness.py": {
+      "before_sha256": "29dbd25d4c3b41871e7a8a9f26f84fbfbc85d70b118780ce484a49386f3ed7ed",
+      "after_sha256": "ee4ae3d3d62a8eda2b7713edbe625e415434e8fd3a8dc52790658b221e0533d2",
+      "owners": {
+        "test_attached_native_character_groups_and_toughness_contract": {
+          "before": "85c00d663953ea743a1f22e4ade63965fdb129f86ffef82274fe47876ac39218",
+          "after": "2ea0c35bd3ed6dd1269da24658c695998b37c28d9190826648d0233b0f06043b"
+        },
+        "test_ordinary_unit_uses_highest_present_toughness": {
+          "before": "f2f41bc475ead577973792e5570527baf470991971995d75fcdce075eab0b244",
+          "after": "f9b6c75c0ea0ee0a29089d2967e11d9585b85b18adf680129f2ca1ffe9f3e84f"
+        }
+      }
+    },
+    "tests/rules/section18/test_emergency_status.py": {
+      "before_sha256": "037ab1334fceb309480d79d4460b688b98406742b5d7c285d8bfe67dd09b6533",
+      "after_sha256": "fd3db12da38f514cbbb9e4f100b104c149ccd053dfb7d57fab6d56021a7c65e2",
+      "owners": {
+        "test_native_emergency_survivors_become_actually_battle_shocked": {
+          "before": "f389f1b80de1811747ae48163bd88299f17958cc7ee643f5d13e96fa90c76a49",
+          "after": "ae286d1b724886d50e72584c4916cac8f3f6d7c1a08ac51457ded479e712219b"
+        }
+      }
+    },
+    "tests/support/section05_fixtures.py": {
+      "before_sha256": "a6fa8c3b501d6709ad41d019aaaca822ee7b3b22907f9d0ca69bf12265216063",
+      "after_sha256": "f4340e1b9423244aa157d34fc02d20b9aa17926b4131c8a7ecf8120545489ea8",
+      "owners": {
+        "@module": {
+          "before": "47e4d4f482f5d4b23090dba5313fce66774272144aab0c6ebe95a7250d209033",
+          "after": "283a771216acce0bec3dd48a2e4dc318a4471ed382801509a2dc883405cce027"
+        },
+        "section05_definitions": {
+          "before": "7dd4259ce841408f8702dd92d3e6f61157e554ac17b363aa1fabf72501e6395b",
+          "after": "872cdc75b96beb48b132ced3a41671058890faf7b6d81ad375563d930c377cf2"
         }
       }
     },
@@ -478,11 +586,11 @@
     },
     "tools/performance_tool_inputs_v4.py": {
       "before_sha256": "2df3f461775dfe1a4cf3e0e8560268346d0d55f2d484bc2e443222533b76de39",
-      "after_sha256": "4943c7815e3994972bf579f2a14f9ee42c5ec7f7e8221a736b6d0714eebb9cd3",
+      "after_sha256": "61bbaf2ae1e24303ee2ff7c6a7ba06861116f36fb88deae700fec5b65be14959",
       "owners": {
         "@module": {
           "before": "ed95af6ff441991452b0e344f74d3e46e2f1767c90e44a758f49c0af78a72728",
-          "after": "f541d0c5382c23a62e8faaf54f9ff6d161134c338438e50ad9350a6a7db9069c"
+          "after": "690fad11fec67aac526c30be1143a3d4630898d839868cbae46012a9caf4e30f"
         },
         "ReviewedScope": {
           "before": null,
@@ -849,11 +957,99 @@
       "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
       "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
     },
+    "tests/factions/aeldari/unit/test_battle_focus_consumers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-6741624e410251f7",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
+      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
+      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+    },
     "tests/factions/emperors_children/test_selected_consumers.py": {
       "category": "rule_semantics",
       "operations": [
         "qualification40-exact-43d80a5328081a25",
         "supported-ec-profile-regression-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
+      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
+      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+    },
+    "tests/factions/emperors_children/test_shared_attack_consumers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b7575b3e0b8cba2c",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
+      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
+      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+    },
+    "tests/rules/section02/test_02_04_01_constructed_contract.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-4e4fc6f5f0a8200e",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
+      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
+      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+    },
+    "tests/rules/section02/test_02_04_weapons.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-5c91154b98e55444",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
+      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
+      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+    },
+    "tests/rules/section05/test_rolls.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-da9779c1ffb863f2",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
+      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
+      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+    },
+    "tests/rules/section05/test_toughness.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-37bef5065fc201a1",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
+      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
+      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+    },
+    "tests/rules/section18/test_emergency_status.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-97ba81bb1395873b",
+        "supported-ec-source-fixture-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",
+      "source_obligation": "Observed versioned40k.app v981 profiles for LordExultant, Tormentors, Infractors, LordKakophonist, NoiseMarines and FlawlessBlades bind existing stable rows. Preserve unrelated descriptors, keywords, abilities and all historical source bytes; no support promotion.",
+      "unchanged_work": "Existing generic source overlay, catalog, native attack, persistence/replay and RNG consumers remain. New registry selects only code-reviewed base/spec hashes and closed roles. Independent inventories, common/harness equality, six fresh samples, complete trees, supervision, original controls and budgets remain required."
+    },
+    "tests/support/section05_fixtures.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-c03306f582fcad74",
+        "supported-ec-source-fixture-controls"
       ],
       "selected_families": [],
       "rationale": "Correct20 numeric fields on15 existing source rows across six supported EC sheets, with exact preimage boundaries. Approved finite reviewed-scope registration admits this actual-base comparison without weakening historical or current gates.",

@@ -48,7 +48,8 @@ def test_native_emergency_survivors_become_actually_battle_shocked(
     state = native_state(
         d, shooter, (Pose.at(10, 10),), enemy=carrier, enemy_poses=(Pose.at(18, 10),)
     )
-    state.game_id = "section18:emergency:seed-8"
+    # Current native profile: observed hit/wound/failed save reaches Emergency placement.
+    state.game_id = "section18:emergency:seed-1"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     state.army_definitions[:] = [
         replace(a, units=(*a.units, passenger)) if a.player_id == "opponent" else a
